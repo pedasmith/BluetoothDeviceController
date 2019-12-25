@@ -222,6 +222,16 @@ namespace BluetoothDeviceController.BleEditor
 
                                 foreach (var characteristic in cresult.Characteristics)
                                 {
+                                    //The descriptors don't seem to be actually interesting. it's how we read and write.
+                                    var descriptorStatus = await characteristic.GetDescriptorsAsync();
+                                    if (descriptorStatus.Status == GattCommunicationStatus.Success)
+                                    {
+                                        foreach (var descriptor in descriptorStatus.Descriptors)
+                                        {
+                                            ;
+                                        }
+                                    }
+
                                     var defaultCharacteristic = defaultService?.GetChacteristic(characteristic.Uuid.ToString("D"));
                                     var wireCharacteristic = new NameCharacteristic(characteristic, defaultCharacteristic, characteristicCount++);
                                     wireService.Characteristics.Add(wireCharacteristic);
@@ -238,16 +248,6 @@ namespace BluetoothDeviceController.BleEditor
                                     foreach (var format in characteristic.PresentationFormats)
                                     {
                                         raw += $"    Fmt: Description:{format.Description} Namespace:{format.Namespace} Type:{format.FormatType} Unit: {format.Unit} Exp:{format.Exponent}\n";
-                                    }
-
-                                    //The descriptors don't seem to be actually interesting. it's how we read and write.
-                                    var descriptorStatus = await characteristic.GetDescriptorsAsync();
-                                    if (descriptorStatus.Status == GattCommunicationStatus.Success)
-                                    {
-                                        foreach (var descriptor in descriptorStatus.Descriptors)
-                                        {
-                                            ;
-                                        }
                                     }
 
 

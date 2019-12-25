@@ -104,8 +104,26 @@ namespace BluetoothDeviceController.BleEditor
                 if (uidname.Length < 8)
                 {
                     namestr = uidname;
+                    if (namestr == "ffa2")
+                    {
+                        ;
+                    }
+                    if (namestr == "ffa3")
+                    {
+                        ;
+                    }
+                    if (!String.IsNullOrWhiteSpace(characteristic.UserDescription))
+                    {
+                        namestr += " " + characteristic.UserDescription;
+                    }
+                    else
+                    {
+                        ;
+                    }
                 }
             }
+
+
 
             // Either we have a good name (yay!) or we use the alternate route of using the
             // uuid info area.
@@ -121,10 +139,6 @@ namespace BluetoothDeviceController.BleEditor
                 if (!string.IsNullOrWhiteSpace(NC?.Name))
                 {
                     infostr = NC.Name + " ";
-                }
-                if (!String.IsNullOrWhiteSpace(characteristic.UserDescription))
-                {
-                    infostr += characteristic.UserDescription + " ";
                 }
                 infostr += characteristic.Uuid.ToString();
                 uiInfo.Text = infostr;
