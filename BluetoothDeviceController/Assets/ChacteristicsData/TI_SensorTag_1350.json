@@ -1,0 +1,559 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "CC1350 SensorTag",
+      "ClassName": "TI_SensorTag_1350",
+      "ClassModifiers": "partial",
+      "Description": "The TI 1350 and 2650 are the latest in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth",
+      "Aliases": [],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: CC1350 SensorTag",
+                "CC1350 SensorTag"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  50 00 A0 00 00 00 E8 03"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Suppress":  true,
+          "Characteristics": []
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  92 7A F3 00 00 F1 34 A4",
+                "92 7A F3 00 00 F1 34 A4"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  43 43 31 33 35 30 20 53 65 6E 73 6F 72 54 61 67",
+                "CC1350 SensorTag"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4E 2E 41 2E",
+                "N.A."
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2E 34 33 20 28 53 65 70 20 20 38 20 32 30 31 37 29",
+                "1.43 (Sep  8 2017)"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4E 2E 41 2E",
+                "N.A."
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4E 2E 41 2E",
+                "N.A."
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manuafacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  54 65 78 61 73 20 49 6E 73 74 72 75 6D 65 6E 74 73",
+                "Texas Instruments"
+              ]
+            },
+            {
+              "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Regulatory List",
+              "Type": "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C",
+                "FE 00 experimental"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 0D 00 00 00 10 01",
+                "\u0001\\r\\0\\0\\0\u0010\u0001"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 94%",
+                "94"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa00-0451-4000-b000-000000000000",
+          "Name": "IR Service",
+          "Priority":  5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa01-0451-4000-b000-000000000000",
+              "Name": "IR Data",
+              "Type": "I16^4_/_0.03125_*|FIXED|ObjTemp|C I16^4_/_0.03125_*|FIXED|AmbTemp|C",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": 15,
+                "chartDefaultMaxY": 35,
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "ExampleData": [
+                "Value:  00 00 00 00",
+                "0.00 0.00"
+              ]
+            },
+            {
+              "UUID": "f000aa02-0451-4000-b000-000000000000",
+              "Name": "IR Service Config",
+              "Type": "U8|HEX|Enable",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "00"
+              ]
+            },
+            {
+              "UUID": "f000aa03-0451-4000-b000-000000000000",
+              "Name": "IR Service Period",
+              "Type": "U8|DEC|Period|10ms",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  64",
+                "100"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa20-0451-4000-b000-000000000000",
+          "Name": "Humidity",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa21-0451-4000-b000-000000000000",
+              "Name": "Humidity Data",
+              "Type": "U16^DU_3_ZE_175.72_*_65536_/_46.85_-_SW_2_JZ_PO_NP|FIXED|Temp U16^DU_3_ZE_125.0_*_65536_/_6.0_-_SW_2_JZ_PO_NP|FIXED|Humidity",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "ExampleData": [
+                "Value:  00 00 00 00",
+                "0.00 0.00"
+              ]
+            },
+            {
+              "UUID": "f000aa22-0451-4000-b000-000000000000",
+              "Name": "Humidity Config",
+              "Type": "U8|HEX|Enable",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "00"
+              ]
+            },
+            {
+              "UUID": "f000aa23-0451-4000-b000-000000000000",
+              "Name": "Humidity Period",
+              "Type": "U8|DEC|Period|10ms",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  64",
+                "100"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa40-0451-4000-b000-000000000000",
+          "Name": "Barometer",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa41-0451-4000-b000-000000000000",
+              "Name": "Barometer Data",
+              "Type": "I24^100_/|FIXED|Temp|C I24^100_/|FIXED|Pressure|hPa",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "IsNotifyConfigure": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00",
+                "0.00 0.00"
+              ]
+            },
+            {
+              "UUID": "f000aa42-0451-4000-b000-000000000000",
+              "Name": "Barometer Config",
+              "Type": "U8|HEX|Enable",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "00"
+              ]
+            },
+            {
+              "UUID": "f000aa44-0451-4000-b000-000000000000",
+              "Name": "Barometer Period",
+              "Type": "U8|DEC|Period|10ms",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  64",
+                "100"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa80-0451-4000-b000-000000000000",
+          "Name": "Accelerometer",
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "f000aa81-0451-4000-b000-000000000000",
+              "Name": "Accelerometer Data",
+              "Type": "I16^500_*_65536_/|FIXED^N3|GyroX|dps I16^500_*_65536_/|FIXED^N3|GyroY|dps I16^500_*_65536_/|FIXED^N3|GyroZ|dps I16^8_*_32768_/|FIXED^N3|AccX|g I16^8_*_32768_/|FIXED^N3|AccY|g I16^8_*_32768_/|FIXED^N3|AccZ|g I16|DEC|MagnetometerX|microTesla I16|DEC|MagnetometerY|microTesla I16|DEC|MagnetometerZ|microTesla",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": -5,
+                "chartDefaultMaxY": 5,
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
+                "0.00 0.00 0.00 0.00 0.00 0.00 0 0 0"
+              ]
+            },
+            {
+              "UUID": "f000aa82-0451-4000-b000-000000000000",
+              "Name": "Accelerometer Config",
+              "Type": "U16|HEX|Enable",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00 02",
+                "0200"
+              ]
+            },
+            {
+              "UUID": "f000aa83-0451-4000-b000-000000000000",
+              "Name": "Accelerometer Period",
+              "Type": "U8|DEC|Period|10ms",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  64",
+                "100"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa70-0451-4000-b000-000000000000",
+          "Name": "Optical Service",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa71-0451-4000-b000-000000000000",
+              "Name": "Optical Service Data",
+              "Type": "U16^DU_12_RS_15_AN_2_XY_0.01_*_SW_4095_AN_*|FIXED^N1|Lux",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": 15,
+                "chartDefaultMaxY": 35,
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "ExampleData": [
+                "Value:  00 00",
+                "0.00"
+              ]
+            },
+            {
+              "UUID": "f000aa72-0451-4000-b000-000000000000",
+              "Name": "Optical Service Config",
+              "Type": "U8|HEX|Enable",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "00"
+              ]
+            },
+            {
+              "UUID": "f000aa73-0451-4000-b000-000000000000",
+              "Name": "Optical Service Period",
+              "Type": "U8|DEC|Period|10ms",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  50",
+                "80"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000ffe0-0000-1000-8000-00805f9b34fb",
+          "Name": "Key Press",
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "0000ffe1-0000-1000-8000-00805f9b34fb",
+              "Name": "Key Press State",
+              "Type": "U8|HEX",
+              "IsNotify": true,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa64-0451-4000-b000-000000000000",
+          "Name": "IO Service",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa65-0451-4000-b000-000000000000",
+              "Name": "IO Service Data",
+              "Type": "BYTES|HEX",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  7E"
+              ]
+            },
+            {
+              "UUID": "f000aa66-0451-4000-b000-000000000000",
+              "Name": "IO Service Config",
+              "Type": "U8|HEX",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000ac00-0451-4000-b000-000000000000",
+          "Name": "Register service",
+          "Priority": 1,
+          "Characteristics": [
+            {
+              "UUID": "f000ac01-0451-4000-b000-000000000000",
+              "Name": "Register Data",
+              "Type": "BYTES|HEX",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  01 00 00 00"
+              ]
+            },
+            {
+              "UUID": "f000ac02-0451-4000-b000-000000000000",
+              "Name": "Register Address",
+              "Type": "BYTES|HEX",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  04 28 16 00 20"
+              ]
+            },
+            {
+              "UUID": "f000ac03-0451-4000-b000-000000000000",
+              "Name": "Register Device ID",
+              "Type": "BYTES|HEX",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  05 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000ccc0-0451-4000-b000-000000000000",
+          "Name": "Connection Control service",
+          "Suppress":  true,
+          "Characteristics": [
+            {
+              "UUID": "f000ccc1-0451-4000-b000-000000000000",
+              "Name": "Conn Parameters A",
+              "Type": "U16|DEC|ConnectionInterval U16|DEC|ServantLatency U16|DEC|SupervisionTimeout",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  09 00 00 00 C0 03",
+                "9 0 960"
+              ]
+            },
+            {
+              "UUID": "f000ccc2-0451-4000-b000-000000000000",
+              "Name": "Conn Parameters B",
+              "Type": "U16|DEC|MinConnectionInterval U16|DEC|MaxConnectionInterval U16|DEC|ServentLatency U16|DEC|SupervisionTimeout",
+              "IsWrite": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "f000ccc3-0451-4000-b000-000000000000",
+              "Name": "Disconnect Request",
+              "Type": "BYTES|HEX",
+              "IsWrite": true,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "f000ffc0-0451-4000-b000-000000000000",
+          "Name": "OAD service",
+          "Suppress":  true,
+          "Characteristics": [
+            {
+              "UUID": "f000ffc1-0451-4000-b000-000000000000",
+              "Name": "Img Identify",
+              "Type": "BYTES|HEX",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "f000ffc2-0451-4000-b000-000000000000",
+              "Name": "Img Block",
+              "Type": "BYTES|HEX",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "f000ffc3-0451-4000-b000-000000000000",
+              "Name": "Img Count",
+              "Type": "BYTES|HEX",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "f000ffc4-0451-4000-b000-000000000000",
+              "Name": "Img Status",
+              "Type": "BYTES|HEX",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-a4:34:f1:f3:7a:92\nCanPair:False IsPaired:True"
+    }
+  ]
+}

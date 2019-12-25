@@ -1,0 +1,455 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Dotti",
+      "ClassName": "Witti_Dotti",
+      "ClassModifiers": "partial",
+      "Aliases": [],
+      "REM_Links": [
+        "https://www.wittidesign.com/products/dotti-one",
+        "https://www.wittidesign.com/pages/video-tutorials-dotti",
+        "https://github.com/bertrandmartel/dotti-bluetooth-android",
+        "https://github.com/MartyMacGyver/dotti-interfacing"
+      ],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: Dotti",
+                "Dotti"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "ExampleData": [
+                "Privacy:  00"
+              ]
+            },
+            {
+              "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+              "Name": "Reconnect Address",
+              "Type": "BYTES|HEX|ReconnectAddress",
+              "IsWrite": true
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  50 00 A0 00 00 00 E8 03"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  5C AD 89 00 00 3E 31 5C",
+                "5C AD 89 00 00 3E 31 5C"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4D 6F 64 65 6C 20 4E 75 6D 62 65 72 00",
+                "Model Number\\0"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  53 65 72 69 61 6C 20 4E 75 6D 62 65 72 00",
+                "Serial Number\\0"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  46 69 72 6D 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+                "Firmware Revision\\0"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  48 61 72 64 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+                "Hardware Revision\\0"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  53 6F 66 74 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+                "Software Revision\\0"
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manuafacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4D 61 6E 75 66 61 63 74 75 72 65 72 20 4E 61 6D 65 00",
+                "Manufacturer Name\\0"
+              ]
+            },
+            {
+              "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Regulatory List",
+              "Type": "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C",
+                "FE 00 experimental"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 0D 00 00 00 10 01",
+                "\u0001\\r\\0\\0\\0\u0010\u0001"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 100%",
+                "100"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+          "Name": "LED Control",
+          "Characteristics": [
+            {
+              "UUID": "0000fff3-0000-1000-8000-00805f9b34fb",
+              "Name": "Command",
+              "Type": "OEB U16|HEX|Command U8|HEX|C1 U8|HEX|C2 U8|HEX|C3 U8|HEX|C4",
+              "IsWrite": true,
+              "ExampleData": [
+                "Set entire panel to red",
+                "06 01 ff 00 00"
+              ]
+            },
+            {
+              "UUID": "0000fff4-0000-1000-8000-00805f9b34fb",
+              "Name": "Unused_1",
+              "Type": "BYTES|HEX|Unused_1",
+              "IsNotify": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "0000fff5-0000-1000-8000-00805f9b34fb",
+              "Name": "Unused_2",
+              "Type": "BYTES|HEX|Unused_2",
+              "IsWrite": true,
+              "ExampleData": ""
+            },
+            {
+              "UUID": "0000fff6-0000-1000-8000-00805f9b34fb",
+              "Name": "Unused_3",
+              "Type": "BYTES|HEX|Unused_3",
+              "IsNotify": true,
+              "ExampleData": []
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5c:31:3e:89:ad:5c\nCanPair:True IsPaired:False"
+    },
+
+
+    {
+      "Name": "Notti",
+      "ClassName": "Witti_Notti",
+      "ClassModifiers": "partial",
+      "Aliases": [],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: Notti",
+                "Notti"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "ExampleData": [
+                "Privacy:  00"
+              ]
+            },
+            {
+              "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+              "Name": "Reconnect Address",
+              "Type": "BYTES|HEX|ReconnectAddress",
+              "IsWrite": true
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  50 00 A0 00 00 00 E8 03"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  51 2A 8B 00 00 3E 31 5C",
+                "51 2A 8B 00 00 3E 31 5C"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4D 6F 64 65 6C 20 4E 75 6D 62 65 72 00",
+                "Model Number\\0"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  53 65 72 69 61 6C 20 4E 75 6D 62 65 72 00",
+                "Serial Number\\0"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  46 69 72 6D 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+                "Firmware Revision\\0"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  48 61 72 64 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+                "Hardware Revision\\0"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  53 6F 66 74 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+                "Software Revision\\0"
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manuafacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4D 61 6E 75 66 61 63 74 75 72 65 72 20 4E 61 6D 65 00",
+                "Manufacturer Name\\0"
+              ]
+            },
+            {
+              "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Regulatory List",
+              "Type": "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C",
+                "FE 00 experimental"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 0D 00 00 00 10 01",
+                "\u0001\\r\\0\\0\\0\u0010\u0001"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 100%",
+                "100"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+          "Name": "LED Control",
+          "Characteristics": [
+            {
+              "UUID": "0000fff3-0000-1000-8000-00805f9b34fb",
+              "Name": "Command",
+              "Type": "OEB U16|HEX|Command U8|HEX|Data1 U8|HEX|Data2 U8|HEX|Data3 U8|HEX|Data4 U8|HEX|Data5 U8|HEX|Data6",
+              "IsWrite": true,
+              "ExampleData": [
+                "Change light from red to green (command rgb1 rgb2)",
+                "0908 FF 00 00 00 FF 00"
+              ]
+            },
+            {
+              "UUID": "0000fff4-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsNotify": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "0000fff5-0000-1000-8000-00805f9b34fb",
+              "Name": "ChangeName",
+              "Type": "BYTES|HEX|Name",
+              "IsWrite": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "0000fff6-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown3",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsNotify": true,
+              "ExampleData": []
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5c:31:3e:8b:2a:51\nCanPair:True IsPaired:False"
+    }
+
+  ]
+}

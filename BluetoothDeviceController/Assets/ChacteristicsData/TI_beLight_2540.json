@@ -1,0 +1,52 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "beLight",
+      "ClassName":  "TI_beLight_2540",
+      "REM_About": "TI beLight high-intensity developer kit",
+      "Links": [
+        "http://www.ti.com/tool/tidc-bluetooth-low-energy-light",
+        "http://www.ti.com/lit/ug/swru392a/swru392a.pdf"
+      ],
+
+      "Services": [
+        {
+          "UUID": "0000ffb0-0000-1000-8000-00805f9b34fb",
+          "Name": "Lamp Control",
+          "Characteristics": [
+            {
+              "UUID": "0000ffb1-0000-1000-8000-00805f9b34fb",
+              "Name": "Red",
+              "IsWrite": true,
+              "Type": "U8|HEX|Red"
+            },
+            {
+              "UUID": "0000ffb2-0000-1000-8000-00805f9b34fb",
+              "Name": "Green",
+              "IsWrite": true,
+              "Type": "U8|HEX|Green"
+            },
+            {
+              "UUID": "0000ffb3-0000-1000-8000-00805f9b34fb",
+              "Name": "Blue",
+              "IsWrite": true,
+              "Type": "U8|HEX|Blue"
+            },
+            {
+              "UUID": "0000ffb4-0000-1000-8000-00805f9b34fb",
+              "Name": "White",
+              "IsWrite": true,
+              "Type": "U8|HEX|White"
+            },
+            {
+              "UUID": "0000ffb5-0000-1000-8000-00805f9b34fb",
+              "Name": "SetColor",
+              "IsWrite": true,
+              "Type": "U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|White"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,546 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "SensorBug10B5D0",
+      "ClassName":  "BleHome_SensorBug",
+      "ClassModifiers": "",
+      "Description": "",
+      "Aliases": [],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: SensorBug10B5D0",
+                "SensorBug10B5D0"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+              "Name": "Privacy",
+              "Type": "BYTES|HEX|Privacy",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Privacy:  00"
+              ]
+            },
+            {
+              "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+              "Name": "Reconnect Address",
+              "Type": "BYTES|HEX|ReconnectAddress",
+              "IsWrite": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  48 00 58 00 00 00 64 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Suppress": true,
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manuafacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  42 6C 75 65 52 61 64 69 6F 73 2C 49 6E 63 2E",
+                "BlueRadios,Inc."
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  42 52 2D 42 55 54 54 4F 4E 2D 53 33 41",
+                "BR-BUTTON-S3A"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  45",
+                "E"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2E 32 2E 32 2E 30",
+                "1.2.2.0"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  30",
+                "0"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 85 00 02 00 00 01",
+                "01 85 00 02 00 00 01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 100%",
+                "100"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001803-0000-1000-8000-00805f9b34fb",
+          "Name": "Link Loss",
+          "Characteristics": [
+            {
+              "UUID": "00002a06-0000-1000-8000-00805f9b34fb",
+              "Name": "Link Loss Alert Level",
+              "Type": "U8|DEC|Level",
+              "REM_Level": "0=none 1=mild 2=high",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001802-0000-1000-8000-00805f9b34fb",
+          "Name": "Immediate Alert",
+          "Characteristics": [
+            {
+              "UUID": "00002a06-0000-1000-8000-00805f9b34fb",
+              "Name": "Immediate Alert Level",
+              "Type": "U8|DEC|Level",
+              "REM_Level": "0=none 1=mild 2=high",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001804-0000-1000-8000-00805f9b34fb",
+          "Name": "Tranmit Power",
+          "Characteristics": [
+            {
+              "UUID": "00002a07-0000-1000-8000-00805f9b34fb",
+              "Name": "Transmit Power",
+              "Type": "I8|DEC|Power|db",
+              "REM_db":  "db allowed values are -100 to 20", 
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b10",
+          "Name": "Accelerometer",
+          "Priority": 3,
+          "Characteristics": [
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b11",
+              "Name": "Accelerometer_Config",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  01 0D 3F 02 02 00 00 00 2D 00 00 00 02"
+              ]
+            },
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b12",
+              "Name": "Accelerometer_Data",
+              "Type": "I16|DEC|X|mg I16|DEC|Y|mg I16|DEC|Z|mg",
+              "REM_mg": "mg stands for milli-gravity so that 1000 is 1G",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  10 00 00 00 C0 FF"
+              ]
+            },
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b13",
+              "Name": "Accelerometer_Alert",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  0F 00 20"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b20",
+          "Name": "Light",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b21",
+              "Name": "Light Config",
+              "Type": "U8|HEX|Enable U8|HEX|ModeFlags U16|DEC|DataRate U16|DEC|NotiRate U16|DEC|AlertLog U16|DEC|AlertHi U16|DEC|AlertFaults U16|DEC|Reserved U8|DEC|Range U8|DEC|Resolution U16|DEC|AlertResetCount U16|DC|AertResetDiff",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  01 01 10 27 FA 00 00 00 FF FF 01 00 00 00 01 01"
+              ]
+            },
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b22",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  16 BA 00"
+              ]
+            },
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b23",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 00"
+              ]
+            },
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b24",
+              "Name": "Unknown3",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  00 00 FF FF 00 00 00 00 00 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b30",
+          "Name": "Temperature",
+          "Priority": 3,
+          "Characteristics": [
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b31",
+              "Name": "Temperature_Config",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  01 01 10 27 E8 03 90 FC 60 09 01 00 00"
+              ]
+            },
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b32",
+              "Name": "Temperature_Data",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  05 02"
+              ]
+            },
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b33",
+              "Name": "Temperature_Alert",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 00"
+              ]
+            },
+            {
+              "UUID": "9dc84838-7619-4f09-a1ce-ddcf63225b34",
+              "Name": "Temperature_Status",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  01 00 0D 02 0D 02 0D 02 00 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "edb10b81-1f98-45ea-b403-e27a1a39a790",
+          "Name": "OTA_Firmware",
+          "Priority": 0,
+          "Suppress": true,
+          "Characteristics": [
+            {
+              "UUID": "edb10b81-1f98-45ea-b403-e27a1a39a791",
+              "Name": "OTA_Control_Status",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 04 04 00 00 00"
+              ]
+            },
+            {
+              "UUID": "edb10b81-1f98-45ea-b403-e27a1a39a792",
+              "Name": "OTA_Data",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "3188ac28-72d4-4006-bd96-c6c4bc6153a0",
+          "Name": "Pairing",
+          "Priority": 3,
+          "Characteristics": [
+            {
+              "UUID": "3188ac28-72d4-4006-bd96-c6c4bc6153a1",
+              "Name": "Pairing_Control_Status",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 00 FF FF FF FF FF FF 1B AA 01 08 00"
+              ]
+            },
+            {
+              "UUID": "3188ac28-72d4-4006-bd96-c6c4bc6153a2",
+              "Name": "Pairing_Data",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  12 00 70 5A 22 85 83 BC 00 AA 80 00 50 45 54 45 52 50 52 4F 34 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "3188ac28-72d4-4006-bd96-c6c4bc6153a3",
+              "Name": "Pairing_Config",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  04 01 AA 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "3188ac28-72d4-4006-bd96-c6c4bc6153a4",
+              "Name": "Pairing_AD_Key",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec30",
+          "Name": "BR_Utilities",
+          "Priority": 3,
+          "Characteristics": [
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec32",
+              "Name": "Utility_DeviceName",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  53 65 6E 73 6F 72 42 75 67 31 30 42 35 44 30"
+              ]
+            },
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec33",
+              "Name": "Utility_Default_Conn_Param",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  48 00 58 00 00 00 64 00 00 00"
+              ]
+            },
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec34",
+              "Name": "Utility_Curr_Conn_Param",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  09 00 00 00 C0 03"
+              ]
+            },
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec36",
+              "Name": "Utility_RF_Power",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  00 01"
+              ]
+            },
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec37",
+              "Name": "Utility_Disconnect",
+              "Type": "BYTES|HEX|Unknown4",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec39",
+              "Name": "Utility_Public_Address",
+              "Type": "BYTES|HEX|Unknown5",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  D0 B5 10 7E FE EC"
+              ]
+            },
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec3c",
+              "Name": "Utility_Config_Counter",
+              "Type": "BYTES|HEX|Unknown6",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01"
+              ]
+            },
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec3e",
+              "Name": "Utility_Advertising_Param",
+              "Type": "BYTES|HEX|Unknown7",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  00 07 64 06 00 00 2C 01 A0 00 03 00 00 00 A0 00 1E C8 0C 01"
+              ]
+            },
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec41",
+              "Name": "Utility_Unknown",
+              "Type": "BYTES|HEX|Unknown8",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  06 00 1B 1A FF 4C 00 02 15 B8 FB 18 55 06 44 4F FC 94 E7 CB A1 0C FC 40 87 7E 10 B5 D0 C5"
+              ]
+            },
+            {
+              "UUID": "4216378b-2073-47c4-83d6-a7df9a61ec42",
+              "Name": "Utility_Blink_LED",
+              "Type": "U8|HEX|LEDs U8|DEC|NBlink U8|DEC|PercentOn U16|DEC|Period|ms",
+              "REM_LEDs": "0x01=Blue 0x02=Green",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": []
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-ec:fe:7e:10:b5:d0\nCanPair:False IsPaired:True"
+    }
+  ]
+}

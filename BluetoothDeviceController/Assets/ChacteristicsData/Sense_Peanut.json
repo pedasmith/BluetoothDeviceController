@@ -1,0 +1,91 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "SensePeanut",
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: SensePeanut",
+                "SensePeanut"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  50 00 78 00 06 00 58 02"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Suppress":  true,
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsRead": true,
+              "IsIndicate": true,
+              "ExampleData": [
+                "Value:  0F 00 0C 00",
+                "15 12"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "93cd3ce1-58d0-4757-8767-3a9e03511f43",
+          "Name": "Peanut",
+          "Priority":  10,
+          "Characteristics": [
+            {
+              "UUID": "a2cb1256-6ba8-48de-98b6-d5989f26a203",
+              "Name": "Ack",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true
+            },
+            {
+              "UUID": "780a1f13-6153-487a-8be7-38c9058fc322",
+              "Name": "Command",
+              "Type": "U8|DEC|CmdId U8|HEX|x1 U8|HEX|x2 U8|HEX|x3 U8|HEX|x4 U8|HEX|x5 U8|HEX|bootloaderId U8|HEX|usageId U8|HEX|firmwareId BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "\"Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\".",
+                "REM write [5] to buzz",
+                "REM write [10]  to get initData ",
+                "REM write [100] to get mac address in bytes 6..12 (6 bytes total)"
+
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-00:a0:50:0b:13:26\nCanPair:True IsPaired:False"
+    }
+  ]
+}

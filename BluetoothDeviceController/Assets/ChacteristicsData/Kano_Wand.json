@@ -1,0 +1,342 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Kano-Wand",
+      "ClassName": "Kano_Wand",
+      "ClassModifiers": "",
+      "Description": "",
+      "Aliases": [],
+      "Links": [
+        "https://kano.me/store/us/products/coding-wand"
+      ],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Description": null,
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Description": null,
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Name: Kano-Wand-3e-8a-c5",
+                "Kano-Wand-3e-8a-c5"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Description": null,
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Description": null,
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Value:  08 00 08 00 00 00 90 01"
+              ]
+            },
+            {
+              "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+              "Name": "Central Address Resolution",
+              "Description": null,
+              "Type": "U8|DEC|AddressResolutionSupported",
+              "IsRead": true,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Value:  01",
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Description": null,
+          "Suppress": true,
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Description": null,
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsRead": false,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": true,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "64a70010-f691-4b93-a6f4-0968f5b648f8",
+          "Name": "WandSoftwareInfo",
+          "Description": null,
+          "Characteristics": [
+            {
+              "UUID": "64a7000b-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "Maker Name",
+              "Description": null,
+              "Type": "STRING|ASCII|Maker",
+              "IsRead": true,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Value:  4B 61 6E 6F 20 43 6F 6D 70 75 74 69 6E 67",
+                "Kano Computing"
+              ]
+            },
+            {
+              "UUID": "64a70013-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "Version",
+              "Description": null,
+              "Type": "STRING|ASCII|Version",
+              "IsRead": true,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Value:  31 2E 30 2E 30",
+                "1.0.0"
+              ]
+            },
+            {
+              "UUID": "64a70001-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "HardwareDescription",
+              "Description": null,
+              "Type": "STRING|ASCII|HardwareDescription",
+              "IsRead": true,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Value:  33"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "64a70012-f691-4b93-a6f4-0968f5b648f8",
+          "Name": "HardwareControl",
+          "Description": null,
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "64a70007-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "Battery",
+              "Description": null,
+              "Type": "U8|DEC|Battery",
+              "IsRead": true,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            },
+            {
+              "UUID": "64a70008-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "Vibration",
+              "Description": null,
+              "Type": "U8|HEX|Vibration",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Value:  00",
+                "01 is long",
+                "02 is short",
+                "03 is 3 short",
+                "04 is very long",
+                "05 is short + long",
+                "06 is "
+              ]
+            },
+            {
+              "UUID": "64a70009-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "LED Control",
+              "Description": null,
+              "Type": "U8|DEC|OnOff U16|HEX|R5G6B5",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Value:  00 11 11"
+              ]
+            },
+            {
+              "UUID": "64a7000d-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "Button",
+              "Description": null,
+              "Type": "U8|HEX|Button0",
+              "IsRead": true,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            },
+            {
+              "UUID": "64a7000f-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "Keepalive",
+              "Description": null,
+              "Type": "BYTES|HEX|Keepalive",
+              "IsRead": false,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "64a70011-f691-4b93-a6f4-0968f5b648f8",
+          "Name": "WandData",
+          "Description": null,
+          "Priority": 15,
+          "Characteristics": [
+            {
+              "UUID": "64a70002-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "WandData",
+              "REM_Name": "Is often weirdly called KeepaliveNotification even though its the main wand position data",
+              "Description": null,
+              "Type": "I16|DEC|Angle I16|DEC|LeftRight I16|DEC|Twist I16|DEC|Pitch",
+              "IsRead": false,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "ExampleData": [],
+              "UI": {
+                "tableType": "standard",
+                "chartType": "cursor",
+                "chartCommand": "SetCursorPosition(-LeftRight.AsDouble, Angle.AsDouble)"
+              }
+            },
+            {
+              "UUID": "64a70004-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "RstQuaternions",
+              "Description": null,
+              "Type": "BYTES|HEX|RawQuaternions",
+              "IsRead": false,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "ExampleData": []
+            },
+            {
+              "UUID": "64a7000a-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "Raw9Axis",
+              "Description": null,
+              "Type": "BYTES|HEX|RawAxisData",
+              "IsRead": false,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "ExampleData": []
+            },
+            {
+              "UUID": "64a7000c-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "Linear Acc",
+              "Description": null,
+              "Type": "BYTES|HEX|RawLinearAcceleration",
+              "IsRead": false,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "ExampleData": []
+            },
+            {
+              "UUID": "64a70014-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "Temperature",
+              "Description": null,
+              "Type": "BYTES|HEX|Temperature",
+              "IsRead": false,
+              "IsWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "ExampleData": []
+            },
+            {
+              "UUID": "64a70021-f691-4b93-a6f4-0968f5b648f8",
+              "Name": "MagnetometerCalibration",
+              "Description": null,
+              "Type": "BYTES|HEX|Calibration",
+              "IsRead": false,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "0000fe59-0000-1000-8000-00805f9b34fb",
+          "Name": "FirmwareUpdate",
+          "Description": null,
+          "Characteristics": [
+            {
+              "UUID": "8ec90003-f315-4f60-9fb8-838830daea50",
+              "Name": "DeviceFirmwareUpdate",
+              "Description": null,
+              "Type": "BYTES|HEX|FirmwareData",
+              "REM_Type": "Actual contents and meaning of the value are unknown",
+              "IsRead": false,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": true,
+              "ExampleData": []
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-e6:d2:67:3e:8a:c5\nCanPair:True IsPaired:False"
+    }
+  ]
+}

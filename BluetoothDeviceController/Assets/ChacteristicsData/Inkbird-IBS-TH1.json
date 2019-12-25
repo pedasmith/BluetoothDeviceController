@@ -1,0 +1,213 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "InkBird IBS-TH1",
+      "ClassName": "InkBord_IbsTh1",
+      "REM":  "The InkBird doesn't seem to work with Windows at all -- the device can be found about half the time, but the data is seemingly unreadable?",
+      "LINK": "https://inkbird.shop/products/ibs-th1",
+      "Services": [
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 100%",
+                "100"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Suppress": true,
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: sps",
+                "sps"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+              "Name": "Privacy",
+              "Type": "BYTES|HEX|Privacy",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Privacy:  00",
+                "00"
+              ]
+            },
+            {
+              "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+              "Name": "Reconnect Address",
+              "Type": "BYTES|HEX|ReconnectAddress",
+              "IsWrite": true
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  50 00 A0 00 00 00 E8 03",
+                "50 00 A0 00 00 00 E8 03"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Suppress": true,
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  6C 79 0A 00 00 D7 81 38",
+                "ly\\n\\0\\0ׁ8"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4D 6F 64 65 6C 20 4E 75 6D 62 65 72",
+                "Model Number"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  53 65 72 69 61 6C 20 4E 75 6D 62 65 72",
+                "Serial Number"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  46 69 72 6D 77 61 72 65 20 52 65 76 69 73 69 6F 6E",
+                "Firmware Revision"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  48 61 72 64 77 61 72 65 20 52 65 76 69 73 69 6F 6E",
+                "Hardware Revision"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2D 31",
+                "1-1"
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manuafacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  49 4E 4B 42 49 52 44",
+                "INKBIRD"
+              ]
+            },
+            {
+              "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Regulatory List",
+              "Type": "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C",
+                "FE 00 experimental"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 0D 00 00 00 10 01",
+                "\u0001\\r\\0\\0\\0\u0010\u0001"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+          "Name": "DataValues",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "0000fff1-0000-1000-8000-00805f9b34fb",
+              "Name": "DataValues",
+              "Type": "I16^100_/|FIXED|Temperature I16^100_/|FIXED|Humidity",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "0000fff2-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-38:81:d7:0a:79:6c\nCanPair:True IsPaired:False"
+    }
+  ]
+}

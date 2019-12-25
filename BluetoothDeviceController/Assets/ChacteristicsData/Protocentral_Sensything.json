@@ -1,0 +1,132 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Sensything",
+      "ClassName": "Protocentral_Sensything",
+      "ClassModifiers": "",
+      "Description": "Sensything is an open source, high-resolution (24-bit), Wi-Fi and Bluetooth-enabled sensor interface platform that supports multiple sensor readings. In most cases, it offers a single-board, single-platform solution for acquiring and logging multiple sensor readings that can be seen/sent through an Android app, an IoT or analytics platform, over an ordinary USB connection, or logged right to a microSD.",
+      "Links": [
+        "https://www.crowdsupply.com/protocentral/sensything",
+        "https://github.com/Protocentral/protocentral_sensything"
+      ],
+      "Aliases": [],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: Sensything-319E",
+                "Sensything-319E"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+              "Name": "Central Address Resolution",
+              "Type": "U8|DEC|AddressResolutionSupported",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  00",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Suppress": true,
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Incorrect percent length:00 00",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "cd5c1105-4448-7db8-ae4c-d1da8cba36d0",
+          "Name": "Primary",
+          "Characteristics": [
+            {
+              "UUID": "cd5c1106-4448-7db8-ae4c-d1da8cba36d0",
+              "Name": "Analog",
+              "Type": "I32^100000_/|FIXED|A1|volts I32^100000_/|FIXED|A2|volts I32^100000_/|FIXED|A3|volts I32^100000_/|FIXED|A4|volts",
+              "REM_Read_Write": "The Sensything claims to be able to read and write. That's not true; the data is indicate only.",
+              "SuppressRead": true,
+              "SuppressWrite":  true,
+              "IsRead": false,
+              "IsWrite": false,
+              "IsNotify": true,
+              "Priority":  10,
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": 0,
+                "chartDefaultMaxY": 3,
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "ExampleData": [
+                "Value:  32 01 00 00 30 01 00 00 2A 01 00 00 21 01 00 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "cd5c1100-4448-7db8-ae4c-d1da8cba36d0",
+          "Name": "QWIIC",
+          "Characteristics": [
+            {
+              "REM_About_QWIIC": "As of 2019-08-14 I have not attempted to read QWIIC sensors",
+              "UUID": "cd5c1101-4448-7db8-ae4c-d1da8cba36d0",
+              "Name": "QWIIC",
+              "Type": "OEB U8|HEX|Sensor U16|HEX|Channel1 U16|HEX|Channel2 U16|HEX|Channel3 U16|HEX|Channel4 U16|HEX|Channel5",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-d8:a0:1d:61:31:9e\nCanPair:True IsPaired:False"
+    }
+  ]
+}

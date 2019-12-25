@@ -1,0 +1,253 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "##DEFAULT##",
+      "REM_Useful_Link_For_Services": "https://www.bluetooth.com/specifications/gatt/services/",
+      "REM_Useful_Link_For_Characteristics": "https://www.bluetooth.com/specifications/gatt/characteristics/",
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: Thingy",
+                "Thingy"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+              "Name": "Peripheral Privacy Flag",
+              "Type": "U8|DEC|Flag",
+              "IsRead": true,
+              "ExampleData": [
+                "Privacy:  00"
+              ]
+            },
+            {
+              "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+              "Name": "Reconnect Address",
+              "IsRead": true,
+              "Type": "BYTES|HEX|ReconnectAddress"
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "IsRead": true,
+              "Type": "BYTES|HEX|ConnectionParameter"
+            },
+            {
+              "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+              "Name": "Central Address Resolution",
+              "IsRead": true,
+              "Type": "U8|DEC|AddressResolutionSupported"
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "00001802-0000-1000-8000-00805f9b34fb",
+          "Name": "Immediate Alert",
+          "Characteristics": [
+            {
+              "UUID": "00002a06-0000-1000-8000-00805f9b34fb",
+              "Name": "Alert Level",
+              "Type": "U8|DEC|Level",
+              "REM_Level": "0=none 1=mild 2=high",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001803-0000-1000-8000-00805f9b34fb",
+          "Name": "Link Loss Alert",
+          "Characteristics": [
+            {
+              "UUID": "00002a06-0000-1000-8000-00805f9b34fb",
+              "Name": "Alert Level",
+              "Type": "U8|DEC|Level",
+              "REM_Level": "0=none 1=mild 2=high",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001804-0000-1000-8000-00805f9b34fb",
+          "Name": "Tranmit Power",
+          "Characteristics": [
+            {
+              "UUID": "00002a07-0000-1000-8000-00805f9b34fb",
+              "Name": "Transmit Power",
+              "Type": "I8|DEC|Power|db",
+              "REM_db": "db allowed values are -100 to 20",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII"
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII"
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII"
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII"
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII"
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII"
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manuafacturer Name",
+              "Type": "STRING|ASCII"
+            },
+            {
+              "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Regulatory List",
+              "Type": "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data"
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII"
+            },
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange"
+            }
+
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a07-0000-1000-8000-00805f9b34fb",
+              "Name": "Transmit Power",
+              "Type": "I8|DEC|Transmit Power|db"
+            },
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 88%",
+                "88"
+              ]
+            }
+          ]
+        },
+
+        {
+          "UUID": "00001816-0000-1000-8000-00805f9b34fb",
+          "Name": "Cycling Speed and Cadence",
+          "REM_Abstract": "This service exposes speed-related and cadence-related data from a Cycling Speed and Cadence sensor intended for fitness applications",
+          "REM_Summary": "The Cycling Speed and Cadence (CSC) Service exposes speed-related data and/or cadence-related data while using the Cycling Speed and Cadence sensor (Server).",
+          "Characteristics": [
+            {
+              "UUID": "00002a5b-0000-1000-8000-00805f9b34fb",
+              "Name": "Cycling Service Measurement",
+              "Type": "U8|HEX|Flags_1wheel_2crank U32|DEC|WheelRevolutions U16^1024_/|FIXED|WheelLastTime|s U32|DEC|CrankRevolutions U16^1024_/|FIXED|CrankLastTime|s "
+            },
+            {
+              "UUID": "00002a5c-0000-1000-8000-00805f9b34fb",
+              "Name": "Cycling Service Feature",
+              "Type": "U16|HEX|FeatureFlag_0Wheel_1Crank_2Multiple"
+            },
+            {
+              "UUID": "00002a5d-0000-1000-8000-00805f9b34fb",
+              "Name": "Cycling Sensor Location",
+              "Type": "U8|DEC|Location",
+              "REM_Enum_Location": [
+                { "0": "Other" },
+                { "1": "Top of shoe" },
+                { "2": "In shoe" },
+                { "3": "Hip" },
+                { "4": "Front Wheel" },
+                { "5": "Left crank" },
+                { "6": "Right crank" },
+                { "7": "Left pedal" },
+                { "8": "Right pedal" },
+                { "9": "Front hub" },
+                { "10": "Rear dropout" },
+                { "11": "Chainstay" },
+                { "12": "Rear wheel" },
+                { "13": "Rear hub" },
+                { "14": "Chest" },
+                { "15": "Spider" },
+                { "16": "Chain ring" }
+              ]
+            },
+            {
+              "UUID": "00002a55-0000-1000-8000-00805f9b34fb",
+              "Name": "Cycling SC Control Point",
+              "Type": "BYTES|HEX|Set_1cumul_2calib_3loc_4_reqloc"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

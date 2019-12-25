@@ -1,0 +1,24 @@
+﻿<UserControl
+    x:Class="BluetoothDeviceController.PageDockAdapterControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:local="using:BluetoothDeviceController"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="100"
+    d:DesignWidth="100">
+
+    <Border x:Name="uiBorder" Height="100" Width="100">
+        <Grid>
+            <TextBlock x:Name="uiUndockedText" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Top" />
+            <Viewbox Height="100" Width="100">
+                <Grid x:Name="uiPageContainer" Visibility="Collapsed"/>
+            </Viewbox>
+            <controls:ImageEx x:Name="uiDevicePicture" Opacity=".5" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/Device_Outline.PNG" />
+            <TextBlock x:Name="uiDeviceId" HorizontalAlignment="Center"  VerticalAlignment="Bottom" Text="Bluetooth Device" TextWrapping="Wrap"/>
+            <Button Content="🗙" HorizontalAlignment="Right" VerticalAlignment="Top" Click="OnDelete"/>
+        </Grid>
+    </Border>
+</UserControl>

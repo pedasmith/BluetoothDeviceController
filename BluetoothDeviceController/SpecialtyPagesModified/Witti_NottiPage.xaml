@@ -1,0 +1,125 @@
+﻿<Page
+    x:Class="BluetoothDeviceController.SpecialtyPages.Witti_NottiPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:enumUtilities="using:enumUtilities"
+    xmlns:protocols="using:BluetoothProtocols"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <!-- You have to compile MainPage.Xaml.Cs for VS to find the local: class. -->
+        <protocols:NottiModeConverter x:Key="NottiModeConverter" />
+        <protocols:NottiAlarmConverter x:Key="NottiAlarmConverter" />
+    </Page.Resources>
+
+    <StackPanel>
+        <TextBlock Style="{StaticResource TitleStyle}">Witti designs NOTTI device</TextBlock>
+        <ProgressRing x:Name="uiProgress" />
+        <TextBlock x:Name="uiStatus" Style="{StaticResource StatusStyle}" />
+
+        <toolkit:TabView SelectedIndex="1">
+            <toolkit:TabViewItem Header="Setup">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource HeaderStyle}">Set NOTTI Mode</TextBlock>
+                    <ComboBox x:Name="uiMode" MinWidth="200" SelectionChanged="OnModeChanged"
+                          ItemsSource="{Binding Source={StaticResource NottiModeConverter}, Path=EnumValues}" 
+                          >
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock FontSize="14" Text="{Binding Converter={StaticResource NottiModeConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <StackPanel Margin="0,20,0,0">
+                        <TextBlock Style="{StaticResource HeaderStyle}">Set Clock Time</TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                            <StackPanel.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="MinWidth" Value="100" />
+                                    <Setter Property="Margin" Value="0,0,10,0" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <TextBox x:Name="uiHours" Header="Hours" Text="14" />
+                            <TextBox x:Name="uiMinutes" Header="Minutes" Text="33" />
+                            <TextBox x:Name="uiSeconds" Header="Seconds" Text="00" />
+                            <Button VerticalAlignment="Bottom" Content="Set Now" Click="OnSyncTime" />
+                        </StackPanel>
+                        <Button Content="Reset to now" Click="OnResetTime" />
+                    </StackPanel>
+                    
+                    <Rectangle Height="20" />
+                    <TextBlock Style="{StaticResource HeaderStyle}" >About NOTTI</TextBlock>
+                    <toolkit:ImageEx Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/WITTI_NOTTI.PNG" />
+                    <TextBlock Style="{StaticResource AboutStyle}" >
+            The NOTTI is a small (approx 70mm by 90mm) rechargable-battery powered device
+            with an single color LED. The LED can change color, and will light up based on a
+            alarm time setting.                        .
+            
+            This app lets you set the device mode and set the alarm time.
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource HeaderStyle}" >Links to more info</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <HyperlinkButton NavigateUri="https://www.wittidesign.com/products/notti">Main WITTI NOTTI page</HyperlinkButton>
+                        <HyperlinkButton NavigateUri="https://www.wittidesign.com/pages/video-tutorials-notti" Margin="10,0,0,0">Video tutorial</HyperlinkButton>
+                    </StackPanel>
+                </StackPanel>
+            </toolkit:TabViewItem>
+            <toolkit:TabViewItem Header="Alarm">
+                <StackPanel>
+
+
+                    <StackPanel Margin="0,20,0,0">
+                        <TextBlock Style="{StaticResource HeaderStyle}">Set Alarm Time</TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                            <StackPanel.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="MinWidth" Value="100" />
+                                    <Setter Property="Margin" Value="0,0,10,0" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <TextBox x:Name="uiAlarmHours" Header="Hours" Text="14" />
+                            <TextBox x:Name="uiAlarmMinutes" Header="Minutes" Text="33" />
+                            <Button VerticalAlignment="Bottom" Content="Set Now" Click="OnSetAlarmTime" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Slider x:Name="uiAlarmWakeupTime"  
+                            Minimum="1" Maximum="16" 
+                            Width="200" HorizontalAlignment="Left" 
+                            Header="Set how long the light takes to turn on (2.5 to 25 minutes)" 
+                            TickFrequency="1" TickPlacement="BottomRight" />
+
+                    <ComboBox x:Name="uiAlarm" MinWidth="200" SelectedIndex="1" 
+                          ItemsSource="{Binding Source={StaticResource NottiAlarmConverter}, Path=EnumValues}" 
+                          >
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock FontSize="14" Text="{Binding Converter={StaticResource NottiAlarmConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ColorPicker x:Name="uiAlarmColor" Color="Red" />
+
+                    <Button Content="Set alarm" Click="OnSetAlarmMode" />
+                </StackPanel>
+            </toolkit:TabViewItem>
+
+            <toolkit:TabViewItem Header="Color">
+                <StackPanel>
+                    <ColorPicker x:Name="uiColor" ColorChanged="OnColorChanged" />
+                </StackPanel>
+            </toolkit:TabViewItem>
+            <toolkit:TabViewItem Header="Changing Color">
+                <StackPanel>
+                    <ColorPicker x:Name="uiColor1" ColorChanged="OnColor1Changed" />
+                    <ColorPicker x:Name="uiColor2" ColorChanged="OnColor2Changed" />
+                </StackPanel>
+            </toolkit:TabViewItem>
+        </toolkit:TabView>
+    </StackPanel>
+</Page>

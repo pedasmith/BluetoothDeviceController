@@ -1,0 +1,443 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Thingy",
+      "ClassName": "Nordic_Thingy",
+      "Description": "The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC",
+      "REM_Links": [
+        "https://nordicsemiconductor.github.io/Nordic-Thingy52-FW/documentation/firmware_architecture.html#fw_arch_ble_services"
+      ],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: Thingy",
+                "Thingy"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  06 00 18 00 00 00 40 01"
+              ]
+            },
+            {
+              "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+              "Name": "Central Address Resolution",
+              "Type": "U8|DEC|AddressResolutionSupported",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01",
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 88%",
+                "88"
+              ]
+            }
+          ]
+        },
+
+        {
+          "UUID": "EF680100-9B35-4933-9B10-52FFA9740042",
+          "Name": "Configuration",
+          "Characteristics": [
+            {
+              "UUID": "EF680101-9B35-4933-9B10-52FFA9740042",
+              "Name": "Configuration Device Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "Type": "STRING|ASCII|Name"
+            },
+            {
+              "UUID": "EF680102-9B35-4933-9B10-52FFA9740042",
+              "Name": "Advertising Parameter",
+              "IsRead": true,
+              "IsWrite": true,
+              "Type": "U16|DEC|Interval|ms U8|DEC|Timeout|s"
+            },
+            {
+              "UUID": "EF680104-9B35-4933-9B10-52FFA9740042",
+              "Name": "Connection parameters",
+              "Type": "U16|DEC|MinInterval U16|DEC|MaxInterval U16|DEC|Latency U16|DEC|SupervisionTimeout|10ms",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "EF680105-9B35-4933-9B10-52FFA9740042",
+              "Name": "Eddystone URL",
+              "Type": "STRING|Eddystone|Eddystone",
+              "IsRead": true,
+              "IsWrite": true,
+              "REM_Incorrect_Type": "U8|HEX|FrameType I8|DEC|TXPower|dBm_at_1_m STRING|Eddystone|Eddystone"
+            },
+            {
+              "UUID": "EF680106-9B35-4933-9B10-52FFA9740042",
+              "Name": "Cloud Token",
+              "Type": "BYTES|HEX|CloudToken",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "EF680107-9B35-4933-9B10-52FFA9740042",
+              "Name": "Firmware Version",
+              "Type": "U8|DEC|Major U8|DEC|Minor U8|DEC|Patch",
+              "IsRead": true
+            },
+            {
+              "UUID": "EF680108-9B35-4933-9B10-52FFA9740042",
+              "Name": "MTU Request",
+              "Type": "U8 U16",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "EF680109-9B35-4933-9B10-52FFA9740042",
+              "Name": "NFC Tag",
+              "Type": "STRING|ASCII|NFCTag"
+            }
+
+          ]
+        },
+
+        {
+          "UUID": "EF680200-9B35-4933-9B10-52FFA9740042",
+          "Name": "Environment",
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "EF680201-9B35-4933-9B10-52FFA9740042",
+              "Name": "Temperature (c)",
+              "Type": "/I8/P8|FIXED|Temperature|C",
+              "IsNotify": true,
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": 0,
+                "chartDefaultMaxY": 100,
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              }
+            },
+            {
+              "UUID": "EF680202-9B35-4933-9B10-52FFA9740042",
+              "Name": "Pressure (hpa)",
+              "Type": "/I32/P8|FIXED|Pressure|hPA",
+              "IsNotify": true,
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": 983,
+                "chartDefaultMaxY": 1043,
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              }
+            },
+            {
+              "UUID": "EF680203-9B35-4933-9B10-52FFA9740042",
+              "Name": "Humidity (%)",
+              "Type": "U8|DEC|Humidity|%",
+              "IsNotify": true,
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": 0,
+                "chartDefaultMaxY": 100,
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              }
+            },
+            {
+              "UUID": "EF680204-9B35-4933-9B10-52FFA9740042",
+              "Name": "Air Quality eCOS TVOC",
+              "Type": "U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb",
+              "IsNotify": true,
+              "REM": "Gas sensor is a CCS811",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartLineDefaults": {
+                  "eCOS": {
+                    "stroke": "DarkGreen"
+                  },
+                  "TVOC": {
+                    "stroke": "DarkBlue"
+                  }
+                },
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              }
+            },
+            {
+              "UUID": "EF680205-9B35-4933-9B10-52FFA9740042",
+              "Name": "Color RGB+Clear",
+              "REM_alias": "Get LIGHT / LUMEN value",
+              "Type": "U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear",
+              "IsNotify": true,
+              "UI": {
+                "tableType": "standard",
+                "chartType": "ytime",
+                "chartMinY": 0,
+                "chartDefaultMaxY": 10000,
+                "chartLineDefaults": {
+                  "Red": {
+                    "stroke": "DarkRed"
+                  },
+                  "Green": {
+                    "stroke": "DarkGreen"
+                  },
+                  "Blue": {
+                    "stroke": "DarkBlue"
+                  },
+                  "Clear": {
+                    "stroke": "Black"
+                  }
+                },
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              }
+            },
+            {
+              "UUID": "EF680206-9B35-4933-9B10-52FFA9740042",
+              "Name": "Environment Configuration",
+              "Type": "U16|DEC|TempInterval|ms U16|DEC|PressureInterval|ms U16|DEC|HumidityInterval|ms U16|DEC|ColorInterval|ms U8|DEC|GasMode U8|DEC|RedCalibration U8|DEC|GreenCalibration U8|DEC|BlueCalibration",
+              "REM": "TempInterval is 100..60K; PressureInterval is 50..60K; HumidityInterval is 100..60K; ColorInterval is 200..60K Gas mode is 1 (1 second), 2 (10 seconds) or 3 (1 minute)",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  E8 03 E8 03 E8 03 C4 09 02 64 64 64",
+                "1000 1000 1000 2500 2 100 100 100"
+              ]
+            }
+          ]
+        },
+
+        {
+          "UUID": "EF680300-9B35-4933-9B10-52FFA9740042",
+          "Name": "UI",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "EF680301-9B35-4933-9B10-52FFA9740042",
+              "Name": "LED Characteristics",
+              "Type": "U8 U8 U8 U8",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  02 02 14 AC 0D",
+                "02 02 14 AC"
+              ]
+
+            },
+            {
+              "UUID": "EF680302-9B35-4933-9B10-52FFA9740042",
+              "Name": "Button",
+              "Type": "U8|HEX|Press",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF680303-9B35-4933-9B10-52FFA9740042",
+              "Name": "External pin",
+              "Type": "U8 U8 U8 U8",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00 00 00 00",
+                "00 00 00 00"
+              ]
+            }
+          ]
+        },
+
+        {
+          "UUID": "EF680400-9B35-4933-9B10-52FFA9740042",
+          "Name": "Motion",
+          "Priority": 6,
+          "Characteristics": [
+            {
+              "UUID": "EF680401-9B35-4933-9B10-52FFA9740042",
+              "Name": "Motion Configuration",
+              "Type": "U16|DEC U16|DEC U16|DEC U16|DEC U8",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  E8 03 F4 01 F4 01 0A 00 01",
+                "1000 500 500 10 01"
+              ]
+            },
+            {
+              "UUID": "EF680402-9B35-4933-9B10-52FFA9740042",
+              "Name": "Taps",
+              "Type": "U8 U8|DEC",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF680403-9B35-4933-9B10-52FFA9740042",
+              "Name": "Orientation",
+              "Type": "U8|HEX",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF680404-9B35-4933-9B10-52FFA9740042",
+              "Name": "Quaternions",
+              "Type": "Q2Q30|DEC|W Q2Q30|DEC|X Q2Q30|DEC|Y Q2Q30|DEC|Z",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF680405-9B35-4933-9B10-52FFA9740042",
+              "Name": "Step Counter",
+              "Type": "U32|DEC|Steps U32|DEC|Time|ms",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF680406-9B35-4933-9B10-52FFA9740042",
+              "Name": "Raw Motion",
+              "Type": "Q6Q10|HEX|AccelX|g Q6Q10|HEX|AccelY|g Q6Q10|HEX|AccelZ|g Q5Q11|HEX|GyroX|dps Q5Q11|HEX|GyroY|dps Q5Q11|HEX|GyroZ|dps Q12Q4|HEX|CompassX|microTesla Q12Q4|HEX|CompassY|microTesla Q12Q4|HEX|CompassZ|microTesla",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF680407-9B35-4933-9B10-52FFA9740042",
+              "Name": "Euler",
+              "Type": "I32|DEC|Roll|d I32|DEC|Pitch|d I32|DEC|Yaw|d",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF680408-9B35-4933-9B10-52FFA9740042",
+              "Name": "RotationMatrix",
+              "Type": "I16 I16 I16 I16 I16 I16 I16 I16 I16",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF680409-9B35-4933-9B10-52FFA9740042",
+              "Name": "Compass Heading",
+              "Type": "Q16Q16|DEC|Heading|d",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF68040A-9B35-4933-9B10-52FFA9740042",
+              "Name": "Gravity",
+              "Type": "F32|N3|X|mpss F32|N3|Y|mpss F32|N3|Z|mpss",
+              "REM_Type": "The ms is meters per second squared; the values are 9.8 for normal gravity",
+              "IsNotify": true,
+              "UI": {
+                "tableType": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": -20,
+                "chartDefaultMaxY": 20,
+                "chartLineDefaults": {
+                  "X": {
+                    "stroke": "DarkRed"
+                  },
+                  "Y": {
+                    "stroke": "DarkGreen"
+                  },
+                  "Z": {
+                    "stroke": "DarkBlue"
+                  }
+                },
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              }
+            }
+          ]
+        },
+
+        {
+          "UUID": "EF680500-9B35-4933-9B10-52FFA9740042",
+          "Name": "Audio",
+          "Priority": 3,
+          "Characteristics": [
+            {
+              "UUID": "EF680501-9B35-4933-9B10-52FFA9740042",
+              "Name": "Audio Configuration",
+              "Type": "U8|HEX|SpeakerMode U8|HEX|MicrophoneMode",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  01 01",
+                "01 01"
+              ]
+            },
+            {
+              "UUID": "EF680502-9B35-4933-9B10-52FFA9740042",
+              "Name": "Speaker Data",
+              "Type": "BYTES|HEX|Data",
+              "IsWriteWithoutResponse": true
+            },
+            {
+              "UUID": "EF680503-9B35-4933-9B10-52FFA9740042",
+              "Name": "Speaker Status",
+              "Type": "U8|HEX|SpeakerStatus",
+              "IsNotify": true
+            },
+            {
+              "UUID": "EF680504-9B35-4933-9B10-52FFA9740042",
+              "Name": "Microphone Data",
+              "Type": "BYTES|HEX|MicrophoneStatus",
+              "IsNotify": true
+            }
+          ]
+        },
+
+        {
+          "UUID": "0000FE59-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Firmware",
+          "Suppress": true,
+          "Characteristics": [
+            {
+              "UUID": "8EC90001-F315-4F60-9FB8-838830DAEA50",
+              "Name": "Device Firmware Update (DFU) Characteristics",
+              "Type": "U8|HEX|EnableButtonlessDfuMode"
+            },
+            {
+              "UUID": "8ec90003-f315-4f60-9fb8-838830daea50",
+              "Name": "Unknown",
+              "Type": "BYTES|HEX|FirmwareUpdate_Unknown",
+              "IsWrite": true,
+              "IsIndicate": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

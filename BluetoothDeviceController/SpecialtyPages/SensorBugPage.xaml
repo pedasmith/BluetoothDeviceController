@@ -1,0 +1,52 @@
+﻿<Page
+    x:Class="BluetoothDeviceController.SpecialtyPages.SensorBugPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel>
+        <TextBlock FontSize="32">SensorBug Data</TextBlock>
+        <ProgressRing x:Name="uiProgress" />
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold">Connection</TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="1" FontWeight="Bold">Value (milliVolts)</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0">A1</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="uiA1">??</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="0">A2</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="uiA2">??</TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="0">A3</TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="uiA3">??</TextBlock>
+            <TextBlock Grid.Row="4" Grid.Column="0">A4</TextBlock>
+            <TextBlock Grid.Row="4" Grid.Column="1" x:Name="uiA4">??</TextBlock>
+        </Grid>
+
+        <Rectangle Height="40" />
+        <TextBlock x:Name="uiStatus" />
+        <!-- TODO: fix all this :-) -->
+        <TextBlock Padding="0,20,0,0">Links to technical info</TextBlock>
+        <StackPanel Orientation="Horizontal">
+            <HyperlinkButton NavigateUri="https://sensything.protocentral.com/">Sensything</HyperlinkButton>
+            <HyperlinkButton NavigateUri="https://github.com/Protocentral/protocentral_sensything" Margin="10,0,0,0">Github (Protocentral)</HyperlinkButton>
+        </StackPanel>
+
+    </StackPanel>
+</Page>

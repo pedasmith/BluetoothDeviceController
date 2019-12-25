@@ -1,0 +1,678 @@
+﻿<Page
+    x:Class="BluetoothDeviceController.SpecialtyPages.BleHome_SensorBugPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:charts="using:BluetoothDeviceController.Charts"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <Style TargetType="Button">
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="Margin" Value="10,0,0,0" />
+        </Style>
+        <Style TargetType="Line">
+            <Setter Property="Margin" Value="0,15,0,0" />
+            <Setter Property="Stroke" Value="ForestGreen" />
+        </Style>
+        <Style x:Key="TitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30" />
+        </Style>
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+        <Style x:Key="HeaderStyleExpander" TargetType="controls:Expander">
+            <Setter Property="MinWidth" Value="550" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="SubheaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+        <Style x:Key="AboutStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="ChacteristicListStyle" TargetType="StackPanel">
+            <Setter Property="Background" Value="WhiteSmoke" />
+            <Setter Property="Margin" Value="18,0,0,0" />
+        </Style>
+        <Style x:Key="HEXStyle" TargetType="TextBox">
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="5,0,0,0" />
+        </Style>
+        <Style x:Key="TableStyle" TargetType="controls:DataGrid">
+            <Setter Property = "Background" Value="BlanchedAlmond" />
+            <Setter Property = "FontSize" Value="12" />
+            <Setter Property = "Height" Value="200" />
+            <Setter Property = "HorizontalAlignment" Value="Center" />
+            <Setter Property = "Width" Value="500" />
+        </Style>
+    </Page.Resources>
+
+    <StackPanel>
+        <Grid MaxWidth="550" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Style="{StaticResource TitleStyle}">SensorBug10B5D0 device</TextBlock>
+                <TextBlock Style="{StaticResource AboutStyle}">
+
+                </TextBlock>
+            </StackPanel>
+            <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/BleHome_SensorBug.PNG" />
+        </Grid>
+        <ProgressRing x:Name="uiProgress" />
+        <TextBlock x:Name="uiStatus" />
+
+        <controls:Expander Header="Battery" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">BatteryLevel</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="BatteryLevel_BatteryLevel" Text="*" Header="BatteryLevel" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadBatteryLevel" />
+
+                    <Button Content="Notify" Click="OnNotifyBatteryLevel" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Light" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Light Config</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_Enable" Text="*" Header="Enable" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_ModeFlags" Text="*" Header="ModeFlags" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_DataRate" Text="*" Header="DataRate" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_NotiRate" Text="*" Header="NotiRate" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_AlertLog" Text="*" Header="AlertLog" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_AlertHi" Text="*" Header="AlertHi" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_AlertFaults" Text="*" Header="AlertFaults" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_Reserved" Text="*" Header="Reserved" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_Range" Text="*" Header="Range" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_Resolution" Text="*" Header="Resolution" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_AlertResetCount" Text="*" Header="AlertResetCount" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Light_Config_AertResetDiff" Text="*" Header="AertResetDiff" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteLight_Config" />
+
+                    <Button Content="Read" Click="OnReadLight_Config" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Unknown1</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Unknown1_Unknown1" Text="*" Header="Unknown1" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadUnknown1" />
+
+                    <Button Content="Notify" Click="OnNotifyUnknown1" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Unknown2</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Unknown2_Unknown2" Text="*" Header="Unknown2" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUnknown2" />
+
+                    <Button Content="Read" Click="OnReadUnknown2" />
+
+                    <Button Content="Notify" Click="OnNotifyUnknown2" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Unknown3</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Unknown3_Unknown3" Text="*" Header="Unknown3" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUnknown3" />
+
+                    <Button Content="Read" Click="OnReadUnknown3" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Accelerometer" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Accelerometer_Config</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Accelerometer_Config_Unknown0" Text="*" Header="Unknown0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteAccelerometer_Config" />
+
+                    <Button Content="Read" Click="OnReadAccelerometer_Config" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Accelerometer_Data</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Accelerometer_Data_X" Text="*" Header="X" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="Accelerometer_Data_Y" Text="*" Header="Y" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="Accelerometer_Data_Z" Text="*" Header="Z" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadAccelerometer_Data" />
+
+                    <Button Content="Notify" Click="OnNotifyAccelerometer_Data" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Accelerometer_Alert</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Accelerometer_Alert_Unknown2" Text="*" Header="Unknown2" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteAccelerometer_Alert" />
+
+                    <Button Content="Read" Click="OnReadAccelerometer_Alert" />
+
+                    <Button Content="Notify" Click="OnNotifyAccelerometer_Alert" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Temperature" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Temperature_Config</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Temperature_Config_Unknown0" Text="*" Header="Unknown0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteTemperature_Config" />
+
+                    <Button Content="Read" Click="OnReadTemperature_Config" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Temperature_Data</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Temperature_Data_Unknown1" Text="*" Header="Unknown1" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadTemperature_Data" />
+
+                    <Button Content="Notify" Click="OnNotifyTemperature_Data" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Temperature_Alert</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Temperature_Alert_Unknown2" Text="*" Header="Unknown2" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteTemperature_Alert" />
+
+                    <Button Content="Read" Click="OnReadTemperature_Alert" />
+
+                    <Button Content="Notify" Click="OnNotifyTemperature_Alert" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Temperature_Status</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Temperature_Status_Unknown3" Text="*" Header="Unknown3" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteTemperature_Status" />
+
+                    <Button Content="Read" Click="OnReadTemperature_Status" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Pairing" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Pairing_Control_Status</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Pairing_Control_Status_Unknown0" Text="*" Header="Unknown0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWritePairing_Control_Status" />
+
+                    <Button Content="Read" Click="OnReadPairing_Control_Status" />
+
+                    <Button Content="Notify" Click="OnNotifyPairing_Control_Status" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Pairing_Data</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Pairing_Data_Unknown1" Text="*" Header="Unknown1" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWritePairing_Data" />
+
+                    <Button Content="Read" Click="OnReadPairing_Data" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Pairing_Config</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Pairing_Config_Unknown2" Text="*" Header="Unknown2" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWritePairing_Config" />
+
+                    <Button Content="Read" Click="OnReadPairing_Config" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Pairing_AD_Key</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Pairing_AD_Key_Unknown3" Text="*" Header="Unknown3" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadPairing_AD_Key" />
+
+                    <Button Content="Notify" Click="OnNotifyPairing_AD_Key" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="BR_Utilities" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_DeviceName</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_DeviceName_Unknown0" Text="*" Header="Unknown0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUtility_DeviceName" />
+
+                    <Button Content="Read" Click="OnReadUtility_DeviceName" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_Default_Conn_Param</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_Default_Conn_Param_Unknown1" Text="*" Header="Unknown1" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUtility_Default_Conn_Param" />
+
+                    <Button Content="Read" Click="OnReadUtility_Default_Conn_Param" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_Curr_Conn_Param</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_Curr_Conn_Param_Unknown2" Text="*" Header="Unknown2" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUtility_Curr_Conn_Param" />
+
+                    <Button Content="Read" Click="OnReadUtility_Curr_Conn_Param" />
+
+                    <Button Content="Notify" Click="OnNotifyUtility_Curr_Conn_Param" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_RF_Power</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_RF_Power_Unknown3" Text="*" Header="Unknown3" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUtility_RF_Power" />
+
+                    <Button Content="Read" Click="OnReadUtility_RF_Power" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_Disconnect</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_Disconnect_Unknown4" Text="*" Header="Unknown4" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUtility_Disconnect" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_Public_Address</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Utility_Public_Address_Unknown5" Text="*" Header="Unknown5" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadUtility_Public_Address" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_Config_Counter</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Utility_Config_Counter_Unknown6" Text="*" Header="Unknown6" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadUtility_Config_Counter" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_Advertising_Param</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_Advertising_Param_Unknown7" Text="*" Header="Unknown7" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUtility_Advertising_Param" />
+
+                    <Button Content="Read" Click="OnReadUtility_Advertising_Param" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_Unknown</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_Unknown_Unknown8" Text="*" Header="Unknown8" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUtility_Unknown" />
+
+                    <Button Content="Read" Click="OnReadUtility_Unknown" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Utility_Blink_LED</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_Blink_LED_LEDs" Text="*" Header="LEDs" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_Blink_LED_NBlink" Text="*" Header="NBlink" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_Blink_LED_PercentOn" Text="*" Header="PercentOn" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Utility_Blink_LED_Period" Text="*" Header="Period" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUtility_Blink_LED" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadDevice_Name" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Appearance</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Appearance_Appearance" Text="*" Header="Appearance" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadAppearance" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Privacy</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Privacy_Privacy" Text="*" Header="Privacy" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWritePrivacy" />
+
+                    <Button Content="Read" Click="OnReadPrivacy" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Reconnect Address</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Reconnect_Address_ReconnectAddress" Text="*" Header="ReconnectAddress" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteReconnect_Address" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Connection Parameter</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_ConnectionParameter" Text="*" Header="ConnectionParameter" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadConnection_Parameter" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Device Info" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Manuafacturer Name</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Manuafacturer_Name_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadManuafacturer_Name" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Model Number</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Model_Number_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadModel_Number" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Hardware Revision</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Hardware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadHardware_Revision" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Firmware Revision</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Firmware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadFirmware_Revision" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Software Revision</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Software_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadSoftware_Revision" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">PnP ID</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="PnP_ID_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadPnP_ID" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Link Loss" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Link Loss Alert Level</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Link_Loss_Alert_Level_Level" Text="*" Header="Level" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteLink_Loss_Alert_Level" />
+
+                    <Button Content="Read" Click="OnReadLink_Loss_Alert_Level" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Immediate Alert" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Immediate Alert Level</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Immediate_Alert_Level_Level" Text="*" Header="Level" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteImmediate_Alert_Level" />
+
+                    <Button Content="Read" Click="OnReadImmediate_Alert_Level" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Tranmit Power" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Transmit Power</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Transmit_Power_Power" Text="*" Header="Power" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadTransmit_Power" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <Button Content="REREAD" Click="OnRereadDevice" />
+    </StackPanel>
+</Page>

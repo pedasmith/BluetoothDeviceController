@@ -1,0 +1,221 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "TailorToys PowerUp",
+      "Links": [
+        "https://github.com/TobyRich/lib-smartlink-android/blob/master/Smartlink/src/main/java/lib/smartlink/BLEService.java"
+      ]
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: TailorToys PowerUp",
+                "TailorToys PowerUp"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+              "Name": "Peripheral Privacy Flag",
+              "Type": "U8|DEC|Flag",
+              "IsRead": true,
+              "ExampleData": [
+                "Privacy:  00"
+              ]
+            },
+            {
+              "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+              "Name": "Reconnect Address",
+              "Type": "BYTES|HEX|ReconnectAddress",
+              "IsWrite": true
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  50 00 A0 00 00 00 E8 03"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  EB C8 61 00 00 B8 5F D0",
+                "EB C8 61 00 00 B8 5F D0"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  50 6F 77 65 72 55 70 20 33 2E 30 00",
+                "PowerUp 3.0\\0"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  54 54 50 55 2F 72 32 2E 33 2F 30 30 34 00 00 00 00 00 00 00",
+                "TTPU/r2.3/004\\0\\0\\0\\0\\0\\0\\0"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  66 61 63 74 6F 72 79 2D 31 2E 36 2E 30 00",
+                "factory-1.6.0\\0"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2E 78 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
+                "1.x\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manuafacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  54 61 69 6C 6F 72 20 54 6F 79 73 20 4C 54 44 00",
+                "Tailor Toys LTD\\0"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 100%",
+                "100"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "75b64e51-f181-4ed1-921a-476090d80ba7",
+          "Name": "Unknown4",
+          "Characteristics": [
+            {
+              "UUID": "75b64e51-f182-4ed1-921a-476090d80ba7",
+              "Name": "Rf Test",
+              "Description": "Rf Test",
+              "Type": "BYTES|HEX|RfTest",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            },
+            {
+              "UUID": "75b64e51-f184-4ed1-921a-476090d80ba7",
+              "Name": "Motor",
+              "Description": "Motor",
+              "Type": "U8|DEC|MotorTest",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            },
+            {
+              "UUID": "75b64e51-f185-4ed1-921a-476090d80ba7",
+              "Name": "Rudder",
+              "Description": "Rudder",
+              "Type": "I8|DEC|Rudder",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000ffc0-0451-4000-b000-000000000000",
+          "Name": "Unknown5",
+          "Characteristics": [
+            {
+              "UUID": "f000ffc1-0451-4000-b000-000000000000",
+              "Name": "Img Identify",
+              "Description": "Img Identify",
+              "Type": "BYTES|HEX|Img Identify",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true
+            },
+            {
+              "UUID": "f000ffc2-0451-4000-b000-000000000000",
+              "Name": "Img Block",
+              "Description": "Img Block",
+              "Type": "BYTES|HEX|Img Block",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-d0:5f:b8:61:c8:eb\nCanPair:True IsPaired:False"
+    }
+  ]
+}

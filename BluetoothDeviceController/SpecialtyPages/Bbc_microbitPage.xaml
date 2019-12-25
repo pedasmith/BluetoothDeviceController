@@ -1,0 +1,709 @@
+﻿<Page
+    x:Class="BluetoothDeviceController.SpecialtyPages.Bbc_MicroBitPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:charts="using:BluetoothDeviceController.Charts"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <Style TargetType="Button">
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="Margin" Value="10,0,0,0" />
+        </Style>
+        <Style TargetType="Line">
+            <Setter Property="Margin" Value="0,15,0,0" />
+            <Setter Property="Stroke" Value="ForestGreen" />
+        </Style>
+        <Style x:Key="TitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30" />
+        </Style>
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+        <Style x:Key="HeaderStyleExpander" TargetType="controls:Expander">
+            <Setter Property="MinWidth" Value="550" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="SubheaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+        <Style x:Key="AboutStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="ChacteristicListStyle" TargetType="StackPanel">
+            <Setter Property="Background" Value="WhiteSmoke" />
+            <Setter Property="Margin" Value="18,0,0,0" />
+        </Style>
+        <Style x:Key="HEXStyle" TargetType="TextBox">
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="5,0,0,0" />
+        </Style>
+        <Style x:Key="TableStyle" TargetType="controls:DataGrid">
+            <Setter Property = "Background" Value="BlanchedAlmond" />
+            <Setter Property = "FontSize" Value="12" />
+            <Setter Property = "Height" Value="200" />
+            <Setter Property = "HorizontalAlignment" Value="Center" />
+            <Setter Property = "Width" Value="500" />
+        </Style>
+    </Page.Resources>
+
+    <StackPanel>
+        <Grid MaxWidth="550" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Style="{StaticResource TitleStyle}">BBC micro:bit device</TextBlock>
+                <TextBlock Style="{StaticResource AboutStyle}">
+
+                </TextBlock>
+            </StackPanel>
+            <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/Bbc_MicroBit.PNG" />
+        </Grid>
+        <ProgressRing x:Name="uiProgress" />
+        <TextBlock x:Name="uiStatus" />
+
+        <controls:Expander Header="Accelerometer" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">AccelerometerData</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="AccelerometerData_X" Text="*" Header="X" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="AccelerometerData_Y" Text="*" Header="Y" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="AccelerometerData_Z" Text="*" Header="Z" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadAccelerometerData" />
+
+                    <Button Content="Notify" Click="OnNotifyAccelerometerData" />
+
+                </StackPanel>
+
+                <controls:Expander Header="AccelerometerData Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                    <StackPanel MinWidth="550">
+                        <charts:ChartControl Height="200" Width="500" x:Name="AccelerometerDataChart" />
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="AccelerometerDataGrid" ItemsSource="{Binding AccelerometerDataRecordData}" />
+                        <TextBox  x:Name="AccelerometerData_Notebox" KeyDown="OnAccelerometerData_NoteKeyDown" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <ComboBox SelectionChanged="OnKeepCountAccelerometerData" Header="Keep how many items?" SelectedIndex="2">
+                                <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                            </ComboBox>
+                            <Rectangle Width="5" />
+                            <ComboBox SelectionChanged="OnAlgorithmAccelerometerData" Header="Remove algorithm?" SelectedIndex="0">
+                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content = "Copy" Click="OnCopyAccelerometerData" />
+                        </StackPanel>
+                    </StackPanel>
+                </controls:Expander>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">AccelerometerPeriod</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="AccelerometerPeriod_AccelerometerPeriod" Text="*" Header="AccelerometerPeriod" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteAccelerometerPeriod" />
+
+                    <Button Content="Read" Click="OnReadAccelerometerPeriod" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="LED" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">LedPattern</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="LedPattern_Row1" Text="*" Header="Row1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="LedPattern_Row2" Text="*" Header="Row2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="LedPattern_Row3" Text="*" Header="Row3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="LedPattern_Row4" Text="*" Header="Row4" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="LedPattern_Row5" Text="*" Header="Row5" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteLedPattern" />
+
+                    <Button Content="Read" Click="OnReadLedPattern" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">LedText</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="LedText_LedText" Text="*" Header="LedText" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteLedText" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">LedScrollTime</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="LedScrollTime_ScrollTime" Text="*" Header="ScrollTime" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteLedScrollTime" />
+
+                    <Button Content="Read" Click="OnReadLedScrollTime" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Temperature" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">TemperatureData</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="TemperatureData_Temperature" Text="*" Header="Temperature" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadTemperatureData" />
+
+                    <Button Content="Notify" Click="OnNotifyTemperatureData" />
+
+                </StackPanel>
+
+                <controls:Expander Header="TemperatureData Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                    <StackPanel MinWidth="550">
+                        <charts:ChartControl Height="200" Width="500" x:Name="TemperatureDataChart" />
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="TemperatureDataGrid" ItemsSource="{Binding TemperatureDataRecordData}" />
+                        <TextBox  x:Name="TemperatureData_Notebox" KeyDown="OnTemperatureData_NoteKeyDown" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <ComboBox SelectionChanged="OnKeepCountTemperatureData" Header="Keep how many items?" SelectedIndex="2">
+                                <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                            </ComboBox>
+                            <Rectangle Width="5" />
+                            <ComboBox SelectionChanged="OnAlgorithmTemperatureData" Header="Remove algorithm?" SelectedIndex="0">
+                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content = "Copy" Click="OnCopyTemperatureData" />
+                        </StackPanel>
+                    </StackPanel>
+                </controls:Expander>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">TemperaturePeriod</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="TemperaturePeriod_TemperaturePeriod" Text="*" Header="TemperaturePeriod" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteTemperaturePeriod" />
+
+                    <Button Content="Read" Click="OnReadTemperaturePeriod" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="EventReadWrite" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">EventReadA</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadA_EventType1" Text="*" Header="EventType1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadA_EventValue1" Text="*" Header="EventValue1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadA_EventType2" Text="*" Header="EventType2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadA_EventValue2" Text="*" Header="EventValue2" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadA_EventType3" Text="*" Header="EventType3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadA_EventValue3" Text="*" Header="EventValue3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadA_EventType4" Text="*" Header="EventType4" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadA_EventValue4" Text="*" Header="EventValue4" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadEventReadA" />
+
+                    <Button Content="Notify" Click="OnNotifyEventReadA" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">EventReadB</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadB_EventType1" Text="*" Header="EventType1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadB_EventValue1" Text="*" Header="EventValue1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadB_EventType2" Text="*" Header="EventType2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadB_EventValue2" Text="*" Header="EventValue2" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadB_EventType3" Text="*" Header="EventType3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadB_EventValue3" Text="*" Header="EventValue3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadB_EventType4" Text="*" Header="EventType4" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="EventReadB_EventValue4" Text="*" Header="EventValue4" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadEventReadB" />
+
+                    <Button Content="Notify" Click="OnNotifyEventReadB" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">EventWriteA</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteA_EventType1" Text="*" Header="EventType1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteA_EventValue1" Text="*" Header="EventValue1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteA_EventType2" Text="*" Header="EventType2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteA_EventValue2" Text="*" Header="EventValue2" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteA_EventType3" Text="*" Header="EventType3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteA_EventValue3" Text="*" Header="EventValue3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteA_EventType4" Text="*" Header="EventType4" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteA_EventValue4" Text="*" Header="EventValue4" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteEventWriteA" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">EventWriteB</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteB_EventType1" Text="*" Header="EventType1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteB_EventValue1" Text="*" Header="EventValue1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteB_EventType2" Text="*" Header="EventType2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteB_EventValue2" Text="*" Header="EventValue2" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteB_EventType3" Text="*" Header="EventType3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteB_EventValue3" Text="*" Header="EventValue3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteB_EventType4" Text="*" Header="EventType4" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="EventWriteB_EventValue4" Text="*" Header="EventValue4" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteEventWriteB" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Button" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">ButtonDataA</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="ButtonDataA_ButtonA" Text="*" Header="ButtonA" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadButtonDataA" />
+
+                    <Button Content="Notify" Click="OnNotifyButtonDataA" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">ButtonDataB</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="ButtonDataB_ButtonB" Text="*" Header="ButtonB" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadButtonDataB" />
+
+                    <Button Content="Notify" Click="OnNotifyButtonDataB" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="IOPin" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">PinAnalog</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="PinAnalog_SetAnalog" Text="*" Header="SetAnalog" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWritePinAnalog" />
+
+                    <Button Content="Read" Click="OnReadPinAnalog" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">PinInput</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="PinInput_SetInput" Text="*" Header="SetInput" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWritePinInput" />
+
+                    <Button Content="Read" Click="OnReadPinInput" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">PinPwm</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="PinPwm_PinNumber1" Text="*" Header="PinNumber1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinPwm_Value1" Text="*" Header="Value1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinPwm_Period1" Text="*" Header="Period1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinPwm_PinNumber2" Text="*" Header="PinNumber2" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="PinPwm_Value2" Text="*" Header="Value2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinPwm_Period2" Text="*" Header="Period2" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWritePinPwm" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">PinData</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_PinNumber1" Text="*" Header="PinNumber1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_DEPinData1" Text="*" Header="DEPinData1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_PinNumber2" Text="*" Header="PinNumber2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_DEPinData2" Text="*" Header="DEPinData2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_PinNumber3" Text="*" Header="PinNumber3" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_DEPinData3" Text="*" Header="DEPinData3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_PinNumber4" Text="*" Header="PinNumber4" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_DEPinData4" Text="*" Header="DEPinData4" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_PinNumber5" Text="*" Header="PinNumber5" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_DEPinData5" Text="*" Header="DEPinData5" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_PinNumber6" Text="*" Header="PinNumber6" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_DEPinData6" Text="*" Header="DEPinData6" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_PinNumber7" Text="*" Header="PinNumber7" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_DEPinData7" Text="*" Header="DEPinData7" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_PinNumber8" Text="*" Header="PinNumber8" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_DEPinData8" Text="*" Header="DEPinData8" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_PinNumber9" Text="*" Header="PinNumber9" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="PinData_DEPinData9" Text="*" Header="DEPinData9" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWritePinData" />
+
+                    <Button Content="Read" Click="OnReadPinData" />
+
+                    <Button Content="Notify" Click="OnNotifyPinData" />
+
+                </StackPanel>
+
+                <controls:Expander Header="PinData Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                    <StackPanel MinWidth="550">
+                        <charts:ChartControl Height="200" Width="500" x:Name="PinDataChart" />
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="PinDataGrid" ItemsSource="{Binding PinDataRecordData}" />
+                        <TextBox  x:Name="PinData_Notebox" KeyDown="OnPinData_NoteKeyDown" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <ComboBox SelectionChanged="OnKeepCountPinData" Header="Keep how many items?" SelectedIndex="2">
+                                <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                            </ComboBox>
+                            <Rectangle Width="5" />
+                            <ComboBox SelectionChanged="OnAlgorithmPinData" Header="Remove algorithm?" SelectedIndex="0">
+                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content = "Copy" Click="OnCopyPinData" />
+                        </StackPanel>
+                    </StackPanel>
+                </controls:Expander>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Magnetometer" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">MagnetometerData</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="MagnetometerData_MagX" Text="*" Header="MagX" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="MagnetometerData_MagY" Text="*" Header="MagY" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="MagnetometerData_MagZ" Text="*" Header="MagZ" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadMagnetometerData" />
+
+                    <Button Content="Notify" Click="OnNotifyMagnetometerData" />
+
+                </StackPanel>
+
+                <controls:Expander Header="MagnetometerData Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                    <StackPanel MinWidth="550">
+                        <charts:ChartControl Height="200" Width="500" x:Name="MagnetometerDataChart" />
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="MagnetometerDataGrid" ItemsSource="{Binding MagnetometerDataRecordData}" />
+                        <TextBox  x:Name="MagnetometerData_Notebox" KeyDown="OnMagnetometerData_NoteKeyDown" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <ComboBox SelectionChanged="OnKeepCountMagnetometerData" Header="Keep how many items?" SelectedIndex="2">
+                                <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                            </ComboBox>
+                            <Rectangle Width="5" />
+                            <ComboBox SelectionChanged="OnAlgorithmMagnetometerData" Header="Remove algorithm?" SelectedIndex="0">
+                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content = "Copy" Click="OnCopyMagnetometerData" />
+                        </StackPanel>
+                    </StackPanel>
+                </controls:Expander>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">MagnetometerBearing</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="MagnetometerBearing_Bearing" Text="*" Header="Bearing" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadMagnetometerBearing" />
+
+                    <Button Content="Notify" Click="OnNotifyMagnetometerBearing" />
+
+                </StackPanel>
+
+                <controls:Expander Header="MagnetometerBearing Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                    <StackPanel MinWidth="550">
+                        <charts:ChartControl Height="200" Width="500" x:Name="MagnetometerBearingChart" />
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="MagnetometerBearingGrid" ItemsSource="{Binding MagnetometerBearingRecordData}" />
+                        <TextBox  x:Name="MagnetometerBearing_Notebox" KeyDown="OnMagnetometerBearing_NoteKeyDown" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <ComboBox SelectionChanged="OnKeepCountMagnetometerBearing" Header="Keep how many items?" SelectedIndex="2">
+                                <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                            </ComboBox>
+                            <Rectangle Width="5" />
+                            <ComboBox SelectionChanged="OnAlgorithmMagnetometerBearing" Header="Remove algorithm?" SelectedIndex="0">
+                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content = "Copy" Click="OnCopyMagnetometerBearing" />
+                        </StackPanel>
+                    </StackPanel>
+                </controls:Expander>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">MagnetometerPeriod</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="MagnetometerPeriod_MagnetometerPeriod" Text="*" Header="MagnetometerPeriod" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteMagnetometerPeriod" />
+
+                    <Button Content="Read" Click="OnReadMagnetometerPeriod" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">MagnetometerCalibration</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="MagnetometerCalibration_MagnetometerCalibration" Text="*" Header="MagnetometerCalibration" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteMagnetometerCalibration" />
+
+                    <Button Content="Read" Click="OnReadMagnetometerCalibration" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteDevice_Name" />
+
+                    <Button Content="Read" Click="OnReadDevice_Name" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Appearance</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Appearance_Appearance" Text="*" Header="Appearance" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadAppearance" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Connection Parameter</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_ConnectionParameter" Text="*" Header="ConnectionParameter" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadConnection_Parameter" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Device Info" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Model Number</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Model_Number_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadModel_Number" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Serial Number</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Serial_Number_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadSerial_Number" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Firmware Revision</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Firmware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadFirmware_Revision" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <Button Content="REREAD" Click="OnRereadDevice" />
+    </StackPanel>
+</Page>

@@ -1,0 +1,2008 @@
+﻿{
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "ExampleData": [
+            "Name: iPhone",
+            "iPhone"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  40 00",
+            "Phone"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service",
+      "Characteristics": [
+        {
+          "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+          "Name": "Service Changes",
+          "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+          "IsIndicate": true
+        }
+      ]
+    },
+    {
+      "UUID": "d0611e78-bbb4-4591-a5f8-487910ae4366",
+      "Name": "Unknown2",
+      "Characteristics": [
+        {
+          "UUID": "8667556c-9a37-4c91-84ed-54ee27d90049",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsWrite": true,
+          "IsNotify": true
+        }
+      ]
+    },
+    {
+      "UUID": "9fa480e0-4967-4542-9390-d343dc5d04ae",
+      "Name": "Unknown3",
+      "Characteristics": [
+        {
+          "UUID": "af0badb1-5b99-43cd-917a-a77bc549e3cc",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsWrite": true,
+          "IsNotify": true
+        }
+      ]
+    },
+    {
+      "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+      "Name": "Battery",
+      "Characteristics": [
+        {
+          "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+          "Name": "BatteryLevel",
+          "Type": "I8|DEC|BatteryLevel|%",
+          "IsRead": true,
+          "IsNotify": true
+        }
+      ]
+    },
+    {
+      "UUID": "00001805-0000-1000-8000-00805f9b34fb",
+      "Name": "Unknown5",
+      "Characteristics": [
+        {
+          "UUID": "00002a2b-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsRead": true,
+          "IsNotify": true
+        },
+        {
+          "UUID": "00002a0f-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown1",
+          "Type": "Bytes|HEX|Unknown1",
+          "IsRead": true
+        }
+      ]
+    },
+    {
+      "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+      "Name": "Device Info",
+      "Characteristics": [
+        {
+          "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+          "Name": "Manuafacturer Name",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  41 70 70 6C 65 20 49 6E 63 2E",
+            "Apple Inc."
+          ]
+        },
+        {
+          "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+          "Name": "Model Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  69 50 68 6F 6E 65 31 30 2C 34",
+            "iPhone10,4"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "7905f431-b5ce-4e99-a40f-4b1e122d00d0",
+      "Name": "Unknown7",
+      "Characteristics": [
+        {
+          "UUID": "69d1d8f3-45e1-49a8-9821-9bbdfdaad9d9",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsWrite": true
+        },
+        {
+          "UUID": "9fbf120d-6301-42d9-8c58-25e699a21dbd",
+          "Name": "Unknown1",
+          "Type": "Bytes|HEX|Unknown1",
+          "IsNotify": true
+        },
+        {
+          "UUID": "22eac6e9-24d6-4bb5-be44-b36ace7c7bfb",
+          "Name": "Unknown2",
+          "Type": "Bytes|HEX|Unknown2",
+          "IsNotify": true
+        }
+      ]
+    },
+    {
+      "UUID": "89d3502b-0f36-433a-8ef4-c502ad55f8dc",
+      "Name": "Unknown8",
+      "Characteristics": [
+        {
+          "UUID": "9b3c81d8-57b1-4a8a-b8df-0e56f7ca51c2",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsWrite": true,
+          "IsNotify": true
+        },
+        {
+          "UUID": "2f7cabce-808d-411f-9a0c-bb92ba96c102",
+          "Name": "Unknown1",
+          "Type": "Bytes|HEX|Unknown1",
+          "IsWrite": true,
+          "IsNotify": true
+        },
+        {
+          "UUID": "c6b2f38c-23ab-46d8-a6ab-a3a870bbd5d7",
+          "Name": "Unknown2",
+          "Type": "Bytes|HEX|Unknown2",
+          "IsRead": true,
+          "IsWrite": true
+        }
+      ]
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5f:3c:c2:c0:30:f4\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-79:5a:4a:fe:ac:a0\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Charge 2",
+  "Services": [
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service",
+      "Characteristics": [
+        {
+          "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+          "Name": "Service Changes",
+          "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+          "IsIndicate": true
+        }
+      ]
+    },
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsWriteWithoutResponse": true,
+          "ExampleData": [
+            "Name: Charge 2",
+            "Charge 2"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsWriteWithoutResponse": true,
+          "ExampleData": [
+            "Appearance:  40 04",
+            "Running_Walking_Sensor"
+          ]
+        },
+        {
+          "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+          "Name": "Connection Parameter",
+          "Type": "Bytes|HEX|ConnectionParameter",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Value:  FF FF FF FF 00 00 FF FF"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "adabfb00-6e7d-4601-bda2-bffaa68956ba",
+      "Name": "Unknown2"
+    },
+    {
+      "UUID": "558dfa00-4fa8-4105-9f02-4eaa93e62980",
+      "Name": "Unknown3",
+      "Characteristics": [
+        {
+          "UUID": "558dfa01-4fa8-4105-9f02-4eaa93e62980",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsRead": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Value:  8C B7 5E 5D 71 0B 00 00 4C DC 22 00 AE 04 3C 00 18 00 4B 02"
+          ]
+        }
+      ]
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-d2:be:1c:14:19:ce\nCanPair:False IsPaired:True"
+},
+{
+  "Name": "MX Anywhere 2S",
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Name: MX Anywhere 2S",
+            "MX Anywhere 2S"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  C2 03",
+            "Mouse"
+          ]
+        },
+        {
+          "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+          "Name": "Connection Parameter",
+          "Type": "Bytes|HEX|ConnectionParameter",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  06 00 09 00 2C 00 D8 00"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service",
+      "Characteristics": [
+        {
+          "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+          "Name": "Service Changes",
+          "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+          "IsIndicate": true
+        }
+      ]
+    },
+    {
+      "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+      "Name": "Device Info",
+      "Characteristics": [
+        {
+          "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+          "Name": "Manuafacturer Name",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  4C 6F 67 69 74 65 63 68",
+            "Logitech"
+          ]
+        },
+        {
+          "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+          "Name": "Model Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  4D 58 20 41 6E 79 77 68 65 72 65 20 32 53",
+            "MX Anywhere 2S"
+          ]
+        },
+        {
+          "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+          "Name": "Serial Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  41 41 36 32 45 44 38 31 39 44 44 42 35 44 46 42",
+            "AA62ED819DDB5DFB"
+          ]
+        },
+        {
+          "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+          "Name": "Hardware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  31 2E 30",
+            "1.0"
+          ]
+        },
+        {
+          "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+          "Name": "Firmware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  4D 50 4D 31 33 2E 30 30 5F 30 30 30 33",
+            "MPM13.00_0003"
+          ]
+        },
+        {
+          "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+          "Name": "Software Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  30 30 35 39 30 37 30 30 35 41",
+            "005907005A"
+          ]
+        },
+        {
+          "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+          "Name": "PnP ID",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  02 6D 04 1A B0 03 00",
+            "02 6D 04 1A B0 03 00"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+      "Name": "Battery",
+      "Characteristics": [
+        {
+          "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+          "Name": "BatteryLevel",
+          "Type": "I8|DEC|BatteryLevel|%",
+          "IsRead": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Battery: 20%",
+            "20"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001812-0000-1000-8000-00805f9b34fb",
+      "Name": "Unknown4"
+    },
+    {
+      "UUID": "00010000-0000-1000-8000-011f2000046d",
+      "Name": "Unknown5"
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-cb:ae:2c:ca:c9:29\nCanPair:False IsPaired:True"
+},
+{
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "ExampleData": [
+            "Name: \\0IG BLE Controller",
+            "\\0IG BLE Controller"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  00 01",
+            "Clock"
+          ]
+        },
+        {
+          "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+          "Name": "Connection Parameter",
+          "Type": "Bytes|HEX|ConnectionParameter",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  3C 00 40 00 00 00 E8 03"
+          ]
+        },
+        {
+          "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+          "Name": "Central Address Resolution",
+          "Type": "U8|DEC|AddressResolutionSupported",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  00",
+            "0"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service",
+      "Characteristics": [
+        {
+          "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+          "Name": "Service Changes",
+          "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+          "IsIndicate": true
+        }
+      ]
+    },
+    {
+      "UUID": "db2f6070-7b89-11e6-bdf4-0800200c9a66",
+      "Name": "Unknown2",
+      "Characteristics": [
+        {
+          "UUID": "db2f6071-7b89-11e6-bdf4-0800200c9a66",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsWriteWithoutResponse": true
+        },
+        {
+          "UUID": "db2f6072-7b89-11e6-bdf4-0800200c9a66",
+          "Name": "Unknown1",
+          "Type": "Bytes|HEX|Unknown1",
+          "IsNotify": true
+        }
+      ]
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-00:a0:50:7c:b3:da\nCanPair:False IsPaired:True"
+},
+{
+  "Name": "beLight 0.2",
+  "ClassName": "TI_beLight_2540",
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "ExampleData": [
+            "Name: beLight 0.2",
+            "beLight 0.2"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  00 00",
+            "Unknown"
+          ]
+        },
+        {
+          "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+          "Name": "Privacy",
+          "Type": "Bytes|HEX|Privacy",
+          "IsRead": true,
+          "ExampleData": [
+            "Privacy:  00"
+          ]
+        },
+        {
+          "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+          "Name": "Reconnect Address",
+          "Type": "Bytes|HEX|ReconnectAddress",
+          "IsWrite": true
+        },
+        {
+          "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+          "Name": "Connection Parameter",
+          "Type": "Bytes|HEX|ConnectionParameter",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  50 00 A0 00 00 00 E8 03"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service",
+      "Characteristics": [
+        {
+          "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+          "Name": "Service Changes",
+          "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+          "IsIndicate": true
+        }
+      ]
+    },
+    {
+      "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+      "Name": "Device Info",
+      "Characteristics": [
+        {
+          "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+          "Name": "System ID",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  7F BF 8D 00 00 8F C3 20",
+            "7F BF 8D 00 00 8F C3 20"
+          ]
+        },
+        {
+          "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+          "Name": "Model Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  4D 6F 64 65 6C 20 4E 75 6D 62 65 72 00",
+            "Model Number\\0"
+          ]
+        },
+        {
+          "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+          "Name": "Serial Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  53 65 72 69 61 6C 20 4E 75 6D 62 65 72 00",
+            "Serial Number\\0"
+          ]
+        },
+        {
+          "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+          "Name": "Firmware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  46 69 72 6D 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+            "Firmware Revision\\0"
+          ]
+        },
+        {
+          "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+          "Name": "Hardware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  48 61 72 64 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+            "Hardware Revision\\0"
+          ]
+        },
+        {
+          "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+          "Name": "Software Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  53 6F 66 74 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+            "Software Revision\\0"
+          ]
+        },
+        {
+          "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+          "Name": "Manuafacturer Name",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  4D 61 6E 75 66 61 63 74 75 72 65 72 20 4E 61 6D 65 00",
+            "Manufacturer Name\\0"
+          ]
+        },
+        {
+          "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+          "Name": "Regulatory List",
+          "Type": "U8|HEX|BodyType U8|HEX|BodyStructure String|ASCII|Data",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C",
+            "FE 00 experimental"
+          ]
+        },
+        {
+          "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+          "Name": "PnP ID",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  01 0D 00 00 00 10 01",
+            "\u0001\\r\\0\\0\\0\u0010\u0001"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "0000ffb0-0000-1000-8000-00805f9b34fb",
+      "Name": "Lamp Control",
+      "Characteristics": [
+        {
+          "UUID": "0000ffb1-0000-1000-8000-00805f9b34fb",
+          "Name": "Red",
+          "Type": "U8|HEX|Red",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsWriteWithoutResponse": true,
+          "ExampleData": [
+            "Value:  00",
+            "00"
+          ]
+        },
+        {
+          "UUID": "0000ffb2-0000-1000-8000-00805f9b34fb",
+          "Name": "Green",
+          "Type": "U8|HEX|Green",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsWriteWithoutResponse": true,
+          "ExampleData": [
+            "Value:  00",
+            "00"
+          ]
+        },
+        {
+          "UUID": "0000ffb3-0000-1000-8000-00805f9b34fb",
+          "Name": "Blue",
+          "Type": "U8|HEX|Blue",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsWriteWithoutResponse": true,
+          "ExampleData": [
+            "Value:  00",
+            "00"
+          ]
+        },
+        {
+          "UUID": "0000ffb4-0000-1000-8000-00805f9b34fb",
+          "Name": "White",
+          "Type": "U8|HEX|White",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsWriteWithoutResponse": true,
+          "ExampleData": [
+            "Value:  00",
+            "00"
+          ]
+        },
+        {
+          "UUID": "0000ffb5-0000-1000-8000-00805f9b34fb",
+          "Name": "SetColor",
+          "Type": "U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|White",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsWriteWithoutResponse": true,
+          "ExampleData": [
+            "Value:  00 00 00 00",
+            "00 00 00 00"
+          ]
+        }
+      ]
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-20:c3:8f:8d:bf:7f\nCanPair:False IsPaired:True"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5e:f1:b4:11:d2:c9\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-7c:92:da:89:49:62\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-49:aa:89:1e:e4:a3\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "ID115Plus HR",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-e8:95:3b:24:8d:7f\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-7f:49:2e:8c:31:50\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5d:74:fe:fe:48:da\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-41:d7:40:18:b9:e5\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPad",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-54:a9:7a:e5:fe:9b\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5d:90:fa:f8:b1:ce\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Notti",
+  "ClassName": "Witti_Notti",
+  "ClassModifiers": "partial",
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "ExampleData": [
+            "Name: Notti",
+            "Notti"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  00 00",
+            "Unknown"
+          ]
+        },
+        {
+          "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+          "Name": "Privacy",
+          "Type": "Bytes|HEX|Privacy",
+          "IsRead": true,
+          "ExampleData": [
+            "Privacy:  00"
+          ]
+        },
+        {
+          "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+          "Name": "Reconnect Address",
+          "Type": "Bytes|HEX|ReconnectAddress",
+          "IsWrite": true
+        },
+        {
+          "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+          "Name": "Connection Parameter",
+          "Type": "Bytes|HEX|ConnectionParameter",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  50 00 A0 00 00 00 E8 03"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service",
+      "Characteristics": [
+        {
+          "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+          "Name": "Service Changes",
+          "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+          "IsIndicate": true
+        }
+      ]
+    },
+    {
+      "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+      "Name": "Device Info",
+      "Characteristics": [
+        {
+          "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+          "Name": "System ID",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  51 2A 8B 00 00 3E 31 5C",
+            "51 2A 8B 00 00 3E 31 5C"
+          ]
+        },
+        {
+          "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+          "Name": "Model Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  4D 6F 64 65 6C 20 4E 75 6D 62 65 72 00",
+            "Model Number\\0"
+          ]
+        },
+        {
+          "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+          "Name": "Serial Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  53 65 72 69 61 6C 20 4E 75 6D 62 65 72 00",
+            "Serial Number\\0"
+          ]
+        },
+        {
+          "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+          "Name": "Firmware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  46 69 72 6D 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+            "Firmware Revision\\0"
+          ]
+        },
+        {
+          "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+          "Name": "Hardware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  48 61 72 64 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+            "Hardware Revision\\0"
+          ]
+        },
+        {
+          "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+          "Name": "Software Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  53 6F 66 74 77 61 72 65 20 52 65 76 69 73 69 6F 6E 00",
+            "Software Revision\\0"
+          ]
+        },
+        {
+          "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+          "Name": "Manuafacturer Name",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  4D 61 6E 75 66 61 63 74 75 72 65 72 20 4E 61 6D 65 00",
+            "Manufacturer Name\\0"
+          ]
+        },
+        {
+          "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+          "Name": "Regulatory List",
+          "Type": "U8|HEX|BodyType U8|HEX|BodyStructure String|ASCII|Data",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C",
+            "FE 00 experimental"
+          ]
+        },
+        {
+          "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+          "Name": "PnP ID",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  01 0D 00 00 00 10 01",
+            "\u0001\\r\\0\\0\\0\u0010\u0001"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+      "Name": "Battery",
+      "Characteristics": [
+        {
+          "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+          "Name": "BatteryLevel",
+          "Type": "I8|DEC|BatteryLevel|%",
+          "IsRead": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Battery: 100%",
+            "100"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+      "Name": "LED Control",
+      "Characteristics": [
+        {
+          "UUID": "0000fff3-0000-1000-8000-00805f9b34fb",
+          "Name": "Command",
+          "Type": "U16|HEX|Command U8|HEX|Data1 U8|HEX|Data2 U8|HEX|Data3 U8|HEX|Data4 U8|HEX|Data5 U8|HEX|Data6",
+          "IsWrite": true
+        },
+        {
+          "UUID": "0000fff4-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown1",
+          "Type": "Bytes|HEX|Unknown1",
+          "IsNotify": true
+        },
+        {
+          "UUID": "0000fff5-0000-1000-8000-00805f9b34fb",
+          "Name": "ChangeName",
+          "Type": "Bytes|HEX|Name",
+          "IsWrite": true
+        },
+        {
+          "UUID": "0000fff6-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown3",
+          "Type": "Bytes|HEX|Unknown3",
+          "IsNotify": true
+        }
+      ]
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5c:31:3e:8b:2a:51\nCanPair:False IsPaired:True"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-75:7b:8b:ee:f5:6c\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-58:11:6e:a1:d0:88\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-7e:c8:1f:c4:a5:c0\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Tile",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-d4:56:e2:de:88:cd\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-7d:3e:78:12:b8:c2\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-57:a8:91:c6:91:cb\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-54:5e:d2:59:b4:5e\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5a:bf:33:f0:ae:19\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-75:75:9d:1a:32:be\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-40:68:f0:52:6f:e0\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Apple Watch",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-55:23:4a:9a:d1:d6\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-58:60:20:69:b6:85\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Inspire HR",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-26:2d:27:7e:a3:f7\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-61:9a:97:00:ea:0b\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-6a:33:7c:3b:26:2e\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-7b:47:ae:84:31:1c\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-4d:e3:ad:57:8a:b0\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "MS1021",
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Name: MS1021\\0",
+            "MS1021\\0"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  00 00",
+            "Unknown"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00010203-0405-0607-0809-0a0b0c0d1912",
+      "Name": "Unknown1",
+      "Characteristics": [
+        {
+          "UUID": "00010203-0405-0607-0809-0a0b0c0d2b12",
+          "Name": "OTA",
+          "Type": "Bytes|HEX|OTA",
+          "IsRead": true,
+          "IsWriteWithoutResponse": true,
+          "ExampleData": [
+            "Value:  00"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "0000fee7-0000-1000-8000-00805f9b34fb",
+      "Name": "Unknown2",
+      "Characteristics": [
+        {
+          "UUID": "0000fec7-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsWrite": true
+        },
+        {
+          "UUID": "0000fec8-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown1",
+          "Type": "Bytes|HEX|Unknown1",
+          "IsIndicate": true
+        },
+        {
+          "UUID": "0000fec9-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown2",
+          "Type": "Bytes|HEX|Unknown2",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  A4 C1 7A 4C 80 16"
+          ]
+        },
+        {
+          "UUID": "0000fea1-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown3",
+          "Type": "Bytes|HEX|Unknown3",
+          "IsRead": true,
+          "IsNotify": true,
+          "IsIndicate": true,
+          "ExampleData": [
+            "Value:  01 00 00 00"
+          ]
+        },
+        {
+          "UUID": "0000fea2-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown4",
+          "Type": "Bytes|HEX|Unknown4",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsIndicate": true,
+          "ExampleData": [
+            "Value:  01 10 27 00"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "0000cc00-0000-1000-8000-00805f9b34fb",
+      "Name": "Unknown3",
+      "Characteristics": [
+        {
+          "UUID": "0000cc02-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Value:  00 00 00 00 00 00 00 00 00 00 00 21 43 6A 00 00 00 00 00 00"
+          ]
+        },
+        {
+          "UUID": "0000cc03-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown1",
+          "Type": "Bytes|HEX|Unknown1",
+          "IsRead": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Value:  46 10 07 01 0D 0D 31 03 00 00 00 00 00 00 00 00 00 00 00 00"
+          ]
+        },
+        {
+          "UUID": "0000cc04-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown2",
+          "Type": "Bytes|HEX|Unknown2",
+          "IsRead": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Value:  07 00 05 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+          ]
+        },
+        {
+          "UUID": "0000cc05-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown3",
+          "Type": "Bytes|HEX|Unknown3",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Value:  01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14"
+          ]
+        },
+        {
+          "UUID": "0000cc06-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown4",
+          "Type": "Bytes|HEX|Unknown4",
+          "IsWrite": true
+        }
+      ]
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-a4:c1:7a:4c:80:16\nCanPair:False IsPaired:True"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-46:99:32:76:ba:13\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-53:25:2b:da:f4:89\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-69:29:7a:44:00:3b\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-41:a0:39:b0:be:d7\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPad",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-76:1b:48:c7:13:72\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-70:79:ed:c0:2f:25\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-67:3f:72:ae:97:76\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-68:df:92:c9:65:85\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-49:11:53:fc:8e:c9\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-4b:45:58:d5:40:dc\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "LEDBlue-4C479F18",
+  "ClassName": "Triones_LedLight",
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "ExampleData": [
+            "Name: LEDBlue-4C479F18",
+            "LEDBlue-4C479F18"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  00 00",
+            "Unknown"
+          ]
+        },
+        {
+          "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+          "Name": "Privacy",
+          "Type": "Bytes|HEX|Privacy",
+          "IsRead": true,
+          "ExampleData": [
+            "Privacy:  00"
+          ]
+        },
+        {
+          "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+          "Name": "Reconnect Address",
+          "Type": "Bytes|HEX|ReconnectAddress",
+          "IsWrite": true
+        },
+        {
+          "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+          "Name": "Connection Parameter",
+          "Type": "Bytes|HEX|ConnectionParameter",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  50 00 A0 00 00 00 E8 03"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service",
+      "Characteristics": [
+        {
+          "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+          "Name": "Service Changes",
+          "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+          "IsIndicate": true
+        }
+      ]
+    },
+    {
+      "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+      "Name": "Device Info",
+      "Characteristics": [
+        {
+          "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+          "Name": "System ID",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  18 9F 47 00 00 4C 99 B4",
+            "18 9F 47 00 00 4C 99 B4"
+          ]
+        },
+        {
+          "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+          "Name": "Model Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  00",
+            "\\0"
+          ]
+        },
+        {
+          "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+          "Name": "Serial Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  00",
+            "\\0"
+          ]
+        },
+        {
+          "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+          "Name": "Firmware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  76 35 00",
+            "v5\\0"
+          ]
+        },
+        {
+          "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+          "Name": "Hardware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  00",
+            "\\0"
+          ]
+        },
+        {
+          "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+          "Name": "Software Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  00",
+            "\\0"
+          ]
+        },
+        {
+          "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+          "Name": "Manuafacturer Name",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  00",
+            "\\0"
+          ]
+        },
+        {
+          "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+          "Name": "Regulatory List",
+          "Type": "U8|HEX|BodyType U8|HEX|BodyStructure String|ASCII|Data",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C",
+            "FE 00 experimental"
+          ]
+        },
+        {
+          "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+          "Name": "PnP ID",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  01 0D 00 00 00 10 01",
+            "\u0001\\r\\0\\0\\0\u0010\u0001"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+      "Name": "Unknown-fff0",
+      "Characteristics": [
+        {
+          "UUID": "0000fff1-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown fff1",
+          "Type": "Bytes|HEX",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+          ]
+        },
+        {
+          "UUID": "0000fff2-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown fff2",
+          "Type": "Bytes|HEX",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  02"
+          ]
+        },
+        {
+          "UUID": "0000fff3-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown fff3",
+          "Type": "Bytes|HEX",
+          "IsWrite": true
+        },
+        {
+          "UUID": "0000fff4-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown fff4",
+          "Type": "Bytes|HEX",
+          "IsNotify": true
+        },
+        {
+          "UUID": "0000fff5-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown fff5",
+          "Type": "Bytes|HEX",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Value:  01 02 03 04 05 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "0000ffe5-0000-1000-8000-00805f9b34fb",
+      "Name": "Light Control",
+      "Characteristics": [
+        {
+          "UUID": "0000ffe6-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown ffe6",
+          "Type": "Bytes|HEX",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+          ]
+        },
+        {
+          "UUID": "0000ffe7-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown ffe7",
+          "Type": "Bytes|HEX",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  00"
+          ]
+        },
+        {
+          "UUID": "0000ffe8-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown ffe8",
+          "Type": "Bytes|HEX",
+          "IsWrite": true
+        },
+        {
+          "UUID": "0000ffea-0000-1000-8000-00805f9b34fb",
+          "Name": "Characteristic 4",
+          "Type": "Bytes|HEX|Characteristic 4",
+          "IsNotify": true
+        },
+        {
+          "UUID": "0000ffe9-0000-1000-8000-00805f9b34fb",
+          "Name": "Triones Command",
+          "Type": "Bytes|HEX",
+          "IsWriteWithoutResponse": true
+        }
+      ]
+    },
+    {
+      "UUID": "0000ffe0-0000-1000-8000-00805f9b34fb",
+      "Name": "Unknown-ffe0",
+      "Characteristics": [
+        {
+          "UUID": "0000ffe1-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown ffe1",
+          "Type": "Bytes|HEX",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+          ]
+        },
+        {
+          "UUID": "0000ffe2-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown ffe2",
+          "Type": "Bytes|HEX",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  00"
+          ]
+        },
+        {
+          "UUID": "0000ffe3-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown ffe3",
+          "Type": "Bytes|HEX",
+          "IsWrite": true
+        },
+        {
+          "UUID": "0000ffe4-0000-1000-8000-00805f9b34fb",
+          "Name": "Status Reply",
+          "Type": "U8|HEX|Opcode U8|HEX|Constant U8|HEX|Power U8|HEX|Mode U8|HEX|Unknown U8|HEX|Speed U8|HEX|R U8|HEX|G U8|HEX|B U8|HEX|W U8|HEX|Unknown2 U8|HEX|Final",
+          "IsNotify": true
+        },
+        {
+          "UUID": "0000ffe5-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown ffe5",
+          "Type": "Bytes|HEX",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+          ]
+        }
+      ]
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-b4:99:4c:47:9f:18\nCanPair:False IsPaired:True"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-55:5b:bd:74:7f:ca\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-68:4b:a0:6d:a4:be\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-4e:c8:94:c4:a6:7a\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-4e:2f:72:15:26:49\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-74:58:c0:5a:c0:24\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-60:cd:91:ce:5d:33\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-51:9b:d8:3d:5f:47\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-61:91:6c:49:ad:ae\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Apple Watch",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-64:f4:02:91:6a:38\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-7b:18:39:ec:86:0c\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-7f:54:36:4f:e4:fa\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-60:df:f4:3a:ee:95\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-4c:e3:cd:1c:41:74\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Apple Watch",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-50:71:66:09:c1:bd\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-60:77:e8:b4:f5:32\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-54:2a:f8:a0:8e:30\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-54:11:f0:2d:7f:fb\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-63:52:b3:c9:88:19\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-47:77:53:84:1e:10\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-58:d9:56:30:3d:95\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-41:ed:6b:10:e3:bd\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPad",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5f:5d:cd:6f:d3:a8\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-58:98:81:09:ef:19\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-50:76:ca:9d:49:8d\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-6d:29:a8:86:e5:70\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-50:3c:0d:b7:fc:6c\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-6b:66:c8:c1:05:f4\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-51:a6:5b:7f:45:70\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-55:b6:44:73:25:87\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-6e:91:d6:41:5a:e1\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-61:8a:60:2c:bc:6a\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-61:92:0a:70:68:db\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-64:da:5e:f7:0c:93\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Apple Watch",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-6b:29:d8:be:ee:66\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-45:53:53:9c:ab:9c\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-7b:e7:b7:a7:f9:b5\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "DfuTarg",
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Name: DfuTarg",
+            "DfuTarg"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  00 00",
+            "Unknown"
+          ]
+        },
+        {
+          "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+          "Name": "Connection Parameter",
+          "Type": "Bytes|HEX|ConnectionParameter",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  0C 00 18 00 00 00 90 01"
+          ]
+        },
+        {
+          "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+          "Name": "Central Address Resolution",
+          "Type": "U8|DEC|AddressResolutionSupported",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  01",
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service"
+    },
+    {
+      "UUID": "0000fe59-0000-1000-8000-00805f9b34fb",
+      "Name": "Unknown2",
+      "Characteristics": [
+        {
+          "UUID": "8ec90002-f315-4f60-9fb8-838830daea50",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsWriteWithoutResponse": true
+        },
+        {
+          "UUID": "8ec90001-f315-4f60-9fb8-838830daea50",
+          "Name": "Unknown1",
+          "Type": "Bytes|HEX|Unknown1",
+          "IsWrite": true,
+          "IsNotify": true
+        }
+      ]
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-d6:0d:44:a8:91:9a\nCanPair:False IsPaired:True"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-6b:a4:d3:fc:8d:0c\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-57:cb:b6:16:65:47\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-55:8a:04:a7:c8:81\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-50:2d:12:e3:8a:63\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5d:02:0b:dc:8a:10\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-75:7e:d5:3b:b6:dc\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-42:2e:23:1e:1c:ff\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-59:8b:2c:ff:52:2b\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-4a:f6:40:f9:b9:ea\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-75:54:60:d0:0b:7f\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-41:c5:6a:ef:69:e5\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPad",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-55:60:ee:aa:90:13\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Skoobot",
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Name: Skoobot",
+            "Skoobot"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  00 00",
+            "Unknown"
+          ]
+        },
+        {
+          "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+          "Name": "Connection Parameter",
+          "Type": "Bytes|HEX|ConnectionParameter",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  08 00 20 00 00 00 90 01"
+          ]
+        },
+        {
+          "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+          "Name": "Central Address Resolution",
+          "Type": "U8|DEC|AddressResolutionSupported",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  01",
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service",
+      "Characteristics": [
+        {
+          "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+          "Name": "Service Changes",
+          "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+          "IsIndicate": true
+        }
+      ]
+    },
+    {
+      "UUID": "00001523-1212-efde-1523-785feabcd123",
+      "Name": "Unknown2",
+      "Characteristics": [
+        {
+          "UUID": "00001525-1212-efde-1523-785feabcd123",
+          "Name": "Unknown0",
+          "Type": "Bytes|HEX|Unknown0",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Value:  22"
+          ]
+        },
+        {
+          "UUID": "00001524-1212-efde-1523-785feabcd123",
+          "Name": "Unknown1",
+          "Type": "Bytes|HEX|Unknown1",
+          "IsRead": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Value:  B5"
+          ]
+        },
+        {
+          "UUID": "00001526-1212-efde-1523-785feabcd123",
+          "Name": "Unknown2",
+          "Type": "Bytes|HEX|Unknown2",
+          "IsRead": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Value:  00 2E"
+          ]
+        },
+        {
+          "UUID": "00001528-1212-efde-1523-785feabcd123",
+          "Name": "Unknown3",
+          "Type": "Bytes|HEX|Unknown3",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Value:  37 CF 22 AC"
+          ]
+        },
+        {
+          "UUID": "00001527-1212-efde-1523-785feabcd123",
+          "Name": "Unknown4",
+          "Type": "Bytes|HEX|Unknown4",
+          "IsRead": true,
+          "IsWrite": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Value:  AE 6D FB 97 D6 53 06 FF E8 12 81 EB 05 AE 1E D5 31 DB B0 01"
+          ]
+        }
+      ]
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-e2:ae:33:71:fb:b1\nCanPair:False IsPaired:True"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-4f:6a:7b:1a:74:1d\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-47:c2:df:fa:7e:78\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-53:3b:cd:77:e5:6c\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "iPhone",
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-55:7e:7b:66:65:e1\nCanPair:True IsPaired:False"
+},
+{
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-52:c8:a5:c1:c5:57\nCanPair:True IsPaired:False"
+},
+{
+  "Name": "Surface Pen",
+  "Services": [
+    {
+      "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+      "Name": "Common Configuration",
+      "Characteristics": [
+        {
+          "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Name",
+          "Type": "String|ASCII|Device_Name",
+          "IsRead": true,
+          "IsWrite": true,
+          "ExampleData": [
+            "Name: Surface Pen",
+            "Surface Pen"
+          ]
+        },
+        {
+          "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+          "Name": "Appearance",
+          "Type": "U16|Speciality^Appearance|Appearance",
+          "IsRead": true,
+          "ExampleData": [
+            "Appearance:  C7 03",
+            "Digital_Pen"
+          ]
+        },
+        {
+          "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+          "Name": "Connection Parameter",
+          "Type": "Bytes|HEX|ConnectionParameter",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  06 00 18 00 F3 01 80 0C"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+      "Name": "Generic Service",
+      "Characteristics": [
+        {
+          "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+          "Name": "Service Changes",
+          "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+          "IsIndicate": true
+        }
+      ]
+    },
+    {
+      "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+      "Name": "Device Info",
+      "Characteristics": [
+        {
+          "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+          "Name": "Manuafacturer Name",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  4D 69 63 72 6F 73 6F 66 74",
+            "Microsoft"
+          ]
+        },
+        {
+          "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+          "Name": "Serial Number",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  30 37 32 35 38 38 35 37 30 31 35 37 34 20 28 32 30 35 64 31 62 38 63 29",
+            "0725885701574 (205d1b8c)"
+          ]
+        },
+        {
+          "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+          "Name": "Hardware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  44 56",
+            "DV"
+          ]
+        },
+        {
+          "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+          "Name": "Firmware Revision",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  32 30 35 31 65 30 37 30",
+            "2051e070"
+          ]
+        },
+        {
+          "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+          "Name": "PnP ID",
+          "Type": "String|ASCII",
+          "IsRead": true,
+          "ExampleData": [
+            "Value:  02 5E 04 0E 09 33 00",
+            "\u0002^\u0004\u000e\t3\\0"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+      "Name": "Battery",
+      "Characteristics": [
+        {
+          "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+          "Name": "BatteryLevel",
+          "Type": "I8|DEC|BatteryLevel|%",
+          "IsRead": true,
+          "IsNotify": true,
+          "ExampleData": [
+            "Battery: 59%",
+            "59"
+          ]
+        }
+      ]
+    },
+    {
+      "UUID": "00001812-0000-1000-8000-00805f9b34fb",
+      "Name": "Unknown4"
+    }
+  ],
+  "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-fa:50:cc:5e:42:b4\nCanPair:False IsPaired:True"
+}

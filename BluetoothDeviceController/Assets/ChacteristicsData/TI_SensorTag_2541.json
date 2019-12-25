@@ -1,0 +1,613 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "SensorTag",
+      "ClassName": "TI_SensorTag_2541",
+      "ClassModifiers": "partial",
+      "Description": "The original smaller (upright) TI SensorTag. As of 2017, it's obsolete. The CC2541 SensorTag is the first Bluetooth Smart development kit focused on wireless sensor applications and it is the only development kit targeted for smart phone app developers. The SensorTag can be used as reference design and development platform for a variety of smart phone accessories.",
+      "Aliases": [ "TI BLE Sensor Tag" ],
+      "DefaultPin":  "0",
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: TI BLE Sensor Tag",
+                "TI BLE Sensor Tag"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+              "Name": "Privacy",
+              "Type": "BYTES|HEX|Privacy",
+              "IsRead": true,
+              "ExampleData": [
+                "Privacy:  00"
+              ]
+            },
+            {
+              "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+              "Name": "Reconnect Address",
+              "Type": "BYTES|HEX|ReconnectAddress",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  50 00 A0 00 00 00 E8 03"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Suppress":  true,
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  AE 3D D1 00 00 F7 B1 34",
+                "AE 3D D1 00 00 F7 B1 34"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4E 2E 41 2E 00",
+                "N.A.\\0"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4E 2E 41 2E 00",
+                "N.A.\\0"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2E 30 31 20 28 46 65 62 20 20 37 20 32 30 31 33 29 00",
+                "1.01 (Feb  7 2013)\\0"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4E 2E 41 2E 00",
+                "N.A.\\0"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  4E 2E 41 2E 00",
+                "N.A.\\0"
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manuafacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  54 65 78 61 73 20 49 6E 73 74 72 75 6D 65 6E 74 73 00",
+                "Texas Instruments\\0"
+              ]
+            },
+            {
+              "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Regulatory List",
+              "Type": "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C",
+                "FE 00 experimental"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 0D 00 00 00 10 01",
+                "\u0001\\r\\0\\0\\0\u0010\u0001"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa00-0451-4000-b000-000000000000",
+          "Name": "IR Service",
+          "Priority":  5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa01-0451-4000-b000-000000000000",
+              "Name": "IR Data",
+              "Type": "I16|HEX|ObjTemp|C I16|HEX|AmbientTemp|C",
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "ReadConvert": "valueList = bleDevice.ConvertIR();",
+              "NotifyConvert": "valueList = bleDevice.ConvertIR();",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "ZZchartDefaultMinY": -1.5,
+                "ZZchartDefaultMaxY": 1.5,
+                "chartLineDefaults": {
+                  "ObjTemp": {
+                    "stroke": "DarkRed"
+                  },
+                  "AmbientTemp": {
+                    "stroke": "DarkGreen"
+                  }
+                },
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "ExampleData": [
+                "Value:  00 00 00 00",
+                "REM Actual data is a complex calculation"
+              ]
+            },
+            {
+              "UUID": "f000aa02-0451-4000-b000-000000000000",
+              "Name": "IR Service Configure",
+              "Type": "U8|HEX|IRConfigure",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM 0=off 1=on"
+              ]
+            },
+            {
+              "UUID": "f000aa03-0451-4000-b000-000000000000",
+              "Name": "IR Service Period",
+              "Type": "U8|DEC|IRPeriod",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM time in ms 10..255"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa10-0451-4000-b000-000000000000",
+          "Name": "Accelerometer",
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "f000aa11-0451-4000-b000-000000000000",
+              "Name": "Accelerometer Data",
+              "Type": "I8^64_/|FIXED|AccelX|g I8^64_/|FIXED|AccelY|g I8^64_/_IV|FIXED|AccelZ|g",
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": -1.5,
+                "chartDefaultMaxY": 1.5,
+                "chartLineDefaults": {
+                  "AccelX": {
+                    "stroke": "DarkRed"
+                  },
+                  "AccelY": {
+                    "stroke": "DarkGreen"
+                  },
+                  "AccelZ": {
+                    "stroke": "DarkBlue"
+                  }
+                },
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "ExampleData": [
+                "Value:  00 00 00"
+              ]
+            },
+            {
+              "UUID": "f000aa12-0451-4000-b000-000000000000",
+              "Name": "Accelerometer Configure",
+              "Type": "U8|HEX|AccelerometerConfigure",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM 0=off 1=on"
+              ]
+            },
+            {
+              "UUID": "f000aa13-0451-4000-b000-000000000000",
+              "Name": "Accelerometer Period",
+              "Type": "U8|DEC|AccelerometerPeriod",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  64",
+                "REM time in ms 10..255"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa20-0451-4000-b000-000000000000",
+          "Name": "Humidity",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa21-0451-4000-b000-000000000000",
+              "Name": "Humidity Data",
+              "Type": "U16^175.72_*_65536_/_46.86_-|FIXED|Temp U16^125.0_*_65536_/_6.0_-|FIXED|Humidity",
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": 0,
+                "chartDefaultMaxY": 100,
+                "chartLineDefaults": {
+                  "Temp": {
+                    "stroke": "DarkGreen"
+                  },
+                  "Humidity": {
+                    "stroke": "DarkBlue"
+                  }
+                },
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "ExampleData": [
+                "Value:  00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "f000aa22-0451-4000-b000-000000000000",
+              "Name": "Humidity Configure",
+              "Type": "U8|HEX|HumidityConfigure",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM 0=off 1=on"
+              ]
+            },
+            {
+              "UUID": "f000aa23-0451-4000-b000-000000000000",
+              "Name": "Humidity Period",
+              "Type": "U8|DEC|HumidityPeriod",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM time in ms 10..255"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa30-0451-4000-b000-000000000000",
+          "Name": "Magnetometer",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa31-0451-4000-b000-000000000000",
+              "Name": "Magnetometer Data",
+              "Type": "I16^2000_*_65536_/_IV|FIXED|X I16^2000_*_65536_/_IV|FIXED|Y I16^2000_*_65536_/|FIXED|Z",
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": -200,
+                "chartDefaultMaxY": 200,
+                "chartLineDefaults": {
+                  "X": {
+                    "stroke": "DarkRed"
+                  },
+                  "Y": {
+                    "stroke": "DarkGreen"
+                  },
+                  "Z": {
+                    "stroke": "DarkBlue"
+                  }
+                },
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "f000aa32-0451-4000-b000-000000000000",
+              "Name": "Magnetometer Configure",
+              "Type": "U8|HEX|MagnetometerConfigure",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM 0=off 1=on"
+              ]
+            },
+            {
+              "UUID": "f000aa33-0451-4000-b000-000000000000",
+              "Name": "Magnetometer Period",
+              "Type": "U8|DEC|MagnetometerPeriod",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  C8",
+                "REM time in ms 10..255"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa40-0451-4000-b000-000000000000",
+          "Name": "Barometer",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa41-0451-4000-b000-000000000000",
+              "Name": "Barometer Data",
+              "Type": "U16|HEX|TempRaw U16|HEX|PressureRaw",
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "ExampleData": [
+                "Value:  00 00 00 00",
+                "REM Value is a complex calculation"
+              ]
+            },
+            {
+              "UUID": "f000aa42-0451-4000-b000-000000000000",
+              "Name": "Barometer Configure",
+              "Type": "U8|HEX|BarometerConfigure",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM 0=off 1=on 2=get calibration data"
+              ]
+            },
+            {
+              "UUID": "f000aa43-0451-4000-b000-000000000000",
+              "Name": "Barometer Calibration",
+              "Type": "BYTES|HEX|BarometerCalibration",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "f000aa44-0451-4000-b000-000000000000",
+              "Name": "Barometer Period",
+              "Type": "U8|DEC|BarometerPeriod",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM time in ms 10..255"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa50-0451-4000-b000-000000000000",
+          "Name": "Gyroscope",
+          "Priority": 5,
+          "Characteristics": [
+            {
+              "UUID": "f000aa51-0451-4000-b000-000000000000",
+              "Name": "Gyroscope Data",
+              "Type": "I16^500_*_65536_/_IV|FIXED|X I16^500_*_65536_/|FIXED|Y I16^500_*_65536_/|FIXED|Z",
+              "IsRead": true,
+              "IsNotify": true,
+              "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": -250,
+                "chartDefaultMaxY": 250,
+                "chartLineDefaults": {
+                  "X": {
+                    "stroke": "DarkRed"
+                  },
+                  "Y": {
+                    "stroke": "DarkGreen"
+                  },
+                  "Z": {
+                    "stroke": "DarkBlue"
+                  }
+                },
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "f000aa52-0451-4000-b000-000000000000",
+              "Name": "Gyroscope Configure",
+              "Type": "U8|HEX|GyroscopeConfigure",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM 0=off 1=X 2=Y 4=Z 7=All"
+              ]
+            },
+            {
+              "UUID": "f000aa53-0451-4000-b000-000000000000",
+              "Name": "Gyroscope Period",
+              "Type": "U8|DEC|GyroscopePeriod",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM time in ms 10..255"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000ffe0-0000-1000-8000-00805f9b34fb",
+          "Name": "Key Press",
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "0000ffe1-0000-1000-8000-00805f9b34fb",
+              "Name": "Key Press State",
+              "Type": "U8|HEX|KeyPressState",
+              "IsNotify": true,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "f000aa60-0451-4000-b000-000000000000",
+          "Name": "Test Service",
+          "Suppress":  true,
+          "Characteristics": [
+            {
+              "UUID": "f000aa61-0451-4000-b000-000000000000",
+              "Name": "Test Data",
+              "Type": "U16|HEX|TestData",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  3F 00",
+                "Bits 0..6 are test failed=0 or passed=1 for IR Humidity Mag Accel Barometer Gyro"
+              ]
+            },
+            {
+              "UUID": "f000aa62-0451-4000-b000-000000000000",
+              "Name": "Test Configure",
+              "Type": "BYTES|HEX|TestConfigure",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00",
+                "REM 80 to enable bottom 2 bits are LED"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000ccc0-0451-4000-b000-000000000000",
+          "Name": "Connection Control",
+          "Suppress":  true,
+          "Characteristics": [
+            {
+              "UUID": "f000ccc1-0451-4000-b000-000000000000",
+              "Name": "Conn. Params",
+              "Type": "U16|HEX|ConnInterval U16|HEX|WorkerLatency U16|HEX|SupervisorTimeout",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  09 00 00 00 C0 03"
+              ]
+            },
+            {
+              "UUID": "f000ccc2-0451-4000-b000-000000000000",
+              "Name": "Conn. Params Req",
+              "Type": "U16|HEX|MinConnInterval U16|HEX|MaxConnInterval U16|HEX|WorkerLatency U16|HEX|SupervisionTimeout",
+              "IsWrite": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "f000ccc3-0451-4000-b000-000000000000",
+              "Name": "Disconnect Req",
+              "Type": "BYTES|HEX|Disconnect",
+              "IsWrite": true,
+              "ExampleData": []
+            }
+          ]
+        },
+        {
+          "UUID": "f000ffc0-0451-4000-b000-000000000000",
+          "Name": "Image",
+          "Suppress":  true,
+          "Characteristics": [
+            {
+              "UUID": "f000ffc1-0451-4000-b000-000000000000",
+              "Name": "Img Identify",
+              "Type": "BYTES|HEX|ImageIdentify",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": []
+            },
+            {
+              "UUID": "f000ffc2-0451-4000-b000-000000000000",
+              "Name": "Img Block",
+              "Type": "BYTES|HEX|ImgageBlock",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "ExampleData": []
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-34:b1:f7:d1:3d:ae\nCanPair:False IsPaired:True"
+    }
+  ]
+}
