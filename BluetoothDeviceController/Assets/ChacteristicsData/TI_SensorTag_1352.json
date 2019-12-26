@@ -2,7 +2,7 @@
   "AllDevices": [
     {
       "Name": "Multi-Sensor",
-      "ClassName": "TI_SensorTag_1350",
+      "ClassName": "TI_SensorTag_1352",
       "ClassModifiers": "partial",
       "Description": "The TI 1352 is the latest 2019 version in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth",
       "Services": [
@@ -71,7 +71,7 @@
             {
               "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
               "Name": "System ID",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|SystemId",
               "IsRead": true,
               "ExampleData": [
                 "Value:  05 C4 1E 00 00 B0 6F 80",
@@ -81,7 +81,7 @@
             {
               "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
               "Name": "Model Number",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|ModelNumber",
               "IsRead": true,
               "ExampleData": [
                 "Value:  4D 6F 64 65 6C 20 4E 75 6D 62 65 72",
@@ -91,7 +91,7 @@
             {
               "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
               "Name": "Serial Number",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|SerialNumber",
               "IsRead": true,
               "ExampleData": [
                 "Value:  53 65 72 69 61 6C 20 4E 75 6D 62 65 72",
@@ -101,7 +101,7 @@
             {
               "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
               "Name": "Firmware Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|FirmwareRevision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  46 69 72 6D 77 61 72 65 20 52 65 76 69 73 69 6F 6E",
@@ -111,7 +111,7 @@
             {
               "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
               "Name": "Hardware Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|HardwareRevision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  48 61 72 64 77 61 72 65 20 52 65 76 69 73 69 6F 6E",
@@ -121,7 +121,7 @@
             {
               "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
               "Name": "Software Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|SoftwareRevision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  53 6F 66 74 77 61 72 65 20 52 65 76 69 73 69 6F 6E",
@@ -131,7 +131,7 @@
             {
               "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
               "Name": "Manuafacturer Name",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|ManufacturerName",
               "IsRead": true,
               "ExampleData": [
                 "Value:  4D 61 6E 75 66 61 63 74 75 72 65 72 20 4E 61 6D 65",
@@ -151,7 +151,7 @@
             {
               "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
               "Name": "PnP ID",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|PnPID",
               "IsRead": true,
               "ExampleData": [
                 "Value:  01 0D 00 00 00 10 01",
@@ -168,7 +168,7 @@
               "UUID": "f000ffc1-0451-4000-b000-000000000000",
               "Name": "Img Identify",
               "Description": "Img Identify",
-              "Type": "BYTES|HEX|Img Identify",
+              "Type": "BYTES|HEX|Img_Identify",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "IsNotify": true
@@ -177,7 +177,7 @@
               "UUID": "f000ffc2-0451-4000-b000-000000000000",
               "Name": "Img Block",
               "Description": "Img Block",
-              "Type": "BYTES|HEX|Img Block",
+              "Type": "BYTES|HEX|Img_Block",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "IsNotify": true
@@ -186,7 +186,7 @@
               "UUID": "f000ffc5-0451-4000-b000-000000000000",
               "Name": "OAD Extended Control",
               "Description": "OAD Extended Control",
-              "Type": "BYTES|HEX|OAD Extended Control",
+              "Type": "BYTES|HEX|OAD_Extended_Control",
               "IsWriteWithoutResponse": true,
               "IsNotify": true
             }
@@ -218,7 +218,7 @@
               "UUID": "f000aa02-0451-4000-b000-000000000000",
               "Name": "Temperature Conf.",
               "Description": "Temperature Conf.",
-              "Type": "BYTES|HEX|Temperature Conf.",
+              "Type": "U8|HEX|Enable",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -303,7 +303,7 @@
               "UUID": "f000aa72-0451-4000-b000-000000000000",
               "Name": "Light Conf.",
               "Description": "Light Conf.",
-              "Type": "BYTES|HEX|Light Conf.",
+              "Type": "BYTES|HEX|Enable",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -314,7 +314,7 @@
               "UUID": "f000aa73-0451-4000-b000-000000000000",
               "Name": "Light Period",
               "Description": "Light Period",
-              "Type": "BYTES|HEX|Light Period",
+              "Type": "BYTES|HEX|Light_Period",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -371,7 +371,7 @@
               "UUID": "f0001121-0451-4000-b000-000000000000",
               "Name": "Button 0",
               "Description": "Button 0",
-              "Type": "U8|HEX|Value",
+              "Type": "U8|HEX|Button0",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -382,7 +382,7 @@
               "UUID": "f0001122-0451-4000-b000-000000000000",
               "Name": "Button 1",
               "Description": "Button 1",
-              "Type": "U8|HEX|Value",
+              "Type": "U8|HEX|Button1",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -416,7 +416,7 @@
               "UUID": "f000ffa1-0451-4000-b000-000000000000",
               "Name": "Accel Enable",
               "Description": "Accel Enable",
-              "Type": "BYTES|HEX|Accel Enable",
+              "Type": "BYTES|HEX|Enable",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -427,7 +427,7 @@
               "UUID": "f000ffa2-0451-4000-b000-000000000000",
               "Name": "Accel Range",
               "Description": "Accel Range",
-              "Type": "U16|HEX|Accel Range",
+              "Type": "U16|HEX|Accel_Range",
               "IsRead": true,
               "ExampleData": [
                 "Value:  14 00"
@@ -437,21 +437,21 @@
               "UUID": "f000ffa3-0451-4000-b000-000000000000",
               "Name": "X",
               "Description": "Accel X-Coordinate",
-              "Type": "I16^1000_/|FIXED|Accel X-Coordinate",
+              "Type": "I16^1000_/|FIXED|AccelX",
               "IsNotify": true
             },
             {
               "UUID": "f000ffa4-0451-4000-b000-000000000000",
               "Name": "Y",
               "Description": "Accel Y-Coordinate",
-              "Type": "I16^1000_/|FIXED|Accel Y-Coordinate",
+              "Type": "I16^1000_/|FIXED|AccelY",
               "IsNotify": true
             },
             {
               "UUID": "f000ffa5-0451-4000-b000-000000000000",
               "Name": "Z",
               "Description": "Accel Z-Coordinate",
-              "Type": "I16^1000_/|FIXED|Accel Z-Coordinate",
+              "Type": "I16^1000_/|FIXED|AccelZ",
               "IsNotify": true
             }
           ]

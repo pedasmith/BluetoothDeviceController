@@ -66,6 +66,7 @@ namespace BluetoothDeviceController
 
             // All of the TI sensor tags :-)
             // The 2650 and 1350 SensorTag have the same interface and use the same page
+            new Specialization (typeof(SpecialtyPages.TI_SensorTag_1352Page), new string[] { "Multi-Sensor" }, DATA, "TI 1352 SensorTag", "SensorTag data"),
             new Specialization (typeof(SpecialtyPages.TI_SensorTag_1350Page), new string[] { "CC1350" }, DATA, "TI 1350 SensorTag", "SensorTag data"),
             new Specialization (typeof(SpecialtyPages.TI_SensorTag_1350Page), new string[] { "CC2650 SensorTag" }, DATA, "TI 2650 SensorTag", "SensorTag data"),
             new Specialization (typeof(SpecialtyPages.TI_SensorTag_1350Page), new string[] { "SensorTag 2.0" }, DATA, "TI 2650 SensorTag", "SensorTag data"),
@@ -809,7 +810,8 @@ namespace BluetoothDeviceController
             {
                 Content = new GenerateCodeControl(),
                 PrimaryButtonText = "OK",
-                Title = "Generate Code from JSON descriptions"
+                Title = "Generate Code from JSON descriptions",
+                Width = 500,
             };
             await dlg.ShowAsync();
         }

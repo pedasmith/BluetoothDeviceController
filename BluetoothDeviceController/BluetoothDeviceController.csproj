@@ -172,6 +172,7 @@
     <Compile Include="BluetoothProtocols\TI_beLight_2540.cs" />
     <Compile Include="BluetoothProtocols\TI_SensorTag_1350.cs" />
     <Compile Include="BluetoothProtocols\TI_SensorTag_1350_Custom.cs" />
+    <Compile Include="BluetoothProtocols\TI_SensorTag_1352.cs" />
     <Compile Include="BluetoothProtocols\TI_SensorTag_2541.cs" />
     <Compile Include="BluetoothProtocols\TI_SensorTag_2541_Custom.cs" />
     <Compile Include="BluetoothProtocols\Triones_LedLight.cs" />
@@ -242,6 +243,9 @@
       <DependentUpon>Protocentral_SensythingPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPages\TI_SensorTag_1350Page.xaml.cs" />
+    <Compile Include="SpecialtyPages\TI_SensorTag_1352Page.xaml.cs">
+      <DependentUpon>TI_SensorTag_1352Page.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SpecialtyPages\TI_SensorTag_2541Page.xaml.cs" />
     <Compile Include="SpecialtyPages\Vion_MeterPage.xaml.cs">
       <DependentUpon>Vion_MeterPage.xaml</DependentUpon>
@@ -724,6 +728,10 @@
     <Page Include="SpecialtyPages\TI_SensorTag_1350Page.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SpecialtyPages\TI_SensorTag_1352Page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPages\TI_SensorTag_2541Page.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -8,6 +8,10 @@ namespace BluetoothDeviceController.Names
 {
     public static class GenerateCSharpClass
     {
+        public static void Error(string str)
+        {
+            ;
+        }
         public static string DotNetSafe(this string name)
         {
             // "  foo  " --> "foo"
@@ -146,6 +150,7 @@ namespace BluetoothDeviceController.Names
             {
                 return "double";
             }
+            Error($"ByteFormatToCSharp: unknown format {format}");
             return $"OtherType{format}";
         }
         private static string ByteFormatToCSharpDefault(string format)
@@ -169,6 +174,7 @@ namespace BluetoothDeviceController.Names
             {
                 return "0.0";
             }
+            Error($"ByteFormatToCSharpDefault: unknown format {format}");
             return $"OtherType{format}";
         }
 
@@ -539,6 +545,8 @@ namespace BluetoothDeviceController.Names
                                 }
                                 else
                                 {
+                                    Error($"GenerateCShartClass: unknown type {format} / {name}");
+
                                     paramlist += $"UNKNOWN_TYPE_{format} {name}";
                                     arglist += $"            dw.WriteUNKNOWN_TYPE_{format}({name});\n";
                                 }
