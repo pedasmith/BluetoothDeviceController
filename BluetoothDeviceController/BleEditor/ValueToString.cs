@@ -239,14 +239,36 @@ namespace BluetoothDeviceController.BleEditor
                                 case "F32":
                                     {
                                         dvalue = dr.ReadSingle();
-                                        if (displayFormat == "") displayFormat = "N3";
+                                        switch (displayFormat)
+                                        {
+                                            case "":
+                                            case "FIXED":
+                                                displayFormat = (displayFormatSecondary == "") ? "N3" : displayFormatSecondary;
+                                                break;
+                                            case "DEC":
+                                                displayFormat = (displayFormatSecondary == "") ? "N0" : displayFormatSecondary;
+                                                break;
+                                            case "HEX":
+                                                return ValueParserResult.CreateError(decodeCommands, $"Float displayFormat unrecognized; should be FIXED {displayFormat}");
+                                        }
                                         stritem = dvalue.ToString(displayFormat); // e.g. N3 for 3 digits
                                     }
                                     break;
                                 case "F64":
                                     {
                                         dvalue = dr.ReadDouble();
-                                        if (displayFormat == "") displayFormat = "N3";
+                                        switch (displayFormat)
+                                        {
+                                            case "":
+                                            case "FIXED":
+                                                displayFormat = (displayFormatSecondary == "") ? "N3" : displayFormatSecondary;
+                                                break;
+                                            case "DEC":
+                                                displayFormat = (displayFormatSecondary == "") ? "N0" : displayFormatSecondary;
+                                                break;
+                                            case "HEX":
+                                                return ValueParserResult.CreateError(decodeCommands, $"Float displayFormat unrecognized; should be FIXED {displayFormat}");
+                                        }
                                         stritem = dvalue.ToString(displayFormat); // e.g. N3 for 3 digits
                                     }
                                     break;

@@ -55,6 +55,16 @@
               "Name": "Central Address Resolution",
               "IsRead": true,
               "Type": "U8|DEC|AddressResolutionSupported"
+            },
+            {
+              "UUID": "00002ac9-0000-1000-8000-00805f9b34fb",
+              "Name": "Resolvable Private Address Only",
+              "Type": "U8|HEX|ResolvablePrivateAddressFlag",
+              "IsRead": true,
+              "REM": "Seen in the TI SensorTag 1353 in 2019",
+              "ExampleData": [
+                "Value:  00"
+              ]
             }
           ]
         },

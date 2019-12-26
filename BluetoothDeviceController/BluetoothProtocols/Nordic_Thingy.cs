@@ -2474,7 +2474,7 @@ namespace BluetoothProtocols
                     NotifyGravity_ValueChanged_Set = true;
                     ch.ValueChanged += (sender, args) =>
                     {
-                        var datameaning = "F32|N3|X|mpss F32|N3|Y|mpss F32|N3|Z|mpss";
+                        var datameaning = "F32|FLOAT|X|mpss F32|N3|Y|mpss F32|N3|Z|mpss";
                         var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
 
                         Gravity_X = parseResult.ValueList.GetValue("X").AsDouble;

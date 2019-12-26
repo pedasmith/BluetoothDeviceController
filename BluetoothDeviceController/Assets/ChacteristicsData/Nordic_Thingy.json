@@ -356,7 +356,7 @@
             {
               "UUID": "EF68040A-9B35-4933-9B10-52FFA9740042",
               "Name": "Gravity",
-              "Type": "F32|N3|X|mpss F32|N3|Y|mpss F32|N3|Z|mpss",
+              "Type": "F32|FIXED|X|mpss F32|N3|Y|mpss F32|N3|Z|mpss",
               "REM_Type": "The ms is meters per second squared; the values are 9.8 for normal gravity",
               "IsNotify": true,
               "UI": {

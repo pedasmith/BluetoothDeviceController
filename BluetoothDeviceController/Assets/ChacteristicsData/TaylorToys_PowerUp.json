@@ -4,7 +4,7 @@
       "Name": "TailorToys PowerUp",
       "Links": [
         "https://github.com/TobyRich/lib-smartlink-android/blob/master/Smartlink/src/main/java/lib/smartlink/BLEService.java"
-      ]
+      ],
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

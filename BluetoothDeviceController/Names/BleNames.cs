@@ -61,6 +61,7 @@ namespace BluetoothDeviceController.Names
         // Read in data from the Assets\CharacteristicsData.json file. Note the mis-spelling Assets\Chacteristics!!
         public async Task InitAsync()
         {
+            string path = "";
             AllDevices = new NameAllDevices();
             AllRawDevices = new NameAllDevices();
             try
@@ -76,18 +77,20 @@ namespace BluetoothDeviceController.Names
                 var files = await dir.GetFilesAsync();
                 foreach (var file in files)
                 {
+                    path = file.Path;
                     InitSingleFile(AllDevices, file, DefaultDevice);
                     InitSingleFile(AllRawDevices, file, null); // read in a device without adding in default services
                 }
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine($"ERROR: BLE NAMES: {e.Message}");
+                System.Diagnostics.Debug.WriteLine($"ERROR: BLE NAMES: {e.Message} with path {path}");
             }
         }
 
         private async Task<NameDevice> InitDefault(string dname)
         {
+            string path = "";
             try
             {
                 // Read in the Default device. 
@@ -95,6 +98,7 @@ namespace BluetoothDeviceController.Names
                 string fname = $"{dname}DefaultBluetooth.json";
                 var f = await InstallationFolder.GetFileAsync(fname);
                 var fcontents = File.ReadAllText(f.Path);
+                path = f.Path;
                 var defaultlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllDevices>(fcontents);
                 foreach (var item in defaultlist.AllDevices)
                 {
@@ -106,7 +110,7 @@ namespace BluetoothDeviceController.Names
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine($"ERROR: BLE NAMES: {e.Message}");
+                System.Diagnostics.Debug.WriteLine($"ERROR: DEFAULT BLE NAMES: {e.Message} path {path}");
             }
             return null;
         }
@@ -120,15 +124,19 @@ namespace BluetoothDeviceController.Names
                 foreach (var item in newlist.AllDevices)
                 {
                     // Check to make sure that at least one of IsRead IsNotify IsIndicate IsWrite IsWriteWithoutResponse is used
-                    foreach (var service in item.Services)
+                    // OK for the defaults to not have things specified.
+                    if (item.Name != "##DEFAULT##")
                     {
-                        foreach (var characteristic in service.Characteristics)
+                        foreach (var service in item.Services)
                         {
-                            if (!characteristic.IsIndicate && !characteristic.IsNotify 
-                                && !characteristic.IsRead 
-                                && !characteristic.IsWrite && !characteristic.IsWriteWithoutResponse)
+                            foreach (var characteristic in service.Characteristics)
                             {
-                                System.Diagnostics.Debug.WriteLine($"JSON ERROR: {file.Name} service {service.Name} characteristic {characteristic.Name} has no 'verb' like IsRead:true etc. ");
+                                if (!characteristic.IsIndicate && !characteristic.IsNotify
+                                    && !characteristic.IsRead
+                                    && !characteristic.IsWrite && !characteristic.IsWriteWithoutResponse)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"JSON ERROR: {file.Name} service {service.Name} characteristic {characteristic.Name} has no 'verb' like IsRead:true etc. ");
+                                }
                             }
                         }
                     }

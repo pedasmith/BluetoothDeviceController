@@ -131,6 +131,7 @@ namespace BluetoothDeviceController.Names
             switch (format)
             {
                 case "F32": return "Single";
+                case "F64": return "Double";
                 case "U8": return "Byte";
                 case "U16": return "UInt16";
                 case "U32": return "UInt32";
@@ -152,6 +153,7 @@ namespace BluetoothDeviceController.Names
             switch (format)
             {
                 case "F32": return "0.0";
+                case "F64": return "0.0";
                 case "U8": return "0";
                 case "U16": return "0";
                 case "U24": return "0";
