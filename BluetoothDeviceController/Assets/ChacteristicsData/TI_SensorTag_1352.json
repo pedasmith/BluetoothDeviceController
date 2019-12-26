@@ -54,7 +54,6 @@
               "Name": "Resolvable Private Address Only",
               "Type": "U8|HEX|ResolvablePrivateAddressFlag",
               "IsRead": true,
-              "REM": "Seen in the TI SensorTag 1353 in 2019",
               "ExampleData": [
                 "Value:  00"
               ]
@@ -202,6 +201,13 @@
               "Name": "Temperature Data",
               "Description": "Temperature Data",
               "Type": "F32|FIXED|Temperature|C",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": 20,
+                "chartDefaultMaxY": 25,
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -241,6 +247,13 @@
               "Name": "Humidity Data",
               "Description": "Humidity Data",
               "Type": "F32|FIXED|Humidty|Percent",
+              "UI": {
+                "tabletype": "standard",
+                "chartType": "ytime",
+                "chartDefaultMinY": 0,
+                "chartDefaultMaxY": 100,
+                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+              },
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -279,8 +292,7 @@
               "UUID": "f000aa71-0451-4000-b000-000000000000",
               "Name": "Light Data",
               "Description": "Light Data",
-              "Type": "U16^DU_12_RS_15_AN_2_XY_0.01_*_SW_4095_AN_*|FIXED^N1|Lux",
-			  "TODO:": "Why are there 4 bytes of example data? What are the other bytes?",
+              "Type": "F32|FIXED^N0|Lux",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -323,7 +335,7 @@
               "IsRead": true,
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
-			  "REM": "All LED values are either 0 or 1",
+			        "REM": "All LED values are either 0 or 1",
               "ExampleData": [
                 "Value:  00"
               ]
@@ -415,7 +427,7 @@
               "UUID": "f000ffa2-0451-4000-b000-000000000000",
               "Name": "Accel Range",
               "Description": "Accel Range",
-              "Type": "BYTES|HEX|Accel Range",
+              "Type": "U16|HEX|Accel Range",
               "IsRead": true,
               "ExampleData": [
                 "Value:  14 00"
@@ -425,21 +437,21 @@
               "UUID": "f000ffa3-0451-4000-b000-000000000000",
               "Name": "X",
               "Description": "Accel X-Coordinate",
-              "Type": "BYTES|HEX|Accel X-Coordinate",
+              "Type": "I16^1000_/|FIXED|Accel X-Coordinate",
               "IsNotify": true
             },
             {
               "UUID": "f000ffa4-0451-4000-b000-000000000000",
               "Name": "Y",
               "Description": "Accel Y-Coordinate",
-              "Type": "BYTES|HEX|Accel Y-Coordinate",
+              "Type": "I16^1000_/|FIXED|Accel Y-Coordinate",
               "IsNotify": true
             },
             {
               "UUID": "f000ffa5-0451-4000-b000-000000000000",
               "Name": "Z",
               "Description": "Accel Z-Coordinate",
-              "Type": "BYTES|HEX|Accel Z-Coordinate",
+              "Type": "I16^1000_/|FIXED|Accel Z-Coordinate",
               "IsNotify": true
             }
           ]
