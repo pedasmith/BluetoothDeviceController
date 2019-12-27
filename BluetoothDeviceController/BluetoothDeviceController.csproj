@@ -168,6 +168,7 @@
     <Compile Include="BluetoothProtocols\BluetoothStatusHandler.cs" />
     <Compile Include="BluetoothProtocols\Kano_Wand.cs" />
     <Compile Include="BluetoothProtocols\Mipow_Playbulb_BTL201.cs" />
+    <Compile Include="BluetoothProtocols\Mipow_Playbulb_BTL201_Custom.cs" />
     <Compile Include="BluetoothProtocols\Nordic_Thingy.cs" />
     <Compile Include="BluetoothProtocols\Protocentral_Sensything.cs" />
     <Compile Include="BluetoothProtocols\TI_beLight_2540.cs" />
@@ -237,7 +238,7 @@
     <Compile Include="SpecialtyPages\Kano_WandPage.xaml.cs">
       <DependentUpon>Kano_WandPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SpecialtyPages\Mipow_Playbulb_BTL201Page.xaml.cs">
+    <Compile Include="SpecialtyPagesModified\Mipow_Playbulb_BTL201Page.xaml.cs">
       <DependentUpon>Mipow_Playbulb_BTL201Page.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPages\Nordic_ThingyPage.xaml.cs">
@@ -746,7 +747,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SpecialtyPages\Mipow_Playbulb_BTL201Page.xaml">
+    <Page Include="SpecialtyPagesModified\Mipow_Playbulb_BTL201Page.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
