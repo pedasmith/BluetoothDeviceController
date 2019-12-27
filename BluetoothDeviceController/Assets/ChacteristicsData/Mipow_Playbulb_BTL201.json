@@ -1,0 +1,314 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "PLAYBULB smart bulb",
+      "ClassName":  "MIPOW_Playbulb_BTL201",
+      "Links": [
+        "http://mipow.com/",
+        "https://pdominique.wordpress.com/2015/01/02/hacking-playbulb-candles/",
+        "https://github.com/Phhere/Playbulb/tree/master/protocols"
+      ],
+      "Services": [
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Name: PLAYBULB smart bulb",
+                "PLAYBULB smart bulb"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  40 03",
+                "Heart_rate_Sensor"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  10 00 20 00 00 00 58 02"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001016-d102-11e1-9b23-00025b00a5a5",
+          "Name": "DeviceInformationService",
+          "REM": "Some Github code for other devices says this is a mesh service; others say it is a mystery service.",
+          "REM_2": "https://github.com/samuelsadok/S1/blob/d98580b771a1a13eed5ff9cf1fe498b11068f73e/shared-c%23/Organization/Definitions.cs",
+          "Characteristics": [
+            {
+              "UUID": "00001013-d102-11e1-9b23-00025b00a5a5",
+              "Name": "ApplicationNumber",
+              "Type": "BYTES|HEX|ApplicationNumber",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "00001018-d102-11e1-9b23-00025b00a5a5",
+              "Name": "GetKeyBlock",
+              "Type": "BYTES|HEX|KeyBlock",
+              "IsWrite": true
+            },
+            {
+              "UUID": "00001014-d102-11e1-9b23-00025b00a5a5",
+              "Name": "XferCharacteristics",
+              "Type": "BYTES|HEX|XferCharacteristics",
+              "IsRead": true,
+              "IsNotify": true
+            },
+            {
+              "UUID": "00001011-d102-11e1-9b23-00025b00a5a5",
+              "Name": "GetVersion",
+              "Type": "BYTES|HEX|Version",
+              "IsRead": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000ff0d-0000-1000-8000-00805f9b34fb",
+          "Name": "MipowBulb",
+          "Characteristics": [
+            {
+              "UUID": "00002a37-0000-1000-8000-00805f9b34fb",
+              "Name": "BulbHeartRate",
+              "Type": "BYTES|HEX|BulbHeartRate",
+              "REM": "Makes no actual sense; why is the standard heart rate GUID stuck in the  middle of the Mipow service?",
+              "REM_10": "https://www.bluetooth.com/wp-content/uploads/Sitecore-Media-Library/Gatt/Xml/Characteristics/org.bluetooth.characteristic.heart_rate_measurement.xml",
+              "IsNotify": true
+            },
+            {
+              "UUID": "00001234-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsWrite": true
+            },
+            {
+              "UUID": "0000fff7-0000-1000-8000-00805f9b34fb",
+              "Name": "PINPassword",
+              "Type": "STRING|ASCII|Password",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  30 30 30 30"
+              ]
+            },
+            {
+              "UUID": "0000fff8-0000-1000-8000-00805f9b34fb",
+              "Name": "TimerEffects",
+              "Type": "U8|HEX|W1 U8|HEX|R1 U8|HEX|G1 U8|HEX|B1 U8|DEC|Time1|Minutes U8|HEX|W2 U8|HEX|R2 U8|HEX|G2 U8|HEX|B2 U8|DEC|Time2|Minutes U8|HEX|W3 U8|HEX|R3 U8|HEX|G3 U8|HEX|B3 U8|DEC|Time3|Minutes U8|HEX|W4 U8|HEX|R4 U8|HEX|G4 U8|HEX|B4 U8|DEC|Time4|Minutes",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "0000fff9-0000-1000-8000-00805f9b34fb",
+              "Name": "SecurityMode",
+              "Type": "U8|HEX|SecurityCommand U8|HEX|SecurityCurrentMinute U8|HEX|SecurityCurrentHour U8|HEX|SecurityStartingMinute U8|HEX|SecurityStartingHour U8|HEX|SecurityEndingMinute U8|HEX|SecurityEndingHour U8|DEC|SecurityMinInterval|Minutes U8|DEC|SecurityMaxInterval|Minutes U8|HEX|SecurityW U8|HEX|SecurityR U8|HEX|SecurityG U8|HEX|SecurityB",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  FF FF FF FF FF FF FF FF FF FF FF FF FF"
+              ]
+            },
+            {
+              "UUID": "0000fffb-0000-1000-8000-00805f9b34fb",
+              "Name": "Effect",
+              "Type": "U8|HEX|W U8|HEX|R U8|HEX|G U8|HEX|B U8|HEX|Effect U8|HEX|Junk U8|HEX|Delay1 U8|HEX|Delay2",
+              "IsRead": true,
+              "IsWriteWithoutResponse": true,
+              "REM_EFFECT":  "0=blink 1=pulse 2=rainbow hard 3=rainbow smooth 4=candle ff=off",
+              "ExampleData": [
+                "Value:  FF 00 00 00 FF 00 0A 00"
+              ]
+            },
+            {
+              "UUID": "0000fffc-0000-1000-8000-00805f9b34fb",
+              "Name": "Color",
+              "Type": "U8|HEX|W U8|HEX|R U8|HEX|G U8|HEX|B",
+              "IsRead": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value:  FF 00 00 00"
+              ]
+            },
+            {
+              "UUID": "0000fffd-0000-1000-8000-00805f9b34fb",
+              "Name": "Reset",
+              "Type": "U8|HEX|ResetNow BYTES|HEX|ResetAdditional",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  8B B2 B3 DD 27 8F 01 00 00 00 3C 16 00 27 FC 65 00 EA 09 59"
+              ]
+            },
+            {
+              "UUID": "0000fffe-0000-1000-8000-00805f9b34fb",
+              "Name": "Timer",
+              "Type": "U8|DEC|TimerIndex U8|DEC|TimerType U8|HEX|TimerSeconds U8|HEX|TimerMinutes U8|HEX|TimerHours U8|HEX|TimerRun U8|HEX|TimerMinutesStart U8|HEX|TimerHoursStart U8|HEX|TimerColorW U8|HEX|TimerColorR U8|HEX|TimerColorG U8|HEX|TimerColorB U8|HEX|TimerRuntime|Minutes",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  04 FF FF 04 FF FF 04 FF FF 04 FF FF 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "0000ffff-0000-1000-8000-00805f9b34fb",
+              "Name": "GivenName",
+              "Type": "STRING|ASCII|GivenName",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  50 4C 41 59 42 55 4C 42 20 73 6D 61 72 74 20 62 75 6C 62"
+              ]
+            },
+            {
+              "UUID": "0000fff5-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown10",
+              "Type": "BYTES|HEX|Unknown10",
+              "IsRead": true,
+              "IsWrite": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Incorrect percent length:00 00",
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fef1-0000-1000-8000-00805f9b34fb",
+          "Name": "AirCableSmartMeshService",
+          "REM": "Seems to be another set of mesh characteristics",
+          "REM_10": "https://github.com/aircable/SmartMesh/blob/9a48b0f27616f6206435937deb72cf938502167f/www/js/services/MESHfactory.js",
+          "Characteristics": [
+            {
+              "UUID": "c4edc000-9daf-11e3-8000-00025b000b00",
+              "Name": "NetworkKey",
+              "Type": "BYTES|HEX|NetworkKey",
+              "IsWrite": true
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8001-00025b000b00",
+              "Name": "DeviceUuid",
+              "Type": "BYTES|HEX|DeviceUuid",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8002-00025b000b00",
+              "Name": "DeviceId",
+              "Type": "BYTES|HEX|DeviceId",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8003-00025b000b00",
+              "Name": "MtlContinuationCpUuid",
+              "Type": "BYTES|HEX|MtlContinuationCpUuid",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8004-00025b000b00",
+              "Name": "MtlCompleteCpUuid",
+              "Type": "BYTES|HEX|MtlCompleteCpUuid",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8005-00025b000b00",
+              "Name": "MtlTtlUuid",
+              "Type": "BYTES|HEX|MtlTtlUuid",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  8F"
+              ]
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8006-00025b000b00",
+              "Name": "MeshAppearanceUuid",
+              "Type": "BYTES|HEX|MeshAppearanceUuid",
+              "IsRead": true,
+              "IsWrite": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  42 54 4C 32 30 31 4D 5F 56 31 2E 39",
+                "BTL201M_V1.9"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 0A 00 4C 01 00 01",
+                "\u0001\\n\\0L\u0001\\0\u0001"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-59:2a:4b:19:ac:e6\nCanPair:True IsPaired:False"
+    }
+  ]
+}

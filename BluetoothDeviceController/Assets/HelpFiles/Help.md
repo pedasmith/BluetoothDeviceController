@@ -32,9 +32,10 @@ To control a light, click on it in the menu. Many lights will pop up with severa
 Not all Bluetooth Smart light bulbs are the same. This program can control some but not all Smart Bluetooth bulbs.
 
 * [Flux](Device_MagicLight.md)
+* [Mipow](Device_Mipow_Playbulb_BTL201.md)
 * [Magic Light](Device_MagicLight.md)
 * [TI beLight CC2540](Device_TI_beLight_2540.md)
-* [Triones](Device_Triones.md)
+* [Triones](Device_Triones.md) (includes some Bluetooth strip bulbs)
 * [Witti Dotti](Device_Witti_Dotti.md)
 * [Witti Notti](Device_Witti_Notti.md)
 
@@ -47,6 +48,7 @@ Bulbs that are definitely not compatible include the C by GE bulb, the Philips H
 * [Kano Coding Wand](Device_Kano_Wand.md)
 * [Nordic Thingy](Device_Nordic_Thingy.md)
 * [Sensything](Device_Protocentral_Sensything.md)
+* [TI SensorTag 1352](Device_TI_SensorTag_1352.md), also known as the Multi-Sensor
 * [TI SensorTag 1350 and 2650](Device_TI_SensorTag_1350.md)
 * [(Obsolete) TI SensorTag 2541](Device_TI_SensorTag_2541.md)
 

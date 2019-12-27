@@ -188,6 +188,40 @@ namespace BluetoothDeviceController.BleEditor
             }
             else
             {
+                // TODO: remove this code which is only here while I investigate the WESCALE scale
+#if NEVER_EVER_DEFINED
+                {
+                    // WESCALE: no gatt services
+                    var services = ble.GattServices;
+                    var count = services.Count;
+                    var devacc = ble.DeviceAccessInformation;
+                    var devaccstatus = devacc.CurrentStatus;
+
+                    foreach (var service in services)
+                    {
+                        var chars = service.GetAllCharacteristics();
+                    }
+                    try
+                    {
+                        var guid = Guid.Parse("0000fff0-0000-1000-8000-00805f9b34fb");
+                        var request = await ble.RequestAccessAsync();
+
+                        var allservice = await ble.GetGattServicesForUuidAsync(guid);
+                        var servicefff0 = ble.GetGattService(guid);
+                        var charsfff0 = servicefff0.GetAllCharacteristics();
+                        var countfff0 = charsfff0.Count;
+                        foreach (var ch in charsfff0)
+                        {
+                            ;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ;
+                    }
+                }
+#endif
+
                 var result = await ble.GetGattServicesAsync();
                 if (result.Status != GattCommunicationStatus.Success)
                 {

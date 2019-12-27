@@ -1,0 +1,595 @@
+﻿<Page
+    x:Class="BluetoothDeviceController.SpecialtyPages.MIPOW_Playbulb_BTL201Page"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:charts="using:BluetoothDeviceController.Charts"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <Style TargetType="Button">
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="Margin" Value="10,0,0,0" />
+        </Style>
+        <Style TargetType="Line">
+            <Setter Property="Margin" Value="0,15,0,0" />
+            <Setter Property="Stroke" Value="ForestGreen" />
+        </Style>
+        <Style x:Key="TitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30" />
+        </Style>
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+        <Style x:Key="HeaderStyleExpander" TargetType="controls:Expander">
+            <Setter Property="MinWidth" Value="550" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="SubheaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+        <Style x:Key="AboutStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="ChacteristicListStyle" TargetType="StackPanel">
+            <Setter Property="Background" Value="WhiteSmoke" />
+            <Setter Property="Margin" Value="18,0,0,0" />
+        </Style>
+        <Style x:Key="HEXStyle" TargetType="TextBox">
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="5,0,0,0" />
+        </Style>
+        <Style x:Key="TableStyle" TargetType="controls:DataGrid">
+            <Setter Property = "Background" Value="BlanchedAlmond" />
+            <Setter Property = "FontSize" Value="12" />
+            <Setter Property = "Height" Value="200" />
+            <Setter Property = "HorizontalAlignment" Value="Center" />
+            <Setter Property = "Width" Value="500" />
+        </Style>
+    </Page.Resources>
+
+    <StackPanel>
+        <Grid MaxWidth="550" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Style="{StaticResource TitleStyle}">PLAYBULB smart bulb device</TextBlock>
+                <TextBlock Style="{StaticResource AboutStyle}">
+
+                </TextBlock>
+            </StackPanel>
+            <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/MIPOW_Playbulb_BTL201.PNG" />
+        </Grid>
+        <ProgressRing x:Name="uiProgress" />
+        <TextBlock x:Name="uiStatus" />
+
+        <controls:Expander Header="Generic Service" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Service Changes</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Service_Changes_StartRange" Text="*" Header="StartRange" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="Service_Changes_EndRange" Text="*" Header="EndRange" Style="{StaticResource HEXStyle}"/>
+
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteDevice_Name" />
+
+                    <Button Content="Read" Click="OnReadDevice_Name" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Appearance</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Appearance_Appearance" Text="*" Header="Appearance" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadAppearance" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Connection Parameter</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_ConnectionParameter" Text="*" Header="ConnectionParameter" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadConnection_Parameter" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="DeviceInformationService" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">ApplicationNumber</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="ApplicationNumber_ApplicationNumber" Text="*" Header="ApplicationNumber" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteApplicationNumber" />
+
+                    <Button Content="Read" Click="OnReadApplicationNumber" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">GetKeyBlock</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="GetKeyBlock_KeyBlock" Text="*" Header="KeyBlock" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteGetKeyBlock" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">XferCharacteristics</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="XferCharacteristics_XferCharacteristics" Text="*" Header="XferCharacteristics" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadXferCharacteristics" />
+
+                    <Button Content="Notify" Click="OnNotifyXferCharacteristics" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">GetVersion</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="GetVersion_Version" Text="*" Header="Version" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadGetVersion" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="MipowBulb" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">BulbHeartRate</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="BulbHeartRate_BulbHeartRate" Text="*" Header="BulbHeartRate" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Notify" Click="OnNotifyBulbHeartRate" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Unknown1</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Unknown1_Unknown1" Text="*" Header="Unknown1" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUnknown1" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">PINPassword</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="PINPassword_Password" Text="*" Header="Password" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWritePINPassword" />
+
+                    <Button Content="Read" Click="OnReadPINPassword" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">TimerEffects</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_W1" Text="*" Header="W1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_R1" Text="*" Header="R1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_G1" Text="*" Header="G1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_B1" Text="*" Header="B1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_Time1" Text="*" Header="Time1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_W2" Text="*" Header="W2" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_R2" Text="*" Header="R2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_G2" Text="*" Header="G2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_B2" Text="*" Header="B2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_Time2" Text="*" Header="Time2" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_W3" Text="*" Header="W3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_R3" Text="*" Header="R3" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_G3" Text="*" Header="G3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_B3" Text="*" Header="B3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_Time3" Text="*" Header="Time3" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_W4" Text="*" Header="W4" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_R4" Text="*" Header="R4" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_G4" Text="*" Header="G4" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_B4" Text="*" Header="B4" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="TimerEffects_Time4" Text="*" Header="Time4" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadTimerEffects" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">SecurityMode</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityCommand" Text="*" Header="SecurityCommand" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityCurrentMinute" Text="*" Header="SecurityCurrentMinute" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityCurrentHour" Text="*" Header="SecurityCurrentHour" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityStartingMinute" Text="*" Header="SecurityStartingMinute" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityStartingHour" Text="*" Header="SecurityStartingHour" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityEndingMinute" Text="*" Header="SecurityEndingMinute" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityEndingHour" Text="*" Header="SecurityEndingHour" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityMinInterval" Text="*" Header="SecurityMinInterval" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityMaxInterval" Text="*" Header="SecurityMaxInterval" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityW" Text="*" Header="SecurityW" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityR" Text="*" Header="SecurityR" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityG" Text="*" Header="SecurityG" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="SecurityMode_SecurityB" Text="*" Header="SecurityB" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteSecurityMode" />
+
+                    <Button Content="Read" Click="OnReadSecurityMode" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Effect</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Effect_W" Text="*" Header="W" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Effect_R" Text="*" Header="R" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Effect_G" Text="*" Header="G" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Effect_B" Text="*" Header="B" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Effect_Effect" Text="*" Header="Effect" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Effect_Junk" Text="*" Header="Junk" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Effect_Delay1" Text="*" Header="Delay1" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Effect_Delay2" Text="*" Header="Delay2" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteEffect" />
+
+                    <Button Content="Read" Click="OnReadEffect" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Color</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Color_W" Text="*" Header="W" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Color_R" Text="*" Header="R" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Color_G" Text="*" Header="G" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Color_B" Text="*" Header="B" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteColor" />
+
+                    <Button Content="Read" Click="OnReadColor" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Reset</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Reset_ResetNow" Text="*" Header="ResetNow" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Reset_ResetAdditional" Text="*" Header="ResetAdditional" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteReset" />
+
+                    <Button Content="Read" Click="OnReadReset" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Timer</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerIndex" Text="*" Header="TimerIndex" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerType" Text="*" Header="TimerType" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerSeconds" Text="*" Header="TimerSeconds" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerMinutes" Text="*" Header="TimerMinutes" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerHours" Text="*" Header="TimerHours" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerRun" Text="*" Header="TimerRun" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerMinutesStart" Text="*" Header="TimerMinutesStart" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerHoursStart" Text="*" Header="TimerHoursStart" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerColorW" Text="*" Header="TimerColorW" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerColorR" Text="*" Header="TimerColorR" Style="{StaticResource HEXStyle}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerColorG" Text="*" Header="TimerColorG" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerColorB" Text="*" Header="TimerColorB" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="False" x:Name="Timer_TimerRuntime" Text="*" Header="TimerRuntime" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteTimer" />
+
+                    <Button Content="Read" Click="OnReadTimer" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">GivenName</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="GivenName_GivenName" Text="*" Header="GivenName" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteGivenName" />
+
+                    <Button Content="Read" Click="OnReadGivenName" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Unknown10</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="Unknown10_Unknown10" Text="*" Header="Unknown10" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteUnknown10" />
+
+                    <Button Content="Read" Click="OnReadUnknown10" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Battery" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">BatteryLevel</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="BatteryLevel_BatteryLevel" Text="*" Header="BatteryLevel" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadBatteryLevel" />
+
+                    <Button Content="Notify" Click="OnNotifyBatteryLevel" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="AirCableSmartMeshService" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">NetworkKey</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="NetworkKey_NetworkKey" Text="*" Header="NetworkKey" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteNetworkKey" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">DeviceUuid</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="DeviceUuid_DeviceUuid" Text="*" Header="DeviceUuid" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadDeviceUuid" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">DeviceId</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="DeviceId_DeviceId" Text="*" Header="DeviceId" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteDeviceId" />
+
+                    <Button Content="Read" Click="OnReadDeviceId" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">MtlContinuationCpUuid</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="MtlContinuationCpUuid_MtlContinuationCpUuid" Text="*" Header="MtlContinuationCpUuid" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteMtlContinuationCpUuid" />
+
+                    <Button Content="Notify" Click="OnNotifyMtlContinuationCpUuid" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">MtlCompleteCpUuid</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="MtlCompleteCpUuid_MtlCompleteCpUuid" Text="*" Header="MtlCompleteCpUuid" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteMtlCompleteCpUuid" />
+
+                    <Button Content="Notify" Click="OnNotifyMtlCompleteCpUuid" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">MtlTtlUuid</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="MtlTtlUuid_MtlTtlUuid" Text="*" Header="MtlTtlUuid" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteMtlTtlUuid" />
+
+                    <Button Content="Read" Click="OnReadMtlTtlUuid" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">MeshAppearanceUuid</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="False" x:Name="MeshAppearanceUuid_MeshAppearanceUuid" Text="*" Header="MeshAppearanceUuid" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Write" Click="OnWriteMeshAppearanceUuid" />
+
+                    <Button Content="Read" Click="OnReadMeshAppearanceUuid" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Device Info" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Firmware Revision</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Firmware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadFirmware_Revision" />
+
+                </StackPanel>
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">PnP ID</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="PnP_ID_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadPnP_ID" />
+
+                </StackPanel>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <Button Content="REREAD" Click="OnRereadDevice" />
+    </StackPanel>
+</Page>
