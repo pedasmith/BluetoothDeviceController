@@ -1,0 +1,280 @@
+{
+  "AllDevices": [
+    {
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  34 12",
+                "4660"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  08 00 10 00 00 00 AF 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsRead": true,
+              "IsIndicate": true,
+              "ExampleData": [
+                "Value:  05 FF FF",
+                "65285EXCEPTION reading data System.Exception: The operation attempted to access data outside the valid range (Exception from HRESULT: 0x8000000B)\r\n   at Windows.Storage.Streams.DataReader.ReadUInt16()\r\n   at BluetoothDeviceController.BleEditor.ValueParser.ConvertHelper(DataReader dr, String decodeCommands) index 1 command BluetoothDeviceController.BleEditor.ValueParserSplit len 1"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "Ollie_Robot_Control_Service",
+          "Name": "Unknown2",
+          "Characteristics": [
+            {
+              "UUID": "22bb746f-2ba1-7554-2d6f-726568705327",
+              "Name": "Ollie_Commands",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true
+            },
+            {
+              "UUID": "22bb746f-2ba6-7554-2d6f-726568705327",
+              "Name": "Ollie_Response",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsNotify": true
+            }
+          ]
+        },
+        {
+          "UUID": "22bb746f-2bb0-7554-2d6f-726568705327",
+          "Name": "Ollie_BLE_Service",
+          "Characteristics": [
+            {
+              "UUID": "22bb746f-2bb1-7554-2d6f-726568705327",
+              "Name": "Unknown0",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "Ollie_Tx_Power",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsWrite": true
+            },
+            {
+              "UUID": "22bb746f-2bb3-7554-2d6f-726568705327",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsWrite": true
+            },
+            {
+              "UUID": "22bb746f-2bb6-7554-2d6f-726568705327",
+              "Name": "Unknown3",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsNotify": true
+            },
+            {
+              "UUID": "22bb746f-2bb7-7554-2d6f-726568705327",
+              "Name": "Unknown4",
+              "Type": "BYTES|HEX|Unknown4",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true
+            },
+            {
+              "UUID": "22bb746f-2bb8-7554-2d6f-726568705327",
+              "Name": "Unknown5",
+              "Type": "BYTES|HEX|Unknown5",
+              "IsRead": true
+            },
+            {
+              "UUID": "22bb746f-2bb9-7554-2d6f-726568705327",
+              "Name": "Unknown6",
+              "Type": "BYTES|HEX|Unknown6",
+              "IsRead": true
+            },
+            {
+              "UUID": "22bb746f-2bba-7554-2d6f-726568705327",
+              "Name": "Unknown7",
+              "Type": "BYTES|HEX|Unknown7",
+              "IsRead": true
+            },
+            {
+              "UUID": "Ollie_AntiDOS",
+              "Name": "Unknown8",
+              "Type": "BYTES|HEX|Unknown8",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true
+            },
+            {
+              "UUID": "22bb746f-2bbe-7554-2d6f-726568705327",
+              "Name": "Unknown9",
+              "Type": "BYTES|HEX|Unknown9",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "Ollie_Wake",
+              "Name": "Unknown10",
+              "Type": "BYTES|HEX|Unknown10",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true
+            }
+          ]
+        },
+        {
+          "UUID": "22bb746f-2bc0-7554-2d6f-726568705327",
+          "Name": "Unknown4",
+          "Characteristics": [
+            {
+              "UUID": "22bb746f-2bc1-7554-2d6f-726568705327",
+              "Name": "Checkpoint Observation",
+              "Description": "Checkpoint Observation",
+              "Type": "BYTES|HEX|Checkpoint Observation",
+              "IsNotify": true
+            },
+            {
+              "UUID": "22bb746f-2bc2-7554-2d6f-726568705327",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "22bb746f-2bc3-7554-2d6f-726568705327",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsWrite": true
+            }
+          ]
+        },
+        {
+          "UUID": "00001016-d102-11e1-9b23-00025b00a5a5",
+          "Name": "Unknown5",
+          "Characteristics": [
+            {
+              "UUID": "00001013-d102-11e1-9b23-00025b00a5a5",
+              "Name": "Unknown0",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "00001017-d102-11e1-9b23-00025b00a5a5",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsWrite": true
+            },
+            {
+              "UUID": "00001014-d102-11e1-9b23-00025b00a5a5",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsNotify": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  52 65 76 69 73 69 6F 6E 20 4B 20 6F 72 20 68 69 67 68 65 72",
+                "Revision K or higher"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 30",
+                "10"
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manuafacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  53 70 68 65 72 6F",
+                "Sphero"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 0A 00 4C 01 00 01",
+                "\u0001\\n\\0L\u0001\\0\u0001"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-f4:87:92:77:6a:be\nCanPair:True IsPaired:False"
+    }
+  ]
+}

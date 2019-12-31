@@ -13,10 +13,11 @@
         <!-- You have to compile MainPage.Xaml.Cs for VS to find the local: class. -->
         <local:DisplayPreferenceConverter x:Key="DisplayPreferenceConverter" />
         <local:SearchScopeConverter x:Key="SearchScopeConverter" />
+        <local:ReadSelectionConverter x:Key="ReadSelectionConverter" />
     </UserControl.Resources>
     <StackPanel>
         <TextBlock Style="{StaticResource TitleStyle}">Bluetooth Settings</TextBlock>
-        <ComboBox  Name="SearchScopeComboBox" Header="Show which devices?" MinWidth="180"
+        <ComboBox  x:Name="SearchScopeComboBox" Header="Show which devices?" MinWidth="180"
                    SelectionChanged="OnSearchScopeChanged"
                       ItemsSource="{Binding Source={StaticResource SearchScopeConverter}, Path=EnumValues}" 
                       SelectedItem="{Binding Scope, Mode=TwoWay}">
@@ -49,10 +50,22 @@
             <Button x:Name="uiSearchCancel" Content="✘ Cancel" Click="OnSearchCancel" Margin="10,0,0,0" ToolTipService.ToolTip="Cancel current search" />
             <Button Content="✀" Click="OnCopyJson" Margin="10,0,0,0" ToolTipService.ToolTip="Copy current search results as JSON" />
         </StackPanel>
+
+        <ComboBox  Name="ReadSelectionComboBox"  MinWidth="180" Margin="0,4,0,0"
+                       ItemsSource="{Binding Source={StaticResource ReadSelectionConverter}, Path=EnumValues}" 
+                      SelectedItem="{Binding DeviceReadSelection, Mode=TwoWay}">
+            <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock FontSize="14" Text="{Binding Converter={StaticResource ReadSelectionConverter}}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>        
+        <!--
         <CheckBox x:Name="uiReadFromEach" IsEnabled="False" Content="Attempt to read from each device" IsChecked="False" />
+        -->
         <Grid HorizontalAlignment="Stretch">
             <CheckBox x:Name="uiKeepScreenOn" Content="Keep Screen On" IsChecked="False" Checked="OnKeepScreenOnChecked" Unchecked="OnKeepScreenOnChecked" />
-  
         </Grid>
     </StackPanel>
 </UserControl>

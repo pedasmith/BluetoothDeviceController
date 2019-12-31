@@ -21,6 +21,7 @@ namespace BluetoothDeviceController
 {
     public class DisplayPreferenceConverter : EnumValueConverter<UserPreferences.DisplayPreference> { }
     public class SearchScopeConverter : EnumValueConverter<UserPreferences.SearchScope> { }
+    public class ReadSelectionConverter : EnumValueConverter<UserPreferences.ReadSelection> { }
 
     public sealed partial class UserPreferenceControl : UserControl
     {
@@ -67,8 +68,7 @@ namespace BluetoothDeviceController
         private void OnSearchStart(object sender, RoutedEventArgs e)
         {
             if (Search == null) return;
-            var searchType = CurrSearchType();
-            Search.StartSearch(searchType);
+            Search.StartSearch(Preferences.DeviceReadSelection);
             UpdateSearchUI();
         }
 
@@ -79,22 +79,19 @@ namespace BluetoothDeviceController
             UpdateSearchUI();
         }
 
-        private DeviceSearchType CurrSearchType()
-        {
-            return (uiReadFromEach.IsChecked.HasValue && uiReadFromEach.IsChecked.Value) ? DeviceSearchType.FullRead : DeviceSearchType.Standard;
-        }
 
         private void OnSearchScopeChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count != 1) return;
-            switch ((UserPreferences.SearchScope)e.AddedItems[0])
+            var scope = (UserPreferences.SearchScope)e.AddedItems[0];
+
+            switch (scope)
             {
                 case UserPreferences.SearchScope.All_bluetooth_devices:
-                    uiReadFromEach.IsEnabled = true;
+                    ReadSelectionComboBox.IsEnabled = true;
                     break;
                 default:
-                    uiReadFromEach.IsEnabled = false;
-                    uiReadFromEach.IsChecked = false;
+                    ReadSelectionComboBox.IsEnabled = false;
                     break;
             }
         }

@@ -9,6 +9,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -25,11 +26,11 @@ using Windows.UI.Xaml.Navigation;
 
 namespace BluetoothDeviceController
 {
-    public enum DeviceSearchType {  Standard, FullRead }
+
     public interface IDoSearch
     {
         bool GetSearchActive();
-        void StartSearch(DeviceSearchType searchType);
+        void StartSearch(UserPreferences.ReadSelection searchType);
         void CancelSearch();
         event EventHandler DeviceEnumerationChanged;
         string GetCurrentSearchResults();
@@ -129,15 +130,15 @@ namespace BluetoothDeviceController
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             ContentFrame.Navigated += ContentFrame_Navigated;
+            Preferences.ReadFromLocalSettings();
 
             // It might look like AllBleNames is never used. In reality, this initializes a static class.
             AllBleNames = new BleNames();
             await AllBleNames.InitAsync();
             await UserNameMappings.InitAsync();
-            StartSearch(DeviceSearchType.Standard);
+            StartSearch(UserPreferences.ReadSelection.Address); // do the default at startup
             NavView_Navigate("Help", "welcome.md", null);
             uiDock.DockParent = this;
-
         }
 
         /// <summary>
@@ -219,6 +220,7 @@ namespace BluetoothDeviceController
                 {
                     await (App.Current as App).WaitForAppLockAsync("SettingsDlg");
                     result = await dlg.ShowAsync();
+                    Preferences.SaveToLocalSettings(); // Always save the old values.
                 }
                 catch (Exception ex)
                 {
@@ -548,13 +550,17 @@ namespace BluetoothDeviceController
         /// </summary>
         /// 
         public event EventHandler DeviceEnumerationChanged;
-        public void StartSearch(DeviceSearchType searchType)
+        public void StartSearch(UserPreferences.ReadSelection searchType)
         {
             ClearDevices();
             StartWatch();
-            if (searchType == DeviceSearchType.FullRead)
+            Task searchTask = null;
+            switch (searchType)
             {
-                var task = StartFullReadAsync(); // will set the FullReadTask global as needed.
+                case UserPreferences.ReadSelection.Everything:
+                case UserPreferences.ReadSelection.Name:
+                    searchTask = StartDeviceReadAsync(searchType); // will set the DeviceReadTask global as needed.
+                    break;
             }
         }
 
@@ -569,8 +575,8 @@ namespace BluetoothDeviceController
             return MenuDeviceWatcher != null;
         }
         DeviceWatcher MenuDeviceWatcher = null;
-        Task FullReadTask = null;
-        CancellationTokenSource FullReadCts = null;
+        Task DeviceReadTask = null;
+        CancellationTokenSource DeviceReadCts = null;
 
         private void StopWatch()
         {
@@ -675,27 +681,34 @@ namespace BluetoothDeviceController
         }
 
 
-        private async Task StartFullReadAsync()
+        private async Task StartDeviceReadAsync(UserPreferences.ReadSelection searchType)
         {
             // Step one: if we're already running, kill the old task
-            if (FullReadTask != null)
+            if (DeviceReadTask != null)
             {
                 // Must cancel
-                if (FullReadCts != null)
+                if (DeviceReadCts != null)
                 {
-                    FullReadCts?.Cancel();
-                    while (!FullReadTask.IsCompleted)
+                    DeviceReadCts?.Cancel();
+                    while (!DeviceReadTask.IsCompleted)
                     {
                         await Task.Delay(50);
                     }
-                    FullReadTask = null;
+                    DeviceReadTask = null;
                 }
             }
 
             // Now go for realsie
-            FullReadCts = new CancellationTokenSource();
-            var task = FullReadAsync(FullReadCts.Token);
-            FullReadTask = task;
+            DeviceReadCts = new CancellationTokenSource();
+            switch (searchType)
+            {
+                case UserPreferences.ReadSelection.Everything:
+                    DeviceReadTask = FullReadAsync(DeviceReadCts.Token);
+                    break;
+                case UserPreferences.ReadSelection.Name:
+                    DeviceReadTask = NameReadAsync(DeviceReadCts.Token);
+                    break;
+            }
         }
 
 
@@ -779,6 +792,80 @@ namespace BluetoothDeviceController
             }
         }
 
+
+        private async Task NameReadAsync(CancellationToken ct)
+        {
+            CurrJsonSearch = "";
+            await Task.Delay(1000); // pause 1000 ms = 1 s to get some BT
+            int startidx = FindListStart() + 1;
+            int endidx = FindListEnd() - 1;
+            if (ct.IsCancellationRequested) return;
+
+            var commonConfigurationGuid = BluetoothLEStandardServices.Display; //  Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"); // service
+            var deviceNameGuid = BluetoothLEStandardServices.Name;  // new Guid("00002a00-0000-1000-8000-00805f9b34fb"); // characteristic
+
+            for (int i = startidx; i < endidx; i++)
+            {
+                var nvi = uiNavigation.MenuItems[i] as NavigationViewItemBase;
+                var di = nvi?.Tag as DeviceInformation;
+                if (di != null)
+                {
+                    // Just do a query for the name
+                    try
+                    {
+                        var ble = await BluetoothLEDevice.FromIdAsync(di.Id);
+                        if (ble != null)
+                        {
+                            if (string.IsNullOrEmpty(ble.Name))
+                            {
+                                System.Diagnostics.Debug.WriteLine($"DEVICE: Get name for {di.Id}");
+                                var services = await ble.GetGattServicesForUuidAsync(commonConfigurationGuid);
+                                if (services.Status != GattCommunicationStatus.Success)
+                                {
+                                    continue;
+                                }
+
+                                foreach (var service in services.Services)
+                                {
+                                    var characteristics = await service.GetCharacteristicsForUuidAsync(deviceNameGuid);
+                                    if (characteristics.Status != GattCommunicationStatus.Success)
+                                    {
+                                        continue;
+                                    }
+                                    foreach (var characteristic in characteristics.Characteristics)
+                                    {
+                                        var read = await characteristic.ReadValueAsync();
+                                        if (read.Status != GattCommunicationStatus.Success)
+                                        {
+                                            continue;
+                                        }
+                                        var name = BluetoothLEStandardServices.CharacteristicData.ValueAsString(BluetoothLEStandardServices.DisplayType.String, read.Value);
+                                        System.Diagnostics.Debug.WriteLine($"  --> read name as {name}");
+
+                                        var entry = nvi.Content as DeviceMenuEntryControl;
+                                        if (entry != null)
+                                        {
+                                            await this.Dispatcher.RunAsync(
+                                                Windows.UI.Core.CoreDispatcherPriority.Normal, 
+                                                () => { entry.UpdateName(name); });
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"ERROR: unable to navigate {ex.Message}");
+                        // I don't know of any exceptions. But if there are any, supress them completely.
+                    }
+                }
+
+                // Always re-get the end because it's always being updated.
+                endidx = FindListEnd() - 1;
+            }
+        }
 
         private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
         {

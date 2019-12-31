@@ -57,18 +57,24 @@ namespace BluetoothDeviceController
 
             public string AsString(IBuffer buffer)
             {
-                string str = "";
+                string prefix = "";
                 switch (Characteristic)
                 {
-                    case Characteristic.Appearance: str += "Appearance: "; break;
-                    case Characteristic.BatteryPercent: str += "Battery: "; break;
-                    case Characteristic.Name: str += "Name: "; break;
-                    case Characteristic.Privacy: str += "Privacy: "; break;
+                    case Characteristic.Appearance: prefix += "Appearance: "; break;
+                    case Characteristic.BatteryPercent: prefix += "Battery: "; break;
+                    case Characteristic.Name: prefix += "Name: "; break;
+                    case Characteristic.Privacy: prefix += "Privacy: "; break;
                     default:
-                        str += "Value: ";
+                        prefix += "Value: ";
                         break;
                 }
-                switch (DisplayType)
+                var str = ValueAsString(DisplayType, buffer, prefix);
+                return str;
+            }
+            public static string ValueAsString(DisplayType displayType, IBuffer buffer, string prefix = "")
+            {
+                string str = prefix;
+                switch (displayType)
                 {
                     default:
                     case DisplayType.Hex:
@@ -94,7 +100,7 @@ namespace BluetoothDeviceController
                 return str;
             }
 
-            private string AsErrorString(IBuffer buffer, string prefix)
+            private static string AsErrorString(IBuffer buffer, string prefix)
             {
                 string str = "";
                 for (uint i = 0; i < buffer.Length; i++)
