@@ -59,7 +59,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <local:PageDock Grid.Row="0" Height="104" x:Name="uiDock" />
-                    <ScrollViewer Grid.Row="1">
+                    <ScrollViewer Grid.Row="1" x:Name="uiPageScroller">
                         <Frame x:Name="ContentFrame" Padding="12,0,12,24" IsTabStop="True"
                             NavigationFailed="ContentFrame_NavigationFailed"/>
                     </ScrollViewer>

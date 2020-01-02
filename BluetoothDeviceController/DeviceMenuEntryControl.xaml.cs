@@ -21,13 +21,13 @@ namespace BluetoothDeviceController
 {
     public sealed partial class DeviceMenuEntryControl : UserControl
     {
-        public delegate void DeviceSettingsHandler(object source, DeviceInformation di);
+        public delegate void DeviceSettingsHandler(object source, DeviceInformationWrapper di);
         public event DeviceSettingsHandler SettingsClick;
 
         const string OTHER = "🜹";
-        public DeviceInformation DI;
+        public DeviceInformationWrapper DI;
 
-        public DeviceMenuEntryControl(DeviceInformation di, string name, Specialization specialization)
+        public DeviceMenuEntryControl(DeviceInformationWrapper di, string name, Specialization specialization)
         {
             this.InitializeComponent();
             DI = di;
@@ -37,7 +37,7 @@ namespace BluetoothDeviceController
             {
                 uiIconBlock.Text = OTHER;
                 uiIconBlock.FontSize = uiIconBlock.FontSize * 0.7; // make it smaller and less eye-catching
-                uiDescriptionBlock.Text = di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "Address:");
+                uiDescriptionBlock.Text = di.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "Address:");
             }
             else
             {

@@ -34,8 +34,8 @@ namespace BluetoothDeviceController.SpecialtyPages
         protected async override void OnNavigatedTo(NavigationEventArgs args)
         {
             uiProgress.IsActive = true;
-            var di = args.Parameter as DeviceInformation;
-            var ble = await BluetoothLEDevice.FromIdAsync(di.Id);
+            var di = args.Parameter as DeviceInformationWrapper;
+            var ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
             uiProgress.IsActive = false;
 
             bleDevice.ble = ble;

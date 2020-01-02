@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -136,7 +137,12 @@ namespace BluetoothDeviceController
             AllBleNames = new BleNames();
             await AllBleNames.InitAsync();
             await UserNameMappings.InitAsync();
-            StartSearch(UserPreferences.ReadSelection.Address); // do the default at startup
+            var readSelection = Preferences.DeviceReadSelection;
+            if (readSelection == UserPreferences.ReadSelection.Everything)
+            {
+                readSelection = UserPreferences.ReadSelection.Name; // Don't automaticaly get everything
+            }
+            StartSearch(readSelection);
             NavView_Navigate("Help", "welcome.md", null);
             uiDock.DockParent = this;
         }
@@ -163,7 +169,7 @@ namespace BluetoothDeviceController
 
         private async void UiNavigation_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            var di = args.InvokedItemContainer.Tag as DeviceInformation;
+            var di = args.InvokedItemContainer.Tag as DeviceInformationWrapper;
             if (di != null)
             {
                 NavView_Navigate(di, args.RecommendedNavigationTransitionInfo);
@@ -259,23 +265,33 @@ namespace BluetoothDeviceController
         /// </summary>
         /// <param name="di"></param>
         /// <param name="transitionInfo"></param>
-        private void NavView_Navigate(DeviceInformation di, NavigationTransitionInfo transitionInfo)
+        private void NavView_Navigate(DeviceInformationWrapper di, NavigationTransitionInfo transitionInfo)
         {
             Type _pageType = null;
             var preftype = Preferences.Display;
-            if (preftype == UserPreferences.DisplayPreference.Specialized_Display)
+            if (Preferences.Scope == UserPreferences.SearchScope.Bluetooth_Com_Device)
             {
-                var deviceName = GetDeviceInformationName(di);
+                _pageType = typeof(SerialPort.SimpleTerminalPage);
+                uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                uiPageScroller.VerticalScrollMode = ScrollMode.Disabled;
+            }
+            else if (preftype == UserPreferences.DisplayPreference.Specialized_Display)
+            {
+                var deviceName = GetDeviceInformationName(di?.di);
 
                 var specialized = Specialization.Get(Specializations, deviceName);
                 if (specialized != null)
                 {
                     _pageType = specialized.Page;
                 }
+                uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                uiPageScroller.VerticalScrollMode = ScrollMode.Enabled;
             }
             if (_pageType == null) // Either the preferences is for an editor, or this particular BT devices doesn't have a specialization.
             {
                 _pageType = typeof(BleEditor.BleEditorPage);
+                uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                uiPageScroller.VerticalScrollMode = ScrollMode.Enabled;
                 // There's also a device information page, but it's not really useful at all.
             }
 
@@ -289,7 +305,7 @@ namespace BluetoothDeviceController
             {
                 // Not super pleased with this; there's a strong assumption that the bluetooth device id will match the deviceinfo id.
                 // That's not actually required.
-                if (!NewPageIsSameIdAsCurrentPage(di?.Id ?? null))
+                if (!NewPageIsSameIdAsCurrentPage(di?.di?.Id ?? null))
                 {
                     MinimizeCurrentWindowToDock();
                 }
@@ -391,14 +407,14 @@ namespace BluetoothDeviceController
             }
         }
 
-        private int FindDevice (DeviceInformation di)
+        private int FindDevice (DeviceInformation diToFind)
         {
             int idx = -1;
             for (int i = 0; i < uiNavigation.MenuItems.Count && idx == -1; i++)
             {
                 var nvi = uiNavigation.MenuItems[i] as NavigationViewItemBase;
-                var dvi = nvi?.Tag as DeviceInformation;
-                if (dvi != null && dvi.Id == di.Id)
+                var di = nvi?.Tag as DeviceInformationWrapper;
+                if (di != null && di.di != null && di.di.Id == diToFind.Id)
                 {
                     return i;
                 }
@@ -458,13 +474,13 @@ namespace BluetoothDeviceController
             return name;
         }
 
-        private void AddDevice(DeviceInformation di)
+        private void AddDevice(DeviceInformationWrapper di)
         {
             var includeAll = Preferences.Scope == UserPreferences.SearchScope.All_bluetooth_devices;
-            var name = GetDeviceInformationName(di, includeAll); // gets null for unnamed devices unless we want all devices.
+            var name = GetDeviceInformationName(di.di, includeAll); // gets null for unnamed devices unless we want all devices.
             if (name == null) return;
 
-            var idx = FindDevice(di);
+            var idx = FindDevice(di.di);
             if (idx != -1)
             {
                 // Replace the old tag device information with this new one
@@ -506,14 +522,14 @@ namespace BluetoothDeviceController
         /// <summary>
         /// Display a pop-up for the ⚙ per-device setting
         /// </summary>
-        private async void OnDeviceSettingsClick(object source, DeviceInformation di)
+        private async void OnDeviceSettingsClick(object source, DeviceInformationWrapper di)
         {
             if (di == null) return; // The tag is always a DeviceInformation
-            var name = GetDeviceInformationName(di);
+            if (di.di == null) return;
+            var name = GetDeviceInformationName(di.di);
 
-            ; // throw new NotImplementedException();
-            var oldName = GetDeviceInformationName(di, true);
-            var perdevice = new PerDeviceSettings(di, oldName);
+            var oldName = GetDeviceInformationName(di.di, true);
+            var perdevice = new PerDeviceSettings(di.di, oldName);
 
             var cd = new ContentDialog()
             {
@@ -539,7 +555,7 @@ namespace BluetoothDeviceController
             if (result == ContentDialogResult.Primary)
             {
                 // Please update the settings.
-                await UserNameMappings.AddAsync(di.Id, perdevice.UserName);
+                await UserNameMappings.AddAsync(di.di.Id, perdevice.UserName);
                 // Update the UI????
             }
         }
@@ -550,16 +566,23 @@ namespace BluetoothDeviceController
         /// </summary>
         /// 
         public event EventHandler DeviceEnumerationChanged;
-        public void StartSearch(UserPreferences.ReadSelection searchType)
+        public void StartSearch(UserPreferences.ReadSelection readType)
         {
             ClearDevices();
             StartWatch();
             Task searchTask = null;
-            switch (searchType)
+            switch (Preferences.Scope)
             {
-                case UserPreferences.ReadSelection.Everything:
-                case UserPreferences.ReadSelection.Name:
-                    searchTask = StartDeviceReadAsync(searchType); // will set the DeviceReadTask global as needed.
+                case UserPreferences.SearchScope.Bluetooth_Com_Device:
+                    break;
+                default:
+                    switch (readType)
+                    {
+                        case UserPreferences.ReadSelection.Everything:
+                        case UserPreferences.ReadSelection.Name:
+                            searchTask = StartDeviceReadAsync(readType); // will set the DeviceReadTask global as needed.
+                            break;
+                    }
                     break;
             }
         }
@@ -601,7 +624,16 @@ namespace BluetoothDeviceController
             };
 
             //var qstr = BluetoothLEDevice.GetDeviceSelectorFromPairingState(false);
-            var qstr = "System.Devices.Aep.ProtocolId:=\"{BB7BB05E-5972-42B5-94FC-76EAA7084D49}\"";
+            string qstr = "";
+            switch (Preferences.Scope) // get either Bluetooth LE or COM port things
+            {
+                case UserPreferences.SearchScope.Bluetooth_Com_Device:
+                    qstr = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.SerialPort);
+                    break;
+                default:
+                    qstr = "System.Devices.Aep.ProtocolId:=\"{BB7BB05E-5972-42B5-94FC-76EAA7084D49}\"";
+                    break;
+            }
             MenuDeviceWatcher = DeviceInformation.CreateWatcher(
                 qstr,
                 requestedProperties,
@@ -641,43 +673,32 @@ namespace BluetoothDeviceController
 
         private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
-            object result;
-            bool got = args.Properties.TryGetValue("System.Devices.Aep.IsPresent", out result);
-            if (got)
-            {
-                var b = result as Boolean?;
-                if(b.HasValue)
-                {
-                    if (b.Value)
-                    {
-
-                    }
-                    else
-                    {
-                        ;
-                    }
-                }
-                else
-                {
-                    ;
-                }
-            }
-            else
-            {
-                ;
-            }
-
+            //Testing the IsPresent value.
+            //object result;
+            //bool got = args.Properties.TryGetValue("System.Devices.Aep.IsPresent", out result);
             System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device Added");
             await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
-                () => { AddDevice(args); });
+                () => { AddDevice(new DeviceInformationWrapper (args)); });
         }
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device Removed");
+            var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
+            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device Removed {id} kind {args.Kind}");
         }
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device updated");
+            var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
+
+            // Play around with getting a strength value!
+            object strength = null;
+            args.Properties.TryGetValue("System.Devices.Aep.SignalStrength", out strength);
+            if (strength != null && strength is int)
+            {
+                ;
+                var strvalue = (int)strength;
+                System.Diagnostics.Debug.WriteLine($"DeviceWatcher: {id} strength {strength}");
+            }
+            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device updated {id} kind {args.Kind}");
         }
 
 
@@ -723,12 +744,12 @@ namespace BluetoothDeviceController
             for (int i=startidx; i<endidx; i++)
             {
                 var nvi = uiNavigation.MenuItems[i] as NavigationViewItemBase;
-                var dvi = nvi?.Tag as DeviceInformation;
-                if (dvi != null)
+                var di = nvi?.Tag as DeviceInformationWrapper;
+                if (di != null)
                 {
                     // Got a device to investigate.
                     var _page = typeof(BleEditor.BleEditorPage);
-                    ContentFrame.Navigate(_page, dvi);
+                    ContentFrame.Navigate(_page, di);
                     var editor = ContentFrame.Content as BleEditor.BleEditorPage;
                     while (!editor.NavigationComplete && !ct.IsCancellationRequested)
                     {
@@ -807,18 +828,18 @@ namespace BluetoothDeviceController
             for (int i = startidx; i < endidx; i++)
             {
                 var nvi = uiNavigation.MenuItems[i] as NavigationViewItemBase;
-                var di = nvi?.Tag as DeviceInformation;
+                var di = nvi?.Tag as DeviceInformationWrapper;
                 if (di != null)
                 {
                     // Just do a query for the name
                     try
                     {
-                        var ble = await BluetoothLEDevice.FromIdAsync(di.Id);
+                        var ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
                         if (ble != null)
                         {
                             if (string.IsNullOrEmpty(ble.Name))
                             {
-                                System.Diagnostics.Debug.WriteLine($"DEVICE: Get name for {di.Id}");
+                                System.Diagnostics.Debug.WriteLine($"DEVICE: Get name for {di.di.Id}");
                                 var services = await ble.GetGattServicesForUuidAsync(commonConfigurationGuid);
                                 if (services.Status != GattCommunicationStatus.Success)
                                 {

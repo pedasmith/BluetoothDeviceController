@@ -12,7 +12,7 @@ namespace BluetoothDeviceController
             Specialized_Display,
             Device_Editor };
         public DisplayPreference Display { get; set; } = DisplayPreference.Specialized_Display;
-        public enum SearchScope {  Has_specialized_display, Device_is_named, All_bluetooth_devices };
+        public enum SearchScope {  Has_specialized_display, Bluetooth_Com_Device, Device_is_named, All_bluetooth_devices };
         public SearchScope Scope { get; set; } = SearchScope.Has_specialized_display;
 
         public enum ReadSelection { Address, Name, Everything } // Same as DeviceSearchType: Standard, NameRead, Everything

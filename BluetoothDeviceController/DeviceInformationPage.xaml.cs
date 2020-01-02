@@ -61,14 +61,14 @@ namespace BluetoothDeviceController
 
         protected async override void OnNavigatedTo(NavigationEventArgs args)
         {
-            var di = args.Parameter as DeviceInformation;
+            var di = args.Parameter as DeviceInformationWrapper;
             uiProgress.IsActive = true;
-            var raw = $"Name:{di.Name} Id:{di.Id}\nCanPair:{di.Pairing.CanPair} IsPaired:{di.Pairing.IsPaired}\n";
+            var raw = $"Name:{di.di.Name} Id:{di.di.Id}\nCanPair:{di.di.Pairing.CanPair} IsPaired:{di.di.Pairing.IsPaired}\n";
             uiRawData.Text = raw;
             raw = "";
             //var cache = BluetoothCacheMode.Uncached;
 
-            ble = await BluetoothLEDevice.FromIdAsync(di.Id);
+            ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
             if (ble == null)
             {
                 // Happens if another program is trying to use the device!

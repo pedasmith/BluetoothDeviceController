@@ -191,6 +191,7 @@
     <Compile Include="DeviceInformationPage.xaml.cs">
       <DependentUpon>DeviceInformationPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DeviceInformationWrapper.cs" />
     <Compile Include="DeviceMenuEntryControl.xaml.cs">
       <DependentUpon>DeviceMenuEntryControl.xaml</DependentUpon>
     </Compile>
@@ -221,6 +222,12 @@
       <DependentUpon>PerDeviceSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerialPort\BluetoothCommTerminalAdapter.cs" />
+    <Compile Include="SerialPort\Shortcuts.cs" />
+    <Compile Include="SerialPort\SimpleTerminalPage.xaml.cs">
+      <DependentUpon>SimpleTerminalPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SerialPort\SlantRobotics_LittleBot_Shortcuts.cs" />
     <Compile Include="SpecialtyPagesModified\TI_beLight_2540Page.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\TrionesPage.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\Witti_DottiPage.xaml.cs" />
@@ -712,6 +719,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PerDeviceSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SerialPort\SimpleTerminalPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

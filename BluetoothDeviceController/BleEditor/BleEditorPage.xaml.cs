@@ -94,12 +94,12 @@ namespace BluetoothDeviceController.BleEditor
         String BleDeviceId = "";
         protected async override void OnNavigatedTo(NavigationEventArgs args)
         {
-            var di = args.Parameter as DeviceInformation;
+            var di = args.Parameter as DeviceInformationWrapper;
             uiProgress.IsActive = true;
 
             try
             {
-                ble = await BluetoothLEDevice.FromIdAsync(di.Id);
+                ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
                 if (ble != null)
                 {
                     var knownDevice = BleNames.GetDevice(ble.Name);
@@ -157,7 +157,7 @@ namespace BluetoothDeviceController.BleEditor
                 return property;
             }
         }
-        private async Task DisplayBluetooth(NameDevice knownDevice, DeviceInformation di, BluetoothLEDevice ble)
+        private async Task DisplayBluetooth(NameDevice knownDevice, DeviceInformationWrapper di, BluetoothLEDevice ble)
         {
             var jsonFormat = Newtonsoft.Json.Formatting.Indented;
             var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings()
@@ -169,8 +169,8 @@ namespace BluetoothDeviceController.BleEditor
 
             var wireAllDevices = new NameAllDevices();
             WireDevice = new NameDevice();
-            WireDevice.Name = di.Name;
-            WireDevice.Details += $"Id:{di.Id}\nCanPair:{di.Pairing.CanPair} IsPaired:{di.Pairing.IsPaired}";
+            WireDevice.Name = di.di.Name;
+            WireDevice.Details += $"Id:{di.di.Id}\nCanPair:{di.di.Pairing.CanPair} IsPaired:{di.di.Pairing.IsPaired}";
             wireAllDevices.AllDevices.Add(WireDevice);
 
             WireDevice.ClassModifiers = knownDevice.ClassModifiers;
