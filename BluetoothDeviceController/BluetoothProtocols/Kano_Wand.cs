@@ -12,13 +12,14 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 10/12/2019 8:48 PM
+    /// This class was automatically generated 1/4/2020 11:28 AM
     /// </summary>
 
     public class Kano_Wand : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+        // Link: https://kano.me/store/us/products/coding-wand
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();

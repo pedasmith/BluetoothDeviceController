@@ -12,13 +12,13 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The original smaller (upright) TI SensorTag. As of 2017, it's obsolete. The CC2541 SensorTag is the first Bluetooth Smart development kit focused on wireless sensor applications and it is the only development kit targeted for smart phone app developers. The SensorTag can be used as reference design and development platform for a variety of smart phone accessories..
-    /// This class was automatically generated 10/12/2019 8:06 PM
+    /// This class was automatically generated 1/4/2020 11:30 AM
     /// </summary>
 
     public partial class TI_SensorTag_2541 : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();

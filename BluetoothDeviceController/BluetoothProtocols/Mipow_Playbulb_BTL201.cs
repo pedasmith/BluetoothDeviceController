@@ -12,13 +12,17 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 12/26/2019 8:59 PM
+    /// This class was automatically generated 1/4/2020 11:28 AM
     /// </summary>
 
     public class MIPOW_Playbulb_BTL201 : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+        // Link: http://mipow.com/
+        // Link: https://pdominique.wordpress.com/2015/01/02/hacking-playbulb-candles/
+        // Link: https://github.com/Heckie75/Mipow-Playbulb-BTL201
+        // Link: https://github.com/Phhere/Playbulb/tree/master/protocols
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();

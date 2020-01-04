@@ -102,7 +102,8 @@ namespace BluetoothDeviceController
                                     var dc = DeviceCharacteristic.Create(characteristic);
                                     raw += $"    Characteristic:{characteristic.Uuid} {characteristic.UserDescription}\n";
 
-                                    //TODO: does any device have a presentation format?
+                                    //NOTE: does any device have a presentation format?
+                                    //AFAICT, the answer is "no"
                                     foreach (var format in characteristic.PresentationFormats)
                                     {
                                         raw += $"    Fmt: Description:{format.Description} Namespace:{format.Namespace} Type:{format.FormatType} Unit: {format.Unit} Exp:{format.Exponent}\n";

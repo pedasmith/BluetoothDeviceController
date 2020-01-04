@@ -12,13 +12,17 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 10/13/2019 2:56 PM
+    /// This class was automatically generated 1/4/2020 11:31 AM
     /// </summary>
 
     public partial class Witti_Dotti : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+        // Link: https://www.wittidesign.com/products/dotti-one
+        // Link: https://www.wittidesign.com/pages/video-tutorials-dotti
+        // Link: https://github.com/bertrandmartel/dotti-bluetooth-android
+        // Link: https://github.com/MartyMacGyver/dotti-interfacing
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();
@@ -770,7 +774,7 @@ namespace BluetoothProtocols
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
-            dw.ByteOrder = ByteOrder.BigEndian;
+            dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
             dw.WriteUInt16(Command);
             dw.WriteByte(C1);

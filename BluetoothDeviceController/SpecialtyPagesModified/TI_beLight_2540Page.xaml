@@ -21,7 +21,6 @@
 
         <TextBlock Padding="0,20,0,0">Links to technical info</TextBlock>
         <StackPanel Orientation="Horizontal">
-            <!-- TODO: good links -->
             <HyperlinkButton NavigateUri="http://www.ti.com/tool/tidc-bluetooth-low-energy-light">TI home page for CC2540T</HyperlinkButton>
             <HyperlinkButton NavigateUri="http://www.ti.com/lit/ug/swru392a/swru392a.pdf" Margin="10,0,0,0">PDF Description</HyperlinkButton>
         </StackPanel>

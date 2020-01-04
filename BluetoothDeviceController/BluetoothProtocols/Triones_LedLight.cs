@@ -12,13 +12,16 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 10/12/2019 8:08 PM
+    /// This class was automatically generated 1/4/2020 11:30 AM
     /// </summary>
 
     public class Triones_LedLight : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+        // Link: https://github.com/madhead/saberlight/blob/master/protocols/Triones/protocol.md
+        // Link: https://github.com/hunsly/Ledblee-Triones-control
+        // Link: https://github.com/Betree/magicblue/wiki/Characteristics-list
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();
@@ -250,6 +253,25 @@ namespace BluetoothProtocols
 
 
 
+
+        /// <summary>
+        /// Writes data for Triones_Command
+        /// </summary>
+        /// <param name="Period"></param>
+        /// <returns></returns>
+        public async Task WriteTriones_Command(byte[] param0)
+        {
+            if (!await EnsureCharacteristicAsync()) return;
+
+            var dw = new DataWriter();
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            dw.ByteOrder = ByteOrder.LittleEndian;
+            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
+            dw.WriteBytes(param0);
+
+            var command = dw.DetachBuffer().ToArray();
+            await WriteCommandAsync(17, "Triones_Command", command, GattWriteOption.WriteWithoutResponse);
+        }
 
     }
 }

@@ -12,13 +12,14 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 10/12/2019 10:12 PM
+    /// This class was automatically generated 1/4/2020 11:26 AM
     /// </summary>
 
     public class Nordic_Thingy : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+        // Link: https://nordicsemiconductor.github.io/Nordic-Thingy52-FW/documentation/firmware_architecture.html#fw_arch_ble_services
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();
@@ -2474,7 +2475,7 @@ namespace BluetoothProtocols
                     NotifyGravity_ValueChanged_Set = true;
                     ch.ValueChanged += (sender, args) =>
                     {
-                        var datameaning = "F32|FLOAT|X|mpss F32|N3|Y|mpss F32|N3|Z|mpss";
+                        var datameaning = "F32|FIXED|X|mpss F32|N3|Y|mpss F32|N3|Z|mpss";
                         var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
 
                         Gravity_X = parseResult.ValueList.GetValue("X").AsDouble;

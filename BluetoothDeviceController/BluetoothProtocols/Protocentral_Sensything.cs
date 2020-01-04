@@ -12,13 +12,15 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Sensything is an open source, high-resolution (24-bit), Wi-Fi and Bluetooth-enabled sensor interface platform that supports multiple sensor readings. In most cases, it offers a single-board, single-platform solution for acquiring and logging multiple sensor readings that can be seen/sent through an Android app, an IoT or analytics platform, over an ordinary USB connection, or logged right to a microSD..
-    /// This class was automatically generated 10/12/2019 7:54 PM
+    /// This class was automatically generated 1/4/2020 11:28 AM
     /// </summary>
 
     public class Protocentral_Sensything : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+        // Link: https://www.crowdsupply.com/protocentral/sensything
+        // Link: https://github.com/Protocentral/protocentral_sensything
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();

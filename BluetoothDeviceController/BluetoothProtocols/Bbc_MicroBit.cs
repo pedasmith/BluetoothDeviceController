@@ -12,13 +12,14 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 10/12/2019 1:09 PM
+    /// This class was automatically generated 1/4/2020 11:14 AM
     /// </summary>
 
     public class Bbc_MicroBit : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+        // Link: https://lancaster-university.github.io/microbit-docs/resources/bluetooth/bluetooth_profile.html
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();

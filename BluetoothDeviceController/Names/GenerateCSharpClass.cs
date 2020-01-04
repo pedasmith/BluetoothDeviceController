@@ -1292,7 +1292,6 @@ typeof([[CHARACTERISTICNAME]]Record).GetProperty(""[[DATANAME]]""),", // DATA4_L
                 }
 " };
 
-        //TODO: fix the NOTE: about popping up a dialog box
         private static string PageCSharp_CharacteristicWriteTemplate = @"
         private async void OnWrite[[CHARACTERISTICNAME]](object sender, RoutedEventArgs e)
         {

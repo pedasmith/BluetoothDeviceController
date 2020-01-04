@@ -47,7 +47,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             IsFullyInitialized = true;
         }
 
-        public string GetId() //TODO: add to all pages
+        public string GetId()
         {
             return bleDevice.ble.DeviceId;
         }

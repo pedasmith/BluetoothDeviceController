@@ -12,13 +12,15 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 10/12/2019 8:03 PM
+    /// This class was automatically generated 1/4/2020 11:29 AM
     /// </summary>
 
     public class TI_beLight_2540 : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+        // Link: http://www.ti.com/tool/tidc-bluetooth-low-energy-light
+        // Link: http://www.ti.com/lit/ug/swru392a/swru392a.pdf
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();

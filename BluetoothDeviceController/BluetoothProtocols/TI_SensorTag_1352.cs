@@ -12,13 +12,13 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The TI 1352 is the latest 2019 version in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth.
-    /// This class was automatically generated 12/26/2019 11:55 AM
+    /// This class was automatically generated 1/4/2020 11:30 AM
     /// </summary>
 
     public partial class TI_SensorTag_1352 : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();
