@@ -39,6 +39,7 @@ namespace BluetoothDeviceController.Names
         public string DefaultPin { get; set; }
         public List<string> Aliases { get; set; } = new List<string>(); // Must not be null
         public IList<NameService> Services { get; } = new List<NameService>();
+        public IList<String> Links { get; } = new List<String>();
 
         public NameService GetService (string uuid)
         {

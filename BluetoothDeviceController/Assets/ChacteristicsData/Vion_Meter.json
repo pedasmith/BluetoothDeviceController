@@ -3,7 +3,10 @@
     {
       "Name": "Vion Meter",
       "ClassName": "Vion_Meter",
-      "LINK": "https://www.kickstarter.com/projects/1441579202/the-worlds-simplest-bluetooth-multimeter",
+      "Links": [
+        "https://www.kickstarter.com/projects/1441579202/the-worlds-simplest-bluetooth-multimeter" 
+
+      ],
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

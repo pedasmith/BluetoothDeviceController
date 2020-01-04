@@ -3,401 +3,407 @@
     {
       "Name": "BBC micro:bit",
       "ClassName": "Bbc_MicroBit",
-      "LINK": "https://lancaster-university.github.io/microbit-docs/resources/bluetooth/bluetooth_profile.html",
-      "Services": [
-        {
-          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
-          "Name": "Common Configuration",
-          "Characteristics": [
-            {
-              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
-              "Name": "Device Name",
-              "Type": "STRING|ASCII|Device_Name",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Name: BBC micro:bit [vezet]",
-                "BBC micro:bit [vezet]"
-              ]
-            },
-            {
-              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
-              "Name": "Appearance",
-              "Type": "U16|Speciality^Appearance|Appearance",
-              "IsRead": true,
-              "ExampleData": [
-                "Appearance:  00 02",
-                "Tag"
-              ]
-            },
-            {
-              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
-              "Name": "Connection Parameter",
-              "Type": "BYTES|HEX|ConnectionParameter",
-              "IsRead": true,
-              "ExampleData": [
-                "Value:  08 00 10 00 00 00 90 01"
-              ]
-            }
-          ]
-        },
-        {
-          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
-          "Name": "Generic Service",
-          "Suppress": true,
-          "Characteristics": [
-            {
-              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
-              "Name": "Service Changes",
-              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
-              "IsIndicate": true,
-              "Suppress": true
-            }
-          ]
-        },
-        {
-          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
-          "Name": "Device Info",
-          "Characteristics": [
-            {
-              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
-              "Name": "Model Number",
-              "Type": "STRING|ASCII",
-              "IsRead": true,
-              "ExampleData": [
-                "Value:  42 42 43 20 6D 69 63 72 6F 3A 62 69 74",
-                "BBC micro:bit"
-              ]
-            },
-            {
-              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
-              "Name": "Serial Number",
-              "Type": "STRING|ASCII",
-              "IsRead": true,
-              "ExampleData": [
-                "Value:  32 33 31 31 32 35 36 31 31 32",
-                "2311256112"
-              ]
-            },
-            {
-              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
-              "Name": "Firmware Revision",
-              "Type": "STRING|ASCII",
-              "IsRead": true,
-              "ExampleData": [
-                "Value:  32 2E 30 2E 30 2D 72 63 34",
-                "2.0.0-rc4"
-              ]
-            }
-          ]
-        },
-        {
-          "UUID": "e95d93b0-251d-470a-a062-fa1922dfa9a8",
-          "Name": "DFU Control",
-          "Suppress": true,
-          "Characteristics": [
-            {
-              "UUID": "e95d93b1-251d-470a-a062-fa1922dfa9a8",
-              "Name": "DFU Control",
-              "Type": "U8|HEX|DfuControlCode",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Value:  00",
-                "REM write 1 to boot to Nordic bootloader 2 to request flash"
-              ]
-            }
-          ]
-        },
-        {
-          "UUID": "e95d93af-251d-470a-a062-fa1922dfa9a8",
-          "Name": "EventReadWrite",
-          "Priority":  5,
-          "Characteristics": [
-            {
-              "UUID": "e95db84c-251d-470a-a062-fa1922dfa9a8",
-              "Name": "EventReadA",
-              "Type": "OOPT U16|HEX|EventType1 U16|HEX|EventValue1 U16|HEX|EventType2 U16|HEX|EventValue2 U16|HEX|EventType3 U16|HEX|EventValue3 U16|HEX|EventType4 U16|HEX|EventValue4",
-              "IsRead": true,
-              "IsNotify": true,
-              "ExampleData": [
-                "Value: "
-              ]
-            },
-            {
-              "UUID": "e95d9775-251d-470a-a062-fa1922dfa9a8",
-              "Name": "EventReadB",
-              "Type": "OOPT U16|HEX|EventType1 U16|HEX|EventValue1 U16|HEX|EventType2 U16|HEX|EventValue2 U16|HEX|EventType3 U16|HEX|EventValue3 U16|HEX|EventType4 U16|HEX|EventValue4",
-              "IsRead": true,
-              "IsNotify": true,
-              "ExampleData": [
-                "Value: "
-              ]
-            },
-            {
-              "UUID": "e95d23c4-251d-470a-a062-fa1922dfa9a8",
-              "Name": "EventWriteA",
-              "Type": "OOPT U16|HEX|EventType1 U16|HEX|EventValue1 U16|HEX|EventType2 U16|HEX|EventValue2 U16|HEX|EventType3 U16|HEX|EventValue3 U16|HEX|EventType4 U16|HEX|EventValue4",
-              "IsWrite": true
-            },
-            {
-              "UUID": "e95d5404-251d-470a-a062-fa1922dfa9a8",
-              "Name": "EventWriteB",
-              "Type": "OOPT U16|HEX|EventType1 U16|HEX|EventValue1 U16|HEX|EventType2 U16|HEX|EventValue2 U16|HEX|EventType3 U16|HEX|EventValue3 U16|HEX|EventType4 U16|HEX|EventValue4",
-              "IsWrite": true,
-              "IsWriteWithoutResponse": true
-            }
-          ]
-        },
-        {
-          "UUID": "e95d0753-251d-470a-a062-fa1922dfa9a8",
-          "Name": "Accelerometer",
-          "Priority":  10,
-          "Characteristics": [
-            {
-              "UUID": "e95dca4b-251d-470a-a062-fa1922dfa9a8",
-              "Name": "AccelerometerData",
-              "Type": "I16^1000_/|FIXED|X I16^1000_/|FIXED|Y I16^1000_/|FIXED|Z",
-              "IsRead": true,
-              "IsNotify": true,
-              "ExampleData": [
-                "Value:  00 00 80 FF 00 04"
-              ],
-              "UI": {
-                "tabletype": "standard",
-                "chartType": "ytime",
-                "chartDefaultMinY": -2,
-                "chartDefaultMaxY": 2,
-                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+      "Links": [
+          "https://lancaster-university.github.io/microbit-docs/resources/bluetooth/bluetooth_profile.html"
+        ],
+        "Services"
+        :
+        [
+          {
+            "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+            "Name": "Common Configuration",
+            "Characteristics": [
+              {
+                "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+                "Name": "Device Name",
+                "Type": "STRING|ASCII|Device_Name",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "Name: BBC micro:bit [vezet]",
+                  "BBC micro:bit [vezet]"
+                ]
+              },
+              {
+                "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+                "Name": "Appearance",
+                "Type": "U16|Speciality^Appearance|Appearance",
+                "IsRead": true,
+                "ExampleData": [
+                  "Appearance:  00 02",
+                  "Tag"
+                ]
+              },
+              {
+                "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+                "Name": "Connection Parameter",
+                "Type": "BYTES|HEX|ConnectionParameter",
+                "IsRead": true,
+                "ExampleData": [
+                  "Value:  08 00 10 00 00 00 90 01"
+                ]
               }
-            },
-            {
-              "UUID": "e95dfb24-251d-470a-a062-fa1922dfa9a8",
-              "Name": "AccelerometerPeriod",
-              "Type": "U16|DEC|AccelerometerPeriod",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Value:  14 00",
-                "REM Valid values are 1 2 5 10 20 80 160 640 "
-              ]
-            }
-          ]
-        },
-        {
-          "UUID": "e95d9882-251d-470a-a062-fa1922dfa9a8",
-          "Name": "Button",
-          "Priority":  5,
-          "Characteristics": [
-            {
-              "UUID": "e95dda90-251d-470a-a062-fa1922dfa9a8",
-              "Name": "ButtonDataA",
-              "Type": "U8|HEX|ButtonA",
-              "IsRead": true,
-              "IsNotify": true,
-              "ExampleData": [
-                "Value:  00"
-              ]
-            },
-            {
-              "UUID": "e95dda91-251d-470a-a062-fa1922dfa9a8",
-              "Name": "ButtonDataB",
-              "Type": "U8|HEX|ButtonB",
-              "IsRead": true,
-              "IsNotify": true,
-              "ExampleData": [
-                "Value:  00"
-              ]
-            }
-          ]
-        },
-        {
-          "UUID": "e95d127b-251d-470a-a062-fa1922dfa9a8",
-          "Name": "IOPin",
-          "Priority": 5,
-          "Characteristics": [
-            {
-              "UUID": "e95d5899-251d-470a-a062-fa1922dfa9a8",
-              "Name": "PinAnalog",
-              "Type": "U32|HEX|SetAnalog",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Value:  00 00 00 00",
-                "REM When a bit is set, that pin will be an analog pin"
-              ]
-            },
-            {
-              "UUID": "e95db9fe-251d-470a-a062-fa1922dfa9a8",
-              "Name": "PinInput",
-              "Type": "U32|HEX|SetInput",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Value:  00 00 00 00",
-                "REM when a bit is set, that pin will be an input pin"
-              ]
-            },
-            {
-              "UUID": "e95dd822-251d-470a-a062-fa1922dfa9a8",
-              "Name": "PinPwm",
-              "Type": "U8|DEC|PinNumber1 U16|DEC|Value1 U32|DEC|Period1 U8|DEC|PinNumber2 U16|DEC|Value2 U32|DEC|Period2",
-              "IsWrite": true
-            },
-            {
-              "UUID": "e95d8d00-251d-470a-a062-fa1922dfa9a8",
-              "Name": "PinData",
-              "Type": "OOPT U8|DEC|PinNumber1 U8|DEC|DEPinData1 U8|DEC|PinNumber2 U8|DEC|DEPinData2 U8|DEC|PinNumber3 U8|DEC|DEPinData3 U8|DEC|PinNumber4 U8|DEC|DEPinData4 U8|DEC|PinNumber5 U8|DEC|DEPinData5 U8|DEC|PinNumber6 U8|DEC|DEPinData6 U8|DEC|PinNumber7 U8|DEC|DEPinData7 U8|DEC|PinNumber8 U8|DEC|DEPinData8 U8|DEC|PinNumber9 U8|DEC|DEPinData9",
-              "IsRead": true,
-              "IsWrite": true,
-              "IsNotify": true,
-              "ExampleData": [
-                "Value: "
-              ],
-              "UI": {
-                "tabletype": "standard",
-                "chartType": "ytime",
-                "chartDefaultMinY": 0,
-                "chartDefaultMaxY": 255,
-                "chartCommand": "AddLineYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+            ]
+          },
+          {
+            "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+            "Name": "Generic Service",
+            "Suppress": true,
+            "Characteristics": [
+              {
+                "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+                "Name": "Service Changes",
+                "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+                "IsIndicate": true,
+                "Suppress": true
               }
-            }
-          ]
-        },
-        {
-          "UUID": "e95dd91d-251d-470a-a062-fa1922dfa9a8",
-          "Name": "LED",
-          "Priority": 10,
-          "Characteristics": [
-            {
-              "UUID": "e95d7b77-251d-470a-a062-fa1922dfa9a8",
-              "Name": "LedPattern",
-              "Type": "U8|HEX|Row1 U8|HEX|Row2 U8|HEX|Row3 U8|HEX|Row4 U8|HEX|Row5",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Value:  00 00 04 00 00"
-              ]
-            },
-            {
-              "UUID": "e95d93ee-251d-470a-a062-fa1922dfa9a8",
-              "Name": "LedText",
-              "Type": "STRING|ASCII|LedText",
-              "IsWrite": true
-            },
-            {
-              "UUID": "e95d0d2d-251d-470a-a062-fa1922dfa9a8",
-              "Name": "LedScrollTime",
-              "Type": "U16|DEC|ScrollTime",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Value:  78 00"
-              ]
-            }
-          ]
-        },
-        {
-          "UUID": "e95df2d8-251d-470a-a062-fa1922dfa9a8",
-          "Name": "Magnetometer",
-          "Priority": 5,
-          "REM": "Not all version of the .HEX file include the magnetometer?",
-          "Characteristics": [
-            {
-              "UUID": "e95dfb11-251d-470a-a062-fa1922dfa9a8",
-              "Name": "MagnetometerData",
-              "Type": "I16|DEC|MagX I16|DEC|MagY I16|DEC|MagZ",
-              "IsRead": true,
-              "IsNotify": true,
-              "ExampleData": [
-                "Value: "
-              ],
-              "UI": {
-                "tabletype": "standard",
-                "chartType": "ytime",
-                "chartDefaultMinY": 0,
-                "chartDefaultMaxY": 100,
-                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+            ]
+          },
+          {
+            "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+            "Name": "Device Info",
+            "Characteristics": [
+              {
+                "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+                "Name": "Model Number",
+                "Type": "STRING|ASCII",
+                "IsRead": true,
+                "ExampleData": [
+                  "Value:  42 42 43 20 6D 69 63 72 6F 3A 62 69 74",
+                  "BBC micro:bit"
+                ]
+              },
+              {
+                "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+                "Name": "Serial Number",
+                "Type": "STRING|ASCII",
+                "IsRead": true,
+                "ExampleData": [
+                  "Value:  32 33 31 31 32 35 36 31 31 32",
+                  "2311256112"
+                ]
+              },
+              {
+                "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+                "Name": "Firmware Revision",
+                "Type": "STRING|ASCII",
+                "IsRead": true,
+                "ExampleData": [
+                  "Value:  32 2E 30 2E 30 2D 72 63 34",
+                  "2.0.0-rc4"
+                ]
               }
-            },
-            {
-              "UUID": "e95d9715-251d-470a-a062-fa1922dfa9a8",
-              "Name": "MagnetometerBearing",
-              "Type": "I16|DEC|Bearing",
-              "IsRead": true,
-              "IsNotify": true,
-              "ExampleData": [
-                "Value: "
-              ],
-              "UI": {
-                "tabletype": "standard",
-                "chartType": "ytime",
-                "chartDefaultMinY": 0,
-                "chartDefaultMaxY": 100,
-                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+            ]
+          },
+          {
+            "UUID": "e95d93b0-251d-470a-a062-fa1922dfa9a8",
+            "Name": "DFU Control",
+            "Suppress": true,
+            "Characteristics": [
+              {
+                "UUID": "e95d93b1-251d-470a-a062-fa1922dfa9a8",
+                "Name": "DFU Control",
+                "Type": "U8|HEX|DfuControlCode",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "Value:  00",
+                  "REM write 1 to boot to Nordic bootloader 2 to request flash"
+                ]
               }
-            },
-            {
-              "UUID": "e95d386c-251d-470a-a062-fa1922dfa9a8",
-              "Name": "MagnetometerPeriod",
-              "Type": "U16|DEC|MagnetometerPeriod",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Value:  64 00",
-                "REM Valid values are 1 2 5 10 20 80 160 640 "
-              ]
-            },
-            {
-              "UUID": "e95db358-251d-470a-a062-fa1922dfa9a8",
-              "Name": "MagnetometerCalibration",
-              "Type": "U8|DEC|MagnetometerCalibration",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "REM 0=unknown 1=requested 2=completed OK 3=completed Error"
-              ]
-            }
+            ]
+          },
+          {
+            "UUID": "e95d93af-251d-470a-a062-fa1922dfa9a8",
+            "Name": "EventReadWrite",
+            "Priority": 5,
+            "Characteristics": [
+              {
+                "UUID": "e95db84c-251d-470a-a062-fa1922dfa9a8",
+                "Name": "EventReadA",
+                "Type": "OOPT U16|HEX|EventType1 U16|HEX|EventValue1 U16|HEX|EventType2 U16|HEX|EventValue2 U16|HEX|EventType3 U16|HEX|EventValue3 U16|HEX|EventType4 U16|HEX|EventValue4",
+                "IsRead": true,
+                "IsNotify": true,
+                "ExampleData": [
+                  "Value: "
+                ]
+              },
+              {
+                "UUID": "e95d9775-251d-470a-a062-fa1922dfa9a8",
+                "Name": "EventReadB",
+                "Type": "OOPT U16|HEX|EventType1 U16|HEX|EventValue1 U16|HEX|EventType2 U16|HEX|EventValue2 U16|HEX|EventType3 U16|HEX|EventValue3 U16|HEX|EventType4 U16|HEX|EventValue4",
+                "IsRead": true,
+                "IsNotify": true,
+                "ExampleData": [
+                  "Value: "
+                ]
+              },
+              {
+                "UUID": "e95d23c4-251d-470a-a062-fa1922dfa9a8",
+                "Name": "EventWriteA",
+                "Type": "OOPT U16|HEX|EventType1 U16|HEX|EventValue1 U16|HEX|EventType2 U16|HEX|EventValue2 U16|HEX|EventType3 U16|HEX|EventValue3 U16|HEX|EventType4 U16|HEX|EventValue4",
+                "IsWrite": true
+              },
+              {
+                "UUID": "e95d5404-251d-470a-a062-fa1922dfa9a8",
+                "Name": "EventWriteB",
+                "Type": "OOPT U16|HEX|EventType1 U16|HEX|EventValue1 U16|HEX|EventType2 U16|HEX|EventValue2 U16|HEX|EventType3 U16|HEX|EventValue3 U16|HEX|EventType4 U16|HEX|EventValue4",
+                "IsWrite": true,
+                "IsWriteWithoutResponse": true
+              }
+            ]
+          },
+          {
+            "UUID": "e95d0753-251d-470a-a062-fa1922dfa9a8",
+            "Name": "Accelerometer",
+            "Priority": 10,
+            "Characteristics": [
+              {
+                "UUID": "e95dca4b-251d-470a-a062-fa1922dfa9a8",
+                "Name": "AccelerometerData",
+                "Type": "I16^1000_/|FIXED|X I16^1000_/|FIXED|Y I16^1000_/|FIXED|Z",
+                "IsRead": true,
+                "IsNotify": true,
+                "ExampleData": [
+                  "Value:  00 00 80 FF 00 04"
+                ],
+                "UI": {
+                  "tabletype": "standard",
+                  "chartType": "ytime",
+                  "chartDefaultMinY": -2,
+                  "chartDefaultMaxY": 2,
+                  "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+                }
+              },
+              {
+                "UUID": "e95dfb24-251d-470a-a062-fa1922dfa9a8",
+                "Name": "AccelerometerPeriod",
+                "Type": "U16|DEC|AccelerometerPeriod",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "Value:  14 00",
+                  "REM Valid values are 1 2 5 10 20 80 160 640 "
+                ]
+              }
+            ]
+          },
+          {
+            "UUID": "e95d9882-251d-470a-a062-fa1922dfa9a8",
+            "Name": "Button",
+            "Priority": 5,
+            "Characteristics": [
+              {
+                "UUID": "e95dda90-251d-470a-a062-fa1922dfa9a8",
+                "Name": "ButtonDataA",
+                "Type": "U8|HEX|ButtonA",
+                "IsRead": true,
+                "IsNotify": true,
+                "ExampleData": [
+                  "Value:  00"
+                ]
+              },
+              {
+                "UUID": "e95dda91-251d-470a-a062-fa1922dfa9a8",
+                "Name": "ButtonDataB",
+                "Type": "U8|HEX|ButtonB",
+                "IsRead": true,
+                "IsNotify": true,
+                "ExampleData": [
+                  "Value:  00"
+                ]
+              }
+            ]
+          },
+          {
+            "UUID": "e95d127b-251d-470a-a062-fa1922dfa9a8",
+            "Name": "IOPin",
+            "Priority": 5,
+            "Characteristics": [
+              {
+                "UUID": "e95d5899-251d-470a-a062-fa1922dfa9a8",
+                "Name": "PinAnalog",
+                "Type": "U32|HEX|SetAnalog",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "Value:  00 00 00 00",
+                  "REM When a bit is set, that pin will be an analog pin"
+                ]
+              },
+              {
+                "UUID": "e95db9fe-251d-470a-a062-fa1922dfa9a8",
+                "Name": "PinInput",
+                "Type": "U32|HEX|SetInput",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "Value:  00 00 00 00",
+                  "REM when a bit is set, that pin will be an input pin"
+                ]
+              },
+              {
+                "UUID": "e95dd822-251d-470a-a062-fa1922dfa9a8",
+                "Name": "PinPwm",
+                "Type": "U8|DEC|PinNumber1 U16|DEC|Value1 U32|DEC|Period1 U8|DEC|PinNumber2 U16|DEC|Value2 U32|DEC|Period2",
+                "IsWrite": true
+              },
+              {
+                "UUID": "e95d8d00-251d-470a-a062-fa1922dfa9a8",
+                "Name": "PinData",
+                "Type": "OOPT U8|DEC|PinNumber1 U8|DEC|DEPinData1 U8|DEC|PinNumber2 U8|DEC|DEPinData2 U8|DEC|PinNumber3 U8|DEC|DEPinData3 U8|DEC|PinNumber4 U8|DEC|DEPinData4 U8|DEC|PinNumber5 U8|DEC|DEPinData5 U8|DEC|PinNumber6 U8|DEC|DEPinData6 U8|DEC|PinNumber7 U8|DEC|DEPinData7 U8|DEC|PinNumber8 U8|DEC|DEPinData8 U8|DEC|PinNumber9 U8|DEC|DEPinData9",
+                "IsRead": true,
+                "IsWrite": true,
+                "IsNotify": true,
+                "ExampleData": [
+                  "Value: "
+                ],
+                "UI": {
+                  "tabletype": "standard",
+                  "chartType": "ytime",
+                  "chartDefaultMinY": 0,
+                  "chartDefaultMaxY": 255,
+                  "chartCommand": "AddLineYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+                }
+              }
+            ]
+          },
+          {
+            "UUID": "e95dd91d-251d-470a-a062-fa1922dfa9a8",
+            "Name": "LED",
+            "Priority": 10,
+            "Characteristics": [
+              {
+                "UUID": "e95d7b77-251d-470a-a062-fa1922dfa9a8",
+                "Name": "LedPattern",
+                "Type": "U8|HEX|Row1 U8|HEX|Row2 U8|HEX|Row3 U8|HEX|Row4 U8|HEX|Row5",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "Value:  00 00 04 00 00"
+                ]
+              },
+              {
+                "UUID": "e95d93ee-251d-470a-a062-fa1922dfa9a8",
+                "Name": "LedText",
+                "Type": "STRING|ASCII|LedText",
+                "IsWrite": true
+              },
+              {
+                "UUID": "e95d0d2d-251d-470a-a062-fa1922dfa9a8",
+                "Name": "LedScrollTime",
+                "Type": "U16|DEC|ScrollTime",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "Value:  78 00"
+                ]
+              }
+            ]
+          },
+          {
+            "UUID": "e95df2d8-251d-470a-a062-fa1922dfa9a8",
+            "Name": "Magnetometer",
+            "Priority": 5,
+            "REM": "Not all version of the .HEX file include the magnetometer?",
+            "Characteristics": [
+              {
+                "UUID": "e95dfb11-251d-470a-a062-fa1922dfa9a8",
+                "Name": "MagnetometerData",
+                "Type": "I16|DEC|MagX I16|DEC|MagY I16|DEC|MagZ",
+                "IsRead": true,
+                "IsNotify": true,
+                "ExampleData": [
+                  "Value: "
+                ],
+                "UI": {
+                  "tabletype": "standard",
+                  "chartType": "ytime",
+                  "chartDefaultMinY": 0,
+                  "chartDefaultMaxY": 100,
+                  "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+                }
+              },
+              {
+                "UUID": "e95d9715-251d-470a-a062-fa1922dfa9a8",
+                "Name": "MagnetometerBearing",
+                "Type": "I16|DEC|Bearing",
+                "IsRead": true,
+                "IsNotify": true,
+                "ExampleData": [
+                  "Value: "
+                ],
+                "UI": {
+                  "tabletype": "standard",
+                  "chartType": "ytime",
+                  "chartDefaultMinY": 0,
+                  "chartDefaultMaxY": 100,
+                  "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+                }
+              },
+              {
+                "UUID": "e95d386c-251d-470a-a062-fa1922dfa9a8",
+                "Name": "MagnetometerPeriod",
+                "Type": "U16|DEC|MagnetometerPeriod",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "Value:  64 00",
+                  "REM Valid values are 1 2 5 10 20 80 160 640 "
+                ]
+              },
+              {
+                "UUID": "e95db358-251d-470a-a062-fa1922dfa9a8",
+                "Name": "MagnetometerCalibration",
+                "Type": "U8|DEC|MagnetometerCalibration",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "REM 0=unknown 1=requested 2=completed OK 3=completed Error"
+                ]
+              }
 
-          ]
-        },
-        {
-          "UUID": "e95d6100-251d-470a-a062-fa1922dfa9a8",
-          "Name": "Temperature",
-          "Priority": 10,
-          "Characteristics": [
-            {
-              "UUID": "e95d9250-251d-470a-a062-fa1922dfa9a8",
-              "Name": "TemperatureData",
-              "Type": "I8|DEC|Temperature|C",
-              "IsRead": true,
-              "IsNotify": true,
-              "ExampleData": [
-                "Value:  00"
-              ],
-              "UI": {
-                "tabletype": "standard",
-                "chartType": "ytime",
-                "chartDefaultMinY": 20,
-                "chartDefaultMaxY": 30,
-                "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+            ]
+          },
+          {
+            "UUID": "e95d6100-251d-470a-a062-fa1922dfa9a8",
+            "Name": "Temperature",
+            "Priority": 10,
+            "Characteristics": [
+              {
+                "UUID": "e95d9250-251d-470a-a062-fa1922dfa9a8",
+                "Name": "TemperatureData",
+                "Type": "I8|DEC|Temperature|C",
+                "IsRead": true,
+                "IsNotify": true,
+                "ExampleData": [
+                  "Value:  00"
+                ],
+                "UI": {
+                  "tabletype": "standard",
+                  "chartType": "ytime",
+                  "chartDefaultMinY": 20,
+                  "chartDefaultMaxY": 30,
+                  "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
+                }
+              },
+              {
+                "UUID": "e95d1b25-251d-470a-a062-fa1922dfa9a8",
+                "Name": "TemperaturePeriod",
+                "Type": "U16|DEC|TemperaturePeriod",
+                "IsRead": true,
+                "IsWrite": true,
+                "ExampleData": [
+                  "Value:  E8 03",
+                  "REM Valid values are 1 2 5 10 20 80 160 640 "
+                ]
               }
-            },
-            {
-              "UUID": "e95d1b25-251d-470a-a062-fa1922dfa9a8",
-              "Name": "TemperaturePeriod",
-              "Type": "U16|DEC|TemperaturePeriod",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Value:  E8 03",
-                "REM Valid values are 1 2 5 10 20 80 160 640 "
-              ]
-            }
-          ]
-        }
-      ],
-      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-f7:16:85:c4:85:a7\nCanPair:True IsPaired:False"
+            ]
+          }
+        ],
+        "Details"
+        :
+        "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-f7:16:85:c4:85:a7\nCanPair:True IsPaired:False"
     }
   ]
 }

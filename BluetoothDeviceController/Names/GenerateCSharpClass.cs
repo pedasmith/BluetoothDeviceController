@@ -425,6 +425,13 @@ namespace BluetoothDeviceController.Names
                 {"[[CURRTIME]]", $"{now.ToShortDateString()} {now.ToShortTimeString()}" },
                 {"[[SERVICE_CHARACTERISTIC_LIST]]",Generate_Protocol_SERVICE_CHARACTERISTIC_LIST(nameDevice) },
             };
+            // Create the [[LINKS]]
+            var links = "";
+            foreach (var link in nameDevice.Links)
+            {
+                links += $"\t\t// Link: {link}\n";
+            }
+            replace.Add("[[LINKS]]", links);
             var Retval = Replace(Protocol_BodyTemplate, replace);
             return Retval;
         }
@@ -653,7 +660,7 @@ namespace BluetoothProtocols
     public [[CLASSMODIFIERS]] class [[CLASSNAME]] : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // [[LINKS]]TODO: create LINKS
+[[LINKS]]
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();

@@ -228,9 +228,9 @@ namespace BluetoothDeviceController.BleEditor
                     Characteristic.ValueChanged += Characteristic_ValueChanged;
                     await Characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Indicate);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    ; //NOTE: 
+                    uiValueShow.Text = $"Unable to set indicate callback {ex.Message}"; ;
                 }
                 uiIndicateOnFlag.Visibility = Visibility.Visible;
             }
@@ -242,8 +242,9 @@ namespace BluetoothDeviceController.BleEditor
                     Characteristic.ValueChanged -= Characteristic_ValueChanged;
                     await Characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    uiValueShow.Text = $"Unable to remove indicate callback {ex.Message}"; ;
                     ; // NOTE: for example, we've long lost the connection. Should have a single info bar per device that can report that we've lost connection.
                 }
                 uiIndicateOnFlag.Visibility = Visibility.Collapsed;
@@ -261,9 +262,9 @@ namespace BluetoothDeviceController.BleEditor
                     Characteristic.ValueChanged += Characteristic_ValueChanged;
                     await Characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    ; //TODO: 
+                    uiValueShow.Text = $"Unable to add value changed callback {ex.Message}"; ;
                 }
                 uiNotifyOnFlag.Visibility = Visibility.Visible;
             }
@@ -275,8 +276,9 @@ namespace BluetoothDeviceController.BleEditor
                     Characteristic.ValueChanged -= Characteristic_ValueChanged;
                     await Characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    uiValueShow.Text = $"Unable to remove value changed callback {ex.Message}"; ;
                     ; // NOTE: for example, we've long lost the connection. Should have a single info bar per device that can report that we've lost connection.
                 }
                 uiNotifyOnFlag.Visibility = Visibility.Collapsed;

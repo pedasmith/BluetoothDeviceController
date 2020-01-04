@@ -1,0 +1,65 @@
+﻿{
+  "AllDevices": [
+    {
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: Flic BA48-A49324",
+                "Flic BA48-A49324"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "00420000-8f59-4420-870d-84f3b617e493",
+          "Name": "RX_TX",
+          "Characteristics": [
+            {
+              "UUID": "00420001-8f59-4420-870d-84f3b617e493",
+              "Name": "TX",
+              "Type": "BYTES|HEX|DataTX",
+              "IsWriteWithoutResponse": true
+            },
+            {
+              "UUID": "00420002-8f59-4420-870d-84f3b617e493",
+              "Name": "RX",
+              "Type": "BYTES|HEX|DataTX",
+              "IsNotify": true
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-80:e4:da:77:00:ab\nCanPair:True IsPaired:False"
+    }
+  ]
+}

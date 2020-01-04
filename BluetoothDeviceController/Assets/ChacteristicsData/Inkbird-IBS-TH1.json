@@ -3,8 +3,10 @@
     {
       "Name": "InkBird IBS-TH1",
       "ClassName": "InkBord_IbsTh1",
-      "REM":  "The InkBird doesn't seem to work with Windows at all -- the device can be found about half the time, but the data is seemingly unreadable?",
-      "LINK": "https://inkbird.shop/products/ibs-th1",
+      "REM": "The InkBird doesn't seem to work with Windows at all -- the device can be found about half the time, but the data is seemingly unreadable?",
+      "Links": [
+        "https://inkbird.shop/products/ibs-th1"
+      ],
       "Services": [
         {
           "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
