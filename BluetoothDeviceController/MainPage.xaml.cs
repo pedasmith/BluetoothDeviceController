@@ -3,23 +3,16 @@ using BluetoothDeviceController.UserData;
 using Microsoft.Advertising.WinRT.UI;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
@@ -85,7 +78,7 @@ namespace BluetoothDeviceController
 
         public BleNames AllBleNames { get; set; }
         public UserPreferences Preferences { get; } = new UserPreferences();
-
+        public UserSerialPortPreferences SerialPortPreferences { get; } = new UserSerialPortPreferences();
         public string CurrJsonSearch { get; internal set; }
         public string GetCurrentSearchResults()
         {
@@ -132,6 +125,7 @@ namespace BluetoothDeviceController
         {
             ContentFrame.Navigated += ContentFrame_Navigated;
             Preferences.ReadFromLocalSettings();
+            SerialPortPreferences.ReadFromLocalSettings();
 
             // It might look like AllBleNames is never used. In reality, this initializes a static class.
             AllBleNames = new BleNames();
@@ -274,6 +268,7 @@ namespace BluetoothDeviceController
                 _pageType = typeof(SerialPort.SimpleTerminalPage);
                 uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 uiPageScroller.VerticalScrollMode = ScrollMode.Disabled;
+                di.SerialPortPreferences = SerialPortPreferences;
             }
             else if (preftype == UserPreferences.DisplayPreference.Specialized_Display)
             {

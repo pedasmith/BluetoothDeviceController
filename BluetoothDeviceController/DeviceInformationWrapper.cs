@@ -14,5 +14,6 @@ namespace BluetoothDeviceController
             di = deviceInformation;
         }
         public DeviceInformation di { get; set; } = null;
+        public UserSerialPortPreferences SerialPortPreferences = null;
     }
 }

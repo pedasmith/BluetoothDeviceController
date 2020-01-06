@@ -270,6 +270,10 @@
     <Compile Include="UserData\NameMapping.cs" />
     <Compile Include="UserData\UserNameMappings.cs" />
     <Compile Include="UserPreferences.cs" />
+    <Compile Include="UserSerialPortPreferences.cs" />
+    <Compile Include="UserSerialPortPreferencesControl.xaml.cs">
+      <DependentUpon>UserSerialPortPreferencesControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\EnumUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -800,6 +804,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserPreferenceControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserSerialPortPreferencesControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

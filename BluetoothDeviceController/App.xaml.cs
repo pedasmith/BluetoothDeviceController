@@ -35,6 +35,12 @@ namespace BluetoothDeviceController
 
         public int AppLockTraceLevel = 0;
         bool AppLock = false;
+        /// <summary>
+        /// What is up with the apps lock? Because for a while I was having terrible problems
+        /// with concurrency and race conditions and crashing. So now I have more locking.
+        /// </summary>
+        /// <param name="requester"></param>
+        /// <returns></returns>
         public async Task WaitForAppLockAsync(string requester)
         {
             bool gotLock = false;

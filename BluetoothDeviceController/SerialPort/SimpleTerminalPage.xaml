@@ -34,7 +34,9 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Macro Button Definitions" />
+            <!-- NOTE: in the future, let people add their own macros.
             <Button Grid.Row="1" Grid.Column="1" Content="+" />
+            -->
             <VariableSizedWrapGrid Grid.Row="1" Grid.Column="0" x:Name="uiMacroButtonList"
                                    Orientation="Horizontal">
                 
@@ -44,6 +46,8 @@
                  Header="Type your command and press return:"
                  TextChanged="OnInputText"
                  AcceptsReturn="True" IsSpellCheckEnabled="False" />
-        <Button Grid.Row="3" VerticalAlignment="Top" HorizontalAlignment="Right" Content="SETTINGS" />
+        <Button Grid.Row="3" VerticalAlignment="Top" HorizontalAlignment="Right"
+            x:Name="uiSettings" FontSize="16" Content="⚙" Margin="3,30,8,0" Click="OnSettingsClicked" />
+
     </Grid>
 </Page>

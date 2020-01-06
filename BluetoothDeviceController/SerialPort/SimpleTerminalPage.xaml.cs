@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using static BluetoothDeviceController.UserSerialPortPreferences;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -54,8 +55,7 @@ namespace BluetoothDeviceController.SerialPort
     /// </summary>
     public sealed partial class SimpleTerminalPage : Page, ITerminal, SpecialtyPages.ISetHandleStatus
     {
-        public enum TerminalLineEnd { None, CR, LF, CRLF };
-        TerminalLineEnd LineEnd = TerminalLineEnd.CRLF; // Needed for Slant LittleBot
+        UserSerialPortPreferences SerialPortPreferences = null;
 
         BluetoothCommTerminalAdapter TerminalAdapter;
 
@@ -80,6 +80,10 @@ namespace BluetoothDeviceController.SerialPort
             await TerminalAdapter.InitAsync();
 
             ParentStatusHandler?.SetStatusActive(false);
+            if (di.SerialPortPreferences != null)
+            {
+                SerialPortPreferences = di.SerialPortPreferences;
+            }
         }
 
 
@@ -217,7 +221,7 @@ namespace BluetoothDeviceController.SerialPort
             var sendText = ConvertString(text);
             if (!sendText.EndsWith('\r') && !sendText.EndsWith('\n'))
             {
-                switch (LineEnd)
+                switch (SerialPortPreferences.LineEnd)
                 {
                     case TerminalLineEnd.CR: sendText += "\r"; break;
                     case TerminalLineEnd.LF: sendText += "\n"; break;
@@ -243,6 +247,36 @@ namespace BluetoothDeviceController.SerialPort
             retval = retval.Replace("\\t", "\t");
             retval = retval.Replace("\\0", "\0");
             return retval;
+        }
+
+        private async void OnSettingsClicked(object sender, RoutedEventArgs e)
+        {
+            var settings = new UserSerialPortPreferencesControl();
+            settings.SetPreferences(SerialPortPreferences);
+            var dlg = new ContentDialog()
+            {
+                Content = settings,
+                PrimaryButtonText = "OK",
+                Title = "Serial Terminal Settings"
+            };
+
+            // There are two different dialogs; 
+            ContentDialogResult result = ContentDialogResult.None;
+            try
+            {
+                await(App.Current as App).WaitForAppLockAsync("SerialPortSettingsDlg");
+                result = await dlg.ShowAsync();
+                SerialPortPreferences.SaveToLocalSettings(); // Always save the old values.
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception: SerialPortSettingsDlg: {ex.Message}");
+            }
+            finally
+            {
+                (App.Current as App).ReleaseAppLock("SerialPortSettingsDlg");
+            }
+
         }
     }
 }
