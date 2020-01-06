@@ -30,7 +30,7 @@ This JSON sample is from the Nordic Thingy temperature characteristic. In the ch
 
 ## To make a table
 
-To make a table, add in the UI : { } JSON element and add add a **"tableType": "standard"**. This will automatically generate
+To make a table, add a UI : { } JSON element and in that element add add a **"tableType": "standard"**. This will automatically generate
 the charting UI code in the XAML and and code-behind. The chart UI will include date, time, all of the data in the Type field, 
 and a Notes column (adding notes to the data turns out to be super useful)
 

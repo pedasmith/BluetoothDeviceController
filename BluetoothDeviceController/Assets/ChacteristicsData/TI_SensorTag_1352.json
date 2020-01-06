@@ -62,7 +62,8 @@
         },
         {
           "UUID": "00001801-0000-1000-8000-00805f9b34fb",
-          "Name": "Generic Service"
+          "Name": "Generic Service",
+          "Supress":  true
         },
         {
           "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
@@ -130,7 +131,7 @@
             },
             {
               "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
-              "Name": "Manuafacturer Name",
+              "Name": "Manufacturer Name",
               "Type": "STRING|ASCII|ManufacturerName",
               "IsRead": true,
               "ExampleData": [
@@ -163,6 +164,7 @@
         {
           "UUID": "f000ffc0-0451-4000-b000-000000000000",
           "Name": "Imaging",
+          "Supress": true,
           "Characteristics": [
             {
               "UUID": "f000ffc1-0451-4000-b000-000000000000",
@@ -195,6 +197,7 @@
         {
           "UUID": "f000aa00-0451-4000-b000-000000000000",
           "Name": "Temperature",
+          "Priority":  10,
           "Characteristics": [
             {
               "UUID": "f000aa01-0451-4000-b000-000000000000",
@@ -241,6 +244,7 @@
         {
           "UUID": "f000aa20-0451-4000-b000-000000000000",
           "Name": "Humidity",
+          "Priority": 10,
           "Characteristics": [
             {
               "UUID": "f000aa21-0451-4000-b000-000000000000",
@@ -287,6 +291,7 @@
         {
           "UUID": "f000aa70-0451-4000-b000-000000000000",
           "Name": "Optical Service",
+          "Priority": 3,
           "Characteristics": [
             {
               "UUID": "f000aa71-0451-4000-b000-000000000000",
@@ -326,6 +331,7 @@
         {
           "UUID": "f0001110-0451-4000-b000-000000000000",
           "Name": "LED",
+          "Priority": 8,
           "Characteristics": [
             {
               "UUID": "f0001111-0451-4000-b000-000000000000",
@@ -335,7 +341,7 @@
               "IsRead": true,
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
-			        "REM": "All LED values are either 0 or 1",
+              "REM": "All LED values are either 0 or 1",
               "ExampleData": [
                 "Value:  00"
               ]
@@ -366,6 +372,7 @@
         {
           "UUID": "f0001120-0451-4000-b000-000000000000",
           "Name": "Button",
+          "Priority": 7,
           "Characteristics": [
             {
               "UUID": "f0001121-0451-4000-b000-000000000000",
@@ -394,6 +401,7 @@
         {
           "UUID": "f000180f-0451-4000-b000-000000000000",
           "Name": "Battery",
+          "Priority": 2,
           "Characteristics": [
             {
               "UUID": "f0002a19-0451-4000-b000-000000000000",
@@ -411,6 +419,7 @@
         {
           "UUID": "f000ffa0-0451-4000-b000-000000000000",
           "Name": "Accelerometer",
+          "Priority": 4,
           "Characteristics": [
             {
               "UUID": "f000ffa1-0451-4000-b000-000000000000",

@@ -476,9 +476,14 @@ namespace BluetoothDeviceController
 
         private void AddDevice(DeviceInformationWrapper di)
         {
+            var id = di.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
             var includeAll = Preferences.Scope == UserPreferences.SearchScope.All_bluetooth_devices;
             var name = GetDeviceInformationName(di.di, includeAll); // gets null for unnamed devices unless we want all devices.
-            if (name == null) return;
+            if (name == null)
+            {
+                System.Diagnostics.Debug.WriteLine($"Device {id} not added because there's no name");
+                return;
+            }
 
             var idx = FindDevice(di.di);
             if (idx != -1)
@@ -504,6 +509,7 @@ namespace BluetoothDeviceController
             {
                 // There's no specialization and the user asked for items with a specialization only.
                 // That means we shouldn't add this to the list.
+                System.Diagnostics.Debug.WriteLine($"Device {id} not added because there's no specialization");
                 return;
             }
 
@@ -676,14 +682,15 @@ namespace BluetoothDeviceController
             //Testing the IsPresent value.
             //object result;
             //bool got = args.Properties.TryGetValue("System.Devices.Aep.IsPresent", out result);
-            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device Added");
+            var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
+            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} Added");
             await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
                 () => { AddDevice(new DeviceInformationWrapper (args)); });
         }
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {
             var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
-            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device Removed {id} kind {args.Kind}");
+            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} Removed");
         }
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
@@ -696,9 +703,12 @@ namespace BluetoothDeviceController
             {
                 ;
                 var strvalue = (int)strength;
-                System.Diagnostics.Debug.WriteLine($"DeviceWatcher: {id} strength {strength}");
+                System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} updated strength {strength}");
             }
-            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device updated {id} kind {args.Kind}");
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} updated ");
+            }
         }
 
 

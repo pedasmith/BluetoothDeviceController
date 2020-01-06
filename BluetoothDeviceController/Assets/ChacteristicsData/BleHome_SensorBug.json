@@ -79,7 +79,7 @@
           "Characteristics": [
             {
               "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
-              "Name": "Manuafacturer Name",
+              "Name": "Manufacturer Name",
               "Type": "STRING|ASCII",
               "IsRead": true,
               "ExampleData": [

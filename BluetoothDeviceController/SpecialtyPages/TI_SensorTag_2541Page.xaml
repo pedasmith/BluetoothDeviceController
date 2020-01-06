@@ -627,13 +627,13 @@
                 </StackPanel>
 
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Manuafacturer Name</TextBlock>
+                <TextBlock Style="{StaticResource SubheaderStyle}">Manufacturer Name</TextBlock>
                 <StackPanel Orientation="Horizontal">
 
-                    <TextBox IsReadOnly="True" x:Name="Manuafacturer_Name_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Manufacturer_Name_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
 
 
-                    <Button Content="Read" Click="OnReadManuafacturer_Name" />
+                    <Button Content="Read" Click="OnReadManufacturer_Name" />
 
                 </StackPanel>
 

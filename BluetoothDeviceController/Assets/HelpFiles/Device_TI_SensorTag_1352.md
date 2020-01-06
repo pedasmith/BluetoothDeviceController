@@ -8,14 +8,14 @@ The SensorTag is a small device created by TI in order to demonstrate the cababi
 dealing with a variety of on-board sensors. 
 
 This SensorTag uses 2 AAA batteries for power. It is larger and heavier than any previous SensorTag.
-# Example
 
-![Accelerometer](../ScreenShots/Device_TI_SensorTag_1352-175.png)
 
 # Pairing (code 0) and usage details
 The device does not need to be paired with Windows before it can be used.
 
-![SensorTag 1352](../ScreenShots/Device_TI_SensorTag_1352_Humidity.png)
+# Example
+
+![SensorTag 1352](../ScreenShots/Device_TI_SensorTag_1352_Temperature.png)
 
 The SensorTag can be a little finicky to connect; sometimes you have to try several times, 
 pressing the pairing button. 

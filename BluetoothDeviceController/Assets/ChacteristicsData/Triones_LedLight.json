@@ -3,7 +3,7 @@
     {
       "Name": "Triones",
       "ClassName":  "Triones_LedLight",
-      "Aliases": [ "LEDBlue"  ],
+      "Aliases": [ "LEDBlue" ],
       "REM_About": "Multiple LED bulbs use similar protocols",
       "Links": [
         "https://github.com/madhead/saberlight/blob/master/protocols/Triones/protocol.md",

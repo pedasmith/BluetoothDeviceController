@@ -228,6 +228,7 @@
       <DependentUpon>SimpleTerminalPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="SerialPort\SlantRobotics_LittleBot_Shortcuts.cs" />
+    <Compile Include="SerialPort\StandardRobotCar_Shortcuts.cs" />
     <Compile Include="SpecialtyPagesModified\TI_beLight_2540Page.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\TrionesPage.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\Witti_DottiPage.xaml.cs" />
@@ -543,6 +544,12 @@
     <Content Include="Assets\ChacteristicsData\Flic_Flic_2_Button.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ChacteristicsData\SharperImage_SBT5007.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\HelpFiles\Json_Tweaks.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -597,6 +604,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ScreenShots\Data_Excel_Table_20.PNG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ScreenShots\Device_TI_SensorTag_1352_Temperature.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ScreenShots\Device_Nordic_Thingy_Data.PNG">

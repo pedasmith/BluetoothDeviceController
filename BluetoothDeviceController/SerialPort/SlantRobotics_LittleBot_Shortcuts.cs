@@ -7,6 +7,7 @@
             // Why these? Because that's what comes in the package :-)
             // BluetoothName = "HC 06";
             DeviceName = "Dev B";
+            Description = "The Slant Robotics LittleBot robot";
 
             Add("Stop", "222\r\n", "Code 222=turn off all motors");
             Add("Go", "1 20 20\r\n", "forward at speed 20");

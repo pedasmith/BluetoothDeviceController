@@ -8,6 +8,9 @@ actually works. They include
 3. A list of the characteristics for each service
 4. A description of how to interpret the characteristic data
 
+
 # More details
 
+[Tweaking JSON](Json_Tweaks.md)
 [Graphs and JSON](Json_Graphs.md)
+[Interpreting Data](https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/)

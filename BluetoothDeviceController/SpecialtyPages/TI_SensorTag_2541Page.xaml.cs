@@ -1311,9 +1311,9 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-        public class Manuafacturer_NameRecord : INotifyPropertyChanged
+        public class Manufacturer_NameRecord : INotifyPropertyChanged
         {
-            public Manuafacturer_NameRecord()
+            public Manufacturer_NameRecord()
             {
                 this.EventTime = DateTime.Now;
             }
@@ -1333,49 +1333,49 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Manuafacturer_NameRecord> Manuafacturer_NameRecordData { get; } = new DataCollection<Manuafacturer_NameRecord>();
-        private void OnManuafacturer_Name_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+        public DataCollection<Manufacturer_NameRecord> Manufacturer_NameRecordData { get; } = new DataCollection<Manufacturer_NameRecord>();
+        private void OnManufacturer_Name_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
                 var text = (sender as TextBox).Text.Trim();
                 (sender as TextBox).Text = "";
                 // Add the text to the notes section
-                if (Manuafacturer_NameRecordData.Count == 0)
+                if (Manufacturer_NameRecordData.Count == 0)
                 {
-                    Manuafacturer_NameRecordData.AddRecord(new Manuafacturer_NameRecord());
+                    Manufacturer_NameRecordData.AddRecord(new Manufacturer_NameRecord());
                 }
-                Manuafacturer_NameRecordData[Manuafacturer_NameRecordData.Count - 1].Note = text;
+                Manufacturer_NameRecordData[Manufacturer_NameRecordData.Count - 1].Note = text;
                 e.Handled = true;
             }
         }
 
         // Functions called from the expander
-        private void OnKeepCountManuafacturer_Name(object sender, SelectionChangedEventArgs e)
+        private void OnKeepCountManufacturer_Name(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count != 1) return;
             int value;
             var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
             if (!ok) return;
-            Manuafacturer_NameRecordData.MaxLength = value;
+            Manufacturer_NameRecordData.MaxLength = value;
 
 
         }
 
-        private void OnAlgorithmManuafacturer_Name(object sender, SelectionChangedEventArgs e)
+        private void OnAlgorithmManufacturer_Name(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count != 1) return;
             int value;
             var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
             if (!ok) return;
-            Manuafacturer_NameRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+            Manufacturer_NameRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
         }
-        private void OnCopyManuafacturer_Name(object sender, RoutedEventArgs e)
+        private void OnCopyManufacturer_Name(object sender, RoutedEventArgs e)
         {
             // Copy the contents over...
             var sb = new System.Text.StringBuilder();
             sb.Append("EventDate,EventTime,param0,Notes\n");
-            foreach (var row in Manuafacturer_NameRecordData)
+            foreach (var row in Manufacturer_NameRecordData)
             {
                 var time24 = row.EventTime.ToString("HH:mm:ss.f");
                 sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
@@ -1386,30 +1386,30 @@ namespace BluetoothDeviceController.SpecialtyPages
             Clipboard.SetContent(datapackage);
         }
 
-        private async void OnReadManuafacturer_Name(object sender, RoutedEventArgs e)
+        private async void OnReadManufacturer_Name(object sender, RoutedEventArgs e)
         {
             SetStatusActive(true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
-                var valueList = await bleDevice.ReadManuafacturer_Name();
+                var valueList = await bleDevice.ReadManufacturer_Name();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Manuafacturer_Name");
+                    SetStatus($"Error: unable to read Manufacturer_Name");
                     return;
                 }
 
-                var record = new Manuafacturer_NameRecord();
+                var record = new Manufacturer_NameRecord();
 
                 var param0 = valueList.GetValue("param0");
                 if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString)
                 {
                     record.param0 = (string)param0.AsString;
-                    Manuafacturer_Name_param0.Text = record.param0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Manufacturer_Name_param0.Text = record.param0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                 }
 
 
-                Manuafacturer_NameRecordData.Add(record);
+                Manufacturer_NameRecordData.Add(record);
 
             }
             catch (Exception ex)

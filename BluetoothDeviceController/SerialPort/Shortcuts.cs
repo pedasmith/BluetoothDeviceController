@@ -26,6 +26,8 @@ namespace BluetoothDeviceController.SerialPort
         /// </summary>
         public string DeviceName { get; internal set; } = "";
 
+        public string Description { get; internal set; } = "";
+
         public List<Shortcut> List { get; } = new List<Shortcut>();
         public void Add (string label, string replace, string alt)
         {
@@ -33,16 +35,10 @@ namespace BluetoothDeviceController.SerialPort
             List.Add(sc);
         }
 
-        /// <summary>
-        /// E.G.: BluetoothName is HC-06
-        /// </summary>
-        /// <param name="bluetoothName"></param>
-        /// <param name="deviceName"></param>
-        /// <returns></returns>
         public bool IsMatch (string deviceName)
         {
             //var btMatch = BluetoothName == "" || bluetoothName == "" || bluetoothName.StartsWith(BluetoothName);
-            var devMatch = DeviceName == "" || deviceName == "" || deviceName.StartsWith(DeviceName);
+            var devMatch = !String.IsNullOrEmpty(DeviceName) && deviceName.StartsWith(DeviceName);
             //var match = btMatch || devMatch;
             return devMatch;
         }
@@ -58,6 +54,7 @@ namespace BluetoothDeviceController.SerialPort
             {
                 All = new List<Shortcuts>();
                 All.Add(new SlantRobotics_LittleBot_Shortcuts()); // 2017 robot
+                All.Add(new StandardRobotCar_Shortcuts()); 
             }
         }
 

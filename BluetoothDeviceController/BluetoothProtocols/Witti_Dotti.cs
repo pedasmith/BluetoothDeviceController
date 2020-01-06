@@ -71,7 +71,7 @@ namespace BluetoothProtocols
             Guid.Parse("00002a26-0000-1000-8000-00805f9b34fb"), // #3 is Firmware Revision
             Guid.Parse("00002a27-0000-1000-8000-00805f9b34fb"), // #4 is Hardware Revision
             Guid.Parse("00002a28-0000-1000-8000-00805f9b34fb"), // #5 is Software Revision
-            Guid.Parse("00002a29-0000-1000-8000-00805f9b34fb"), // #6 is Manuafacturer Name
+            Guid.Parse("00002a29-0000-1000-8000-00805f9b34fb"), // #6 is Manufacturer Name
             Guid.Parse("00002a2a-0000-1000-8000-00805f9b34fb"), // #7 is Regulatory List
             Guid.Parse("00002a50-0000-1000-8000-00805f9b34fb"), // #8 is PnP ID
             Guid.Parse("00002a19-0000-1000-8000-00805f9b34fb"), // #0 is BatteryLevel
@@ -94,7 +94,7 @@ namespace BluetoothProtocols
             "Firmware Revision", // #3 is 00002a26-0000-1000-8000-00805f9b34fb
             "Hardware Revision", // #4 is 00002a27-0000-1000-8000-00805f9b34fb
             "Software Revision", // #5 is 00002a28-0000-1000-8000-00805f9b34fb
-            "Manuafacturer Name", // #6 is 00002a29-0000-1000-8000-00805f9b34fb
+            "Manufacturer Name", // #6 is 00002a29-0000-1000-8000-00805f9b34fb
             "Regulatory List", // #7 is 00002a2a-0000-1000-8000-00805f9b34fb
             "PnP ID", // #8 is 00002a50-0000-1000-8000-00805f9b34fb
             "BatteryLevel", // #0 is 00002a19-0000-1000-8000-00805f9b34fb
@@ -574,12 +574,12 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-        private string _Manuafacturer_Name = "";
-        private bool _Manuafacturer_Name_set = false;
-        public string Manuafacturer_Name
+        private string _Manufacturer_Name = "";
+        private bool _Manufacturer_Name_set = false;
+        public string Manufacturer_Name
         {
-            get { return _Manuafacturer_Name; }
-            internal set { if (_Manuafacturer_Name_set && value == _Manuafacturer_Name) return; _Manuafacturer_Name = value; _Manuafacturer_Name_set = true; OnPropertyChanged(); }
+            get { return _Manufacturer_Name; }
+            internal set { if (_Manufacturer_Name_set && value == _Manufacturer_Name) return; _Manufacturer_Name = value; _Manufacturer_Name_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -587,16 +587,16 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadManuafacturer_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadManufacturer_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(12, "Manuafacturer_Name", cacheMode);
+            IBuffer result = await ReadAsync(12, "Manufacturer_Name", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
 
-            Manuafacturer_Name = parseResult.ValueList.GetValue("param0").AsString;
+            Manufacturer_Name = parseResult.ValueList.GetValue("param0").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
