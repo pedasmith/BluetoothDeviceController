@@ -10,6 +10,8 @@ namespace BluetoothDeviceController.SerialPort
     {
         public StandardRobotCar_Shortcuts()
         {
+            Id = "Standard-Robot-Car";
+            Name = "Standard Robot Car Protocol";
             DeviceName = "";
             Description = "The Standard Robot Car (SRC) protocol";
 

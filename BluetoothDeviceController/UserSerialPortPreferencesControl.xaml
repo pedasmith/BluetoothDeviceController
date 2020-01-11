@@ -27,5 +27,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
+        <ComboBox x:Name="ShortcutIdComboBox" Header="Preferred Macro Set" SelectionChanged="OnMacroChanged" MinWidth="250">
+        </ComboBox>
     </StackPanel>
 </UserControl>

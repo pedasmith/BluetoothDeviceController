@@ -21,6 +21,9 @@ namespace BluetoothDeviceController.SerialPort
         // No good way to get this.
         // public string BluetoothName { get; internal set; } = "";
 
+        public string Id { get; internal set; } = "no-id-set";
+        public string Name { get; internal set; } = "no-name-set";
+
         /// <summary>
         /// E.G. the SlantRobotics LittleBot is an "HC 06" for bluetooth but "Dev B" for device name.
         /// </summary>
@@ -35,19 +38,22 @@ namespace BluetoothDeviceController.SerialPort
             List.Add(sc);
         }
 
-        public bool IsMatch (string deviceName)
+        public bool IsMatch (string deviceName, string id)
         {
+            // The matches are optimistic -- goal is I can ask for deviceName="" id="Slant-Robotics-LittleBot" and get
+            // the exact one I want.
             //var btMatch = BluetoothName == "" || bluetoothName == "" || bluetoothName.StartsWith(BluetoothName);
-            var devMatch = !String.IsNullOrEmpty(DeviceName) && deviceName.StartsWith(DeviceName);
-            //var match = btMatch || devMatch;
-            return devMatch;
+            var idMatch = id == "" || (!String.IsNullOrEmpty(Id) && id==Id);
+            var devMatch = deviceName == "" || (!String.IsNullOrEmpty(DeviceName) && deviceName.StartsWith(DeviceName));
+            var match = idMatch && devMatch;
+            return match;
         }
 
     }
 
     static class AllShortcuts
     {
-        static List<Shortcuts> All = null;
+        public static List<Shortcuts> All = null;
         public static void Init()
         {
             if (All == null)
@@ -58,13 +64,13 @@ namespace BluetoothDeviceController.SerialPort
             }
         }
 
-        public static IList<Shortcuts> GetShortcuts(string deviceName)
+        public static IList<Shortcuts> GetShortcuts(string deviceName, string id="")
         {
             var retval = new List<Shortcuts>();
             Init();
             foreach (var shortcut in All)
             {
-                if (shortcut.IsMatch (deviceName))
+                if (shortcut.IsMatch (deviceName, id))
                 {
                     retval.Add(shortcut);
                 }

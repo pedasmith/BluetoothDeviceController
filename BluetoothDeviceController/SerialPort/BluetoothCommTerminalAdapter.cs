@@ -131,6 +131,10 @@ namespace BluetoothDeviceController.SerialPort
                             // Give the string to the terminal
                             Terminal?.ReceivedData(str);
                         }
+                        else
+                        {
+                            keepGoing = false;
+                        }
                     }
                     readAll = null; // The task is going away; null it out.
                 });

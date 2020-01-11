@@ -55,7 +55,8 @@ namespace BluetoothDeviceController.SerialPort
     /// </summary>
     public sealed partial class SimpleTerminalPage : Page, ITerminal, SpecialtyPages.ISetHandleStatus
     {
-        UserSerialPortPreferences SerialPortPreferences = null;
+        DeviceInformationWrapper DI = null;
+        UserSerialPortPreferences SerialPortPreferences {  get { return DI.SerialPortPreferences; } }
 
         BluetoothCommTerminalAdapter TerminalAdapter;
 
@@ -63,7 +64,7 @@ namespace BluetoothDeviceController.SerialPort
         FontWeight SendWeight = FontWeights.Bold;
         FontWeight ReceiveWeight = FontWeights.Normal;
         Brush ErrorBrush = new SolidColorBrush(Colors.DarkRed);
-        Thickness macroButtonMargin = new Thickness(2);
+        Thickness shortcutButtonMargin = new Thickness(2);
 
 
         public SimpleTerminalPage()
@@ -72,18 +73,14 @@ namespace BluetoothDeviceController.SerialPort
         }
         protected async override void OnNavigatedTo(NavigationEventArgs args)
         {
-            var di = args.Parameter as DeviceInformationWrapper;
+            DI = args.Parameter as DeviceInformationWrapper;
             ParentStatusHandler?.SetStatusActive(true);
-            AddShortcutButtons(di.di.Name);
+            UpdateShortcutButtons();
 
-            TerminalAdapter = new BluetoothCommTerminalAdapter(this, di);
+            TerminalAdapter = new BluetoothCommTerminalAdapter(this, DI);
             await TerminalAdapter.InitAsync();
 
             ParentStatusHandler?.SetStatusActive(false);
-            if (di.SerialPortPreferences != null)
-            {
-                SerialPortPreferences = di.SerialPortPreferences;
-            }
         }
 
 
@@ -93,10 +90,21 @@ namespace BluetoothDeviceController.SerialPort
             ParentStatusHandler = handleStatus;
         }
 
-        private void AddShortcutButtons(string deviceName)
+        private void UpdateShortcutButtons()
         {
-            var list = AllShortcuts.GetShortcuts(deviceName);
-            uiMacroButtonList.Children.Clear();
+            // Getting the list of buttons.
+            var deviceName = DI.di.Name;
+            IList<Shortcuts> list = AllShortcuts.GetShortcuts(deviceName);
+            if (!String.IsNullOrEmpty (SerialPortPreferences?.ShortcutId))
+            {
+                var preflist = AllShortcuts.GetShortcuts("", SerialPortPreferences.ShortcutId);
+                if (preflist.Count > 0)
+                {
+                    list = preflist;
+                }
+            }
+
+            uiShortcutButtonList.Children.Clear();
             foreach (var shortcuts in list)
             {
                 foreach (var shortcut in shortcuts.List)
@@ -106,15 +114,15 @@ namespace BluetoothDeviceController.SerialPort
                         Content = shortcut.Label,
                         Tag = shortcut.Replace,
                         Width = 100,
-                        Margin = macroButtonMargin,
+                        Margin = shortcutButtonMargin,
                     };
-                    b.Click += OnMacroClick;
-                    uiMacroButtonList.Children.Add(b);
+                    b.Click += OnShortcutClick;
+                    uiShortcutButtonList.Children.Add(b);
                 }
             }
         }
 
-        private void OnMacroClick(object sender, RoutedEventArgs e)
+        private void OnShortcutClick(object sender, RoutedEventArgs e)
         {
             var b = sender as Button;
             var text = b?.Tag as string;
@@ -251,6 +259,7 @@ namespace BluetoothDeviceController.SerialPort
 
         private async void OnSettingsClicked(object sender, RoutedEventArgs e)
         {
+            var oldShortcutId = DI.SerialPortPreferences.ShortcutId;
             var settings = new UserSerialPortPreferencesControl();
             settings.SetPreferences(SerialPortPreferences);
             var dlg = new ContentDialog()
@@ -276,7 +285,10 @@ namespace BluetoothDeviceController.SerialPort
             {
                 (App.Current as App).ReleaseAppLock("SerialPortSettingsDlg");
             }
-
+            if (DI.SerialPortPreferences.ShortcutId != oldShortcutId)
+            {
+                UpdateShortcutButtons();
+            }
         }
     }
 }

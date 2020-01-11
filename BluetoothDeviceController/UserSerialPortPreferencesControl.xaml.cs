@@ -1,4 +1,5 @@
-﻿using enumUtilities;
+﻿using BluetoothDeviceController.SerialPort;
+using enumUtilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +25,32 @@ namespace BluetoothDeviceController
         public UserSerialPortPreferencesControl()
         {
             this.InitializeComponent();
+            this.Loaded += UserSerialPortPreferencesControl_Loaded;
         }
+
+        private void UserSerialPortPreferencesControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            int selectedIndex = 0;
+            ShortcutIdComboBox.Items.Add(new ComboBoxItem()
+            { 
+                Content="Based on device",
+                Tag="",
+            });
+            foreach (var item in AllShortcuts.All)
+            {
+                ShortcutIdComboBox.Items.Add(new ComboBoxItem()
+                {
+                    Content = item.Name,
+                    Tag = item.Id,
+                });
+                if (item.Id == SerialPortPreferences.ShortcutId)
+                {
+                    selectedIndex = ShortcutIdComboBox.Items.Count-1; // e.g. item[1] has count of 2 ([0] and [1])
+                }
+            }
+            ShortcutIdComboBox.SelectedIndex = selectedIndex;
+        }
+
         public UserSerialPortPreferences SerialPortPreferences { get; set; }
         public void SetPreferences(UserSerialPortPreferences pref)
         {
@@ -34,7 +60,15 @@ namespace BluetoothDeviceController
 
         private void OnLineEndChanged(object sender, SelectionChangedEventArgs e)
         {
+            ; // don't actually have to do anything here.
+        }
 
+        private void OnMacroChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1) return;
+            var item = e.AddedItems[0] as ComboBoxItem;
+            SerialPortPreferences.ShortcutId = item.Tag as string;
+            SerialPortPreferences.SaveToLocalSettings();
         }
     }
 }

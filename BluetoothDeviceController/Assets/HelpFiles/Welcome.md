@@ -26,6 +26,7 @@ and more devices -- please leave feedback to request specific devices!
 
 ## Other devices
 [![Kano Wand](../DevicePictures/Kano_Wand-175.png)](Device_Kano_Wand.md)
+[![LittleBot](../DevicePictures/SlantRobotics-LittleBot-175.png)](Device_SlantRobotics_LittleBot.md)
 
 ## More help
 [Help](Help.md)

@@ -4,7 +4,8 @@ Got a Bluetooth device and want to control it? The Bluetooth Device Controller p
 
 1. It can control many kinds of Bluetooth smart lights
 2. It can read data from a variety of different Bluetooth-enabled sensors
-3. It can read and control raw Bluetooth LE devices. This is an advanced feature for people who need to get a detailed analysis of their Bluetooth devices.
+3. It can control a small number of robots
+4. It can read and control raw Bluetooth LE devices. This is an advanced feature for people who need to get a detailed analysis of their Bluetooth devices.
 
 ![Quick Overview](../ScreenShots/Help.png)
 
@@ -58,7 +59,12 @@ The individual data sensors usually have a host of capabilities.
 1. [Reading Data](Sensor_Data_Reading.md)
 2. [Exporting Data to Excel](Sensor_Data_Excel.md)
 
-### Protocol details
+## Controlling Robots
+There are a wide variety of Arduino-type robots and devices that can potentially be controlled. 
+Right now, the following list has been verified as controllable with this program
+* [Slant Robotics LittleBot](Device_SlantRobotics_LittleBot.md)
+
+## Protocol details
 
 [JSON Description Protocol](Json_About.md)
 
