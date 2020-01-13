@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothDeviceController.Names;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -94,7 +95,7 @@ namespace BluetoothDeviceController.SerialPort
         {
             // Getting the list of buttons.
             var deviceName = DI.di.Name;
-            IList<Shortcuts> list = AllShortcuts.GetShortcuts(deviceName);
+            IList<SerialConfig> list = AllShortcuts.GetShortcuts(deviceName);
             if (!String.IsNullOrEmpty (SerialPortPreferences?.ShortcutId))
             {
                 var preflist = AllShortcuts.GetShortcuts("", SerialPortPreferences.ShortcutId);
@@ -105,14 +106,33 @@ namespace BluetoothDeviceController.SerialPort
             }
 
             uiShortcutButtonList.Children.Clear();
+            PrevValues.Clear();
+            CurrValues.Clear();
+
             foreach (var shortcuts in list)
             {
-                foreach (var shortcut in shortcuts.List)
+                // Add in all values
+                foreach (var (name, setting) in shortcuts.Settings)
+                {
+                    var tb = new TextBox()
+                    {
+                        Header = setting.Name ?? name,
+                        Text = setting.Init.ToString(),
+                        Tag = name,
+                    };
+                    tb.TextChanged += SettingValueTextChanged;
+                    uiShortcutButtonList.Children.Add(tb);
+                    PrevValues[name] = setting.Init;
+                    CurrValues[name] = setting.Init;
+                }
+
+                // Add in the button proper
+                foreach (var (name,shortcut) in shortcuts.Commands)
                 {
                     var b = new Button()
                     {
                         Content = shortcut.Label,
-                        Tag = shortcut.Replace,
+                        Tag = shortcut,
                         Width = 100,
                         Margin = shortcutButtonMargin,
                     };
@@ -122,14 +142,47 @@ namespace BluetoothDeviceController.SerialPort
             }
         }
 
+        private void SettingValueTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var tb = sender as TextBox;
+            var name = tb.Tag as string;
+            double newvalue;
+            bool convertOk = Double.TryParse(tb.Text, out newvalue);
+            if (convertOk)
+            {
+                CurrValues[name] = newvalue;
+            }
+        }
+
+        Dictionary<string, double> CurrValues = new Dictionary<string, double>();
+        Dictionary<string, double> PrevValues = new Dictionary<string, double>();
+
         private void OnShortcutClick(object sender, RoutedEventArgs e)
         {
             var b = sender as Button;
-            var text = b?.Tag as string;
-            if (text == null) return;
+            var command = b?.Tag as Command;
+            if (command == null) return;
 
-            AddInputTextToUI(text);
-            OnSendData?.Invoke(this, text);
+            var cmd = command.Replace;
+            if (!string.IsNullOrEmpty (command.Compute))
+            {
+                var commandlist = command.Compute.Split(new char[] { ' ' });
+                cmd = "";
+                foreach (var strcommand in commandlist)
+                {
+                    var calculateResult = BleEditor.ValueCalculate.Calculate(strcommand, double.NaN, null, PrevValues, CurrValues);
+                    cmd += calculateResult.S ?? calculateResult.D.ToString();
+                }
+
+                // Actually calculate the value and then move new-->old
+                foreach (var (name,value) in CurrValues)
+                {
+                    PrevValues[name] = value;
+                }
+            }
+
+            AddInputTextToUI(cmd);
+            OnSendData?.Invoke(this, cmd);
         }
 
         public event TerminalSendDataEventHandler OnSendData;

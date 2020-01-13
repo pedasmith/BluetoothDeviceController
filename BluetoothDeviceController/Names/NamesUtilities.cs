@@ -21,6 +21,9 @@ namespace Utilities
         public static implicit operator Bytes(String v) { return new Bytes(); }
     }
 
+    /// <summary>
+    /// Wrapper class to make a common set of parsers for bytes, ints etc.
+    /// </summary>
     public class Parsers
     {
         public static bool TryParseString(string text, System.Globalization.NumberStyles style, IFormatProvider format, out string result)

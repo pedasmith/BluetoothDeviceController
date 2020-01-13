@@ -16,15 +16,15 @@ namespace BluetoothDeviceController.BleEditor
     public static class ValueCalculate
     {
         /// <summary>
-        /// Commands (like AN for an AND) are always exactly 2 uppercase letters
+        /// Commands (like AN for an AND) are always exactly 2 uppercase letters. String constants are not commands.
         /// </summary>
         /// <param name="cmd"></param>
         /// <returns></returns>
         private static bool IsCommand(string cmd)
         {
             if (cmd == null) return false;
-            if (cmd.Length != 2) return false;
             char c1 = cmd[0];
+            if (cmd.Length != 2) return false;
             char c2 = cmd[1];
             var retval = (c1 >= 'A' && c1 <= 'Z' && c2 >= 'A' && c2 <= 'Z');
             return retval;
@@ -45,6 +45,81 @@ namespace BluetoothDeviceController.BleEditor
         }
 
         /// <summary>
+        /// Replaces chars in the string with the escaped version
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string EscapeString (string value)
+        {
+            var retval = value;
+            retval = retval.Replace("\\", "\\\\");
+
+            // All of the 'C' style chars
+            retval = retval.Replace("\a", "\\a"); // NOT ALLOWED IN JSON
+            retval = retval.Replace("\b", "\\b");
+            retval = retval.Replace("\f", "\\f");
+            retval = retval.Replace("\n", "\\n");
+            retval = retval.Replace("\r", "\\r");
+            retval = retval.Replace("\t", "\\t");
+            retval = retval.Replace("\v", "\\v"); // NOT ALLOWED IN JSON
+            retval = retval.Replace("'", "\\'"); // NOT ALLOWED IN JSON
+            retval = retval.Replace("\"", "\\\"");
+            retval = retval.Replace("?", "\\?"); // NOT ALLOWED IN JSON
+            retval = retval.Replace("\0", "\\00"); // JSON REQUIRES THIS TO BE \u0000
+            // JSON ALSO CAN ESCAPE /
+            // JSON ALSO ALLOWS \uXXXX for arbitrary hex
+            // LASTLY, JSON DISALLOWS E.G. ^A to be in the string; it must be escaped.
+
+            // All of the special chars TODO: JSON does not permit the use of weird escapes like \s \p \c
+            // TODO: Recommend using $ instead. And following exactly the JSON escape syntax.
+            retval = retval.Replace(" ", "\\s");
+            retval = retval.Replace("|", "\\p");
+            retval = retval.Replace("^", "\\c");
+
+            return retval;
+        }
+        public static string ReverseReplace(this string str, string arg1, string arg2)
+        {
+            return str.Replace(arg2, arg1);
+        }
+        public static string UnescapeString(string value)
+        {
+            var retval = value;
+            // All of the special chars
+            retval = retval.ReverseReplace("^", "\\c");
+            retval = retval.ReverseReplace("|", "\\p");
+            retval = retval.ReverseReplace(" ", "\\s");
+
+            // All of the 'C' style chars
+            retval = retval.ReverseReplace("\0", "\\00");
+            retval = retval.ReverseReplace("?", "\\?");
+            retval = retval.ReverseReplace("\"", "\\\"");
+            retval = retval.ReverseReplace("'", "\\'");
+            retval = retval.ReverseReplace("\v", "\\v");
+            retval = retval.ReverseReplace("\t", "\\t");
+            retval = retval.ReverseReplace("\r", "\\r");
+            retval = retval.ReverseReplace("\n", "\\n");
+            retval = retval.ReverseReplace("\f", "\\f");
+            retval = retval.ReverseReplace("\b", "\\b");
+            retval = retval.ReverseReplace("\a", "\\a");
+
+            retval = retval.ReverseReplace("\\", "\\\\");
+
+            return retval;
+        }
+
+        public class CalculateResult
+        {
+            public CalculateResult (double d, string s) => (D, S) = (d, s);
+            public double D { get; internal set; }
+            public string S { get; internal set; }
+            public void Deconstruct (out double d, out string s)
+            {
+                (d, s) = (D, S);
+            }
+        }
+
+        /// <summary>
         /// Given a string like 1000_/ do a calculation. The string is split by underscore and the 'words'
         /// are RPN with values (1000), operations (AN) or opcodes (+). 1000_/ will divide the value on the 
         /// stack by 1000.
@@ -52,14 +127,15 @@ namespace BluetoothDeviceController.BleEditor
         /// <param name="str"></param>
         /// <param name="startValue"></param>
         /// <returns></returns>
-        public static double Calculate (string str, double startValue)
+        public static CalculateResult Calculate(string str, double startValue, string startStringValue = "", Dictionary<string, double> previousValues = null, Dictionary<string, double> currValues = null)
         {
-            double Retval = double.NaN;
             int index = 0;
             try
             {
                 var stack = new Stack<double>();
                 stack.Push(startValue);
+                var stringstack = new Stack<string>();
+                stringstack.Push(startStringValue); 
 
                 var commands = str.Split(new char[] { '_' });
                 index = 0;
@@ -72,7 +148,7 @@ namespace BluetoothDeviceController.BleEditor
                         double d1;
                         double d2;
                         double value;
-                        switch (command)
+                        switch (command) // or op...
                         {
                             case "+":
                                 d1 = stack.Pop();
@@ -112,6 +188,35 @@ namespace BluetoothDeviceController.BleEditor
                             case "GO": // go to a location
                                 d1 = stack.Pop();
                                 nextindex = (int)d1;
+                                break;
+                            case "GN": // Get a name, look up in current (new)
+                                {
+                                    string name = stringstack.Pop();
+                                    value = currValues[name];
+                                    stack.Push(value);
+                                }
+                                break;
+                            case "GP": // Get a name, look up in previous dictionaries
+                                {
+                                    string name = stringstack.Pop();
+                                    value = previousValues[name];
+                                    stack.Push(value);
+                                }
+                                break;
+                            case "GD": // Get a name, look up in current and previous dictionaries. If same, return blank; otherwise return new
+                                {
+                                    string name = stringstack.Pop();
+                                    double prev = previousValues[name];
+                                    double curr = currValues[name];
+                                    if (prev == curr)
+                                    {
+                                        stringstack.Push("");
+                                    }
+                                    else
+                                    {
+                                        stack.Push(curr);
+                                    }
+                                }
                                 break;
                             case "IV": // negate (inverse)
                                 d1 = stack.Pop();
@@ -180,8 +285,17 @@ namespace BluetoothDeviceController.BleEditor
                                 value = ((int)d2) & ~((int)d1);
                                 stack.Push(value);
                                 break;
-
                         }
+                    }
+                    else if (command.Length >= 1 && command[0] == '$')
+                    {
+                        // Is a string constant. 
+                        // String constants include escaped chars like \s=SP \p=BAR (pipe) \c=CARET
+                        // TODO: that's not how space etc is escaped after re-checking the JSON spec :-(
+                        // and also escaped chars for \r\n
+                        // They include all C escapes except for octal and \uXXXX is the code for Unicode
+                        var constString = UnescapeString (command.Substring(1));
+                        stringstack.Push(constString);
                     }
                     else
                     {
@@ -190,7 +304,7 @@ namespace BluetoothDeviceController.BleEditor
                         if (!parseOk)
                         {
                             Error($"ERROR: ValueCalculate: not a constant {command} index {index} command {str}");
-                            return double.NaN;
+                            return new CalculateResult(double.NaN, null);
                         }
                         stack.Push(value);
                     }
@@ -200,18 +314,19 @@ namespace BluetoothDeviceController.BleEditor
                     if (stack.Count > 10)
                     {
                         Error($"ERROR: ValueCalculate: stack too large {stack.Count} index {index} command {str}");
-                        return double.NaN;
+                        return new CalculateResult(double.NaN, null);
                     }
                 }
 
-
-                Retval = stack.Pop();
+                double d = stack.Count > 0 ? stack.Pop() : double.NaN;
+                string s = stringstack.Count > 0 ? stringstack.Pop() : null;
+                return new CalculateResult(d, s);
             }
             catch (Exception)
             {
                 Error($"ERROR: ValueCalculate: not enough params index {index} command {str}");
+                return new CalculateResult(double.NaN, null);
             }
-            return Retval;
         }
 
         private static void Error (string text)

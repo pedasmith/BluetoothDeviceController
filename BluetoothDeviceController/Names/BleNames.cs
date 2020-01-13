@@ -11,10 +11,11 @@ namespace BluetoothDeviceController.Names
 {
     public class BleNames
     {
-        private static NameAllDevices AllDevices { get; set; } = null;
-        public static NameAllDevices AllRawDevices { get; set; } = null;
+        private static NameAllBleDevices AllDevices { get; set; } = null;
+        public static NameAllBleDevices AllRawDevices { get; set; } = null;
+        public static NameAllSerialDevices AllSerialDevices { get; set; } = null;
         static NameDevice DefaultDevice = null;
-        public static NameDevice GetDevice(string name, NameAllDevices allDevices = null)
+        public static NameDevice GetDevice(string name, NameAllBleDevices allDevices = null)
         {
             if (allDevices == null) allDevices = AllDevices;
             if (allDevices == null) return null;
@@ -61,15 +62,23 @@ namespace BluetoothDeviceController.Names
         // Read in data from the Assets\CharacteristicsData.json file. Note the mis-spelling Assets\Chacteristics!!
         public async Task InitAsync()
         {
+            AllDevices = new NameAllBleDevices();
+            AllRawDevices = new NameAllBleDevices();
+            AllSerialDevices = new NameAllSerialDevices();
+            await InitBleAsync();
+            await InitSerialAsync();
+        }
+
+        // Read in data from the Assets\CharacteristicsData.json file. Note the mis-spelling Assets\Chacteristics!!
+        private async Task InitBleAsync()
+        {
             string path = "";
-            AllDevices = new NameAllDevices();
-            AllRawDevices = new NameAllDevices();
             try
             {
                 string dname = @"Assets\ChacteristicsData\";
 
                 // Read in the Default device. 
-                DefaultDevice = await InitDefault(dname);
+                DefaultDevice = await InitBleDefault(dname);
 
                 // Read in the full set of devices
                 StorageFolder InstallationFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
@@ -78,8 +87,8 @@ namespace BluetoothDeviceController.Names
                 foreach (var file in files)
                 {
                     path = file.Path;
-                    InitSingleFile(AllDevices, file, DefaultDevice);
-                    InitSingleFile(AllRawDevices, file, null); // read in a device without adding in default services
+                    InitSingleBleFile(AllDevices, file, DefaultDevice);
+                    InitSingleBleFile(AllRawDevices, file, null); // read in a device without adding in default services
                 }
             }
             catch (Exception e)
@@ -88,7 +97,35 @@ namespace BluetoothDeviceController.Names
             }
         }
 
-        private async Task<NameDevice> InitDefault(string dname)
+        private async Task InitSerialAsync()
+        {
+            string path = "";
+            try
+            {
+                string dname = @"Assets\SerialData\";
+
+                // Read in the full set of devices
+                StorageFolder InstallationFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                var dir = await InstallationFolder.GetFolderAsync(dname);
+                var files = await dir.GetFilesAsync();
+                foreach (var file in files)
+                {
+                    // Serial devices are much simpler than the full bluetooth BLE devices
+                    path = file.Path;
+                    var contents = File.ReadAllText(file.Path);
+                    var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllSerialDevices>(contents);
+                    foreach (var item in newlist.AllSerialDevices)
+                    {
+                        AllSerialDevices.AllSerialDevices.Add(item);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"ERROR: SERIAL NAMES: {e.Message} with path {path}");
+            }
+        }
+        private async Task<NameDevice> InitBleDefault(string dname)
         {
             string path = "";
             try
@@ -99,7 +136,7 @@ namespace BluetoothDeviceController.Names
                 var f = await InstallationFolder.GetFileAsync(fname);
                 var fcontents = File.ReadAllText(f.Path);
                 path = f.Path;
-                var defaultlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllDevices>(fcontents);
+                var defaultlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllBleDevices>(fcontents);
                 foreach (var item in defaultlist.AllDevices)
                 {
                     if (item.Name == "##DEFAULT##")
@@ -115,12 +152,12 @@ namespace BluetoothDeviceController.Names
             return null;
         }
 
-        private void InitSingleFile(NameAllDevices allDevices, StorageFile file, NameDevice defaultDevice)
+        private void InitSingleBleFile(NameAllBleDevices allDevices, StorageFile file, NameDevice defaultDevice)
         {
             if (File.Exists(file.Path))
             {
                 var contents = File.ReadAllText(file.Path);
-                var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllDevices>(contents);
+                var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllBleDevices>(contents);
                 foreach (var item in newlist.AllDevices)
                 {
                     // Check to make sure that at least one of IsRead IsNotify IsIndicate IsWrite IsWriteWithoutResponse is used
@@ -150,7 +187,7 @@ namespace BluetoothDeviceController.Names
                     }
 
                     // And now either replace or update.
-                    var index = allDevices.GetIndex(item.Name);
+                    var index = allDevices.GetBleIndex(item.Name);
                     if (index < 0) allDevices.AllDevices.Add(item);
                     else allDevices.AllDevices[index] = item; // replace or add.
                 }

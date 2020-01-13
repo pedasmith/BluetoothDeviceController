@@ -1,0 +1,70 @@
+﻿{
+  "AllSerialDevices": [
+    {
+      "Id": "Standard-Robot-Car",
+      "Name": "Standard Robot Car",
+      "ClassName": "Standard_RobotCar",
+      "DeviceName": "",
+      "ClassModifiers": "",
+      "Description": "SRC: a simple Arduino interface for robot cars",
+      "Aliases": [],
+      "Links": [
+        "https://blog.adafruit.com/2015/05/26/how-to-control-an-arduino-car-via-bluetooth/",
+        "https://shipwrecksoftware.wordpress.com/2020/01/05/dont-reinvent-the-wheel-use-the-standard-robot-car-protocol-instead/"
+      ],
+      "Commands": {
+        "Stop": {
+          "Replace": "S"
+        },
+        "Forward": {
+          "Replace": "F"
+        },
+        "Left": {
+          "Replace": "L"
+        },
+        "Right": {
+          "Replace": "R"
+        },
+        "Backwards": {
+          "Replace": "B"
+        },
+        "Left-Forward": {
+          "Replace": "G"
+        },
+        "Right-Forward": {
+          "Replace": "I"
+        },
+        "Left-Backwards": {
+          "Replace": "H"
+        },
+        "Right-Backwards": {
+          "Replace": "J"
+        },
+        "Lights-on": {
+          "Replace": "W"
+        },
+        "Lights-off": {
+          "Replace": "w"
+        },
+        "Rear lights-on": {
+          "Replace": "U"
+        },
+        "Rear lights-off": {
+          "Replace": "u"
+        },
+        "Horn-on": {
+          "Replace": "V"
+        },
+        "Horn-off": {
+          "Replace": "v"
+        },
+        "Ping distance": {
+          "Replace": "P"
+        },
+        "Device query name": {
+          "Replace": "Q"
+        }
+      }
+    }
+  ]
+}

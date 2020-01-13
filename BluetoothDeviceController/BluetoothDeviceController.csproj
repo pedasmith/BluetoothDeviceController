@@ -155,9 +155,9 @@
     <Compile Include="BleEditor\CharacteristicEditorControl.xaml.cs">
       <DependentUpon>CharacteristicEditorControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BleEditor\ValueCalculate.cs" />
-    <Compile Include="BleEditor\ValueToString.cs" />
-    <Compile Include="BleEditor\ValueToStringTests.cs" />
+    <Compile Include="IotNumberFormats\ValueCalculate.cs" />
+    <Compile Include="IotNumberFormats\ValueToString.cs" />
+    <Compile Include="IotNumberFormats\ValueToStringTests.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothAppearance.cs" />
     <Compile Include="BluetoothDefinitionLanguage\Device.cs" />
     <Compile Include="BluetoothDefinitionLanguage\Eddystone.cs" />
@@ -207,11 +207,12 @@
     <Compile Include="Names\BleNames.cs" />
     <Compile Include="Names\GenerateCSharpClass.cs" />
     <Compile Include="Names\GuidGetCommon.cs" />
-    <Compile Include="Names\NameAllDevices.cs" />
+    <Compile Include="Names\NameAllBleDevices.cs" />
     <Compile Include="Names\NameChacteristic.cs" />
     <Compile Include="Names\NameDevice.cs" />
     <Compile Include="Names\NameService.cs" />
     <Compile Include="Names\NamesUtilities.cs" />
+    <Compile Include="Names\SerialConfig.cs" />
     <Compile Include="PageDock.xaml.cs">
       <DependentUpon>PageDock.xaml</DependentUpon>
     </Compile>
@@ -223,12 +224,10 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerialPort\BluetoothCommTerminalAdapter.cs" />
-    <Compile Include="SerialPort\Shortcuts.cs" />
+    <Compile Include="SerialPort\SerialConfig.cs" />
     <Compile Include="SerialPort\SimpleTerminalPage.xaml.cs">
       <DependentUpon>SimpleTerminalPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SerialPort\SlantRobotics_LittleBot_Shortcuts.cs" />
-    <Compile Include="SerialPort\StandardRobotCar_Shortcuts.cs" />
     <Compile Include="SpecialtyPagesModified\TI_beLight_2540Page.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\TrionesPage.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\Witti_DottiPage.xaml.cs" />
@@ -561,6 +560,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Assets\HelpFiles\Device_SlantRobotics_LittleBot.md" />
+    <Content Include="Assets\SerialData\RealityRobots_BERO.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\SerialData\SlantRobotics_LittleBot.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\SerialData\Standard_RobotCar.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

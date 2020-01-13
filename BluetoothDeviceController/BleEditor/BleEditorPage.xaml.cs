@@ -167,7 +167,7 @@ namespace BluetoothDeviceController.BleEditor
                 ContractResolver = IgnoreEmptyEnumerableResolver.Instance,
             };
 
-            var wireAllDevices = new NameAllDevices();
+            var wireAllDevices = new NameAllBleDevices();
             WireDevice = new NameDevice();
             WireDevice.Name = di.di.Name;
             WireDevice.Details += $"Id:{di.di.Id}\nCanPair:{di.di.Pairing.CanPair} IsPaired:{di.di.Pairing.IsPaired}";

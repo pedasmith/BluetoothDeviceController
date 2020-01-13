@@ -12,29 +12,24 @@ namespace BluetoothDeviceController.BleEditor
     /// Converts an IBuffer to a string using the given type. Default is HEX.
     /// </summary>
     /// 
-    /// Decode Commands are
-    /// String[^ASCII|^Eddystone]
-    /// BYTES[|HEX]
-    /// Numbers are:
+    /// See https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/ for details
     /// 
-    /// {I|U}{8|16|24|32}[|HEX||DEC||OCT||BIN]
-    /// /{I|U}{8|16|24|32}/{I|U|P}{8|16|32}.Fixed
-    ///     When given a P, the /P8 (for example) is taken to be a decimal amount
-    ///     P8 == 100 P16 == 10000 P32 = 100000000
-    /// 
-    /// Commands can be seperated with spaces
-    /// U8 U16
-    /// 
-    /// All commands can include a name and type
-    /// I8|DEC|ColorRed|%
-    /// 
-    /// OEL OEB for option endian little and big 
-    /// 
-    /// Not implemented:
-    /// .ASCII versus .Eddystone
-    /// .OCT and .BIN
-    /// 
-
+    // Description is Field [SP Field]*
+    // Field is Format|Display|Name|Units  e.g. U8|HEX|Green
+    // Format is format [^calculation]
+    //     U<bitsize> or I<bitsize> or F<bitsize>
+    //      bitsize is 8, 16, 24, 32 for U and I, 32 and 64 for F
+    //     Q<intbits>Q<fractionalbits>  fixed point number e.g. Q6Q10|HEX|AccelX|G
+    //         total of intbits + fractionalbits must be 8, 16, 32
+    //     /[U|I]<intbits>/[U|I|P]<fractionalbits> fixed point number
+    //         intbits and fractionalbits are each 8,16, or 32
+    //         P means the number is a decimal e.g. for P8 the number is 0..99 
+    //     BYTES
+    //     STRING -- display is ASCII
+    //     OEB OEL order endian; default is little-endian
+    //     OOPT reset of fields are optional
+    //
+    //  Display is DEC HEX FIXED
     public class ValueParserResult
     {
         public static ValueParserResult CreateError(string str, string error)
@@ -80,7 +75,7 @@ namespace BluetoothDeviceController.BleEditor
     /// <summary>
     /// Class to perfectly parse the binary value descriptor strings.
     /// Simple example: "U8 U8" "U8|DEC|Temp|C U8|HEX|Mode"
-    /// Complex example: "Q12Q4^/125|FIXED|Pressure|mbar"
+    /// Complex example: "Q12Q4^_125_/|FIXED|Pressure|mbar"
     /// Three levels of splitting using space, vertical-bar (|) and caret (^)
     /// </summary>
     public class ValueParserSplit
@@ -335,7 +330,7 @@ namespace BluetoothDeviceController.BleEditor
                                         string calculateCommand = command.Get(0, 1); // e.g. for I24^100_/ for TI 1350 barometer values
                                         if (!string.IsNullOrEmpty(calculateCommand))
                                         {
-                                            dvalue = ValueCalculate.Calculate(calculateCommand, dvalue);
+                                            dvalue = ValueCalculate.Calculate(calculateCommand, dvalue).D;
                                             if (double.IsNaN(dvalue))
                                             {
                                                 return ValueParserResult.CreateError(decodeCommands, $"Calculation failed for {calculateCommand} in {readcmd}");
@@ -469,7 +464,7 @@ namespace BluetoothDeviceController.BleEditor
                                     string calculateCommand = command.Get(0, 1); // e.g. for I24^100_/ for TI 1350 barometer values
                                     if (!string.IsNullOrEmpty(calculateCommand))
                                     {
-                                        dvalue = ValueCalculate.Calculate(calculateCommand, dvalue);
+                                        dvalue = ValueCalculate.Calculate(calculateCommand, dvalue).D;
                                         if (double.IsNaN(dvalue))
                                         {
                                             return ValueParserResult.CreateError(decodeCommands, $"Calculation failed for {calculateCommand} in {readcmd}");

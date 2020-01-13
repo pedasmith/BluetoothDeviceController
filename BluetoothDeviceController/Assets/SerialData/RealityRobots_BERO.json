@@ -1,0 +1,101 @@
+﻿{
+  "AllSerialDevices": [
+    {
+      "Name": "BERO",
+      "ClassName": "RealityRobots_Bero",
+      "ClassModifiers": "",
+      "Description": "",
+      "Aliases": [],
+      "Links": [
+        "http://realityrobotics.com/",
+        "http://sourceforge.net/p/betherobot",
+        "https://fccid.io/SVTGC343156"
+      ],
+      "Settings": {
+        "ArmL": {
+          "Min": -90,
+          "Max": 90,
+          "Init": 0
+        },
+        "ArmR": {
+          "Min": -90,
+          "Max": 90,
+          "Init": 0
+        },
+        "Head": {
+          "Min": -90,
+          "Max": 90,
+          "Init": 0
+        },
+        "Tilt": {
+          "Min": 0,
+          "Max": 0,
+          "Init": 0
+        },
+        "DriveL": {
+          "Min": -100,
+          "Max": 100,
+          "Init": 0
+        },
+        "DriveR": {
+          "Min": -100,
+          "Max": 100,
+          "Init": 0
+        },
+        "Led0": {
+          "Min": 0,
+          "Max": 99,
+          "Init": 0
+        },
+        "Led1": {
+          "Min": 0,
+          "Max": 99,
+          "Init": 0
+        },
+        "Led2": {
+          "Min": 0,
+          "Max": 99,
+          "Init": 0
+        },
+        "Led3": {
+          "Min": 0,
+          "Max": 99,
+          "Init": 0
+        },
+        "Led4": {
+          "Min": 0,
+          "Max": 99,
+          "Init": 0
+        },
+        "Led5": {
+          "Min": 0,
+          "Max": 99,
+          "Init": 0
+        },
+        "Headphone": {
+          "Name": "🎧",
+          "Min": 0,
+          "Max": 99,
+          "Init": 99
+        }
+      },
+      "Commands": {
+        "Update": {
+          "Label": "Update",
+          "Alt": "Update Robot",
+          "Compute": "$BERO1.0ACT,0,, $ArmL_GD $, $ArmR_GD $, $Head_GD $,0, $DriveL_GD $, $DriveR_GD $, $Led0_GD $, $Led1_GD $, $Led2_GD $, $Led3_GD $, $Led4_GD $, $Led5_GD $, $Headphone_GD $,1\r\n"
+        },
+        "Head ON": {
+          "Label": "🎧 ON",
+          "Alt": "turn the headphones on",
+          "Replace": "BERO1.0ACT,0,,0,0,0,0,0,0,0,0,0,0,0,0,99,1\r\n"
+        },
+        "Head OFF": {
+          "Label": "🎧 OFF",
+          "Alt": "turn the headphones off",
+          "Replace": "BERO1.0ACT,0,,0,0,0,0,0,0,0,0,0,0,0,0,0,1\r\n"
+        }
+      }
+    }
+  ]
+}

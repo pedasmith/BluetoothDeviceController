@@ -14,6 +14,7 @@ namespace BluetoothDeviceController.BleEditor
         {
             int NError = 0;
             NError += TestSimple();
+            NError += TestStringEscape();
             return NError;
         }
 
@@ -69,7 +70,63 @@ namespace BluetoothDeviceController.BleEditor
             return result.ByteResult.ToArray();
         }
 
+        private static int TestStringEscape()
+        {
+            int nerror = 0;
+            nerror += TestStringEscapeOne("abc");
+            nerror += TestStringEscapeOne("");
+            nerror += TestStringEscapeOne("U8 U16 U32");
+            nerror += TestStringEscapeOne("STRING^$BERO");
+            for (char ch = char.MinValue; ch < (char)127; ch++)
+            {
+                var str = ch.ToString();
+                nerror += TestStringEscapeOne(str);
+            }
+            return nerror;
+        }
 
+        private static int TestStringEscapeOne(string str)
+        {
+            int nerror = 0;
+            var escape = ValueCalculate.EscapeString(str);
+            if (escape.Contains('\0'))
+            {
+                nerror++;
+                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains NULL");
+            }
+            if (escape.Contains(' '))
+            {
+                nerror++;
+                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains SPACE");
+            }
+            if (escape.Contains('|'))
+            {
+                nerror++;
+                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains BAR");
+            }
+            if (escape.Contains('^'))
+            {
+                nerror++;
+                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains CARET");
+            }
+            if (escape.Contains('\r'))
+            {
+                nerror++;
+                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains CR");
+            }
+            if (escape.Contains('\n'))
+            {
+                nerror++;
+                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains LF");
+            }
+            var reverse = ValueCalculate.UnescapeString(escape);
+            if (reverse != str)
+            {
+                nerror++;
+                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} reverse {reverse} isn't the same!");
+            }
+
+            return nerror;
+        }
     }
-
 }

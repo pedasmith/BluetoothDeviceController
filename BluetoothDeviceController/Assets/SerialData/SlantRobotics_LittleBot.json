@@ -1,0 +1,46 @@
+﻿{
+  "AllSerialDevices": [
+    {
+      "Id": "SlantRobotics-LittleBot",
+      "Name": "Slant Robotics LittleBot+",
+      "ClassName": "SlantRobotics_LittleBot",
+      "DeviceName": "Dev B",
+      "ClassModifiers": "",
+      "Description": "The Slant Robotics LittleBot robot",
+      "Aliases": [],
+      "Links": [
+        "https://www.littlearmrobot.com/",
+        "https://www.kickstarter.com/projects/slantrobotics/littlebot-a-fun-arduino-robot-for-students-and-beg/posts/2254960"
+      ],
+      "Commands": {
+        "Stop": {
+          "Replace": "222 0 0 0\n"
+        },
+        "Go": {
+          "Replace": "1 20 20 0\n"
+        },
+        "Go slow": {
+          "Replace": "1 10 10 0\n"
+        },
+        "Left": {
+          "Replace": "1 10 20 0\n"
+        },
+        "Right": {
+          "Replace": "1 20 10 0\n"
+        },
+        "Back": {
+          "Replace": "1 -15 -15 0\n"
+        },
+        "Automatic": {
+          "Replace": "256 0 0 0\n"
+        },
+        "Distance": {
+          "Replace": "4 0 0 0\n"
+        },
+        "Name": {
+          "Replace": "3 0 0 0\n"
+        }
+      }
+    }
+  ]
+}
