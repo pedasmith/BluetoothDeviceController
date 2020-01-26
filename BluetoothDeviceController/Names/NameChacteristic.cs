@@ -26,6 +26,10 @@ namespace BluetoothDeviceController.Names
 
     public class UISpecifications
     {
+        /// <summary>
+        /// Allowed values: "" and "standard"
+        /// </summary>
+        public string buttonType { get; set; } = "";
         public string tableType { get; set; } = "";
         public string chartType { get; set; } = "";
         public string chartCommand { get; set; } = "";
@@ -153,7 +157,7 @@ namespace BluetoothDeviceController.Names
         public string Name { get; set; }
         public string Description { get; set; }
         /// <summary>
-        /// Says how to interpret the results -- e.g. "U8|HEX|Red U8|HEX|Green U8|HEX|Blue"
+        /// Says how to interpret the results -- e.g. "U8|HEX|Red U8|HEX|Green U8|HEX|Blue". Can be parsed with ValueParserSplit.
         /// </summary>
         public string Type { get; set; }
 
@@ -171,6 +175,10 @@ namespace BluetoothDeviceController.Names
 
 
         public List<string> ExampleData { get; set; } = new List<string>();
+        /// <summary>
+        /// See WilliamWeilerEngineering_Skoobot for an example
+        /// </summary>
+        public Dictionary<string, Dictionary<string, int>> EnumValues = new Dictionary<string, Dictionary<string, int>>();
         public override string ToString()
         {
             return $"{Name}:{UUID}";

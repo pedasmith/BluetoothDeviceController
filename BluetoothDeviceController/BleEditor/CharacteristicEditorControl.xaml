@@ -10,7 +10,7 @@
     d:DesignWidth="400">
 
     <StackPanel x:Name="uiList">
-        <Grid Padding="0,0,0,10">
+        <Grid x:Name="uiTypeInput" Padding="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
@@ -24,6 +24,9 @@
             </ComboBox>
             <Button Content="Write" Grid.Column="2" Click="OnWrite" VerticalAlignment="Bottom"/>
         </Grid>
+        <VariableSizedWrapGrid x:Name="uiButtons" Orientation="Horizontal">
+            
+        </VariableSizedWrapGrid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
         <TextBlock x:Name="uiData" IsTextSelectionEnabled="True" TextWrapping="Wrap" />

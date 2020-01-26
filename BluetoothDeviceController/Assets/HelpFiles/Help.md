@@ -56,12 +56,15 @@ Bulbs that are definitely not compatible include the C by GE bulb, the Philips H
 ### Learning more
 The individual data sensors usually have a host of capabilities. 
 
-1. [Reading Data](Sensor_Data_Reading.md)
-2. [Exporting Data to Excel](Sensor_Data_Excel.md)
+* [Reading Data](Sensor_Data_Reading.md)
+* [Exporting Data to Excel](Sensor_Data_Excel.md)
 
 ## Controlling Robots
 There are a wide variety of Arduino-type robots and devices that can potentially be controlled. 
 Right now, the following list has been verified as controllable with this program
+
+* [Reality Robotics BERO](Device_RealityRobotics_Bero.md)
+* [Reality Robotics BERO](Device_RealityRobotics_Bero.md)
 * [Slant Robotics LittleBot](Device_SlantRobotics_LittleBot.md)
 
 ## Protocol details

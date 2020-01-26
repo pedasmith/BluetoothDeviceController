@@ -1,0 +1,156 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Skoobot",
+      "ClassName": "WilliamWeilerEngineering_Skoobot",
+      "Links": [
+        "https://www.william-weiler-engineering.com/",
+        "https://hackaday.io/project/75832-skoobot",
+        "https://www.facebook.com/skoobot/",
+        "https://twitter.com/BillBsee"
+      ],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Name: Skoobot",
+                "Skoobot"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  08 00 20 00 00 00 90 01"
+              ]
+            },
+            {
+              "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+              "Name": "Central Address Resolution",
+              "Type": "U8|DEC|AddressResolutionSupported",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01",
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "00001523-1212-efde-1523-785feabcd123",
+          "Name": "Robot",
+          "Characteristics": [
+            {
+              "UUID": "00001525-1212-efde-1523-785feabcd123",
+              "Name": "Command",
+              "Type": "U8|HEX|Command",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  03"
+              ],
+              "EnumValues": {
+                "Command": {
+                  "Right30": 8,
+                  "Left30": 9,
+                  "Right": 16,
+                  "Left": 17,
+                  "Forward": 18,
+                  "Backward": 19,
+                  "Stop": 20,
+                  "StopTurning": 21,
+                  "MotorsSleep": 22,
+                  "RequestAmbient": 33,
+                  "RequestDistance": 34,
+                  "PlayBuzzer": 23,
+                  "RoverMode": 64,
+                  "FotovoreMode": 65,
+                  "RoverModeBackward": 66
+                }
+              },
+              "UI": {
+                "buttonType":  "standard"
+              }
+            },
+            {
+              "UUID": "00001524-1212-efde-1523-785feabcd123",
+              "Name": "Distance",
+              "Type": "U8^20_/_2.54_*|HEX|Distance|cm",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  B5"
+              ],
+              "REM": "To get distance, write a RequestDistance to the command and it will trigger a reading"
+            },
+            {
+              "UUID": "00001526-1212-efde-1523-785feabcd123",
+              "Name": "AmbientLight",
+              "Type": "OEB U16|HEX|AmbientLight|Lux",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  16 80"
+              ],
+              "REM":  "To get ambient light, write a RequestAmbient to the command and it will trigger a reading"
+            },
+            {
+              "UUID": "00001528-1212-efde-1523-785feabcd123",
+              "Name": "B4",
+              "Type": "U32|HEX|B4",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  37 DF 62 AC"
+              ]
+            },
+            {
+              "UUID": "00001527-1212-efde-1523-785feabcd123",
+              "Name": "Microphone",
+              "Type": "BYTES|HEX|Audio",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  AE 6D FB 97 12 53 06 FF E8 12 81 EB 45 AE 1E D5 31 DB B0 01"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-e2:ae:33:71:fb:b1\nCanPair:True IsPaired:False"
+    }
+  ]
+}

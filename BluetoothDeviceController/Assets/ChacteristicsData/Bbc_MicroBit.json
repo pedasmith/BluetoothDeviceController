@@ -168,7 +168,7 @@
                   "Value:  00 00 80 FF 00 04"
                 ],
                 "UI": {
-                  "tabletype": "standard",
+                  "tableType": "standard",
                   "chartType": "ytime",
                   "chartDefaultMinY": -2,
                   "chartDefaultMaxY": 2,
@@ -259,7 +259,7 @@
                   "Value: "
                 ],
                 "UI": {
-                  "tabletype": "standard",
+                  "tableType": "standard",
                   "chartType": "ytime",
                   "chartDefaultMinY": 0,
                   "chartDefaultMaxY": 255,
@@ -317,7 +317,7 @@
                   "Value: "
                 ],
                 "UI": {
-                  "tabletype": "standard",
+                  "tableType": "standard",
                   "chartType": "ytime",
                   "chartDefaultMinY": 0,
                   "chartDefaultMaxY": 100,
@@ -334,7 +334,7 @@
                   "Value: "
                 ],
                 "UI": {
-                  "tabletype": "standard",
+                  "tableType": "standard",
                   "chartType": "ytime",
                   "chartDefaultMinY": 0,
                   "chartDefaultMaxY": 100,
@@ -380,7 +380,7 @@
                   "Value:  00"
                 ],
                 "UI": {
-                  "tabletype": "standard",
+                  "tableType": "standard",
                   "chartType": "ytime",
                   "chartDefaultMinY": 20,
                   "chartDefaultMaxY": 30,

@@ -40,11 +40,16 @@ namespace BluetoothDeviceController.Names
 
     public class SerialConfigSetting
     {
+        public string Label { get; set; } = null;
+        public enum UiType {  TextBox, Slider, Hide};
+
         public string Name { get; set; } = null;
         public double Min { get; set; } = 0.0;
         public double Max { get; set; } = 100.0;
         public double Init { get; set; } = 0.0;
-
+        public UiType InputType { get; set; } = UiType.TextBox;
+        public string OnChange { get; set; } = null;
+        public string CmdName { get; set; }
         public override string ToString()
         {
             return $"Settings Min={Min} Init={Init} Max={Max}";
@@ -63,5 +68,7 @@ namespace BluetoothDeviceController.Names
         /// </summary>
         public string Replace { get; set; } = "";
         public string Alt { get; set; } = "";
+        public string OnChange { get; set; } = null;
+        public Dictionary<string, double> Set { get; } = new Dictionary<string, double>();
     }
 }

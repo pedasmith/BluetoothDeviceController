@@ -95,7 +95,7 @@
               "IsNotify": true,
               "Priority":  10,
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 0,
                 "chartDefaultMaxY": 3,

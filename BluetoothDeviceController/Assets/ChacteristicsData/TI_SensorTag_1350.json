@@ -171,7 +171,7 @@
               "Name": "IR Data",
               "Type": "I16^4_/_0.03125_*|FIXED|ObjTemp|C I16^4_/_0.03125_*|FIXED|AmbTemp|C",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 15,
                 "chartDefaultMaxY": 35,
@@ -219,7 +219,7 @@
               "Name": "Humidity Data",
               "Type": "U16^DU_3_ZE_175.72_*_65536_/_46.85_-_SW_2_JZ_PO_NP|FIXED|Temp U16^DU_3_ZE_125.0_*_65536_/_6.0_-_SW_2_JZ_PO_NP|FIXED|Humidity",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
               },
@@ -265,7 +265,7 @@
               "Name": "Barometer Data",
               "Type": "I24^100_/|FIXED|Temp|C I24^100_/|FIXED|Pressure|hPa",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
               },
@@ -312,7 +312,7 @@
               "Name": "Accelerometer Data",
               "Type": "I16^500_*_65536_/|FIXED^N3|GyroX|dps I16^500_*_65536_/|FIXED^N3|GyroY|dps I16^500_*_65536_/|FIXED^N3|GyroZ|dps I16^8_*_32768_/|FIXED^N3|AccX|g I16^8_*_32768_/|FIXED^N3|AccY|g I16^8_*_32768_/|FIXED^N3|AccZ|g I16|DEC|MagnetometerX|microTesla I16|DEC|MagnetometerY|microTesla I16|DEC|MagnetometerZ|microTesla",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": -5,
                 "chartDefaultMaxY": 5,
@@ -360,7 +360,7 @@
               "Name": "Optical Service Data",
               "Type": "U16^DU_12_RS_15_AN_2_XY_0.01_*_SW_4095_AN_*|FIXED^N1|Lux",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 15,
                 "chartDefaultMaxY": 35,

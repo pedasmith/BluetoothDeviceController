@@ -45,6 +45,8 @@ namespace BluetoothDeviceController.BleEditor
         IList<string> ArchivedData = new List<String>();
         string DefaultFormat = "BYTES|HEX";
         string PreferredFormat = null;
+        enum ValueShowMethod {Overwrite, Append };
+        ValueShowMethod CurrValueShowMethod = BleCharacteristicControl.ValueShowMethod.Overwrite;
 
         public BleCharacteristicControl(NameDevice device, GattDeviceService service, GattCharacteristic characteristic)
         {
@@ -88,11 +90,6 @@ namespace BluetoothDeviceController.BleEditor
 
             await DoReadAsync(true); // update the value field even if it's not readable
 
-            // bool isWritable = props.HasFlag(GattCharacteristicProperties.WriteWithoutResponse) || props.HasFlag(GattCharacteristicProperties.Write);
-
-
-
-
             var namestr = "";
             if (!String.IsNullOrEmpty (NC?.Name))
             {
@@ -106,11 +103,11 @@ namespace BluetoothDeviceController.BleEditor
                     namestr = uidname;
                     if (namestr == "ffa2")
                     {
-                        ;
+                        ; // something handy to put a debugger on!
                     }
                     if (namestr == "ffa3")
                     {
-                        ;
+                        ; // a handy line to put a debugger on!
                     }
                     if (!String.IsNullOrWhiteSpace(characteristic.UserDescription))
                     {
@@ -143,6 +140,28 @@ namespace BluetoothDeviceController.BleEditor
                 infostr += characteristic.Uuid.ToString();
                 uiInfo.Text = infostr;
                 uiInfo.Visibility = Visibility.Visible;
+            }
+
+            // If there's a readable value with displayFormatPrimary=ASCII and secondary of LONG (ASCII^LONG)
+            // then make the text area multi-line
+            var vps = ValueParserSplit.ParseLine(NC?.Type ?? "");
+            if (vps.Count == 1)
+            {
+                var displayFormat = vps[0].DisplayFormatPrimary;
+                var displayFormatSecondary = vps[0].Get(1, 1);
+                switch (displayFormat)
+                {
+                    case "ASCII":
+                        switch (displayFormatSecondary)
+                        {
+                            case "LONG":
+                                var h = uiValueShow.ActualHeight;
+                                uiValueShow.MinHeight = h * 3;
+                                CurrValueShowMethod = ValueShowMethod.Append;
+                                break;
+                        }
+                        break;
+                }
             }
         }
 
@@ -188,7 +207,34 @@ namespace BluetoothDeviceController.BleEditor
             }
             if (isReadable || ignoreUnreadableValues)
             {
-                uiValueShow.Text = valuestr;
+                AddString(valuestr);
+            }
+        }
+
+        private void AddString(string valuestr)
+        {
+            switch (CurrValueShowMethod)
+            {
+                case ValueShowMethod.Overwrite:
+                    uiValueShow.Text = valuestr;
+                    break;
+                case ValueShowMethod.Append:
+                    {
+                        var currLen = uiValueShow.Text.Length;
+                        const int maxLen = 1000;
+                        if (currLen <= maxLen)
+                        {
+                            uiValueShow.Text += valuestr;
+                        }
+                        else
+                        {
+                            // Chop down the old value ruthlessly!
+                            var newtext = (uiValueShow.Text + valuestr);
+                            newtext = newtext.Substring(newtext.Length - maxLen);
+                            uiValueShow.Text = newtext;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -295,8 +341,8 @@ namespace BluetoothDeviceController.BleEditor
             }
             await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
             {
-                uiValueShow.Text = valuestr;
-            });
+                AddString(valuestr);
+           });
         }
 
         private async void OnShowMoreTapped(object sender, TappedRoutedEventArgs e)
@@ -328,7 +374,7 @@ namespace BluetoothDeviceController.BleEditor
         {
             try
             {
-                var cvc = new CharacteristicEditorControl();
+                var cvc = new CharacteristicEditorControl(NC);
                 await cvc.InitAsync(Service, Characteristic);
                 var dlg = new ContentDialog()
                 {

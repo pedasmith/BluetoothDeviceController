@@ -187,7 +187,7 @@
               "ReadConvert": "valueList = bleDevice.ConvertIR();",
               "NotifyConvert": "valueList = bleDevice.ConvertIR();",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "ZZchartDefaultMinY": -1.5,
                 "ZZchartDefaultMaxY": 1.5,
@@ -243,7 +243,7 @@
               "IsNotify": true,
               "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": -1.5,
                 "chartDefaultMaxY": 1.5,
@@ -301,7 +301,7 @@
               "IsNotify": true,
               "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 0,
                 "chartDefaultMaxY": 100,
@@ -356,7 +356,7 @@
               "IsNotify": true,
               "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": -200,
                 "chartDefaultMaxY": 200,
@@ -463,7 +463,7 @@
               "IsNotify": true,
               "NotifyConfigure": "await bleDevice.Write[[SERVICENAME]]_ConfigNotify(notifyType);",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": -250,
                 "chartDefaultMaxY": 250,

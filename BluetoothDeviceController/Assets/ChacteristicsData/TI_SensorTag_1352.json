@@ -205,7 +205,7 @@
               "Description": "Temperature Data",
               "Type": "F32|FIXED|Temperature|C",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 20,
                 "chartDefaultMaxY": 25,
@@ -252,7 +252,7 @@
               "Description": "Humidity Data",
               "Type": "F32|FIXED|Humidty|Percent",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 0,
                 "chartDefaultMaxY": 100,

@@ -25,6 +25,7 @@ and more devices -- please leave feedback to request specific devices!
 
 
 ## Other devices
+[![BERO](../DevicePictures/RealityRobotics_Bero-175.png)](Device_RealityRobotics_Bero.md)
 [![Kano Wand](../DevicePictures/Kano_Wand-175.png)](Device_Kano_Wand.md)
 [![LittleBot](../DevicePictures/SlantRobotics-LittleBot-175.png)](Device_SlantRobotics_LittleBot.md)
 

@@ -4,96 +4,177 @@
       "Name": "BERO",
       "ClassName": "RealityRobots_Bero",
       "ClassModifiers": "",
-      "Description": "",
+      "Description": "Pre-built Robot on Kickstarter, 2013",
       "Aliases": [],
       "Links": [
         "http://realityrobotics.com/",
+        "https://www.kickstarter.com/projects/realityrobotics/be-the-robot-bero-bluetooth-controlled-open-source",
         "http://sourceforge.net/p/betherobot",
         "https://fccid.io/SVTGC343156"
       ],
       "Settings": {
         "ArmL": {
+          "Label":  "L. Arm",
           "Min": -90,
           "Max": 90,
-          "Init": 0
+          "Init": 90,
+          "InputType": "Slider",
+          "OnChange": "Update"
         },
         "ArmR": {
+          "Label": "R. Arm",
           "Min": -90,
           "Max": 90,
-          "Init": 0
+          "Init": 90,
+          "InputType": "Slider",
+          "OnChange": "Update"
         },
         "Head": {
           "Min": -90,
           "Max": 90,
-          "Init": 0
+          "Init": 0,
+          "InputType": "Slider",
+          "OnChange": "Update"
         },
         "Tilt": {
           "Min": 0,
           "Max": 0,
-          "Init": 0
+          "Init": 0,
+          "InputType":  "Hide"
         },
         "DriveL": {
+          "Label": "Left",
           "Min": -100,
           "Max": 100,
           "Init": 0
         },
         "DriveR": {
+          "Label": "Right",
           "Min": -100,
           "Max": 100,
           "Init": 0
         },
         "Led0": {
+          "Label": "Eye 0",
           "Min": 0,
-          "Max": 99,
+          "Max": 9,
           "Init": 0
         },
         "Led1": {
+          "Label": "Eye 1",
           "Min": 0,
-          "Max": 99,
+          "Max": 9,
           "Init": 0
         },
         "Led2": {
+          "Label": "Eye 2",
           "Min": 0,
-          "Max": 99,
+          "Max": 9,
           "Init": 0
         },
         "Led3": {
+          "Label": "Eye 3",
           "Min": 0,
-          "Max": 99,
+          "Max": 9,
           "Init": 0
         },
         "Led4": {
+          "Label": "Eye 4",
           "Min": 0,
-          "Max": 99,
+          "Max": 9,
           "Init": 0
         },
         "Led5": {
+          "Label": "Eye 5",
           "Min": 0,
-          "Max": 99,
+          "Max": 9,
           "Init": 0
         },
         "Headphone": {
-          "Name": "🎧",
+          "Label": "🎧",
           "Min": 0,
           "Max": 99,
           "Init": 99
         }
       },
       "Commands": {
+        "Forward Left": {
+          "Label": "⇖",
+          "Set": {
+            "DriveL": 40,
+            "DriveR": 70
+          },
+          "OnChange": "Update"
+        },
+        "Forward": {
+          "Label": "⇑",
+          "Set": {
+            "DriveL": 60,
+            "DriveR": 60
+          },
+          "OnChange": "Update"
+        },
+        "Forward Right": {
+          "Label": "⇗",
+          "Set": {
+            "DriveL": 70,
+            "DriveR": 40
+          },
+          "OnChange": "Update"
+        },
+
+
+        "Left": {
+          "Label": "⇐",
+          "Set": {
+            "DriveL": 20,
+            "DriveR": 50
+          },
+          "OnChange": "Update"
+        },
+        "Stop": {
+          "Label": "⊚",
+          "Set": {
+            "DriveL": 0,
+            "DriveR": 0
+          },
+          "OnChange": "Update"
+        },
+        "Right": {
+          "Label": "⇒",
+          "Set": {
+            "DriveL": 50,
+            "DriveR": 30
+          },
+          "OnChange": "Update"
+        },
+        "Backward Left": {
+          "Label": "⇙",
+          "Set": {
+            "DriveL": -30,
+            "DriveR": -60
+          },
+          "OnChange": "Update"
+        },
+        "Backward": {
+          "Label": "⇓",
+          "Set": {
+            "DriveL": -40,
+            "DriveR": -40
+          },
+          "OnChange": "Update"
+        },
+        "Backward Right": {
+          "Label": "⇘",
+          "Set": {
+            "DriveL": -60,
+            "DriveR": -30
+          },
+          "OnChange": "Update"
+        },
         "Update": {
           "Label": "Update",
-          "Alt": "Update Robot",
           "Compute": "$BERO1.0ACT,0,, $ArmL_GD $, $ArmR_GD $, $Head_GD $,0, $DriveL_GD $, $DriveR_GD $, $Led0_GD $, $Led1_GD $, $Led2_GD $, $Led3_GD $, $Led4_GD $, $Led5_GD $, $Headphone_GD $,1\r\n"
-        },
-        "Head ON": {
-          "Label": "🎧 ON",
-          "Alt": "turn the headphones on",
-          "Replace": "BERO1.0ACT,0,,0,0,0,0,0,0,0,0,0,0,0,0,99,1\r\n"
-        },
-        "Head OFF": {
-          "Label": "🎧 OFF",
-          "Alt": "turn the headphones off",
-          "Replace": "BERO1.0ACT,0,,0,0,0,0,0,0,0,0,0,0,0,0,0,1\r\n"
         }
       }
     }

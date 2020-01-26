@@ -1,11 +1,14 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "Vion Meter",
-      "ClassName": "Vion_Meter",
+      "Name": "Espruino SMARTIBOT",
+      "Aliases": [
+        "Smartibot"
+      ],
+      "ClassName": "CraftyRobot_Smartibot",
+      "ClassModifiers": "partial",
+      "Description": "Robot with a carboard shell. The interior robot is a typical Espruino JavaScript-based bot. Communications are via a TX and RX characteristic.",
       "Links": [
-        "https://www.kickstarter.com/projects/1441579202/the-worlds-simplest-bluetooth-multimeter" 
-
       ],
       "Services": [
         {
@@ -19,8 +22,8 @@
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
-                "Name: Vion Meter(30E91ay)",
-                "Vion Meter(30E91ay)"
+                "Name: Espruino SMARTIBOT",
+                "Espruino SMARTIBOT"
               ]
             },
             {
@@ -39,8 +42,7 @@
               "Type": "BYTES|HEX|ConnectionParameter",
               "IsRead": true,
               "ExampleData": [
-                "Value:  10 00 3C 00 00 00 90 01",
-                "10 00 3C 00 00 00 90 01"
+                "Value:  06 00 06 00 00 00 90 01"
               ]
             },
             {
@@ -57,42 +59,30 @@
         },
         {
           "UUID": "00001801-0000-1000-8000-00805f9b34fb",
-          "Name": "Generic Service",
-          "Suppress": true
+          "Name": "Generic Service"
         },
         {
           "UUID": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
-          "Name": "Meter Data",
-          "Priority":  10,
+          "Name": "Transmit",
           "Characteristics": [
             {
-              "UUID": "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-              "Name": "Data Configuration",
-              "REM":  "TODO: what's the right values for configuration?",
-              "Type": "BYTES|HEX|Data_Configuration",
-              "IsWrite": true,
-              "IsWriteWithoutResponse": true
+              "UUID": "6e400003-b5a3-f393-e0a9-e50e24dcca9e",
+              "Name": "Receive",
+              "Type": "STRING|ASCII^LONG|Data",
+              "IsNotify": true
             },
             {
-              "UUID": "6e400003-b5a3-f393-e0a9-e50e24dcca9e",
-              "REM": "Sigh. SIGH. This is just the Nordic UART service, so it's completely generic and unfindable in any reasonable way on Github.",
-              "Name": "Data Values",
-              "Type": "I24|HEX|Command U8|DEC|Range OEB U16|DEC|Value U8|DEC|V3 BYTES|HEX|More_Data",
-              "IsNotify": true,
-              "REM_SampleData": [
-                "61 33 33 6C 00 1E 7F 20 20 20 20 20 20 20 20 8C 20 20 20 20"
-              ],
-              "UI": {
-                "tableType": "standard",
-                "REM": "TODO: make a chart with just the value. How exactly does that work?",
-                "ZZZchartType": "ytime",
-                "ZZZchartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"
-              }
+              "UUID": "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+              "Name": "Transmit",
+              "Type": "STRING|ASCII^LONG|Data",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "Commands": {}
             }
           ]
         }
       ],
-      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-ce:a2:6c:98:51:58\nCanPair:True IsPaired:False"
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-d6:0d:44:a8:91:99\nCanPair:True IsPaired:False"
     }
   ]
 }

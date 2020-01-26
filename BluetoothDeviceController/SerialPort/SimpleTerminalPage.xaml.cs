@@ -90,18 +90,19 @@ namespace BluetoothDeviceController.SerialPort
         {
             ParentStatusHandler = handleStatus;
         }
-
+        IList<SerialConfig> CurrConfigList = null;
+        Thickness SliderMargin = new Thickness(2);
         private void UpdateShortcutButtons()
         {
             // Getting the list of buttons.
             var deviceName = DI.di.Name;
-            IList<SerialConfig> list = AllShortcuts.GetShortcuts(deviceName);
+            CurrConfigList = AllShortcuts.GetShortcuts(deviceName);
             if (!String.IsNullOrEmpty (SerialPortPreferences?.ShortcutId))
             {
                 var preflist = AllShortcuts.GetShortcuts("", SerialPortPreferences.ShortcutId);
                 if (preflist.Count > 0)
                 {
-                    list = preflist;
+                    CurrConfigList = preflist;
                 }
             }
 
@@ -109,19 +110,55 @@ namespace BluetoothDeviceController.SerialPort
             PrevValues.Clear();
             CurrValues.Clear();
 
-            foreach (var shortcuts in list)
+            uiShortcutButtonList.ItemWidth = 120;
+            uiShortcutButtonList.ItemHeight = 60;
+
+            foreach (var shortcuts in CurrConfigList)
             {
                 // Add in all values
                 foreach (var (name, setting) in shortcuts.Settings)
                 {
-                    var tb = new TextBox()
+                    setting.CmdName = name;
+                    switch (setting.InputType)
                     {
-                        Header = setting.Name ?? name,
-                        Text = setting.Init.ToString(),
-                        Tag = name,
-                    };
-                    tb.TextChanged += SettingValueTextChanged;
-                    uiShortcutButtonList.Children.Add(tb);
+                        case SerialConfigSetting.UiType.Hide:
+                            // Hiden values do nothing.
+                            break;
+
+                        case SerialConfigSetting.UiType.TextBox:
+                            {
+                                var numberScope = new InputScope();
+                                numberScope.Names.Add(new InputScopeName() { NameValue = InputScopeNameValue.Number });
+                                var tb = new TextBox()
+                                {
+                                    Header = setting.Label ?? setting.Name ?? name,
+                                    InputScope = numberScope,
+                                    Text = setting.Init.ToString(),
+                                    Tag = setting,
+                                };
+                                tb.TextChanged += SettingValueTextChanged;
+                                uiShortcutButtonList.Children.Add(tb);
+                                VariableSizedWrapGrid.SetColumnSpan(tb, 1);
+                            }
+                            break;
+                        case SerialConfigSetting.UiType.Slider:
+                            {
+                                var slider = new Slider()
+                                {
+                                    Header = setting.Name ?? name,
+                                    Value = setting.Init,
+                                    Margin = SliderMargin,
+                                    Minimum = setting.Min,
+                                    Maximum = setting.Max,
+                                    Tag = setting,
+                                };
+                                slider.ValueChanged += SliderValueChanged;
+                                uiShortcutButtonList.Children.Add(slider);
+                                VariableSizedWrapGrid.SetColumnSpan(slider, 1);
+                            }
+                            break;
+
+                    }
                     PrevValues[name] = setting.Init;
                     CurrValues[name] = setting.Init;
                 }
@@ -135,6 +172,7 @@ namespace BluetoothDeviceController.SerialPort
                         Tag = shortcut,
                         Width = 100,
                         Margin = shortcutButtonMargin,
+                        VerticalAlignment = VerticalAlignment.Bottom,
                     };
                     b.Click += OnShortcutClick;
                     uiShortcutButtonList.Children.Add(b);
@@ -142,26 +180,66 @@ namespace BluetoothDeviceController.SerialPort
             }
         }
 
-        private void SettingValueTextChanged(object sender, TextChangedEventArgs e)
+        private async void SliderValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            var slider = sender as Slider;
+            var scs = slider.Tag as SerialConfigSetting;
+            double newValue = slider.Value;
+            CurrValues[scs.CmdName] = newValue;
+            await DoCommandAsync(scs.OnChange);
+        }
+
+        private async void SettingValueTextChanged(object sender, TextChangedEventArgs e)
         {
             var tb = sender as TextBox;
-            var name = tb.Tag as string;
-            double newvalue;
-            bool convertOk = Double.TryParse(tb.Text, out newvalue);
+            var scs = tb.Tag as SerialConfigSetting;
+            double newValue;
+            bool convertOk = Double.TryParse(tb.Text, out newValue);
             if (convertOk)
             {
-                CurrValues[name] = newvalue;
+                CurrValues[scs.CmdName] = newValue;
+                await DoCommandAsync (scs.OnChange);
+            }
+        }
+
+        private async Task DoCommandAsync (string cmdname)
+        {
+            if (String.IsNullOrEmpty(cmdname)) return;
+            if (CurrCommandState != CommandState.Ready) return;
+
+            foreach (var shortcuts in CurrConfigList)
+            {
+                foreach (var (name, shortcut) in shortcuts.Commands)
+                {
+                    if (name == cmdname)
+                    {
+                        await DoCommandAsync(shortcut, true);
+                    }
+                }
             }
         }
 
         Dictionary<string, double> CurrValues = new Dictionary<string, double>();
         Dictionary<string, double> PrevValues = new Dictionary<string, double>();
 
-        private void OnShortcutClick(object sender, RoutedEventArgs e)
+        private async void OnShortcutClick(object sender, RoutedEventArgs e)
         {
             var b = sender as Button;
             var command = b?.Tag as Command;
+            await DoCommandAsync(command, false);
+        }
+
+        enum CommandState {  Ready, Busy};
+        CommandState CurrCommandState = CommandState.Ready;
+        private async Task DoCommandAsync (Command command, bool wait)
+        { 
             if (command == null) return;
+            CurrCommandState = CommandState.Busy;
+
+            foreach (var (name, newValue) in command.Set)
+            {
+                CurrValues[name] = newValue;
+            }
 
             var cmd = command.Replace;
             if (!string.IsNullOrEmpty (command.Compute))
@@ -180,9 +258,19 @@ namespace BluetoothDeviceController.SerialPort
                     PrevValues[name] = value;
                 }
             }
+            if (!String.IsNullOrEmpty(cmd))
+            {
+                AddInputTextToUI(cmd);
+                OnSendData?.Invoke(this, cmd);
+                if (wait) await Task.Delay(100); // wait until the device has the chance to handle the command.
+            }
+            CurrCommandState = CommandState.Ready;
 
-            AddInputTextToUI(cmd);
-            OnSendData?.Invoke(this, cmd);
+            // And do the follow-on command, if any.
+            if (!string.IsNullOrEmpty(command.OnChange))
+            {
+                await DoCommandAsync(command.OnChange);
+            }
         }
 
         public event TerminalSendDataEventHandler OnSendData;

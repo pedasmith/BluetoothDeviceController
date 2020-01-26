@@ -29,7 +29,7 @@ namespace BluetoothDeviceController.BleEditor
     //     OEB OEL order endian; default is little-endian
     //     OOPT reset of fields are optional
     //
-    //  Display is DEC HEX FIXED
+    //  Display is DEC HEX FIXED STRING
     public class ValueParserResult
     {
         public static ValueParserResult CreateError(string str, string error)
@@ -92,13 +92,14 @@ namespace BluetoothDeviceController.BleEditor
         public string NamePrimary { get; set; } = "";
         public string UnitsPrimary { get; set; } = "";
         /// <summary>
-        /// Universal GET by index. Get (0,0) is the same as getting the ByteFormatPrimary
+        /// Universal GET by index. Get (0,0) is the same as getting the ByteFormatPrimary. Invalid indexes return ""
         /// </summary>
         /// <param name="index1"></param>
         /// <param name="index2"></param>
-        /// <returns></returns>
+        /// <returns>either the value or "" for indexes that are out of range</returns>
         public string Get(int index1, int index2)
         {
+            if (index1 < 0 || index2 < 0) return "";
             if (index1 == 0 && index2 == 0) return ByteFormatPrimary;
             if (index1 == 1 && index2 == 0) return DisplayFormatPrimary;
             if (index1 == 2 && index2 == 0) return NamePrimary;
@@ -533,7 +534,7 @@ namespace BluetoothDeviceController.BleEditor
                                             {
                                                 case "":
                                                 case "ASCII":
-                                                    stritem = EscapeString(stritem);
+                                                    stritem = EscapeString(stritem, displayFormatSecondary);
                                                     break;
                                                 case "Eddystone":
                                                     stritem = BluetoothDefinitionLanguage.Eddystone.EddystoneUrlToString(stritem);
@@ -749,12 +750,25 @@ namespace BluetoothDeviceController.BleEditor
         }
 
 
-        private static string EscapeString(string rawstr)
+        private static string EscapeString(string rawstr, string displayFormatSecondary) // displayFormatSecondary is either "" or LONG
         {
             rawstr = rawstr.Replace("\\", "\\\\"); // escape all back-slashes
             rawstr = rawstr.Replace("\0", "\\0"); // replace a real NUL with an escaped null.
-            rawstr = rawstr.Replace("\r", "\\r");
-            rawstr = rawstr.Replace("\n", "\\n");
+            switch (displayFormatSecondary)
+            {
+                default:
+                    rawstr = rawstr.Replace("\r", "\\r");
+                    rawstr = rawstr.Replace("\n", "\\n");
+                    break;
+                case "LONG":
+                    // The LONG style display can easily display CR and LF 
+                    // The concept where was to make it trivial to both get the CR LF and
+                    // also see the values on the screen. The goal was to be easier to distinguish.
+                    // The actual result looked cluttered and ugly.
+                    //rawstr = rawstr.Replace("\r", "\\r\r");
+                    //rawstr = rawstr.Replace("\n", "\\n\n");
+                    break;
+            }
             rawstr = rawstr.Replace("\v", "\\v");
             return rawstr;
         }

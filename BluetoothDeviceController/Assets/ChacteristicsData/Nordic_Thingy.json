@@ -156,7 +156,7 @@
               "Type": "/I8/P8|FIXED|Temperature|C",
               "IsNotify": true,
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 0,
                 "chartDefaultMaxY": 100,
@@ -169,7 +169,7 @@
               "Type": "/I32/P8|FIXED|Pressure|hPA",
               "IsNotify": true,
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 983,
                 "chartDefaultMaxY": 1043,
@@ -182,7 +182,7 @@
               "Type": "U8|DEC|Humidity|%",
               "IsNotify": true,
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 0,
                 "chartDefaultMaxY": 100,
@@ -196,7 +196,7 @@
               "IsNotify": true,
               "REM": "Gas sensor is a CCS811",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartLineDefaults": {
                   "eCOS": {

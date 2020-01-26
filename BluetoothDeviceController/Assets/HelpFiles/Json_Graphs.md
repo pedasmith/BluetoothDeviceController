@@ -15,7 +15,7 @@ This JSON sample is from the Nordic Thingy temperature characteristic. In the ch
               "Name": "Temperature (c)",
               "Type": "/I8/P8|FIXED|Temperature|C",
               "UI": {
-                "tabletype": "standard",
+                "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 0,
                 "chartDefaultMaxY": 100,
