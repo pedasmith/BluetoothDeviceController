@@ -156,7 +156,8 @@ namespace BluetoothDeviceController.BleEditor
                         {
                             case "LONG":
                                 var h = uiValueShow.ActualHeight;
-                                uiValueShow.MinHeight = h * 3;
+                                uiValueShowScroll.MinHeight = h * 3;
+                                uiValueShowScroll.MaxHeight = h * 7;
                                 CurrValueShowMethod = ValueShowMethod.Append;
                                 break;
                         }
@@ -365,16 +366,27 @@ namespace BluetoothDeviceController.BleEditor
             }
         }
 
-        private async void OnEditTapped(object sender, TappedRoutedEventArgs e)
+        private GattWriteOption PreferredWriteOption()
         {
-            await DoWriteAsync();
+            GattWriteOption writeOption = GattWriteOption.WriteWithResponse;
+            if (Characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
+            {
+                writeOption = GattWriteOption.WriteWithoutResponse;
+            }
+            return writeOption;
         }
 
-        private async Task DoWriteAsync()
+        private async void OnEditTapped(object sender, TappedRoutedEventArgs e)
+        {
+            GattWriteOption writeOption = PreferredWriteOption();
+            await DoWriteAsync(writeOption);
+        }
+
+        private async Task DoWriteAsync(GattWriteOption writeOption)
         {
             try
             {
-                var cvc = new CharacteristicEditorControl(NC);
+                var cvc = new CharacteristicEditorControl(NC, writeOption);
                 await cvc.InitAsync(Service, Characteristic);
                 var dlg = new ContentDialog()
                 {
@@ -401,12 +413,12 @@ namespace BluetoothDeviceController.BleEditor
 
         private async void OnWriteTapped(object sender, TappedRoutedEventArgs e)
         {
-            await DoWriteAsync();
+            await DoWriteAsync(GattWriteOption.WriteWithoutResponse);
         }
 
         private async void OnWriteWithResponseTapped(object sender, TappedRoutedEventArgs e)
         {
-            await DoWriteAsync();
+            await DoWriteAsync(GattWriteOption.WriteWithResponse);
         }
     }
 }

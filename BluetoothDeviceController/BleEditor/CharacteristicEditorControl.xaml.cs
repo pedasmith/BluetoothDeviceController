@@ -26,37 +26,40 @@ namespace BluetoothDeviceController.BleEditor
 {
     public sealed partial class CharacteristicEditorControl : UserControl
     {
-        public CharacteristicEditorControl(NameCharacteristic nc)
+        public CharacteristicEditorControl(NameCharacteristic nc, GattWriteOption writeOption)
         {
             NC = nc;
+            WriteOption = writeOption;
             this.InitializeComponent();
             this.Loaded += CharacteristicEditorControl_Loaded;
         }
+        private GattWriteOption WriteOption;
+        private string DisplayFormat;
+        private string DisplayFormatSecondary;
 
         private void CharacteristicEditorControl_Loaded(object sender, RoutedEventArgs e)
         {
             if (NC == null) return;
             var vps = ValueParserSplit.ParseLine(NC.Type);
             if (vps.Count != 1) return; // if there are multiple values, give up and let the user struggle with HEX
-            var displayFormat = vps[0].DisplayFormatPrimary;
-            var displayFormatSecondary = vps[0].Get(1, 1);
+            DisplayFormat = vps[0].DisplayFormatPrimary;
+            DisplayFormatSecondary = vps[0].Get(1, 1);
 
             foreach (var item in uiConvertType.Items)
             {
                 var tag = (item as ComboBoxItem).Tag as string;
-                if (tag == displayFormat)
+                if (tag == DisplayFormat)
                 {
                     uiConvertType.SelectedItem = item;
                 }
             }
 
-            if (displayFormat == "ASCII" && displayFormatSecondary == "LONG")
+            if (DisplayFormat == "ASCII" && DisplayFormatSecondary == "LONG")
             {
                 var h = uiEditBox.ActualHeight;
                 uiEditBox.MinHeight = h * 3;
                 uiEditBox.MinWidth = 300;
                 uiEditBox.AcceptsReturn = true;
-                ;
             }
         }
 
@@ -136,7 +139,7 @@ namespace BluetoothDeviceController.BleEditor
 
         private void AddButtons()
         {
-            // e.g. the williamWeillerEngineering Skoobot has "buttons" -- there are enums
+            // e.g. the WilliamWeillerEngineering Skoobot has "buttons" -- there are enums
             // defined for specific commands like forward and reverse. When buttonType is set to
             // "standard" then we add buttons for those specific commands.
             //OTHERWISE we just have the string command to send.
@@ -202,8 +205,28 @@ namespace BluetoothDeviceController.BleEditor
             var result = str.ConvertToBuffer(convertType); // e.g. HEX DEC ASCII
             if (result.Result == ValueParserResult.ResultValues.Ok)
             {
-                var data = result.ByteResult.ToArray().AsBuffer();
-                await DoWriteAsync(data);
+                // In the case of a STRING, we are more careful. The string has to be broken up
+                // into the correct size pieces to be sent.
+                // Why look at DisplayFormat here even though the original conversion used the
+                // convertType? Because the user might have to enter a long set of HEX values.
+                // But the long hex value still needs to be chopped up as appropriate.
+                if (DisplayFormat == "ASCII" && DisplayFormatSecondary == "LONG")
+                {
+                    var list = result.ByteResult.ToArray();
+                    for (int i=0; i<list.Length; i+= 20)
+                    {
+                        // So many calculations and copying just to get a slice
+                        var maxCount = Math.Min(20, list.Length - i);
+                        var sublist = new ArraySegment<byte>(list, i, maxCount);
+                        var data = sublist.ToArray().AsBuffer();
+                        await DoWriteAsync(data);
+                    }
+                }
+                else
+                {
+                    var data = result.ByteResult.ToArray().AsBuffer();
+                    await DoWriteAsync(data);
+                }
             }
             else
             {
@@ -218,14 +241,8 @@ namespace BluetoothDeviceController.BleEditor
 
             try
             {
-                GattWriteOption writeOption = GattWriteOption.WriteWithResponse;
-                if (Characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
-                {
-                    writeOption = GattWriteOption.WriteWithoutResponse;
-                }
                 uiStatus.Text = "Writing data...";
-                var status = await Characteristic.WriteValueWithResultAsync(data, writeOption);
-
+                var status = await Characteristic.WriteValueWithResultAsync(data, WriteOption);
 
                 switch (status.Status)
                 {

@@ -35,7 +35,9 @@
         <!-- The value fields -->
         <StackPanel Grid.Column="1" Orientation="Horizontal">
             <Grid Width="380">
-                <TextBlock x:Name="uiValueShow" IsTextSelectionEnabled="True" Width="400" />
+                <ScrollViewer x:Name="uiValueShowScroll">
+                    <TextBlock x:Name="uiValueShow" IsTextSelectionEnabled="True" Width="400" />
+                </ScrollViewer>
             </Grid>
         </StackPanel>        
         
@@ -46,7 +48,6 @@
                     <Setter Property="FontSize" Value="18"/>
                     <Setter Property="Padding" Value="0,2,0,0"/>
                     <Setter Property="Width" Value="22" />
-                    <Setter Property="Height" Value="30" />
                     <Setter Property="Height" Value="30" />
                 </Style>
             </Panel.Resources>
