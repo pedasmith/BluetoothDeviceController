@@ -16,7 +16,9 @@
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="uiEditBox" Header="Edit data" Grid.Column="0" AcceptsReturn="True" TextWrapping="Wrap" />
+            <ScrollViewer Grid.Column="0" MaxHeight="250">
+                <TextBox x:Name="uiEditBox" Header="Edit data" AcceptsReturn="True" TextWrapping="Wrap" />
+            </ScrollViewer>
             <ComboBox x:Name="uiConvertType" SelectedIndex="0" Grid.Column="1" Width="100" VerticalAlignment="Bottom">
                 <ComboBoxItem Content="Hex" Tag="HEX" />
                 <ComboBoxItem Content="Decimal" Tag="DEC" />
