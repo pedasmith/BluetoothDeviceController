@@ -14,24 +14,25 @@ namespace BluetoothDeviceController
 
         const string LineEndPreferenceSetting = "LineEndDisplayPreference";
         const string ShortcutIdPreferenceSetting = "ShortcutIdDisplayPreference";
+        public string SavePrefix = "";
         public void ReadFromLocalSettings()
         {
             var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-            if (localSettings.Values.ContainsKey(LineEndPreferenceSetting))
+            if (localSettings.Values.ContainsKey(SavePrefix+LineEndPreferenceSetting))
             {
-                LineEnd = (TerminalLineEnd)(int)localSettings.Values[LineEndPreferenceSetting];
+                LineEnd = (TerminalLineEnd)(int)localSettings.Values[SavePrefix+LineEndPreferenceSetting];
             }
-            if (localSettings.Values.ContainsKey(ShortcutIdPreferenceSetting))
+            if (localSettings.Values.ContainsKey(SavePrefix + ShortcutIdPreferenceSetting))
             {
-                ShortcutId = (string)localSettings.Values[ShortcutIdPreferenceSetting];
+                ShortcutId = (string)localSettings.Values[SavePrefix + ShortcutIdPreferenceSetting];
             }
         }
 
         public void SaveToLocalSettings()
         {
             var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-            localSettings.Values[LineEndPreferenceSetting] = (int)LineEnd;
-            localSettings.Values[ShortcutIdPreferenceSetting] = ShortcutId;
+            localSettings.Values[SavePrefix+LineEndPreferenceSetting] = (int)LineEnd;
+            localSettings.Values[SavePrefix+ShortcutIdPreferenceSetting] = ShortcutId;
         }
     }
 }

@@ -36,6 +36,7 @@ namespace BluetoothDeviceController
                 Content="Based on device",
                 Tag="",
             });
+            AllShortcuts.Init();
             foreach (var item in AllShortcuts.All)
             {
                 ShortcutIdComboBox.Items.Add(new ComboBoxItem()

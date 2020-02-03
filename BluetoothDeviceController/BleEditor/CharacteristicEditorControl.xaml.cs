@@ -212,13 +212,14 @@ namespace BluetoothDeviceController.BleEditor
                 // But the long hex value still needs to be chopped up as appropriate.
                 if (DisplayFormat == "ASCII" && DisplayFormatSecondary == "LONG")
                 {
-                    var list = result.ByteResult.ToArray();
-                    for (int i=0; i<list.Length; i+= 20)
+                    var command = result.ByteResult.ToArray();
+                    const int MAXBYTES = 20;
+                    for (int i=0; i<command.Length; i+= MAXBYTES)
                     {
                         // So many calculations and copying just to get a slice
-                        var maxCount = Math.Min(20, list.Length - i);
-                        var sublist = new ArraySegment<byte>(list, i, maxCount);
-                        var data = sublist.ToArray().AsBuffer();
+                        var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                        var subcommand = new ArraySegment<byte>(command, i, maxCount);
+                        var data = subcommand.ToArray().AsBuffer();
                         await DoWriteAsync(data);
                     }
                 }

@@ -1,19 +1,12 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "Espruino SMARTIBOT",
-      "Aliases": [
-        "Smartibot"
-      ],
-      "ClassName": "CraftyRobot_Smartibot",
-      "ClassModifiers": "partial",
-      "Description": "Robot with a carboard shell. The interior robot is a typical Espruino JavaScript-based bot. Communications are via a TX and RX characteristic.",
+      "Name": "Puck.js",
+      "ClassName": "Espruino_Puckjs",
       "Links": [
-        "https://thecraftyrobot.net/collections/smartibot",
-        "http://www.espruino.com/Smartibot",
-        "https://www.kickstarter.com/projects/460355237/smartibot-the-worlds-first-ai-enabled-cardboard-ro",
-        "https://www.espruino.com/modules/Smartibot.js",
-		"https://www.reddit.com/r/Smartibot/"
+        "https://www.puck-js.com/",
+        "https://www.espruino.com/Puck.js",
+        "https://www.kickstarter.com/projects/gfw/puckjs-the-ground-breaking-bluetooth-beacon/"
       ],
       "Services": [
         {
@@ -27,8 +20,8 @@
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
-                "Name: Espruino SMARTIBOT",
-                "Espruino SMARTIBOT"
+                "Name: Puck.js 75c8",
+                "Puck.js 75c8"
               ]
             },
             {
@@ -47,7 +40,7 @@
               "Type": "BYTES|HEX|ConnectionParameter",
               "IsRead": true,
               "ExampleData": [
-                "Value:  06 00 06 00 00 00 90 01"
+                "Value:  06 00 10 00 00 00 90 01"
               ]
             },
             {
@@ -81,13 +74,12 @@
               "Name": "Transmit",
               "Type": "STRING|ASCII^LONG|Data",
               "IsWrite": true,
-              "IsWriteWithoutResponse": true,
-              "Commands": {}
+              "IsWriteWithoutResponse": true
             }
           ]
         }
       ],
-      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-d6:0d:44:a8:91:99\nCanPair:True IsPaired:False"
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-fc:e9:33:c0:75:c8\nCanPair:True IsPaired:False"
     }
   ]
 }

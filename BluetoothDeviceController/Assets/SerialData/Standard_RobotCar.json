@@ -13,55 +13,74 @@
         "https://shipwrecksoftware.wordpress.com/2020/01/05/dont-reinvent-the-wheel-use-the-standard-robot-car-protocol-instead/"
       ],
       "Commands": {
-        "Stop": {
-          "Replace": "S"
-        },
-        "Forward": {
-          "Replace": "F"
-        },
-        "Left": {
-          "Replace": "L"
-        },
-        "Right": {
-          "Replace": "R"
-        },
-        "Backwards": {
-          "Replace": "B"
-        },
         "Left-Forward": {
+          "Label": "⇖",
           "Replace": "G"
         },
+        "Forward": {
+          "Label": "⇑",
+          "Replace": "F"
+        },
         "Right-Forward": {
+          "Label": "⇗",
           "Replace": "I"
         },
-        "Left-Backwards": {
-          "Replace": "H"
-        },
-        "Right-Backwards": {
-          "Replace": "J"
-        },
         "Lights-on": {
+          "Label": "",
           "Replace": "W"
         },
         "Lights-off": {
+          "Label": "",
           "Replace": "w"
         },
-        "Rear lights-on": {
-          "Replace": "U"
+
+        "Left": {
+          "Label": "⇐",
+          "Replace": "L"
         },
-        "Rear lights-off": {
-          "Replace": "u"
+        "Stop": {
+          "Label": "⊚",
+          "Replace": "S"
+        },
+        "Right": {
+          "Label": "⇒",
+          "Replace": "R"
         },
         "Horn-on": {
+          "Label": "🕬",
           "Replace": "V"
         },
         "Horn-off": {
+          "Label": "🕫",
           "Replace": "v"
         },
+
+        "Left-Backwards": {
+          "Label": "⇙",
+          "Replace": "H"
+        },
+        "Backwards": {
+          "Label": "⇓",
+          "Replace": "B"
+        },
+        "Right-Backwards": {
+          "Label": "⇘",
+          "Replace": "J"
+        },
+        "Rear lights-on": {
+          "Label": "",
+          "Replace": "U"
+        },
+        "Rear lights-off": {
+          "Label": "",
+          "Replace": "u"
+        },
         "Ping distance": {
+          "Label": "",
           "Replace": "P"
         },
         "Device query name": {
+          "Label": "ℹ",
           "Replace": "Q"
         }
       }

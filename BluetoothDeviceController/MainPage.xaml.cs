@@ -29,16 +29,27 @@ namespace BluetoothDeviceController
         event EventHandler DeviceEnumerationChanged;
         string GetCurrentSearchResults();
     }
+
+    public class PageDisplayPreferences
+    {
+        public bool ParentShouldScroll { get; internal set; } = true;
+    }
+    public interface IGetPageDisplayPreferences
+    {
+        PageDisplayPreferences GetPageDisplayPreferences();
+    }
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class MainPage : Page, IDoSearch, IDockParent, SpecialtyPages.IHandleStatus
     {
         const string ALARM = "⏰";
-        const string LIGHT = "💡";
-        const string WATER = "🚰";
         const string DATA = "📈"; //"🥼";
+        const string LIGHT = "💡";
+        const string ROBOT = ""; // Part of the Segoe MDL2 Assets FontFamily
         const string WAND = "🖉"; // yeah, a pencil isn't reall a wand.
+        const string WATER = "🚰";
+
         
         /// <summary>
         /// Converts a list of possible Bluetooth names into a page to display
@@ -74,6 +85,7 @@ namespace BluetoothDeviceController
             new Specialization (typeof(SpecialtyPages.Nordic_ThingyPage), new string[] { "Thingy" }, DATA, "Nordic Thingy", "Nordic Semiconductor Thingy sensor platform"),
             new Specialization (typeof(SpecialtyPages.Vion_MeterPage), new string[] { "Vion Meter" }, DATA, "Vion Meter", "Vion smart multimeter"),
 
+            new Specialization (typeof(SpecialtyPagesCustom.CraftyRobot_SmartibotPage), new string[] { "Smartibot" }, ROBOT, "Smartibot", "Smartibot espruino-based robot", Specialization.ParentScrollType.ChildHandlesScrolling),
         };
 
         public BleNames AllBleNames { get; set; }
@@ -154,6 +166,17 @@ namespace BluetoothDeviceController
 
             var handleStatus = ContentFrame.Content as SpecialtyPages.ISetHandleStatus;
             handleStatus?.SetHandleStatus(this);
+
+            // Set the max height of the content frame?
+            switch (uiPageScroller.VerticalScrollMode)
+            {
+                case ScrollMode.Disabled:
+                    ContentFrame.MaxHeight = uiPageScroller.ActualHeight;
+                    break;
+                default:
+                    ContentFrame.MaxHeight = Double.PositiveInfinity;
+                    break;
+            }
         }
 
         private void UiNavigation_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
@@ -263,11 +286,11 @@ namespace BluetoothDeviceController
         {
             Type _pageType = null;
             var preftype = Preferences.Display;
+            var scrollType = Specialization.ParentScrollType.ParentShouldScroll;
             if (Preferences.Scope == UserPreferences.SearchScope.Bluetooth_Com_Device)
             {
                 _pageType = typeof(SerialPort.SimpleTerminalPage);
-                uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                uiPageScroller.VerticalScrollMode = ScrollMode.Disabled;
+                scrollType = Specialization.ParentScrollType.ChildHandlesScrolling;
                 di.SerialPortPreferences = SerialPortPreferences;
             }
             else if (preftype == UserPreferences.DisplayPreference.Specialized_Display)
@@ -278,18 +301,25 @@ namespace BluetoothDeviceController
                 if (specialized != null)
                 {
                     _pageType = specialized.Page;
+                    scrollType = specialized.ParentShouldScroll;
                 }
-                uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
-                uiPageScroller.VerticalScrollMode = ScrollMode.Enabled;
             }
             if (_pageType == null) // Either the preferences is for an editor, or this particular BT devices doesn't have a specialization.
             {
                 _pageType = typeof(BleEditor.BleEditorPage);
-                uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
-                uiPageScroller.VerticalScrollMode = ScrollMode.Enabled;
                 // There's also a device information page, but it's not really useful at all.
             }
-
+            switch (scrollType)
+            {
+                case Specialization.ParentScrollType.ParentShouldScroll:
+                    uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                    uiPageScroller.VerticalScrollMode = ScrollMode.Enabled;
+                    break;
+                case Specialization.ParentScrollType.ChildHandlesScrolling:
+                    uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+                    uiPageScroller.VerticalScrollMode = ScrollMode.Disabled;
+                    break;
+            }
             // Get the page type before navigation so you can prevent duplicate
             // entries in the backstack. Except that I use the same page type for e.g. different Thingy devices.
             var preNavPageType = ContentFrame.CurrentSourcePageType;

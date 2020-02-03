@@ -256,8 +256,28 @@
               "Type": "BYTES|HEX|Set_1cumul_2calib_3loc_4_reqloc"
             }
           ]
-        }
-      ]
+        },
+        {
+          "UUID": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+          "Name": "Transmit",
+          "REM_Abstract": "BLE UART TX and RX used by Nordic nRF devices. Often used by Espruino devices",
+          "Characteristics": [
+            {
+              "UUID": "6e400003-b5a3-f393-e0a9-e50e24dcca9e",
+              "Name": "Receive",
+              "Type": "STRING|ASCII^LONG|Data",
+              "IsNotify": true
+            },
+            {
+              "UUID": "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+              "Name": "Transmit",
+              "Type": "STRING|ASCII^LONG|Data",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "Commands": {}
+            }
+          ]
+        }      ]
     }
   ]
 }

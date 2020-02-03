@@ -9,7 +9,8 @@ namespace BluetoothDeviceController
 {
     public class Specialization
     {
-        public Specialization (Type page, string[] names, string icon, string shortDescription, string description)
+        public enum ParentScrollType {  ParentShouldScroll, ChildHandlesScrolling};
+        public Specialization (Type page, string[] names, string icon, string shortDescription, string description, ParentScrollType parentShouldScroll=ParentScrollType.ParentShouldScroll)
         {
             Page = page;
             Icon = icon;
@@ -20,12 +21,14 @@ namespace BluetoothDeviceController
             {
                 Names.Add(name);
             }
+            ParentShouldScroll = parentShouldScroll;
         }
         private IList<string> Names = new List<string>();
         public Type Page { get; internal set; }
         public string Icon { get; internal set; }
         public string Description { get; internal set; }
         public string ShortDescription { get; internal set; }
+        public ParentScrollType ParentShouldScroll { get; internal set; }
         public bool Match (string deviceName)
         {
             foreach (var name in Names)

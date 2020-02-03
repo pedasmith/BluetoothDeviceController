@@ -919,7 +919,15 @@ namespace BluetoothProtocols
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
 [[ARGS]]
             var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync([[CHARACTERISTICINDEX]], ""[[CHARACTERISTICNAME]]"", command, [[WRITEMODE]]);
+            const int MAXBYTES = 20;
+            for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync([[CHARACTERISTICINDEX]], ""[[CHARACTERISTICNAME]]"", subcommand, [[WRITEMODE]]);
+            }
+            // original: await DoWriteAsync(data);
         }
 ";
 

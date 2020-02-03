@@ -32,6 +32,7 @@ namespace BluetoothDeviceController.Names
             // the exact one I want.
             //var btMatch = BluetoothName == "" || bluetoothName == "" || bluetoothName.StartsWith(BluetoothName);
             var idMatch = id == "" || (!String.IsNullOrEmpty(Id) && id == Id);
+            if (id == "(name)") idMatch = false; // default names don't match!
             var devMatch = deviceName == "" || (!String.IsNullOrEmpty(DeviceName) && deviceName.StartsWith(DeviceName));
             var match = idMatch && devMatch;
             return match;

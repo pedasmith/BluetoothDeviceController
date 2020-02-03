@@ -30,7 +30,6 @@ namespace BluetoothDeviceController.Names
 
     public class NameAllSerialDevices
     {
-
         public IList<SerialConfig> AllSerialDevices { get; } = new List<SerialConfig>();
 
         public int GetSerialIndex(string name)
@@ -50,5 +49,4 @@ namespace BluetoothDeviceController.Names
             return $"AllSerialDevices [{AllSerialDevices.Count}]";
         }
     }
-
 }

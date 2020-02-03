@@ -53,7 +53,7 @@ namespace BluetoothDeviceController.BleEditor
         public enum ResultValues {  Ok, Error };
         public ResultValues Result = ResultValues.Ok;
         /// <summary>
-        /// The nice decoded value. If there was an error, this might bee ??-??
+        /// The nice decoded value. If there was an error, this might be ??-??
         /// </summary>
         public string UserString = "??-??";
         /// <summary>
