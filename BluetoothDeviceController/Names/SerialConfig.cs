@@ -68,7 +68,16 @@ namespace BluetoothDeviceController.Names
         /// A simple string to send to the device.
         /// </summary>
         public string Replace { get; set; } = "";
+        /// <summary>
+        /// The name of a file like SerialFiles/Espruino_Modules_Smartibot.js
+        /// The file will be in the Assets directory.
+        /// </summary>
+        public string ReplaceFile { get; set; } = "";
         public string Alt { get; set; } = "";
+        /// <summary>
+        /// When set to true, the command is hidden
+        /// </summary>
+        public bool IsHidden { get; set; } = false;
         public string OnChange { get; set; } = null;
         public Dictionary<string, double> Set { get; } = new Dictionary<string, double>();
     }

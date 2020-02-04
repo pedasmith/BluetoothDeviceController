@@ -20,7 +20,7 @@ and more devices -- please leave feedback to request specific devices!
 [![Nordic Thingy](../DevicePictures/Nordic_Thingy-175.png)](Device_Nordic_Thingy.md)
 [![Sensything](../DevicePictures/Protocentral_Sensything-175.png)](Device_Protocentral_Sensything.md)
 [![1352 Sensor Tag](../DevicePictures/TI_SensorTag_1352-175.png)](Device_TI_SensorTag_1352.md)
-[![Sensor Tag](../DevicePictures/TI_SensorTag_1350-175.png)](Device_TI_SensorTag_1350.md)
+[![Sensor Tag 1350](../DevicePictures/TI_SensorTag_1350-175.png)](Device_TI_SensorTag_1350.md)
 [![Original Sensor Tag](../DevicePictures/TI_SensorTag_2541-175.png)](Device_TI_SensorTag_2541.md)
 
 
@@ -28,6 +28,8 @@ and more devices -- please leave feedback to request specific devices!
 [![BERO](../DevicePictures/RealityRobotics_Bero-175.png)](Device_RealityRobotics_Bero.md)
 [![Kano Wand](../DevicePictures/Kano_Wand-175.png)](Device_Kano_Wand.md)
 [![LittleBot](../DevicePictures/SlantRobotics-LittleBot-175.png)](Device_SlantRobotics_LittleBot.md)
+[![Skoobot](../DevicePictures/WilliamWeilerEngineering_Skoobot-175.png)](Device_WilliamWeilerEngineering_Skoobot.md)
+[![Smartibot](../DevicePictures/CraftyRobot_Smartibot-175.png)](Device_CraftyRobot_Smartibot.md)
 
 ## More help
 [Help](Help.md)

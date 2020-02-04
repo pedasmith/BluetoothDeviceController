@@ -63,9 +63,10 @@ The individual data sensors usually have a host of capabilities.
 There are a wide variety of Arduino-type robots and devices that can potentially be controlled. 
 Right now, the following list has been verified as controllable with this program
 
-* [Reality Robotics BERO](Device_RealityRobotics_Bero.md)
+* [Crafty Robot Smartibot](Device_CraftyRobot_Smartibot.md)
 * [Reality Robotics BERO](Device_RealityRobotics_Bero.md)
 * [Slant Robotics LittleBot](Device_SlantRobotics_LittleBot.md)
+* [William Weiler Engineering Skoobot](WilliamWeilerEngineering_Skoobot.md)
 
 ## Protocol details
 

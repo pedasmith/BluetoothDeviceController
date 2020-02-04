@@ -2,21 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using static BluetoothDeviceController.UserSerialPortPreferences;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -104,7 +99,7 @@ namespace BluetoothDeviceController.SerialPort
                             {
                                 var slider = new Slider()
                                 {
-                                    Header = setting.Name ?? name,
+                                    Header = setting.Label ?? setting.Name ?? name,
                                     Value = setting.Init,
                                     Margin = SliderMargin,
                                     Minimum = setting.Min,
@@ -126,17 +121,20 @@ namespace BluetoothDeviceController.SerialPort
                 // Add in the button proper
                 foreach (var (name, shortcut) in shortcuts.Commands)
                 {
-                    var b = new Button()
+                    if (!shortcut.IsHidden)
                     {
-                        Content = shortcut.Label,
-                        FontFamily = ff,
-                        Tag = shortcut,
-                        Width = 100,
-                        Margin = shortcutButtonMargin,
-                        VerticalAlignment = VerticalAlignment.Bottom,
-                    };
-                    b.Click += OnShortcutClick;
-                    uiShortcutButtonList.Children.Add(b);
+                        var b = new Button()
+                        {
+                            Content = shortcut.Label,
+                            FontFamily = ff,
+                            Tag = shortcut,
+                            Width = 100,
+                            Margin = shortcutButtonMargin,
+                            VerticalAlignment = VerticalAlignment.Bottom,
+                        };
+                        b.Click += OnShortcutClick;
+                        uiShortcutButtonList.Children.Add(b);
+                    }
                 }
             }
         }
@@ -225,6 +223,22 @@ namespace BluetoothDeviceController.SerialPort
                 foreach (var (name, value) in CurrValues)
                 {
                     PrevValues[name] = value;
+                }
+            }
+            if (!string.IsNullOrEmpty(command.ReplaceFile))
+            {
+                // Is like SerialFiles\\Espruino_Modules_Smartibot.js in the Assets directory
+                var filename = command.ReplaceFile;
+                try
+                {
+                    StorageFolder InstallationFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                    string fname = @"Assets\" + filename;
+                    var f = await InstallationFolder.GetFileAsync(fname);
+                    var fcontents = File.ReadAllText(f.Path);
+                    cmd = fcontents;
+                }
+                catch (Exception)
+                {
                 }
             }
             if (!String.IsNullOrEmpty(cmd))

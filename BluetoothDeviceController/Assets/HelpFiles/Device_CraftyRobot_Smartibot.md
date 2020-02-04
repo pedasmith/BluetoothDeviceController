@@ -12,12 +12,16 @@ The device uses the *Espruino* system to run JavaScript on the device. Somewhat 
     var smarti = require("Smartibot");
     smarti.setLEDs([255,0,0], [0,255,0
 
-The *require* statement is handled by the Espruino development system. This program doesn't include the entire development system. Instead, the source code to the 
+## Changes to the require("Smartibot") statement
+First run this statement:
+
+    var smarti = exports = {}
+
+Then push the entire Smarti module to the device. Once you do this, you should be able to use the smarti object to control your device. Technical details: the *require* statement is normally handled by the Espruino development system. This program doesn't include the entire development system but does include the Smartibot module as an option to download to the board.  Because the smarti.js module is fairly simple, you can simply send the module directly to your board. First you have to define the "exports" object. The exports object will be created as the smarti object.
 
 
-Set the screen to show three buttons wide; this results in the best set of controls. There are sliders for the arms 
-and the head. You can set exactly values for the two drive motors (marked Left and Right) and the LED eyes and the 
-light-up headphones. The lights take a value from 0 to 9 where 0 is off and 9 is the maximum brightness.
+Set the screen to show three buttons wide; this results in the best set of controls. There are sliders for the "eyes". You can set exactly values for the two drive motors (marked Left and Right) and the LED eyes and the 
+light-up headphones. 
 
 # Screen Shot
 ![Screen Shot](../ScreenShots/CraftyRobot_Smartibot.png)

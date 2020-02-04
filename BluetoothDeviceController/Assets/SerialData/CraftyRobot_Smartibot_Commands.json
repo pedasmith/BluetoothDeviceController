@@ -37,46 +37,66 @@
           "Init": 0,
           "InputType": "Slider",
           "OnChange": "UpdateEye"
+        },
+        "RightEyeRed": {
+          "Label": "R. Red",
+          "Min": 0,
+          "Max": 255,
+          "Init": 0,
+          "InputType": "Slider",
+          "OnChange": "UpdateEye"
+        },
+        "RightEyeGreen": {
+          "Label": "R. Green",
+          "Min": 0,
+          "Max": 255,
+          "Init": 0,
+          "InputType": "Slider",
+          "OnChange": "UpdateEye"
+        },
+        "RightEyeBlue": {
+          "Label": "R. Blue",
+          "Min": 0,
+          "Max": 255,
+          "Init": 0,
+          "InputType": "Slider",
+          "OnChange": "UpdateEye"
         }
       },
       "Commands": {
-        "Smart": {
-          "Label": "Smarti",
-          "Replace": "smarti=exports={};\n"
-        },
         "Forward Left": {
           "Label": "⇖",
           "Set": {
-            "DriveL": 40,
-            "DriveR": 70
+            "DriveL": 1,
+            "DriveR": 0
           },
-          "OnChange": "Update"
+          "OnChange": "UpdateMotors"
         },
         "Forward": {
           "Label": "⇑",
           "Set": {
-            "DriveL": 60,
-            "DriveR": 60
+            "DriveL": 1,
+            "DriveR": 1
           },
-          "OnChange": "Update"
+          "OnChange": "UpdateMotors"
         },
         "Forward Right": {
           "Label": "⇗",
           "Set": {
-            "DriveL": 70,
-            "DriveR": 40
+            "DriveL": 0,
+            "DriveR": 1
           },
-          "OnChange": "Update"
+          "OnChange": "UpdateMotors"
         },
 
 
         "Left": {
           "Label": "⇐",
           "Set": {
-            "DriveL": 20,
-            "DriveR": 50
+            "DriveL": 1,
+            "DriveR": -1
           },
-          "OnChange": "Update"
+          "OnChange": "UpdateMotors"
         },
         "Stop": {
           "Label": "⊚",
@@ -84,47 +104,59 @@
             "DriveL": 0,
             "DriveR": 0
           },
-          "OnChange": "Update"
+          "OnChange": "UpdateMotors"
         },
         "Right": {
           "Label": "⇒",
           "Set": {
-            "DriveL": 50,
-            "DriveR": 30
+            "DriveL": -1,
+            "DriveR": 1
           },
-          "OnChange": "Update"
+          "OnChange": "UpdateMotors"
         },
+
         "Backward Left": {
           "Label": "⇙",
           "Set": {
-            "DriveL": -30,
-            "DriveR": -60
+            "DriveL": 0,
+            "DriveR": -1
           },
-          "OnChange": "Update"
+          "OnChange": "UpdateMotors"
         },
         "Backward": {
           "Label": "⇓",
           "Set": {
-            "DriveL": -40,
-            "DriveR": -40
+            "DriveL": -1,
+            "DriveR": -1
           },
-          "OnChange": "Update"
+          "OnChange": "UpdateMotors"
         },
         "Backward Right": {
           "Label": "⇘",
           "Set": {
-            "DriveL": -60,
-            "DriveR": -30
+            "DriveL": -1,
+            "DriveR": 0
           },
-          "OnChange": "Update"
+          "OnChange": "UpdateMotors"
         },
-        "Update": {
-          "Label": "Update",
-          "Compute": "$BERO1.0ACT,0,, $ArmL_GD $, $ArmR_GD $, $Head_GD $,0, $DriveL_GD $, $DriveR_GD $, $Led0_GD $, $Led1_GD $, $Led2_GD $, $Led3_GD $, $Led4_GD $, $Led5_GD $, $Headphone_GD $,1\r\n"
+        "Smart": {
+          "Label": "Pre-Smarti",
+          "Replace": "smarti=exports={};\n"
+        },
+        "Load": {
+          "Label": "Smarti",
+          "ReplaceFile": "SerialFiles\\Espruino_Modules_Smartibot.js"
+        },
+        "UpdateMotors": {
+          "Label": "UpdateMotors",
+          "IsHidden": true,
+          "TODO:_REM": "This is the old BERO command line",
+          "Compute": "$smarti.setMotor(1, $DriveL_GN $);\nsmarti.setMotor(2, $DriveR_GN_IV $);\n"
         },
         "UpdateEye": {
           "Label": "Eye",
-          "Compute": "$smarti.setLEDs([ $LeftEyeGreen_GD $, $LeftEyeRed_GD $, $LeftEyeBlue_GD $]);\n"
+          "IsHidden": true,
+          "Compute": "$smarti.setLEDs([ $LeftEyeGreen_GN $, $LeftEyeRed_GN $, $LeftEyeBlue_GN $],[ $RightEyeGreen_GN $, $RightEyeRed_GN $, $RightEyeBlue_GN $]);\n"
         }
       }
     }
