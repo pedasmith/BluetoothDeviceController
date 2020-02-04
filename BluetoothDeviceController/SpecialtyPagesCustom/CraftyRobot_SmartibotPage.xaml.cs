@@ -39,13 +39,19 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             var di = args.Parameter as DeviceInformationWrapper;
             if (di.SerialPortPreferences == null)
             {
-                // Don't use the user-saved preferences; the Espruino has particular requirements
-                // that we don't want the user to over-ride.
+                // Make sure we set up good defaults.
+                const string DefaultShortcutId = "CraftyRobot-Smartibot";
                 di.SerialPortPreferences = new UserSerialPortPreferences()
                 {
                     LineEnd = UserSerialPortPreferences.TerminalLineEnd.CR,
                     SavePrefix = "CraftyRobot_Smartibot_",
+                    ShortcutId = DefaultShortcutId, // must match the Id value in CraftyRobot_Smartibot_Commands.json
                 };
+                di.SerialPortPreferences.ReadFromLocalSettings();
+                if (di.SerialPortPreferences.ShortcutId == "(name)")
+                {
+                    di.SerialPortPreferences.ShortcutId = DefaultShortcutId;
+                }
             }
             var ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
             SetStatusActive(false);
@@ -55,7 +61,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             // Set up the terminal adapter, connecting the terminal control and the bluetooth device.
             TerminalAdapter = new nRFUartTerminalAdapter(uiTerminalControl, bleDevice);
-            uiTerminalControl.ParentTerminal = this; 
+            uiTerminalControl.ParentTerminal = this;
+            uiTerminalControl.UserCanSetSerialLineEndings = false;
             // the adapter tells the terminal control to display the status.
             // The terminal control would rather we display the status.
 

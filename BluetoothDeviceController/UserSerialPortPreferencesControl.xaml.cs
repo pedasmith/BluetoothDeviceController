@@ -53,8 +53,9 @@ namespace BluetoothDeviceController
         }
 
         public UserSerialPortPreferences SerialPortPreferences { get; set; }
-        public void SetPreferences(UserSerialPortPreferences pref)
+        public void SetPreferences(UserSerialPortPreferences pref, bool userCanSetLineEndings)
         {
+            TerminalLineEndConverterComboBox.Visibility = userCanSetLineEndings ? Visibility.Visible : Visibility.Collapsed;
             SerialPortPreferences = pref;
             this.DataContext = SerialPortPreferences;
         }

@@ -25,6 +25,7 @@ namespace BluetoothDeviceController.SerialPort
         public DeviceInformationWrapper DI = null;
         public IDoTerminalSendData DoSendData = null;
         UserSerialPortPreferences SerialPortPreferences { get { return DI.SerialPortPreferences; } }
+        public bool UserCanSetSerialLineEndings { get; set; } = true;
 
         // UI setting to distinguish send receive and error text.
         FontWeight SendWeight = FontWeights.Bold;
@@ -390,7 +391,7 @@ namespace BluetoothDeviceController.SerialPort
 
             var oldShortcutId = DI.SerialPortPreferences.ShortcutId;
             var settings = new UserSerialPortPreferencesControl();
-            settings.SetPreferences(SerialPortPreferences);
+            settings.SetPreferences(SerialPortPreferences, UserCanSetSerialLineEndings);
             var dlg = new ContentDialog()
             {
                 Content = settings,

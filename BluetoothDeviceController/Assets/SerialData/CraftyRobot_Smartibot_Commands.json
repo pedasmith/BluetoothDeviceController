@@ -1,6 +1,7 @@
 ﻿{
   "AllSerialDevices": [
     {
+      "Id": "CraftyRobot-Smartibot",
       "Name": "Smartibot",
       "ClassName": "CraftyRobot_Smartibot",
       "DeviceName": "Smartibot",
