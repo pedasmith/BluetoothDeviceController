@@ -126,7 +126,7 @@ namespace BluetoothDeviceController.SerialPort
                     {
                         var b = new Button()
                         {
-                            Content = shortcut.Label,
+                            Content = shortcut.Label ?? name, // no shortcut.Name...
                             FontFamily = ff,
                             Tag = shortcut,
                             Width = 100,

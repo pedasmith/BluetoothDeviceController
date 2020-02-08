@@ -594,7 +594,11 @@
     <Content Include="Assets\HelpFiles\Device_SlantRobotics_LittleBot.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ScreenShots\Device_CraftyRobot_Smartibot.PNG" />
     <Content Include="Assets\ScreenShots\Device_RealityRobotics_Bero.PNG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ScreenShots\Device_SlantRobotics_LittleBot.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\SerialData\RealityRobots_BERO.json">
@@ -621,7 +625,10 @@
     <Content Include="Assets\SerialData\CraftyRobot_Smartibot_Commands.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\HelpFiles\WilliamWeilerEngineering_Skoobot.md">
+    <Content Include="Assets\HelpFiles\Device_WilliamWeilerEngineering_Skoobot.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ScreenShots\Device_WilliamWeilerEngineering_Skoobot.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />

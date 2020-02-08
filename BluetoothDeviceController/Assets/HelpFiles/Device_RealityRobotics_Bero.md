@@ -1,5 +1,7 @@
 ﻿# Reality Robotics BERO robot
 
+## Serial port name: SerialPort
+
 ![Robot](../DevicePictures/RealityRobotics_Bero-175.png)
 
 The Reality Robotics BERO (Be the Robot) was a kickstarter fully-assembled robot launched on [Kickstarter](https://www.kickstarter.com/projects/realityrobotics/be-the-robot-bero-bluetooth-controlled-open-source). Unlike

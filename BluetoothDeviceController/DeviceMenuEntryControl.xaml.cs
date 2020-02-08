@@ -37,7 +37,11 @@ namespace BluetoothDeviceController
             {
                 uiIconBlock.Text = OTHER;
                 uiIconBlock.FontSize = uiIconBlock.FontSize * 0.7; // make it smaller and less eye-catching
-                uiDescriptionBlock.Text = di.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "Address:");
+                // BluetoothLE and Bluetooth -- replace the useless bits about the device type
+                var id = di.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "Address:");
+                id = id.Replace("Bluetooth#Bluetoothbc:83:85:22:5a:70-", "Address:");
+                id = id.Replace(":00000000:{00001101-0000-1000-8000-00805f9b34fb}", "");
+                uiDescriptionBlock.Text = id;
             }
             else
             {

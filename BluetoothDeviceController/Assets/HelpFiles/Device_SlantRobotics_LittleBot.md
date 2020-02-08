@@ -1,5 +1,7 @@
 ﻿# Slant Robotics LittleBot
 
+## Serial port name: Dev B
+
 ![Robot Kit](../DevicePictures/SlantRobotics_LittleBot-175.png)
 
 The Slant Robotics LittleBot was a 3D-printed robot kit launched on [Kickstarter](https://www.kickstarter.com/projects/slantrobotics/littlebot-a-fun-arduino-robot-for-students-and-beg). The robot

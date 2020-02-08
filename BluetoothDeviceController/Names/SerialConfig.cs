@@ -59,7 +59,7 @@ namespace BluetoothDeviceController.Names
 
     public class Command
     {
-        public string Label { get; set; } = "KEY";
+        public string Label { get; set; } = null;
         /// <summary>
         /// Compute is a computed value: e.g. STRING^$BERO1.0. Values like space must be escaped. Use Replace for simple scenarios that involve just sending a string.
         /// </summary>

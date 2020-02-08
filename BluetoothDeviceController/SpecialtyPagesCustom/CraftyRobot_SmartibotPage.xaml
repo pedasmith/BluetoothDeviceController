@@ -14,7 +14,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock>TODO: Smartibot Espruino Rocks!</TextBlock>
+        <TextBlock>Click Pre-Smarti and then Smarti to load the standard Smarti Module.</TextBlock>
         <serial:SimpleTerminalControl Grid.Row="1" x:Name="uiTerminalControl" />
     </Grid>
 </Page>

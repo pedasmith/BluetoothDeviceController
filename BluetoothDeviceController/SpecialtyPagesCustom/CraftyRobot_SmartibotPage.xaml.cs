@@ -68,6 +68,9 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             await TerminalAdapter.InitAsync();
             uiTerminalControl.DI = di;
+
+            // Get the buttons to show!
+            uiTerminalControl.UpdateShortcutButtons();
         }
         private IHandleStatus ParentStatusHandler = null;
 
