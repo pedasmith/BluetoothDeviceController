@@ -30,7 +30,6 @@ namespace BluetoothDeviceController.SerialPort
         public DataWriter dw { get; internal set; } = null;
         private Task readAll { get; set; } = null;
         private CancellationTokenSource cts { get; set; } = null;
-        bool connected = false;
 
         public async Task InitAsync()
         {

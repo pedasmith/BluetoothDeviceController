@@ -59,6 +59,7 @@ namespace BluetoothDeviceController
             // Fun specializations
             new Specialization (typeof(SpecialtyPages.Kano_WandPage), new string[] { "Kano-Wand" }, WAND, "Kano Wand", "Kano coding kit Harry Potter Wand"),
             new Specialization (typeof(SpecialtyPagesCustom.CraftyRobot_SmartibotPage), new string[] { "Smartibot" }, ROBOT, "Smartibot", "Smartibot espruino-based robot", Specialization.ParentScrollType.ChildHandlesScrolling),
+            new Specialization (typeof(SpecialtyPages.WilliamWeilerEngineering_SkoobotPage), new string[] { "Skoobot" }, ROBOT, "Skoobot", "Skoobot tiny robot"),
 
             // Lights
             new Specialization (typeof(SpecialtyPages.TI_beLight_2540Page), new string[] { "beLight" }, LIGHT, "TI Light", "TI CC2540 Bluetooth kit"),

@@ -1,5 +1,8 @@
 ﻿# JSON tweaks for a better UI
 
+The JSON file that can be deduced from the the captured Bluetooth sisgnals is often not ideal. 
+You can tweak the resulting JSON file to make it exactly match your needs.
+
 ## Device name, class name, aliases
 
 The default C# class name that is generated is derived from the Name of the device. This is 
@@ -31,14 +34,27 @@ to help create a better UI
 Set Suppress to true to prevent a service from being placed in the UI at all. This is commonly
 done for services used for services that have no good support in this program (like over-the-air updates),
 services that are not understood, and services that don't work. Don't laugh; a surprising number
-of devices have boilerplate services that aren't actually hooked up.
+of devices have boilerplate services that aren't actually hooked up. 
 
           "Suppress":  true,
 
+
 Set the priority of a service to place it higher in the list of services in the UI. Services with
-higher priorities are displayed first.
+higher priorities are displayed first. If the priority is >= 10, the service expander is open by default.
 
           "Priority":  5,
+
+# Characteristics
+
+Characteristics can also have names and descriptions
+
+## Supress, SupressRead and SupressWrite
+
+Individual characteristics can suppress the read and write properties. This is needed because some characteristics are incorrectly marked as "writable" or "readable" when in reality they are not. 
+
+You can suppress the UI for a characteristic by setting Supress to true
+
+          "Suppress":  true,
 
 ## Adding tables and graph
 

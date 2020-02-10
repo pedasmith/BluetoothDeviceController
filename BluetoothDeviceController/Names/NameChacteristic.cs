@@ -7,6 +7,31 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace BluetoothDeviceController.Names
 {
+    public class ButtonPerButtonUI
+    {
+        public enum ButtonType { Button, Blank };
+        public ButtonType Type { get; set; } = ButtonType.Button;
+        public string Enum { get; set; }
+        public string Label { get; set; }
+        public override string ToString()
+        {
+            switch (Type)
+            {
+                case ButtonType.Blank:
+                    return "Type=Blank";
+                case ButtonType.Button:
+                    return $"Type=Button Enum={Enum} Label={Label}";
+            }
+            return "??Unknown type";
+        }
+    }
+    public class ButtonUI
+    {
+        public string DefaultEnum { get; set; } = null;
+        public int MaxColumns { get; set; } = 5; // Use a reasonable default here!
+        public IList<ButtonPerButtonUI> Buttons { get; } = new List<ButtonPerButtonUI>();
+    }
+
     public class ChartLineDefaults
     {
         public string stroke = "Green";
@@ -27,9 +52,16 @@ namespace BluetoothDeviceController.Names
     public class UISpecifications
     {
         /// <summary>
-        /// Allowed values: "" and "standard"
+        /// Allowed values: "" and "standard"; says whether there will be a panel of buttons or not.
+        /// As of Feb 2020, only characteristics with a set of Enums can have buttons.
         /// </summary>
         public string buttonType { get; set; } = "";
+        /// <summary>
+        /// If there's supposed to be buttons, but there's no buttonUI, then we will make buttons 
+        /// straight from the set of enums. This is a workable first pass for the resuts, but makes
+        /// a mediocre set of buttons (bad labels, etc).
+        /// </summary>
+        public ButtonUI buttonUI { get; set; } 
         public string tableType { get; set; } = "";
         public string chartType { get; set; } = "";
         public string chartCommand { get; set; } = "";
@@ -122,6 +154,7 @@ namespace BluetoothDeviceController.Names
                 Name = defaultCharacteristic.Name;
                 SuppressRead = defaultCharacteristic.SuppressRead;
                 SuppressWrite = defaultCharacteristic.SuppressWrite;
+                Suppress = defaultCharacteristic.Suppress;
             }
             if (String.IsNullOrEmpty(Name))
             {
@@ -156,6 +189,7 @@ namespace BluetoothDeviceController.Names
         public string UUID { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public bool Suppress { get; set; } = false; // when set, the UI doesn't need to see this characteristic.
         /// <summary>
         /// Says how to interpret the results -- e.g. "U8|HEX|Red U8|HEX|Green U8|HEX|Blue". Can be parsed with ValueParserSplit.
         /// </summary>
@@ -165,12 +199,16 @@ namespace BluetoothDeviceController.Names
         public bool IsRead { get; set; }
         public string ReadConvert { get; set; }
         public bool IsWrite { get; set; }
-        public bool SuppressRead { get; set; }
-        public bool SuppressWrite { get; set; }
+        public bool SuppressRead { get; set; } = false;
+        public bool SuppressWrite { get; set; } = false;
         public bool IsWriteWithoutResponse { get; set; }
         public bool IsNotify { get; set; }
         public string NotifyConfigure { get; set; }
         public string NotifyConvert { get; set; }
+        /// <summary>
+        /// When true, the UI will automatically call the DoNotify()
+        /// </summary>
+        public bool AutoNotify { get; set; } = false;
         public bool IsIndicate { get; set; }
 
 

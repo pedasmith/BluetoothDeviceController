@@ -156,6 +156,7 @@
       <DependentUpon>CharacteristicEditorControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
+    <Compile Include="BluetoothProtocols\WilliamWeilerEngineering_Skoobot.cs" />
     <Compile Include="IotNumberFormats\ValueCalculate.cs" />
     <Compile Include="IotNumberFormats\ValueToString.cs" />
     <Compile Include="IotNumberFormats\ValueToStringTests.cs" />
@@ -207,6 +208,7 @@
     </Compile>
     <Compile Include="Names\BleNames.cs" />
     <Compile Include="Names\GenerateCSharpClass.cs" />
+    <Compile Include="Names\Generate_CSharp_Templates.cs" />
     <Compile Include="Names\GuidGetCommon.cs" />
     <Compile Include="Names\NameAllBleDevices.cs" />
     <Compile Include="Names\NameChacteristic.cs" />
@@ -270,6 +272,9 @@
     <Compile Include="SpecialtyPages\TI_SensorTag_2541Page.xaml.cs" />
     <Compile Include="SpecialtyPages\Vion_MeterPage.xaml.cs">
       <DependentUpon>Vion_MeterPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialtyPages\WilliamWeilerEngineering_SkoobotPage.xaml.cs">
+      <DependentUpon>WilliamWeilerEngineering_SkoobotPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserPreferenceControl.xaml.cs">
       <DependentUpon>UserPreferenceControl.xaml</DependentUpon>
@@ -601,6 +606,7 @@
     <Content Include="Assets\ScreenShots\Device_SlantRobotics_LittleBot.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ScreenShots\Device_WilliamWeilerEngineering_Skoobot.PNG" />
     <Content Include="Assets\SerialData\RealityRobots_BERO.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -626,9 +632,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\HelpFiles\Device_WilliamWeilerEngineering_Skoobot.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\ScreenShots\Device_WilliamWeilerEngineering_Skoobot.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
@@ -888,6 +891,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="SpecialtyPages\Vion_MeterPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPages\WilliamWeilerEngineering_SkoobotPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

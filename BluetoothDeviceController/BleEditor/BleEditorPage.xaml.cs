@@ -270,6 +270,10 @@ namespace BluetoothDeviceController.BleEditor
                                     var wireCharacteristic = new NameCharacteristic(characteristic, defaultCharacteristic, characteristicCount++);
                                     wireService.Characteristics.Add(wireCharacteristic);
 
+                                    if (wireCharacteristic.Suppress)
+                                    {
+                                        continue; // don't show a UI for a supressed characteristic.
+                                    }
                                     //
                                     // Here are each of the editor children items
                                     //

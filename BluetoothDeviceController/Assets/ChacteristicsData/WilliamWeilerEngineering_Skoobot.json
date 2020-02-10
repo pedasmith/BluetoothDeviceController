@@ -30,6 +30,7 @@
               "Name": "Appearance",
               "Type": "U16|Speciality^Appearance|Appearance",
               "IsRead": true,
+              "Suppress":  true,
               "ExampleData": [
                 "Appearance:  00 00",
                 "Unknown"
@@ -40,6 +41,7 @@
               "Name": "Connection Parameter",
               "Type": "BYTES|HEX|ConnectionParameter",
               "IsRead": true,
+              "Suppress": true,
               "ExampleData": [
                 "Value:  08 00 20 00 00 00 90 01"
               ]
@@ -49,6 +51,7 @@
               "Name": "Central Address Resolution",
               "Type": "U8|DEC|AddressResolutionSupported",
               "IsRead": true,
+              "Suppress": true,
               "ExampleData": [
                 "Value:  01",
                 "1"
@@ -59,6 +62,7 @@
         {
           "UUID": "00001801-0000-1000-8000-00805f9b34fb",
           "Name": "Generic Service",
+          "Suppress":  true,
           "Characteristics": [
             {
               "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
@@ -71,6 +75,7 @@
         {
           "UUID": "00001523-1212-efde-1523-785feabcd123",
           "Name": "Robot",
+          "Priority":  10,
           "Characteristics": [
             {
               "UUID": "00001525-1212-efde-1523-785feabcd123",
@@ -101,7 +106,63 @@
                 }
               },
               "UI": {
-                "buttonType":  "standard"
+                "buttonType": "standard",
+                "buttonUI": {
+                  "DefaultEnum": "Command",
+                  "REM": "defaultEnum default is the first one",
+                  "MaxColumns":  3,
+                  "Buttons": [
+                    {
+                      "Enum": "PlayBuzzer",
+                      "Label": "🔊"
+                    },
+                    {
+                      "REM": "default type is Button",
+                      "Enum": "Forward",
+                      "Label": "⇑"
+                    },
+                    {
+                      "Type": "blank"
+                    },
+
+                    {
+                      "Enum": "Left",
+                      "Label": "⇐"
+                    },
+                    {
+                      "Enum": "Stop",
+                      "Label": "⊚"
+                    },
+                    {
+                      "Enum": "Right",
+                      "Label": "⇒"
+                    },
+
+                    {
+                      "Type": "blank"
+                    },
+                    {
+                      "Enum": "Backward",
+                      "Label": "⇓"
+                    },
+                    {
+                      "Type": "blank"
+                    },
+
+                    {
+                      "Enum": "RoverMode",
+                      "Label": "🚗"
+                    },
+                    {
+                      "Enum": "RequestDistance",
+                      "Label": ""
+                    },
+                    {
+                      "Enum": "RequestAmbient",
+                      "Label": ""
+                    }
+                  ]
+                }
               }
             },
             {
@@ -110,6 +171,7 @@
               "Type": "U8^20_/_2.54_*|HEX|Distance|cm",
               "IsRead": true,
               "IsNotify": true,
+              "AutoNotify":  true,
               "ExampleData": [
                 "Value:  B5"
               ],
@@ -121,15 +183,18 @@
               "Type": "OEB U16|HEX|AmbientLight|Lux",
               "IsRead": true,
               "IsNotify": true,
+              "AutoNotify": true,
               "ExampleData": [
                 "Value:  16 80"
               ],
-              "REM":  "To get ambient light, write a RequestAmbient to the command and it will trigger a reading"
+              "REM": "To get ambient light, write a RequestAmbient to the command and it will trigger a reading"
             },
             {
               "UUID": "00001528-1212-efde-1523-785feabcd123",
               "Name": "B4",
               "Type": "U32|HEX|B4",
+              "REM": "This value is never actually used by the firmware!",
+              "Suppress": true,
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
