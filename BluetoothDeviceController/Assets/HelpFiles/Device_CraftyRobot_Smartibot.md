@@ -34,8 +34,11 @@ Once you do this, you should be able to use the smarti object to control your de
 The *require* statement is normally handled by the Espruino development system. This program doesn't include the entire development system but does include the Smartibot module as an option to download to the board.  Because the smarti.js module is fairly simple, you can simply send the module directly to your board. First you have to define the "exports" object. The exports object will be created as the smarti object.
 
 ## Running Smartibot
-Set the screen to show three buttons wide; this results in the best set of controls. There are sliders for the "eyes". You can set exactly values for the two drive motors (marked Left and Right) and the LED eyes and the 
-light-up headphones. 
+Set the screen to show three buttons wide; this results in the best set of controls. There are sliders for the "eyes" for the reg, green, and blue values, and a robot control keypad. Lastly, there's a Pre-Smart and Smarti button; to load the Smarti module, first press the Pre-Smarti and then Smarti.
+
+You can directly type commands to the Smartibot.
+
+To save the current Smarti program, type save() into the input area.
 
 # Screen Shot
 ![Screen Shot](../ScreenShots/Device_CraftyRobot_Smartibot.png)

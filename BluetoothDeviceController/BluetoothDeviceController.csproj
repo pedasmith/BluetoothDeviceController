@@ -599,14 +599,18 @@
     <Content Include="Assets\HelpFiles\Device_SlantRobotics_LittleBot.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ScreenShots\Device_CraftyRobot_Smartibot.PNG" />
+    <Content Include="Assets\ScreenShots\Device_CraftyRobot_Smartibot.PNG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ScreenShots\Device_RealityRobotics_Bero.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ScreenShots\Device_SlantRobotics_LittleBot.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ScreenShots\Device_WilliamWeilerEngineering_Skoobot.PNG" />
+    <Content Include="Assets\ScreenShots\Device_WilliamWeilerEngineering_Skoobot.PNG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\SerialData\RealityRobots_BERO.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -43,6 +43,8 @@ namespace BluetoothDeviceController
     /// </summary>
     public sealed partial class MainPage : Page, IDoSearch, IDockParent, SpecialtyPages.IHandleStatus
     {
+        const bool ALLOW_AD = false;
+
         const string ALARM = "⏰";
         const string DATA = "📈"; //"🥼";
         const string LIGHT = "💡";
@@ -136,6 +138,10 @@ namespace BluetoothDeviceController
         }
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!ALLOW_AD)
+            {
+                uiAdVertical.Visibility = Visibility.Collapsed;
+            }
             ContentFrame.Navigated += ContentFrame_Navigated;
             Preferences.ReadFromLocalSettings();
             SerialPortPreferences.ReadFromLocalSettings();
