@@ -68,6 +68,13 @@ Right now, the following list has been verified as controllable with this progra
 * [Slant Robotics LittleBot](Device_SlantRobotics_LittleBot.md)
 * [William Weiler Engineering Skoobot](WilliamWeilerEngineering_Skoobot.md)
 
+## Programmable Devices
+There are a wide variety of Espruino and other programmable Bluetooth devices. This program will
+recognize devices that use the Nordic UART system; this includes many of the Espruino-based
+devices that are programmable in JavaScript.
+
+* [PuckJs](Device_Espruino_PuckJs.md)
+
 ## Protocol details
 
 [JSON Description Protocol](Json_About.md)

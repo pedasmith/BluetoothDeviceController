@@ -15,5 +15,18 @@ namespace BluetoothDeviceController
         }
         public DeviceInformation di { get; set; } = null;
         public UserSerialPortPreferences SerialPortPreferences = null;
+
+        bool _IsNordicUart = false;
+        bool _IsNordicUartChecked = false;
+        public BluetoothProtocolsCustom.Nordic_Uart AsNordicUart { get; internal set; } = null;
+        public async Task<bool> IsNordicUartAsync()
+        {
+            if (di == null) return false; // but don't update the IsNordicUartChecked
+            if (_IsNordicUartChecked) return _IsNordicUart;
+            _IsNordicUartChecked = true;
+            AsNordicUart = new BluetoothProtocolsCustom.Nordic_Uart(di);
+            var retval = await AsNordicUart.EnsureCharacteristicAsync();
+            return retval;
+        }
     }
 }

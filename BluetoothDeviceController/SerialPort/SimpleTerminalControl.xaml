@@ -2,6 +2,7 @@
     x:Class="BluetoothDeviceController.SerialPort.SimpleTerminalControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:local="using:BluetoothDeviceController.SerialPort"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -23,23 +24,19 @@
                       VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Visible">
             <RichTextBlock  x:Name="uiOutput" />
         </ScrollViewer>
+        
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Macro Button Definitions" />
+            <controls:Expander Grid.Row="1" Header="Macro Button Definitions" IsExpanded="true" HorizontalAlignment="Left">
+                <VariableSizedWrapGrid x:Name="uiShortcutButtonList" Orientation="Horizontal">
+                </VariableSizedWrapGrid>
+            </controls:Expander>
             <!-- NOTE: in the future, let people add their own macros.
             <Button Grid.Row="1" Grid.Column="1" Content="+" />
             -->
-            <VariableSizedWrapGrid Grid.Row="1" Grid.Column="0" x:Name="uiShortcutButtonList"
-                                   Orientation="Horizontal">
-
-            </VariableSizedWrapGrid>
         </Grid>
         <ScrollViewer Grid.Row="3" MinHeight="80" MaxHeight="200">
             <TextBox x:Name="uiInput" 

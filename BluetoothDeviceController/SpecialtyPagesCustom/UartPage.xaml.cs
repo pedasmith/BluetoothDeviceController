@@ -3,19 +3,8 @@ using BluetoothDeviceController.SerialPort;
 using BluetoothDeviceController.SpecialtyPages;
 using BluetoothProtocols;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -25,13 +14,12 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class CraftyRobot_SmartibotPage : Page, ITerminal, ISetHandleStatus
+    public sealed partial class UartPage : Page, ITerminal
     {
         nRFUartTerminalAdapter TerminalAdapter;
-        // // // CraftyRobot_Smartibot bleDevice = new CraftyRobot_Smartibot();
-        Nordic_Uart Uart;
-
-        public CraftyRobot_SmartibotPage()
+        Nordic_Uart bleDevice = null; 
+        
+        public UartPage()
         {
             this.InitializeComponent();
         }
@@ -42,11 +30,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             if (di.SerialPortPreferences == null)
             {
                 // Make sure we set up good defaults.
-                const string DefaultShortcutId = "CraftyRobot-Smartibot";
+                const string DefaultShortcutId = "Nordic-Uart";
                 di.SerialPortPreferences = new UserSerialPortPreferences()
                 {
                     LineEnd = UserSerialPortPreferences.TerminalLineEnd.CR,
-                    SavePrefix = "CraftyRobot_Smartibot_",
+                    SavePrefix = "Nordic_Uart_",
                     ShortcutId = DefaultShortcutId, // must match the Id value in CraftyRobot_Smartibot_Commands.json
                 };
                 di.SerialPortPreferences.ReadFromLocalSettings();
@@ -58,16 +46,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             var ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
             SetStatusActive(false);
 
-            // // // bleDevice.ble = ble;
-            // // // bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
-
-            Uart = new Nordic_Uart(ble);
-            await Uart.EnsureCharacteristicAsync();
-            Uart.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
-            // TODO: check for status?
+            bleDevice = new Nordic_Uart(ble);
+            bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
 
             // Set up the terminal adapter, connecting the terminal control and the bluetooth device.
-            TerminalAdapter = new nRFUartTerminalAdapter(uiTerminalControl, Uart);
+            TerminalAdapter = new nRFUartTerminalAdapter(uiTerminalControl, bleDevice);
             uiTerminalControl.ParentTerminal = this;
             uiTerminalControl.UserCanSetSerialLineEndings = false;
             // the adapter tells the terminal control to display the status.
@@ -128,6 +111,5 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                     ParentStatusHandler?.SetStatusText(text);
                 });
         }
-
     }
 }

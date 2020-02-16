@@ -1,4 +1,5 @@
-﻿using BluetoothProtocols;
+﻿using BluetoothDeviceController.BluetoothProtocolsCustom;
+using BluetoothProtocols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,14 +20,13 @@ namespace BluetoothDeviceController.SerialPort
         /// </summary>
         /// <param name="terminal"></param>
         /// <param name="input_nrf"></param>
-        public nRFUartTerminalAdapter(ITerminal terminal, CraftyRobot_Smartibot input_nrf)
+        public nRFUartTerminalAdapter(ITerminal terminal, Nordic_Uart input_nrf)
         {
             Terminal = terminal;
             nrf = input_nrf;
         }
         ITerminal Terminal;
-        CraftyRobot_Smartibot nrf { get; set; } = null;
-        public RfcommDeviceService serviceRfcomm { get; internal set; } = null;
+        Nordic_Uart nrf { get; set; } = null;
         public DataWriter dw { get; internal set; } = null;
         private Task readAll { get; set; } = null;
         private CancellationTokenSource cts { get; set; } = null;

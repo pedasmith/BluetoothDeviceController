@@ -1,0 +1,21 @@
+﻿<Page
+    x:Class="BluetoothDeviceController.SpecialtyPagesCustom.UartPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController.SpecialtyPagesCustom"
+    xmlns:serial="using:BluetoothDeviceController.SerialPort"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock>UART (serial port) based BLE Devices</TextBlock>
+        <serial:SimpleTerminalControl Grid.Row="1" x:Name="uiTerminalControl" />
+    </Grid>
+</Page>

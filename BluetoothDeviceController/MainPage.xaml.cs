@@ -1,4 +1,5 @@
-﻿using BluetoothDeviceController.Names;
+﻿using BluetoothDeviceController.BluetoothProtocolsCustom;
+using BluetoothDeviceController.Names;
 using BluetoothDeviceController.UserData;
 using Microsoft.Advertising.WinRT.UI;
 using System;
@@ -30,25 +31,23 @@ namespace BluetoothDeviceController
         string GetCurrentSearchResults();
     }
 
-    public class PageDisplayPreferences
-    {
-        public bool ParentShouldScroll { get; internal set; } = true;
-    }
-    public interface IGetPageDisplayPreferences
-    {
-        PageDisplayPreferences GetPageDisplayPreferences();
-    }
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class MainPage : Page, IDoSearch, IDockParent, SpecialtyPages.IHandleStatus
     {
+#if DEBUG
         const bool ALLOW_AD = false;
+#else
+        const bool ALLOW_AD = true;
+#endif
 
         const string ALARM = "⏰";
         const string DATA = "📈"; //"🥼";
         const string LIGHT = "💡";
         const string ROBOT = ""; // Part of the Segoe MDL2 Assets FontFamily
+        const string UART = "🖀";
         const string WAND = "🖉"; // yeah, a pencil isn't reall a wand.
         const string WATER = "🚰";
 
@@ -60,6 +59,8 @@ namespace BluetoothDeviceController
         {
             // Fun specializations
             new Specialization (typeof(SpecialtyPages.Kano_WandPage), new string[] { "Kano-Wand" }, WAND, "Kano Wand", "Kano coding kit Harry Potter Wand"),
+            new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { "Puck" }, UART, "Espruino (puck)", "Puck.js: a UART-based Espruino device", Specialization.ParentScrollType.ChildHandlesScrolling),
+            new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { Nordic_Uart.SpecializationName }, UART, "UART Comm port", "Nordic UART comm port", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPagesCustom.CraftyRobot_SmartibotPage), new string[] { "Smartibot" }, ROBOT, "Smartibot", "Smartibot espruino-based robot", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPages.WilliamWeilerEngineering_SkoobotPage), new string[] { "Skoobot" }, ROBOT, "Skoobot", "Skoobot tiny robot"),
 
@@ -305,6 +306,14 @@ namespace BluetoothDeviceController
                 var deviceName = GetDeviceInformationName(di?.di);
 
                 var specialized = Specialization.Get(Specializations, deviceName);
+                if (specialized == null && di != null)
+                {
+                    // Maybe it's a UART?
+                    if (di.AsNordicUart != null)
+                    {
+                        specialized = Specialization.Get(Specializations, Nordic_Uart.SpecializationName);
+                    }
+                }
                 if (specialized != null)
                 {
                     _pageType = specialized.Page;
@@ -355,7 +364,7 @@ namespace BluetoothDeviceController
             uiDeviceProgress.IsActive = isActive;
         }
 
-        #region DOCK
+#region DOCK
 
         /// <summary>
         /// Returns true iff the new page is actually the same as the current page.
@@ -407,7 +416,7 @@ namespace BluetoothDeviceController
             handleStatus?.SetHandleStatus(this); // start handling the status again.
         }
 
-        #endregion // DOCK
+#endregion // DOCK
 
         /// <summary>
         /// All of the device management methods
@@ -506,7 +515,7 @@ namespace BluetoothDeviceController
             return name;
         }
 
-        private void AddDevice(DeviceInformationWrapper di)
+        private async Task AddDeviceAsync(DeviceInformationWrapper di)
         {
             var id = di.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
             var includeAll = Preferences.Scope == UserPreferences.SearchScope.All_bluetooth_devices;
@@ -537,6 +546,15 @@ namespace BluetoothDeviceController
             if (idx == -1) idx = 0; // Impossible; the list always includes the list-stat and list-end
 
             var specialization = Specialization.Get(Specializations, name);
+            if (specialization == null)
+            {
+                var isUart = await di.IsNordicUartAsync();
+                if (isUart)
+                {
+                    specialization = Specialization.Get(Specializations, Nordic_Uart.SpecializationName);
+                }
+            }
+
             if (specialization == null && Preferences.Scope == UserPreferences.SearchScope.Has_specialized_display)
             {
                 // There's no specialization and the user asked for items with a specialization only.
@@ -717,7 +735,7 @@ namespace BluetoothDeviceController
             var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
             System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} Added");
             await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
-                () => { AddDevice(new DeviceInformationWrapper (args)); });
+                async () => { await AddDeviceAsync(new DeviceInformationWrapper (args)); });
         }
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {

@@ -155,6 +155,7 @@
     <Compile Include="BleEditor\CharacteristicEditorControl.xaml.cs">
       <DependentUpon>CharacteristicEditorControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BluetoothProtocolsCustom\Nordic_Uart.cs" />
     <Compile Include="BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
     <Compile Include="BluetoothProtocols\WilliamWeilerEngineering_Skoobot.cs" />
     <Compile Include="IotNumberFormats\ValueCalculate.cs" />
@@ -238,6 +239,9 @@
     </Compile>
     <Compile Include="SpecialtyPagesCustom\CraftyRobot_SmartibotPage.xaml.cs">
       <DependentUpon>CraftyRobot_SmartibotPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialtyPagesCustom\UartPage.xaml.cs">
+      <DependentUpon>UartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPagesModified\TI_beLight_2540Page.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\TrionesPage.xaml.cs" />
@@ -336,6 +340,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\DevicePictures\Device_Outline.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\DevicePictures\Espruino_PuckJs-175.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\DevicePictures\Espruino_PuckJs-350.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\DevicePictures\Kano_Wand-175.png">
@@ -602,6 +612,9 @@
     <Content Include="Assets\ScreenShots\Device_CraftyRobot_Smartibot.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ScreenShots\Device_Espruino_Puckjs.PNG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ScreenShots\Device_RealityRobotics_Bero.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -638,6 +651,7 @@
     <Content Include="Assets\HelpFiles\Device_WilliamWeilerEngineering_Skoobot.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Assets\HelpFiles\Device_Espruino_Puckjs.md" />
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -835,6 +849,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPagesCustom\CraftyRobot_SmartibotPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPagesCustom\UartPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
