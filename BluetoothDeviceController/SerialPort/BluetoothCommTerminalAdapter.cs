@@ -79,7 +79,7 @@ namespace BluetoothDeviceController.SerialPort
                         {
                             Terminal?.ErrorFromDevice($"ERROR: Sending: {ex.Message}\r");
                             Terminal?.SetDeviceStatus($"Failed to send");
-                            //TODO: cancel the socket completely
+                            //NOTE: cancel the socket completely
                         }
                     }
                 };

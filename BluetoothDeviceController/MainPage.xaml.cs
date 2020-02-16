@@ -348,7 +348,7 @@ namespace BluetoothDeviceController
                 // That's not actually required.
                 if (!NewPageIsSameIdAsCurrentPage(di?.di?.Id ?? null))
                 {
-                    MinimizeCurrentWindowToDock();
+                    MinimizeCurrentWindowToDeviceDock();
                 }
                 ContentFrame.Navigate(_pageType, di, transitionInfo);
             }
@@ -387,10 +387,10 @@ namespace BluetoothDeviceController
         /// <param name="e"></param>
         private void OnMinimizeWindow(object sender, RoutedEventArgs e)
         {
-            MinimizeCurrentWindowToDock();
+            MinimizeCurrentWindowToDeviceDock();
         }
 
-        private void MinimizeCurrentWindowToDock()
+        private void MinimizeCurrentWindowToDeviceDock()
         {
             var page = ContentFrame.Content as Page;
             if (page == null) return; // should never happen
@@ -409,7 +409,7 @@ namespace BluetoothDeviceController
         /// <param name="page"></param>
         public void DisplayFromDock(Page page)
         {
-            MinimizeCurrentWindowToDock();
+            MinimizeCurrentWindowToDeviceDock();
             ContentFrame.Content = page;
 
             var handleStatus = page as SpecialtyPages.ISetHandleStatus;

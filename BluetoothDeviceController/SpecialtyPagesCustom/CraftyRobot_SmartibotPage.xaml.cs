@@ -64,7 +64,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             Uart = new Nordic_Uart(ble);
             await Uart.EnsureCharacteristicAsync();
             Uart.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
-            // TODO: check for status?
+            // NOTE: check for status?
 
             // Set up the terminal adapter, connecting the terminal control and the bluetooth device.
             TerminalAdapter = new nRFUartTerminalAdapter(uiTerminalControl, Uart);

@@ -151,7 +151,6 @@
         "UpdateMotors": {
           "Label": "UpdateMotors",
           "IsHidden": true,
-          "TODO:_REM": "This is the old BERO command line",
           "Compute": "$smarti.setMotor(1, $DriveL_GN $);\nsmarti.setMotor(2, $DriveR_GN_IV $);\n"
         },
         "UpdateEye": {
