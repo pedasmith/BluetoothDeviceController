@@ -67,14 +67,30 @@ namespace BluetoothDeviceController.Charts
                     {
                         str = ui8.ToString();
                     }
+                    else if (value is String asString)
+                    {
+                        str = asString;
+                    }
+                    else if (value is null)
+                    {
+                        str = ""; // empty notes are not strings.
+                    }
                     else
                     {
                         var dvalue = Convert.ToDouble(value);
                         str = dvalue.ToString("N3");
                     }
-                    if (property.Name == "EventTime")
+                    if (str == "")
+                    {
+
+                    }
+                    else if (property.Name == "EventTime")
                     {
                         retval += $"At {str}";
+                    }
+                    else if (property.Name == "Note")
+                    {
+                        retval += $"\n{str}";
                     }
                     else
                     {

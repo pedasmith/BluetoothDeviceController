@@ -140,6 +140,15 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="BCBasic\MockClasses.cs" />
+    <Compile Include="Beacons\BluetoothAddress.cs" />
+    <Compile Include="Beacons\Eddystone.cs" />
+    <Compile Include="Beacons\RuuviTag.cs" />
+    <Compile Include="Beacons\RuuvitagPage.xaml.cs">
+      <DependentUpon>RuuvitagPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Beacons\SimpleBeaconPage.xaml.cs">
+      <DependentUpon>SimpleBeaconPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BleEditor\BleCharacteristicControl.xaml.cs">
       <DependentUpon>BleCharacteristicControl.xaml</DependentUpon>
     </Compile>
@@ -402,6 +411,12 @@
     <Content Include="Assets\DevicePictures\RealityRobotics_Bero-350.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\DevicePictures\Ruuvi_RuuviTag-175.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\DevicePictures\Ruuvi_RuuviTag-350.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\DevicePictures\SlantRobotics-LittleBot-175.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -652,6 +667,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Assets\HelpFiles\Device_Espruino_Puckjs.md" />
+    <Content Include="Assets\HelpFiles\Device_Ruuvi_RuuviTag.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -784,6 +802,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Beacons\RuuvitagPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Beacons\SimpleBeaconPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="BleEditor\BleCharacteristicControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

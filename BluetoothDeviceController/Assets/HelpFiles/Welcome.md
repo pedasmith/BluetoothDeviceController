@@ -18,6 +18,7 @@ and more devices -- please leave feedback to request specific devices!
 ## Data sensors that can be read
 [![BBC micro:bit](../DevicePictures/Bbc_MicroBit-175.png)](Device_Bbc_MicroBit.md)
 [![Nordic Thingy](../DevicePictures/Nordic_Thingy-175.png)](Device_Nordic_Thingy.md)
+[![RuuviTag](../DevicePictures/Ruuvi_RuuviTag-175.png)](Device_Ruuvi_RuuviTag.md)
 [![Sensything](../DevicePictures/Protocentral_Sensything-175.png)](Device_Protocentral_Sensything.md)
 [![1352 Sensor Tag](../DevicePictures/TI_SensorTag_1352-175.png)](Device_TI_SensorTag_1352.md)
 [![Sensor Tag 1350](../DevicePictures/TI_SensorTag_1350-175.png)](Device_TI_SensorTag_1350.md)

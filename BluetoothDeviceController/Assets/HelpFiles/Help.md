@@ -48,6 +48,7 @@ Bulbs that are definitely not compatible include the C by GE bulb, the Philips H
 * [BBC micro:bit](Device_Bbc_MicroBit.md)
 * [Kano Coding Wand](Device_Kano_Wand.md)
 * [Nordic Thingy](Device_Nordic_Thingy.md)
+* [RuuviTag](Device_Ruuvi_RuuviTag.md)
 * [Sensything](Device_Protocentral_Sensything.md)
 * [TI SensorTag 1352](Device_TI_SensorTag_1352.md), also known as the Multi-Sensor
 * [TI SensorTag 1350 and 2650](Device_TI_SensorTag_1350.md)

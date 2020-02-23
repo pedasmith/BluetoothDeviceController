@@ -70,6 +70,44 @@ namespace BluetoothDeviceController.Names
         public double? chartMaxY { get; set; } = null;
         public double? chartDefaultMinY { get; set; } = null;
         public double? chartMinY { get; set; } = null;
+
+        public enum YMinMaxCombined { Combined, Separate };
+        public YMinMaxCombined chartYAxisCombined { get; set; } = YMinMaxCombined.Combined;
+        public double? chartDefaultMinY0 { get; set; } = null;
+        public double? chartDefaultMaxY0 { get; set; } = null;
+        public double? chartDefaultMinY1 { get; set; } = null;
+        public double? chartDefaultMaxY1 { get; set; } = null;
+        public double? chartDefaultMinY2 { get; set; } = null;
+        public double? chartDefaultMaxY2 { get; set; } = null;
+        public double? chartDefaultMinY3 { get; set; } = null;
+        public double? chartDefaultMaxY3 { get; set; } = null;
+        public double? chartDefaultMinY4 { get; set; } = null;
+        public double? chartDefaultMaxY4 { get; set; } = null;
+        public double? GetChartDefaultMinY(int lineIndex)
+        {
+            switch (lineIndex)
+            {
+                case 0: return chartDefaultMinY0 ?? chartDefaultMinY;
+                case 1: return chartDefaultMinY1 ?? chartDefaultMinY;
+                case 2: return chartDefaultMinY2 ?? chartDefaultMinY;
+                case 3: return chartDefaultMinY3 ?? chartDefaultMinY;
+                case 4: return chartDefaultMinY4 ?? chartDefaultMinY;
+            }
+            return chartDefaultMinY;
+        }
+        public double? GetChartDefaultMaxY(int lineIndex)
+        {
+            switch (lineIndex)
+            {
+                case 0: return chartDefaultMaxY0 ?? chartDefaultMaxY;
+                case 1: return chartDefaultMaxY1 ?? chartDefaultMaxY;
+                case 2: return chartDefaultMaxY2 ?? chartDefaultMaxY;
+                case 3: return chartDefaultMaxY3 ?? chartDefaultMaxY;
+                case 4: return chartDefaultMaxY4 ?? chartDefaultMaxY;
+            }
+            return chartDefaultMaxY;
+        }
+
         public Dictionary<string, ChartLineDefaults> chartLineDefaults = new Dictionary<string, ChartLineDefaults>()
         {
         };
@@ -77,30 +115,33 @@ namespace BluetoothDeviceController.Names
         /// <summary>
         /// Returns the correct min y for a chart. If there's a specified min, use that. If there's a default min, use that iff it's less than the potential min. Otherwise, use the potential min value.
         /// </summary>
-        public double ChartMinY(double potentialMinY)
+        public double ChartMinY(int lineIndex, double potentialMinY)
         {
+            // This is a definitive value and overrides all others.
             if (chartMinY.HasValue)
             {
                 return chartMinY.Value;
             }
-            if (chartDefaultMinY.HasValue)
+            double? value = GetChartDefaultMinY(lineIndex);
+            if (value.HasValue)
             {
-                return Math.Min(chartDefaultMinY.Value, potentialMinY);
+                return Math.Min(value.Value, potentialMinY);
             }
             return potentialMinY;
         }
         /// <summary>
         /// Returns the correct max y for a chart. If there's a specified max, use that. If there's a default max, use that iff it's less than the potential max. Otherwise, use the potential max value.
         /// </summary>
-        public double ChartMaxY(double potentialMaxY)
+        public double ChartMaxY(int lineIndex, double potentialMaxY)
         {
             if (chartMaxY.HasValue)
             {
                 return chartMaxY.Value;
             }
-            if (chartDefaultMaxY.HasValue)
+            double? value = GetChartDefaultMaxY(lineIndex);
+            if (value.HasValue)
             {
-                return Math.Max(chartDefaultMaxY.Value, potentialMaxY);
+                return Math.Max(value.Value, potentialMaxY);
             }
             return potentialMaxY;
         }

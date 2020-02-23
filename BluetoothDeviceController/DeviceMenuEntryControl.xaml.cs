@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothDeviceController.Beacons;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,27 +22,42 @@ namespace BluetoothDeviceController
 {
     public sealed partial class DeviceMenuEntryControl : UserControl
     {
-        public delegate void DeviceSettingsHandler(object source, DeviceInformationWrapper di);
+        public delegate void DeviceSettingsHandler(object source, DeviceInformationWrapper wrapper);
         public event DeviceSettingsHandler SettingsClick;
 
         const string OTHER = "🜹";
-        public DeviceInformationWrapper DI;
+        public DeviceInformationWrapper Wrapper;
 
-        public DeviceMenuEntryControl(DeviceInformationWrapper di, string name, Specialization specialization)
+        public DeviceMenuEntryControl(DeviceInformationWrapper wrapper, string name, Specialization specialization)
         {
             this.InitializeComponent();
-            DI = di;
+            Wrapper = wrapper;
+            Update(wrapper, name, specialization);
+        }
 
+        public void Update(DeviceInformationWrapper wrapper, string name, Specialization specialization)
+        { 
             uiNameBlock.Text = name;
             if (specialization == null)
             {
                 uiIconBlock.Text = OTHER;
                 uiIconBlock.FontSize = uiIconBlock.FontSize * 0.7; // make it smaller and less eye-catching
                 // BluetoothLE and Bluetooth -- replace the useless bits about the device type
-                var id = di.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "Address:");
-                id = id.Replace("Bluetooth#Bluetoothbc:83:85:22:5a:70-", "Address:");
-                id = id.Replace(":00000000:{00001101-0000-1000-8000-00805f9b34fb}", "");
-                uiDescriptionBlock.Text = id;
+                string description = "??--??";
+                if (wrapper.di != null)
+                {
+                    description = wrapper.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "Address:");
+                    description = description.Replace("Bluetooth#Bluetoothbc:83:85:22:5a:70-", "Address:");
+                    description = description.Replace(":00000000:{00001101-0000-1000-8000-00805f9b34fb}", "");
+                }
+                else if (wrapper.BleAdvert != null)
+                {
+                    var ble = wrapper.BleAdvert.BleAdvert;
+                    var addr = BluetoothAddress.AsString(ble.BluetoothAddress);
+                    var timestamp = ble.Timestamp.ToString("T");
+                    description = $"{addr} RSS {ble.RawSignalStrengthInDBm} at {timestamp}";
+                }
+                uiDescriptionBlock.Text = description;
             }
             else
             {
@@ -55,14 +71,18 @@ namespace BluetoothDeviceController
             }
         }
 
-        public void UpdateName(string name)
+        public void UpdateName(string text)
         {
-            uiNameBlock.Text = name;
+            uiNameBlock.Text = text;
+        }
+        public void UpdateDescription(string text)
+        {
+            uiDescriptionBlock.Text = text;
         }
 
         private void OnSettingsClick(object sender, RoutedEventArgs e)
         {
-            SettingsClick?.Invoke(this, DI);
+            SettingsClick?.Invoke(this, Wrapper);
         }
     }
 }
