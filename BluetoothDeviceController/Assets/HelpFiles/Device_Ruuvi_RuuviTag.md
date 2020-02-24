@@ -9,7 +9,7 @@ The Kickstarter version of the device is supported by this program.
 
 # Example
 
-![Environmental Data](../ScreenShots/Device_Ruuvi_RuuviTag-175.png)
+![Environmental Data](../ScreenShots/Device_Ruuvi_RuuviTag.png)
 
 # Connecting
 

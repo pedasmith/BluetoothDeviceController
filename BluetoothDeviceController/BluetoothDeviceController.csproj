@@ -142,6 +142,9 @@
     <Compile Include="BCBasic\MockClasses.cs" />
     <Compile Include="Beacons\BluetoothAddress.cs" />
     <Compile Include="Beacons\Eddystone.cs" />
+    <Compile Include="Beacons\EddystonePage.xaml.cs">
+      <DependentUpon>EddystonePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Beacons\RuuviTag.cs" />
     <Compile Include="Beacons\RuuvitagPage.xaml.cs">
       <DependentUpon>RuuvitagPage.xaml</DependentUpon>
@@ -633,6 +636,9 @@
     <Content Include="Assets\ScreenShots\Device_RealityRobotics_Bero.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ScreenShots\Device_Ruuvi_RuuviTag.PNG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ScreenShots\Device_SlantRobotics_LittleBot.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -802,6 +808,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Beacons\EddystonePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Beacons\RuuvitagPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

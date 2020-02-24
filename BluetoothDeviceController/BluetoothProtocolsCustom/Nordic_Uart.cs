@@ -43,7 +43,17 @@ namespace BluetoothDeviceController.BluetoothProtocolsCustom
             if (Device == null && DI != null)
             {
                 // Get the device information
-                Device = await BluetoothLEDevice.FromIdAsync(DI.Id);
+                try
+                {
+                    Device = await BluetoothLEDevice.FromIdAsync(DI.Id);
+                }
+                catch (Exception)
+                {
+                    // Couldn't convert the Id into a BLE device.
+                    // That might be because it's not a proper Id at all.
+                    // Just return
+                    return false; // If we can't get the data, then it's not a Uart!
+                }
             }
 
             DidInit = true;

@@ -17,6 +17,7 @@ namespace BluetoothDeviceController
         public enum BleAdvertisementType { None, BluetoothLE, Eddystone, RuuviTag }
         public BleAdvertisementType AdvertisementType { get; set; } = BleAdvertisementType.None;
         public BluetoothLEAdvertisementReceivedEventArgs BleAdvert { get; set; } = null;
+        public string EddystoneUrl { get; set; }
 
         public delegate void BluetoothLEAdvertisementEvent(BluetoothLEAdvertisementReceivedEventArgs data);
         public event BluetoothLEAdvertisementEvent UpdatedBleAdvertisement = null;
@@ -37,6 +38,15 @@ namespace BluetoothDeviceController
         public void Event(RuuviTag.Ruuvi_DataRecord results)
         {
             UpdatedRuuviAdvertisement?.Invoke(results);
+        }
+
+        public override string ToString()
+        {
+            var ble = BleAdvert;
+            var addr = BluetoothAddress.AsString(ble.BluetoothAddress);
+            var timestamp = ble.Timestamp.ToString("T");
+            var description = $"{addr} RSS {ble.RawSignalStrengthInDBm} at {timestamp}";
+            return description;
         }
 
 

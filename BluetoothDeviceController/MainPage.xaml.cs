@@ -47,8 +47,10 @@ namespace BluetoothDeviceController
 #endif
 
         const string ALARM = "⏰";
+        const string BEACON = "⛯"; // MAP SYMBOL FOR LIGHTHOUSE //"🖄";
         const string DATA = "📈"; //"🥼";
         const string LIGHT = "💡";
+        const string LIGHTNING = "🖄"; // envelope with lightning
         const string ROBOT = ""; // Part of the Segoe MDL2 Assets FontFamily
         const string UART = "🖀";
         const string WAND = "🖉"; // yeah, a pencil isn't reall a wand.
@@ -93,6 +95,10 @@ namespace BluetoothDeviceController
             new Specialization (typeof(SpecialtyPages.Nordic_ThingyPage), new string[] { "Thingy" }, DATA, "Nordic Thingy", "Nordic Semiconductor Thingy sensor platform"),
             new Specialization (typeof(SpecialtyPages.Vion_MeterPage), new string[] { "Vion Meter" }, DATA, "Vion Meter", "Vion smart multimeter"),
 
+            // RuuviTag and other EddyStone data sensors
+            new Specialization (typeof(Beacons.EddystonePage), new string[] { "Beacon" }, LIGHTNING, "", "Advertisement", Specialization.ParentScrollType.ChildHandlesScrolling),
+            new Specialization (typeof(Beacons.EddystonePage), new string[] { "Eddystone" }, BEACON, "", "Eddystone beacon", Specialization.ParentScrollType.ChildHandlesScrolling),
+            new Specialization (typeof(Beacons.RuuvitagPage), new string[] { "Ruuvi" }, DATA, "", "RuuviTag environmental sensor"),
         };
 
         public BleNames AllBleNames { get; set; }
@@ -311,6 +317,9 @@ namespace BluetoothDeviceController
                 {
                     case BleAdvertisementWrapper.BleAdvertisementType.RuuviTag:
                         _pageType = typeof(Beacons.RuuvitagPage);
+                        break;
+                    case BleAdvertisementWrapper.BleAdvertisementType.Eddystone:
+                        _pageType = typeof(Beacons.EddystonePage);
                         break;
                     default:
                         _pageType = typeof(Beacons.SimpleBeaconPage);
@@ -617,6 +626,78 @@ namespace BluetoothDeviceController
             uiNavigation.MenuItems.Insert(idx, menu);
         }
 
+        private string CustomizeWrapperFromAdvertisement(DeviceInformationWrapper wrapper, BluetoothLEAdvertisementReceivedEventArgs ble, string name)
+        {
+            // Lets's see if it's an Eddystone beacon...
+            // https://github.com/google/eddystone
+            // https://github.com/google/eddystone/blob/master/protocol-specification.md
+
+            foreach (var section in ble.Advertisement.DataSections)
+            {
+                switch (section.DataType)
+                {
+                    case 0x16: // 22=service data
+                        var dr = DataReader.FromBuffer(section.Data);
+                        dr.ByteOrder = ByteOrder.LittleEndian;
+                        var Service = dr.ReadUInt16();
+                        // https://github.com/google/eddystone
+                        if (Service == 0xFEAA) // An Eddystone type
+                        {
+                            //EddystoneFrameType = (byte)(0x0F & (dr.ReadByte() >> 4));
+                            var EddystoneFrameType = dr.ReadByte();
+                            const int TypeUID = 0x00;
+                            const int TypeURL = 0x10;
+                            const int TypeTLM = 0x20;
+                            const int TypeEID = 0x40;
+                            switch (EddystoneFrameType)
+                            {
+                                case TypeUID:
+                                    wrapper.BleAdvert.Event("UID: <data>");
+                                    break;
+                                case TypeTLM:
+                                    wrapper.BleAdvert.Event("TLM: <data>");
+                                    break;
+                                case TypeEID:
+                                    wrapper.BleAdvert.Event("EID: <data>");
+                                    break;
+                                case TypeURL: // 0x10: An Eddystone-URL
+                                    // https://github.com/google/eddystone/tree/master/eddystone-url
+                                    var result = BluetoothDeviceController.Beacons.Eddystone.ParseEddystoneUrlArgs(section.Data);
+                                    name = result.Success ? result.Url : "Invalid eddystone!";
+                                    wrapper.BleAdvert.EddystoneUrl = name;
+                                    if (result.Success && result.Url.StartsWith("https://ruu.vi/#"))
+                                    {
+                                        //foundValues.Add(AdvertisementType.RuuviTag);
+                                        var ruuvi = BluetoothDeviceController.Beacons.RuuviTag.ParseRuuviTag(result.Url);
+                                        ruuvi.Data.EventTime = DateTime.Now;
+                                        if (ruuvi.Success)
+                                        {
+                                            name = ruuvi.ToString(); // Make a new user-friendly string
+                                        }
+                                        wrapper.BleAdvert.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.RuuviTag;
+                                        // TODO: this is actually weird; it should be done somewhere else.
+                                        // This function is all about setting up the wrapper, not actually
+                                        // triggering events!
+                                        wrapper.BleAdvert.Event(ruuvi.Data);
+                                    }
+                                    else
+                                    {
+                                        wrapper.BleAdvert.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Eddystone;
+                                        name = $"Eddystone {result.Url}";
+                                        // TODO: this is actually weird; it should be done somewhere else.
+                                        // This function is all about setting up the wrapper, not actually
+                                        // triggering events!
+                                        wrapper.BleAdvert.Event(result.Url);
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+            return name;
+        }
+
         /// <summary>
         /// Called when a device is added and when it's updated
         /// </summary>
@@ -636,57 +717,27 @@ namespace BluetoothDeviceController
             {
                 name = id;
             }
-            const int SIGNAL_STRENGTH_THRESHOLD = -75;
+            const int SIGNAL_STRENGTH_THRESHOLD = -95;
             if (ble.RawSignalStrengthInDBm < SIGNAL_STRENGTH_THRESHOLD)
             {
                 return;
             }
 
-            // Lets's see if it's an Eddystone beacon...
-            foreach (var section in ble.Advertisement.DataSections)
-            {
-                switch (section.DataType)
-                {
-                    case 0x16: // 22=service data
-                        var dr = DataReader.FromBuffer(section.Data);
-                        dr.ByteOrder = ByteOrder.LittleEndian;
-                        var Service = dr.ReadUInt16();
-                        // https://github.com/google/eddystone
-                        if (Service == 0xFEAA) // An Eddystone type
-                        {
-                            //EddystoneFrameType = (byte)(0x0F & (dr.ReadByte() >> 4));
-                            var EddystoneFrameType = dr.ReadByte();
-                            switch (EddystoneFrameType)
-                            {
-                                case 0x10: // An Eddystone-URL
-                                    // https://github.com/google/eddystone/tree/master/eddystone-url
-                                    var result = BluetoothDeviceController.Beacons.Eddystone.ParseEddystoneUrlArgs(section.Data);
-                                    name = result.Success ? result.Url : "Invalid eddystone!";
-                                    if (result.Success && result.Url.StartsWith("https://ruu.vi/#"))
-                                    {
-                                        //foundValues.Add(AdvertisementType.RuuviTag);
-                                        var ruuvi = BluetoothDeviceController.Beacons.RuuviTag.ParseRuuviTag(result.Url);
-                                        ruuvi.Data.EventTime = DateTime.Now;
-                                        if (ruuvi.Success)
-                                        {
-                                            name = ruuvi.ToString(); // Make a new user-friendly string
-                                        }
-                                        wrapper.BleAdvert.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.RuuviTag;
-                                        wrapper.BleAdvert.Event(ruuvi.Data);
-                                    }
-                                    else
-                                    {
-                                        wrapper.BleAdvert.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Eddystone;
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                }
-
-            }
-
+            name = CustomizeWrapperFromAdvertisement(wrapper, ble, name);
             var specialization = Specialization.Get(Specializations, name);
+            if (specialization != null && string.IsNullOrEmpty(specialization.ShortDescription))
+            {
+                specialization.ShortDescription = wrapper.BleAdvert.ToString();
+            }
+            if (specialization == null)
+            {
+                specialization = Specialization.Get(Specializations, "Beacon");
+                specialization.ShortDescription = wrapper.BleAdvert.ToString();
+
+                // Not eddystone or ruuvitag. Let's do the event so it can be seen
+                // by the SimpleBeaconPage
+                wrapper.BleAdvert.Event(ble);
+            }
 
             if (idx != -1)
             {

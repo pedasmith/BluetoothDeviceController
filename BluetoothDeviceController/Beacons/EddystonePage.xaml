@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="BluetoothDeviceController.Beacons.SimpleBeaconPage"
+    x:Class="BluetoothDeviceController.Beacons.EddystonePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BluetoothDeviceController.Beacons"
@@ -11,16 +11,12 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock>Bluetooth Advertisement</TextBlock>
-        <!--
-        <TextBlock Grid.Row="1" Text="Time&#x09;Signal" />
-            -->
-        
-        <ScrollViewer Grid.Row="2">
+        <TextBlock IsTextSelectionEnabled="True"><Run>Eddystone URL: </Run><Run x:Name="uiUrl"></Run></TextBlock>
+
+        <ScrollViewer Grid.Row="1">
             <TextBlock x:Name="uiBeaconData" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
         </ScrollViewer>
     </Grid>
