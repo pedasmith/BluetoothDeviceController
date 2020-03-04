@@ -140,6 +140,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="BCBasic\MockClasses.cs" />
+    <Compile Include="Beacons\BleAdvertisementFormat.cs" />
     <Compile Include="Beacons\BluetoothAddress.cs" />
     <Compile Include="Beacons\Eddystone.cs" />
     <Compile Include="Beacons\EddystonePage.xaml.cs">
@@ -167,6 +168,8 @@
     <Compile Include="BleEditor\CharacteristicEditorControl.xaml.cs">
       <DependentUpon>CharacteristicEditorControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs" />
+    <Compile Include="BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
     <Compile Include="BluetoothProtocolsCustom\Nordic_Uart.cs" />
     <Compile Include="BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
     <Compile Include="BluetoothProtocols\WilliamWeilerEngineering_Skoobot.cs" />

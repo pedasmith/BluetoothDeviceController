@@ -21,9 +21,18 @@ namespace BluetoothDeviceController
 
         public delegate void BluetoothLEAdvertisementEvent(BluetoothLEAdvertisementReceivedEventArgs data);
         public event BluetoothLEAdvertisementEvent UpdatedBleAdvertisement = null;
+        // All wrappers use the same static Universal advertisement
+        public static event BluetoothLEAdvertisementEvent UpdatedUniversalBleAdvertisement = null;
         public void Event(BluetoothLEAdvertisementReceivedEventArgs results)
         {
-            UpdatedBleAdvertisement?.Invoke(results);
+            if (UpdatedBleAdvertisement == null)
+            {
+                UpdatedUniversalBleAdvertisement?.Invoke(results);
+            }
+            else
+            {
+                UpdatedBleAdvertisement.Invoke(results);
+            }
         }
 
         public delegate void BluetoothEddystoneAdvertisementEvent(string data);
@@ -42,11 +51,7 @@ namespace BluetoothDeviceController
 
         public override string ToString()
         {
-            var ble = BleAdvert;
-            var addr = BluetoothAddress.AsString(ble.BluetoothAddress);
-            var timestamp = ble.Timestamp.ToString("T");
-            var description = $"{addr} RSS {ble.RawSignalStrengthInDBm} at {timestamp}";
-            return description;
+            return BleAdvertisementFormat.AsDescription(BleAdvert);
         }
 
 

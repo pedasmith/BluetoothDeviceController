@@ -96,7 +96,7 @@ namespace BluetoothDeviceController
             new Specialization (typeof(SpecialtyPages.Vion_MeterPage), new string[] { "Vion Meter" }, DATA, "Vion Meter", "Vion smart multimeter"),
 
             // RuuviTag and other EddyStone data sensors
-            new Specialization (typeof(Beacons.EddystonePage), new string[] { "Beacon" }, LIGHTNING, "", "Advertisement", Specialization.ParentScrollType.ChildHandlesScrolling),
+            new Specialization (typeof(Beacons.SimpleBeaconPage), new string[] { "Beacon" }, LIGHTNING, "", "Advertisement", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(Beacons.EddystonePage), new string[] { "Eddystone" }, BEACON, "", "Eddystone beacon", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(Beacons.RuuvitagPage), new string[] { "Ruuvi" }, DATA, "", "RuuviTag environmental sensor"),
         };
@@ -313,17 +313,22 @@ namespace BluetoothDeviceController
             else if (Preferences.Scope == UserPreferences.SearchScope.Bluetooth_Beacons)
             {
                 var ble = wrapper.BleAdvert;
-                switch (ble.AdvertisementType)
+                if (ble != null)
                 {
-                    case BleAdvertisementWrapper.BleAdvertisementType.RuuviTag:
-                        _pageType = typeof(Beacons.RuuvitagPage);
-                        break;
-                    case BleAdvertisementWrapper.BleAdvertisementType.Eddystone:
-                        _pageType = typeof(Beacons.EddystonePage);
-                        break;
-                    default:
-                        _pageType = typeof(Beacons.SimpleBeaconPage);
-                        break;
+                    switch (ble.AdvertisementType)
+                    {
+                        case BleAdvertisementWrapper.BleAdvertisementType.RuuviTag:
+                            _pageType = typeof(Beacons.RuuvitagPage);
+                            break;
+                        case BleAdvertisementWrapper.BleAdvertisementType.Eddystone:
+                            _pageType = typeof(Beacons.EddystonePage);
+                            scrollType = Specialization.ParentScrollType.ChildHandlesScrolling;
+                            break;
+                        default:
+                            _pageType = typeof(Beacons.SimpleBeaconPage);
+                            scrollType = Specialization.ParentScrollType.ChildHandlesScrolling;
+                            break;
+                    }
                 }
             }
             else if (preftype == UserPreferences.DisplayPreference.Specialized_Display)
@@ -626,117 +631,44 @@ namespace BluetoothDeviceController
             uiNavigation.MenuItems.Insert(idx, menu);
         }
 
-        private string CustomizeWrapperFromAdvertisement(DeviceInformationWrapper wrapper, BluetoothLEAdvertisementReceivedEventArgs ble, string name)
-        {
-            // Lets's see if it's an Eddystone beacon...
-            // https://github.com/google/eddystone
-            // https://github.com/google/eddystone/blob/master/protocol-specification.md
 
-            foreach (var section in ble.Advertisement.DataSections)
-            {
-                switch (section.DataType)
-                {
-                    case 0x16: // 22=service data
-                        var dr = DataReader.FromBuffer(section.Data);
-                        dr.ByteOrder = ByteOrder.LittleEndian;
-                        var Service = dr.ReadUInt16();
-                        // https://github.com/google/eddystone
-                        if (Service == 0xFEAA) // An Eddystone type
-                        {
-                            //EddystoneFrameType = (byte)(0x0F & (dr.ReadByte() >> 4));
-                            var EddystoneFrameType = dr.ReadByte();
-                            const int TypeUID = 0x00;
-                            const int TypeURL = 0x10;
-                            const int TypeTLM = 0x20;
-                            const int TypeEID = 0x40;
-                            switch (EddystoneFrameType)
-                            {
-                                case TypeUID:
-                                    wrapper.BleAdvert.Event("UID: <data>");
-                                    break;
-                                case TypeTLM:
-                                    wrapper.BleAdvert.Event("TLM: <data>");
-                                    break;
-                                case TypeEID:
-                                    wrapper.BleAdvert.Event("EID: <data>");
-                                    break;
-                                case TypeURL: // 0x10: An Eddystone-URL
-                                    // https://github.com/google/eddystone/tree/master/eddystone-url
-                                    var result = BluetoothDeviceController.Beacons.Eddystone.ParseEddystoneUrlArgs(section.Data);
-                                    name = result.Success ? result.Url : "Invalid eddystone!";
-                                    wrapper.BleAdvert.EddystoneUrl = name;
-                                    if (result.Success && result.Url.StartsWith("https://ruu.vi/#"))
-                                    {
-                                        //foundValues.Add(AdvertisementType.RuuviTag);
-                                        var ruuvi = BluetoothDeviceController.Beacons.RuuviTag.ParseRuuviTag(result.Url);
-                                        ruuvi.Data.EventTime = DateTime.Now;
-                                        if (ruuvi.Success)
-                                        {
-                                            name = ruuvi.ToString(); // Make a new user-friendly string
-                                        }
-                                        wrapper.BleAdvert.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.RuuviTag;
-                                        // TODO: this is actually weird; it should be done somewhere else.
-                                        // This function is all about setting up the wrapper, not actually
-                                        // triggering events!
-                                        wrapper.BleAdvert.Event(ruuvi.Data);
-                                    }
-                                    else
-                                    {
-                                        wrapper.BleAdvert.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Eddystone;
-                                        name = $"Eddystone {result.Url}";
-                                        // TODO: this is actually weird; it should be done somewhere else.
-                                        // This function is all about setting up the wrapper, not actually
-                                        // triggering events!
-                                        wrapper.BleAdvert.Event(result.Url);
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                }
-            }
-            return name;
-        }
+
 
         /// <summary>
         /// Called when a device is added and when it's updated
         /// </summary>
         /// <param name="wrapper"></param>
-        private void AddDeviceBle(DeviceInformationWrapper wrapper)
+        private void AddOrUpdateDeviceBle(DeviceInformationWrapper wrapper)
         {
-            int idx = -1;
-            string name = "???";
-            string id = "??-??";
-            var ble = wrapper.BleAdvert.BleAdvert;
-
-            if (ble == null) return;
-            idx = FindDeviceBle(ble);
-            name = ble.Advertisement.LocalName;
-            id = ble.BluetoothAddress.ToString("X");
-            if (string.IsNullOrEmpty (name))
-            {
-                name = id;
-            }
             const int SIGNAL_STRENGTH_THRESHOLD = -95;
-            if (ble.RawSignalStrengthInDBm < SIGNAL_STRENGTH_THRESHOLD)
+
+            var bleAdvert = wrapper.BleAdvert.BleAdvert;
+            if (bleAdvert == null) return;
+            if (bleAdvert.RawSignalStrengthInDBm < SIGNAL_STRENGTH_THRESHOLD)
             {
                 return;
             }
 
-            name = CustomizeWrapperFromAdvertisement(wrapper, ble, name);
+            int idx = FindDeviceBle(bleAdvert);
+
+            var (name, id, description) = BleAdvertisementFormat.GetBleName(wrapper, bleAdvert);
+
+
             var specialization = Specialization.Get(Specializations, name);
             if (specialization != null && string.IsNullOrEmpty(specialization.ShortDescription))
             {
-                specialization.ShortDescription = wrapper.BleAdvert.ToString();
+                specialization.ShortDescription = description;
             }
             if (specialization == null)
             {
-                specialization = Specialization.Get(Specializations, "Beacon");
-                specialization.ShortDescription = wrapper.BleAdvert.ToString();
+                specialization = Specialization.Get(Specializations, "Beacon"); // This will get the SimpleBeaconPage
+                specialization.ShortDescription = description;
 
                 // Not eddystone or ruuvitag. Let's do the event so it can be seen
-                // by the SimpleBeaconPage
-                wrapper.BleAdvert.Event(ble);
+                // by the SimpleBeaconPage. 
+                // There's one wrapper per device; only the navigated-to page will have
+                // added an event to any wrapper, anywhere to get the updates.
+                wrapper.BleAdvert.Event(bleAdvert);
             }
 
             if (idx != -1)
@@ -943,7 +875,7 @@ namespace BluetoothDeviceController
             var diwrapper = new DeviceInformationWrapper(wrapper);
 
             await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
-                () => { AddDeviceBle(diwrapper); }
+                () => { AddOrUpdateDeviceBle(diwrapper); }
                 );
         }
 

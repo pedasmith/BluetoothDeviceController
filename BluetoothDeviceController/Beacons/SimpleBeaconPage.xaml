@@ -13,6 +13,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <TextBlock>Bluetooth Advertisement</TextBlock>
@@ -23,5 +24,9 @@
         <ScrollViewer Grid.Row="2">
             <TextBlock x:Name="uiBeaconData" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
         </ScrollViewer>
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <CheckBox Content="Full details" IsChecked="False" x:Name="uiFullDetails" IsThreeState="False" />
+            <CheckBox Content="Track all" IsChecked="True" x:Name="uiTrackAll" IsThreeState="False" />
+        </StackPanel>
     </Grid>
 </Page>

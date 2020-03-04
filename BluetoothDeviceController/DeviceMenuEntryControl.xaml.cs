@@ -34,14 +34,19 @@ namespace BluetoothDeviceController
             Wrapper = wrapper;
             Update(wrapper, name, specialization);
         }
-
+        int NUpdates = 0;
         public void Update(DeviceInformationWrapper wrapper, string name, Specialization specialization)
-        { 
+        {
+            NUpdates++;
             uiNameBlock.Text = name;
             if (specialization == null)
             {
                 uiIconBlock.Text = OTHER;
-                uiIconBlock.FontSize = uiIconBlock.FontSize * 0.7; // make it smaller and less eye-catching
+                if (NUpdates == 1)
+                {
+                    // Make it smaller and less appealing, but only the first time.
+                    uiIconBlock.FontSize = uiIconBlock.FontSize * 0.7; 
+                }
                 // BluetoothLE and Bluetooth -- replace the useless bits about the device type
                 string description = "??--??";
                 if (wrapper.di != null)
@@ -62,6 +67,10 @@ namespace BluetoothDeviceController
             else
             {
                 uiIconBlock.Text = specialization.Icon;
+                if (string.IsNullOrEmpty(specialization.ShortDescription))
+                {
+                    ;
+                }
                 uiDescriptionBlock.Text = specialization.ShortDescription;
                 uiNameBlock.FontWeight = FontWeights.Bold;
 
