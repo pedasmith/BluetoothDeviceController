@@ -111,7 +111,7 @@ namespace BluetoothDeviceController.Beacons
                 return (name, id, description);
             }
             name = bleAdvert.Advertisement.LocalName;
-            id = bleAdvert.BluetoothAddress.ToString("X");
+            id = BluetoothAddress.AsString(bleAdvert.BluetoothAddress);
             if (EmptyOrAllNull(name))
             {
                 // BAD: There's a device where the LocalName is 13 NUL chars!
@@ -126,8 +126,9 @@ namespace BluetoothDeviceController.Beacons
         public static string AsDescription (BluetoothLEAdvertisementReceivedEventArgs bleAdvert)
         {
             var addr = BluetoothAddress.AsString(bleAdvert.BluetoothAddress);
-            var timestamp = bleAdvert.Timestamp.ToString("T");
-            var description = $"{addr} RSS {bleAdvert.RawSignalStrengthInDBm} at {timestamp}";
+            var time24 = bleAdvert.Timestamp.ToString("HH:mm:ss.f");
+
+            var description = $"{addr} at {time24} RSS {bleAdvert.RawSignalStrengthInDBm}";
             return description;
         }
     }

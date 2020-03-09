@@ -295,6 +295,7 @@
     <Compile Include="SpecialtyPages\WilliamWeilerEngineering_SkoobotPage.xaml.cs">
       <DependentUpon>WilliamWeilerEngineering_SkoobotPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserBeaconPreferences.cs" />
     <Compile Include="UserPreferenceControl.xaml.cs">
       <DependentUpon>UserPreferenceControl.xaml</DependentUpon>
     </Compile>

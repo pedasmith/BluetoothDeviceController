@@ -9,7 +9,7 @@ using Windows.Storage.Streams;
 
 namespace BluetoothDeviceController.BluetoothDefinitionLanguage
 {
-    class BluetoothCompanyIdentifier
+    public class BluetoothCompanyIdentifier
     {
         // From https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers 2015-11-10
         // From https://www.bluetooth.com/specifications/assigned-numbers/company-identifiers/ 2020
@@ -718,8 +718,10 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             return $"CompanyId={companyId}";
         }
 
-        public static string ParseManufacturerData(BluetoothLEAdvertisementDataSection section, sbyte txPower)
+        public enum CommonManufacturerType {  Other, Apple10}
+        public static (string result, CommonManufacturerType) ParseManufacturerData(BluetoothLEAdvertisementDataSection section, sbyte txPower)
         {
+            CommonManufacturerType manufacturerType = CommonManufacturerType.Other;
             try
             {
                 var bytes = section.Data.ToArray();
@@ -741,6 +743,10 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                             sb.Append("\n");
                             displayAsHex = false; // we have a better display
                         }
+                        else if (appleIBeacon.IsApple10)
+                        {
+                            manufacturerType = CommonManufacturerType.Apple10;
+                        }
                         break;
                 }
                 if (displayAsHex)
@@ -753,11 +759,11 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                     }
                     sb.Append('\n');
                 }
-                return sb.ToString();
+                return (sb.ToString(), manufacturerType);
             }
             catch (Exception)
             {
-                return "??\n";
+                return ("??\n", manufacturerType);
             }
         }
 
@@ -765,11 +771,13 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
         {
             public const short AppleCompanyId = 0x4c; // aka 76
             public const byte IBeaconType = 0x02;
+            public const byte ApplePhoneType = 0x10;
             public const byte IBeaconLen = 0x15;
             public ushort CompanyId { get; set; }
             public byte BeaconType { get; set; }
             public byte BeaconLen { get; set; }
             public bool IsValid {  get { return BeaconType == IBeaconType && BeaconLen >= IBeaconLen; } }
+            public bool IsApple10 {  get { return BeaconType == ApplePhoneType; } }
             public Guid BeaconGuid { get; set; }
             public UInt16 Major { get; set; }
             public UInt16 Minor { get; set; }
@@ -824,6 +832,12 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                             retval.MeasuredPower = (sbyte)dr.ReadByte();
                             retval.MeasuredPower = RSSI;
                             break;
+                        case 0x10:
+                        case 0x12:
+                            // TODO: how to handle a typical phone?
+                            break;
+                        default:
+                            break; //TODO: what value here?
                     }
                 }
                 catch (Exception)

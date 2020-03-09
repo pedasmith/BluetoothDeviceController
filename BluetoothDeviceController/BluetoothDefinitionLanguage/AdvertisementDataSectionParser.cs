@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Storage.Streams;
 
 namespace BluetoothDeviceController.BluetoothDefinitionLanguage
 {
@@ -63,24 +64,38 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             }
         }
 
+        public static string ParseAppearance(BluetoothLEAdvertisementDataSection section)
+        {
+            var dr = DataReader.FromBuffer(section.Data);
+            dr.ByteOrder = ByteOrder.LittleEndian; // bluetooth is little-endian by default
+            if (dr.UnconsumedBufferLength < 2)
+            {
+                return $"?len={dr.UnconsumedBufferLength}";
+            }
+            var appearance = dr.ReadUInt16();
+            var retval = BluetoothAppearance.AppearaceToString(appearance);
+            return retval;
+        }
+
         public static sbyte  ParseTxPowerLevel(BluetoothLEAdvertisementDataSection section)
         {
             var db = (sbyte)(section.Data.ToArray()[0]);
             return db;
         }
 
-        public static string Parse(BluetoothLEAdvertisementDataSection section, sbyte txPower)
+        public static (string result, BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType) Parse(BluetoothLEAdvertisementDataSection section, sbyte txPower, string indent)
         {
             string str = "??";
             byte b = section.DataType;
             DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value
+            BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
             try
             {
                 var printAsHex = false;
                 switch (dtv)
                 {
                     case DataTypeValue.ManufacturerData:
-                        str = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower);
+                        (str, manufacturerType) = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower);
                         break;
                     case DataTypeValue.Flags:
                         str = ParseFlags(section);
@@ -122,7 +137,8 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 var result = ValueParser.Parse(section.Data, "BYTES|HEX");
                 str = $"error section {section.DataType} data={result.AsString}\n";
             }
-            return str;
+            if (!string.IsNullOrWhiteSpace(str)) str = indent + str;
+            return (str, manufacturerType);
         }
 
         /// <summary>

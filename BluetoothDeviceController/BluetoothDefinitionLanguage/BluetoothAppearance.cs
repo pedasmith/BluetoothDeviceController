@@ -9,6 +9,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
     public class BluetoothAppearance
     {
         // Data from https://www.bluetooth.com/specifications/gatt/characteristics/
+        // https://www.bluetooth.com/wp-content/uploads/Sitecore-Media-Library/Gatt/Xml/Characteristics/org.bluetooth.characteristic.gap.appearance.xml
         // Characteristic 0x2A01, Appearance
         // Values are automatically converted from the XML (plus hand corrections)
         public enum Appearance
@@ -77,13 +78,37 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
         {
             try
             {
+                // My "Gems" activity tracker has appearance 0x1234 (!)
+                // which is not a valid appearance. Incorrect appearance
+                // values can be caught by seeing if the resulting string
+                // is in fact all-digits.
+
                 Appearance a = (Appearance)appearance;
-                return a.ToString();
+                var astr = a.ToString();
+                if (IsAllDigits (astr))
+                {
+                    astr = $"?{appearance}";
+                }
+                else
+                {
+                    ; // just here for a nice debugger breakpoint.
+                }
+                return astr;
             }
             catch (Exception)
             {
+                ;
             }
-            return $"{appearance}";
+            return $"??{appearance}";
+        }
+
+        private static bool IsAllDigits(string str)
+        {
+            foreach (var ch in str)
+            {
+                if (ch < '0' || ch > '9') return false;
+            }
+            return true;
         }
 #if NEVER_EER_DEFINED
 

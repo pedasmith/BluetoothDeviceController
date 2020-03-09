@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using Windows.UI.WebUI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -50,11 +51,13 @@ namespace BluetoothDeviceController
         /// <summary>
         /// Adds a page to the dock. It might already have a spot in the dock.
         /// Each page is wrapped in a ViewBox zooming viewer and added to the uiDock panel
+        /// The dock is made visible.
         /// </summary>
         /// <param name="page"></param>
         public void AddPage(Page page)
         {
             if (!(page is HasId)) return;
+            this.Visibility = Visibility.Visible;
             var id = (page as HasId).GetId();
             var index = FindPage(id);
             if (index >= 0)
@@ -75,6 +78,10 @@ namespace BluetoothDeviceController
         public void DeletePage(PageDockAdapterControl page)
         {
             uiDock.Items.Remove(page);
+            if (uiDock.Items.Count == 0)
+            {
+                this.Visibility = Visibility.Collapsed;
+            }
         }
 
         /// <summary>

@@ -165,8 +165,8 @@ namespace BluetoothDeviceController
             {
                 readSelection = UserPreferences.ReadSelection.Name; // Don't automaticaly get everything
             }
-            StartSearch(readSelection);
             NavView_Navigate("Help", "welcome.md", null);
+            StartSearch(readSelection);
             uiDock.DockParent = this;
         }
 
@@ -293,6 +293,20 @@ namespace BluetoothDeviceController
             }
         }
 
+        private void SetParentScrolltype(Specialization.ParentScrollType scrollType)
+        {
+            switch (scrollType)
+            {
+                case Specialization.ParentScrollType.ParentShouldScroll:
+                    uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                    uiPageScroller.VerticalScrollMode = ScrollMode.Enabled;
+                    break;
+                case Specialization.ParentScrollType.ChildHandlesScrolling:
+                    uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+                    uiPageScroller.VerticalScrollMode = ScrollMode.Disabled;
+                    break;
+            }
+        }
 
         /// <summary>
         /// Primary call to show a page for a specific bluetooth device.
@@ -330,6 +344,11 @@ namespace BluetoothDeviceController
                             break;
                     }
                 }
+                else
+                {
+                    _pageType = typeof(Beacons.SimpleBeaconPage);
+                    scrollType = Specialization.ParentScrollType.ChildHandlesScrolling;
+                }
             }
             else if (preftype == UserPreferences.DisplayPreference.Specialized_Display)
             {
@@ -355,17 +374,7 @@ namespace BluetoothDeviceController
                 _pageType = typeof(BleEditor.BleEditorPage);
                 // There's also a device information page, but it's not really useful at all.
             }
-            switch (scrollType)
-            {
-                case Specialization.ParentScrollType.ParentShouldScroll:
-                    uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
-                    uiPageScroller.VerticalScrollMode = ScrollMode.Enabled;
-                    break;
-                case Specialization.ParentScrollType.ChildHandlesScrolling:
-                    uiPageScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
-                    uiPageScroller.VerticalScrollMode = ScrollMode.Disabled;
-                    break;
-            }
+            SetParentScrolltype(scrollType);
             // Get the page type before navigation so you can prevent duplicate
             // entries in the backstack. Except that I use the same page type for e.g. different Thingy devices.
             var preNavPageType = ContentFrame.CurrentSourcePageType;
@@ -425,8 +434,7 @@ namespace BluetoothDeviceController
             var page = ContentFrame.Content as Page;
             if (page == null) return; // should never happen
             ContentFrame.Content = null; // remove the old page
-            var dock = uiDock;
-            dock.AddPage(page); // the dock is smart enough to ignore pages that can't be docked.
+            uiDock.AddPage(page); // the dock is smart enough to ignore pages that can't be docked.
 
             var handleStatus = page as SpecialtyPages.ISetHandleStatus;
             handleStatus?.SetHandleStatus(null); // stop handling the status.
@@ -666,8 +674,6 @@ namespace BluetoothDeviceController
 
                 // Not eddystone or ruuvitag. Let's do the event so it can be seen
                 // by the SimpleBeaconPage. 
-                // There's one wrapper per device; only the navigated-to page will have
-                // added an event to any wrapper, anywhere to get the updates.
                 wrapper.BleAdvert.Event(bleAdvert);
             }
 
@@ -749,6 +755,21 @@ namespace BluetoothDeviceController
         public event EventHandler DeviceEnumerationChanged;
         public void StartSearch(UserPreferences.ReadSelection readType)
         {
+            switch (Preferences.Scope)
+            {
+                case UserPreferences.SearchScope.Bluetooth_Beacons:
+                    // Navigate to a beacons page
+                    // tODO: navigate
+                    var _page = typeof(Beacons.SimpleBeaconPage);
+                    var di = new DeviceInformationWrapper((BleAdvertisementWrapper)null);
+                    di.BeaconPreferences = new UserBeaconPreferences()
+                    {
+                        DefaultTrackAll = true,
+                    };
+                    SetParentScrolltype(Specialization.ParentScrollType.ChildHandlesScrolling); // SimpleBeachPage knows how to scroll itself.
+                    ContentFrame.Navigate(_page, di);
+                    break;
+            }
             ClearDevices();
             StartWatch();
             Task searchTask = null;
