@@ -1,0 +1,176 @@
+{
+  "AllDevices": [
+    {
+      "Name": "Fitness",
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: Fitness\\0",
+                "Fitness\\0"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  2C 01 44 01 00 00 F4 01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 94%",
+                "94"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000d0ff-3c17-d293-8e48-14fe2e4da212",
+          "Name": "OTA_SERVICE",
+          "Characteristics": [
+            {
+              "UUID": "0000ffd1-0000-1000-8000-00805f9b34fb",
+              "Name": "OTA_WRITE",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsWriteWithoutResponse": true
+            },
+            {
+              "UUID": "0000ffd2-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  78 02 B7 08 52 1C"
+              ]
+            },
+            {
+              "UUID": "0000ffd3-0000-1000-8000-00805f9b34fb",
+              "Name": "OTA_READ_PATCH",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  19 3E"
+              ]
+            },
+            {
+              "UUID": "0000ffd4-0000-1000-8000-00805f9b34fb",
+              "Name": "READ_APP",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  C1 04"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "000055ff-0000-1000-8000-00805f9b34fb",
+          "Name": "SERVICE_NO1",
+		  "REM":"https://github.com/krctech9999/boysrun/blob/38506088b4438d8f174b4775fbfcd9c93e3108ad/src/com/app/boysrun/handle/UUID_HANDLE.java",
+          "Characteristics": [
+            {
+              "UUID": "000033f1-0000-1000-8000-00805f9b34fb",
+			        "REM": "CHARC0 aka getCharcWriteUUID",
+              "Name": "Control",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 00 00 40 00 00 00 08 00 00 00 01 00 40",
+                "getCmdBytes type=M04:  A4 B1 B2 or maybe A4 B1 A1 B2??",
+                "A1 is Read The Bluetooth version number eg RM07K5AC001217",
+                "A2 is Battery eg A2 50 FF FF FF FF FF FF FF but just the first byte is valid",
+                "A3 is set time YY YY MM DD HH MM SS eg A3 07 E4 03 09 15 32 00",
+                "A3 example https://github.com/fobsoft/Gadgetbridge/blob/e11e1105465a8ece461075d21ac53c024b78ffaf/app/src/main/java/nodomain/freeyourgadget/gadgetbridge/service/devices/no1f1/No1F1Support.java",
+                "AD is Factory Reset",
+                "AE is eg 78 02 B7 08 52 1C",
+                "xxA4 is Turn on the pedometer function",
+                "B1 is Read the pedometer data for the current hour and accumulate the data to the current hour, today's data",
+                "B2 is Read all data for 7 days",
+                "C1 is eg 00 ",
+                "C3 is eg 00",
+                "D8 is eg 00 00",
+                "E8 is Reset"
+              ]
+            },
+            {
+              "UUID": "000033f2-0000-1000-8000-00805f9b34fb",
+			        "REM": "CHARC1 aka getCharcReadUUID",
+              "Name": "Measure",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsNotify": true,
+			  "ExampleData": [
+			  "From a B1: B1 07 E3 0B 13 05 00 00 00 00 00 00",
+			  "Another  : B1 07 E3 0B 13 06 02 07 00 00 02 07  where steps=519 km=.0 kcal=11",
+			  "Steps is data[6] and data[7]"
+			  ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fee7-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Tencent Holdings Limited.",
+          "Name": "Maybe-Wechat",
+          "REM": "https://github.com/skywang12345/bt_decompile/blob/a18b03ff5afdfe760531008567986da1e63b3a09/src/com/example/airsync_test/ble/WechatGattAttributes.java",
+          "Characteristics": [
+            {
+              "UUID": "0000fec9-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown0",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  78 02 B7 08 52 1C"
+              ]
+            },
+            {
+              "UUID": "0000fec7-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsWrite": true
+            },
+            {
+              "UUID": "0000fec8-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsIndicate": true
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-78:02:b7:08:52:1c\nCanPair:True IsPaired:False"
+    }
+  ]
+}

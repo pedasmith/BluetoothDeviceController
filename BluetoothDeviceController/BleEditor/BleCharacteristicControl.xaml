@@ -19,6 +19,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="5" />
         </Grid.RowDefinitions>
         
@@ -57,7 +58,9 @@
             </Grid>
             <TextBlock Tapped="OnReadTapped" x:Name="uiReadFlag" Text="🅁" ToolTipService.ToolTip="Can Read" />
             <TextBlock Tapped="OnWriteTapped" x:Name="uiWriteFlag" Text="🅆" ToolTipService.ToolTip="Can Write"/>
+            <TextBlock Tapped="OnIncrementWriteTapped" x:Name="uiIncrementWriteFlag" Text="⊞" ToolTipService.ToolTip="Increment and write"/>
             <TextBlock Tapped="OnWriteWithResponseTapped" x:Name="uiWriteWithResponseFlag" Text="🆆" FontSize="14" Padding="0,4,0,0"  ToolTipService.ToolTip="Can write with response"/>
+            <TextBlock Tapped="OnIncrementWriteWithResponseTapped" x:Name="uiIncrementWriteWithResponseFlag" Text="⊞" ToolTipService.ToolTip="Increment and write"/>
             <Grid Tapped="OnIndicateTapped">
                 <TextBlock x:Name="uiIndicateFlag" Text="🅸" FontSize="14" Padding="0,4,0,0" ToolTipService.ToolTip="Can indicate"/>
                 <TextBlock x:Name="uiIndicateOnFlag" Text="⌁" Padding="0,13,0,0" FontSize="16" ToolTipService.ToolTip="Indicate" />
@@ -78,8 +81,19 @@
         
         <!-- The ID + name + user description of the characteristic  (if any) -->
         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="uiInfo" IsTextSelectionEnabled="True" FontSize="12" Padding="0,0,0,10" />
+
+
+
+        <ListView Grid.Row="2" ItemsSource="{Binding Commands}" SelectionMode="None">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <local:CommandControl />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
         <!--
-        <Line Stroke="Black" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" X1="0" X2="200" Y1="2" Y2="2"   />
+        <Line Stroke="Black" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" X1="0" X2="200" Y1="2" Y2="2"   />
         -->
 
     </Grid>

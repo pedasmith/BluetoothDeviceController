@@ -2,9 +2,11 @@
 using BluetoothDeviceController.Names;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
@@ -21,7 +23,12 @@ using Windows.UI.Xaml.Navigation;
 
 namespace BluetoothDeviceController.BleEditor
 {
-    public sealed partial class BleCharacteristicControl : UserControl
+    public interface IWriteCharacteristic
+    { 
+        Task<GattWriteResult> DoWriteString(string str);
+    }
+
+    public sealed partial class BleCharacteristicControl : UserControl, IWriteCharacteristic
     {
         //string On = "⌁"; // Electrical arrow u+2301
         //string Notify = "🄽"; // Squared latin capital letter n u+1f13d
@@ -45,17 +52,19 @@ namespace BluetoothDeviceController.BleEditor
         IList<string> ArchivedData = new List<String>();
         string DefaultFormat = "BYTES|HEX";
         string PreferredFormat = null;
-        enum ValueShowMethod {Overwrite, Append };
+        enum ValueShowMethod { Overwrite, Append };
         ValueShowMethod CurrValueShowMethod = BleCharacteristicControl.ValueShowMethod.Overwrite;
+        public ObservableCollection<Command> Commands { get; } = new ObservableCollection<Command>();
 
         public BleCharacteristicControl(NameDevice device, GattDeviceService service, GattCharacteristic characteristic)
         {
+            this.DataContext = this;
             this.InitializeComponent();
             if (device == null)
             {
                 ;
             }
-            Loaded += async (s,e) => await SetupAsync(device, service, characteristic);
+            Loaded += async (s, e) => await SetupAsync(device, service, characteristic);
         }
 
 
@@ -64,15 +73,24 @@ namespace BluetoothDeviceController.BleEditor
         {
             Service = service;
             Characteristic = characteristic;
-
             NC = BleNames.Get(device, service, characteristic);
+
+            Commands.Clear();
+            foreach (var (_,command) in NC.Commands)
+            {
+                command.WriteCharacteristic = this;
+                Commands.Add(command);
+            }
+
 
             var props = characteristic.CharacteristicProperties;
             uiNotifyFlag.Visibility = props.HasFlag(GattCharacteristicProperties.Notify) ? Visibility.Visible : Visibility.Collapsed;
             uiNotifyOnFlag.Visibility = Visibility.Collapsed;
             uiReadFlag.Visibility = props.HasFlag(GattCharacteristicProperties.Read) ? Visibility.Visible : Visibility.Collapsed;
             uiWriteFlag.Visibility = props.HasFlag(GattCharacteristicProperties.WriteWithoutResponse) ? Visibility.Visible : Visibility.Collapsed;
+            uiIncrementWriteFlag.Visibility = uiWriteFlag.Visibility;
             uiWriteWithResponseFlag.Visibility = props.HasFlag(GattCharacteristicProperties.Write) ? Visibility.Visible : Visibility.Collapsed;
+            uiIncrementWriteWithResponseFlag.Visibility = uiWriteWithResponseFlag.Visibility;
             uiIndicateFlag.Visibility = props.HasFlag(GattCharacteristicProperties.Indicate) ? Visibility.Visible : Visibility.Collapsed;
             uiIndicateOnFlag.Visibility = Visibility.Collapsed;
 
@@ -84,14 +102,14 @@ namespace BluetoothDeviceController.BleEditor
             uiWritableAuxilariesFlag.Visibility = props.HasFlag(GattCharacteristicProperties.WritableAuxiliaries) ? Visibility.Visible : Visibility.Collapsed;
 
             // Set the little edit marker
-            uiEditFlag.Visibility = (props.HasFlag (GattCharacteristicProperties.Write)
+            uiEditFlag.Visibility = (props.HasFlag(GattCharacteristicProperties.Write)
                 || props.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
                  ? Visibility.Visible : Visibility.Collapsed;
 
             await DoReadAsync(true); // update the value field even if it's not readable
 
             var namestr = "";
-            if (!String.IsNullOrEmpty (NC?.Name))
+            if (!String.IsNullOrEmpty(NC?.Name))
             {
                 namestr = NC.Name;
             }
@@ -343,7 +361,7 @@ namespace BluetoothDeviceController.BleEditor
             await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
             {
                 AddString(valuestr);
-           });
+            });
         }
 
         private async void OnShowMoreTapped(object sender, TappedRoutedEventArgs e)
@@ -376,6 +394,36 @@ namespace BluetoothDeviceController.BleEditor
             return writeOption;
         }
 
+        public async Task<GattWriteResult> DoWriteString (string str)
+        {
+            GattWriteOption writeOption = PreferredWriteOption();
+            var bytes = Encoding.UTF8.GetBytes(str);
+            if (bytes.Length > 20)
+            {
+                GattWriteResult status = null;
+                for (int i = 0; i < bytes.Length; i += 20)
+                {
+                    // So much painful copying. So...much....copying....
+                    var end = Math.Min(bytes.Length, i + 20);
+                    var len = (end - i);
+                    var bytesub = new byte[len];
+                    for (int j = 0; j < len; j++)
+                    {
+                        bytesub[j] = bytes[i + j];
+                    }
+                    var data = bytesub.AsBuffer();
+                    status = await Characteristic.WriteValueWithResultAsync(data, writeOption);
+                }
+                return status;
+            }
+
+            else
+            {
+                var data = bytes.AsBuffer();
+                var status = await Characteristic.WriteValueWithResultAsync(data, writeOption);
+                return status;
+            }
+        }
         private async void OnEditTapped(object sender, TappedRoutedEventArgs e)
         {
             GattWriteOption writeOption = PreferredWriteOption();
@@ -419,6 +467,54 @@ namespace BluetoothDeviceController.BleEditor
         private async void OnWriteWithResponseTapped(object sender, TappedRoutedEventArgs e)
         {
             await DoWriteAsync(GattWriteOption.WriteWithResponse);
+        }
+
+        private async Task DoIncrementWriteTapped(GattWriteOption WriteOption)
+        {
+            var oldValue = uiValueShow.Text;
+            var characteristic = Characteristic;
+
+            try
+            {
+                if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
+                {
+                    var buffer = await characteristic.ReadValueAsync();
+                    if (buffer.Status == GattCommunicationStatus.Success)
+                    {
+                        var data = buffer.Value.ToArray();
+                        for (int i = data.Length - 1; i >= 0; i--)
+                        {
+                            if (data[i] < 0xFF)
+                            {
+                                data[i]++;
+                                break;
+                            }
+                            else
+                            {
+                                data[i] = 0;
+                                // And carry the one to the next byte.
+                            }
+                        }
+                        var dataBuffer = data.AsBuffer();
+                        var newAsString = ValueParser.ConvertToStringHex(dataBuffer);
+                        uiValueShow.Text = newAsString;
+                        var status = await Characteristic.WriteValueWithResultAsync(dataBuffer, WriteOption);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                ; //TODO: show exception to user!
+            }
+        }
+        private async void OnIncrementWriteTapped(object sender, TappedRoutedEventArgs e)
+        {
+            await DoIncrementWriteTapped(GattWriteOption.WriteWithoutResponse);
+        }
+
+        private async void OnIncrementWriteWithResponseTapped(object sender, TappedRoutedEventArgs e)
+        {
+            await DoIncrementWriteTapped(GattWriteOption.WriteWithResponse);
         }
     }
 }

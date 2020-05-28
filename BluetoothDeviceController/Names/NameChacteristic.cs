@@ -258,6 +258,12 @@ namespace BluetoothDeviceController.Names
         /// See WilliamWeilerEngineering_Skoobot for an example
         /// </summary>
         public Dictionary<string, Dictionary<string, int>> EnumValues = new Dictionary<string, Dictionary<string, int>>();
+
+        /// <summary>
+        /// List of commands that use this one characterisic. Is used by e.g. the Elegoo MiniCar
+        /// where there's one characteristic that uses a series of commands like {BEEP[10]}
+        /// </summary>
+        public Dictionary<string, Command> Commands { get; } = new Dictionary<string, Command>();
         public override string ToString()
         {
             return $"{Name}:{UUID}";

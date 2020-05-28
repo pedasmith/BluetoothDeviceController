@@ -168,10 +168,18 @@
     <Compile Include="BleEditor\CharacteristicEditorControl.xaml.cs">
       <DependentUpon>CharacteristicEditorControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BleEditor\CommandControl.xaml.cs">
+      <DependentUpon>CommandControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BleEditor\VariableControl.xaml.cs">
+      <DependentUpon>VariableControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs" />
+    <Compile Include="BluetoothDefinitionLanguage\BluetoothServiceRegistration.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
     <Compile Include="BluetoothProtocolsCustom\Nordic_Uart.cs" />
     <Compile Include="BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
+    <Compile Include="BluetoothProtocols\Elegoo_Mini_Car.cs" />
     <Compile Include="BluetoothProtocols\WilliamWeilerEngineering_Skoobot.cs" />
     <Compile Include="IotNumberFormats\ValueCalculate.cs" />
     <Compile Include="IotNumberFormats\ValueToString.cs" />
@@ -254,6 +262,9 @@
     </Compile>
     <Compile Include="SpecialtyPagesCustom\CraftyRobot_SmartibotPage.xaml.cs">
       <DependentUpon>CraftyRobot_SmartibotPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialtyPagesCustom\Elegoo_MiniCarPage.xaml.cs">
+      <DependentUpon>Elegoo_MiniCarPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPagesCustom\UartPage.xaml.cs">
       <DependentUpon>UartPage.xaml</DependentUpon>
@@ -676,6 +687,12 @@
     <Content Include="Assets\HelpFiles\Device_WilliamWeilerEngineering_Skoobot.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ChacteristicsData\Gems_ActivityTracker.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ChacteristicsData\Elegoo_Mini_Car.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\HelpFiles\Device_Espruino_Puckjs.md" />
     <Content Include="Assets\HelpFiles\Device_Ruuvi_RuuviTag.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -844,6 +861,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="BleEditor\CommandControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BleEditor\VariableControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Charts\ChartControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -889,6 +914,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPagesCustom\CraftyRobot_SmartibotPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPagesCustom\Elegoo_MiniCarPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

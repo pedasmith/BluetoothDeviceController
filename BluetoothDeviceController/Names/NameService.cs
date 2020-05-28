@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothDeviceController.BluetoothDefinitionLanguage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ namespace BluetoothDeviceController.Names
         }
         public NameService (GattDeviceService service, NameService defaultService, int count = -1)
         {
+            var reg = BluetoothServiceRegistration.FindRegistration(service.Uuid);
             UUID = service.Uuid.ToString("D"); // documented at https://docs.microsoft.com/en-us/dotnet/api/system.guid.tostring?view=netframework-4.8#System_Guid_ToString_System_String_
             if (defaultService != null)
             {
@@ -22,13 +24,26 @@ namespace BluetoothDeviceController.Names
                 Suppress = defaultService.Suppress;
                 Description = defaultService.Description;
                 Priority = defaultService.Priority;
+                if (!string.IsNullOrEmpty(defaultService.RegistrationOwner))
+                {
+                    RegistrationOwner = defaultService.RegistrationOwner;
+                }
+                else if (reg != null)
+                {
+                    RegistrationOwner = reg.RegistrationOwner;
+                }
             }
             else
             {
                 Name = count >= 0 ? $"Unknown{count}" : "Unknown";
+                if (reg != null)
+                {
+                    RegistrationOwner = reg.RegistrationOwner;
+                }
             }
         }
         public string UUID { get; set; }
+        public string RegistrationOwner { get; set; } // what company is this service registered to?
         public string Name { get; set; }
         /// <summary>
         /// When true, the UI for the service will be entirely suppressed.

@@ -235,6 +235,7 @@ namespace BluetoothDeviceController.BleEditor
                 return;
             }
         }
+
         private async Task DoWriteAsync(IBuffer data)
         {
             uiStatus.Text = "";

@@ -76,11 +76,11 @@ namespace BluetoothDeviceController.SerialPort
                     setting.CmdName = name;
                     switch (setting.InputType)
                     {
-                        case SerialConfigSetting.UiType.Hide:
+                        case VariableDescription.UiType.Hide:
                             // Hiden values do nothing.
                             break;
 
-                        case SerialConfigSetting.UiType.TextBox:
+                        case VariableDescription.UiType.TextBox:
                             {
                                 var numberScope = new InputScope();
                                 numberScope.Names.Add(new InputScopeName() { NameValue = InputScopeNameValue.Number });
@@ -96,7 +96,7 @@ namespace BluetoothDeviceController.SerialPort
                                 VariableSizedWrapGrid.SetColumnSpan(tb, 1);
                             }
                             break;
-                        case SerialConfigSetting.UiType.Slider:
+                        case VariableDescription.UiType.Slider:
                             {
                                 var slider = new Slider()
                                 {
@@ -143,7 +143,7 @@ namespace BluetoothDeviceController.SerialPort
         private async void SliderValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             var slider = sender as Slider;
-            var scs = slider.Tag as SerialConfigSetting;
+            var scs = slider.Tag as VariableDescription;
             double newValue = slider.Value;
             CurrValues[scs.CmdName] = newValue;
             await DoCommandAsync(scs.OnChange);
@@ -152,7 +152,7 @@ namespace BluetoothDeviceController.SerialPort
         private async void SettingValueTextChanged(object sender, TextChangedEventArgs e)
         {
             var tb = sender as TextBox;
-            var scs = tb.Tag as SerialConfigSetting;
+            var scs = tb.Tag as VariableDescription;
             double newValue;
             bool convertOk = Double.TryParse(tb.Text, out newValue);
             if (convertOk)

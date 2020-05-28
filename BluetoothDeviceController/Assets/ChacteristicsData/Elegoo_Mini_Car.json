@@ -1,0 +1,208 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "ELEGOO BT16",
+      "ClassName": "Elegoo_MiniCar",
+      "ClassModifiers": "partial",
+      "Description": "Robot with a wooden shell. The interior robot is a typical Arduino bot. Communications are via pretend Serial port ffe1/ffe2.",
+      "Links": [
+        "https://www.elegoo.com/",
+        "https://www.elegoo.com/product/elegoo-robotic-wooden-car-kit-with-nanoarduino-compatible-line-tracking-avoiding-obstacle-mobile-controlling-and-graphical-programming-intelligent-and-educational-toy-car-kitstem-toys-for-kids/",
+        "https://www.elegoo.com/tutorial/Elegoo%20Robot%20miniCar%20Kit%20V1.0.2020.01.07.zip"
+      ],
+      "Services": [
+        {
+          "UUID": "0000ffe0-0000-1000-8000-00805f9b34fb",
+          "Name": "Car",
+          "Characteristics": [
+            {
+              "UUID": "0000ffe1-0000-1000-8000-00805f9b34fb",
+              "Name": "Result",
+              "Type": "STRING|ASCII|Result",
+              "IsNotify": true
+            },
+            {
+              "UUID": "0000ffe2-0000-1000-8000-00805f9b34fb",
+              "Name": "Command",
+              "Type": "STRING|ASCII|Command",
+              "IsWriteWithoutResponse": true,
+              "Commands": {
+                "ObstacleAvoidance": {
+                  "Label": "Obstacle Avoidance Mode",
+                  "Compute": "${OA[?]}"
+                },
+                "LineTrack": {
+                  "Parameters": {
+                    "Sensor": {
+                      "Label": "Sensor",
+                      "Init": 0,
+                      "ValueNames": {
+                        "Left": 0,
+                        "Right": 1
+                      },
+                      "InputType": "ComboBox"
+                    }
+                  },
+                  "Label": "Line Tracking Mode",
+                  "Compute": "${LT[ $Sensor_GN $][?]}"
+                },
+                "Sport": {
+                  "Parameters": {
+                    "Direction": {
+                      "Label": "Direction",
+                      "ValueNames": {
+                        "Stop": 0,
+                        "Forward": 1,
+                        "Backward": 2,
+                        "Left": 3,
+                        "Right": 4,
+                      },
+                      "Init":  1,
+                      "InputType":  "ComboBox"
+                    },
+                    "Speed": {
+                      "Label":  "Speed",
+                      "Min": 0,
+                      "Max": 255,
+                      "Init": 100,
+                      "InputType": "Slider"
+                    }
+                  },
+                  "Label": "Sport Mode",
+                  "Compute": "${TURN[ $Direction_GN $][ $Speed_GN $]}"
+                },
+                "Beep": {
+                  "Parameters": {
+                    "Tone": {
+                      "Label": "Beep Tone",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100,
+                      "InputType": "Slider"
+                    }
+                  },
+                  "Label": "Beep",
+                  "Compute": "${BEEP[ $Tone_GN $]}"
+                },
+                "Beep_Off": {
+                  "Label": "Beep Off",
+                  "Compute": "${BEEP[0]}"
+                },
+                "Beep_Test": {
+                  "Label": "Beep Test",
+                  "Compute": "${BEEPS[120][50]}"
+                },
+                "Beep2": {
+                  "Parameters": {
+                    "Tone": {
+                      "Label": "Beep Tone",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100,
+                      "InputType": "Slider"
+                    },
+                    "Duration": {
+                      "Label": "Duration in milliseconds",
+                      "Min": 0,
+                      "Max": 65535,
+                      "Init": 250,
+                      "InputType": "Slider"
+                    }
+                  },
+                  "Label": "Beep Advanced",
+                  "Compute": "${BEEPS[ $Tone_GN $][ $Duration_G $]}"
+                },
+                "RGB": {
+                  "Parameters": {
+                    "R": {
+                      "Label": "Red",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100,
+                      "InputType": "Slider"
+                    },
+                    "G": {
+                      "Label": "Green",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100,
+                      "InputType": "Slider"
+                    },
+                    "B": {
+                      "Label": "Blue",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100,
+                      "InputType": "Slider"
+                    },
+                    "Lights": {
+                      "Label": "Lights",
+                      "ValueNames": {
+                        "Both": 0,
+                        "Left": 1,
+                        "Right": 2
+                      },
+                      "Init": 0,
+                      "InputType": "ComboBox"
+                    },
+                    "Duration": {
+                      "Label": "Duration",
+                      "Min": 0,
+                      "Max": 255,
+                      "Init": 100,
+                      "InputType": "Slider"
+                    },
+                    "Mode": {
+                      "Label": "Flashing",
+                      "ValueNames": {
+                        "Solid": 0,
+                        "Flashing": 1
+                      },
+                      "Init": 0,
+                      "InputType": "ComboBox"
+                    }
+                  },
+                  "Label": "Lights",
+                  "Compute": "${RGB[ $R_GN $][ $G_GN $][ $B_GN $][ $Lights_GN $][ $Duration_GN $][ $Mode_GN $]}"
+                },
+                "Clear": {
+                  "Parameters": {
+                    "ClearMode": {
+                      "Label": "Clear what?",
+                      "ValueNames": {
+                        "All": 0,
+                        "Lights_Off": 1,
+                        "Stop": 2,
+                        "Mute": 3
+                      },
+                      "InputType": "ComboBox",
+                      "Init": 0
+                    }
+                  },
+                  "Label": "Clear car",
+                  "Compute": "${CLEAR[ $ClearMode_GN $]}"
+                }
+              },
+              "ExampleData": [
+                "{OA[?]}",
+                "{LT[Sensor|0=Left,1=Right,?=Inquire]}",
+                "{TURN[Motion|0=Stop,1=Forward,2=Backward,3=Left,4=Right][Speed|300=Unchanged,0..255]}",
+                "{TURNS[Motion|0=Stop,1=Forward,2=Backward,3=Left,4=Right][Speed|300=Unchanged,0..255][Lights|0=Off,1=White,2=Purple]}",
+                "{MOVE[Motor|0=All,1=Left,2=Right][Commmand|0=Stop,1=Forward,2=Backward,3=Noop][Speed|300=Unchanged,0..255]}",
+                "{MOVES[Motor|[Left_Commmand|0=Stop,1=Forward,2=Backward,3=Noop][Left_Speed|300=Unchanged,0..255][Right_Command][Right_Speed]}",
+                "{RGB[<<Red|0..255>>][<<Green|0..255>>][<<Blue|0..255>>][<<Light|0=All,1=Left,2=Right>>][Duration|0=On,1..255][Style|0=Solid,1=Flashing]}",
+                "{RGBS[Left_RGB eg FF0000][Left_Style|0=Solid,1=Flashing][Right_RGB][Right_Style]}",
+                "{RGBB[Brightness|0..255]}",
+                "{BEEP[Tone|0=Off,1..255]}",
+                "{BEEPS[Tone|1..255][Duration_Milliseconds|0..65535]}",
+                "{KEY[Mode|0=Standby,1=Line-tracking,2=Obstacle,3=Auto-follow,4=Explorer]}",
+                "{CLEAR[Mode|0=All,1=Light_Off,2=Stop,3=Mute]}"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-48:87:2d:11:40:b0\nCanPair:True IsPaired:False"
+    }
+  ]
+}

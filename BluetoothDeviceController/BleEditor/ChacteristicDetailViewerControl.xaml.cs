@@ -1,20 +1,10 @@
 ﻿using BluetoothDefinitionLanguage;
+using BluetoothDeviceController.BluetoothDefinitionLanguage;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -38,6 +28,11 @@ namespace BluetoothDeviceController.BleEditor
             try
             {
                 AddData("Service", characteristic.Service.Uuid.ToString());
+                var reg = BluetoothServiceRegistration.FindRegistration(characteristic.Service.Uuid);
+                if (reg != null)
+                {
+                    AddData("RegistrationOwner", reg.RegistrationOwner);
+                }
                 AddData("ID", characteristic.Uuid.ToString());
             }
             catch (Exception e1)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothDeviceController.BleEditor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace BluetoothDeviceController.Names
         public List<string> Aliases { get; set; } = new List<string>(); // Must not be null
         public IList<String> Links { get; } = new List<String>();
 
-        public Dictionary<string, SerialConfigSetting> Settings = new Dictionary<string, SerialConfigSetting>();
+        public Dictionary<string, VariableDescription> Settings = new Dictionary<string, VariableDescription>();
         public Dictionary<string, Command> Commands = new Dictionary<string, Command>();
 
         public override string ToString()
@@ -39,15 +40,24 @@ namespace BluetoothDeviceController.Names
         }
     }
 
-    public class SerialConfigSetting
+    public class VariableDescription
     {
         public string Label { get; set; } = null;
-        public enum UiType {  TextBox, Slider, Hide};
+        public enum UiType { TextBox, Slider, Hide, ComboBox };
 
         public string Name { get; set; } = null;
         public double Min { get; set; } = 0.0;
         public double Max { get; set; } = 100.0;
         public double Init { get; set; } = 0.0;
+        public double CurrValue { get; set; } = 0.0;
+        /// <summary>
+        /// Set of enum values e.g. ValueNames: { "All":0, "Lights_Off":1, "Stop":2, "Mute":3 }
+        /// </summary>
+        public Dictionary<string, double> ValueNames { get; } = new Dictionary<string, double>();
+        /// <summary>
+        /// Input type, one of TextBox (default), Slider, Hide, and ComboBox or ComboBoxOrSlider. The ComboBox
+        /// will only be used when ValueNames are provided.
+        /// </summary>
         public UiType InputType { get; set; } = UiType.TextBox;
         public string OnChange { get; set; } = null;
         public string CmdName { get; set; }
@@ -62,10 +72,12 @@ namespace BluetoothDeviceController.Names
         public string Label { get; set; } = null;
         /// <summary>
         /// Compute is a computed value: e.g. STRING^$BERO1.0. Values like space must be escaped. Use Replace for simple scenarios that involve just sending a string.
+        /// Values are seperated by spaces e.g "${CLEAR[ $ClearMode_GN $]}" is split into three values
+        /// which will be concatenated together.
         /// </summary>
         public string Compute { get; set; } = "";
         /// <summary>
-        /// A simple string to send to the device.
+        /// A simple string to send to the device. Why replace? Because why not, that's why.
         /// </summary>
         public string Replace { get; set; } = "";
         /// <summary>
@@ -79,6 +91,16 @@ namespace BluetoothDeviceController.Names
         /// </summary>
         public bool IsHidden { get; set; } = false;
         public string OnChange { get; set; } = null;
+        /// <summary>
+        /// Provides explicit values for the values needed by a command
+        /// </summary>
         public Dictionary<string, double> Set { get; } = new Dictionary<string, double>();
+
+        /// <summary>
+        /// Variables that can be used with the command. These are per-command.
+        /// </summary>
+        public Dictionary<string, VariableDescription> Parameters { get; } = new Dictionary<string, VariableDescription>();
+
+        public IWriteCharacteristic WriteCharacteristic { get; set; } = null;
     }
 }

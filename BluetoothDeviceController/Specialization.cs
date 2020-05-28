@@ -23,6 +23,10 @@ namespace BluetoothDeviceController
             }
             ParentShouldScroll = parentShouldScroll;
         }
+        public override string ToString()
+        {
+            return $"{ShortDescription} -- {Page.ToString()} -- {Names[0]}";
+        }
         private IList<string> Names = new List<string>();
         public Type Page { get; internal set; }
         public string Icon { get; internal set; }

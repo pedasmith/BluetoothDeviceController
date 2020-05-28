@@ -206,7 +206,7 @@ namespace BluetoothDeviceController
             var di = args.InvokedItemContainer.Tag as DeviceInformationWrapper;
             if (di != null)
             {
-                NavView_Navigate(di, args.RecommendedNavigationTransitionInfo);
+                await NavView_NavigateAsync(di, args.RecommendedNavigationTransitionInfo);
                 return;
             }
 
@@ -313,7 +313,7 @@ namespace BluetoothDeviceController
         /// </summary>
         /// <param name="wrapper"></param>
         /// <param name="transitionInfo"></param>
-        private void NavView_Navigate(DeviceInformationWrapper wrapper, NavigationTransitionInfo transitionInfo)
+        private async Task NavView_NavigateAsync(DeviceInformationWrapper wrapper, NavigationTransitionInfo transitionInfo)
         {
             Type _pageType = null;
             var preftype = Preferences.Display;
@@ -354,19 +354,19 @@ namespace BluetoothDeviceController
             {
                 var deviceName = GetDeviceInformationName(wrapper?.di);
 
-                var specialized = Specialization.Get(Specializations, deviceName);
-                if (specialized == null && wrapper != null)
+                var specialization = Specialization.Get(Specializations, deviceName);
+                if (specialization == null && wrapper != null)
                 {
-                    // Maybe it's a UART?
-                    if (wrapper.AsNordicUart != null)
+                    var isUart = await wrapper.IsNordicUartAsync();
+                    if (isUart)
                     {
-                        specialized = Specialization.Get(Specializations, Nordic_Uart.SpecializationName);
+                        specialization = Specialization.Get(Specializations, Nordic_Uart.SpecializationName);
                     }
                 }
-                if (specialized != null)
+                if (specialization != null)
                 {
-                    _pageType = specialized.Page;
-                    scrollType = specialized.ParentShouldScroll;
+                    _pageType = specialization.Page;
+                    scrollType = specialization.ParentShouldScroll;
                 }
             }
             if (_pageType == null) // Either the preferences is for an editor, or this particular BT devices doesn't have a specialization.
