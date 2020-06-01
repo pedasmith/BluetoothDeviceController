@@ -20,6 +20,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="5" />
         </Grid.RowDefinitions>
         
@@ -92,8 +93,12 @@
             </ListView.ItemTemplate>
         </ListView>
 
+        <StackPanel Grid.Row="3" x:Name="uiUI" Grid.Column="0" Grid.ColumnSpan="3">
+            <!-- Add in UI for the device -->
+        </StackPanel>
+
         <!--
-        <Line Stroke="Black" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" X1="0" X2="200" Y1="2" Y2="2"   />
+        <Line Stroke="Black" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" X1="0" X2="200" Y1="2" Y2="2"   />
         -->
 
     </Grid>

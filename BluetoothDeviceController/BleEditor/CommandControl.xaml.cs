@@ -33,49 +33,17 @@ namespace BluetoothDeviceController.BleEditor
         {
             Command command = DataContext as Command;
             if (command == null) return; // should never happen
-
-            //TODO: init with previous values???
-            foreach (var (name, newValue) in command.Set)
-            {
-                CurrValues[name] = newValue;
-            }
-            foreach (var (name, variableDescription) in command.Parameters)
-            {
-                CurrValues[name] = variableDescription.Init;
-            }
+            command.InitVariables();
         }
 
-        Dictionary<string, double> CurrValues = new Dictionary<string, double>();
-        Dictionary<string, double> PrevValues = new Dictionary<string, double>();
+        VariableSet Variables = new VariableSet();
 
         private async void OnDoCommand(object sender, RoutedEventArgs e)
         {
             ;
             Command command = DataContext as Command;
             if (command == null) return; // should never happen
-
-            foreach (var (name, variableDescription) in command.Parameters)
-            {
-                CurrValues[name] = variableDescription.CurrValue;
-            }
-
-            // TODO: move all this to a common library -- it's shared between here
-            // and the serial class.
-            var list = command.Compute.Split(new char[] { ' ' });
-            var cmd = "";
-            foreach (var strcommand in list)
-            {
-                var calculateResult = BleEditor.ValueCalculate.Calculate(strcommand, double.NaN, null, PrevValues, CurrValues);
-                cmd += calculateResult.S ?? calculateResult.D.ToString();
-            }
-            foreach (var (name, value) in CurrValues)
-            {
-                PrevValues[name] = value;
-            }
-
-            // Got the command to send! now what?
-            var result = await command.WriteCharacteristic.DoWriteString(cmd);
-            ;
+            await command.DoCommand();
         }
     }
 }

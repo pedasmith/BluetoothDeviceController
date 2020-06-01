@@ -7,6 +7,17 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace BluetoothDeviceController.Names
 {
+    public class SimpleUI
+    {
+        public string UIType { get; set; }
+        public string Target { get; set; }
+        public string ComputeTarget { get; set; }
+        public string PlaceAt { get; set; }
+        public string Label { get; set; }
+        public List<string> Set { get; } = new List<string>();
+        public double N { get; set; } = double.NaN;
+    }
+
     public class ButtonPerButtonUI
     {
         public enum ButtonType { Button, Blank };
@@ -264,6 +275,7 @@ namespace BluetoothDeviceController.Names
         /// where there's one characteristic that uses a series of commands like {BEEP[10]}
         /// </summary>
         public Dictionary<string, Command> Commands { get; } = new Dictionary<string, Command>();
+        public List<SimpleUI> UIList { get; } = new List<SimpleUI>();
         public override string ToString()
         {
             return $"{Name}:{UUID}";

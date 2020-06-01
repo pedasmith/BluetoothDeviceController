@@ -1,19 +1,9 @@
 ﻿using BluetoothDeviceController.Names;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using static BluetoothDeviceController.Names.VariableDescription;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -48,6 +38,7 @@ namespace BluetoothDeviceController.BleEditor
             if (v == null) return; // should never happen.
 
             v.CurrValue = v.Init;
+            v.CurrValueString = v.InitString;
 
             // Don't add this label; it merely duplicates the label on the slider or combo box. 
             // uiPanel.Children.Add(new TextBlock() { Text = v.Label };);
@@ -65,6 +56,19 @@ namespace BluetoothDeviceController.BleEditor
                         };
                         s.ValueChanged += S_ValueChanged;
                         uiPanel.Children.Add(s);
+                    }
+                    break;
+                case UiType.TextBox:
+                    {
+                        var tb = new TextBox()
+                        {
+                            Header = v.Label ?? v.Name,
+                            Text = v.InitString,
+                            Tag = v
+                        };
+                        tb.TextChanged += Tb_TextChanged;
+                        uiPanel.Children.Add(tb);
+                        v.CurrValueIsString = true;
                     }
                     break;
                 case UiType.ComboBox:
@@ -95,6 +99,13 @@ namespace BluetoothDeviceController.BleEditor
                     }
                     break;
             }
+        }
+
+        private void Tb_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var v = (sender as FrameworkElement)?.Tag as VariableDescription;
+            if (v == null) return; // should never happen.
+            v.CurrValueString = (sender as TextBox)?.Text;
         }
 
         private void Cb_SelectionChanged(object sender, SelectionChangedEventArgs e)

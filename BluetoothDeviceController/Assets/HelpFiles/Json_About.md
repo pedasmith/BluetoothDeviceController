@@ -11,6 +11,7 @@ actually works. They include
 
 # More details
 
-[Tweaking JSON](Json_Tweaks.md)
-[Graphs and JSON](Json_Graphs.md)
-[Interpreting Data](https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/)
+* [Tweaking JSON](Json_Tweaks.md)
+* [Graphs and JSON](Json_Graphs.md)
+* [String Oriented Commands](Json_StringOrientedCommands.md)
+* [Interpreting Data](https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/)

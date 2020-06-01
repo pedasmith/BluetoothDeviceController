@@ -202,6 +202,10 @@ namespace BluetoothDeviceController.BleEditor
 
             var str = uiEditBox.Text;
             var convertType = ((uiConvertType.SelectedItem as ComboBoxItem)?.Tag as string) ?? "HEX";
+            if (convertType == "ASCII")
+            {
+                str = str.Replace("\\r", "\r").Replace("\\n", "\n");
+            }
             var result = str.ConvertToBuffer(convertType); // e.g. HEX DEC ASCII
             if (result.Result == ValueParserResult.ResultValues.Ok)
             {

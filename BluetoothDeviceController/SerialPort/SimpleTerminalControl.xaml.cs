@@ -1,4 +1,5 @@
-﻿using BluetoothDeviceController.Names;
+﻿using BluetoothDeviceController.BleEditor;
+using BluetoothDeviceController.Names;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,8 +63,7 @@ namespace BluetoothDeviceController.SerialPort
             }
 
             uiShortcutButtonList.Children.Clear();
-            PrevValues.Clear();
-            CurrValues.Clear();
+            Variables.Clear();
 
             uiShortcutButtonList.ItemWidth = 120;
             uiShortcutButtonList.ItemHeight = 60;
@@ -114,8 +114,8 @@ namespace BluetoothDeviceController.SerialPort
                             break;
 
                     }
-                    PrevValues[name] = setting.Init;
-                    CurrValues[name] = setting.Init;
+                    Variables.SetCurrDouble(name, setting.Init);
+                    Variables.SetPreviousDouble(name, setting.Init);
                 }
 
                 FontFamily ff = new FontFamily("Segoe UI,Segoe MDL2 Assets");
@@ -145,7 +145,7 @@ namespace BluetoothDeviceController.SerialPort
             var slider = sender as Slider;
             var scs = slider.Tag as VariableDescription;
             double newValue = slider.Value;
-            CurrValues[scs.CmdName] = newValue;
+            Variables.SetCurrDouble(scs.CmdName, newValue);
             await DoCommandAsync(scs.OnChange);
         }
 
@@ -157,7 +157,7 @@ namespace BluetoothDeviceController.SerialPort
             bool convertOk = Double.TryParse(tb.Text, out newValue);
             if (convertOk)
             {
-                CurrValues[scs.CmdName] = newValue;
+                Variables.SetCurrDouble(scs.CmdName, newValue);
                 await DoCommandAsync(scs.OnChange);
             }
         }
@@ -179,8 +179,7 @@ namespace BluetoothDeviceController.SerialPort
             }
         }
 
-        Dictionary<string, double> CurrValues = new Dictionary<string, double>();
-        Dictionary<string, double> PrevValues = new Dictionary<string, double>();
+        VariableSet Variables = new VariableSet();
 
         private async void OnShortcutClick(object sender, RoutedEventArgs e)
         {
@@ -204,11 +203,7 @@ namespace BluetoothDeviceController.SerialPort
             if (command == null) return;
             CurrCommandState = CommandState.Busy;
 
-            foreach (var (name, newValue) in command.Set)
-            {
-                CurrValues[name] = newValue;
-            }
-
+            Variables.Init(command.Set);
             var cmd = command.Replace;
             if (!string.IsNullOrEmpty(command.Compute))
             {
@@ -216,15 +211,11 @@ namespace BluetoothDeviceController.SerialPort
                 cmd = "";
                 foreach (var strcommand in commandlist)
                 {
-                    var calculateResult = BleEditor.ValueCalculate.Calculate(strcommand, double.NaN, null, PrevValues, CurrValues);
+                    var calculateResult = BleEditor.ValueCalculate.Calculate(strcommand, double.NaN, null, Variables);
                     cmd += calculateResult.S ?? calculateResult.D.ToString();
                 }
 
-                // Actually calculate the value and then move new-->old
-                foreach (var (name, value) in CurrValues)
-                {
-                    PrevValues[name] = value;
-                }
+                Variables.CopyToPrev();
             }
             if (!string.IsNullOrEmpty(command.ReplaceFile))
             {

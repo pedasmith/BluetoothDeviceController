@@ -1,23 +1,16 @@
-﻿using BluetoothDefinitionLanguage;
-using BluetoothDeviceController.Names;
+﻿using BluetoothDeviceController.Names;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -75,13 +68,15 @@ namespace BluetoothDeviceController.BleEditor
             Characteristic = characteristic;
             NC = BleNames.Get(device, service, characteristic);
 
+#if NEVER_EVER_DEFINED
+            // Setting it up differently now via the UILIst + uiUI
             Commands.Clear();
             foreach (var (_,command) in NC.Commands)
             {
                 command.WriteCharacteristic = this;
                 Commands.Add(command);
             }
-
+#endif
 
             var props = characteristic.CharacteristicProperties;
             uiNotifyFlag.Visibility = props.HasFlag(GattCharacteristicProperties.Notify) ? Visibility.Visible : Visibility.Collapsed;
@@ -181,6 +176,219 @@ namespace BluetoothDeviceController.BleEditor
                         }
                         break;
                 }
+            }
+            try
+            {
+                SetupUI();
+            }
+            catch (Exception)
+            {
+                ;
+            }
+
+            if (NC.Commands != null)
+            {
+                foreach (var (_, command) in NC.Commands)
+                {
+                    command.InitVariables();
+                    command.WriteCharacteristic = this;
+                }
+            }
+        }
+        const double ElementMinWidth = 150;
+        Thickness ElementMargin = new Thickness(2);
+        /// <summary>
+        /// Set up the uiUI list based on the UIList of SimpleUI
+        /// </summary>
+        private void SetupUI()
+        {
+            Panel panel = uiUI;
+            panel.Children.Clear();
+            Stack<Panel> stack = new Stack<Panel>();
+            var SPACE = new char[] { ' ' };
+
+            if (NC.UIList == null) return;
+
+            foreach (var simple in NC.UIList)
+            {
+                // Find the target
+                Command command = null;
+                var tlist = string.IsNullOrEmpty (simple.Target) ? new string[] { "" } : simple.Target.Split(SPACE);
+                NC.Commands.TryGetValue(tlist[0], out command);
+
+
+                switch (simple.UIType)
+                {
+                    default:
+                        Console.WriteLine($"ERROR: unknown UIType {simple.UIType} for {NC.Name}");
+                        break;
+                    case "Blank":
+                        {
+                            var tb = new TextBlock() { Text = "" };
+                            panel.Children.Add(tb);
+                        }
+                        break;
+                    case "ButtonFor":
+                        {
+                            var b = new Button()
+                            {
+                                Content = simple.Label ?? simple.PlaceAt ?? command?.Label,
+                                Tag = simple,
+                                MinWidth = ElementMinWidth,
+                                Margin = ElementMargin,
+                            };
+                            b.Click += B_Click;
+                            panel.Children.Add(b);
+                        }
+                        break;
+                    case "ComboBoxFor":
+                        {
+                            var param = command?.Parameters[tlist[1]];
+                            var cb = new ComboBox()
+                            {
+                                Header = simple.Label ?? simple.PlaceAt ?? command?.Label,
+                                MinWidth = ElementMinWidth,
+                                Tag = simple,
+                            };
+                            ComboBoxItem selected = null;
+                            foreach (var (name, value) in param.ValueNames)
+                            {
+                                var cbi = new ComboBoxItem()
+                                {
+                                    Content = name,
+                                    Tag = (simple, param, name, value)
+                                };
+                                if (value == param.Init)
+                                {
+                                    selected = cbi;
+                                }
+                                cb.Items.Add(cbi);
+                            }
+                            cb.SelectionChanged += Cb_SelectionChanged;
+                            panel.Children.Add(cb);
+                        }
+                        break;
+                    case "RadioFor":
+                        {
+                            var param = command?.Parameters[tlist[1]];
+                            var sp = new StackPanel();
+                            foreach (var (name, value) in param.ValueNames)
+                            {
+                                var rb = new RadioButton()
+                                {
+                                    Content = name,
+                                    Tag = (simple, param, name, value)
+                                };
+                                if (value == param.Init)
+                                {
+                                    rb.IsChecked = true;
+                                }
+                                rb.Checked += Rb_Checked;
+                                sp.Children.Add(rb);
+                            }
+                            panel.Children.Add(sp);
+                        }
+                        break;
+                    case "RowEnd":
+                        panel = stack.Pop();
+                        break;
+                    case "RowStart":
+                        {
+                            var n = double.IsNaN(simple.N) ? 4 : (int)simple.N;
+                            var grid = new VariableSizedWrapGrid()
+                            {
+                                Orientation = Orientation.Horizontal,
+                                MaximumRowsOrColumns = n,
+                            };
+                            panel.Children.Add(grid);
+                            stack.Push(panel);
+                            panel = grid;
+                        }
+                        break;
+                    case "SliderFor":
+                        {
+                            var param = command?.Parameters[tlist[1]];
+                            var s = new Slider()
+                            {
+                                Width = ElementMinWidth,
+                                Header = simple.Label ?? param.Label,
+                                Minimum = param.Min,
+                                Maximum = param.Max,
+                                Value = param.Init,
+                                Tag = simple,
+                                Margin = ElementMargin
+                            };
+                            s.ValueChanged += S_ValueChanged;
+                            panel.Children.Add(s);
+                        }
+                        break;
+                }
+            }
+        }
+
+        private void Cb_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1) return; // should never happen.
+            var cbi = e.AddedItems[0] as ComboBoxItem;
+            var (simple, variable, name, value) = ((SimpleUI, VariableDescription, String, Double))(cbi.Tag);
+            variable.CurrValue = value;
+        }
+
+        private void Rb_Checked(object sender, RoutedEventArgs e)
+        {
+            var (simple, variable, name, value) = ((SimpleUI, VariableDescription, String, Double))((sender as FrameworkElement).Tag);
+            variable.CurrValue = value;
+        }
+
+        private async void S_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            var simple = (sender as FrameworkElement).Tag as SimpleUI;
+            if (simple == null) return;
+
+            var target = simple.Target.Split(new char[] { ' ' });
+            if (target.Length != 2) return;
+
+            Command command = null;
+            NC.Commands.TryGetValue(target[0], out command);
+            if (command != null)
+            {
+                command.Parameters[target[1]].CurrValue = e.NewValue;
+            }
+            NC.Commands.TryGetValue(simple.ComputeTarget ?? "", out command);
+            if (command != null)
+            {
+                await command.DoCommand();
+            }
+        }
+
+        private async void B_Click(object sender, RoutedEventArgs e)
+        {
+            var simple = (sender as FrameworkElement).Tag as SimpleUI;
+            if (simple == null) return;
+
+            Command command = null;
+
+            foreach (var setter in simple.Set)
+            {
+                // e.g. Sport Direction Forward
+                // set the direction parameter to the named Forward value
+                var target = setter.Split(new char[] { ' ' });
+                if (target.Length == 3)
+                {
+                    NC.Commands.TryGetValue(target[0], out command);
+                    if (command != null && command.Parameters.ContainsKey(target[1]))
+                    {
+                        var variable = command.Parameters[target[1]];
+                        var value = variable.ValueNames[target[2]];
+                        variable.CurrValue = value;
+                    }
+                }
+            }
+
+            NC.Commands.TryGetValue(simple.Target, out command);
+            if (command != null)
+            {
+                await command.DoCommand();
             }
         }
 

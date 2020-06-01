@@ -49,7 +49,10 @@ namespace BluetoothDeviceController.Names
         public double Min { get; set; } = 0.0;
         public double Max { get; set; } = 100.0;
         public double Init { get; set; } = 0.0;
+        public string InitString { get; set; } = "";
         public double CurrValue { get; set; } = 0.0;
+        public string CurrValueString { get; set; } = "";
+        public bool CurrValueIsString { get; set; } = false;
         /// <summary>
         /// Set of enum values e.g. ValueNames: { "All":0, "Lights_Off":1, "Stop":2, "Mute":3 }
         /// </summary>
@@ -102,5 +105,31 @@ namespace BluetoothDeviceController.Names
         public Dictionary<string, VariableDescription> Parameters { get; } = new Dictionary<string, VariableDescription>();
 
         public IWriteCharacteristic WriteCharacteristic { get; set; } = null;
+
+        VariableSet Variables = new VariableSet();
+        public void InitVariables()
+        {
+            Variables.Init(Set);
+            Variables.Init(Parameters);
+        }
+        public async Task DoCommand()
+        {
+            Variables.SetCurrValue(Parameters);
+
+            var list = Compute.Split(new char[] { ' ' });
+            var cmd = "";
+            foreach (var strcommand in list)
+            {
+                var calculateResult = BleEditor.ValueCalculate.Calculate(strcommand, double.NaN, null, Variables);
+                cmd += calculateResult.S ?? calculateResult.D.ToString();
+            }
+            Variables.CopyToPrev();
+
+
+            // Got the command to send! now what?
+            var result = await WriteCharacteristic.DoWriteString(cmd);
+            System.Diagnostics.Debug.WriteLine($"COMMAND: {cmd}");
+            ;
+        }
     }
 }

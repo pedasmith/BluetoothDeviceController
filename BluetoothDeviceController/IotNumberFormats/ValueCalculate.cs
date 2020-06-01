@@ -127,7 +127,7 @@ namespace BluetoothDeviceController.BleEditor
         /// <param name="str"></param>
         /// <param name="startValue"></param>
         /// <returns></returns>
-        public static CalculateResult Calculate(string str, double startValue, string startStringValue = "", Dictionary<string, double> previousValues = null, Dictionary<string, double> currValues = null)
+        public static CalculateResult Calculate(string str, double startValue, string startStringValue = "", VariableSet variables = null)
         {
             int index = 0;
             try
@@ -189,25 +189,34 @@ namespace BluetoothDeviceController.BleEditor
                                 d1 = stack.Pop();
                                 nextindex = (int)d1;
                                 break;
+
+
                             case "GN": // Get a name, look up in current (new)
                                 {
                                     string name = stringstack.Pop();
-                                    value = currValues[name];
+                                    value = variables.GetCurrDouble(name); 
                                     stack.Push(value);
                                 }
                                 break;
                             case "GP": // Get a name, look up in previous dictionaries
                                 {
                                     string name = stringstack.Pop();
-                                    value = previousValues[name];
+                                    value = variables.GetPreviousDouble(name);
                                     stack.Push(value);
+                                }
+                                break;
+                            case "GS": // Get a name, look up in current (new) as a string TODO: document
+                                {
+                                    string name = stringstack.Pop();
+                                    var valuestr = variables.GetCurrString(name);
+                                    stringstack.Push(valuestr);
                                 }
                                 break;
                             case "GD": // Get a name, look up in current and previous dictionaries. If same, return blank; otherwise return new
                                 {
                                     string name = stringstack.Pop();
-                                    double prev = previousValues[name];
-                                    double curr = currValues[name];
+                                    double prev = variables.GetPreviousDouble(name);
+                                    double curr = variables.GetCurrDouble(name);
                                     if (prev == curr)
                                     {
                                         stringstack.Push("");

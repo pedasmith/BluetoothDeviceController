@@ -227,6 +227,7 @@
     <Compile Include="HelpPage.xaml.cs">
       <DependentUpon>HelpPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IotNumberFormats\VariableSet.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -695,6 +696,9 @@
     </Content>
     <None Include="Assets\HelpFiles\Device_Espruino_Puckjs.md" />
     <Content Include="Assets\HelpFiles\Device_Ruuvi_RuuviTag.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\HelpFiles\Json_StringOrientedCommands.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
