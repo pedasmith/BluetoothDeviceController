@@ -294,7 +294,7 @@ namespace BluetoothDeviceController.BleEditor
                         break;
                     case "RowStart":
                         {
-                            var n = double.IsNaN(simple.N) ? 4 : (int)simple.N;
+                            var n = simple.GetN();
                             var grid = new VariableSizedWrapGrid()
                             {
                                 Orientation = Orientation.Horizontal,
@@ -606,21 +606,17 @@ namespace BluetoothDeviceController.BleEditor
         {
             GattWriteOption writeOption = PreferredWriteOption();
             var bytes = Encoding.UTF8.GetBytes(str);
-            if (bytes.Length > 20)
+            const int MAXBYTES = 20;
+            if (bytes.Length > MAXBYTES)
             {
                 GattWriteResult status = null;
-                for (int i = 0; i < bytes.Length; i += 20)
+
+                for (int i = 0; i < bytes.Length; i += MAXBYTES)
                 {
-                    // So much painful copying. So...much....copying....
-                    var end = Math.Min(bytes.Length, i + 20);
-                    var len = (end - i);
-                    var bytesub = new byte[len];
-                    for (int j = 0; j < len; j++)
-                    {
-                        bytesub[j] = bytes[i + j];
-                    }
-                    var data = bytesub.AsBuffer();
-                    status = await Characteristic.WriteValueWithResultAsync(data, writeOption);
+                    // So many calculations and copying just to get a slice
+                    var maxCount = Math.Min(MAXBYTES, bytes.Length - i);
+                    var subcommand = new ArraySegment<byte>(bytes, i, maxCount).ToArray().AsBuffer();
+                    status = await Characteristic.WriteValueWithResultAsync(subcommand, writeOption);
                 }
                 return status;
             }

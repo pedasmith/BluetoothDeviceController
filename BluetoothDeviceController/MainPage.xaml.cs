@@ -48,6 +48,7 @@ namespace BluetoothDeviceController
 
         const string ALARM = "⏰";
         const string BEACON = "⛯"; // MAP SYMBOL FOR LIGHTHOUSE //"🖄";
+        const string CAR = "🚗";
         const string DATA = "📈"; //"🥼";
         const string LIGHT = "💡";
         const string LIGHTNING = "🖄"; // envelope with lightning
@@ -67,6 +68,7 @@ namespace BluetoothDeviceController
             new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { "Puck" }, UART, "Espruino (puck)", "Puck.js: a UART-based Espruino device", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { Nordic_Uart.SpecializationName }, UART, "UART Comm port", "Nordic UART comm port", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPagesCustom.CraftyRobot_SmartibotPage), new string[] { "Smartibot" }, ROBOT, "Smartibot", "Smartibot espruino-based robot", Specialization.ParentScrollType.ChildHandlesScrolling),
+            new Specialization (typeof(SpecialtyPages.Elegoo_MiniCarPage), new string[] { "ELEGOO BT16" }, CAR, "Elegoo Mini-Car", "Elegoo small robot car"),
             new Specialization (typeof(SpecialtyPages.WilliamWeilerEngineering_SkoobotPage), new string[] { "Skoobot" }, ROBOT, "Skoobot", "Skoobot tiny robot"),
 
             // Lights
@@ -627,8 +629,8 @@ namespace BluetoothDeviceController
                 return;
             }
 
-
-            var dmec = new DeviceMenuEntryControl(wrapper, name, specialization);
+            var icon = GetIconForName(name);
+            var dmec = new DeviceMenuEntryControl(wrapper, name, specialization, icon);
             dmec.SettingsClick += OnDeviceSettingsClick;
             var menu = new NavigationViewItem()
             {
@@ -639,7 +641,21 @@ namespace BluetoothDeviceController
             uiNavigation.MenuItems.Insert(idx, menu);
         }
 
+        const string OTHER = "🜹";
 
+        private static string GetIconForName(string name)
+        {
+            string icon = null;
+            switch (name)
+            {
+                case "MX Anywhere 2S": icon = "🖰"; break;
+                case "MS1021": icon = "🖮"; break;
+                case "Charge 2": icon = "⌚"; break;
+                case "Surface Pen": icon = "🖉"; break;
+                default: icon = OTHER; break;
+            }
+            return icon;
+        }
 
 
         /// <summary>
@@ -685,7 +701,7 @@ namespace BluetoothDeviceController
                 var entry = nvib.Content as DeviceMenuEntryControl;
                 if (entry != null)
                 {
-                    entry.Update(wrapper, name, specialization);
+                    entry.Update(wrapper, name, specialization, null);
                 }
                 return;
             }
@@ -694,8 +710,8 @@ namespace BluetoothDeviceController
             idx = FindListEnd();
             if (idx == -1) idx = 0; // Impossible; the list always includes the list-stat and list-end
 
-
-            var dmec = new DeviceMenuEntryControl(wrapper, name, specialization);
+            string icon = GetIconForName(name);
+            var dmec = new DeviceMenuEntryControl(wrapper, name, specialization, icon);
             dmec.SettingsClick += OnDeviceSettingsClick;
             var menu = new NavigationViewItem()
             {

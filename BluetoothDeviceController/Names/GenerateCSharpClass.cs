@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using Windows.ApplicationModel.Activation;
 
 namespace BluetoothDeviceController.Names
 {
@@ -131,11 +133,92 @@ namespace BluetoothDeviceController.Names
                         var function = Generate_PageCSharp_function(replace, split, Generate_CSharp_Templates.PageCSharp_CharacteristicNotifyTemplate, Generate_CSharp_Templates.PageCSharp_CharacteristicNotify_DataTemplates);
                         functionlist += function;
                     }
+                    // All of the string-oriented commands
+                    if (characteristic.UIList.Count > 0)
+                    {
+                        var liststr = Generate_PageCSharp_UIList(characteristic, replace);
+                        functionlist += liststr;
+                    }
                 }
                 replace["[[CHARACTERISTIC_LIST]]"] = functionlist;
                 serviceList += Replace(Generate_CSharp_Templates.PageCSharp_ServiceTemplate, replace);
             }
             return serviceList;
+        }
+
+        private static string Generate_PageCSharp_UIList(NameCharacteristic characteristic, SortedDictionary<string, string> replace)
+        {
+            var liststr = "";
+            foreach (var simpleUI in characteristic.UIList)
+            {
+                Command target = null;
+                string[] targetlist = null;
+                if (!string.IsNullOrEmpty(simpleUI.Target))
+                {
+                    targetlist = simpleUI.Target.Split(new char[] { ' ' });
+                    target = characteristic.Commands[targetlist[0]];
+                    replace["[[COMMAND]]"] = DotNetSafe(targetlist[0]);
+                    replace["[[LABEL]]"] = string.IsNullOrEmpty(simpleUI.Label) ? target.Label : simpleUI.Label;
+                    // Is, e.g., "RGB R" -- the red parameter in the RGB command.
+                    if (targetlist.Length > 1)
+                    {
+                        var parameter = target.Parameters[targetlist[1]];
+                        replace["[[PARAM]]"] = DotNetSafe(targetlist[1]);
+                        replace["[[MIN]]"] = parameter.Min.ToString();
+                        replace["[[MAX]]"] = parameter.Max.ToString();
+                        replace["[[INIT]]"] = parameter.Init.ToString();
+                        if (!string.IsNullOrEmpty(parameter.Label))
+                        {
+                            replace["[[LABEL]]"] = parameter.Label;
+                        }
+                    }
+                }
+                else
+                {
+                    replace["[[LABEL]]"] = simpleUI.Label;
+                }
+
+                // E.G. A slider can set a value (the target like RGB R) and can also trigger a compute.
+                // The compute is technically given a different name, just because we can.
+                if (!string.IsNullOrEmpty (simpleUI.ComputeTarget))
+                {
+                    replace["[[TARGETCOMMAND]]"] = simpleUI.ComputeTarget;
+                }
+                else
+                {
+                    replace["[[SLIDERCHANGE_COMPUTETARGET]]"] = "";
+                }
+                switch (simpleUI.UIType)
+                {
+                    case "Blank":
+                        break;
+                    case "ButtonFor":
+                        break;
+                    case "SliderFor":
+                        {
+                            var needCompute = string.IsNullOrEmpty(simpleUI.ComputeTarget);
+                            if (needCompute)
+                            {
+                                var ct = Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_SliderChangeComputeTarget, replace);
+                                replace["[[ASYNC]]"] = "async ";
+                                replace["[[SLIDERCHANGE_COMPUTETARGET]]"] = ct;
+                            }
+                            else
+                            {
+                                replace["[[ASYNC]]"] = " ";
+                                replace["[[SLIDERCHANGE_COMPUTETARGET]]"] = "";
+                            }
+                            liststr += Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_SliderChange, replace);
+                        }
+                        break;
+                    case "RowEnd":
+                        break;
+                    case "RowStart":
+                        break;
+                }
+
+            }
+            return liststr;
         }
 
         private static string ByteFormatToCSharp(string format)
@@ -406,60 +489,30 @@ namespace BluetoothDeviceController.Names
                     }
                     replace["[[DATA1_LIST]]"] = datalist;
 
+                    // For the e.g. William Wiler Skoobot
                     var buttonUI = characteristic.UI?.buttonUI;
-                    if (characteristic.UI?.buttonType == "standard")
-                    {
-                        if (buttonUI == null)
-                        {
-                            foreach (var (enumcommandname, enumlist) in characteristic.EnumValues)
-                            {
-                                foreach (var (enumname, enumvalue) in enumlist)
-                                {
-                                    replace["[[ENUM_NAME]]"] = enumname;
-                                    replace["[[ENUM_VALUE]]"] = enumvalue.ToString(); // values are e.g. 17 as an int.
-                                    enumButtonList += Replace(Generate_CSharp_Templates.PageXamlCharacteristicEnumButtonTemplate, replace);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var defaultEnum = String.IsNullOrEmpty(buttonUI.DefaultEnum)
-                                ? characteristic.EnumValues.Keys.First()
-                                : buttonUI.DefaultEnum;
-                            foreach (var item in buttonUI.Buttons)
-                            {
-                                try
-                                {
-                                    // NOTE: in the future, allow this to be set. For now, we only ever allow
-                                    // enums when there's a single command, so there will only ever be a single
-                                    // item in the EnumValues list.
-                                    var enumList = characteristic.EnumValues[defaultEnum];
-                                    switch (item.Type)
-                                    {
-                                        case ButtonPerButtonUI.ButtonType.Blank:
-                                            enumButtonList += "                    <Rectangle />\n"; // have to make some kind of XAML object!
-                                            break;
-                                        case ButtonPerButtonUI.ButtonType.Button:
-                                            replace["[[ENUM_NAME]]"] = String.IsNullOrEmpty(item.Label) ? item.Enum : item.Label;
-                                            replace["[[ENUM_VALUE]]"] = enumList[item.Enum].ToString(); // values are e.g. 17 as an int.
-                                            enumButtonList += Replace(Generate_CSharp_Templates.PageXamlCharacteristicEnumButtonTemplate, replace);
-                                            break;
-                                    }
-                                }
-                                catch (Exception)
-                                {
-                                    enumButtonList += $"\nERROR: while processing button {item}\n";
-                                }
-                            }
-                        }
-                    }
-
+                    enumButtonList = Generate_PageXaml_UI_ButtonList(characteristic, replace);
                     replace["[[ENUM_BUTTON_LIST]]"] = enumButtonList;
                     replace["[[MAXCOLUMNS]]"] = (buttonUI==null ? 5 : buttonUI.MaxColumns).ToString();
                     replace["[[ENUM_BUTTON_LIST_PANEL]]"] = String.IsNullOrEmpty(enumButtonList)
                         ? ""
                         : Replace(Generate_CSharp_Templates.PageXamlCharacteristicEnumButtonPanelTemplate, replace);
                     ;
+
+                    // All of the string-oriented commands
+                    if (characteristic.UIList.Count > 0)
+                    {
+                        var liststr = Generate_PageXaml_UIList(characteristic, replace);
+                        replace["[[FUNCTIONUILIST]]"] = liststr;
+                        var panelstr = Replace(Generate_CSharp_Templates.PageXamlFunctionUIListPanelTemplate, replace);
+                        replace["[[FUNCTIONUI_LIST_PANEL]]"] = panelstr;
+                    }
+                    else
+                    {
+                        replace["[[FUNCTIONUI_LIST_PANEL]]"] = "";
+                    }
+
+
                     replace["[[READWRITE_BUTTON_LIST]]"] = readwriteButtonList;
                     replace["[[TABLE]]"] = table;
                     var c = Replace(Generate_CSharp_Templates.PageXaml_CharacteristicTemplate, replace);
@@ -472,6 +525,113 @@ namespace BluetoothDeviceController.Names
                 serviceList += Replace(Generate_CSharp_Templates.PageXaml_ServiceTemplate, replace);
             }
             return serviceList;
+        }
+
+        private static string Generate_PageXaml_UIList(NameCharacteristic characteristic, SortedDictionary<string, string> replace)
+        {
+            var liststr = "";
+            foreach (var simpleUI in characteristic.UIList)
+            {
+                Command target = null;
+                string[] targetlist = null;
+                if (!string.IsNullOrEmpty(simpleUI.Target))
+                {
+                    targetlist = simpleUI.Target.Split(new char[] { ' ' });
+                    target = characteristic.Commands[targetlist[0]];
+                    replace["[[COMMAND]]"] = DotNetSafe(targetlist[0]);
+                    replace["[[LABEL]]"] = string.IsNullOrEmpty(simpleUI.Label) ? target.Label : simpleUI.Label;
+                    // Is, e.g., "RGB R" -- the red parameter in the RGB command.
+                    if (targetlist.Length > 1)
+                    {
+                        var parameter = target.Parameters[targetlist[1]];
+                        replace["[[PARAM]]"] = DotNetSafe(targetlist[1]);
+                        replace["[[MIN]]"] = parameter.Min.ToString();
+                        replace["[[MAX]]"] = parameter.Max.ToString();
+                        replace["[[INIT]]"] = parameter.Init.ToString();
+                        if (!string.IsNullOrEmpty(parameter.Label))
+                        {
+                            replace["[[LABEL]]"] = parameter.Label;
+                        }
+                    }
+                }
+                else
+                {
+                    replace["[[LABEL]]"] = simpleUI.Label;
+                }
+                switch (simpleUI.UIType)
+                {
+                    case "Blank":
+                        // It doesn't take much to make a blank item.
+                        liststr += "<Rectangle />\n";
+                        break;
+                    case "ButtonFor":
+                        liststr += Replace(Generate_CSharp_Templates.PageXamlFunctionButtonTemplate, replace);
+                        break;
+                    case "SliderFor":
+                        liststr += Replace(Generate_CSharp_Templates.PageXamlFunctionSliderTemplate, replace);
+                        break;
+                    case "RowEnd":
+                        liststr += "</VariableSizedWrapGrid>\n";
+                        break;
+                    case "RowStart":
+                        liststr += $"<VariableSizedWrapGrid Orientation=\"Horizontal\" MaximumRowsOrColumns=\"{simpleUI.GetN()}\">\n";
+                        break;
+                }
+
+            }
+            return liststr;
+        }
+        private static string Generate_PageXaml_UI_ButtonList(NameCharacteristic characteristic, SortedDictionary<string, string> replace)
+        {
+            string enumButtonList = "";
+            var buttonUI = characteristic.UI?.buttonUI;
+            if (characteristic.UI?.buttonType == "standard")
+            {
+                if (buttonUI == null)
+                {
+                    foreach (var (enumcommandname, enumlist) in characteristic.EnumValues)
+                    {
+                        foreach (var (enumname, enumvalue) in enumlist)
+                        {
+                            replace["[[ENUM_NAME]]"] = enumname;
+                            replace["[[ENUM_VALUE]]"] = enumvalue.ToString(); // values are e.g. 17 as an int.
+                            enumButtonList += Replace(Generate_CSharp_Templates.PageXamlCharacteristicEnumButtonTemplate, replace);
+                        }
+                    }
+                }
+                else
+                {
+                    var defaultEnum = String.IsNullOrEmpty(buttonUI.DefaultEnum)
+                        ? characteristic.EnumValues.Keys.First()
+                        : buttonUI.DefaultEnum;
+                    foreach (var item in buttonUI.Buttons)
+                    {
+                        try
+                        {
+                            // NOTE: in the future, allow this to be set. For now, we only ever allow
+                            // enums when there's a single command, so there will only ever be a single
+                            // item in the EnumValues list.
+                            var enumList = characteristic.EnumValues[defaultEnum];
+                            switch (item.Type)
+                            {
+                                case ButtonPerButtonUI.ButtonType.Blank:
+                                    enumButtonList += "                    <Rectangle />\n"; // have to make some kind of XAML object!
+                                    break;
+                                case ButtonPerButtonUI.ButtonType.Button:
+                                    replace["[[ENUM_NAME]]"] = String.IsNullOrEmpty(item.Label) ? item.Enum : item.Label;
+                                    replace["[[ENUM_VALUE]]"] = enumList[item.Enum].ToString(); // values are e.g. 17 as an int.
+                                    enumButtonList += Replace(Generate_CSharp_Templates.PageXamlCharacteristicEnumButtonTemplate, replace);
+                                    break;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            enumButtonList += $"\nERROR: while processing button {item}\n";
+                        }
+                    }
+                }
+            }
+            return enumButtonList;
         }
 
 
@@ -689,7 +849,56 @@ namespace BluetoothDeviceController.Names
                             : "GattWriteOption.WriteWithResponse";
                         Retval += Replace(Generate_CSharp_Templates.Protocol_WriteMethodTemplate, replace);
                     }
+                    foreach (var (functionname, command) in characteristic.Commands)
+                    {
+                        // Set these up before replacing in the per-param values.
+                        replace["[[FUNCTION_COMPUTE]]"] = command.Compute;
+                        replace["[[FUNCTIONNAME]]"] = functionname;
 
+                        var fparams = "";
+                        var addvars = "";
+                        var setvars = "";
+                        var fenums = "";
+
+                        foreach (var (paramname, param) in command.Parameters)
+                        {
+                            if (fparams.Length > 0) fparams += ", ";
+                            replace["[[FUNCTIONPARAMNAME]]"] = paramname;
+
+                            var enumname = "";
+                            if (param.ValueNames.Count > 0)
+                            {
+                                var fenuminit = "";
+                                foreach (var (varname, varvalue) in param.ValueNames)
+                                {
+                                    var varnamedn = DotNetSafe(varname);
+                                    fenuminit += $"            {varnamedn} = {varvalue},\n";
+                                }
+                                replace["[[FUNCTION_ENUM_INITS]]"] = fenuminit.TrimEnd();
+                                fenums += Replace(Generate_CSharp_Templates.Protocol_Function_Enum, replace);
+                                enumname = Replace("[[CHARACTERISTICNAME]]_[[FUNCTIONNAME]]_[[FUNCTIONPARAMNAME]]", replace);
+                            }
+
+                            var issigned = param.Min < 0;
+                            var sbytestr = issigned ? "s" : "";
+                            var sintstr = issigned ? "" : "u";
+                            if (enumname != "") fparams += enumname + " ";
+                            else if (param.Max <= 255) fparams += $"{sbytestr}byte ";
+                            else if (param.Max <= 65535) fparams += $"{sintstr}short ";
+                            else fparams += $"{sintstr}int ";
+                            fparams += paramname;
+
+                            replace["[[FUNCTIONPARAMINIT]]"] = param.Init.ToString();
+                            addvars += Replace(Generate_CSharp_Templates.Protocol_Function_AddVariableTemplate, replace);
+                            setvars += Replace(Generate_CSharp_Templates.Protocol_Function_SetVariableTemplate, replace);
+                        }
+
+                        replace["[[PROTOCOL_FUNCTION_ENUMS]]"] = fenums;
+                        replace["[[FUNCTION_ADDVARIABLES]]"] = addvars;
+                        replace["[[FUNCTION_SETVARIABLES]]"] = setvars;
+                        replace["[[FUNCTION_PARAMS]]"] = fparams;
+                        Retval += Replace(Generate_CSharp_Templates.Protocol_FunctionTemplate, replace);
+                    }
 
                     characteristicIndex++;
                 }

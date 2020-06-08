@@ -14,6 +14,7 @@
         {
           "UUID": "0000ffe0-0000-1000-8000-00805f9b34fb",
           "Name": "Car",
+          "Priority":  10,
           "Characteristics": [
             {
               "UUID": "0000ffe1-0000-1000-8000-00805f9b34fb",
@@ -73,7 +74,7 @@
                   "Target": "Sport",
                   "Set": [ "Sport Direction Stop" ],
                   "PlaceAt": "Stop",
-                  "Label": "⊚"
+                  "Label": "🛑"
                 },
                 {
                   "UIType": "ButtonFor",

@@ -28,7 +28,7 @@
                 <ComboBoxItem Content="Page C#" Tag="Page_C#" />
             </ComboBox>
         </StackPanel>
-        <ScrollViewer Grid.Row="2" Height="150" MinWidth="400">
+        <ScrollViewer Grid.Row="2" Height="150" MinWidth="400" MaxWidth="400">
             <TextBlock x:Name="uiJsonText" IsTextSelectionEnabled="True" TextWrapping="NoWrap"  />
         </ScrollViewer>
     </Grid>

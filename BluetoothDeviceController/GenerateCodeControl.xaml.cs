@@ -7,6 +7,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -28,12 +29,26 @@ namespace BluetoothDeviceController
             this.Loaded += GenerateCodeControl_Loaded;
         }
 
+        const string SAVED_DEVICE_NAME = "GenerateCode_Saved_Device";
         private void GenerateCodeControl_Loaded(object sender, RoutedEventArgs e)
         {
+            var selectedName = "non device has been saved";
+            var localSettings = ApplicationData.Current.LocalSettings;
+            if (localSettings.Values.ContainsKey (SAVED_DEVICE_NAME))
+            {
+                selectedName = localSettings.Values[SAVED_DEVICE_NAME] as string;
+            }
             // Add all JSON files to the list
+            ComboBoxItem selectedItem = null;
             foreach (var nameDevice in BleNames.AllRawDevices.AllDevices)
             {
-                uiJsonNames.Items.Add(new ComboBoxItem() { Content = nameDevice.Name });
+                var cbi = new ComboBoxItem() { Content = nameDevice.Name };
+                uiJsonNames.Items.Add(cbi);
+                if (nameDevice.Name == selectedName) selectedItem = cbi; 
+            }
+            if (selectedItem != null)
+            {
+                uiJsonNames.SelectedItem = selectedItem;
             }
         }
 
@@ -41,10 +56,12 @@ namespace BluetoothDeviceController
         private void OnSelectJsonFile(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count != 1) return;
-
             var name = (e.AddedItems[0] as ComboBoxItem).Content as string;
-            SelectedNameDevice = BleNames.GetDevice(name, BleNames.AllRawDevices);
 
+            var localSettings = ApplicationData.Current.LocalSettings;
+            localSettings.Values[SAVED_DEVICE_NAME] = name;
+
+            SelectedNameDevice = BleNames.GetDevice(name, BleNames.AllRawDevices);
             DisplaySelection();
         }
 

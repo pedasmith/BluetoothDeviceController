@@ -66,7 +66,7 @@ namespace BluetoothDeviceController.Names
         public string CmdName { get; set; }
         public override string ToString()
         {
-            return $"Settings Min={Min} Init={Init} Max={Max}";
+            return $"Settings {Name} Min={Min} Init={Init} Max={Max}";
         }
     }
 
@@ -112,7 +112,8 @@ namespace BluetoothDeviceController.Names
             Variables.Init(Set);
             Variables.Init(Parameters);
         }
-        public async Task DoCommand()
+
+        public string DoCompute()
         {
             Variables.SetCurrValue(Parameters);
 
@@ -124,12 +125,20 @@ namespace BluetoothDeviceController.Names
                 cmd += calculateResult.S ?? calculateResult.D.ToString();
             }
             Variables.CopyToPrev();
-
-
-            // Got the command to send! now what?
+            return cmd;
+        }
+        public async Task DoCommand()
+        {
+            if (WriteCharacteristic == null) return; // can happen at startup
+            var cmd = DoCompute();
             var result = await WriteCharacteristic.DoWriteString(cmd);
             System.Diagnostics.Debug.WriteLine($"COMMAND: {cmd}");
             ;
+        }
+
+        public void SetCurrDouble(string name, double value)
+        {
+            Parameters[name].CurrValue = value;
         }
     }
 }

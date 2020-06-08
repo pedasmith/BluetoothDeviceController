@@ -1,4 +1,5 @@
-﻿using System;
+﻿//From template: Protocol_Body
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -7,17 +8,21 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
+using BluetoothDeviceController.Names;
 
 namespace BluetoothProtocols
 {
     /// <summary>
     /// Robot with a wooden shell. The interior robot is a typical Arduino bot. Communications are via pretend Serial port ffe1/ffe2..
-    /// This class was automatically generated 5/24/2020 9:22 PM
+    /// This class was automatically generated 6/7/2020 6:40 PM
     /// </summary>
 
     public partial class Elegoo_MiniCar : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
+        // Link: https://www.elegoo.com/
+        // Link: https://www.elegoo.com/product/elegoo-robotic-wooden-car-kit-with-nanoarduino-compatible-line-tracking-avoiding-obstacle-mobile-controlling-and-graphical-programming-intelligent-and-educational-toy-car-kitstem-toys-for-kids/
+        // Link: https://www.elegoo.com/tutorial/Elegoo%20Robot%20miniCar%20Kit%20V1.0.2020.01.07.zip
 
 
         public BluetoothLEDevice ble { get; set; } = null;
@@ -67,6 +72,7 @@ namespace BluetoothProtocols
         public async Task<bool> EnsureCharacteristicAsync(bool forceReread = false)
         {
             if (Characteristics.Length == 0) return false;
+            if (ble == null) return false; // might not be initialized yet
 
             GattCharacteristicsResult lastResult = null;
             if (forceReread)
@@ -251,7 +257,7 @@ namespace BluetoothProtocols
 
             return true;
         }
-
+        //From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Command
         /// </summary>
@@ -279,5 +285,560 @@ namespace BluetoothProtocols
             // original: await DoWriteAsync(data);
         }
 
+        //From template:Protocol_FunctionTemplate
+
+        Command command_Command_ObstacleAvoidance = null;
+        public Command Command_ObstacleAvoidance_Init()
+        {
+            if (command_Command_ObstacleAvoidance == null)
+            {
+                var command = new Command();
+
+                command.InitVariables();
+                command.Compute = "${OA[?]}";
+                command_Command_ObstacleAvoidance = command;
+            }
+            return command_Command_ObstacleAvoidance;
+        }
+        public async Task Command_ObstacleAvoidance()
+        {
+            var command = Command_ObstacleAvoidance_Init();
+
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_LineTrack_Sensor
+        {
+            Left = 0,
+            Right = 1,
+        }
+        Command command_Command_LineTrack = null;
+        public Command Command_LineTrack_Init()
+        {
+            if (command_Command_LineTrack == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("Sensor",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.InitVariables();
+                command.Compute = "${LT[ $Sensor_GN $][?]}";
+                command_Command_LineTrack = command;
+            }
+            return command_Command_LineTrack;
+        }
+        public async Task Command_LineTrack(Command_LineTrack_Sensor Sensor)
+        {
+            var command = Command_LineTrack_Init();
+
+            command.Parameters["Sensor"].CurrValue = (double)Sensor;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_Sport_Direction
+        {
+            Stop = 0,
+            Forward = 1,
+            Backward = 2,
+            Left = 3,
+            Right = 4,
+        }
+        Command command_Command_Sport = null;
+        public Command Command_Sport_Init()
+        {
+            if (command_Command_Sport == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("Direction",
+                    new VariableDescription()
+                    {
+                        Init = 1,
+                    });
+                command.Parameters.Add("Speed",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.InitVariables();
+                command.Compute = "${TURN[ $Direction_GN $][ $Speed_GN $]}";
+                command_Command_Sport = command;
+            }
+            return command_Command_Sport;
+        }
+        public async Task Command_Sport(Command_Sport_Direction Direction, byte Speed)
+        {
+            var command = Command_Sport_Init();
+
+            command.Parameters["Direction"].CurrValue = (double)Direction;
+            command.Parameters["Speed"].CurrValue = (double)Speed;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_Sport2_Direction
+        {
+            Stop = 0,
+            Forward = 1,
+            Backward = 2,
+            Left = 3,
+            Right = 4,
+        }
+        public enum Command_Sport2_Light
+        {
+            Off = 0,
+            White = 1,
+            Purple_A020F0 = 2,
+        }
+        Command command_Command_Sport2 = null;
+        public Command Command_Sport2_Init()
+        {
+            if (command_Command_Sport2 == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("Direction",
+                    new VariableDescription()
+                    {
+                        Init = 1,
+                    });
+                command.Parameters.Add("Speed",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.Parameters.Add("Light",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.InitVariables();
+                command.Compute = "${TURNS[ $Direction_GN $][ $Speed_GN $][ $Light_GN $]}";
+                command_Command_Sport2 = command;
+            }
+            return command_Command_Sport2;
+        }
+        public async Task Command_Sport2(Command_Sport2_Direction Direction, byte Speed, Command_Sport2_Light Light)
+        {
+            var command = Command_Sport2_Init();
+
+            command.Parameters["Direction"].CurrValue = (double)Direction;
+            command.Parameters["Speed"].CurrValue = (double)Speed;
+            command.Parameters["Light"].CurrValue = (double)Light;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_Move_Motor
+        {
+            All = 0,
+            Left = 1,
+            Right = 2,
+        }
+        public enum Command_Move_Direction
+        {
+            Stop = 0,
+            Forward = 1,
+            Reverse = 2,
+            No_Execution = 3,
+        }
+        Command command_Command_Move = null;
+        public Command Command_Move_Init()
+        {
+            if (command_Command_Move == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("Motor",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.Parameters.Add("Direction",
+                    new VariableDescription()
+                    {
+                        Init = 1,
+                    });
+                command.Parameters.Add("Speed",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.InitVariables();
+                command.Compute = "${MOVE[ $Motor_GN $][ $Direction_GN $][ $Speed_GN $]}";
+                command_Command_Move = command;
+            }
+            return command_Command_Move;
+        }
+        public async Task Command_Move(Command_Move_Motor Motor, Command_Move_Direction Direction, byte Speed)
+        {
+            var command = Command_Move_Init();
+
+            command.Parameters["Motor"].CurrValue = (double)Motor;
+            command.Parameters["Direction"].CurrValue = (double)Direction;
+            command.Parameters["Speed"].CurrValue = (double)Speed;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_Move2_LeftDirection
+        {
+            Stop = 0,
+            Forward = 1,
+            Reverse = 2,
+            No_Execution = 3,
+        }
+        public enum Command_Move2_RightDirection
+        {
+            Stop = 0,
+            Forward = 1,
+            Reverse = 2,
+            No_Execution = 3,
+        }
+        Command command_Command_Move2 = null;
+        public Command Command_Move2_Init()
+        {
+            if (command_Command_Move2 == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("LeftDirection",
+                    new VariableDescription()
+                    {
+                        Init = 1,
+                    });
+                command.Parameters.Add("LeftSpeed",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.Parameters.Add("RightDirection",
+                    new VariableDescription()
+                    {
+                        Init = 1,
+                    });
+                command.Parameters.Add("RightSpeed",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.InitVariables();
+                command.Compute = "${MOVES[ $LeftDirection_GN $][ $LeftSpeed_GN $][ $RightDirection_GN $][ $RightSpeed_GN $]}";
+                command_Command_Move2 = command;
+            }
+            return command_Command_Move2;
+        }
+        public async Task Command_Move2(Command_Move2_LeftDirection LeftDirection, byte LeftSpeed, Command_Move2_RightDirection RightDirection, byte RightSpeed)
+        {
+            var command = Command_Move2_Init();
+
+            command.Parameters["LeftDirection"].CurrValue = (double)LeftDirection;
+            command.Parameters["LeftSpeed"].CurrValue = (double)LeftSpeed;
+            command.Parameters["RightDirection"].CurrValue = (double)RightDirection;
+            command.Parameters["RightSpeed"].CurrValue = (double)RightSpeed;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_Beep_Song
+        {
+            Off = 0,
+            Frère_Jacques = 1,
+        }
+        Command command_Command_Beep = null;
+        public Command Command_Beep_Init()
+        {
+            if (command_Command_Beep == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("Song",
+                    new VariableDescription()
+                    {
+                        Init = 1,
+                    });
+                command.InitVariables();
+                command.Compute = "${BEEP[ $Song_GN $]}";
+                command_Command_Beep = command;
+            }
+            return command_Command_Beep;
+        }
+        public async Task Command_Beep(Command_Beep_Song Song)
+        {
+            var command = Command_Beep_Init();
+
+            command.Parameters["Song"].CurrValue = (double)Song;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        Command command_Command_Beep2 = null;
+        public Command Command_Beep2_Init()
+        {
+            if (command_Command_Beep2 == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("Tone",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.Parameters.Add("Duration",
+                    new VariableDescription()
+                    {
+                        Init = 250,
+                    });
+                command.InitVariables();
+                command.Compute = "${BEEPS[ $Tone_GN $][ $Duration_GN_1000_/ $]}";
+                command_Command_Beep2 = command;
+            }
+            return command_Command_Beep2;
+        }
+        public async Task Command_Beep2(byte Tone, ushort Duration)
+        {
+            var command = Command_Beep2_Init();
+
+            command.Parameters["Tone"].CurrValue = (double)Tone;
+            command.Parameters["Duration"].CurrValue = (double)Duration;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_RGB_Lights
+        {
+            Both = 0,
+            Left = 1,
+            Right = 2,
+        }
+        public enum Command_RGB_Mode
+        {
+            Solid = 0,
+            Flashing = 1,
+        }
+        Command command_Command_RGB = null;
+        public Command Command_RGB_Init()
+        {
+            if (command_Command_RGB == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("R",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.Parameters.Add("G",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.Parameters.Add("B",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.Parameters.Add("Lights",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.Parameters.Add("Duration",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.Parameters.Add("Mode",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.InitVariables();
+                command.Compute = "${RGB[ $R_GN $][ $G_GN $][ $B_GN $][ $Lights_GN $][ $Duration_GN $][ $Mode_GN $]}";
+                command_Command_RGB = command;
+            }
+            return command_Command_RGB;
+        }
+        public async Task Command_RGB(byte R, byte G, byte B, Command_RGB_Lights Lights, byte Duration, Command_RGB_Mode Mode)
+        {
+            var command = Command_RGB_Init();
+
+            command.Parameters["R"].CurrValue = (double)R;
+            command.Parameters["G"].CurrValue = (double)G;
+            command.Parameters["B"].CurrValue = (double)B;
+            command.Parameters["Lights"].CurrValue = (double)Lights;
+            command.Parameters["Duration"].CurrValue = (double)Duration;
+            command.Parameters["Mode"].CurrValue = (double)Mode;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_RGBSet_LeftMode
+        {
+            Solid = 0,
+            Flashing = 1,
+        }
+        public enum Command_RGBSet_RightMode
+        {
+            Solid = 0,
+            Flashing = 1,
+        }
+        Command command_Command_RGBSet = null;
+        public Command Command_RGBSet_Init()
+        {
+            if (command_Command_RGBSet == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("LeftRGB",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.Parameters.Add("LeftMode",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.Parameters.Add("RightRGB",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.Parameters.Add("RightMode",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.InitVariables();
+                command.Compute = "${RGBS[ $LeftRGB_GS $][ $LeftMode_GN $][ $RightRGB_GS $][ $RightMode_GN $]}";
+                command_Command_RGBSet = command;
+            }
+            return command_Command_RGBSet;
+        }
+        public async Task Command_RGBSet(byte LeftRGB, Command_RGBSet_LeftMode LeftMode, byte RightRGB, Command_RGBSet_RightMode RightMode)
+        {
+            var command = Command_RGBSet_Init();
+
+            command.Parameters["LeftRGB"].CurrValue = (double)LeftRGB;
+            command.Parameters["LeftMode"].CurrValue = (double)LeftMode;
+            command.Parameters["RightRGB"].CurrValue = (double)RightRGB;
+            command.Parameters["RightMode"].CurrValue = (double)RightMode;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        Command command_Command_Brightness = null;
+        public Command Command_Brightness_Init()
+        {
+            if (command_Command_Brightness == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("Brightness",
+                    new VariableDescription()
+                    {
+                        Init = 100,
+                    });
+                command.InitVariables();
+                command.Compute = "${RGBB[ $Brightness_GN $]}";
+                command_Command_Brightness = command;
+            }
+            return command_Command_Brightness;
+        }
+        public async Task Command_Brightness(byte Brightness)
+        {
+            var command = Command_Brightness_Init();
+
+            command.Parameters["Brightness"].CurrValue = (double)Brightness;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_Key_KeyMode
+        {
+            Standby = 0,
+            Line_Tracking = 1,
+            Obstacle_Avoidance = 2,
+            Auto_follow = 3,
+            Explorer = 4,
+        }
+        Command command_Command_Key = null;
+        public Command Command_Key_Init()
+        {
+            if (command_Command_Key == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("KeyMode",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.InitVariables();
+                command.Compute = "${KEY[ $KeyMode_GN $]}";
+                command_Command_Key = command;
+            }
+            return command_Command_Key;
+        }
+        public async Task Command_Key(Command_Key_KeyMode KeyMode)
+        {
+            var command = Command_Key_Init();
+
+            command.Parameters["KeyMode"].CurrValue = (double)KeyMode;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
+        //From template:Protocol_FunctionTemplate
+
+        public enum Command_Clear_ClearMode
+        {
+            All = 0,
+            Lights_Off = 1,
+            Stop = 2,
+            Mute = 3,
+        }
+        Command command_Command_Clear = null;
+        public Command Command_Clear_Init()
+        {
+            if (command_Command_Clear == null)
+            {
+                var command = new Command();
+
+                command.Parameters.Add("ClearMode",
+                    new VariableDescription()
+                    {
+                        Init = 0,
+                    });
+                command.InitVariables();
+                command.Compute = "${CLEAR[ $ClearMode_GN $]}";
+                command_Command_Clear = command;
+            }
+            return command_Command_Clear;
+        }
+        public async Task Command_Clear(Command_Clear_ClearMode ClearMode)
+        {
+            var command = Command_Clear_Init();
+
+            command.Parameters["ClearMode"].CurrValue = (double)ClearMode;
+            var computed_string = command.DoCompute();
+            await WriteCommand(computed_string);
+        }
     }
 }

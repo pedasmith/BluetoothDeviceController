@@ -264,9 +264,6 @@
     <Compile Include="SpecialtyPagesCustom\CraftyRobot_SmartibotPage.xaml.cs">
       <DependentUpon>CraftyRobot_SmartibotPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SpecialtyPagesCustom\Elegoo_MiniCarPage.xaml.cs">
-      <DependentUpon>Elegoo_MiniCarPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="SpecialtyPagesCustom\UartPage.xaml.cs">
       <DependentUpon>UartPage.xaml</DependentUpon>
     </Compile>
@@ -282,6 +279,9 @@
     </Compile>
     <Compile Include="SpecialtyPages\DigHoseEndPage.xaml.cs">
       <DependentUpon>DigHoseEndPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialtyPages\Elegoo_MiniCarPage.xaml.cs">
+      <DependentUpon>Elegoo_MiniCarPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPages\IHandleStatus.cs" />
     <Compile Include="SpecialtyPages\Kano_WandPage.xaml.cs">
@@ -921,10 +921,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SpecialtyPagesCustom\Elegoo_MiniCarPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="SpecialtyPagesCustom\UartPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -954,6 +950,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPages\DigHoseEndPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPages\Elegoo_MiniCarPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -9,7 +9,8 @@ namespace BluetoothDeviceController.Names
     class Generate_CSharp_Templates
     {
 
-        public static string Protocol_BodyTemplate = @"using System;
+        public static string Protocol_BodyTemplate = @"//From template: Protocol_Body
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -18,6 +19,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
+using BluetoothDeviceController.Names;
 
 namespace BluetoothProtocols
 {
@@ -46,6 +48,7 @@ namespace BluetoothProtocols
         public async Task<bool> EnsureCharacteristicAsync(bool forceReread = false)
         {
             if (Characteristics.Length == 0) return false;
+            if (ble == null) return false; // might not be initialized yet
 
             GattCharacteristicsResult lastResult = null;
             if (forceReread) 
@@ -272,7 +275,7 @@ namespace BluetoothProtocols
         }
 ";
 
-        public static string Protocol_WriteMethodTemplate = @"
+        public static string Protocol_WriteMethodTemplate = @"//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for [[CHARACTERISTICNAME]]
         /// </summary>
@@ -314,6 +317,47 @@ namespace BluetoothProtocols
         }
 ";
 
+        public static string Protocol_FunctionTemplate = @"
+        //From template:Protocol_FunctionTemplate
+[[PROTOCOL_FUNCTION_ENUMS]]
+        Command command_[[CHARACTERISTICNAME]]_[[FUNCTIONNAME]] = null;
+        public Command [[CHARACTERISTICNAME]]_[[FUNCTIONNAME]]_Init()
+        {
+            if (command_[[CHARACTERISTICNAME]]_[[FUNCTIONNAME]] == null)
+            {
+                var command = new Command();
+[[FUNCTION_ADDVARIABLES]]
+                command.InitVariables();
+                command.Compute = ""[[FUNCTION_COMPUTE]]"";
+                command_[[CHARACTERISTICNAME]]_[[FUNCTIONNAME]] = command;
+            }
+            return command_[[CHARACTERISTICNAME]]_[[FUNCTIONNAME]];
+        }
+        public async Task [[CHARACTERISTICNAME]]_[[FUNCTIONNAME]]([[FUNCTION_PARAMS]])
+        {
+            var command = [[CHARACTERISTICNAME]]_[[FUNCTIONNAME]]_Init();
+[[FUNCTION_SETVARIABLES]]
+            var computed_string = command.DoCompute();
+            await Write[[CHARACTERISTICNAME]](computed_string);
+        }";
+
+        public static string Protocol_Function_AddVariableTemplate = @"
+                command.Parameters.Add(""[[FUNCTIONPARAMNAME]]"",
+                    new VariableDescription()
+                    {
+                        Init = [[FUNCTIONPARAMINIT]],
+                    });";
+        public static string Protocol_Function_SetVariableTemplate = @"
+            command.Parameters[""[[FUNCTIONPARAMNAME]]""].CurrValue = (double)[[FUNCTIONPARAMNAME]];";
+
+        public static string Protocol_Function_Enum = @"
+        public enum [[CHARACTERISTICNAME]]_[[FUNCTIONNAME]]_[[FUNCTIONPARAMNAME]]
+        {
+[[FUNCTION_ENUM_INITS]]
+        }";
+        // FUNCTION_ENUM_INITS is e.g. "            Left = 0,"
+
+
         public static string PageXaml_BodyTemplate = @"
 <Page
     x:Class=""BluetoothDeviceController.SpecialtyPages.[[CLASSNAME]]Page""
@@ -332,6 +376,11 @@ namespace BluetoothProtocols
             <Setter Property=""VerticalAlignment"" Value=""Bottom"" />
             <Setter Property=""FontFamily"" Value=""Segoe UI,Segoe MDL2 Assets"" />
             <Setter Property=""Margin"" Value=""10,5,0,0"" />
+        </Style>
+        <Style TargetType=""Slider"">
+            <Setter Property=""MinWidth"" Value=""200"" />
+            <Setter Property=""FontFamily"" Value=""Segoe UI,Segoe MDL2 Assets"" />
+            <Setter Property=""Margin"" Value=""10,5,10,0"" />
         </Style>
         <Style TargetType=""Line"">
             <Setter Property=""Margin"" Value=""0,15,0,0"" />
@@ -410,6 +459,7 @@ namespace BluetoothProtocols
 [[READWRITE_BUTTON_LIST]]
                 </StackPanel>
 [[ENUM_BUTTON_LIST_PANEL]]
+[[FUNCTIONUI_LIST_PANEL]]
 [[TABLE]]
 ";
         public static string PageXamlCharacteristicDataTemplate = @"
@@ -450,6 +500,16 @@ namespace BluetoothProtocols
                         </StackPanel>
                     </controls:Expander>
 ";
+
+        public static string PageXamlFunctionUIListPanelTemplate = @"<StackPanel>
+[[FUNCTIONUILIST]]
+</StackPanel>";
+        public static string PageXamlFunctionButtonTemplate = @"<Button Content=""[[LABEL]]"" />
+";
+        public static string PageXamlFunctionSliderTemplate = @"<Slider Header=""[[LABEL]]"" Minimum=""[[MIN]]"" Maximum=""[[MAX]]"" ValueChanged=""[[COMMAND]]_[[PARAM]]_SliderChanged"" />
+";
+
+
         public static string PageCSharp_BodyTemplate =
 @"using BluetoothDeviceController.Charts;
 using BluetoothDeviceController.Names;
@@ -789,6 +849,22 @@ typeof([[CHARACTERISTICNAME]]Record).GetProperty(""[[DATANAME]]""),", // DATA4_L
                 });
             }
         }";
+
+
+        public static string PageCSharp_Characteristic_SliderChange = @"
+        private [[ASYNC]]void [[COMMAND]]_[[PARAM]]_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            var commandSet = bleDevice.[[CHARACTERISTICNAME]]_[[COMMAND]]_Init();
+            commandSet.SetCurrDouble(""[[PARAM]]"", e.NewValue);
+[[SLIDERCHANGE_COMPUTETARGET]]
+        }
+		";
+        public static string PageCSharp_Characteristic_SliderChangeComputeTarget = @"
+            // computedTarget might be different from the computed value
+            var commandWrite = bleDevice.[[CHARACTERISTICNAME]]_[[TARGETCOMMAND]]_Init();
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.Write[[CHARACTERISTICNAME]](commandString);
+		";
 
         public static string PageCSharp_Characteristic_ChartSetup_Template = @"
                 var EventTimeProperty = typeof([[CHARACTERISTICNAME]]Record).GetProperty(""EventTime"");

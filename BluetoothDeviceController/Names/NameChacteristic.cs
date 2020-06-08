@@ -16,6 +16,11 @@ namespace BluetoothDeviceController.Names
         public string Label { get; set; }
         public List<string> Set { get; } = new List<string>();
         public double N { get; set; } = double.NaN;
+        public int GetN(int defaultN = 4)
+        {
+            if (double.IsNaN(N)) return defaultN;
+            return (int)N;
+        }
     }
 
     public class ButtonPerButtonUI

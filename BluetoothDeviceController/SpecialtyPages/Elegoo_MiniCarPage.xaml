@@ -16,6 +16,11 @@
             <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
             <Setter Property="Margin" Value="10,5,0,0" />
         </Style>
+        <Style TargetType="Slider">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,10,0" />
+        </Style>
         <Style TargetType="Line">
             <Setter Property="Margin" Value="0,15,0,0" />
             <Setter Property="Stroke" Value="ForestGreen" />
@@ -73,7 +78,7 @@
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
 
-        <controls:Expander Header="Car" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+        <controls:Expander Header="Car" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Result</TextBlock>
@@ -88,6 +93,7 @@
 
 
 
+
                 <TextBlock Style="{StaticResource SubheaderStyle}">Command</TextBlock>
                 <StackPanel Orientation="Horizontal">
 
@@ -98,6 +104,42 @@
 
                 </StackPanel>
 
+                <StackPanel>
+                    <Button Content="Obstacle" />
+                    <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
+                        <Button Content="Line Tracking Mode" />
+                    </VariableSizedWrapGrid>
+                    <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
+                        <Slider Header="Speed" Minimum="0" Maximum="255" ValueChanged="Sport_Speed_SliderChanged" />
+                        <Button Content="⇑" />
+                        <Rectangle />
+                        <Button Content="⇐" />
+                        <Button Content="🛑" />
+                        <Button Content="⇒" />
+                        <Rectangle />
+                        <Button Content="⇓" />
+                    </VariableSizedWrapGrid>
+                    <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
+                        <Slider Header="Beep Tone" Minimum="1" Maximum="255" ValueChanged="Beep2_Tone_SliderChanged" />
+                        <Slider Header="Duration in milliseconds" Minimum="0" Maximum="65535" ValueChanged="Beep2_Duration_SliderChanged" />
+                        <Button Content="Beep" />
+                    </VariableSizedWrapGrid>
+                    <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
+                        <Slider Header="Red" Minimum="1" Maximum="255" ValueChanged="RGB_R_SliderChanged" />
+                        <Slider Header="Green" Minimum="1" Maximum="255" ValueChanged="RGB_G_SliderChanged" />
+                        <Slider Header="Blue" Minimum="1" Maximum="255" ValueChanged="RGB_B_SliderChanged" />
+                    </VariableSizedWrapGrid>
+                    <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
+                        <Slider Header="Duration" Minimum="0" Maximum="255" ValueChanged="RGB_Duration_SliderChanged" />
+                    </VariableSizedWrapGrid>
+                    <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
+                        <Button Content="Clear" />
+                        <Button Content="Lights" />
+                        <Button Content="Stop" />
+                        <Button Content="Mute" />
+                    </VariableSizedWrapGrid>
+
+                </StackPanel>
 
 
             </StackPanel>

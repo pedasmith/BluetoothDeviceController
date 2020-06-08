@@ -25,23 +25,22 @@ namespace BluetoothDeviceController
         public delegate void DeviceSettingsHandler(object source, DeviceInformationWrapper wrapper);
         public event DeviceSettingsHandler SettingsClick;
 
-        const string OTHER = "🜹";
         public DeviceInformationWrapper Wrapper;
 
-        public DeviceMenuEntryControl(DeviceInformationWrapper wrapper, string name, Specialization specialization)
+        public DeviceMenuEntryControl(DeviceInformationWrapper wrapper, string name, Specialization specialization, string icon)
         {
             this.InitializeComponent();
             Wrapper = wrapper;
-            Update(wrapper, name, specialization);
+            Update(wrapper, name, specialization, icon);
         }
         int NUpdates = 0;
-        public void Update(DeviceInformationWrapper wrapper, string name, Specialization specialization)
+        public void Update(DeviceInformationWrapper wrapper, string name, Specialization specialization, string icon)
         {
             NUpdates++;
             uiNameBlock.Text = name;
             if (specialization == null)
             {
-                uiIconBlock.Text = OTHER;
+                uiIconBlock.Text = icon;
                 if (NUpdates == 1)
                 {
                     // Make it smaller and less appealing, but only the first time.
