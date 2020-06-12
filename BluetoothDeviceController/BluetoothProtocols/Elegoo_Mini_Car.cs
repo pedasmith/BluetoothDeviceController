@@ -14,7 +14,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Robot with a wooden shell. The interior robot is a typical Arduino bot. Communications are via pretend Serial port ffe1/ffe2..
-    /// This class was automatically generated 6/7/2020 6:40 PM
+    /// This class was automatically generated 6/10/2020 9:52 AM
     /// </summary>
 
     public partial class Elegoo_MiniCar : INotifyPropertyChanged
@@ -365,7 +365,7 @@ namespace BluetoothProtocols
                 command.Parameters.Add("Speed",
                     new VariableDescription()
                     {
-                        Init = 100,
+                        Init = 255,
                     });
                 command.InitVariables();
                 command.Compute = "${TURN[ $Direction_GN $][ $Speed_GN $]}";

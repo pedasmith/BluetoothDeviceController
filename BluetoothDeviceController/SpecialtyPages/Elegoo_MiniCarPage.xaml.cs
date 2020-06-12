@@ -275,73 +275,173 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-        private async void Sport_Speed_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        private async void ObstacleAvoidance_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_ObstacleAvoidance_Init();
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private async void LineTrack_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_LineTrack_Init();
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private void Sport_Speed_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             var commandSet = bleDevice.Command_Sport_Init();
             commandSet.SetCurrDouble("Speed", e.NewValue);
 
-            // computedTarget might be different from the computed value
-            var commandWrite = bleDevice.Command_RGB_Init();
-            var commandString = commandWrite.DoCompute();
-            await bleDevice.WriteCommand(commandString);
-
         }
 
-        private async void Beep2_Tone_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        private async void Sport_Forward_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Sport_Init();
+            commandWrite.Parameters["Direction"].CurrValue = 1; // same as commandWrite.Parameters["Direction"].ValueNames["Forward"];
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private async void Sport_Left_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Sport_Init();
+            commandWrite.Parameters["Direction"].CurrValue = 3; // same as commandWrite.Parameters["Direction"].ValueNames["Left"];
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private async void Sport_Stop_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Sport_Init();
+            commandWrite.Parameters["Direction"].CurrValue = 0; // same as commandWrite.Parameters["Direction"].ValueNames["Stop"];
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private async void Sport_Right_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Sport_Init();
+            commandWrite.Parameters["Direction"].CurrValue = 4; // same as commandWrite.Parameters["Direction"].ValueNames["Right"];
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private async void Sport_Backward_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Sport_Init();
+            commandWrite.Parameters["Direction"].CurrValue = 2; // same as commandWrite.Parameters["Direction"].ValueNames["Backward"];
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private void Beep2_Tone_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             var commandSet = bleDevice.Command_Beep2_Init();
             commandSet.SetCurrDouble("Tone", e.NewValue);
 
-            // computedTarget might be different from the computed value
-            var commandWrite = bleDevice.Command_RGB_Init();
-            var commandString = commandWrite.DoCompute();
-            await bleDevice.WriteCommand(commandString);
-
         }
 
-        private async void Beep2_Duration_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        private void Beep2_Duration_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             var commandSet = bleDevice.Command_Beep2_Init();
             commandSet.SetCurrDouble("Duration", e.NewValue);
 
-            // computedTarget might be different from the computed value
-            var commandWrite = bleDevice.Command_RGB_Init();
-            var commandString = commandWrite.DoCompute();
-            await bleDevice.WriteCommand(commandString);
-
         }
 
-        private void RGB_R_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        private async void Beep2_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Beep2_Init();
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private async void RGB_R_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             var commandSet = bleDevice.Command_RGB_Init();
             commandSet.SetCurrDouble("R", e.NewValue);
 
+            // computedTarget might be different from the computed value
+            var commandWrite = bleDevice.Command_RGB_Init();
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+
         }
 
-        private void RGB_G_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        private async void RGB_G_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             var commandSet = bleDevice.Command_RGB_Init();
             commandSet.SetCurrDouble("G", e.NewValue);
-
-        }
-
-        private void RGB_B_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
-        {
-            var commandSet = bleDevice.Command_RGB_Init();
-            commandSet.SetCurrDouble("B", e.NewValue);
-
-        }
-
-        private async void RGB_Duration_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
-        {
-            var commandSet = bleDevice.Command_RGB_Init();
-            commandSet.SetCurrDouble("Duration", e.NewValue);
 
             // computedTarget might be different from the computed value
             var commandWrite = bleDevice.Command_RGB_Init();
             var commandString = commandWrite.DoCompute();
             await bleDevice.WriteCommand(commandString);
 
+        }
+
+        private async void RGB_B_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            var commandSet = bleDevice.Command_RGB_Init();
+            commandSet.SetCurrDouble("B", e.NewValue);
+
+            // computedTarget might be different from the computed value
+            var commandWrite = bleDevice.Command_RGB_Init();
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+
+        }
+
+        private void RGB_Duration_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            var commandSet = bleDevice.Command_RGB_Init();
+            commandSet.SetCurrDouble("Duration", e.NewValue);
+
+        }
+
+        private async void Clear_All_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Clear_Init();
+            commandWrite.Parameters["ClearMode"].CurrValue = 0; // same as commandWrite.Parameters["ClearMode"].ValueNames["All"];
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private async void Clear_Lights_Off_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Clear_Init();
+            commandWrite.Parameters["ClearMode"].CurrValue = 1; // same as commandWrite.Parameters["ClearMode"].ValueNames["Lights_Off"];
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private async void Clear_Stop_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Clear_Init();
+            commandWrite.Parameters["ClearMode"].CurrValue = 2; // same as commandWrite.Parameters["ClearMode"].ValueNames["Stop"];
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
+        }
+
+        private async void Clear_Mute_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.Command_Clear_Init();
+            commandWrite.Parameters["ClearMode"].CurrValue = 3; // same as commandWrite.Parameters["ClearMode"].ValueNames["Mute"];
+
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.WriteCommand(commandString);
         }
 
 

@@ -105,38 +105,42 @@
                 </StackPanel>
 
                 <StackPanel>
-                    <Button Content="Obstacle" />
+                    <Button Content="Obstacle" Click="ObstacleAvoidance_ButtonClick" />
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <Button Content="Line Tracking Mode" />
+                        <StackPanel>
+                            <RadioButton Content="Left" IsChecked="True" />
+                            <RadioButton Content="Right" IsChecked="True" />
+                        </StackPanel>
+                        <Button Content="Line Tracking Mode" Click="LineTrack_ButtonClick" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
-                        <Slider Header="Speed" Minimum="0" Maximum="255" ValueChanged="Sport_Speed_SliderChanged" />
-                        <Button Content="⇑" />
+                        <Slider Header="Speed" Value="255" Minimum="0" Maximum="255" ValueChanged="Sport_Speed_SliderChanged" />
+                        <Button Content="⇑" Click="Sport_Forward_ButtonClick" />
                         <Rectangle />
-                        <Button Content="⇐" />
-                        <Button Content="🛑" />
-                        <Button Content="⇒" />
+                        <Button Content="⇐" Click="Sport_Left_ButtonClick" />
+                        <Button Content="🛑" Click="Sport_Stop_ButtonClick" />
+                        <Button Content="⇒" Click="Sport_Right_ButtonClick" />
                         <Rectangle />
-                        <Button Content="⇓" />
+                        <Button Content="⇓" Click="Sport_Backward_ButtonClick" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <Slider Header="Beep Tone" Minimum="1" Maximum="255" ValueChanged="Beep2_Tone_SliderChanged" />
-                        <Slider Header="Duration in milliseconds" Minimum="0" Maximum="65535" ValueChanged="Beep2_Duration_SliderChanged" />
-                        <Button Content="Beep" />
+                        <Slider Header="Beep Tone" Value="100" Minimum="1" Maximum="255" ValueChanged="Beep2_Tone_SliderChanged" />
+                        <Slider Header="Duration in milliseconds" Value="250" Minimum="0" Maximum="65535" ValueChanged="Beep2_Duration_SliderChanged" />
+                        <Button Content="Beep" Click="Beep2_ButtonClick" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <Slider Header="Red" Minimum="1" Maximum="255" ValueChanged="RGB_R_SliderChanged" />
-                        <Slider Header="Green" Minimum="1" Maximum="255" ValueChanged="RGB_G_SliderChanged" />
-                        <Slider Header="Blue" Minimum="1" Maximum="255" ValueChanged="RGB_B_SliderChanged" />
+                        <Slider Header="Red" Value="100" Minimum="1" Maximum="255" ValueChanged="RGB_R_SliderChanged" />
+                        <Slider Header="Green" Value="100" Minimum="1" Maximum="255" ValueChanged="RGB_G_SliderChanged" />
+                        <Slider Header="Blue" Value="100" Minimum="1" Maximum="255" ValueChanged="RGB_B_SliderChanged" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <Slider Header="Duration" Minimum="0" Maximum="255" ValueChanged="RGB_Duration_SliderChanged" />
+                        <Slider Header="Duration" Value="100" Minimum="0" Maximum="255" ValueChanged="RGB_Duration_SliderChanged" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <Button Content="Clear" />
-                        <Button Content="Lights" />
-                        <Button Content="Stop" />
-                        <Button Content="Mute" />
+                        <Button Content="Clear" Click="Clear_All_ButtonClick" />
+                        <Button Content="Lights" Click="Clear_Lights_Off_ButtonClick" />
+                        <Button Content="Stop" Click="Clear_Stop_ButtonClick" />
+                        <Button Content="Mute" Click="Clear_Mute_ButtonClick" />
                     </VariableSizedWrapGrid>
 
                 </StackPanel>

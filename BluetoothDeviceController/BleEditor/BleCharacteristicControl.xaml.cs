@@ -186,7 +186,7 @@ namespace BluetoothDeviceController.BleEditor
                 ;
             }
 
-            if (NC.Commands != null)
+            if (NC != null && NC.Commands != null)
             {
                 foreach (var (_, command) in NC.Commands)
                 {
@@ -207,7 +207,7 @@ namespace BluetoothDeviceController.BleEditor
             Stack<Panel> stack = new Stack<Panel>();
             var SPACE = new char[] { ' ' };
 
-            if (NC.UIList == null) return;
+            if (NC == null || NC.UIList == null) return;
 
             foreach (var simple in NC.UIList)
             {
@@ -232,7 +232,7 @@ namespace BluetoothDeviceController.BleEditor
                         {
                             var b = new Button()
                             {
-                                Content = simple.Label ?? simple.PlaceAt ?? command?.Label,
+                                Content = simple.Label ?? command?.Label,
                                 Tag = simple,
                                 MinWidth = ElementMinWidth,
                                 Margin = ElementMargin,
@@ -246,7 +246,7 @@ namespace BluetoothDeviceController.BleEditor
                             var param = command?.Parameters[tlist[1]];
                             var cb = new ComboBox()
                             {
-                                Header = simple.Label ?? simple.PlaceAt ?? command?.Label,
+                                Header = simple.Label ?? command?.Label,
                                 MinWidth = ElementMinWidth,
                                 Tag = simple,
                             };

@@ -28,7 +28,7 @@
               "Type": "STRING|ASCII|Command",
               "IsWriteWithoutResponse": true,
 
-              "REM": "REM: UIType, Target, Set[], PlaceAt, Label",
+              "REM": "REM: UIType, Target, Set[], Label",
               "UIList": [
                 {
                   "UIType": "ButtonFor",
@@ -57,38 +57,38 @@
                 {
                   "UIType": "ButtonFor",
                   "Target": "Sport",
+                  "FunctionName":  "Sport_Forward",
                   "Set": [ "Sport Direction Forward" ],
-                  "PlaceAt": "Forward",
                   "Label": "⇑"
                 },
                 { "UIType": "Blank" },
                 {
                   "UIType": "ButtonFor",
                   "Target": "Sport",
+                  "FunctionName": "Sport_Left",
                   "Set": [ "Sport Direction Left" ],
-                  "PlaceAt": "Left",
                   "LAbel": "⇐"
                 },
                 {
                   "UIType": "ButtonFor",
                   "Target": "Sport",
+                  "FunctionName": "Sport_Stop",
                   "Set": [ "Sport Direction Stop" ],
-                  "PlaceAt": "Stop",
                   "Label": "🛑"
                 },
                 {
                   "UIType": "ButtonFor",
                   "Target": "Sport",
+                  "FunctionName": "Sport_Right",
                   "Set": [ "Sport Direction Right" ],
-                  "PlaceAt": "Right",
                   "Label": "⇒"
                 },
                 { "UIType": "Blank" },
                 {
                   "UIType": "ButtonFor",
                   "Target": "Sport",
+                  "FunctionName": "Sport_Backward",
                   "Set": [ "Sport Direction Backward" ],
-                  "PlaceAt": "Backwards",
                   "Label": "⇓"
                 },
                 { "UIType": "RowEnd" },
@@ -145,24 +145,28 @@
                 {
                   "UIType": "ButtonFor",
                   "Target": "Clear",
+                  "FunctionName": "Clear_All",
                   "Set": [ "Clear ClearMode All" ],
                   "Label": "Clear"
                 },
                 {
                   "UIType": "ButtonFor",
                   "Target": "Clear",
+                  "FunctionName": "Clear_Lights Off",
                   "Set": [ "Clear ClearMode Lights_Off" ],
                   "Label": "Lights"
                 },
                 {
                   "UIType": "ButtonFor",
                   "Target": "Clear",
+                  "FunctionName": "Clear_Stop",
                   "Set": [ "Clear ClearMode Stop" ],
                   "Label": "Stop"
                 },
                 {
                   "UIType": "ButtonFor",
                   "Target": "Clear",
+                  "FunctionName": "Clear_Mute",
                   "Set": [ "Clear ClearMode Mute" ],
                   "Label": "Mute"
                 },
@@ -206,7 +210,7 @@
                       "Label": "Speed",
                       "Min": 0,
                       "Max": 255,
-                      "Init": 100
+                      "Init": 255
                     }
                   },
                   "Label": "Sport Mode",

@@ -158,6 +158,7 @@ namespace BluetoothDeviceController.Names
                     targetlist = simpleUI.Target.Split(new char[] { ' ' });
                     target = characteristic.Commands[targetlist[0]];
                     replace["[[COMMAND]]"] = DotNetSafe(targetlist[0]);
+                    replace["[[FUNCTIONNAME]]"] = DotNetSafe(simpleUI.FunctionName ?? targetlist[0]);
                     replace["[[LABEL]]"] = string.IsNullOrEmpty(simpleUI.Label) ? target.Label : simpleUI.Label;
                     // Is, e.g., "RGB R" -- the red parameter in the RGB command.
                     if (targetlist.Length > 1)
@@ -188,15 +189,36 @@ namespace BluetoothDeviceController.Names
                 {
                     replace["[[SLIDERCHANGE_COMPUTETARGET]]"] = "";
                 }
+                var setstr = "";
+                foreach (var setitem in simpleUI.Set)
+                {
+                    // setitem is e.g. "Sport Direction Forward"
+                    // find the Sport command; in that find the Direction parameter and set the
+                    // currValue to the value of the Forward string
+                    var setlist = setitem.Split(new char[] { ' ' });
+                    if (setlist.Length < 3) continue;
+                    var cmd = characteristic.Commands[setlist[0]];
+                    var param = cmd.Parameters[setlist[1]];
+                    var value = param.ValueNames[setlist[2]];
+                    replace["[[PARAMETER]]"] = setlist[1];
+                    replace["[[VALUENAME]]"] = setlist[2];
+                    replace["[[VALUE]]"] = value.ToString();
+                    var str = Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_SetValue, replace);
+                    setstr += str;
+                }
+                replace["[[SETLIST]]"] = setstr;
                 switch (simpleUI.UIType)
                 {
                     case "Blank":
                         break;
                     case "ButtonFor":
+                        liststr += Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_ButtonClick, replace);
+                        break;
+                    case "RadioFor":
                         break;
                     case "SliderFor":
                         {
-                            var needCompute = string.IsNullOrEmpty(simpleUI.ComputeTarget);
+                            var needCompute = !string.IsNullOrEmpty(simpleUI.ComputeTarget);
                             if (needCompute)
                             {
                                 var ct = Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_SliderChangeComputeTarget, replace);
@@ -534,16 +556,18 @@ namespace BluetoothDeviceController.Names
             {
                 Command target = null;
                 string[] targetlist = null;
+                VariableDescription parameter = null;
                 if (!string.IsNullOrEmpty(simpleUI.Target))
                 {
                     targetlist = simpleUI.Target.Split(new char[] { ' ' });
                     target = characteristic.Commands[targetlist[0]];
                     replace["[[COMMAND]]"] = DotNetSafe(targetlist[0]);
+                    replace["[[FUNCTIONNAME]]"] = DotNetSafe(simpleUI.FunctionName ?? targetlist[0]);
                     replace["[[LABEL]]"] = string.IsNullOrEmpty(simpleUI.Label) ? target.Label : simpleUI.Label;
                     // Is, e.g., "RGB R" -- the red parameter in the RGB command.
                     if (targetlist.Length > 1)
                     {
-                        var parameter = target.Parameters[targetlist[1]];
+                        parameter = target.Parameters[targetlist[1]];
                         replace["[[PARAM]]"] = DotNetSafe(targetlist[1]);
                         replace["[[MIN]]"] = parameter.Min.ToString();
                         replace["[[MAX]]"] = parameter.Max.ToString();
@@ -566,6 +590,21 @@ namespace BluetoothDeviceController.Names
                         break;
                     case "ButtonFor":
                         liststr += Replace(Generate_CSharp_Templates.PageXamlFunctionButtonTemplate, replace);
+                        break;
+                    case "RadioFor":
+                        {
+                            // Radio buttons require more work; it's a stackpanel with a
+                            // series of radio buttons.
+                            liststr += "\t\t\t<StackPanel>\n";
+
+                            foreach (var (varname, varvalue) in parameter.ValueNames)
+                            {
+                                var ischecked = "IsChecked=\"True\"";
+                                liststr += $"\t\t\t\t<RadioButton Content=\"{varname}\" {ischecked} />\n";
+                            }
+
+                            liststr += "\t\t\t</StackPanel>\n";
+                        }
                         break;
                     case "SliderFor":
                         liststr += Replace(Generate_CSharp_Templates.PageXamlFunctionSliderTemplate, replace);

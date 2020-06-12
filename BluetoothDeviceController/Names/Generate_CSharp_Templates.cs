@@ -504,9 +504,9 @@ namespace BluetoothProtocols
         public static string PageXamlFunctionUIListPanelTemplate = @"<StackPanel>
 [[FUNCTIONUILIST]]
 </StackPanel>";
-        public static string PageXamlFunctionButtonTemplate = @"<Button Content=""[[LABEL]]"" />
+        public static string PageXamlFunctionButtonTemplate = @"<Button Content=""[[LABEL]]"" Click=""[[FUNCTIONNAME]]_ButtonClick"" />
 ";
-        public static string PageXamlFunctionSliderTemplate = @"<Slider Header=""[[LABEL]]"" Minimum=""[[MIN]]"" Maximum=""[[MAX]]"" ValueChanged=""[[COMMAND]]_[[PARAM]]_SliderChanged"" />
+        public static string PageXamlFunctionSliderTemplate = @"<Slider Header=""[[LABEL]]"" Value=""[[INIT]]"" Minimum=""[[MIN]]"" Maximum=""[[MAX]]"" ValueChanged=""[[COMMAND]]_[[PARAM]]_SliderChanged"" />
 ";
 
 
@@ -850,6 +850,17 @@ typeof([[CHARACTERISTICNAME]]Record).GetProperty(""[[DATANAME]]""),", // DATA4_L
             }
         }";
 
+        public static string PageCSharp_Characteristic_ButtonClick = @"
+        private async void [[FUNCTIONNAME]]_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.[[CHARACTERISTICNAME]]_[[COMMAND]]_Init();
+[[SETLIST]]
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.Write[[CHARACTERISTICNAME]](commandString);
+        }
+		";
+        public static string PageCSharp_Characteristic_SetValue = @"            commandWrite.Parameters[""[[PARAMETER]]""].CurrValue = [[VALUE]]; // same as commandWrite.Parameters[""[[PARAMETER]]""].ValueNames[""[[VALUENAME]]""];
+";
 
         public static string PageCSharp_Characteristic_SliderChange = @"
         private [[ASYNC]]void [[COMMAND]]_[[PARAM]]_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)

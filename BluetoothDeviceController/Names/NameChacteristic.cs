@@ -12,8 +12,8 @@ namespace BluetoothDeviceController.Names
         public string UIType { get; set; }
         public string Target { get; set; }
         public string ComputeTarget { get; set; }
-        public string PlaceAt { get; set; }
         public string Label { get; set; }
+        public string FunctionName { get; set; }
         public List<string> Set { get; } = new List<string>();
         public double N { get; set; } = double.NaN;
         public int GetN(int defaultN = 4)

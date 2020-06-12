@@ -27,6 +27,7 @@ and more devices -- please leave feedback to request specific devices!
 
 ## Other devices
 [![BERO](../DevicePictures/RealityRobotics_Bero-175.png)](Device_RealityRobotics_Bero.md)
+[![Elegoo MiniCar](../DevicePictures/Elegoo_MiniCar-175.png)](Device_Elegoo_MiniCar.md)
 [![Kano Wand](../DevicePictures/Kano_Wand-175.png)](Device_Kano_Wand.md)
 [![LittleBot](../DevicePictures/SlantRobotics-LittleBot-175.png)](Device_SlantRobotics_LittleBot.md)
 [![PuckJs](../DevicePictures/Device_Espruino_PuckJs-175.png)](Device_Espruino_PuckJs.md)

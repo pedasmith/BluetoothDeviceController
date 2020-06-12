@@ -65,6 +65,7 @@ There are a wide variety of Arduino-type robots and devices that can potentially
 Right now, the following list has been verified as controllable with this program
 
 * [Crafty Robot Smartibot](Device_CraftyRobot_Smartibot.md)
+* [Elegoo MiniCar](Device_Elegoo_MiniCar.md)
 * [Reality Robotics BERO](Device_RealityRobotics_Bero.md)
 * [Slant Robotics LittleBot](Device_SlantRobotics_LittleBot.md)
 * [William Weiler Engineering Skoobot](WilliamWeilerEngineering_Skoobot.md)
