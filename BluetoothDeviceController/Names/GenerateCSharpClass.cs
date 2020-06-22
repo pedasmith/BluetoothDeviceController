@@ -187,8 +187,23 @@ namespace BluetoothDeviceController.Names
                 }
                 else
                 {
-                    replace["[[SLIDERCHANGE_COMPUTETARGET]]"] = "";
+                    replace["[[VALUECHANGE_COMPUTETARGET]]"] = "";
                 }
+
+                // Must do it twice :-)
+                var needCompute = !string.IsNullOrEmpty(simpleUI.ComputeTarget);
+                if (needCompute)
+                {
+                    var ct = Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_ValueChangeComputeTarget, replace);
+                    replace["[[ASYNC]]"] = "async ";
+                    replace["[[VALUECHANGE_COMPUTETARGET]]"] = ct;
+                }
+                else
+                {
+                    replace["[[ASYNC]]"] = " ";
+                    replace["[[VALUECHANGE_COMPUTETARGET]]"] = "";
+                }
+
                 var setstr = "";
                 foreach (var setitem in simpleUI.Set)
                 {
@@ -214,24 +229,14 @@ namespace BluetoothDeviceController.Names
                     case "ButtonFor":
                         liststr += Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_ButtonClick, replace);
                         break;
+                    case "ComboBoxFor":
+                        liststr += Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_ComboChange, replace);
+                        break;
                     case "RadioFor":
+                        liststr += Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_RadioChange, replace);
                         break;
                     case "SliderFor":
-                        {
-                            var needCompute = !string.IsNullOrEmpty(simpleUI.ComputeTarget);
-                            if (needCompute)
-                            {
-                                var ct = Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_SliderChangeComputeTarget, replace);
-                                replace["[[ASYNC]]"] = "async ";
-                                replace["[[SLIDERCHANGE_COMPUTETARGET]]"] = ct;
-                            }
-                            else
-                            {
-                                replace["[[ASYNC]]"] = " ";
-                                replace["[[SLIDERCHANGE_COMPUTETARGET]]"] = "";
-                            }
-                            liststr += Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_SliderChange, replace);
-                        }
+                        liststr += Replace(Generate_CSharp_Templates.PageCSharp_Characteristic_SliderChange, replace);
                         break;
                     case "RowEnd":
                         break;
@@ -552,6 +557,7 @@ namespace BluetoothDeviceController.Names
         private static string Generate_PageXaml_UIList(NameCharacteristic characteristic, SortedDictionary<string, string> replace)
         {
             var liststr = "";
+            int ntab = 5;
             foreach (var simpleUI in characteristic.UIList)
             {
                 Command target = null;
@@ -582,43 +588,82 @@ namespace BluetoothDeviceController.Names
                 {
                     replace["[[LABEL]]"] = simpleUI.Label;
                 }
+                var tab = TAB(ntab);
+                replace["[[TAB]]"] = tab;
                 switch (simpleUI.UIType)
                 {
                     case "Blank":
                         // It doesn't take much to make a blank item.
-                        liststr += "<Rectangle />\n";
+                        liststr += tab + "<Rectangle />\n";
                         break;
                     case "ButtonFor":
                         liststr += Replace(Generate_CSharp_Templates.PageXamlFunctionButtonTemplate, replace);
+                        break;
+                    case "ComboBoxFor":
+                        {
+                            // Radio buttons require more work; it's a stackpanel with a
+                            // series of radio buttons.
+                            var cbilist = "";
+                            int index = 0;
+                            int selectedIndex = -1;
+                            foreach (var (varname, varvalue) in parameter.ValueNames)
+                            {
+                                // TODO: pick the one that's selected by default
+                                // TODO: handle the changes
+                                // TODO: handling the changes also implies possiblyl calling compute.
+                                cbilist += $"{tab}\t<ComboBoxItem Content=\"{varname}\" Tag=\"{varvalue}\"  />\n";
+                                if (varvalue == parameter.Init)
+                                {
+                                    selectedIndex = index;
+                                }
+                                index++;
+                            }
+                            replace["[[COMBOBOXLIST]]"] = cbilist.TrimEnd();
+                            replace["[[COMBOINIT]]"] = selectedIndex < 0 ? "" : $"SelectedIndex=\"{selectedIndex}\" ";
+                            liststr += Replace (Generate_CSharp_Templates.PageXamlFunctionComboBoxTemplate, replace);
+                        }
                         break;
                     case "RadioFor":
                         {
                             // Radio buttons require more work; it's a stackpanel with a
                             // series of radio buttons.
-                            liststr += "\t\t\t<StackPanel>\n";
+                            //TODO: actually set the value
+                            liststr += $"{tab}<StackPanel>\n";
 
                             foreach (var (varname, varvalue) in parameter.ValueNames)
                             {
-                                var ischecked = "IsChecked=\"True\"";
-                                liststr += $"\t\t\t\t<RadioButton Content=\"{varname}\" {ischecked} />\n";
+                                var ischecked = varvalue == parameter.Init;
+                                var cbi = $"{tab}\t<RadioButton Content=\"{varname}\" IsChecked=\"{ischecked}\" Tag=\"{varvalue}\" Checked=\"[[COMMAND]]_[[PARAM]]_RadioCheck\" />\n";
+                                liststr += Replace(cbi, replace);
                             }
 
-                            liststr += "\t\t\t</StackPanel>\n";
+                            liststr += $"{tab}</StackPanel>\n";
                         }
                         break;
                     case "SliderFor":
                         liststr += Replace(Generate_CSharp_Templates.PageXamlFunctionSliderTemplate, replace);
                         break;
                     case "RowEnd":
-                        liststr += "</VariableSizedWrapGrid>\n";
+                        ntab--;
+                        liststr += $"{TAB(ntab)}</VariableSizedWrapGrid>\n";
                         break;
                     case "RowStart":
-                        liststr += $"<VariableSizedWrapGrid Orientation=\"Horizontal\" MaximumRowsOrColumns=\"{simpleUI.GetN()}\">\n";
+                        liststr += $"{tab}<VariableSizedWrapGrid Orientation=\"Horizontal\" MaximumRowsOrColumns=\"{simpleUI.GetN()}\">\n";
+                        ntab++;
                         break;
                 }
 
             }
             return liststr;
+        }
+        private static string TAB(int n)
+        {
+            var retval = "";
+            for (int i = 0; i < n; i++)
+            {
+                retval += "\t";
+            }
+            return retval;
         }
         private static string Generate_PageXaml_UI_ButtonList(NameCharacteristic characteristic, SortedDictionary<string, string> replace)
         {

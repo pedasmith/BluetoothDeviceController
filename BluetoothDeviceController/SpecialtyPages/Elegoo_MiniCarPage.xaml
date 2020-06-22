@@ -108,10 +108,10 @@
                     <Button Content="Obstacle" Click="ObstacleAvoidance_ButtonClick" />
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
                         <StackPanel>
-                            <RadioButton Content="Left" IsChecked="True" />
-                            <RadioButton Content="Right" IsChecked="True" />
+                            <RadioButton Content="Left" IsChecked="True" Tag="0" Checked="LineTrack_Sensor_RadioCheck"  />
+                            <RadioButton Content="Right" IsChecked="False" Tag="1" Checked="LineTrack_Sensor_RadioCheck" />
                         </StackPanel>
-                        <Button Content="Line Tracking Mode" Click="LineTrack_ButtonClick" />
+                        <Button Content="Line Track Mode" Click="LineTrack_ButtonClick" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
                         <Slider Header="Speed" Value="255" Minimum="0" Maximum="255" ValueChanged="Sport_Speed_SliderChanged" />
@@ -135,6 +135,15 @@
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
                         <Slider Header="Duration" Value="100" Minimum="0" Maximum="255" ValueChanged="RGB_Duration_SliderChanged" />
+                        <ComboBox Header="Lights" SelectedIndex="0"  MinWidth="140" SelectionChanged="RGB_Lights_ComboBoxChanged">
+                            <ComboBoxItem Content="Both" Tag="0"  />
+                            <ComboBoxItem Content="Left" Tag="1"  />
+                            <ComboBoxItem Content="Right" Tag="2"  />
+                        </ComboBox>
+                        <ComboBox Header="Flashing" SelectedIndex="0"  MinWidth="140" SelectionChanged="RGB_Mode_ComboBoxChanged">
+                            <ComboBoxItem Content="Solid" Tag="0"  />
+                            <ComboBoxItem Content="Flashing" Tag="1"  />
+                        </ComboBox>
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
                         <Button Content="Clear" Click="Clear_All_ButtonClick" />

@@ -167,7 +167,6 @@ namespace BluetoothDeviceController.Beacons
                 header += "\n";
                 var run = new Run() { Text = header + builder.ToString() };
 
-                //TODO: let the user control this. 
                 var suppress = isApple10 && uiIgnoreApple.IsChecked.Value;
                 if (!suppress)
                 {

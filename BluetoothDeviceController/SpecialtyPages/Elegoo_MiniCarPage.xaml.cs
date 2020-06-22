@@ -283,6 +283,16 @@ namespace BluetoothDeviceController.SpecialtyPages
             await bleDevice.WriteCommand(commandString);
         }
 
+        private void LineTrack_Sensor_RadioCheck(object sender, RoutedEventArgs e)
+        {
+            var commandSet = bleDevice.Command_LineTrack_Init();
+            if (double.TryParse((sender as FrameworkElement).Tag as string, out var value))
+            {
+                commandSet.SetCurrDouble("Sensor", value);
+            }
+
+        }
+
         private async void LineTrack_ButtonClick(object sender, RoutedEventArgs e)
         {
             var commandWrite = bleDevice.Command_LineTrack_Init();
@@ -405,6 +415,28 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             var commandSet = bleDevice.Command_RGB_Init();
             commandSet.SetCurrDouble("Duration", e.NewValue);
+
+        }
+
+        private void RGB_Lights_ComboBoxChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var commandSet = bleDevice.Command_RGB_Init();
+            if (e.AddedItems.Count == 1
+                && (double.TryParse((sender as FrameworkElement).Tag as string, out var value)))
+            {
+                commandSet.SetCurrDouble("Lights", value);
+            }
+
+        }
+
+        private void RGB_Mode_ComboBoxChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var commandSet = bleDevice.Command_RGB_Init();
+            if (e.AddedItems.Count == 1
+                && (double.TryParse((sender as FrameworkElement).Tag as string, out var value)))
+            {
+                commandSet.SetCurrDouble("Mode", value);
+            }
 
         }
 

@@ -501,12 +501,16 @@ namespace BluetoothProtocols
                     </controls:Expander>
 ";
 
-        public static string PageXamlFunctionUIListPanelTemplate = @"<StackPanel>
+        public static string PageXamlFunctionUIListPanelTemplate = @"[[TAB]]<StackPanel>
 [[FUNCTIONUILIST]]
-</StackPanel>";
-        public static string PageXamlFunctionButtonTemplate = @"<Button Content=""[[LABEL]]"" Click=""[[FUNCTIONNAME]]_ButtonClick"" />
+[[TAB]]</StackPanel>";
+        public static string PageXamlFunctionComboBoxTemplate = @"[[TAB]]<ComboBox Header=""[[LABEL]]"" [[COMBOINIT]] MinWidth=""140"" SelectionChanged=""[[COMMAND]]_[[PARAM]]_ComboBoxChanged"">
+[[COMBOBOXLIST]]
+[[TAB]]</ComboBox>
 ";
-        public static string PageXamlFunctionSliderTemplate = @"<Slider Header=""[[LABEL]]"" Value=""[[INIT]]"" Minimum=""[[MIN]]"" Maximum=""[[MAX]]"" ValueChanged=""[[COMMAND]]_[[PARAM]]_SliderChanged"" />
+        public static string PageXamlFunctionButtonTemplate = @"[[TAB]]<Button Content=""[[LABEL]]"" Click=""[[FUNCTIONNAME]]_ButtonClick"" />
+";
+        public static string PageXamlFunctionSliderTemplate = @"[[TAB]]<Slider Header=""[[LABEL]]"" Value=""[[INIT]]"" Minimum=""[[MIN]]"" Maximum=""[[MAX]]"" ValueChanged=""[[COMMAND]]_[[PARAM]]_SliderChanged"" />
 ";
 
 
@@ -859,18 +863,42 @@ typeof([[CHARACTERISTICNAME]]Record).GetProperty(""[[DATANAME]]""),", // DATA4_L
             await bleDevice.Write[[CHARACTERISTICNAME]](commandString);
         }
 		";
+
+        public static string PageCSharp_Characteristic_ComboChange = @"
+        private [[ASYNC]]void [[COMMAND]]_[[PARAM]]_ComboBoxChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var commandSet = bleDevice.[[CHARACTERISTICNAME]]_[[COMMAND]]_Init();
+            if (e.AddedItems.Count == 1
+                && (double.TryParse((sender as FrameworkElement).Tag as string, out var value)))
+            {
+                commandSet.SetCurrDouble(""[[PARAM]]"", value);
+            }
+[[VALUECHANGE_COMPUTETARGET]]
+        }
+		";
         public static string PageCSharp_Characteristic_SetValue = @"            commandWrite.Parameters[""[[PARAMETER]]""].CurrValue = [[VALUE]]; // same as commandWrite.Parameters[""[[PARAMETER]]""].ValueNames[""[[VALUENAME]]""];
 ";
 
+        public static string PageCSharp_Characteristic_RadioChange = @"
+        private void [[COMMAND]]_[[PARAM]]_RadioCheck(object sender, RoutedEventArgs e)
+        {
+            var commandSet = bleDevice.[[CHARACTERISTICNAME]]_[[COMMAND]]_Init();
+            if (double.TryParse((sender as FrameworkElement).Tag as string, out var value))
+            {
+                commandSet.SetCurrDouble(""[[PARAM]]"", value);
+            }
+[[VALUECHANGE_COMPUTETARGET]]
+        }
+";
         public static string PageCSharp_Characteristic_SliderChange = @"
         private [[ASYNC]]void [[COMMAND]]_[[PARAM]]_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             var commandSet = bleDevice.[[CHARACTERISTICNAME]]_[[COMMAND]]_Init();
             commandSet.SetCurrDouble(""[[PARAM]]"", e.NewValue);
-[[SLIDERCHANGE_COMPUTETARGET]]
+[[VALUECHANGE_COMPUTETARGET]]
         }
 		";
-        public static string PageCSharp_Characteristic_SliderChangeComputeTarget = @"
+        public static string PageCSharp_Characteristic_ValueChangeComputeTarget = @"
             // computedTarget might be different from the computed value
             var commandWrite = bleDevice.[[CHARACTERISTICNAME]]_[[TARGETCOMMAND]]_Init();
             var commandString = commandWrite.DoCompute();

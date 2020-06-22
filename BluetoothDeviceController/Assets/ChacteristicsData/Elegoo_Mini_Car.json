@@ -57,7 +57,7 @@
                 {
                   "UIType": "ButtonFor",
                   "Target": "Sport",
-                  "FunctionName":  "Sport_Forward",
+                  "FunctionName": "Sport_Forward",
                   "Set": [ "Sport Direction Forward" ],
                   "Label": "⇑"
                 },
@@ -128,16 +128,16 @@
 
                 { "UIType": "RowStart" },
                 {
+                  "UIType": "SliderFor",
+                  "Target": "RGB Duration"
+                },
+                {
                   "UIType": "ComboBoxFor",
                   "Target": "RGB Lights"
                 },
                 {
                   "UIType": "ComboBoxFor",
                   "Target": "RGB Mode"
-                },
-                {
-                  "UIType": "SliderFor",
-                  "Target": "RGB Duration"
                 },
                 { "UIType": "RowEnd" },
 
@@ -190,7 +190,7 @@
                       }
                     }
                   },
-                  "Label": "Line Tracking Mode",
+                  "Label": "Line Track",
                   "Compute": "${LT[ $Sensor_GN $][?]}"
                 },
                 "Sport": {
