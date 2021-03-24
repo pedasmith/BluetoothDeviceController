@@ -56,6 +56,11 @@ namespace BluetoothDeviceController.BluetoothProtocolsCustom
                 }
             }
 
+            if (Device == null)
+            {
+                return false;
+            }
+
             DidInit = true;
             var TransmitGuid = Guid.Parse(Transmit_Service_Name);
             var TxGuid = Guid.Parse(Tx_Characteristic_Name);

@@ -74,10 +74,19 @@ Create an .MD file file in the HelpFiles directory; it will be called e.g. Devic
 
 Be sure to update the screenshot images!
 
-## Add references
+## Add help links and references
 
 The device should have references added as needed:
 
 1. the Welcome.md file 
 2. the Help.md file
+
+# Validation
+
+1. From the Welcome screen, can I get to the device page?
+2. ... does the image show up?
+3. ... does the screenshot show up?
+4. Ditto from the help page
+5. Does the specialization work?
+6. When minimized, does it show the right icon?
 
