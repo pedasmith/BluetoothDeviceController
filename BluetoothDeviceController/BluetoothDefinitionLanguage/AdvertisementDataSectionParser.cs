@@ -83,10 +83,11 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             return db;
         }
 
-        public static (string result, BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType) Parse(BluetoothLEAdvertisementDataSection section, sbyte txPower, string indent)
+        public static (string result, BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType, UInt16 companyId) Parse(BluetoothLEAdvertisementDataSection section, sbyte txPower, string indent)
         {
             string str = "??";
             byte b = section.DataType;
+            UInt16 companyId = 0xFFFF;
             DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value
             BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
             try
@@ -95,7 +96,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 switch (dtv)
                 {
                     case DataTypeValue.ManufacturerData:
-                        (str, manufacturerType) = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower);
+                        (str, manufacturerType, companyId) = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower);
                         break;
                     case DataTypeValue.Flags:
                         str = ParseFlags(section);
@@ -138,7 +139,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 str = $"error section {section.DataType} data={result.AsString}\n";
             }
             if (!string.IsNullOrWhiteSpace(str)) str = indent + str;
-            return (str, manufacturerType);
+            return (str, manufacturerType, companyId);
         }
 
         /// <summary>

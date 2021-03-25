@@ -140,6 +140,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="BCBasic\MockClasses.cs" />
+    <Compile Include="Beacons\Apple_IBeacon.cs" />
     <Compile Include="Beacons\BleAdvertisementFormat.cs" />
     <Compile Include="Beacons\BluetoothAddress.cs" />
     <Compile Include="Beacons\Eddystone.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Beacons\RuuvitagPage.xaml.cs">
       <DependentUpon>RuuvitagPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Beacons\Ruuvi_Tag.cs" />
     <Compile Include="Beacons\SimpleBeaconPage.xaml.cs">
       <DependentUpon>SimpleBeaconPage.xaml</DependentUpon>
     </Compile>

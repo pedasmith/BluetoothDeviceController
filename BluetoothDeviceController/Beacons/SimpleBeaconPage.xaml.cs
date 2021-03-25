@@ -110,6 +110,7 @@ namespace BluetoothDeviceController.Beacons
                 bool isApple10 = false; 
                 string appearance = "";
                 string completeLocalName = "";
+                UInt16 companyId = 0xFFFF;
 
                 var builder = new StringBuilder();
                 Run bold = null;
@@ -148,7 +149,9 @@ namespace BluetoothDeviceController.Beacons
                             break;
                         default:
                             {
-                                (var result, var manufacturerType) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
+                                string result;
+                                BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
+                                (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
                                 isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
                                 builder.Append(result);
                                 if (result.Contains ("Cypress"))
@@ -168,7 +171,7 @@ namespace BluetoothDeviceController.Beacons
                 var run = new Run() { Text = header + builder.ToString() };
 
                 var suppress = isApple10 && uiIgnoreApple.IsChecked.Value;
-                if (!suppress)
+                // Just for debugging: suppress = (companyId != 1177);                 if (!suppress)
                 {
                     if (bold != null) uiBeaconData.Inlines.Add(bold);
                     uiBeaconData.Inlines.Add(run);
