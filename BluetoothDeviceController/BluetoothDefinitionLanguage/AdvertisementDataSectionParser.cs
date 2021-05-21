@@ -89,6 +89,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             byte b = section.DataType;
             UInt16 companyId = 0xFFFF;
             DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value
+            object speciality = null;
             BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
             try
             {
@@ -96,7 +97,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 switch (dtv)
                 {
                     case DataTypeValue.ManufacturerData:
-                        (str, manufacturerType, companyId) = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower);
+                        (str, manufacturerType, companyId, speciality) = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower);
                         break;
                     case DataTypeValue.Flags:
                         str = ParseFlags(section);

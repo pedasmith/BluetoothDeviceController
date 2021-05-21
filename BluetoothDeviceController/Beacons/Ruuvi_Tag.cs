@@ -9,7 +9,7 @@ using Windows.Storage.Streams;
 
 namespace BluetoothDeviceController.Beacons
 {
-    class Ruuvi_Tag
+    public class Ruuvi_Tag
     {
         public bool IsValid { get; set; } = true;
         public UInt16 CompanyId { get; set; } // will by 0x0499==1177 for standard Ruuvi tags

@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.28606.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothDeviceController", "BluetoothDeviceController\BluetoothDeviceController.csproj", "{F60B4B0B-5303-49BE-AD26-666746D5FB28}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothWatcher", "BluetoothWatcher\BluetoothWatcher.csproj", "{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -41,6 +43,30 @@ Global
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|x86.ActiveCfg = Release|x86
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|x86.Build.0 = Release|x86
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|x86.Deploy.0 = Release|x86
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|ARM.ActiveCfg = Debug|ARM
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|ARM.Build.0 = Debug|ARM
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|ARM.Deploy.0 = Debug|ARM
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|ARM64.Build.0 = Debug|ARM64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|x64.ActiveCfg = Debug|x64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|x64.Build.0 = Debug|x64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|x64.Deploy.0 = Debug|x64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|x86.ActiveCfg = Debug|x86
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|x86.Build.0 = Debug|x86
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|x86.Deploy.0 = Debug|x86
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|ARM.ActiveCfg = Release|ARM
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|ARM.Build.0 = Release|ARM
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|ARM.Deploy.0 = Release|ARM
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|ARM64.ActiveCfg = Release|ARM64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|ARM64.Build.0 = Release|ARM64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|ARM64.Deploy.0 = Release|ARM64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x64.ActiveCfg = Release|x64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x64.Build.0 = Release|x64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x64.Deploy.0 = Release|x64
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x86.ActiveCfg = Release|x86
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x86.Build.0 = Release|x86
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2603,11 +2603,12 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             return $"CompanyId={companyId}";
         }
 
-        public enum CommonManufacturerType {  Other, Apple10}
-        public static (string result, CommonManufacturerType, UInt16 companyId) ParseManufacturerData(BluetoothLEAdvertisementDataSection section, sbyte txPower)
+        public enum CommonManufacturerType {  Other, Apple10, Ruuvi}
+        public static (string result, CommonManufacturerType, UInt16 companyId, object specialty) ParseManufacturerData(BluetoothLEAdvertisementDataSection section, sbyte txPower)
         {
             CommonManufacturerType manufacturerType = CommonManufacturerType.Other;
             UInt16 companyId = 0xFFFF;
+            object speciality = null;
             try
             {
                 var bytes = section.Data.ToArray();
@@ -2636,12 +2637,14 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                         break;
 
                     case 0x0499: // Ruuvi
+                        manufacturerType = CommonManufacturerType.Ruuvi;
                         var ruuviTag = Ruuvi_Tag.Parse(section, txPower);
                         if (ruuviTag.IsValid)
                         {
                             sb.Append(ruuviTag.ToString());
                             sb.Append("\n");
                             displayAsHex = false; // we have a better display
+                            speciality = ruuviTag;
                         }
                         break;
                 }
@@ -2655,11 +2658,11 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                     }
                     sb.Append('\n');
                 }
-                return (sb.ToString(), manufacturerType, companyId);
+                return (sb.ToString(), manufacturerType, companyId, speciality);
             }
             catch (Exception)
             {
-                return ("??\n", manufacturerType, companyId);
+                return ("??\n", manufacturerType, companyId, speciality);
             }
         }
 

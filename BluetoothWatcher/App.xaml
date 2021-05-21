@@ -1,0 +1,12 @@
+﻿<Application
+    x:Class="BluetoothWatcher.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothWatcher">
+    <Application.Resources>
+        <Style TargetType="TextBlock" x:Key="rsTitle">
+            <Setter Property="FontSize" Value="44" />
+        </Style>
+    </Application.Resources>
+
+</Application>
