@@ -23,6 +23,26 @@ namespace BluetoothDeviceController.Beacons
         public byte MovementCounter { get; set; }
         public UInt16 MovementSequenceCounter { get; set; }
 
+        public static Ruuvi_Tag FromRuuvi_DataRecord (Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord dr)
+        {
+            if (dr == null) return null;
+            var retval = new Ruuvi_Tag()
+            {
+                IsValid = true,
+                CompanyId = 0x0499, // synthetic
+                TagType = 1, // https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/broadcast_formats.md
+                TemperatureInDegreesC = dr.Temperature,
+                PressureInPascals = (int)(dr.Pressure * 100), // 1 hPA = 100 Pa
+                HumidityInPercent = dr.Humidity,
+                AccelerationInG = new double[3] { 0, 0, 1.0},
+                BatteryVoltage = 5.0, // synthetic
+                TransmitPowerInDb = 0, // synthetic
+                MovementCounter = 1, // synthetic
+                MovementSequenceCounter = 1, // synthetic
+            };
+            return retval;
+        }
+
         // https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_05.md
         public static Ruuvi_Tag Parse(BluetoothLEAdvertisementDataSection section, sbyte RSSI)
         {
@@ -44,8 +64,8 @@ namespace BluetoothDeviceController.Beacons
                         retval.AccelerationInG[0] = ((double)dr.ReadInt16()) / 1000.0;
                         retval.AccelerationInG[1] = ((double)dr.ReadInt16()) / 1000.0;
                         retval.AccelerationInG[2] = ((double)dr.ReadInt16()) / 1000.0;
-                        var power = dr.ReadUInt16(); //TODO: figure this one out
-                        retval.BatteryVoltage = ((double)(power>>5)) / 1000.0 + 1.6;
+                        var power = dr.ReadUInt16();
+                        retval.BatteryVoltage = ((double)(power >> 5)) / 1000.0 + 1.6;
                         retval.TransmitPowerInDb = ((int)(power & 0x1F)) * 2 - 40;
                         retval.MovementCounter = dr.ReadByte();
                         retval.MovementSequenceCounter = dr.ReadUInt16();

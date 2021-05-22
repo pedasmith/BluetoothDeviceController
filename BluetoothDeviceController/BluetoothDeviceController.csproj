@@ -147,7 +147,7 @@
     <Compile Include="Beacons\EddystonePage.xaml.cs">
       <DependentUpon>EddystonePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Beacons\RuuviTag.cs" />
+    <Compile Include="Beacons\Ruuvi_Tag_v1_Helper.cs" />
     <Compile Include="Beacons\RuuvitagPage.xaml.cs">
       <DependentUpon>RuuvitagPage.xaml</DependentUpon>
     </Compile>

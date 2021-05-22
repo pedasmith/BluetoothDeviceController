@@ -60,7 +60,7 @@ namespace BluetoothDeviceController.Beacons
                                     if (result.Success && result.Url.StartsWith("https://ruu.vi/#"))
                                     {
                                         //foundValues.Add(AdvertisementType.RuuviTag);
-                                        var ruuvi = BluetoothDeviceController.Beacons.RuuviTag.ParseRuuviTag(result.Url);
+                                        var ruuvi = BluetoothDeviceController.Beacons.Ruuvi_Tag_v1_Helper.ParseRuuviTag(result.Url);
                                         ruuvi.Data.EventTime = DateTime.Now;
                                         if (ruuvi.Success)
                                         {

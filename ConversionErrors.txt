@@ -1,0 +1,42 @@
+Dear tim Brice and Todd Hall of the Weather Service,
+
+While looking at the conversion formulas at https://www.weather.gov/media/epz/wxcalc/pressureConversion.pdf
+(this is pointed to from https://www.weather.gov/epz/wxcalc_pressureconvert), I couldn't help but notice the following errors:
+
+Issue #1:Page 3
+The conversion from standard atmosphere (atm) and mmHg are flipped around. The PDF has these formulas as:
+
+	Patm = 760 × P mmHg
+	PmmHg = 0.0013157894 × Patm
+
+But this makes no sense -- one atmosphere is about 30 inches of mercury, so one atmosphere should be considerably more than 30 mm of mercury. Your formulae results in 1 atmosphere being a mere 0.00131 mm of mercury.
+
+It looks like the conversion numbers were simply swapped around and should read
+
+
+	Patm = 0.0013157894 × P mmHg
+	PmmHg = 760 × Patm
+
+The forumula immediately below, which convert standard atmosphere to inches of mercury, appear to be correct.
+
+Issue #2:Page 2
+There's an incorrect divide-by-ten in the conversion formula for PmmHg to PkPa.
+
+	PkPa = 0.1333224 × (PmmHg / 10)
+
+The preceeding equation provides the conversion from PmmHg to Pmb; that equation is 
+
+	Pmb = 1.333224 × PmmHg
+
+Elsewhere the conversionfrom PkPa to Pmb that PkPa = Pmb / 10. It looks like the by-ten conversion was incorrectly applied twice to the 1.333224 factor: the factor was divided by 10 (to 0.1333224) and the PmmHg was also divided by 10 explicitly. For the reverse conversion (Pmb to PmmHg and PkPa to PmmHg), the conversion constant was simply multipled by 10 (0.750062 to 7.50062).
+
+Issue #3: Incorrect convertion from inHg to lbsin (js)
+
+The PDF gives the constant to convert PinHg to Ppsi as 0.491154. The JavaScript uses the conversion factor of 0.491130 in the convertinHGtolbsin function. I don't know which of these is incorrect, but they are definitly inconsistent.  Checking the rest of the numbers, all the numbers in the JavaScript file match a corresponding number in the PDF.
+
+
+
+I was using your PDF in an attempt to make my own conversion routines. I wanted to copy-and-paste your exact numbers into my code to avoid any typos, and then tested against your JavaScript. T
+
+Thanks,
+Peter Smith

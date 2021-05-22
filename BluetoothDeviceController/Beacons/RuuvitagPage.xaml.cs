@@ -6,7 +6,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
-using static BluetoothDeviceController.Beacons.RuuviTag;
+using static BluetoothDeviceController.Beacons.Ruuvi_Tag_v1_Helper;
 
 namespace BluetoothDeviceController.Beacons
 {
@@ -61,7 +61,7 @@ typeof(Ruuvi_DataRecord).GetProperty("Humidity"),
             };
         }
 
-        private async void Di_UpdatedRuuviAdvertisement(RuuviTag.Ruuvi_DataRecord record)
+        private async void Di_UpdatedRuuviAdvertisement(Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord record)
         {
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => 
             {

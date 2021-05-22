@@ -7,6 +7,19 @@
         <Style TargetType="TextBlock" x:Key="rsTitle">
             <Setter Property="FontSize" Value="44" />
         </Style>
+        <Style TargetType="TextBlock" x:Key="rsCriticalValue">
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style TargetType="TextBlock" x:Key="rsNormalValue">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
+        <Style TargetType="TextBlock" x:Key="rsPName">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+        </Style>
     </Application.Resources>
-
 </Application>

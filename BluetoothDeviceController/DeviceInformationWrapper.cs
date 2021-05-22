@@ -42,9 +42,9 @@ namespace BluetoothDeviceController
             UpdatedEddystoneAdvertisement?.Invoke(results);
         }
 
-        public delegate void RuuviAdvertisementEvent(RuuviTag.Ruuvi_DataRecord data);
+        public delegate void RuuviAdvertisementEvent(Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord data);
         public event RuuviAdvertisementEvent UpdatedRuuviAdvertisement = null;
-        public void Event(RuuviTag.Ruuvi_DataRecord results)
+        public void Event(Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord results)
         {
             UpdatedRuuviAdvertisement?.Invoke(results);
         }

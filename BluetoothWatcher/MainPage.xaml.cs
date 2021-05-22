@@ -1,6 +1,7 @@
 ﻿using BluetoothDeviceController.Beacons;
 using BluetoothDeviceController.BluetoothDefinitionLanguage;
 using BluetoothWatcher.DeviceDisplays;
+using BluetoothWatcher.Units;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -51,13 +52,22 @@ namespace BluetoothWatcher
             BleAdvertisementWatcher = new BluetoothLEAdvertisementWatcher();
             BleAdvertisementWatcher.Received += BleAdvertisementWatcher_Received;
             BleAdvertisementWatcher.Start();
+
+
+            // Unit tests!
+            int nerror = 0;
+            nerror += DoubleApprox.Test();
+            nerror += Temperature.Test();
+            nerror += Pressure.Test();
+            if (nerror > 0)
+            {
+                uiNDevice.Text = $"STARTUP ERROR: {nerror}";
+            }
         }
 
         private async void BleAdvertisementWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
-            //TODO: filter out non-Ruuvi advertisements :-)
             sbyte transmitPower = 0;
-            string indent = "";
             ushort companyId;
             object speciality = null;
 
@@ -83,7 +93,19 @@ namespace BluetoothWatcher
                 }
             }
             Ruuvi_Tag ruuvi_tag = speciality as Ruuvi_Tag;
-            if (ruuvi_tag == null) return;
+            if (ruuvi_tag == null)
+            {
+                // Maybe it's a type 1 ruuvi tag?
+                var v1 = Ruuvi_Tag_v1_Helper.GetRuuviUrl(args);
+                if (v1.Success && v1.Data != null)
+                {
+                    ruuvi_tag = Ruuvi_Tag.FromRuuvi_DataRecord(v1.Data);
+                }
+            }
+            if (ruuvi_tag == null)
+            {
+                return;
+            }
 
            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
            {
@@ -104,8 +126,8 @@ namespace BluetoothWatcher
                    display = Displays[addr];
                }
                if (display == null) return;
-
-               display.SetAdvertisement(ruuvi_tag);
+               var macAddress = BluetoothAddress.AsString(addr);
+               display.SetAdvertisement(macAddress, ruuvi_tag);
 
                // Got a device; better make it visible.
                if (addedFirst)

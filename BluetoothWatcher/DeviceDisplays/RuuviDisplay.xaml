@@ -8,18 +8,45 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
-    <Border BorderBrush="Black" BorderThickness="2" Padding="8" Margin="3" Background="LightBlue" Width="200" Height="200">
+    <Border BorderBrush="Black" BorderThickness="2" Padding="8" Margin="3" Background="LightBlue" Width="300" Height="150">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <TextBlock><Run>RUUVI</Run> Name=<Run x:Name="uiName" /> N=<Run x:Name="uiCount" /></TextBlock>
-            <TextBlock Grid.Row="1">
-            <Run>Temperature</Run><Run x:Name="uiTemperature" />
-            <LineBreak/><Run>Pressure</Run><Run x:Name="uiPressure" />
-            <LineBreak/>
-            </TextBlock>
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource rsPName}">Temperature</TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource rsPName}">Pressure</TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource rsPName}">Humidity</TextBlock>
+                <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource rsPName}">Acceleration</TextBlock>
+                <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource rsPName}">Battery</TextBlock>
+
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TemperatureStr}" Style="{StaticResource rsCriticalValue}" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding PressureStr}" Style="{StaticResource rsNormalValue}"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding HumidityStr}" Style="{StaticResource rsNormalValue}"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" >
+                    (<Run Text="{Binding XStr}" />,
+                    <Run Text="{Binding YStr}" />,
+                    <Run Text="{Binding ZStr}" />)
+                </TextBlock>
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding VoltageStr}" Style="{StaticResource rsNormalValue}" />
+            </Grid>
+
+
         </Grid>
     </Border>
 </UserControl>

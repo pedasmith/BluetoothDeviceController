@@ -2,25 +2,29 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security;
+using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 
 namespace BluetoothDeviceController.Beacons
 {
-    public class RuuviTag
+    public static class Ruuvi_Tag_v1_Helper
     {
         public class Ruuvi_Communication
         {
-            public Ruuvi_Communication(bool success, double temperature, double pressure, double humidity)
+            public Ruuvi_Communication(bool success, double temperature, double pressure, double humidity, string ruuviUri = null)
             {
                 Success = success;
                 Data = new Ruuvi_DataRecord(temperature, pressure, humidity);
+                RuuviUri = ruuviUri;
             }
             public static Ruuvi_Communication MakeFailure()
             {
                 return new Ruuvi_Communication(false, double.NaN, double.NaN, double.NaN);
             }
             public bool Success { get; set; }
-            public Ruuvi_DataRecord Data { get; set; }
+            public Ruuvi_DataRecord Data { get; set; } = null;
+            public string RuuviUri { get; set; } = null;
             public override string ToString()
             {
                 if (!Success) return "Ruuvi: Unable to communicate";
@@ -55,6 +59,9 @@ namespace BluetoothDeviceController.Beacons
             private double _Temperature;
             public double Temperature { get { return _Temperature; } set { if (value == _Temperature) return; _Temperature = value; OnPropertyChanged(); } }
 
+            /// <summary>
+            /// Pressure in hPA
+            /// </summary>
             private double _Pressure;
             public double Pressure { get { return _Pressure; } set { if (value == _Pressure) return; _Pressure = value; OnPropertyChanged(); } }
 
@@ -122,7 +129,48 @@ namespace BluetoothDeviceController.Beacons
                     }
                     break;
             }
-            return new Ruuvi_Communication(success, temperature, pressure, humidity);
+            return new Ruuvi_Communication(success, temperature, pressure, humidity, url);
+        }
+
+        public static Ruuvi_Communication GetRuuviUrl(BluetoothLEAdvertisementReceivedEventArgs ble)
+        {
+            // Lets's see if it's an Eddystone beacon...
+            // https://github.com/google/eddystone
+            // https://github.com/google/eddystone/blob/master/protocol-specification.md
+
+            foreach (var section in ble.Advertisement.DataSections)
+            {
+                switch (section.DataType)
+                {
+                    case 0x16: // 22=service data
+                        var dr = DataReader.FromBuffer(section.Data);
+                        dr.ByteOrder = ByteOrder.LittleEndian;
+                        var Service = dr.ReadUInt16();
+                        // https://github.com/google/eddystone
+                        if (Service == 0xFEAA) // An Eddystone type
+                        {
+                            //EddystoneFrameType = (byte)(0x0F & (dr.ReadByte() >> 4));
+                            var EddystoneFrameType = dr.ReadByte();
+                            const int TypeURL = 0x10;
+                            switch (EddystoneFrameType)
+                            {
+                                case TypeURL: // 0x10: An Eddystone-URL
+                                    // https://github.com/google/eddystone/tree/master/eddystone-url
+                                    var result = BluetoothDeviceController.Beacons.Eddystone.ParseEddystoneUrlArgs(section.Data);
+                                    if (result.Success && result.Url.StartsWith("https://ruu.vi/#"))
+                                    {
+                                        //foundValues.Add(AdvertisementType.RuuviTag);
+                                        var ruuvi = ParseRuuviTag(result.Url);
+                                        ruuvi.Data.EventTime = DateTime.Now;
+                                        return ruuvi;
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+            return Ruuvi_Communication.MakeFailure();
         }
     }
 }

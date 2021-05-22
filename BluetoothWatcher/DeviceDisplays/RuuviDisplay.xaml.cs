@@ -1,9 +1,12 @@
 ﻿using BluetoothDeviceController.Beacons;
 using BluetoothDeviceController.BluetoothDefinitionLanguage;
+using BluetoothWatcher.Units;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Foundation;
@@ -21,22 +24,77 @@ using static BluetoothDeviceController.BluetoothDefinitionLanguage.Advertisement
 
 namespace BluetoothWatcher.DeviceDisplays
 {
-    public sealed partial class RuuviDisplay : UserControl
+    public sealed partial class RuuviDisplay : UserControl, INotifyPropertyChanged
     {
         public RuuviDisplay()
         {
+            this.DataContext = this;
             this.InitializeComponent();
         }
 
-        int NAdvertisement { get; set; } = 0;
+        private string _PressureStr = "---";
+        public string PressureStr { get { return _PressureStr; } set { if (_PressureStr == value) return; _PressureStr = value; NotifyPropertyChanged(); } }
 
-        public void SetAdvertisement (Ruuvi_Tag ruuvi_tag)
+        private string _TemperatureStr = "---";
+        public string TemperatureStr { get { return _TemperatureStr; } set { if (_TemperatureStr == value) return; _TemperatureStr = value; NotifyPropertyChanged(); } }
+
+        private string _HumidityStr = "---";
+        public string HumidityStr { get { return _HumidityStr; } set { if (_HumidityStr == value) return; _HumidityStr = value; NotifyPropertyChanged(); } }
+        private string _XStr = "---";
+        public string XStr { get { return _XStr; } set { if (_XStr == value) return; _XStr = value; NotifyPropertyChanged(); } }
+
+        private string _YStr = "---";
+        public string YStr { get { return _YStr; } set { if (_YStr == value) return; _YStr = value; NotifyPropertyChanged(); } }
+
+        private string _ZStr = "---";
+        public string ZStr { get { return _ZStr; } set { if (_ZStr == value) return; _ZStr = value; NotifyPropertyChanged(); } }
+
+        private string _VoltageStr = "---";
+        public string VoltageStr { get { return _VoltageStr; } set { if (_VoltageStr == value) return; _VoltageStr = value; NotifyPropertyChanged(); } }
+
+        private string _TXStr = "---";
+        public string TXStr { get { return _TXStr; } set { if (_TXStr == value) return; _TXStr = value; NotifyPropertyChanged(); } }
+
+        private string _MovementSequenceStr = "---";
+        public string MovementSequenceStr { get { return _MovementSequenceStr; } set { if (_MovementSequenceStr == value) return; _MovementSequenceStr = value; NotifyPropertyChanged(); } }
+
+        private string _MovementCounterStr = "---";
+        public string MovementCounterStr { get { return _MovementCounterStr; } set { if (_MovementCounterStr == value) return; _MovementCounterStr = value; NotifyPropertyChanged(); } }
+
+
+        public UserUnits PreferredUnits { get; set; } = new UserUnits();
+
+        int NAdvertisement { get; set; } = 0;
+        Ruuvi_Tag LastTag = null;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void SetAdvertisement (string macAddress, Ruuvi_Tag ruuvi_tag)
+        {
+            LastTag = ruuvi_tag;
+
             NAdvertisement++;
             uiCount.Text = NAdvertisement.ToString();
+            uiName.Text = macAddress;
 
-            uiTemperature.Text = ruuvi_tag.TemperatureInDegreesC.ToString();
-            uiPressure.Text = ruuvi_tag.PressureInPascals.ToString();
+            TemperatureStr = Units.Temperature.ConvertToString (ruuvi_tag.TemperatureInDegreesC, Temperature.Unit.Celcius, PreferredUnits.Temperature);
+            PressureStr = Units.Pressure.ConvertToString(ruuvi_tag.PressureInPascals, Pressure.Unit.Pascal, PreferredUnits.Pressure);
+            HumidityStr = $"{ruuvi_tag.HumidityInPercent}%";
+
+
+            XStr = $"{ruuvi_tag.AccelerationInG[0]:F2} G";
+            YStr = $"{ruuvi_tag.AccelerationInG[1]:F2} G";
+            ZStr = $"{ruuvi_tag.AccelerationInG[2]:F2} G";
+
+            VoltageStr = $"{ruuvi_tag.BatteryVoltage:F2} volts";
+            TXStr = $"{ruuvi_tag.TransmitPowerInDb} db";
+
+            MovementSequenceStr = $"{ruuvi_tag.MovementSequenceCounter}";
+            MovementCounterStr = $"{ruuvi_tag.MovementCounter}";
         }
     }
 }
