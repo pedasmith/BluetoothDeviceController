@@ -15,7 +15,7 @@
 
   <Properties>
     <DisplayName>BluetoothWatcher</DisplayName>
-    <PublisherDisplayName>toomr</PublisherDisplayName>
+    <PublisherDisplayName>Shipwreck Software</PublisherDisplayName>
     <Logo>Assets\Icons\StoreLogo.png</Logo>
   </Properties>
 
@@ -32,7 +32,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="BluetoothWatcher.App">
       <uap:VisualElements
-        DisplayName="BluetoothWatcher"
+        DisplayName="Bluetooth Watcher"
         Square150x150Logo="Assets\Icons\Square150x150Logo.png"
         Square44x44Logo="Assets\Icons\Square44x44Logo.png"
         Description="Displays data from popular Bluetooth devices like the RuuviTag"

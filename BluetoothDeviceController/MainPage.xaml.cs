@@ -354,21 +354,28 @@ namespace BluetoothDeviceController
             }
             else if (preftype == UserPreferences.DisplayPreference.Specialized_Display)
             {
-                var deviceName = GetDeviceInformationName(wrapper?.di);
+                if (wrapper?.di == null)
+                {
 
-                var specialization = Specialization.Get(Specializations, deviceName);
-                if (specialization == null && wrapper != null)
-                {
-                    var isUart = await wrapper.IsNordicUartAsync();
-                    if (isUart)
-                    {
-                        specialization = Specialization.Get(Specializations, Nordic_Uart.SpecializationName);
-                    }
                 }
-                if (specialization != null)
+                else
                 {
-                    _pageType = specialization.Page;
-                    scrollType = specialization.ParentShouldScroll;
+                    var deviceName = GetDeviceInformationName(wrapper?.di);
+
+                    var specialization = Specialization.Get(Specializations, deviceName);
+                    if (specialization == null && wrapper != null)
+                    {
+                        var isUart = await wrapper.IsNordicUartAsync();
+                        if (isUart)
+                        {
+                            specialization = Specialization.Get(Specializations, Nordic_Uart.SpecializationName);
+                        }
+                    }
+                    if (specialization != null)
+                    {
+                        _pageType = specialization.Page;
+                        scrollType = specialization.ParentShouldScroll;
+                    }
                 }
             }
             if (_pageType == null) // Either the preferences is for an editor, or this particular BT devices doesn't have a specialization.
