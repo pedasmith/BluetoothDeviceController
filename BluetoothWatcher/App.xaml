@@ -4,8 +4,18 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BluetoothWatcher">
     <Application.Resources>
+        <Style x:Key="rsDeviceTile" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="Margin" Value="8" />
+            <Setter Property="Width" Value="300" />
+            <Setter Property="Height" Value="180" />
+            <Setter Property="Background" Value="LightBlue" />
+        </Style>
         <Style TargetType="TextBlock" x:Key="rsTitle">
-            <Setter Property="FontSize" Value="44" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style TargetType="TextBlock" x:Key="rsCriticalValue">
             <Setter Property="FontSize" Value="24" />

@@ -155,6 +155,12 @@
     <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\Eddystone.cs">
       <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\Eddystone.cs</Link>
     </Compile>
+    <Compile Include="..\BluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs">
+      <Link>FromBluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs</Link>
+    </Compile>
+    <Compile Include="..\BluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs">
+      <Link>FromBluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs</Link>
+    </Compile>
     <Compile Include="..\BluetoothDeviceController\IotNumberFormats\ValueCalculate.cs">
       <Link>FromBluetoothDeviceController\IotNumberFormats\ValueCalculate.cs</Link>
     </Compile>
@@ -175,6 +181,9 @@
     </Compile>
     <Compile Include="DeviceDisplays\RuuviDisplay.xaml.cs">
       <DependentUpon>RuuviDisplay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceDisplays\Viatom_PulseOximeter.xaml.cs">
+      <DependentUpon>Viatom_PulseOximeter.xaml</DependentUpon>
     </Compile>
     <Compile Include="FromBluetoothDeviceController\Mocks\IWriteCharacteristic.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -258,6 +267,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="DeviceDisplays\RuuviDisplay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceDisplays\Viatom_PulseOximeter.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

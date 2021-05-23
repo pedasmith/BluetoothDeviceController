@@ -1,5 +1,6 @@
 ﻿using BluetoothDeviceController.Beacons;
 using BluetoothDeviceController.BluetoothDefinitionLanguage;
+using BluetoothDeviceController.BluetoothProtocolsCustom;
 using BluetoothWatcher.DeviceDisplays;
 using BluetoothWatcher.Units;
 using System;
@@ -8,10 +9,14 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -36,7 +41,11 @@ namespace BluetoothWatcher
             this.Loaded += MainPage_Loaded;
         }
         BluetoothLEAdvertisementWatcher BleAdvertisementWatcher = null;
-        Dictionary<ulong, DeviceDisplays.RuuviDisplay> Displays = new Dictionary<ulong, DeviceDisplays.RuuviDisplay>();
+        Dictionary<ulong, DeviceDisplays.RuuviDisplay> RuuviDisplays = new Dictionary<ulong, DeviceDisplays.RuuviDisplay>();
+        Dictionary<ulong, DeviceDisplays.Viatom_PulseOximeter> ViatomDisplays = new Dictionary<ulong, Viatom_PulseOximeter>();
+
+        Dictionary<ulong, Viatom_PulseOximeter_PC60FW_Factory> ViatomFactories = new Dictionary<ulong, Viatom_PulseOximeter_PC60FW_Factory>();
+        Dictionary<ushort, ulong> CharacteristicHandleToBTAddr = new Dictionary<ushort, ulong>();
 
         /// <summary>
         /// Fill in help text + start watcher
@@ -70,16 +79,24 @@ namespace BluetoothWatcher
             sbyte transmitPower = 0;
             ushort companyId;
             object speciality = null;
+            string completeLocalName = "";
 
             // Now parse out the data
+            var addr = args.BluetoothAddress;
             foreach (var section in args.Advertisement.DataSections)
             {
                 var dtv = AdvertisementDataSectionParser.ConvertDataTypeValue(section.DataType);
                 string str = "";
                 BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-
                 switch (dtv)
                 {
+                    case AdvertisementDataSectionParser.DataTypeValue.CompleteLocalName:
+                        {
+                            var dr = DataReader.FromBuffer(section.Data);
+                            completeLocalName = dr.ReadString(dr.UnconsumedBufferLength);
+                        }
+                        break;
+
                     case DataTypeValue.ManufacturerData:
                         (str, manufacturerType, companyId, speciality) = BluetoothCompanyIdentifier.ParseManufacturerData(section, transmitPower);
                         if (speciality != null)
@@ -92,51 +109,123 @@ namespace BluetoothWatcher
                         break;
                 }
             }
-            Ruuvi_Tag ruuvi_tag = speciality as Ruuvi_Tag;
-            if (ruuvi_tag == null)
+            Ruuvi_Tag ruuvi_tag = null;
+            bool added_Viatom_PulseOximeter = false;
+
+            if (completeLocalName.StartsWith("PC-60F"))
             {
-                // Maybe it's a type 1 ruuvi tag?
-                var v1 = Ruuvi_Tag_v1_Helper.GetRuuviUrl(args);
-                if (v1.Success && v1.Data != null)
+                if (!ViatomFactories.ContainsKey (addr))
                 {
-                    ruuvi_tag = Ruuvi_Tag.FromRuuvi_DataRecord(v1.Data);
+                    // Turn on notifications.
+                    var ble = await BluetoothLEDevice.FromBluetoothAddressAsync(addr);
+                    var xmitterResult = await ble.GetGattServicesForUuidAsync(Guid.Parse("6e400001-b5a3-f393-e0a9-e50e24dcca9e"));
+                    if (xmitterResult.Status != GattCommunicationStatus.Success) return;
+                    var receiveResult = await xmitterResult.Services[0].GetCharacteristicsForUuidAsync(Guid.Parse("6e400003-b5a3-f393-e0a9-e50e24dcca9e"));
+                    if (receiveResult.Status != GattCommunicationStatus.Success) return;
+                    var receive = receiveResult.Characteristics[0];
+                    var notifyStatus = await receive.WriteClientCharacteristicConfigurationDescriptorAsync(Windows.Devices.Bluetooth.GenericAttributeProfile.GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                    if (notifyStatus != GattCommunicationStatus.Success) return;
+
+                    if (!CharacteristicHandleToBTAddr.ContainsKey(receive.AttributeHandle))
+                    {
+                        CharacteristicHandleToBTAddr.Add(receive.AttributeHandle, addr);
+                    }
+                    ViatomFactories.Add(addr, new Viatom_PulseOximeter_PC60FW_Factory());
+                    receive.ValueChanged += Viatom_PulseOximeter_PC60FW_Receive_ValueChanged;
+                    added_Viatom_PulseOximeter = true;
                 }
             }
-            if (ruuvi_tag == null)
+            else if (speciality is Ruuvi_Tag)
+            {
+                // Maybe it's a Ruuvi Tag announcement?
+                ruuvi_tag = speciality as Ruuvi_Tag;
+                if (ruuvi_tag == null)
+                {
+                    // Maybe it's a type 1 ruuvi tag?
+                    var v1 = Ruuvi_Tag_v1_Helper.GetRuuviUrl(args);
+                    if (v1.Success && v1.Data != null)
+                    {
+                        ruuvi_tag = Ruuvi_Tag.FromRuuvi_DataRecord(v1.Data);
+                    }
+                }
+            }
+
+            if (ruuvi_tag == null && !added_Viatom_PulseOximeter)
             {
                 return;
             }
 
            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
            {
-               var addr = args.BluetoothAddress;
-               RuuviDisplay display = null;
-               bool addedFirst = false;
-               if (!Displays.ContainsKey(addr))
+               if (ruuvi_tag != null) UpdateRuuviDisplay(addr, ruuvi_tag);
+               if (added_Viatom_PulseOximeter)
                {
-                   // If ruuvi then ...
-                   // We add the display in two places: a list of displays, and the map
-                   display = new RuuviDisplay();
-                   Displays.Add(addr, display);
-                   addedFirst = Displays.Count == 1;
-                   uiDevices.Items.Add(display);
-               }
-               else
-               {
-                   display = Displays[addr];
-               }
-               if (display == null) return;
-               var macAddress = BluetoothAddress.AsString(addr);
-               display.SetAdvertisement(macAddress, ruuvi_tag);
+                   if (!ViatomDisplays.ContainsKey (addr))
+                   {
+                       var display = new Viatom_PulseOximeter();
+                       ViatomDisplays.Add(addr, display);
+                       uiDevices.Items.Add(display);
 
-               // Got a device; better make it visible.
-               if (addedFirst)
-               {
-                   uiStartup.Visibility = Visibility.Collapsed;
-                   uiDevices.Visibility = Visibility.Visible;
+                       // Got a device; better make it visible.
+                       if (uiDevices.Items.Count == 1)
+                       {
+                           uiStartup.Visibility = Visibility.Collapsed;
+                           uiDevices.Visibility = Visibility.Visible;
+                       }
+                       uiNDevice.Text = uiDevices.Items.Count.ToString();
+                   }
                }
-               uiNDevice.Text = Displays.Count.ToString();
            });
+        }
+
+        private void UpdateRuuviDisplay(ulong addr, Ruuvi_Tag ruuvi_tag)
+        {
+            RuuviDisplay display = null;
+            if (!RuuviDisplays.ContainsKey(addr))
+            {
+                // If ruuvi then ...
+                // We add the display in two places: a list of displays, and the map
+                display = new RuuviDisplay();
+                RuuviDisplays.Add(addr, display);
+                uiDevices.Items.Add(display);
+
+                // Got a device; better make it visible.
+                if (uiDevices.Items.Count == 1)
+                {
+                    uiStartup.Visibility = Visibility.Collapsed;
+                    uiDevices.Visibility = Visibility.Visible;
+                }
+                uiNDevice.Text = uiDevices.Items.Count.ToString();
+            }
+            else
+            {
+                display = RuuviDisplays[addr];
+            }
+            if (display == null) return;
+            var macAddress = BluetoothAddress.AsString(addr);
+            display.SetAdvertisement(macAddress, ruuvi_tag);
+        }
+
+        /// <summary>
+        /// Called when a pulse oximeter is updated.
+        /// </summary>
+        private void Viatom_PulseOximeter_PC60FW_Receive_ValueChanged(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic sender, Windows.Devices.Bluetooth.GenericAttributeProfile.GattValueChangedEventArgs args)
+        {
+            var addr = CharacteristicHandleToBTAddr[sender.AttributeHandle];
+            var factory = ViatomFactories[addr];
+            factory.AddNotification(sender, args);
+            var value = factory.GetNext();
+            if (value != null)
+            {
+               var task = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+               {
+                   if (ViatomDisplays.ContainsKey(addr))
+                   {
+                       var display = ViatomDisplays[addr];
+                       display.SetAdvertisement("", value);
+                   }
+               });
+            }
         }
     }
 }

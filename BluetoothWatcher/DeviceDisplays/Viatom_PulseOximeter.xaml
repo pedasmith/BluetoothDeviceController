@@ -1,0 +1,50 @@
+﻿<UserControl
+    x:Class="BluetoothWatcher.DeviceDisplays.Viatom_PulseOximeter"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothWatcher.DeviceDisplays"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid>
+        <Border Style="{StaticResource rsDeviceTile}" >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0">
+                    <TextBlock Style="{StaticResource rsTitle}"><Run>Pulse Oximeter</Run></TextBlock>
+                    <TextBlock>Name=<Run x:Name="uiName" /> N=<Run x:Name="uiCount" /></TextBlock>
+                </StackPanel>
+
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource rsPName}">Pulse</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource rsPName}">Oxygen</TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource rsPName}">Perfusion Index</TextBlock>
+
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding PulseStr}" Style="{StaticResource rsCriticalValue}" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding OxygenStr}" Style="{StaticResource rsNormalValue}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding PerfusionIndexStr}" Style="{StaticResource rsNormalValue}"/>
+                </Grid>
+
+
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

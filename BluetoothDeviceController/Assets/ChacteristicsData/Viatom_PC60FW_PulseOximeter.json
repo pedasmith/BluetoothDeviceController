@@ -1,0 +1,81 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "PC-60F_SN109400",
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Name: PC-60F_SN109400",
+                "PC-60F_SN109400"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  20 00 28 00 00 00 90 01"
+              ]
+            },
+            {
+              "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+              "Name": "Central Address Resolution",
+              "Type": "U8|DEC|AddressResolutionSupported",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01",
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Generic Service"
+        },
+        {
+          "UUID": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+          "Name": "Transmit",
+          "Characteristics": [
+            {
+              "UUID": "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+              "Name": "Transmit",
+              "Type": "STRING|ASCII^LONG|Data",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true
+            },
+            {
+              "UUID": "6e400003-b5a3-f393-e0a9-e50e24dcca9e",
+              "Name": "Receive",
+              "Type": "STRING|ASCII^LONG|Data",
+              "IsNotify": true
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-da:4e:c3:bc:09:78\nCanPair:True IsPaired:False"
+    }
+  ]
+}

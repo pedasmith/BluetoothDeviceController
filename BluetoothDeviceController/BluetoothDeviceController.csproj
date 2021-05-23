@@ -180,6 +180,8 @@
     <Compile Include="BluetoothDefinitionLanguage\BluetoothServiceRegistration.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
     <Compile Include="BluetoothProtocolsCustom\Nordic_Uart.cs" />
+    <Compile Include="BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs" />
+    <Compile Include="BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs" />
     <Compile Include="BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
     <Compile Include="BluetoothProtocols\Elegoo_Mini_Car.cs" />
     <Compile Include="BluetoothProtocols\WilliamWeilerEngineering_Skoobot.cs" />
@@ -705,6 +707,7 @@
     <Content Include="Assets\ChacteristicsData\Elegoo_Mini_Car.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Assets\ChacteristicsData\Viatom_PC60FW_PulseOximeter.json" />
     <None Include="Assets\HelpFiles\Device_Elegoo_MiniCar.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
