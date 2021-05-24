@@ -126,7 +126,7 @@ Look for AA 55 0F . The next item is length. Commands will be concatenated toget
                 var len = CurrBuffer[++NextIndex];
                 if (len > 20) continue; // length is very much out of range; bail and resync.
                 var cmd = CurrBuffer[++NextIndex];
-                if (len == 0x08 && ) // There are other command but we don't care about them.
+                if (len == 0x08 && cmd == 0x01) // There are other command but we don't care about them.
                 {
                     var retval = new Viatom_PulseOximeter_PC60FW();
                     retval.OxygenSaturationInPercent = CurrBuffer[NextIndex + 1];

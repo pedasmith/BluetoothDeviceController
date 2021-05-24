@@ -3,6 +3,7 @@ using BluetoothDeviceController.BluetoothDefinitionLanguage;
 using BluetoothDeviceController.BluetoothProtocolsCustom;
 using BluetoothWatcher.DeviceDisplays;
 using BluetoothWatcher.Units;
+using enumUtilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

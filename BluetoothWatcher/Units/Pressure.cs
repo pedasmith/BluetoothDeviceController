@@ -9,7 +9,22 @@ namespace BluetoothWatcher.Units
 {
     public class Pressure
     {
-        public enum Unit { mmHg_Torr, inHg, hectoPascal_milliBar, kiloPascal, Pascal, PSI, Atmosphere };
+        public enum Unit {
+            [enumUtilities.Display("mm Mercury (Torr)")]
+            mmHg_Torr,
+            [enumUtilities.Display("inches of Mercury")]
+            inHg,
+            [enumUtilities.Display("milliBar (hectoPascal)")]
+            hectoPascal_milliBar,
+            [enumUtilities.Display("kiloPascal")]
+            kiloPascal,
+            [enumUtilities.Display("Pascal")]
+            Pascal,
+            [enumUtilities.Display("PSI")]
+            PSI,
+            [enumUtilities.Display("Atmospheres")]
+            Atmosphere
+        };
         public static double Convert(double value, Unit from, Unit to)
         {
             if (from == to) return value;

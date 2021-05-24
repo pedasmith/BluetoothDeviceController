@@ -176,11 +176,17 @@
     <Compile Include="..\BluetoothDeviceController\Names\SerialConfig.cs">
       <Link>FromBluetoothDeviceController\Names\SerialConfig.cs</Link>
     </Compile>
+    <Compile Include="..\BluetoothDeviceController\Utilities\EnumUtilities.cs">
+      <Link>Utilities\EnumUtilities.cs</Link>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="DeviceDisplays\RuuviDisplay.xaml.cs">
       <DependentUpon>RuuviDisplay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceDisplays\RuuviSetting.xaml.cs">
+      <DependentUpon>RuuviSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="DeviceDisplays\Viatom_PulseOximeter.xaml.cs">
       <DependentUpon>Viatom_PulseOximeter.xaml</DependentUpon>
@@ -267,6 +273,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="DeviceDisplays\RuuviDisplay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceDisplays\RuuviSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

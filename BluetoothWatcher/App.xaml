@@ -25,6 +25,10 @@
             <Setter Property="FontSize" Value="14" />
             <Setter Property="FontWeight" Value="Normal" />
         </Style>
+        <Style TargetType="TextBlock" x:Key="rsSettingValue">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
         <Style TargetType="TextBlock" x:Key="rsPName">
             <Setter Property="FontSize" Value="12" />
             <Setter Property="VerticalAlignment" Value="Bottom" />

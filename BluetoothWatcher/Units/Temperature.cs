@@ -9,7 +9,7 @@ namespace BluetoothWatcher.Units
 {
     public class Temperature
     {
-        public enum Unit { Fahrenheit, Celcius };
+        public enum Unit { Celcius, Fahrenheit };
         public static double Convert (double value, Unit from, Unit to)
         {
             if (from == to) return value;

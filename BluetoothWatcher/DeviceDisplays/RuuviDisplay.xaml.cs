@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using static BluetoothDeviceController.BluetoothDefinitionLanguage.AdvertisementDataSectionParser;
+using enumUtilities;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -80,11 +81,15 @@ namespace BluetoothWatcher.DeviceDisplays
             NAdvertisement++;
             uiCount.Text = NAdvertisement.ToString();
             uiName.Text = macAddress;
+            UpdateFromTag(LastTag);
+        }
 
-            TemperatureStr = Units.Temperature.ConvertToString (ruuvi_tag.TemperatureInDegreesC, Temperature.Unit.Celcius, PreferredUnits.Temperature);
+        private void UpdateFromTag(Ruuvi_Tag ruuvi_tag)
+        {
+            if (ruuvi_tag == null) return;
+            TemperatureStr = Units.Temperature.ConvertToString(ruuvi_tag.TemperatureInDegreesC, Temperature.Unit.Celcius, PreferredUnits.Temperature);
             PressureStr = Units.Pressure.ConvertToString(ruuvi_tag.PressureInPascals, Pressure.Unit.Pascal, PreferredUnits.Pressure);
             HumidityStr = $"{ruuvi_tag.HumidityInPercent}%";
-
 
             XStr = $"{ruuvi_tag.AccelerationInG[0]:F2} G";
             YStr = $"{ruuvi_tag.AccelerationInG[1]:F2} G";
@@ -95,6 +100,19 @@ namespace BluetoothWatcher.DeviceDisplays
 
             MovementSequenceStr = $"{ruuvi_tag.MovementSequenceCounter}";
             MovementCounterStr = $"{ruuvi_tag.MovementCounter}";
+        }
+
+        private async void OnSetting(object sender, RoutedEventArgs e)
+        {
+            var settings = new RuuviSetting(PreferredUnits);
+            var dlg = new ContentDialog()
+            {
+                Title = "Settings",
+                PrimaryButtonText = "OK",
+                Content = settings,
+            };
+            var result = await dlg.ShowAsync();
+            UpdateFromTag(LastTag);
         }
     }
 }
