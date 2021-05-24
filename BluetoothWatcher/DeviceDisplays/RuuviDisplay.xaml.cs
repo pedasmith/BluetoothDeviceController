@@ -33,6 +33,10 @@ namespace BluetoothWatcher.DeviceDisplays
             this.InitializeComponent();
         }
 
+        private bool NameIsCustom = false;
+        private string _NameStr = "ruuvi";
+        public string NameStr { get { return _NameStr; } set { if (_NameStr == value) return; _NameStr = value; NotifyPropertyChanged(); } }
+
         private string _PressureStr = "---";
         public string PressureStr { get { return _PressureStr; } set { if (_PressureStr == value) return; _PressureStr = value; NotifyPropertyChanged(); } }
 
@@ -80,7 +84,10 @@ namespace BluetoothWatcher.DeviceDisplays
 
             NAdvertisement++;
             uiCount.Text = NAdvertisement.ToString();
-            uiName.Text = macAddress;
+            if (!NameIsCustom)
+            {
+                NameStr = macAddress;
+            }
             UpdateFromTag(LastTag);
         }
 
@@ -113,6 +120,28 @@ namespace BluetoothWatcher.DeviceDisplays
             };
             var result = await dlg.ShowAsync();
             UpdateFromTag(LastTag);
+        }
+
+        private async void OnPickName(object sender, TappedRoutedEventArgs e)
+        {
+            var newName = new TextBox()
+            {
+                MinWidth = 200,
+                Text = NameStr,
+            };
+            var dlg = new ContentDialog()
+            {
+                Title = "Pick new name",
+                PrimaryButtonText = "OK",
+                SecondaryButtonText = "Cancel",
+                Content = newName,
+            };
+            var result = await dlg.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                NameIsCustom = true;
+                NameStr = newName.Text;
+            }
         }
     }
 }

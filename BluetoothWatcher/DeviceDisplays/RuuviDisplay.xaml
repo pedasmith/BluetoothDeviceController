@@ -17,7 +17,7 @@
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0">
                 <TextBlock Style="{StaticResource rsTitle}"><Run>Ruuvi</Run></TextBlock>
-                <TextBlock>Name=<Run x:Name="uiName" /> N=<Run x:Name="uiCount" /></TextBlock>
+                <TextBlock Tapped="OnPickName">Name=<Run Text="{Binding NameStr}" /> N=<Run x:Name="uiCount" /></TextBlock>
             </StackPanel>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
