@@ -78,15 +78,23 @@ namespace BluetoothWatcher.DeviceDisplays
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        string SavedMacAddress = null;
         public void SetAdvertisement (string macAddress, Ruuvi_Tag ruuvi_tag)
         {
             LastTag = ruuvi_tag;
 
+            if (NAdvertisement == 0)
+            {
+                SettingSerializer.UpdateUnits(macAddress, PreferredUnits);
+            }
+
             NAdvertisement++;
             uiCount.Text = NAdvertisement.ToString();
-            if (!NameIsCustom)
+            if (!NameIsCustom && SavedMacAddress != macAddress)
             {
-                NameStr = macAddress;
+                SavedMacAddress = macAddress;
+                var userName = SettingSerializer.GetName(macAddress);
+                NameStr = string.IsNullOrEmpty(userName) ? macAddress: userName;
             }
             UpdateFromTag(LastTag);
         }
@@ -111,6 +119,17 @@ namespace BluetoothWatcher.DeviceDisplays
 
         private async void OnSetting(object sender, RoutedEventArgs e)
         {
+            if (SavedMacAddress == null)
+            {
+                var errdlg = new ContentDialog()
+                {
+                    Title = "Error",
+                    Content = "Can't set name until the first data comes in",
+                };
+                await errdlg.ShowAsync();
+                return;
+            }
+
             var settings = new RuuviSetting(PreferredUnits);
             var dlg = new ContentDialog()
             {
@@ -119,11 +138,23 @@ namespace BluetoothWatcher.DeviceDisplays
                 Content = settings,
             };
             var result = await dlg.ShowAsync();
+            SettingSerializer.SaveUnits (SavedMacAddress, PreferredUnits);
             UpdateFromTag(LastTag);
         }
 
         private async void OnPickName(object sender, TappedRoutedEventArgs e)
         {
+            if (SavedMacAddress == null)
+            {
+                var errdlg = new ContentDialog()
+                {
+                    Title = "Error",
+                    Content = "Can't set name until the first data comes in",
+                };
+                await errdlg.ShowAsync();
+                return;
+            }
+
             var newName = new TextBox()
             {
                 MinWidth = 200,
@@ -141,6 +172,7 @@ namespace BluetoothWatcher.DeviceDisplays
             {
                 NameIsCustom = true;
                 NameStr = newName.Text;
+                SettingSerializer.SaveName(SavedMacAddress, newName.Text);
             }
         }
     }

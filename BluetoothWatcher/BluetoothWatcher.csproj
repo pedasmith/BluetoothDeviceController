@@ -196,6 +196,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SettingSerializer.cs" />
     <Compile Include="Units\DoubleApprox.cs" />
     <Compile Include="Units\Pressure.cs" />
     <Compile Include="Units\Temperature.cs" />
