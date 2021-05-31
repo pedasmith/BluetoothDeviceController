@@ -2647,6 +2647,11 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                             speciality = ruuviTag;
                         }
                         break;
+                    case 6: // Microsoft
+                        break;
+                    default:
+                        System.Diagnostics.Debug.WriteLine($"NOTE: saw company {companyId:X4}={companyName}");
+                        break ;
                 }
                 if (displayAsHex)
                 {
