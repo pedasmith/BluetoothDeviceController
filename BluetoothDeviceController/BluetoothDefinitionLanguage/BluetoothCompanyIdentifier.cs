@@ -2598,6 +2598,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 case 1: /* hex=0x0001 */ return "Nokia Mobile Phones";
                 case 0: /* hex=0x0000 */ return "Ericsson Technology Licensing";
                 #endregion
+                case 65534: return "??";
                 case 65535: return "This value has special meaning depending on the context in which it used.";
             }
             return $"CompanyId={companyId}";

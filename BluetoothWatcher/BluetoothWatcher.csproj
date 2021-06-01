@@ -179,9 +179,12 @@
     <Compile Include="..\BluetoothDeviceController\Utilities\EnumUtilities.cs">
       <Link>Utilities\EnumUtilities.cs</Link>
     </Compile>
+    <Compile Include="AdvertismentWatcher\AdvertisementWatcher.cs" />
+    <Compile Include="AdvertismentWatcher\WatcherData.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BufferList\BufferList.cs" />
     <Compile Include="DeviceDisplays\RuuviDisplay.xaml.cs">
       <DependentUpon>RuuviDisplay.xaml</DependentUpon>
     </Compile>
