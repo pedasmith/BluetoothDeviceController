@@ -180,10 +180,9 @@
     <Compile Include="BluetoothDefinitionLanguage\BluetoothServiceRegistration.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
     <Compile Include="BluetoothProtocolsCustom\Nordic_Uart.cs" />
-    <Compile Include="BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs" />
-    <Compile Include="BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs" />
     <Compile Include="BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
     <Compile Include="BluetoothProtocols\Elegoo_Mini_Car.cs" />
+    <Compile Include="BluetoothProtocols\Samico_BloodPressure_BG512.cs" />
     <Compile Include="BluetoothProtocols\WilliamWeilerEngineering_Skoobot.cs" />
     <Compile Include="IotNumberFormats\ValueCalculate.cs" />
     <Compile Include="IotNumberFormats\ValueToString.cs" />
@@ -299,6 +298,9 @@
     </Compile>
     <Compile Include="SpecialtyPages\Protocentral_SensythingPage.xaml.cs">
       <DependentUpon>Protocentral_SensythingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialtyPages\Samico_BloodPressure_BG512Page.xaml.cs">
+      <DependentUpon>Samico_BloodPressure_BG512Page.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPages\TI_SensorTag_1350Page.xaml.cs" />
     <Compile Include="SpecialtyPages\TI_SensorTag_1352Page.xaml.cs">
@@ -444,6 +446,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\DevicePictures\Ruuvi_RuuviTag-350.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\DevicePictures\Samico_BloodPressure_BG512-175.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\DevicePictures\Samico_BloodPressure_BG512-350.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\DevicePictures\SlantRobotics-LittleBot-175.png">
@@ -707,7 +715,13 @@
     <Content Include="Assets\ChacteristicsData\Elegoo_Mini_Car.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ChacteristicsData\Pyle_PHBPBW40_Samico_BG512_Blood_Pressure.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\ChacteristicsData\Viatom_PC60FW_PulseOximeter.json" />
+    <Content Include="Assets\ChacteristicsData\Wescale_KitchenScale.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\HelpFiles\Device_Elegoo_MiniCar.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -718,6 +732,9 @@
     <Content Include="Assets\HelpFiles\Json_StringOrientedCommands.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Assets\HelpFiles\Device_Samico_BloodPressure_BG512.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -987,6 +1004,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPages\Protocentral_SensythingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPages\Samico_BloodPressure_BG512Page.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -25,6 +25,9 @@ using enumUtilities;
 
 namespace BluetoothWatcher.DeviceDisplays
 {
+    /// <summary>
+    /// RUUVI tag sends all the data through advertisements (no need to connect or pair)
+    /// </summary>
     public sealed partial class RuuviDisplay : UserControl, INotifyPropertyChanged
     {
         public RuuviDisplay()

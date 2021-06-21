@@ -18,11 +18,12 @@ and more devices -- please leave feedback to request specific devices!
 ## Data sensors that can be read
 [![BBC micro:bit](../DevicePictures/Bbc_MicroBit-175.png)](Device_Bbc_MicroBit.md)
 [![Nordic Thingy](../DevicePictures/Nordic_Thingy-175.png)](Device_Nordic_Thingy.md)
+[![Pyle PHBPBW40](../DevicePictures/Samico_BloodPressure_BG512-175.png)](Device_Samico_BloodPressure_BG512.md)
 [![RuuviTag](../DevicePictures/Ruuvi_RuuviTag-175.png)](Device_Ruuvi_RuuviTag.md)
 [![Sensything](../DevicePictures/Protocentral_Sensything-175.png)](Device_Protocentral_Sensything.md)
-[![1352 Sensor Tag](../DevicePictures/TI_SensorTag_1352-175.png)](Device_TI_SensorTag_1352.md)
-[![Sensor Tag 1350](../DevicePictures/TI_SensorTag_1350-175.png)](Device_TI_SensorTag_1350.md)
-[![Original Sensor Tag](../DevicePictures/TI_SensorTag_2541-175.png)](Device_TI_SensorTag_2541.md)
+[![TI 1352 Sensor Tag](../DevicePictures/TI_SensorTag_1352-175.png)](Device_TI_SensorTag_1352.md)
+[![TI Sensor Tag 1350](../DevicePictures/TI_SensorTag_1350-175.png)](Device_TI_SensorTag_1350.md)
+[![TI Original Sensor Tag](../DevicePictures/TI_SensorTag_2541-175.png)](Device_TI_SensorTag_2541.md)
 
 
 ## Other devices

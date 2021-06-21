@@ -50,7 +50,11 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             
             ManufacturerData = 0xFF,
         }
-
+        /// <summary>
+        /// Handy routine converts the incoming byte from a bluetooth advert into a DataTypeValue enum
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static DataTypeValue ConvertDataTypeValue (byte b)
         {
             try

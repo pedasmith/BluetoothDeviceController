@@ -337,7 +337,7 @@ namespace BluetoothDeviceController.Names
                 var dataname = item.NamePrimary;
                 // Special case: items whose type starts with O (like OEL or OEB for little and big endian)
                 // should be skipped
-                if (item.ByteFormatPrimary.StartsWith('O')) continue; // skip OEL and OEB (little and big endian indicators) and all other options
+                if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators) and all other options
 
                 if (dataname == "") dataname = $"param{i}";
                 replace["[[DATANAME]]"] = dataname.DotNetSafe();
@@ -402,6 +402,7 @@ namespace BluetoothDeviceController.Names
         {
             var classname = nameDevice.GetClassName().DotNetSafe();
             var name = nameDevice.Name ?? "";
+            var services = Generate_PageXaml_SERVICE_LIST(nameDevice);
 
             var replace = new SortedDictionary<string, string>()
             {
@@ -409,10 +410,18 @@ namespace BluetoothDeviceController.Names
                 {"[[DESCRIPTION]]", nameDevice.Description ?? ""},
                 {"[[DEVICENAME]]", name.DotNetSafe() },
                 {"[[DEVICENAMEUSER]]", name },
-                {"[[SERVICE_LIST]]",Generate_PageXaml_SERVICE_LIST(nameDevice) },
+                {"[[SERVICE_LIST]]", services },
             };
             var Retval = Replace(Generate_CSharp_Templates.PageXaml_BodyTemplate, replace);
             return Retval;
+        }
+
+        static private bool ItemIsSuppressed(ValueParserSplit item)
+        {
+            bool retval = false;
+            if (item.ByteFormatPrimary.StartsWith('O')) retval = true; // skip OEL and OEB (little and big endian indicators)
+            if (item.NamePrimary.EndsWith("Unused") || item.NamePrimary.EndsWith("Internal")) retval = true;
+            return retval;
         }
 
         private static string Generate_PageXaml_SERVICE_LIST(NameDevice nameDevice)
@@ -485,7 +494,7 @@ namespace BluetoothDeviceController.Names
                     for (int i = 0; i < split.Count; i++)
                     {
                         var item = split[i];
-                        if (item.ByteFormatPrimary.StartsWith('O')) continue; // skip OEL and OEB (little and big endian indicators)
+                        if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
                         nitems++;
                     }
                     nitems += nbutton;
@@ -502,7 +511,7 @@ namespace BluetoothDeviceController.Names
                     for (int i=0; i<split.Count; i++)
                     {
                         var item = split[i];
-                        if (item.ByteFormatPrimary.StartsWith('O')) continue; // skip OEL and OEB (little and big endian indicators)
+                        if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
 
                         replace["[[IS_READ_ONLY]]"] = isReadOnly ? "True" : "False";
                         var dataname = item.NamePrimary;
@@ -894,7 +903,7 @@ namespace BluetoothDeviceController.Names
                             var item = split[i];
                             var dataname = item.NamePrimary;
                             if (dataname == "") dataname = $"param{i}";
-                            if (item.ByteFormatPrimary.StartsWith('O')) continue; // skip OEL and OEB (little and big endian indicators)
+                            if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
 
                             // CHDATANAME is either char_data (to make it more unique) or just plain characteristicname.
                             // If a charateristic has just a single data item, that one item doesn't need a seperate name here.

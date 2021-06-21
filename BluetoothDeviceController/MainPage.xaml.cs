@@ -50,6 +50,7 @@ namespace BluetoothDeviceController
         const string BEACON = "⛯"; // MAP SYMBOL FOR LIGHTHOUSE //"🖄";
         const string CAR = "🚗";
         const string DATA = "📈"; //"🥼";
+        const string HEALTH = "🏥"; //"🥼";
         const string LIGHT = "💡";
         const string LIGHTNING = "🖄"; // envelope with lightning
         const string ROBOT = ""; // Part of the Segoe MDL2 Assets FontFamily
@@ -82,6 +83,9 @@ namespace BluetoothDeviceController
 
             // Data Sensors
             new Specialization (typeof(SpecialtyPages.Bbc_MicroBitPage), new string[] { "BBC micro:bit" }, DATA, "BBC micro:bit", "micro:bit with data program"),
+
+            // Health Sensors
+            new Specialization (typeof(SpecialtyPages.Samico_BloodPressure_BG512Page), new string[] { "Samico BP" }, HEALTH, "Pyle / Samico", "Blood pressure cuff"),
 
             // All of the TI sensor tags :-)
             // The 2650 and 1350 SensorTag have the same interface and use the same page
@@ -680,6 +684,10 @@ namespace BluetoothDeviceController
                 return;
             }
 
+            if (bleAdvert.Advertisement.LocalName.Contains ("Wescale"))
+            {
+                ; // Hand yhook for debugger.
+            }
             int idx = FindDeviceBle(bleAdvert);
 
             var (name, id, description) = BleAdvertisementFormat.GetBleName(wrapper, bleAdvert);
@@ -905,7 +913,12 @@ namespace BluetoothDeviceController
 
         private async void MenuBleWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
-            System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {args.Advertisement.LocalName} Seen");
+            System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {args.Advertisement.LocalName} seen");
+            if (args.Advertisement.LocalName.Contains("Wescale"))
+            {
+                ; // Handy hook for debugger.
+            }
+
             // Get the appropriate ble advert wrapper (or make a new one)
             BleAdvertisementWrapper wrapper = null;
             BleWrappers.TryGetValue(args.BluetoothAddress, out wrapper);
@@ -947,7 +960,16 @@ namespace BluetoothDeviceController
             var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
             System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} Added");
             await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
-                async () => { await AddDeviceAsync(new DeviceInformationWrapper (args)); });
+                async () => {
+                    try
+                    {
+                        await AddDeviceAsync(new DeviceInformationWrapper(args));
+                    }
+                    catch (Exception)
+                    {
+                        ;
+                    }
+                });
         }
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {

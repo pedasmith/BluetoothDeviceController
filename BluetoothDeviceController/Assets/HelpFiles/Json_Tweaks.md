@@ -38,7 +38,6 @@ of devices have boilerplate services that aren't actually hooked up.
 
           "Suppress":  true,
 
-
 Set the priority of a service to place it higher in the list of services in the UI. Services with
 higher priorities are displayed first. If the priority is >= 10, the service expander is open by default.
 
@@ -55,6 +54,14 @@ Individual characteristics can suppress the read and write properties. This is n
 You can suppress the UI for a characteristic by setting Supress to true
 
           "Suppress":  true,
+
+In the case where a characteristic includes sub-items, individual items whose name ends with Unused or Internal will not be shown in the UI.
+
+## Automatic notification
+
+You can have a characteristic's notify be automatically called by setting AutoNotify to true
+
+        "AutoNotify": true,
 
 ## Adding tables and graph
 

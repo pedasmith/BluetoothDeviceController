@@ -99,12 +99,19 @@ namespace BluetoothDeviceController.BleEditor
 
             try
             {
-                ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
-                if (ble != null)
+                if (di.di == null)
                 {
-                    var knownDevice = BleNames.GetDevice(ble.Name);
-                    BleDeviceId = ble.DeviceId;
-                    await DisplayBluetooth(knownDevice, di, ble);
+                    ; // can happen when switching from one search type to another.
+                }
+                else
+                {
+                    ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
+                    if (ble != null)
+                    {
+                        var knownDevice = BleNames.GetDevice(ble.Name);
+                        BleDeviceId = ble.DeviceId;
+                        await DisplayBluetooth(knownDevice, di, ble);
+                    }
                 }
             }
             catch (Exception ex)

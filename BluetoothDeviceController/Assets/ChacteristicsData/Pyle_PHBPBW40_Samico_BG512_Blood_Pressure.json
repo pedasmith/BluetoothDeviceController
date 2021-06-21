@@ -1,0 +1,273 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Samico BP",
+      "ClassName": "Samico_BloodPressure_BG512",
+      "REMS": [
+        "Also called the Pyle Health PHBPW40 Bluetooth SMART wrist blood pressure monitor"
+      ],
+      "Links": [
+        "https://github.com/glmck13/VitalBlues/blob/master/samico-bp.sh"
+      ],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: Samico BP",
+                "Samico BP"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "Suppress": true,
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+              "Name": "Peripheral Privacy Flag",
+              "Type": "U8|DEC|Flag",
+              "Suppress": true,
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Privacy:  00",
+                "0"
+              ]
+            },
+            {
+              "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+              "Name": "Reconnect Address",
+              "Type": "BYTES|HEX|ReconnectAddress",
+              "Suppress": true,
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "BYTES|HEX|ConnectionParameter",
+              "Suppress": true,
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  50 00 A0 00 00 00 E8 03"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Generic Service",
+          "Suppress": true,
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII|System_Id",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  E4 55 12 42 48 04 A5 78",
+                "E4 55 12 42 48 04 A5 78"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII|Model_Number",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  42 47 35 31 32",
+                "BG512"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII|Serial_Number",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  30 30 30 30 30 30 30 31",
+                "00000001"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII|Firmware_Revision",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 33 31 32 31 38 30 31",
+                "13121801"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII|Hardware_Revision",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  41 31 33 33 32 31 30 41",
+                "A133210A"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII|Software_Revision",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  35 31 32 3A 30 31 33 32",
+                "512:0132"
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manufacturer Name",
+              "Type": "STRING|ASCII|Manufacturer_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  42 6F 75 67 68 20 54 65 63 68",
+                "Bough Tech"
+              ]
+            },
+            {
+              "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Regulatory List",
+              "Type": "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data",
+              "Suppress": true,
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C",
+                "FE 00 experimental"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "Suppress": true,
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 00 BB 03 12 00 02",
+                "01 00 BB 03 12 00 02"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+          "Name": "BloodPressure",
+          "Description": "Blood pressure and pulse results",
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "0000fff1-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown1",
+              "Description": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "Suppress": true,
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  01 05 06 07 08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "0000fff2-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown2",
+              "Description": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "Suppress": true,
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "0000fff3-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown3",
+              "Description": "Unknown3",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "IsWrite": true,
+              "Suppress": true,
+              "ExampleData": [
+                "Value:  01 02 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "0000fff4-0000-1000-8000-00805f9b34fb",
+              "Name": "Results",
+              "Description": "Results systolic (mmHg) Diastolic and Pulse",
+              "Type": "OEL U8|HEX|Cmd_Internal U8|DEC|CuffPressure U16|DEC|SystolicInMMHg U16|DEC|DiastolicInMMHg U16|DEC|Unused U16|DEC|PulseInBeatsPerMinute",
+              "IsNotify": true,
+              "AutoNotify":  true,
+              "ExampleData": [
+                "Value when running: 20 64",
+                "Result:  119 / 86 BP 65 in hex is 77 / 56 BP 41",
+                "Value when done: 0C 00 77 00 56 00 00 00 41 00"
+              ]
+            },
+            {
+              "UUID": "0000fff5-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown5",
+              "Description": "Unknown5",
+              "Type": "BYTES|HEX|Unknown5",
+              "Suppress": true,
+              "IsRead": true
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 100%",
+                "100"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-78:a5:04:12:55:e4\nCanPair:True IsPaired:False"
+    }
+  ]
+}

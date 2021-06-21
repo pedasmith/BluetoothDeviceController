@@ -145,7 +145,13 @@ namespace BluetoothDeviceController.Beacons
                         case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
                         case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
                         case AdvertisementDataSectionParser.DataTypeValue.Flags:
-                            if (isFullDetails) builder.Append(AdvertisementDataSectionParser.Parse(section, transmitPower, indent));
+                            if (isFullDetails)
+                            {
+                                string result;
+                                BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
+                                (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
+                                builder.Append(result);
+                            }
                             break;
                         default:
                             {
@@ -154,7 +160,7 @@ namespace BluetoothDeviceController.Beacons
                                 (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
                                 isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
                                 builder.Append(result);
-                                if (result.Contains ("Cypress"))
+                                if (bleAdvert.Advertisement.LocalName.Contains ("Wescale"))
                                 {
                                     ;
                                 }
@@ -167,8 +173,8 @@ namespace BluetoothDeviceController.Beacons
                 if (haveTransmitPower) header += $"\t{transmitPower.ToString()}";
                 header += "\t" + appearance;
                 if (completeLocalName != "") header += "\t" + completeLocalName;
-                header += "\n";
-                var run = new Run() { Text = header + builder.ToString() };
+                var txt = $"{header}\n{builder}\n";
+                var run = new Run() { Text = txt };
 
                 var suppress = isApple10 && uiIgnoreApple.IsChecked.Value;
                 // Just for debugging: suppress = (companyId != 1177);                 if (!suppress)

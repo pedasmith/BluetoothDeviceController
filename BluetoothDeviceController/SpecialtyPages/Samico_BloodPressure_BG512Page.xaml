@@ -1,0 +1,245 @@
+﻿<Page
+    x:Class="BluetoothDeviceController.SpecialtyPages.Samico_BloodPressure_BG512Page"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:charts="using:BluetoothDeviceController.Charts"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="60" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,0,0" />
+        </Style>
+        <Style TargetType="Slider">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,10,0" />
+        </Style>
+        <Style TargetType="Line">
+            <Setter Property="Margin" Value="0,15,0,0" />
+            <Setter Property="Stroke" Value="ForestGreen" />
+        </Style>
+        <Style x:Key="TitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30" />
+        </Style>
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+        <Style x:Key="HeaderStyleExpander" TargetType="controls:Expander">
+            <Setter Property="MinWidth" Value="550" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="SubheaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+        <Style x:Key="AboutStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="ChacteristicListStyle" TargetType="StackPanel">
+            <Setter Property="Background" Value="WhiteSmoke" />
+            <Setter Property="Margin" Value="18,0,0,0" />
+        </Style>
+        <Style x:Key="HEXStyle" TargetType="TextBox">
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="5,0,0,0" />
+        </Style>
+        <Style x:Key="TableStyle" TargetType="controls:DataGrid">
+            <Setter Property = "Background" Value="BlanchedAlmond" />
+            <Setter Property = "FontSize" Value="12" />
+            <Setter Property = "Height" Value="200" />
+            <Setter Property = "HorizontalAlignment" Value="Center" />
+            <Setter Property = "Width" Value="500" />
+        </Style>
+    </Page.Resources>
+
+    <StackPanel>
+        <Grid MaxWidth="550" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Style="{StaticResource TitleStyle}">Samico BP device</TextBlock>
+                <TextBlock Style="{StaticResource AboutStyle}">
+
+                </TextBlock>
+            </StackPanel>
+            <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/Samico_BloodPressure_BG512.PNG" />
+        </Grid>
+        <ProgressRing x:Name="uiProgress" />
+        <TextBlock x:Name="uiStatus" />
+
+        <controls:Expander Header="BloodPressure" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Results</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Results_CuffPressure" Text="*" Header="CuffPressure" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="Results_SystolicInMMHg" Text="*" Header="SystolicInMMHg" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="Results_DiastolicInMMHg" Text="*" Header="DiastolicInMMHg" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="Results_PulseInBeatsPerMinute" Text="*" Header="PulseInBeatsPerMinute" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Notify" Click="OnNotifyResults" />
+
+                </StackPanel>
+
+
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadDevice_Name" />
+
+                </StackPanel>
+
+
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Device Info" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">System ID</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="System_ID_System_Id" Text="*" Header="System Id" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadSystem_ID" />
+
+                </StackPanel>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Model Number</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Model_Number_Model_Number" Text="*" Header="Model Number" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadModel_Number" />
+
+                </StackPanel>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Serial Number</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Serial_Number_Serial_Number" Text="*" Header="Serial Number" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadSerial_Number" />
+
+                </StackPanel>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Firmware Revision</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Firmware_Revision_Firmware_Revision" Text="*" Header="Firmware Revision" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadFirmware_Revision" />
+
+                </StackPanel>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Hardware Revision</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Hardware_Revision_Hardware_Revision" Text="*" Header="Hardware Revision" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadHardware_Revision" />
+
+                </StackPanel>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Software Revision</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Software_Revision_Software_Revision" Text="*" Header="Software Revision" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadSoftware_Revision" />
+
+                </StackPanel>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Manufacturer Name</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="Manufacturer_Name_Manufacturer_Name" Text="*" Header="Manufacturer Name" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadManufacturer_Name" />
+
+                </StackPanel>
+
+
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <controls:Expander Header="Battery" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">BatteryLevel</TextBlock>
+                <StackPanel Orientation="Horizontal">
+
+                    <TextBox IsReadOnly="True" x:Name="BatteryLevel_BatteryLevel" Text="*" Header="BatteryLevel" Style="{StaticResource HEXStyle}"/>
+
+
+                    <Button Content="Read" Click="OnReadBatteryLevel" />
+
+                    <Button Content="Notify" Click="OnNotifyBatteryLevel" />
+
+                </StackPanel>
+
+
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <Button Content="REREAD" Click="OnRereadDevice" />
+    </StackPanel>
+</Page>

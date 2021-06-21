@@ -1,0 +1,88 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Wescale",
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: ",
+                ""
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Generic Service"
+        },
+        {
+          "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+          "Name": "Scale",
+          "Characteristics": [
+            {
+              "UUID": "0000fff2-0000-1000-8000-00805f9b34fb",
+              "Name": "Tx",
+              "Type": "BYTES|HEX|Tx",
+              "IsWriteWithoutResponse": true
+            },
+            {
+              "UUID": "0000fff1-0000-1000-8000-00805f9b34fb",
+              "Name": "Rx",
+              "Type": "BYTES|HEX|ScaleReading",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000ffc0-0451-4000-b000-000000000000",
+          "Name": "Update",
+          "Characteristics": [
+            {
+              "UUID": "f000ffc1-0451-4000-b000-000000000000",
+              "Name": "Img Identify",
+              "Description": "Img Identify",
+              "Type": "BYTES|HEX|Img Identify",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true
+            },
+            {
+              "UUID": "f000ffc2-0451-4000-b000-000000000000",
+              "Name": "Img Block",
+              "Description": "Img Block",
+              "Type": "BYTES|HEX|Img Block",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-93:39:19:04:03:02\nCanPair:True IsPaired:False"
+    }
+  ]
+}

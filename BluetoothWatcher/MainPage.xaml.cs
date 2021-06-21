@@ -80,6 +80,49 @@ namespace BluetoothWatcher
             }
         }
 
+        private async Task<bool> StartViatom(WatcherData wdata)
+        {
+            //TODO: this prevents us from restarting a pulse.
+            // e.g., use a pulse oximeter, then stop for a bit, then start again.
+
+            bool mustStart = !ViatomFactories.ContainsKey(wdata.Addr);
+            var ble = await BluetoothLEDevice.FromBluetoothAddressAsync(wdata.Addr);
+            if (ble.ConnectionStatus == BluetoothConnectionStatus.Disconnected)
+            {
+                mustStart = true;
+            }
+
+            if (mustStart)
+            {
+                // Turn on notifications.
+                var xmitterResult = await ble.GetGattServicesForUuidAsync(Guid.Parse("6e400001-b5a3-f393-e0a9-e50e24dcca9e"));
+                if (xmitterResult.Status != GattCommunicationStatus.Success) return false;
+                if (xmitterResult.Services.Count < 1)
+                {
+                    ;
+                    return false;
+                }
+                var receiveResult = await xmitterResult.Services[0].GetCharacteristicsForUuidAsync(Guid.Parse("6e400003-b5a3-f393-e0a9-e50e24dcca9e"));
+                if (receiveResult.Status != GattCommunicationStatus.Success) return false;
+                if (receiveResult.Characteristics.Count < 1)
+                {
+                    ;
+                    return false;
+                }
+                var receive = receiveResult.Characteristics[0];
+                var notifyStatus = await receive.WriteClientCharacteristicConfigurationDescriptorAsync(Windows.Devices.Bluetooth.GenericAttributeProfile.GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                if (notifyStatus != GattCommunicationStatus.Success) return false;
+
+                if (!CharacteristicHandleToBTAddr.ContainsKey(receive.AttributeHandle))
+                {
+                    CharacteristicHandleToBTAddr.Add(receive.AttributeHandle, wdata.Addr);
+                }
+                var added = ViatomFactories.TryAdd(wdata.Addr, new Viatom_PulseOximeter_PC60FW_Factory());
+                receive.ValueChanged += Viatom_PulseOximeter_PC60FW_Receive_ValueChanged;
+                return true;
+            }
+            return false;
+        }
         private async void BleWatcher_WatcherEvent(BluetoothLEAdvertisementWatcher sender, WatcherData wdata)
         {
             Ruuvi_Tag ruuvi_tag = null;
@@ -87,45 +130,7 @@ namespace BluetoothWatcher
 
             if (wdata.CompleteLocalName.StartsWith("PC-60F"))
             {
-                //TODO: this prevents us from restarting a pulse.
-                // e.g., use a pulse oximeter, then stop for a bit, then start again.
-
-                bool mustStart = !ViatomFactories.ContainsKey(wdata.Addr);
-                var ble = await BluetoothLEDevice.FromBluetoothAddressAsync(wdata.Addr);
-                if (ble.ConnectionStatus == BluetoothConnectionStatus.Disconnected)
-                {
-                    mustStart = true;
-                }
-
-                if (mustStart)
-                {
-                    // Turn on notifications.
-                    var xmitterResult = await ble.GetGattServicesForUuidAsync(Guid.Parse("6e400001-b5a3-f393-e0a9-e50e24dcca9e"));
-                    if (xmitterResult.Status != GattCommunicationStatus.Success) return;
-                    if (xmitterResult.Services.Count < 1)
-                    {
-                        ;
-                        return;
-                    }
-                    var receiveResult = await xmitterResult.Services[0].GetCharacteristicsForUuidAsync(Guid.Parse("6e400003-b5a3-f393-e0a9-e50e24dcca9e"));
-                    if (receiveResult.Status != GattCommunicationStatus.Success) return;
-                    if (receiveResult.Characteristics.Count < 1)
-                    {
-                        ;
-                        return;
-                    }
-                    var receive = receiveResult.Characteristics[0];
-                    var notifyStatus = await receive.WriteClientCharacteristicConfigurationDescriptorAsync(Windows.Devices.Bluetooth.GenericAttributeProfile.GattClientCharacteristicConfigurationDescriptorValue.Notify);
-                    if (notifyStatus != GattCommunicationStatus.Success) return;
-
-                    if (!CharacteristicHandleToBTAddr.ContainsKey(receive.AttributeHandle))
-                    {
-                        CharacteristicHandleToBTAddr.Add(receive.AttributeHandle, wdata.Addr);
-                    }
-                    var added = ViatomFactories.TryAdd(wdata.Addr, new Viatom_PulseOximeter_PC60FW_Factory());
-                    receive.ValueChanged += Viatom_PulseOximeter_PC60FW_Receive_ValueChanged;
-                    added_Viatom_PulseOximeter = true;
-                }
+                added_Viatom_PulseOximeter = await StartViatom(wdata);
             }
             else if (wdata.SpecializedDecodedData is Ruuvi_Tag)
             {

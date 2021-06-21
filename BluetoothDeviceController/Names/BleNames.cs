@@ -86,6 +86,10 @@ namespace BluetoothDeviceController.Names
                 var files = await dir.GetFilesAsync();
                 foreach (var file in files)
                 {
+                    if (file.Name.Contains ("Pyle"))
+                    {
+                        ; // hook for debugger.
+                    }
                     path = file.Path;
                     InitSingleBleFile(AllDevices, file, DefaultDevice);
                     InitSingleBleFile(AllRawDevices, file, null); // read in a device without adding in default services
