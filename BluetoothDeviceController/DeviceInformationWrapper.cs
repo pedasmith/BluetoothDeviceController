@@ -69,6 +69,7 @@ namespace BluetoothDeviceController
         public DeviceInformation di { get; set; } = null;
         public UserSerialPortPreferences SerialPortPreferences = null;
         public UserBeaconPreferences BeaconPreferences = null;
+        public UserPreferences UserPreferences = null;
         public BleAdvertisementWrapper BleAdvert = null;
 
         bool _IsNordicUart = false;

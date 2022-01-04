@@ -106,6 +106,32 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                     case DataTypeValue.Flags:
                         str = ParseFlags(section);
                         break;
+                    case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
+                    case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
+                        {
+                            str = "";
+                            var pre = dtv == DataTypeValue.CompleteListOf16BitServiceUuids ? "Service UUIDs (complete): " : "Service UUIDs (incomplete)";
+                            var dr = DataReader.FromBuffer(section.Data);
+                            dr.ByteOrder = ByteOrder.LittleEndian;
+                            while (dr.UnconsumedBufferLength >= 2)
+                            {
+                                var addr = dr.ReadUInt16();
+                                var service = BluetoothServiceUuid16Bit.Decode(addr);
+                                if (service == "") service = $"{addr:X02}";
+                                else service += $"={addr:X02}";
+                                if (str != "") str += ", ";
+                                str += service;
+                            }
+                            if (str == "")
+                            {
+                                str = pre + "\n";
+                            }
+                            else
+                            {
+                                str = pre + str + "\n";
+                            }
+                        }
+                        break;
                     case DataTypeValue.ShortenedLocalName:
                         {
                             var buffer = section.Data.ToArray();

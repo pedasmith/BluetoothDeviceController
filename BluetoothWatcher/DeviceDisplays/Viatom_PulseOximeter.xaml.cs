@@ -21,7 +21,7 @@ using Windows.UI.Xaml.Navigation;
 namespace BluetoothWatcher.DeviceDisplays
 {
     /// <summary>
-    /// Viatom needst to connect to read data
+    /// Viatom needs to connect to read data
     /// </summary>
     public sealed partial class Viatom_PulseOximeter : UserControl, INotifyPropertyChanged
     {

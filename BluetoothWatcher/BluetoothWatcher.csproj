@@ -149,8 +149,17 @@
     <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothAppearance.cs">
       <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothAppearance.cs</Link>
     </Compile>
+    <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothCharacteristic.cs">
+      <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothCharacteristic.cs</Link>
+    </Compile>
     <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs">
       <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs</Link>
+    </Compile>
+    <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothServiceUuid16Bit.cs">
+      <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothServiceUuid16Bit.cs</Link>
+    </Compile>
+    <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothUnit.cs">
+      <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothUnit.cs</Link>
     </Compile>
     <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\Eddystone.cs">
       <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\Eddystone.cs</Link>
@@ -160,6 +169,15 @@
     </Compile>
     <Compile Include="..\BluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs">
       <Link>FromBluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs</Link>
+    </Compile>
+    <Compile Include="..\BluetoothDeviceController\BluetoothProtocols\BluetoothCommunicationStatus.cs">
+      <Link>FromBluetoothDeviceController\BluetoothProtocols\BluetoothCommunicationStatus.cs</Link>
+    </Compile>
+    <Compile Include="..\BluetoothDeviceController\BluetoothProtocols\BluetoothStatusHandler.cs">
+      <Link>FromBluetoothDeviceController\BluetoothProtocols\BluetoothStatusHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\BluetoothDeviceController\BluetoothProtocols\Samico_BloodPressure_BG512.cs">
+      <Link>FromBluetoothDeviceController\BluetoothProtocols\Samico_BloodPressure_BG512.cs</Link>
     </Compile>
     <Compile Include="..\BluetoothDeviceController\IotNumberFormats\ValueCalculate.cs">
       <Link>FromBluetoothDeviceController\IotNumberFormats\ValueCalculate.cs</Link>
@@ -193,6 +211,9 @@
     </Compile>
     <Compile Include="DeviceDisplays\RuuviSetting.xaml.cs">
       <DependentUpon>RuuviSetting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceDisplays\Samico_BloodPressureControl.xaml.cs">
+      <DependentUpon>Samico_BloodPressureControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="DeviceDisplays\Viatom_PulseOximeter.xaml.cs">
       <DependentUpon>Viatom_PulseOximeter.xaml</DependentUpon>
@@ -288,6 +309,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DeviceDisplays\RuuviSetting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceDisplays\Samico_BloodPressureControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

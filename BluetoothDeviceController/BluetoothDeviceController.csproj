@@ -177,8 +177,11 @@
       <DependentUpon>VariableControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs" />
+    <Compile Include="BluetoothDefinitionLanguage\BluetoothCharacteristic.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothServiceRegistration.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
+    <Compile Include="BluetoothDefinitionLanguage\BluetoothUnit.cs" />
+    <Compile Include="BluetoothDefinitionLanguage\BluetoothServiceUuid16Bit.cs" />
     <Compile Include="BluetoothProtocolsCustom\Nordic_Uart.cs" />
     <Compile Include="BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
     <Compile Include="BluetoothProtocols\Elegoo_Mini_Car.cs" />

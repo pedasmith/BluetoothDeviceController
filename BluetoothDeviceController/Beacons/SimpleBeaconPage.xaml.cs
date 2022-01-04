@@ -95,6 +95,15 @@ namespace BluetoothDeviceController.Beacons
         private async Task UpdateUI(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, bool includeLeadingAddress = true)
         {
             bool isFullDetails = uiFullDetails.IsChecked.Value;
+            isFullDetails = true; //TODO: should be remembered from one run to the next.
+
+            // For debugging: include only close-by signals
+            const int CLOSE_SGINAL_STRENGTH = -50;
+            bool isClose = bleAdvert.RawSignalStrengthInDBm > CLOSE_SGINAL_STRENGTH;
+            if (!isClose)
+            {
+                return;
+            }
 
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
@@ -153,6 +162,16 @@ namespace BluetoothDeviceController.Beacons
                                 builder.Append(result);
                             }
                             break;
+                        case AdvertisementDataSectionParser.DataTypeValue.ManufacturerData:
+                            {
+                                string result;
+                                BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
+                                (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
+                                isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
+                                builder.Append(result);
+
+                            }
+                            break;
                         default:
                             {
                                 string result;
@@ -160,7 +179,7 @@ namespace BluetoothDeviceController.Beacons
                                 (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
                                 isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
                                 builder.Append(result);
-                                if (bleAdvert.Advertisement.LocalName.Contains ("Wescale"))
+                                if (bleAdvert.Advertisement.LocalName.Contains ("Govee") || completeLocalName.Contains ("Govee"))
                                 {
                                     ;
                                 }
@@ -168,7 +187,38 @@ namespace BluetoothDeviceController.Beacons
                             break;
                     }
                 }
+
+                // Pull data from the ManufacturerData
+                // Never need to pull data from ManufacturerData; it's already here
+                // via the DataSections item.
+#if NEVER_EVER_DEFINED
+                var mds = new StringBuilder();
+                if (bleAdvert.Advertisement.ManufacturerData.Count == 0)
+                {
+                    mds.Append("    No manufacturer data\n");
+                }
+                else
+                {
+                    foreach (var md in bleAdvert.Advertisement.ManufacturerData)
+                    {
+                        var company = md.CompanyId;
+                        var data = md.Data.ToArray();
+                        mds.Append($"    ManufacturerData: {company:X}: ");
+                        foreach (var b in data)
+                        {
+                            mds.Append($"{b:X2} ");
+                        }
+                        mds.Append("\n");
+                    }
+                }
+                builder.Append(mds);
+#endif
                 // We don't know all of the header information until later
+                //TODO: microsoft manufacturer data includes swiftpair!
+                if (!completeLocalName.Contains ("Govee")) // just for debugging
+                {
+                    return;
+                }
                 var header = $"{address}\t{time24}\t{bleAdvert.RawSignalStrengthInDBm}";
                 if (haveTransmitPower) header += $"\t{transmitPower.ToString()}";
                 header += "\t" + appearance;

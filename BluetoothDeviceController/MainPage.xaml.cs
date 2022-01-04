@@ -156,8 +156,10 @@ namespace BluetoothDeviceController
         {
             if (!ALLOW_AD)
             {
+                uiAdVertical.Suspend(); // don't display the ad at all.
                 uiAdVertical.Visibility = Visibility.Collapsed;
             }
+
             ContentFrame.Navigated += ContentFrame_Navigated;
             Preferences.ReadFromLocalSettings();
             SerialPortPreferences.ReadFromLocalSettings();
@@ -324,6 +326,7 @@ namespace BluetoothDeviceController
             Type _pageType = null;
             var preftype = Preferences.Display;
             var scrollType = Specialization.ParentScrollType.ParentShouldScroll;
+            if (wrapper != null) wrapper.UserPreferences = Preferences;
             if (Preferences.Scope == UserPreferences.SearchScope.Bluetooth_Com_Device)
             {
                 _pageType = typeof(SerialPort.SimpleTerminalPage);

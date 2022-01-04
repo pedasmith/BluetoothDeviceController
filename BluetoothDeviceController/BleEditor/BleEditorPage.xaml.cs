@@ -102,6 +102,14 @@ namespace BluetoothDeviceController.BleEditor
                 if (di.di == null)
                 {
                     ; // can happen when switching from one search type to another.
+                    var advert = di.BleAdvert.AdvertisementType == BleAdvertisementWrapper.BleAdvertisementType.BluetoothLE ? $"({di.BleAdvert.BleAdvert.BluetoothAddress}) " : "";
+                    var dlg = new ContentDialog() { 
+                        Title = "Unable to switch to device", 
+                        Content = $"The selected device {advert}cannot be displayed",
+                        CloseButtonText = "Ok"
+                    };
+                    await dlg.ShowAsync();
+                    uiProgress.IsActive = false;
                 }
                 else
                 {
@@ -110,7 +118,7 @@ namespace BluetoothDeviceController.BleEditor
                     {
                         var knownDevice = BleNames.GetDevice(ble.Name);
                         BleDeviceId = ble.DeviceId;
-                        await DisplayBluetooth(knownDevice, di, ble);
+                        await DisplayBluetooth(knownDevice, di, ble, di.UserPreferences.AutomaticallyReadData);
                     }
                 }
             }
@@ -164,7 +172,7 @@ namespace BluetoothDeviceController.BleEditor
                 return property;
             }
         }
-        private async Task DisplayBluetooth(NameDevice knownDevice, DeviceInformationWrapper di, BluetoothLEDevice ble)
+        private async Task DisplayBluetooth(NameDevice knownDevice, DeviceInformationWrapper di, BluetoothLEDevice ble, bool automaticallyReadData)
         {
             var jsonFormat = Newtonsoft.Json.Formatting.Indented;
             var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings()
@@ -240,6 +248,7 @@ namespace BluetoothDeviceController.BleEditor
                     await header.InitAsync(ble);
 
                     int serviceCount = 0;
+                    int descriptorCount = 0;
 
                     foreach (var service in result.Services)
                     {
@@ -267,8 +276,10 @@ namespace BluetoothDeviceController.BleEditor
                                     var descriptorStatus = await characteristic.GetDescriptorsAsync();
                                     if (descriptorStatus.Status == GattCommunicationStatus.Success)
                                     {
+                                        descriptorCount++;
                                         foreach (var descriptor in descriptorStatus.Descriptors)
                                         {
+                                            Console.WriteLine($"INFO: DESCRIPTOR! device {di.di.Id} service {service.Uuid} char {characteristic.Uuid} descriptor {descriptor.Uuid}");
                                             ;
                                         }
                                     }
@@ -284,7 +295,16 @@ namespace BluetoothDeviceController.BleEditor
                                     //
                                     // Here are each of the editor children items
                                     //
-                                    var edit = new BleCharacteristicControl(knownDevice, service, characteristic);
+
+                                    // Useful while debugging the Govee H5074 temperature + humidity device
+                                    // The device is really "twitchy": it turns off very fast after you connect
+                                    // to it. This will make the display come up much faster, allowing
+                                    // the user to interact (very briefly) with it.
+                                    if (String.IsNullOrEmpty (characteristic.UserDescription))
+                                    {
+                                        continue;
+                                    }
+                                    var edit = new BleCharacteristicControl(knownDevice, service, characteristic, automaticallyReadData);
                                     uiEditor.Children.Add(edit);
 
                                     var dc = DeviceCharacteristic.Create(characteristic);
@@ -298,7 +318,7 @@ namespace BluetoothDeviceController.BleEditor
 
                                     try
                                     {
-                                        if (wireCharacteristic.IsRead)
+                                        if (automaticallyReadData && wireCharacteristic.IsRead)
                                         {
                                             var vresult = await characteristic.ReadValueAsync();
                                             if (vresult.Status != GattCommunicationStatus.Success)

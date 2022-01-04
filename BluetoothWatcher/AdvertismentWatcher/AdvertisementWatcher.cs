@@ -1,4 +1,5 @@
-﻿using BluetoothDeviceController.BluetoothDefinitionLanguage;
+﻿using BluetoothDeviceController.Beacons;
+using BluetoothDeviceController.BluetoothDefinitionLanguage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,13 +27,10 @@ namespace BluetoothWatcher.AdvertismentWatcher
 
         private void BleAdvertisementWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
-            const int filterLevel = -75;
-            if (args.RawSignalStrengthInDBm < filterLevel)
-            {
-                return;
-            }
+            int filterLevel = -75;
 
-            var wdata = new WatcherData()
+
+            var watcherData = new WatcherData()
             {
                 OriginalArgs = args,
             };
@@ -47,26 +45,40 @@ namespace BluetoothWatcher.AdvertismentWatcher
                     case AdvertisementDataSectionParser.DataTypeValue.CompleteLocalName:
                         {
                             var dr = DataReader.FromBuffer(section.Data);
-                            wdata.CompleteLocalName = dr.ReadString(dr.UnconsumedBufferLength);
+                            watcherData.CompleteLocalName = dr.ReadString(dr.UnconsumedBufferLength);
                         }
                         break;
 
                     case DataTypeValue.ManufacturerData:
-                        (wdata.ParsedCompanyData, wdata.ManufacturerType, wdata.CompanyId, wdata.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, wdata.TransmitPower);
+                        (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, watcherData.TransmitPower);
+                        if (watcherData.CompanyId == 18498)
+                        {
+                            ;
+                            (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, watcherData.TransmitPower);
+                        }
                         break;
                     case AdvertisementDataSectionParser.DataTypeValue.TxPowerLevel:
-                        wdata.TransmitPower = AdvertisementDataSectionParser.ParseTxPowerLevel(section);
+                        watcherData.TransmitPower = AdvertisementDataSectionParser.ParseTxPowerLevel(section);
                         break;
                 }
             }
-
-            if (wdata.ManufacturerType != BluetoothCompanyIdentifier.CommonManufacturerType.Apple10)
+            if (watcherData.CompanyId == 18498)
             {
-                // don't bother spiting out apple data; there's much too much of it
-                System.Diagnostics.Debug.WriteLine($"Bluetooth Event: rx={args.RawSignalStrengthInDBm} tx={wdata.TransmitPower}  txarg={args.TransmitPowerLevelInDBm} name={wdata.CompleteLocalName} company {wdata.CompanyId}={BluetoothCompanyIdentifier.GetBluetoothCompanyIdentifier(wdata.CompanyId)} data={wdata.ParsedCompanyDataTrim}");
+                var n = args.Advertisement.LocalName;
+                filterLevel = -255; // Always let in the blood pressure cuff, because reasons.
+            }
+            if (args.RawSignalStrengthInDBm < filterLevel)
+            {
+                return;
             }
 
-            WatcherEvent?.Invoke(sender, wdata);
+            if (watcherData.ManufacturerType != BluetoothCompanyIdentifier.CommonManufacturerType.Apple10)
+            {
+                // don't bother spiting out apple data; there's much too much of it
+                System.Diagnostics.Debug.WriteLine($"Bluetooth Event: addr={BluetoothAddress.AsString(args.BluetoothAddress)} rx={args.RawSignalStrengthInDBm} tx={watcherData.TransmitPower}  txarg={args.TransmitPowerLevelInDBm} name={watcherData.CompleteLocalName} company {watcherData.CompanyId}={BluetoothCompanyIdentifier.GetBluetoothCompanyIdentifier(watcherData.CompanyId)} data={watcherData.ParsedCompanyDataTrim}");
+            }
+
+            WatcherEvent?.Invoke(sender, watcherData); // Often the MainPage.BleWatcher_WatcherEvent
         }
 
 

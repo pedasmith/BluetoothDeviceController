@@ -1,0 +1,275 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Govee_H5074_74C5",
+	  "REM10":"Small battery-powered temperature and humidity sensor"
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "ExampleData": [
+                "Name: Govee_H5074_74C5",
+                "Govee_H5074_74C5"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsRead": true,
+              "IsIndicate": true,
+              "ExampleData": [
+                "Value:  01 00 FF FF",
+                "1 65535"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manufacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  49 6E 74 65 6C 6C 69 5F 52 6F 63 6B 73",
+                "Intelli_Rocks"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  49 52",
+                "IR"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2E 30 30 2E 30 31",
+                "1.00.01"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2E 30 31 2E 30 30",
+                "1.01.00"
+              ]
+            },
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  C5 74 D0 54 17 E0",
+                "C5 74 D0 54 17 E0"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 D2 00 80 05 00 01",
+                "01 D2 00 80 05 00 01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fef5-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Dialog Semiconductor GmbH",
+		  "REM10" : "See https://github.com/s8w1e2ep/BuildingCenter/blob/e874e745b76a65febd26acf6f6e00f3d2f831edb/BuildingCenter/BLEDefines.h",
+		  "REM20: : "Or https://github.com/lilincun/U6/blob/87a5881b8b6600aa61a491ce1c11df5da38f9624/projects/dk_apps/features/ble_suota_client/suota_client.c",
+		  "REM50": "https://www.dialog-semiconductor.com/", 
+          "Name": "SPOTA_SERVICE",
+		  "Suppress": true,
+
+          "Characteristics": [
+            {
+              "UUID": "8082caa8-41a6-4021-91c6-56f9b954cc34",
+              "Name": "SPOTA_MEM_DEV_UUID",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "724249f0-5ec3-4b5f-8804-42345af08651",
+              "Name": "SPOTA_GPIO_MAP_UUID",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "6c53db25-47a1-45fe-a022-7c92fb334fd4",
+              "Name": "SPOTA_MEM_INFO_UUID",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "9d84b9a3-000c-49d8-9183-855b673fda31",
+              "Name": "SPOTA_PATCH_LEN_UUID",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "457871e8-d516-4ca1-9116-57d0b17b9cb2",
+              "Name": "SPOTA_PATCH_DATA_UUID",
+              "Type": "BYTES|HEX|Unknown4",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "5f78df94-798c-46f5-990a-b3eb6a065c88",
+              "Name": "SPOTA_SERV_STATUS_UUID",
+              "Type": "BYTES|HEX|Unknown5",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            },
+            {
+              "UUID": "64b4e8b5-0de5-401b-a21d-acc8db3b913a",
+              "Name": "UUID_SUOTA_VERSION",
+              "Type": "BYTES|HEX|Unknown6",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  0D"
+              ]
+            },
+            {
+              "UUID": "42c3dfdd-77be-4d9c-8454-8f875267fb3b",
+              "Name": "UUID_SUOTA_PATCH_DATA_CHAR_SIZE",
+              "Type": "BYTES|HEX|Unknown7",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  F4 00"
+              ]
+            },
+            {
+              "UUID": "b7de1eea-823d-43bb-a3af-c4903dfce23c",
+              "Name": "UUID_SUOTA_MTU",
+              "Type": "BYTES|HEX|Unknown8",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  F7 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "494e5445-4c4c-495f-524f-434b535f4857",
+          "Name": "GoveeData",
+          "Characteristics": [
+            {
+              "UUID": "494e5445-4c4c-495f-524f-434b535f2012",
+              "Name": "humi_cmd",
+              "Description": "humi_cmd",
+              "Type": "BYTES|HEX|humi_cmd",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "494e5445-4c4c-495f-524f-434b535f2013",
+              "Name": "humi_data",
+              "Description": "humi_data",
+              "Type": "BYTES|HEX|humi_data",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "494e5445-4c4c-495f-524f-434b535f2011",
+              "Name": "protocol",
+              "Description": "protocol",
+              "Type": "BYTES|HEX|protocol",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "494e5445-4c4c-495f-524f-434b535f2014",
+              "Name": "heart_beat",
+              "Description": "heart_beat",
+              "Type": "BYTES|HEX|heart_beat",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value: "
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-e0:17:54:d0:74:c5\nCanPair:True IsPaired:False"
+    }
+  ]
+}

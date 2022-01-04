@@ -22,11 +22,13 @@ namespace BluetoothDeviceController
 
         public enum ReadSelection { Address, Name, Everything } // Same as DeviceSearchType: Standard, NameRead, Everything
         public ReadSelection DeviceReadSelection { get; set; } = UserPreferences.ReadSelection.Name;
+        public bool AutomaticallyReadData { get; set; } = true;
 
 
         const string DisplayPreferenceSetting = "UserPreferenceDisplayPreference";
         const string SearchScopeSetting = "UserPreferenceSearchScope";
         const string ReadSelectionSetting = "UserPreferenceReadSelection";
+        const string AutomaticallyReadDataSetting = "AutomaticallyReadData";
         public void ReadFromLocalSettings()
         {
             var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
@@ -42,6 +44,10 @@ namespace BluetoothDeviceController
             {
                 DeviceReadSelection = (ReadSelection)(int)localSettings.Values[ReadSelectionSetting];
             }
+            if (localSettings.Values.ContainsKey(AutomaticallyReadDataSetting))
+            {
+                AutomaticallyReadData = (bool)localSettings.Values[AutomaticallyReadDataSetting];
+            }
         }
 
         public void SaveToLocalSettings()
@@ -50,6 +56,7 @@ namespace BluetoothDeviceController
             localSettings.Values[DisplayPreferenceSetting] = (int)Display;
             localSettings.Values[SearchScopeSetting] = (int)Scope;
             localSettings.Values[ReadSelectionSetting] = (int)DeviceReadSelection;
+            localSettings.Values[AutomaticallyReadDataSetting] = AutomaticallyReadData;
         }
     }
 }

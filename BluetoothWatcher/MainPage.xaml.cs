@@ -1,6 +1,7 @@
 ﻿using BluetoothDeviceController.Beacons;
 using BluetoothDeviceController.BluetoothDefinitionLanguage;
 using BluetoothDeviceController.BluetoothProtocolsCustom;
+using BluetoothProtocols;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWatcher.DeviceDisplays;
 using BluetoothWatcher.Units;
@@ -46,6 +47,7 @@ namespace BluetoothWatcher
         AdvertisementWatcher BleWatcher = new AdvertisementWatcher();
         Dictionary<ulong, DeviceDisplays.RuuviDisplay> RuuviDisplays = new Dictionary<ulong, DeviceDisplays.RuuviDisplay>();
         Dictionary<ulong, DeviceDisplays.Viatom_PulseOximeter> ViatomDisplays = new Dictionary<ulong, Viatom_PulseOximeter>();
+        Dictionary<ulong, DeviceDisplays.Samico_BloodPressureControl> SamicoDisplays = new Dictionary<ulong, Samico_BloodPressureControl>();
 
         Dictionary<ulong, Viatom_PulseOximeter_PC60FW_Factory> ViatomFactories = new Dictionary<ulong, Viatom_PulseOximeter_PC60FW_Factory>();
         Dictionary<ushort, ulong> CharacteristicHandleToBTAddr = new Dictionary<ushort, ulong>();
@@ -61,9 +63,6 @@ namespace BluetoothWatcher
             uiStartupMarkdown.Text = text;
 
             // Start up the watcher
-            // // // BleAdvertisementWatcher = new BluetoothLEAdvertisementWatcher();
-            // // // BleAdvertisementWatcher.Received += BleAdvertisementWatcher_Received;
-            // // // BleAdvertisementWatcher.Start();
             BleWatcher.WatcherEvent += BleWatcher_WatcherEvent;
             BleWatcher.Start();
 
@@ -79,7 +78,32 @@ namespace BluetoothWatcher
                 uiNDevice.Text = $"STARTUP ERROR: {nerror}";
             }
         }
-
+        private async Task<bool> StartSamico(WatcherData wdata)
+        {
+            Samico_BloodPressureControl display = null;
+            if (!SamicoDisplays.ContainsKey(wdata.Addr))
+            {
+                display = new Samico_BloodPressureControl();
+                SamicoDisplays[wdata.Addr] = display;
+            }
+            else
+            {
+                display = SamicoDisplays[wdata.Addr];
+            }
+            var device = new Samico_BloodPressure_BG512();
+            var ble = await BluetoothLEDevice.FromBluetoothAddressAsync(wdata.Addr);
+            device.ble = ble;
+            device.ResultsEvent += (data) =>
+            {
+                var task = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    var addr = BluetoothAddress.AsString(ble.BluetoothAddress);
+                    display.SetData(addr, device);
+                });
+            };
+            await device.NotifyResultsAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+            return false;
+        }
         private async Task<bool> StartViatom(WatcherData wdata)
         {
             //TODO: this prevents us from restarting a pulse.
@@ -128,9 +152,19 @@ namespace BluetoothWatcher
             Ruuvi_Tag ruuvi_tag = null;
             bool added_Viatom_PulseOximeter = false;
 
+            var addr = BluetoothAddress.AsString(wdata.Addr);
+            if (addr.StartsWith ("78:a5"))
+            {
+                ;
+            }
+
             if (wdata.CompleteLocalName.StartsWith("PC-60F"))
             {
                 added_Viatom_PulseOximeter = await StartViatom(wdata);
+            }
+            else if (wdata.CompleteLocalName.StartsWith ("Samico BP"))
+            {
+                bool did_Samico = await StartSamico(wdata);
             }
             else if (wdata.SpecializedDecodedData is Ruuvi_Tag)
             {
@@ -145,6 +179,10 @@ namespace BluetoothWatcher
                         ruuvi_tag = Ruuvi_Tag.FromRuuvi_DataRecord(v1.Data);
                     }
                 }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Device seen: {wdata.CompleteLocalName}");
             }
 
             if (ruuvi_tag == null && !added_Viatom_PulseOximeter)
@@ -175,130 +213,6 @@ namespace BluetoothWatcher
             });
         }
 
-#if NEVER_EVER_DEFINED
-        private async void BleAdvertisementWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
-        {
-            sbyte transmitPower = 0;
-            ushort companyId;
-            object speciality = null;
-            string completeLocalName = "";
-
-            // Now parse out the data
-            var addr = args.BluetoothAddress;
-            foreach (var section in args.Advertisement.DataSections)
-            {
-                var dtv = AdvertisementDataSectionParser.ConvertDataTypeValue(section.DataType);
-                string str = "";
-                BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-                switch (dtv)
-                {
-                    case AdvertisementDataSectionParser.DataTypeValue.CompleteLocalName:
-                        {
-                            var dr = DataReader.FromBuffer(section.Data);
-                            completeLocalName = dr.ReadString(dr.UnconsumedBufferLength);
-                        }
-                        break;
-
-                    case DataTypeValue.ManufacturerData:
-                        (str, manufacturerType, companyId, speciality) = BluetoothCompanyIdentifier.ParseManufacturerData(section, transmitPower);
-                        if (speciality != null)
-                        {
-                            ;
-                        }
-                        break;
-                    case AdvertisementDataSectionParser.DataTypeValue.TxPowerLevel:
-                        transmitPower = AdvertisementDataSectionParser.ParseTxPowerLevel(section);
-                        break;
-                }
-            }
-            Ruuvi_Tag ruuvi_tag = null;
-            bool added_Viatom_PulseOximeter = false;
-
-            if (completeLocalName.StartsWith("PC-60F"))
-            {
-                //TODO: this prevents us from restarting a pulse.
-                // e.g., use a pulse oximeter, then stop for a bit, then start again.
-
-                bool mustStart = !ViatomFactories.ContainsKey(addr);
-                var ble = await BluetoothLEDevice.FromBluetoothAddressAsync(addr);
-                if (ble.ConnectionStatus == BluetoothConnectionStatus.Disconnected)
-                {
-                    mustStart = true;
-                }
-
-                if (mustStart)
-                {
-                    // Turn on notifications.
-                    var xmitterResult = await ble.GetGattServicesForUuidAsync(Guid.Parse("6e400001-b5a3-f393-e0a9-e50e24dcca9e"));
-                    if (xmitterResult.Status != GattCommunicationStatus.Success) return;
-                    if (xmitterResult.Services.Count < 1)
-                    {
-                        ;
-                        return;
-                    }
-                    var receiveResult = await xmitterResult.Services[0].GetCharacteristicsForUuidAsync(Guid.Parse("6e400003-b5a3-f393-e0a9-e50e24dcca9e"));
-                    if (receiveResult.Status != GattCommunicationStatus.Success) return;
-                    if (receiveResult.Characteristics.Count < 1)
-                    {
-                        ;
-                        return;
-                    }
-                    var receive = receiveResult.Characteristics[0];
-                    var notifyStatus = await receive.WriteClientCharacteristicConfigurationDescriptorAsync(Windows.Devices.Bluetooth.GenericAttributeProfile.GattClientCharacteristicConfigurationDescriptorValue.Notify);
-                    if (notifyStatus != GattCommunicationStatus.Success) return;
-
-                    if (!CharacteristicHandleToBTAddr.ContainsKey(receive.AttributeHandle))
-                    {
-                        CharacteristicHandleToBTAddr.Add(receive.AttributeHandle, addr);
-                    }
-                    var added = ViatomFactories.TryAdd(addr, new Viatom_PulseOximeter_PC60FW_Factory());
-                    receive.ValueChanged += Viatom_PulseOximeter_PC60FW_Receive_ValueChanged;
-                    added_Viatom_PulseOximeter = true;
-                }
-            }
-            else if (speciality is Ruuvi_Tag)
-            {
-                // Maybe it's a Ruuvi Tag announcement?
-                ruuvi_tag = speciality as Ruuvi_Tag;
-                if (ruuvi_tag == null)
-                {
-                    // Maybe it's a type 1 ruuvi tag?
-                    var v1 = Ruuvi_Tag_v1_Helper.GetRuuviUrl(args);
-                    if (v1.Success && v1.Data != null)
-                    {
-                        ruuvi_tag = Ruuvi_Tag.FromRuuvi_DataRecord(v1.Data);
-                    }
-                }
-            }
-
-            if (ruuvi_tag == null && !added_Viatom_PulseOximeter)
-            {
-                return;
-            }
-
-           await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-           {
-               if (ruuvi_tag != null) UpdateRuuviDisplay(addr, ruuvi_tag);
-               if (added_Viatom_PulseOximeter)
-               {
-                   if (!ViatomDisplays.ContainsKey (addr))
-                   {
-                       var display = new Viatom_PulseOximeter();
-                       ViatomDisplays.Add(addr, display);
-                       uiDevices.Items.Add(display);
-
-                       // Got a device; better make it visible.
-                       if (uiDevices.Items.Count == 1)
-                       {
-                           uiStartup.Visibility = Visibility.Collapsed;
-                           uiDevices.Visibility = Visibility.Visible;
-                       }
-                       uiNDevice.Text = uiDevices.Items.Count.ToString();
-                   }
-               }
-           });
-        }
-#endif
 
         private void UpdateRuuviDisplay(ulong addr, Ruuvi_Tag ruuvi_tag)
         {

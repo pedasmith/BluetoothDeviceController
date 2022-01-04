@@ -48,9 +48,11 @@ namespace BluetoothDeviceController.BleEditor
         enum ValueShowMethod { Overwrite, Append };
         ValueShowMethod CurrValueShowMethod = BleCharacteristicControl.ValueShowMethod.Overwrite;
         public ObservableCollection<Command> Commands { get; } = new ObservableCollection<Command>();
+        public bool AutomaticallyReadData { get; internal set; } = true;
 
-        public BleCharacteristicControl(NameDevice device, GattDeviceService service, GattCharacteristic characteristic)
+        public BleCharacteristicControl(NameDevice device, GattDeviceService service, GattCharacteristic characteristic, bool automaticallyReadData)
         {
+            AutomaticallyReadData = automaticallyReadData;
             this.DataContext = this;
             this.InitializeComponent();
             if (device == null)
@@ -61,22 +63,13 @@ namespace BluetoothDeviceController.BleEditor
         }
 
 
+
         // Sets up all of the flags, values, etc.
         private async Task SetupAsync(NameDevice device, GattDeviceService service, GattCharacteristic characteristic)
         {
             Service = service;
             Characteristic = characteristic;
             NC = BleNames.Get(device, service, characteristic);
-
-#if NEVER_EVER_DEFINED
-            // Setting it up differently now via the UILIst + uiUI
-            Commands.Clear();
-            foreach (var (_,command) in NC.Commands)
-            {
-                command.WriteCharacteristic = this;
-                Commands.Add(command);
-            }
-#endif
 
             var props = characteristic.CharacteristicProperties;
             uiNotifyFlag.Visibility = props.HasFlag(GattCharacteristicProperties.Notify) ? Visibility.Visible : Visibility.Collapsed;
@@ -101,7 +94,20 @@ namespace BluetoothDeviceController.BleEditor
                 || props.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
                  ? Visibility.Visible : Visibility.Collapsed;
 
-            await DoReadAsync(true); // update the value field even if it's not readable
+            if (AutomaticallyReadData)
+            {
+                await DoReadAsync(true); // update the value field even if it's not readable
+            }
+            else
+            {
+
+            }
+
+            if (characteristic.Uuid == GoveeKeepaliveCharacteristicUuid)
+            {
+                System.Diagnostics.Debug.WriteLine("DBG: got the one Govee Keepalive / humi_cmd characteristic");
+                ConstantlyWriteGoveeKeepalive (characteristic);
+            }
 
             var namestr = "";
             if (!String.IsNullOrEmpty(NC?.Name))
@@ -151,8 +157,16 @@ namespace BluetoothDeviceController.BleEditor
                     infostr = NC.Name + " ";
                 }
                 infostr += characteristic.Uuid.ToString();
+                if (infostr.Contains("humi"))
+                {
+                    ; // Handy line to hang a debugger on.
+                }
                 uiInfo.Text = infostr;
                 uiInfo.Visibility = Visibility.Visible;
+            }
+            if (namestr.Contains("humi"))
+            {
+                ; // Handy line to hang a debugger on.
             }
 
             // If there's a readable value with displayFormatPrimary=ASCII and secondary of LONG (ASCII^LONG)
@@ -179,7 +193,7 @@ namespace BluetoothDeviceController.BleEditor
             }
             try
             {
-                SetupUI();
+                SetupUI(); // sets up the fancy UI with sliders and buttons.
             }
             catch (Exception)
             {
@@ -195,6 +209,43 @@ namespace BluetoothDeviceController.BleEditor
                 }
             }
         }
+
+        //static Guid GoveeKeepaliveCharacteristicUuid = Guid.Parse("494e5445-4c4c-495f-524f-434b535f2012"); // From OpenHab
+        static Guid GoveeKeepaliveCharacteristicUuid = Guid.Parse("494e5445-4c4c-495f-524f-434b535f2014"); // Use the heartbeat one?
+        Task GoveeTask = null;
+        private void ConstantlyWriteGoveeKeepalive(GattCharacteristic characteristic)
+        {
+            GoveeTask = Task.Run(async () =>
+          {
+              while (true)
+              {
+                  await Task.Delay(1000); // delay 2 seconds 
+                  GattCommunicationStatus status = GattCommunicationStatus.Unreachable;
+                  try
+                  {
+                      byte[] cmd = new byte[20] { 0x33, 0x01, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0x32 }; // 0x32 is the CRC for the command
+                      var buffer = Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(cmd); // UWP has these really dumb aspects.
+                      status = await characteristic.WriteValueAsync(buffer, GattWriteOption.WriteWithoutResponse);
+                      System.Diagnostics.Debug.WriteLine($"DBG: TODO: wrote keepalive; result is {status}");
+                  }
+                  catch (Exception ex)
+                  {
+                      switch ((uint)ex.HResult)
+                      {
+                          case 0x80000013:
+                              System.Diagnostics.Debug.WriteLine($"ERROR: failed to write keepalive; object is closed");
+                              break;
+                          default:
+                              System.Diagnostics.Debug.WriteLine($"ERROR: TODO: Exception while writing keepalive; result is {ex.Message}");
+                              break;
+                      }
+                  }
+              }
+
+          });
+        }
+
+
         const double ElementMinWidth = 150;
         Thickness ElementMargin = new Thickness(2);
         /// <summary>

@@ -194,6 +194,9 @@ namespace BluetoothDeviceController.Names
         }
     }
 
+    /// <summary>
+    /// Characteristic with common data (like the name) filled in
+    /// </summary>
     public class NameCharacteristic
     {
         public NameCharacteristic()
@@ -226,6 +229,10 @@ namespace BluetoothDeviceController.Names
             if (characteristic.UserDescription != "")
             {
                 ;
+            }
+            if (Name.Contains ("20") || Name.Contains ("humi_cmd"))
+            {
+                ; // something for the debugger to hook to.
             }
             Type = defaultCharacteristic == null ? $"BYTES|HEX|{Name}" : defaultCharacteristic.Type;
             IsRead = characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read);

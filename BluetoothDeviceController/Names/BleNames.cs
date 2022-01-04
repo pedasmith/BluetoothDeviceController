@@ -176,7 +176,14 @@ namespace BluetoothDeviceController.Names
                                     && !characteristic.IsRead
                                     && !characteristic.IsWrite && !characteristic.IsWriteWithoutResponse)
                                 {
-                                    System.Diagnostics.Debug.WriteLine($"JSON ERROR: {file.Name} service {service.Name} characteristic {characteristic.Name} has no 'verb' like IsRead:true etc. ");
+                                    if (characteristic.Name.Contains("Unknown") || service.Name.Contains ("Unknown"))
+                                    {
+                                        // Don't really care about items which aren't known.
+                                    }
+                                    else
+                                    {
+                                        System.Diagnostics.Debug.WriteLine($"JSON ERROR: {file.Name} service {service.Name} characteristic {characteristic.Name} has no 'verb' like IsRead:true etc. ");
+                                    }
                                 }
                             }
                         }

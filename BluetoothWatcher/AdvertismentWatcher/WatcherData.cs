@@ -14,7 +14,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
         public String CompleteLocalName { get; set; } = "";
         public String ParsedCompanyData { get; set; } = "";
         public String ParsedCompanyDataTrim { get { return ParsedCompanyData.Trim('\n'); } }
-        public ushort CompanyId { get; set; } = 65534; // is unknown. Is kind of a valid value?
+        public ushort CompanyId { get; set; } = 65534; // is unknown. Is kind of a valid value? //TODO: make this nullable
         public CommonManufacturerType ManufacturerType { get; set; } = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
         public sbyte TransmitPower { get; set; } = 0;
         public object SpecializedDecodedData { get; set; } = null;
