@@ -98,7 +98,7 @@ namespace BluetoothDeviceController.Beacons
             isFullDetails = true; //TODO: should be remembered from one run to the next.
 
             // For debugging: include only close-by signals
-            const int CLOSE_SGINAL_STRENGTH = -50;
+            const int CLOSE_SGINAL_STRENGTH = -90;
             bool isClose = bleAdvert.RawSignalStrengthInDBm > CLOSE_SGINAL_STRENGTH;
             if (!isClose)
             {
@@ -215,9 +215,9 @@ namespace BluetoothDeviceController.Beacons
 #endif
                 // We don't know all of the header information until later
                 //TODO: microsoft manufacturer data includes swiftpair!
-                if (!completeLocalName.Contains ("Govee")) // just for debugging
+                if (!completeLocalName.Contains ("Govee") && !completeLocalName.Contains ("LC")) // just for debugging
                 {
-                    return;
+                    // TODO: just for some debugging: return;
                 }
                 var header = $"{address}\t{time24}\t{bleAdvert.RawSignalStrengthInDBm}";
                 if (haveTransmitPower) header += $"\t{transmitPower.ToString()}";

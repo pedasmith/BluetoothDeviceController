@@ -185,6 +185,8 @@
     <Compile Include="BluetoothProtocolsCustom\Nordic_Uart.cs" />
     <Compile Include="BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
     <Compile Include="BluetoothProtocols\Elegoo_Mini_Car.cs" />
+    <Compile Include="BluetoothProtocols\Lionel_LionChief.cs" />
+    <Compile Include="BluetoothProtocols\Lionel_LionChief_Custom.cs" />
     <Compile Include="BluetoothProtocols\Samico_BloodPressure_BG512.cs" />
     <Compile Include="BluetoothProtocols\WilliamWeilerEngineering_Skoobot.cs" />
     <Compile Include="IotNumberFormats\ValueCalculate.cs" />
@@ -272,6 +274,9 @@
     </Compile>
     <Compile Include="SpecialtyPagesCustom\UartPage.xaml.cs">
       <DependentUpon>UartPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialtyPagesModified\Lionel_LionChiefPage.xaml.cs">
+      <DependentUpon>Lionel_LionChiefPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPagesModified\TI_beLight_2540Page.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\TrionesPage.xaml.cs" />
@@ -721,6 +726,9 @@
     <Content Include="Assets\ChacteristicsData\Pyle_PHBPBW40_Samico_BG512_Blood_Pressure.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ChacteristicsData\Lionel_LionChief.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\ChacteristicsData\Viatom_PC60FW_PulseOximeter.json" />
     <Content Include="Assets\ChacteristicsData\Wescale_KitchenScale.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -959,6 +967,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPagesCustom\UartPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPagesModified\Lionel_LionChiefPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

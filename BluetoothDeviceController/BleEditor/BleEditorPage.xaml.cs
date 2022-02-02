@@ -254,6 +254,8 @@ namespace BluetoothDeviceController.BleEditor
                     {
                         await header.AddServiceAsync(ble, service);
                         var shouldDisplay = ServiceShouldBeEdited(service);
+                        //TODO: if we're gather data for the JSON, we should include all services. However, shouldDisplay is actually never used.
+                        shouldDisplay = true;
 
                         var defaultService = knownDevice.GetService(service.Uuid.ToString("D"));
                         var wireService = new NameService(service, defaultService, serviceCount++);
@@ -302,7 +304,7 @@ namespace BluetoothDeviceController.BleEditor
                                     // the user to interact (very briefly) with it.
                                     if (String.IsNullOrEmpty (characteristic.UserDescription))
                                     {
-                                        continue;
+                                        ; // just for debugging
                                     }
                                     var edit = new BleCharacteristicControl(knownDevice, service, characteristic, automaticallyReadData);
                                     uiEditor.Children.Add(edit);

@@ -54,6 +54,7 @@ namespace BluetoothDeviceController
         const string LIGHT = "💡";
         const string LIGHTNING = "🖄"; // envelope with lightning
         const string ROBOT = ""; // Part of the Segoe MDL2 Assets FontFamily
+        const string TRAIN = "🚂";
         const string UART = "🖀";
         const string WAND = "🖉"; // yeah, a pencil isn't reall a wand.
         const string WATER = "🚰";
@@ -70,6 +71,7 @@ namespace BluetoothDeviceController
             new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { Nordic_Uart.SpecializationName }, UART, "UART Comm port", "Nordic UART comm port", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPagesCustom.CraftyRobot_SmartibotPage), new string[] { "Smartibot" }, ROBOT, "Smartibot", "Smartibot espruino-based robot", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPages.Elegoo_MiniCarPage), new string[] { "ELEGOO BT16" }, CAR, "Elegoo Mini-Car", "Elegoo small robot car"),
+            new Specialization (typeof(SpecialtyPages.Lionel_LionChiefPage), new string[] { "LC" }, TRAIN, "LionChief Train", "Lionel Train Controller"),
             new Specialization (typeof(SpecialtyPages.WilliamWeilerEngineering_SkoobotPage), new string[] { "Skoobot" }, ROBOT, "Skoobot", "Skoobot tiny robot"),
 
             // Lights
@@ -689,7 +691,11 @@ namespace BluetoothDeviceController
 
             if (bleAdvert.Advertisement.LocalName.Contains ("Wescale"))
             {
-                ; // Hand yhook for debugger.
+                ; // Hand hook for debugger.
+            }
+            if (bleAdvert.Advertisement.LocalName.StartsWith("LC"))
+            {
+                ; // Hand hook for debugger.
             }
             int idx = FindDeviceBle(bleAdvert);
 
@@ -918,6 +924,10 @@ namespace BluetoothDeviceController
         {
             System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {args.Advertisement.LocalName} seen");
             if (args.Advertisement.LocalName.Contains("Wescale"))
+            {
+                ; // Handy hook for debugger.
+            }
+            if (args.Advertisement.LocalName.StartsWith("LC"))
             {
                 ; // Handy hook for debugger.
             }
