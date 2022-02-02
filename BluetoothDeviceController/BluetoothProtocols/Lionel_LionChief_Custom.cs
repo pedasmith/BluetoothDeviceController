@@ -48,6 +48,12 @@ namespace BluetoothProtocols
             if (pitch > 2) pitch = 2;
             return WriteLionelCommand(0x44, new byte[] { 0x02, 0x0e, (byte)pitch });
         }
+        public Task WriteLionelHornPitch(sbyte pitch)
+        {
+            if (pitch < -2) pitch = -2;
+            if (pitch > 2) pitch = 2;
+            return WriteLionelCommand(0x44, new byte[] { 0x01, 0x0e, (byte)pitch });
+        }
 
 
         public Task WriteLionelSpeed(byte speed)

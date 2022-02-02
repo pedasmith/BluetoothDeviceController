@@ -337,8 +337,9 @@
                         />
                 </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Slider Header="Steam Chuff Volume" MaxWidth="100" Value="0" Minimum="0" Maximum="7" ValueChanged="OnWriteLionelSteamVolume" />
-                <Slider Header="Bell Pitch" MaxWidth="100" Value="0" Minimum="-2" Maximum="2" ValueChanged="OnWriteLionelBellPitch" />
+                <Slider Header="Steam Chuff Volume" MaxWidth="80" Value="0" Minimum="0" Maximum="7" ValueChanged="OnWriteLionelSteamVolume" />
+                <Slider Header="Bell Pitch" MaxWidth="8" Value="0" Minimum="-2" Maximum="2" ValueChanged="OnWriteLionelBellPitch" />
+                <Slider Header="Horn Pitch" MaxWidth="80" Value="0" Minimum="-2" Maximum="2" ValueChanged="OnWriteLionelHornPitch" />
             </StackPanel>
             <Rectangle Height="20" />
             <StackPanel Orientation="Horizontal">

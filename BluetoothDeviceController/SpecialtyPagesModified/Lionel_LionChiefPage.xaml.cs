@@ -2002,6 +2002,23 @@ namespace BluetoothDeviceController.SpecialtyPages
                 SetStatus($"Error: exception: {ex.Message}");
             }
         }
+
+        private async void OnWriteLionelHornPitch(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            SetStatusActive(true);
+            ncommand++;
+            try
+            {
+                sbyte pitch = (sbyte)((sender as Slider).Value);
+                await bleDevice.WriteLionelHornPitch(pitch);
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"Error: exception: {ex.Message}");
+            }
+        }
+
+
         // For the INotifyPropertyChanged values
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
