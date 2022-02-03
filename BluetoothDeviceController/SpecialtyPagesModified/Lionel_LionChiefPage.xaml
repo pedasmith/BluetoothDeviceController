@@ -14,6 +14,7 @@
     >
     <Page.Resources>
         <protocol:SpeakMessageConverter x:Key="SpeakMessageConverter" />
+        <protocol:SoundSourceConverter x:Key="SoundSourceConverter" />
         <Style TargetType="Button">
             <Setter Property="MinWidth" Value="60" />
             <Setter Property="VerticalAlignment" Value="Bottom" />
@@ -337,11 +338,32 @@
                         MinWidth="10" Padding="0" VerticalAlignment="Center" Margin="40,0,0,0"
                         />
             </StackPanel>
+            <!-- Primary Volume controls -->
             <StackPanel Orientation="Horizontal">
-                <Slider Header="Steam Chuff Volume" MaxWidth="80" Value="0" Minimum="0" Maximum="7" ValueChanged="OnWriteLionelSteamVolume" />
+                <Slider x:Name="uiMainVolume" Header="Main Volume" MaxWidth="80" Value="0" Minimum="0" Maximum="7" ValueChanged="OnWriteLionelSteamVolume" />
                 <Slider Header="Bell Pitch" MaxWidth="8" Value="0" Minimum="-2" Maximum="2" ValueChanged="OnWriteLionelBellPitch" />
                 <Slider Header="Horn Pitch" MaxWidth="80" Value="0" Minimum="-2" Maximum="2" ValueChanged="OnWriteLionelHornPitch" />
             </StackPanel>
+            
+            
+            <!-- Try out all of the speciality values -->
+            
+            <StackPanel Orientation="Horizontal">
+                <ComboBox  Name="uiSoundSource" MinWidth="120"
+                       ItemsSource="{Binding Source={StaticResource SoundSourceConverter}, Path=EnumValues}" 
+                      SelectedItem="{Binding CurrSoundSource, Mode=TwoWay}">
+                    <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="14" Text="{Binding Converter={StaticResource SoundSourceConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <Slider x:Name="uiVolume" Header="Volume" MaxWidth="80" Value="0" Minimum="0" Maximum="7" ValueChanged="OnWriteLionelItemVolumePitch" />
+                <Slider x:Name="uiPitch" Header="Pitch" MaxWidth="8" Value="0" Minimum="-2" Maximum="2" ValueChanged="OnWriteLionelItemVolumePitch" />
+            </StackPanel>
+
             <Rectangle Height="20" />
             <StackPanel Orientation="Horizontal">
                 <Slider x:Name="uiSpeed"  Header="Speed" Value="0" Width="282" Minimum="0" Maximum="31" ValueChanged="OnWriteLionelSpeed" />

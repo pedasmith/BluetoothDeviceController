@@ -174,7 +174,7 @@ namespace BluetoothWatcher.DeviceDisplays
             try
             {
                 byte volume = (byte)((sender as Slider).Value);
-                await bleDevice.WriteLionelSteamVolume(volume);
+                await bleDevice.WriteLionelOverallVolume(volume);
             }
             catch (Exception ex)
             {
@@ -189,7 +189,7 @@ namespace BluetoothWatcher.DeviceDisplays
             try
             {
                 sbyte pitch = (sbyte)((sender as Slider).Value);
-                await bleDevice.WriteLionelBellPitch(pitch);
+                await bleDevice.WriteLionelPitch(SoundSource.Bell, pitch);
             }
             catch (Exception ex)
             {
@@ -204,7 +204,7 @@ namespace BluetoothWatcher.DeviceDisplays
             try
             {
                 sbyte pitch = (sbyte)((sender as Slider).Value);
-                await bleDevice.WriteLionelHornPitch(pitch);
+                await bleDevice.WriteLionelPitch(SoundSource.Horn, pitch);
             }
             catch (Exception ex)
             {

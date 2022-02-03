@@ -1980,7 +1980,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             try
             {
                 byte volume = (byte)((sender as Slider).Value);
-                await bleDevice.WriteLionelSteamVolume(volume);
+                await bleDevice.WriteLionelOverallVolume(volume);
             }
             catch (Exception ex)
             {
@@ -1995,7 +1995,8 @@ namespace BluetoothDeviceController.SpecialtyPages
             try
             {
                 sbyte pitch = (sbyte)((sender as Slider).Value);
-                await bleDevice.WriteLionelBellPitch(pitch);
+                byte volume = (byte)uiVolume.Value;
+                await bleDevice.WriteLionelVolumePitch(SoundSource.Bell, volume, pitch);
             }
             catch (Exception ex)
             {
@@ -2010,7 +2011,8 @@ namespace BluetoothDeviceController.SpecialtyPages
             try
             {
                 sbyte pitch = (sbyte)((sender as Slider).Value);
-                await bleDevice.WriteLionelHornPitch(pitch);
+                byte volume = (byte)uiMainVolume.Value;
+                await bleDevice.WriteLionelVolumePitch(SoundSource.Horn, volume, pitch);
             }
             catch (Exception ex)
             {
@@ -2036,6 +2038,19 @@ namespace BluetoothDeviceController.SpecialtyPages
                 OnPropertyChanged();
             }
         }
+
+        private SoundSource _CurrSoundSource = SoundSource.Engine;
+        public SoundSource CurrSoundSource
+        {
+            get { return _CurrSoundSource; }
+            set
+            {
+                if (value == _CurrSoundSource) return;
+                _CurrSoundSource = value;
+                OnPropertyChanged();
+            }
+        }
+
         private async void OnWriteLionelSpeak(object sender, RoutedEventArgs e)
         {
             SetStatusActive(true);
@@ -2068,5 +2083,23 @@ namespace BluetoothDeviceController.SpecialtyPages
                 SetStatus($"Error: exception: {ex.Message}");
             }
         }
+
+        private async void OnWriteLionelItemVolumePitch(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            SetStatusActive(true);
+            ncommand++;
+            try
+            {
+                byte volume = (byte)uiVolume.Value;
+                var pitch = (sbyte)uiPitch.Value;
+                await bleDevice.WriteLionelVolumePitch(CurrSoundSource, volume, pitch);
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"Error: exception: {ex.Message}");
+            }
+        }
+
+
     }
 }

@@ -5,7 +5,8 @@
       "REM10_Name": "LC010494",
       "ClassName": "Lionel_LionChief",
       "Links": [
-        "https://github.com/Property404/lionchief-controller"
+        "https://github.com/Property404/lionchief-controller",
+        "https://github.com/idaband/lionchief-controller-raspberrypi"
       ],
       "Services": [
         {
