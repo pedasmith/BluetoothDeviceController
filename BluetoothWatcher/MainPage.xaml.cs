@@ -48,6 +48,7 @@ namespace BluetoothWatcher
         Dictionary<ulong, DeviceDisplays.RuuviDisplay> RuuviDisplays = new Dictionary<ulong, DeviceDisplays.RuuviDisplay>();
         Dictionary<ulong, DeviceDisplays.Viatom_PulseOximeter> ViatomDisplays = new Dictionary<ulong, Viatom_PulseOximeter>();
         Dictionary<ulong, DeviceDisplays.Samico_BloodPressureControl> SamicoDisplays = new Dictionary<ulong, Samico_BloodPressureControl>();
+        Dictionary<ulong, DeviceDisplays.Lionel_LionChiefControl> LionelDisplays = new Dictionary<ulong, Lionel_LionChiefControl>();
 
         Dictionary<ulong, Viatom_PulseOximeter_PC60FW_Factory> ViatomFactories = new Dictionary<ulong, Viatom_PulseOximeter_PC60FW_Factory>();
         Dictionary<ushort, ulong> CharacteristicHandleToBTAddr = new Dictionary<ushort, ulong>();
@@ -78,6 +79,26 @@ namespace BluetoothWatcher
                 uiNDevice.Text = $"STARTUP ERROR: {nerror}";
             }
         }
+
+        private async Task<bool> StartLionel(WatcherData wdata)
+        {
+            Lionel_LionChiefControl display = null;
+            if (!LionelDisplays.ContainsKey(wdata.Addr))
+            {
+                display = new Lionel_LionChiefControl();
+                LionelDisplays[wdata.Addr] = display;
+                AddDisplay(display);
+
+                await display.SetBluetooth(wdata.Addr);
+            }
+            else
+            {
+                display = LionelDisplays[wdata.Addr];
+            }
+
+            return false;
+        }
+
         private async Task<bool> StartSamico(WatcherData wdata)
         {
             Samico_BloodPressureControl display = null;
@@ -162,9 +183,13 @@ namespace BluetoothWatcher
             {
                 added_Viatom_PulseOximeter = await StartViatom(wdata);
             }
-            else if (wdata.CompleteLocalName.StartsWith ("Samico BP"))
+            else if (wdata.CompleteLocalName.StartsWith("Samico BP"))
             {
                 bool did_Samico = await StartSamico(wdata);
+            }
+            else if (wdata.CompleteLocalName.StartsWith("LC-"))
+            {
+                bool did_Lionel = await StartLionel(wdata);
             }
             else if (wdata.SpecializedDecodedData is Ruuvi_Tag)
             {
@@ -199,18 +224,23 @@ namespace BluetoothWatcher
                     {
                         var display = new Viatom_PulseOximeter();
                         ViatomDisplays.Add(wdata.Addr, display);
-                        uiDevices.Items.Add(display);
-
-                        // Got a device; better make it visible.
-                        if (uiDevices.Items.Count == 1)
-                        {
-                            uiStartup.Visibility = Visibility.Collapsed;
-                            uiDevices.Visibility = Visibility.Visible;
-                        }
-                        uiNDevice.Text = uiDevices.Items.Count.ToString();
+                        AddDisplay(display);
                     }
                 }
             });
+        }
+
+        private void AddDisplay(Control display)
+        {
+            uiDevices.Items.Add(display);
+
+            // Got a device; better make it visible.
+            if (uiDevices.Items.Count == 1)
+            {
+                uiStartup.Visibility = Visibility.Collapsed;
+                uiDevices.Visibility = Visibility.Visible;
+            }
+            uiNDevice.Text = uiDevices.Items.Count.ToString();
         }
 
 
@@ -223,15 +253,7 @@ namespace BluetoothWatcher
                 // We add the display in two places: a list of displays, and the map
                 display = new RuuviDisplay();
                 RuuviDisplays.Add(addr, display);
-                uiDevices.Items.Add(display);
-
-                // Got a device; better make it visible.
-                if (uiDevices.Items.Count == 1)
-                {
-                    uiStartup.Visibility = Visibility.Collapsed;
-                    uiDevices.Visibility = Visibility.Visible;
-                }
-                uiNDevice.Text = uiDevices.Items.Count.ToString();
+                AddDisplay(display);
             }
             else
             {

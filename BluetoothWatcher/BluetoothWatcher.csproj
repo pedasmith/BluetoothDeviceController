@@ -163,6 +163,9 @@
     <Compile Include="DeviceDisplays\GenericBleDisplay.xaml.cs">
       <DependentUpon>GenericBleDisplay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DeviceDisplays\Lionel_LionChiefControl.xaml.cs">
+      <DependentUpon>Lionel_LionChiefControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DeviceDisplays\RuuviDisplay.xaml.cs">
       <DependentUpon>RuuviDisplay.xaml</DependentUpon>
     </Compile>
@@ -258,6 +261,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="DeviceDisplays\GenericBleDisplay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceDisplays\Lionel_LionChiefControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

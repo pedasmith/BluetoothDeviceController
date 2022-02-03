@@ -1,0 +1,101 @@
+﻿<UserControl
+    x:Class="BluetoothWatcher.DeviceDisplays.Lionel_LionChiefControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothWatcher.DeviceDisplays"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:protocol="using:BluetoothProtocols"
+    xmlns:enumUtilities="using:enumUtilities" 
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+    <UserControl.Resources>
+        <protocol:SpeakMessageConverter x:Key="SpeakMessageConverter" />
+        <Style TargetType="Button">
+            <Setter Property="Control.Padding" Value="3" />
+            <Setter Property="MinWidth" Value="50" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="5,5,0,0" />
+        </Style>
+        <Style TargetType="ToggleButton">
+            <Setter Property="Control.Padding" Value="3" />
+            <Setter Property="MinWidth" Value="50" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="5,5,0,0" />
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="MinWidth" Value="60" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,0,0" />
+        </Style>
+        <Style TargetType="Slider">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,10,0" />
+        </Style>
+
+        <Style x:Key="TitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30" />
+        </Style>
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+
+
+    </UserControl.Resources>
+
+    <Grid>
+        <StackPanel>
+            <Grid MaxWidth="550" HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Style="{StaticResource TitleStyle}">LionChief</TextBlock>
+                </StackPanel>
+                <ProgressRing MinWidth="30" Grid.Column="1" x:Name="uiProgress" />
+            </Grid>
+            <TextBlock x:Name="uiStatus" />
+            <StackPanel >
+                <StackPanel Orientation="Horizontal">
+                    <ToggleButton Content="Bell" Click="OnWriteLionelBell" />
+                    <ToggleButton Content="Horn" Click="OnWriteLionelHorn" />
+                    <ToggleButton Content="Lights" Click="OnWriteLionelLights" IsChecked="True" />
+                    <ComboBox  Name="uiSpeakMessage" MinWidth="120"
+                       ItemsSource="{Binding Source={StaticResource SpeakMessageConverter}, Path=EnumValues}" 
+                      SelectedItem="{Binding CurrSpeakMessage, Mode=TwoWay}">
+                        <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock FontSize="14" Text="{Binding Converter={StaticResource SpeakMessageConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button Content="Speak" Click="OnWriteLionelSpeak" />
+
+                    <Button Content="Disconnect" Click="OnWriteLionelDisconnect" 
+                        FontSize="8" FontStyle="Italic"
+                        MinWidth="10" Padding="0" VerticalAlignment="Center" Margin="40,0,0,0"
+                        />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Slider Header="Steam Chuff Volume" Width="100" Value="0" Minimum="0" Maximum="7" ValueChanged="OnWriteLionelSteamVolume" />
+                    <Slider Header="Bell Pitch" Width="82" Value="0" Minimum="-2" Maximum="2" ValueChanged="OnWriteLionelBellPitch" />
+                    <Slider Header="Horn Pitch" Width="80" Value="0" Minimum="-2" Maximum="2" ValueChanged="OnWriteLionelHornPitch" />
+                </StackPanel>
+                <Rectangle Height="20" />
+                <StackPanel Orientation="Horizontal">
+                    <Slider x:Name="uiSpeed"  Header="Speed" Value="0" Width="90" Minimum="0" Maximum="31" ValueChanged="OnWriteLionelSpeed" />
+                    <ToggleSwitch Header="Direction" IsOn="True"
+                                  OnContent="Forward" OffContent="Reverse"
+                                  Toggled="OnDirectionToggled" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

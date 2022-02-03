@@ -10,7 +10,8 @@
     xmlns:protocol="using:BluetoothProtocols"
     xmlns:enumUtilities="using:enumUtilities" 
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    >
     <Page.Resources>
         <protocol:SpeakMessageConverter x:Key="SpeakMessageConverter" />
         <Style TargetType="Button">
@@ -94,248 +95,248 @@
         <TextBlock x:Name="uiStatus" />
 
         <StackPanel Visibility="Collapsed" >
-        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+            <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+                <StackPanel Style="{StaticResource ChacteristicListStyle}">
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
-                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+                    <StackPanel Orientation="Horizontal">
 
-                    <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadDevice_Name" />
-
-                </StackPanel>
+                        <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
 
 
+                        <Button Content="Read" Click="OnReadDevice_Name" />
 
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Appearance</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Appearance_Appearance" Text="*" Header="Appearance" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadAppearance" />
-
-                </StackPanel>
+                    </StackPanel>
 
 
 
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Peripheral Privacy Flag</TextBlock>
-                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Appearance</TextBlock>
+                    <StackPanel Orientation="Horizontal">
 
-                    <TextBox IsReadOnly="False" x:Name="Peripheral_Privacy_Flag_Flag" Text="*" Header="Flag" Style="{StaticResource HEXStyle}"/>
+                        <TextBox IsReadOnly="True" x:Name="Appearance_Appearance" Text="*" Header="Appearance" Style="{StaticResource HEXStyle}"/>
 
 
-                    <Button Content="Write" Click="OnWritePeripheral_Privacy_Flag" />
+                        <Button Content="Read" Click="OnReadAppearance" />
 
-                    <Button Content="Read" Click="OnReadPeripheral_Privacy_Flag" />
-
-                </StackPanel>
+                    </StackPanel>
 
 
 
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Reconnect Address</TextBlock>
-                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Peripheral Privacy Flag</TextBlock>
+                    <StackPanel Orientation="Horizontal">
 
-                    <TextBox IsReadOnly="False" x:Name="Reconnect_Address_ReconnectAddress" Text="*" Header="ReconnectAddress" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Write" Click="OnWriteReconnect_Address" />
-
-                </StackPanel>
+                        <TextBox IsReadOnly="False" x:Name="Peripheral_Privacy_Flag_Flag" Text="*" Header="Flag" Style="{StaticResource HEXStyle}"/>
 
 
+                        <Button Content="Write" Click="OnWritePeripheral_Privacy_Flag" />
 
+                        <Button Content="Read" Click="OnReadPeripheral_Privacy_Flag" />
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Connection Parameter</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_ConnectionParameter" Text="*" Header="ConnectionParameter" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadConnection_Parameter" />
-
-                </StackPanel>
+                    </StackPanel>
 
 
 
 
-            </StackPanel>
-        </controls:Expander>
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Reconnect Address</TextBlock>
+                    <StackPanel Orientation="Horizontal">
 
-        <controls:Expander Header="Generic Service" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+                        <TextBox IsReadOnly="False" x:Name="Reconnect_Address_ReconnectAddress" Text="*" Header="ReconnectAddress" Style="{StaticResource HEXStyle}"/>
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Service Changes</TextBlock>
-                <StackPanel Orientation="Horizontal">
 
-                    <TextBox IsReadOnly="True" x:Name="Service_Changes_StartRange" Text="*" Header="StartRange" Style="{StaticResource HEXStyle}"/>
+                        <Button Content="Write" Click="OnWriteReconnect_Address" />
 
-                    <TextBox IsReadOnly="True" x:Name="Service_Changes_EndRange" Text="*" Header="EndRange" Style="{StaticResource HEXStyle}"/>
+                    </StackPanel>
+
+
+
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Connection Parameter</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="Connection_Parameter_ConnectionParameter" Text="*" Header="ConnectionParameter" Style="{StaticResource HEXStyle}"/>
+
+
+                        <Button Content="Read" Click="OnReadConnection_Parameter" />
+
+                    </StackPanel>
+
+
 
 
                 </StackPanel>
+            </controls:Expander>
+
+            <controls:Expander Header="Generic Service" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+                <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Service Changes</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="Service_Changes_StartRange" Text="*" Header="StartRange" Style="{StaticResource HEXStyle}"/>
+
+                        <TextBox IsReadOnly="True" x:Name="Service_Changes_EndRange" Text="*" Header="EndRange" Style="{StaticResource HEXStyle}"/>
+
+
+                    </StackPanel>
 
 
 
-
-            </StackPanel>
-        </controls:Expander>
-
-        <controls:Expander Header="Device Info" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">System ID</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="System_ID_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadSystem_ID" />
 
                 </StackPanel>
+            </controls:Expander>
+
+            <controls:Expander Header="Device Info" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+                <StackPanel Style="{StaticResource ChacteristicListStyle}">
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">System ID</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="System_ID_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                        <Button Content="Read" Click="OnReadSystem_ID" />
+
+                    </StackPanel>
 
 
 
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Model Number</TextBlock>
-                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Model Number</TextBlock>
+                    <StackPanel Orientation="Horizontal">
 
-                    <TextBox IsReadOnly="True" x:Name="Model_Number_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+                        <TextBox IsReadOnly="True" x:Name="Model_Number_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
 
 
-                    <Button Content="Read" Click="OnReadModel_Number" />
+                        <Button Content="Read" Click="OnReadModel_Number" />
+
+                    </StackPanel>
+
+
+
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Serial Number</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="Serial_Number_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                        <Button Content="Read" Click="OnReadSerial_Number" />
+
+                    </StackPanel>
+
+
+
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Firmware Revision</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="Firmware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                        <Button Content="Read" Click="OnReadFirmware_Revision" />
+
+                    </StackPanel>
+
+
+
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Hardware Revision</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="Hardware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                        <Button Content="Read" Click="OnReadHardware_Revision" />
+
+                    </StackPanel>
+
+
+
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Software Revision</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="Software_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                        <Button Content="Read" Click="OnReadSoftware_Revision" />
+
+                    </StackPanel>
+
+
+
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Manufacturer Name</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="Manufacturer_Name_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                        <Button Content="Read" Click="OnReadManufacturer_Name" />
+
+                    </StackPanel>
+
+
+
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">Regulatory List</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="Regulatory_List_BodyType" Text="*" Header="BodyType" Style="{StaticResource HEXStyle}"/>
+
+                        <TextBox IsReadOnly="True" x:Name="Regulatory_List_BodyStructure" Text="*" Header="BodyStructure" Style="{StaticResource HEXStyle}"/>
+
+                        <TextBox IsReadOnly="True" x:Name="Regulatory_List_Data" Text="*" Header="Data" Style="{StaticResource HEXStyle}"/>
+
+
+                        <Button Content="Read" Click="OnReadRegulatory_List" />
+
+                    </StackPanel>
+
+
+
+
+                    <TextBlock Style="{StaticResource SubheaderStyle}">PnP ID</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBox IsReadOnly="True" x:Name="PnP_ID_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
+
+
+                        <Button Content="Read" Click="OnReadPnP_ID" />
+
+                    </StackPanel>
+
+
+
 
                 </StackPanel>
+            </controls:Expander>
+        </StackPanel>
 
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Serial Number</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Serial_Number_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadSerial_Number" />
-
-                </StackPanel>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Firmware Revision</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Firmware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadFirmware_Revision" />
-
-                </StackPanel>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Hardware Revision</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Hardware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadHardware_Revision" />
-
-                </StackPanel>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Software Revision</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Software_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadSoftware_Revision" />
-
-                </StackPanel>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Manufacturer Name</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Manufacturer_Name_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadManufacturer_Name" />
-
-                </StackPanel>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Regulatory List</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Regulatory_List_BodyType" Text="*" Header="BodyType" Style="{StaticResource HEXStyle}"/>
-
-                    <TextBox IsReadOnly="True" x:Name="Regulatory_List_BodyStructure" Text="*" Header="BodyStructure" Style="{StaticResource HEXStyle}"/>
-
-                    <TextBox IsReadOnly="True" x:Name="Regulatory_List_Data" Text="*" Header="Data" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadRegulatory_List" />
-
-                </StackPanel>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">PnP ID</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="PnP_ID_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadPnP_ID" />
-
-                </StackPanel>
-
-
-
-
-            </StackPanel>
-        </controls:Expander>
-    </StackPanel>
-
-    <StackPanel Style="{StaticResource ChacteristicListStyle}">
-                <StackPanel Orientation="Horizontal">
-                    <ToggleButton Content="Bell" Click="OnWriteLionelBell" />
-                    <ToggleButton Content="Horn" Click="OnWriteLionelHorn" />
-                    <ToggleButton Content="Lights" Click="OnWriteLionelLights" IsChecked="True" />
-                    <ComboBox  Name="uiSpeakMessage" MinWidth="120"
+        <StackPanel Style="{StaticResource ChacteristicListStyle}">
+            <StackPanel Orientation="Horizontal">
+                <ToggleButton Content="Bell" Click="OnWriteLionelBell" />
+                <ToggleButton Content="Horn" Click="OnWriteLionelHorn" />
+                <ToggleButton Content="Lights" Click="OnWriteLionelLights" IsChecked="True" />
+                <ComboBox  Name="uiSpeakMessage" MinWidth="120"
                        ItemsSource="{Binding Source={StaticResource SpeakMessageConverter}, Path=EnumValues}" 
                       SelectedItem="{Binding CurrSpeakMessage, Mode=TwoWay}">
-                        <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock FontSize="14" Text="{Binding Converter={StaticResource SpeakMessageConverter}}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    <Button Content="Speak" Click="OnWriteLionelSpeak" />
-                    
+                    <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="14" Text="{Binding Converter={StaticResource SpeakMessageConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Content="Speak" Click="OnWriteLionelSpeak" />
+
                 <Button Content="Disconnect" Click="OnWriteLionelDisconnect" 
                         FontSize="8" FontStyle="Italic"
                         MinWidth="10" Padding="0" VerticalAlignment="Center" Margin="40,0,0,0"
                         />
-                </StackPanel>
+            </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Slider Header="Steam Chuff Volume" MaxWidth="80" Value="0" Minimum="0" Maximum="7" ValueChanged="OnWriteLionelSteamVolume" />
                 <Slider Header="Bell Pitch" MaxWidth="8" Value="0" Minimum="-2" Maximum="2" ValueChanged="OnWriteLionelBellPitch" />
@@ -343,11 +344,11 @@
             </StackPanel>
             <Rectangle Height="20" />
             <StackPanel Orientation="Horizontal">
-                    <Slider x:Name="uiSpeed"  Header="Speed" Value="0" Width="282" Minimum="0" Maximum="31" ValueChanged="OnWriteLionelSpeed" />
-                    <ToggleSwitch Header="Direction" IsOn="True"
+                <Slider x:Name="uiSpeed"  Header="Speed" Value="0" Width="282" Minimum="0" Maximum="31" ValueChanged="OnWriteLionelSpeed" />
+                <ToggleSwitch Header="Direction" IsOn="True"
                                   OnContent="Forward" OffContent="Reverse"
                                   Toggled="OnDirectionToggled" />
-                </StackPanel>
+            </StackPanel>
 
 
 

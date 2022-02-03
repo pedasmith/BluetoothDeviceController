@@ -2623,7 +2623,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 bool displayAsHex = true ;
                 switch (companyId)
                 {
-                    case 0x4C: // Apple
+                    case 0x004C: // Apple
                         var appleIBeacon = Apple_IBeacon.Parse(section, txPower);
                         if (appleIBeacon.IsValid)
                         {
@@ -2648,7 +2648,49 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                             speciality = ruuviTag;
                         }
                         break;
-                    case 6: // Microsoft
+                    case 0x0006: // Microsoft
+                        {
+                            // Example: 01 09 21 0A 86 1F 7F B5 31 B8 4D 49 4E 49 4E 54 2D 4D 41 58 46 4C 4F 41 54
+                            //             \t  ! \n -- -- -- --  1 --  M  I  N  I  N  T  -  M  A  X  F  L  O  A  T  
+                            // First two bytes are 06 00 for Microsoft
+                            if (dr.UnconsumedBufferLength < 1)
+                            {
+                                // not enough data.
+                                break;
+                            }
+                            var beaconId = dr.ReadByte();
+                            switch (beaconId) // Microsoft Beacon Id
+                            {
+                                case 0x01: // computer name
+                                    sb.Append($"Beacon type=ROME={beaconId:X2}: ");
+                                    if (dr.UnconsumedBufferLength >= 10)
+                                    {
+                                        // 9 unknown bytes and then a name
+                                        // Example: 09  21  0A  86  1F  7F  B5  31  B8
+                                        //          VER DTY CVR FLG RES SALT..........
+                                        byte version = dr.ReadByte();
+                                        if (version != 0x09) sb.Append($"version={version:X2} ");
+
+                                        byte deviceType = dr.ReadByte(); // CDPDeviceType
+                                        if (deviceType != 0x21) sb.Append($"devicetype={deviceType:X2} ");
+
+                                        byte cdpVersion = dr.ReadByte();
+                                        if (cdpVersion!= 0x0A) sb.Append($"cdpversion={cdpVersion:X2} ");
+
+                                        byte flags = dr.ReadByte();
+                                        if (flags != 0x86) sb.Append($"flags={flags:X2} ");
+
+                                        byte reserved1 = dr.ReadByte();
+                                        if (reserved1 != 0x1F) sb.Append($"reserved1={reserved1:X2} ");
+
+                                        ulong salt = dr.ReadUInt32();
+
+                                        var name = dr.ReadString(dr.UnconsumedBufferLength);
+                                        sb.Append(name);
+                                    }
+                                    break;
+                            }
+                        }
                         break;
                     default:
                         System.Diagnostics.Debug.WriteLine($"NOTE: saw company {companyId:X4}={companyName}");

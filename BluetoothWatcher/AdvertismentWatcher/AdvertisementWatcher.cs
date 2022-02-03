@@ -53,8 +53,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                         (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, watcherData.TransmitPower);
                         if (watcherData.CompanyId == 18498)
                         {
-                            ;
-                            (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, watcherData.TransmitPower);
+                            ; // Handy hook for debugging.
                         }
                         break;
                     case AdvertisementDataSectionParser.DataTypeValue.TxPowerLevel:
