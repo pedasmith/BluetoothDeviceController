@@ -128,21 +128,6 @@
     <Compile Include="..\BluetoothDeviceController\BCBasic\MockClasses.cs">
       <Link>FromBluetoothDeviceController\BCBasic\MockClasses.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothDeviceController\Beacons\Apple_IBeacon.cs">
-      <Link>FromBluetoothDeviceController\Beacons\Apple_IBeacon.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\Beacons\BluetoothAddress.cs">
-      <Link>FromBluetoothDeviceController\Beacons\BluetoothAddress.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\Beacons\Eddystone.cs">
-      <Link>FromBluetoothDeviceController\Beacons\Eddystone.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\Beacons\Ruuvi_Tag.cs">
-      <Link>FromBluetoothDeviceController\Beacons\Ruuvi_Tag.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\Beacons\Ruuvi_Tag_v1_Helper.cs">
-      <Link>FromBluetoothDeviceController\Beacons\Ruuvi_Tag_v1_Helper.cs</Link>
-    </Compile>
     <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs">
       <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs</Link>
     </Compile>
@@ -164,33 +149,6 @@
     <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\Eddystone.cs">
       <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\Eddystone.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs">
-      <Link>FromBluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs">
-      <Link>FromBluetoothDeviceController\BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\BluetoothProtocols\BluetoothCommunicationStatus.cs">
-      <Link>FromBluetoothDeviceController\BluetoothProtocols\BluetoothCommunicationStatus.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\BluetoothProtocols\BluetoothStatusHandler.cs">
-      <Link>FromBluetoothDeviceController\BluetoothProtocols\BluetoothStatusHandler.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\BluetoothProtocols\Samico_BloodPressure_BG512.cs">
-      <Link>FromBluetoothDeviceController\BluetoothProtocols\Samico_BloodPressure_BG512.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\IotNumberFormats\ValueCalculate.cs">
-      <Link>FromBluetoothDeviceController\IotNumberFormats\ValueCalculate.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\IotNumberFormats\ValueToString.cs">
-      <Link>FromBluetoothDeviceController\IotNumberFormats\ValueToString.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\IotNumberFormats\ValueToStringTests.cs">
-      <Link>FromBluetoothDeviceController\IotNumberFormats\ValueToStringTests.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\IotNumberFormats\VariableSet.cs">
-      <Link>FromBluetoothDeviceController\IotNumberFormats\VariableSet.cs</Link>
-    </Compile>
     <Compile Include="..\BluetoothDeviceController\Names\SerialConfig.cs">
       <Link>FromBluetoothDeviceController\Names\SerialConfig.cs</Link>
     </Compile>
@@ -202,7 +160,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BufferList\BufferList.cs" />
     <Compile Include="DeviceDisplays\GenericBleDisplay.xaml.cs">
       <DependentUpon>GenericBleDisplay.xaml</DependentUpon>
     </Compile>
@@ -332,6 +289,9 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
       <Version>7.0.2</Version>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Help\StartupHelp.md">
@@ -339,6 +299,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup />
+  <Import Project="..\BluetoothProtocols\BluetoothProtocols.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

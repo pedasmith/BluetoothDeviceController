@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>190aa0de-8e65-4a8a-8d69-4ea539c572f2</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>BluetoothProtocols</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\Apple_IBeacon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\BleAdvertisementFormat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\BluetoothAddress.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\Eddystone.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\EddystonePage.xaml.cs">
+      <DependentUpon>EddystonePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\RuuvitagPage.xaml.cs">
+      <DependentUpon>RuuvitagPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\Ruuvi_Tag.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\Ruuvi_Tag_v1_Helper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\SimpleBeaconPage.xaml.cs">
+      <DependentUpon>SimpleBeaconPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\BluetoothServiceRegistration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Nordic_Uart.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Bbc_MicroBit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\BleHome_SensorBug.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\BluetoothCommunicationStatus.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\BluetoothStatusHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Elegoo_Mini_Car.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Kano_Wand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Lionel_LionChief.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Lionel_LionChief_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Mipow_Playbulb_BTL201.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Mipow_Playbulb_BTL201_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Nordic_Thingy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Protocentral_Sensything.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Samico_BloodPressure_BG512.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\TI_beLight_2540.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\TI_SensorTag_1350.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\TI_SensorTag_1350_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\TI_SensorTag_1352.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\TI_SensorTag_2541.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\TI_SensorTag_2541_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Triones_LedLight.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Triones_LedLights_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Vion_Meter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\WilliamWeilerEngineering_Skoobot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Witti_Dotti.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Witti_Dotti_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Witti_Notti.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Witti_Notti_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BufferList\BufferList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Charts\ChartControl.xaml.cs">
+      <DependentUpon>ChartControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Charts\DataCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueCalculate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueToString.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueToStringTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\VariableSet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Names\BleNames.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Names\GuidGetCommon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Names\NameAllBleDevices.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Names\NameChacteristic.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Names\NameDevice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Names\NameService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Names\NamesUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\DeviceInformationWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserBeaconPreferences.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserPreferences.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferences.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferencesControl.xaml.cs">
+      <DependentUpon>UserSerialPortPreferencesControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)SerialPort\BluetoothCommTerminalAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SerialPort\ITerminal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SerialPort\nRFUartTerminalAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SerialPort\SerialConfig.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Beacons\EddystonePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Beacons\RuuvitagPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Beacons\SimpleBeaconPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Charts\ChartControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferencesControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>

@@ -140,21 +140,6 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="BCBasic\MockClasses.cs" />
-    <Compile Include="Beacons\Apple_IBeacon.cs" />
-    <Compile Include="Beacons\BleAdvertisementFormat.cs" />
-    <Compile Include="Beacons\BluetoothAddress.cs" />
-    <Compile Include="Beacons\Eddystone.cs" />
-    <Compile Include="Beacons\EddystonePage.xaml.cs">
-      <DependentUpon>EddystonePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Beacons\Ruuvi_Tag_v1_Helper.cs" />
-    <Compile Include="Beacons\RuuvitagPage.xaml.cs">
-      <DependentUpon>RuuvitagPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Beacons\Ruuvi_Tag.cs" />
-    <Compile Include="Beacons\SimpleBeaconPage.xaml.cs">
-      <DependentUpon>SimpleBeaconPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="BleEditor\BleCharacteristicControl.xaml.cs">
       <DependentUpon>BleCharacteristicControl.xaml</DependentUpon>
     </Compile>
@@ -178,54 +163,16 @@
     </Compile>
     <Compile Include="BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCharacteristic.cs" />
-    <Compile Include="BluetoothDefinitionLanguage\BluetoothServiceRegistration.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothUnit.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothServiceUuid16Bit.cs" />
-    <Compile Include="BluetoothProtocolsCustom\Nordic_Uart.cs" />
-    <Compile Include="BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
-    <Compile Include="BluetoothProtocols\Elegoo_Mini_Car.cs" />
-    <Compile Include="BluetoothProtocols\Lionel_LionChief.cs" />
-    <Compile Include="BluetoothProtocols\Lionel_LionChief_Custom.cs" />
-    <Compile Include="BluetoothProtocols\Samico_BloodPressure_BG512.cs" />
-    <Compile Include="BluetoothProtocols\WilliamWeilerEngineering_Skoobot.cs" />
-    <Compile Include="IotNumberFormats\ValueCalculate.cs" />
-    <Compile Include="IotNumberFormats\ValueToString.cs" />
-    <Compile Include="IotNumberFormats\ValueToStringTests.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothAppearance.cs" />
     <Compile Include="BluetoothDefinitionLanguage\Device.cs" />
     <Compile Include="BluetoothDefinitionLanguage\Eddystone.cs" />
     <Compile Include="BluetoothLEStandardServices.cs" />
-    <Compile Include="BluetoothProtocols\Bbc_MicroBit.cs" />
-    <Compile Include="BluetoothProtocols\BleHome_SensorBug.cs" />
-    <Compile Include="BluetoothProtocols\BluetoothCommunicationStatus.cs" />
-    <Compile Include="BluetoothProtocols\BluetoothStatusHandler.cs" />
-    <Compile Include="BluetoothProtocols\Kano_Wand.cs" />
-    <Compile Include="BluetoothProtocols\Mipow_Playbulb_BTL201.cs" />
-    <Compile Include="BluetoothProtocols\Mipow_Playbulb_BTL201_Custom.cs" />
-    <Compile Include="BluetoothProtocols\Nordic_Thingy.cs" />
-    <Compile Include="BluetoothProtocols\Protocentral_Sensything.cs" />
-    <Compile Include="BluetoothProtocols\TI_beLight_2540.cs" />
-    <Compile Include="BluetoothProtocols\TI_SensorTag_1350.cs" />
-    <Compile Include="BluetoothProtocols\TI_SensorTag_1350_Custom.cs" />
-    <Compile Include="BluetoothProtocols\TI_SensorTag_1352.cs" />
-    <Compile Include="BluetoothProtocols\TI_SensorTag_2541.cs" />
-    <Compile Include="BluetoothProtocols\TI_SensorTag_2541_Custom.cs" />
-    <Compile Include="BluetoothProtocols\Triones_LedLight.cs" />
-    <Compile Include="BluetoothProtocols\Triones_LedLights_Custom.cs" />
-    <Compile Include="BluetoothProtocols\Vion_Meter.cs" />
-    <Compile Include="BluetoothProtocols\Witti_Dotti.cs" />
-    <Compile Include="BluetoothProtocols\Witti_Dotti_Custom.cs" />
-    <Compile Include="BluetoothProtocols\Witti_Notti.cs" />
-    <Compile Include="BluetoothProtocols\Witti_Notti_Custom.cs" />
-    <Compile Include="Charts\ChartControl.xaml.cs">
-      <DependentUpon>ChartControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Charts\DataCollection.cs" />
     <Compile Include="DeviceInformationPage.xaml.cs">
       <DependentUpon>DeviceInformationPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DeviceInformationWrapper.cs" />
     <Compile Include="DeviceMenuEntryControl.xaml.cs">
       <DependentUpon>DeviceMenuEntryControl.xaml</DependentUpon>
     </Compile>
@@ -235,19 +182,11 @@
     <Compile Include="HelpPage.xaml.cs">
       <DependentUpon>HelpPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IotNumberFormats\VariableSet.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Names\BleNames.cs" />
     <Compile Include="Names\GenerateCSharpClass.cs" />
     <Compile Include="Names\Generate_CSharp_Templates.cs" />
-    <Compile Include="Names\GuidGetCommon.cs" />
-    <Compile Include="Names\NameAllBleDevices.cs" />
-    <Compile Include="Names\NameChacteristic.cs" />
-    <Compile Include="Names\NameDevice.cs" />
-    <Compile Include="Names\NameService.cs" />
-    <Compile Include="Names\NamesUtilities.cs" />
     <Compile Include="Names\SerialConfig.cs" />
     <Compile Include="PageDock.xaml.cs">
       <DependentUpon>PageDock.xaml</DependentUpon>
@@ -259,10 +198,6 @@
       <DependentUpon>PerDeviceSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SerialPort\BluetoothCommTerminalAdapter.cs" />
-    <Compile Include="SerialPort\ITerminal.cs" />
-    <Compile Include="SerialPort\nRFUartTerminalAdapter.cs" />
-    <Compile Include="SerialPort\SerialConfig.cs" />
     <Compile Include="SerialPort\SimpleTerminalControl.xaml.cs">
       <DependentUpon>SimpleTerminalControl.xaml</DependentUpon>
     </Compile>
@@ -321,18 +256,12 @@
     <Compile Include="SpecialtyPages\WilliamWeilerEngineering_SkoobotPage.xaml.cs">
       <DependentUpon>WilliamWeilerEngineering_SkoobotPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserBeaconPreferences.cs" />
     <Compile Include="UserPreferenceControl.xaml.cs">
       <DependentUpon>UserPreferenceControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Specialization.cs" />
     <Compile Include="UserData\NameMapping.cs" />
     <Compile Include="UserData\UserNameMappings.cs" />
-    <Compile Include="UserPreferences.cs" />
-    <Compile Include="UserSerialPortPreferences.cs" />
-    <Compile Include="UserSerialPortPreferencesControl.xaml.cs">
-      <DependentUpon>UserSerialPortPreferencesControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Utilities\EnumUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -878,18 +807,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Beacons\EddystonePage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Beacons\RuuvitagPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Beacons\SimpleBeaconPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="BleEditor\BleCharacteristicControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -915,10 +832,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BleEditor\VariableControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Charts\ChartControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1050,10 +963,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserSerialPortPreferencesControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
@@ -1087,6 +996,7 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup />
+  <Import Project="..\BluetoothProtocols\BluetoothProtocols.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
