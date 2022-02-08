@@ -16,12 +16,15 @@ namespace Utilities
             bool retval = true;
             var split = text.Split(new char[] { ' ' });
             var bytes = new List<byte>();
-            foreach (var item in split)
+            if (text != "")
             {
-                byte b;
-                var parsedByte = Utilities.Parsers.TryParseByte(item, style, null, out b);
-                if (!parsedByte) retval = false;
-                else bytes.Add(b);
+                foreach (var item in split)
+                {
+                    byte b;
+                    var parsedByte = Utilities.Parsers.TryParseByte(item, style, null, out b);
+                    if (!parsedByte) retval = false;
+                    else bytes.Add(b);
+                }
             }
 
             result = new Bytes() { Data = bytes.ToArray() };

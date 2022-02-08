@@ -48,7 +48,11 @@ namespace BluetoothDeviceController.SpecialtyPages
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
             await DoReadDevice_Name();
 
+            await DoNotifyLionelData(); // Automatically turn this on
+            ContinuouslyGetData = ContinuouslyGetTrainData(); // will run in the background...
         }
+
+        Task ContinuouslyGetData = null;
 
         public string GetId()
         {
@@ -1888,17 +1892,56 @@ namespace BluetoothDeviceController.SpecialtyPages
                     var record = new LionelDataRecord();
 
                     var TrainData = valueList.GetValue("TrainData");
-                    if (TrainData.CurrentType == BCBasic.BCValue.ValueType.IsDouble || TrainData.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                    switch (TrainData.CurrentType)
                     {
-                        record.TrainData = (string)TrainData.AsString;
-                        LionelData_TrainData.Text = record.TrainData.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                        case BCBasic.BCValue.ValueType.IsDouble:
+                        case BCBasic.BCValue.ValueType.IsString:
+                            record.TrainData = (string)TrainData.AsString;
+                            LionelData_TrainData.Text = record.TrainData.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                            break;
+                        case BCBasic.BCValue.ValueType.IsObject:
+                            var dataArray = TrainData.AsArray;
+                            if (dataArray != null)
+                            {
+                                var rawArray = dataArray.AsByteArray();
+
+                                // Set the raw string
+                                var str = "";
+                                foreach (var b in rawArray)
+                                {
+                                    str += $"{b:X2} ";
+                                }
+                                LionelData_TrainData.Text = str;
+
+                                // Set the fancy text
+                                var trainInfo = Lionel_LionChief_TrainInfo.Parse(rawArray);
+                                if (trainInfo != null)
+                                {
+                                    if (prev_trainInfo == null || !prev_trainInfo.Equals(trainInfo))
+                                    {
+                                        uiTrainSpeed.Text = trainInfo.Speed.ToString();
+                                        uiTrainDirection.Text = trainInfo.Direction.ToString();
+                                        var lights = "";
+                                        if (trainInfo.LightsOn) lights += " ";
+                                        if (trainInfo.BellOn) lights += "🕭 ";
+                                        uiTrainLights.Text = lights;
+
+                                        prev_trainInfo = trainInfo;
+                                    }
+                                }
+                            }
+                            break;
                     }
+
+                    // And also pull out the data
 
                     var addResult = LionelDataRecordData.AddRecord(record);
 
                 });
             }
         }
+
+        Lionel_LionChief_TrainInfo prev_trainInfo = null;
 
         private async void OnRereadDevice(object sender, RoutedEventArgs e)
         {
@@ -2137,6 +2180,18 @@ namespace BluetoothDeviceController.SpecialtyPages
             text = Command.ToString("X2");
             LionelCommand_Parameters.Text = text;
             OnWriteLionelCommand(null, null);
+        }
+
+        private async Task ContinuouslyGetTrainData()
+        {
+            while (true)
+            {
+                await Task.Delay(1000); // get data every ____ milliseconds
+                // Command 01 seems to trigger a single notify for train changes.
+                // Notifications flow up to BleDevice_LionelDataEvent
+                // but only if it's been enabled with DoNotifyLionelData
+                await DoWriteLionelCommand(new string[] { "00", "01", "", "00", }, System.Globalization.NumberStyles.AllowHexSpecifier);
+            }
         }
     }
 }

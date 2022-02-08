@@ -8,7 +8,45 @@ namespace BluetoothProtocols
 {
     public class SpeakMessageConverter : EnumValueConverter<Lionel_LionChief_Custom.SpeakMessage> { }
     public class SoundSourceConverter : EnumValueConverter<Lionel_LionChief_Custom.SoundSource> { }
+    public class Lionel_LionChief_TrainInfo
+    {
+        public int Speed { get; set; } = 0;
+        public enum TrainDirection {  Forward, Backwards};        
+        public TrainDirection Direction { get; set; } = Lionel_LionChief_TrainInfo.TrainDirection.Forward;
+        public bool LightsOn { get; set; } = true;
+        public bool BellOn { get; set; } = false;
+        public bool HornOn { get; set; } = false;
 
+        public bool Equals (Lionel_LionChief_TrainInfo b)
+        {
+            bool retval = (this.BellOn == b.BellOn)
+                && (this.Direction == b.Direction)
+                && (this.HornOn == b.HornOn)
+                && (this.LightsOn == b.LightsOn)
+                && (this.Speed == b.Speed)
+                ;
+            return retval;
+        }
+        public static bool IsTrainInfo(byte[] data)
+        {
+            if (data == null || data.Length < 8) return false;
+            if (data[0] != 0x00) return false;
+            if (data[1] != 0x81) return false;
+            if (data[2] != 0x02) return false;
+            return true;
+        }
+
+        public static Lionel_LionChief_TrainInfo Parse(byte[] data)
+        {
+            if (!IsTrainInfo(data)) return null;
+            var retval = new Lionel_LionChief_TrainInfo();
+            retval.Speed = data[3];
+            retval.Direction = data[4] == 02 ? TrainDirection.Backwards : TrainDirection.Forward;
+            retval.LightsOn = ((data[7] & 0x04) == 0) ? false : true;
+            retval.BellOn = ((data[7] & 0x02) == 0) ? false : true;
+            return retval;
+        }
+    }
     public class Lionel_LionChief_Custom : Lionel_LionChief
     {
         /*

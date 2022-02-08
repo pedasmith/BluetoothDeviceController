@@ -392,6 +392,16 @@
                     <Button Content="Command++" Click="OnIncrementCommandWriteLionelCommand" />
                     <Button Content="Param++" Click="OnIncrementParamWriteLionelCommand" />
                 </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>
+                        <Run Text="Train speed=" />
+                        <Run x:Name="uiTrainSpeed" Text="___" />
+                        <Run Text=" " />
+                        <Run x:Name="uiTrainDirection" Text="Forward" />
+                        <Run Text=" " />
+                        <Run x:Name="uiTrainLights" Text="" FontFamily="Segoe MDL2 Assets" />
+                    </TextBlock>
+                </StackPanel>
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">LionelData</TextBlock>

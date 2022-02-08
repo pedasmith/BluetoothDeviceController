@@ -162,7 +162,7 @@ namespace BluetoothDeviceController.BleEditor
             dr.ByteOrder = ByteOrder.LittleEndian; // default to little endian because it's common for bluetooth/
             return ConvertHelper(dr, decodeCommands);
         }
-        enum ResultState { NoResult, IsString, IsDouble };
+        enum ResultState { NoResult, IsString, IsDouble, IsBytes };
 
         private static string DoubleToString(double dvalue, string displayFormat, string displayFormatSecondary, string fixedFormat="F2", string hexFormat="X6", string decFormat="D")
         {
@@ -189,6 +189,9 @@ namespace BluetoothDeviceController.BleEditor
             return null; // null means we couldn't do the conversion
         }
 
+        /// <summary>
+        /// Returns a ValueParserResult: a string and a ValueList of the result
+        /// </summary>
         private static ValueParserResult ConvertHelper(DataReader dr, string decodeCommands)
         {
             var str = "";
@@ -199,6 +202,7 @@ namespace BluetoothDeviceController.BleEditor
             for (int i = 0; i < vps.Count; i++)
             {
                 var stritem = "";
+                byte[] byteArrayItem = null;
 
                 var command = vps[i];
                 var readcmd = command.ByteFormatPrimary;
@@ -559,13 +563,17 @@ namespace BluetoothDeviceController.BleEditor
                                     break;
                                 case "BYTES":
                                     {
+                                        //TODO: I want bytes, so why is the return a string like "02 04 FF D2"? Why not an actual array of bytes?
+                                        //Answer: because this is explicitly generating a string.
+
                                         IBuffer buffer = dr.ReadBuffer(dr.UnconsumedBufferLength);
-                                        for (uint ii=0; ii<buffer.Length; ii++)
+                                        byteArrayItem = buffer.ToArray();
+                                        for (uint ii=0; ii< byteArrayItem.Length; ii++)
                                         {
                                             if (ii != 0) stritem += " ";
-                                            stritem += buffer.GetByte(ii).ToString("X2");
+                                            stritem += byteArrayItem[ii].ToString("X2");
                                         }
-                                        resultState = ResultState.IsString;
+                                        resultState = ResultState.IsBytes;
                                     }
                                     break;
                                 default:
@@ -579,13 +587,20 @@ namespace BluetoothDeviceController.BleEditor
                     stritem = $"EXCEPTION reading data {e} index {i} command {command} len {dr.UnconsumedBufferLength}";
                     return ValueParserResult.CreateError(str + stritem, stritem);
                 }
+                BCBasic.BCValue resultValue = null;
                 switch (resultState)
                 {
+                    case ResultState.IsBytes:
+                        resultValue = new BCBasic.BCValue(byteArrayItem);
+                        valueList.SetProperty(name, resultValue);
+                        break;
                     case ResultState.IsDouble:
-                        valueList.SetProperty(name, new BCBasic.BCValue(dvalue));
+                        resultValue = new BCBasic.BCValue(dvalue);
+                        valueList.SetProperty(name, resultValue);
                         break;
                     case ResultState.IsString:
-                        valueList.SetProperty(name, new BCBasic.BCValue(stritem));
+                        resultValue = new BCBasic.BCValue(stritem);
+                        valueList.SetProperty(name, resultValue);
                         break;
                 }
 
