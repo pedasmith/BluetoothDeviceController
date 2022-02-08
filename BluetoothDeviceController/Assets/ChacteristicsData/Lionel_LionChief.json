@@ -5,6 +5,7 @@
       "REM10_Name": "LC010494",
       "ClassName": "Lionel_LionChief",
       "Links": [
+        "http://www.lionel.com/bluetooth/",
         "https://github.com/Property404/lionchief-controller",
         "https://github.com/idaband/lionchief-controller-raspberrypi"
       ],

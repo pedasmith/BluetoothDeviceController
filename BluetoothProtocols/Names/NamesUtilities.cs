@@ -13,8 +13,19 @@ namespace Utilities
         public byte[] Data = null;
         public static bool TryParse(string text, System.Globalization.NumberStyles style, object obj, out Bytes result)
         {
-            result = new Bytes() { Data = null };
-            return true;
+            bool retval = true;
+            var split = text.Split(new char[] { ' ' });
+            var bytes = new List<byte>();
+            foreach (var item in split)
+            {
+                byte b;
+                var parsedByte = Utilities.Parsers.TryParseByte(item, style, null, out b);
+                if (!parsedByte) retval = false;
+                else bytes.Add(b);
+            }
+
+            result = new Bytes() { Data = bytes.ToArray() };
+            return retval;
         }
 
         public static implicit operator byte[](Bytes v) { return v.Data; }

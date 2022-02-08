@@ -728,6 +728,15 @@ namespace BluetoothProtocols
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+
+                // Write to console
+                var str = "COMMAND: ";
+                foreach (var b in subcommand)
+                {
+                    str += $"{b:X2} ";
+                }
+                System.Diagnostics.Debug.WriteLine(str);
+
                 await WriteCommandAsync(15, "LionelCommand", subcommand, GattWriteOption.WriteWithResponse);
             }
             // original: await DoWriteAsync(data);

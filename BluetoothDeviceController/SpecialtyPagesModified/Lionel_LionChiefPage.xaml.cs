@@ -1684,16 +1684,26 @@ namespace BluetoothDeviceController.SpecialtyPages
         private async void OnClickLionelCommand(object sender, RoutedEventArgs e)
         {
             var text = (sender as Button).Tag as String;
-            await DoWriteLionelCommand(text, System.Globalization.NumberStyles.Integer);
+            await DoWriteLionelCommand(new string[] {
+                LionelCommand_Zero.Text,
+                LionelCommand_Command.Text,
+                LionelCommand_Parameters.Text,
+                LionelCommand_Checksum.Text,
+            }, System.Globalization.NumberStyles.Integer);
         }
 
         private async void OnWriteLionelCommand(object sender, RoutedEventArgs e)
         {
             var text = LionelCommand_Checksum.Text;
-            await DoWriteLionelCommand(text, System.Globalization.NumberStyles.AllowHexSpecifier);
+            await DoWriteLionelCommand(new string[] { 
+                LionelCommand_Zero.Text,
+                LionelCommand_Command.Text,
+                LionelCommand_Parameters.Text,
+                LionelCommand_Checksum.Text,
+            }, System.Globalization.NumberStyles.AllowHexSpecifier);
         }
 
-        private async Task DoWriteLionelCommand(string text, System.Globalization.NumberStyles dec_or_hex)
+        private async Task DoWriteLionelCommand(string[] text, System.Globalization.NumberStyles dec_or_hex)
         {
             SetStatusActive(true);
             ncommand++;
@@ -1707,7 +1717,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 Byte Zero;
                 // History: used to go into LionelCommand_Zero.Text instead of using the variable
                 // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedZero = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out Zero);
+                var parsedZero = Utilities.Parsers.TryParseByte(text[0], dec_or_hex, null, out Zero);
                 if (!parsedZero)
                 {
                     parseError = "Zero";
@@ -1716,7 +1726,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 Byte Command;
                 // History: used to go into LionelCommand_Command.Text instead of using the variable
                 // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedCommand = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out Command);
+                var parsedCommand = Utilities.Parsers.TryParseByte(text[1], dec_or_hex, null, out Command);
                 if (!parsedCommand)
                 {
                     parseError = "Command";
@@ -1725,7 +1735,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 Bytes Parameters;
                 // History: used to go into LionelCommand_Parameters.Text instead of using the variable
                 // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedParameters = Utilities.Parsers.TryParseBytes(text, dec_or_hex, null, out Parameters);
+                var parsedParameters = Utilities.Parsers.TryParseBytes(text[2], dec_or_hex, null, out Parameters);
                 if (!parsedParameters)
                 {
                     parseError = "Parameters";
@@ -1734,7 +1744,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 Byte Checksum;
                 // History: used to go into LionelCommand_Checksum.Text instead of using the variable
                 // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedChecksum = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out Checksum);
+                var parsedChecksum = Utilities.Parsers.TryParseByte(text[3], dec_or_hex, null, out Checksum);
                 if (!parsedChecksum)
                 {
                     parseError = "Checksum";
@@ -2100,6 +2110,33 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
+        private void OnIncrementCommandWriteLionelCommand(object sender, RoutedEventArgs e)
+        {
+            var text = LionelCommand_Command.Text;
+            var dec_or_hex = System.Globalization.NumberStyles.AllowHexSpecifier;
 
+            Byte Command;
+            // History: used to go into LionelCommand_Command.Text instead of using the variable
+            // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
+            var parsedCommand = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out Command);
+            Command++;
+            text = Command.ToString("X2");
+            LionelCommand_Command.Text = text;
+            OnWriteLionelCommand(null, null);
+        }
+        private void OnIncrementParamWriteLionelCommand(object sender, RoutedEventArgs e)
+        {
+            var text = LionelCommand_Parameters.Text;
+            var dec_or_hex = System.Globalization.NumberStyles.AllowHexSpecifier;
+
+            Byte Command;
+            // History: used to go into LionelCommand_Command.Text instead of using the variable
+            // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
+            var parsedCommand = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out Command);
+            Command++;
+            text = Command.ToString("X2");
+            LionelCommand_Parameters.Text = text;
+            OnWriteLionelCommand(null, null);
+        }
     }
 }

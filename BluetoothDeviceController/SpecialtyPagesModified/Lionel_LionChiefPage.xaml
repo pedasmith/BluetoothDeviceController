@@ -374,7 +374,7 @@
 
 
 
-            <StackPanel Visibility="Collapsed" >
+            <StackPanel Visibility="Visible" >
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">LionelCommand</TextBlock>
                 <StackPanel Orientation="Horizontal">
@@ -389,6 +389,8 @@
 
 
                     <Button Content="Write" Click="OnWriteLionelCommand" />
+                    <Button Content="Command++" Click="OnIncrementCommandWriteLionelCommand" />
+                    <Button Content="Param++" Click="OnIncrementParamWriteLionelCommand" />
                 </StackPanel>
 
 
