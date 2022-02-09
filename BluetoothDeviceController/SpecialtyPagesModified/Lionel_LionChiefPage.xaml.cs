@@ -1892,28 +1892,16 @@ namespace BluetoothDeviceController.SpecialtyPages
                     var record = new LionelDataRecord();
 
                     var TrainData = valueList.GetValue("TrainData");
+                    record.TrainData = data.UserString;
+                    LionelData_TrainData.Text = record.TrainData; // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+
                     switch (TrainData.CurrentType)
                     {
-                        case BCBasic.BCValue.ValueType.IsDouble:
-                        case BCBasic.BCValue.ValueType.IsString:
-                            record.TrainData = (string)TrainData.AsString;
-                            LionelData_TrainData.Text = record.TrainData.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                            break;
                         case BCBasic.BCValue.ValueType.IsObject:
                             var dataArray = TrainData.AsArray;
                             if (dataArray != null)
                             {
                                 var rawArray = dataArray.AsByteArray();
-
-                                // Set the raw string
-                                var str = "";
-                                foreach (var b in rawArray)
-                                {
-                                    str += $"{b:X2} ";
-                                }
-                                LionelData_TrainData.Text = str;
-
-                                // Set the fancy text
                                 var trainInfo = Lionel_LionChief_TrainInfo.Parse(rawArray);
                                 if (trainInfo != null)
                                 {
