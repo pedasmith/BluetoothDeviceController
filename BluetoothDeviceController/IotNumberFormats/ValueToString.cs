@@ -84,9 +84,6 @@ namespace BluetoothDeviceController.BleEditor
         {
             Parse(value);
         }
-        /// <summary>
-        /// Examples: U8 F32 BYTES STRING
-        /// </summary>
         public string ByteFormatPrimary { get; set; } = "U8";
         /// <summary>
         /// Examples: HEX DEC FIXED STRING 
@@ -165,7 +162,7 @@ namespace BluetoothDeviceController.BleEditor
             dr.ByteOrder = ByteOrder.LittleEndian; // default to little endian because it's common for bluetooth/
             return ConvertHelper(dr, decodeCommands);
         }
-        enum ResultState { NoResult, IsString, IsDouble, IsBytes };
+        enum ResultState { NoResult, IsString, IsDouble };
 
         private static string DoubleToString(double dvalue, string displayFormat, string displayFormatSecondary, string fixedFormat="F2", string hexFormat="X6", string decFormat="D")
         {
@@ -192,9 +189,6 @@ namespace BluetoothDeviceController.BleEditor
             return null; // null means we couldn't do the conversion
         }
 
-        /// <summary>
-        /// Returns a ValueParserResult: a string and a ValueList of the result
-        /// </summary>
         private static ValueParserResult ConvertHelper(DataReader dr, string decodeCommands)
         {
             var str = "";
@@ -205,7 +199,6 @@ namespace BluetoothDeviceController.BleEditor
             for (int i = 0; i < vps.Count; i++)
             {
                 var stritem = "";
-                byte[] byteArrayItem = null;
 
                 var command = vps[i];
                 var readcmd = command.ByteFormatPrimary;
@@ -566,34 +559,17 @@ namespace BluetoothDeviceController.BleEditor
                                     break;
                                 case "BYTES":
                                     {
-                                        //You might want bytes, but this methods is explicitly generating a string.
-                                        if (dr.UnconsumedBufferLength == 0)
+                                        IBuffer buffer = dr.ReadBuffer(dr.UnconsumedBufferLength);
+                                        for (uint ii=0; ii<buffer.Length; ii++)
                                         {
-                                            stritem = "(no bytes)";
-                                            resultState = ResultState.IsString;
+                                            if (ii != 0) stritem += " ";
+                                            stritem += buffer.GetByte(ii).ToString("X2");
                                         }
-                                        else
-                                        {
-                                            IBuffer buffer = dr.ReadBuffer(dr.UnconsumedBufferLength);
-                                            byteArrayItem = buffer.ToArray();
-                                            var format = "X2";
-                                            switch (displayFormat)
-                                            {
-                                                case "DEC": format = ""; break;
-                                                default:
-                                                case "HEX": format = "X2"; break;
-                                            }
-                                            for (uint ii = 0; ii < byteArrayItem.Length; ii++)
-                                            {
-                                                if (ii != 0) stritem += " ";
-                                                stritem += byteArrayItem[ii].ToString(format);
-                                            }
-                                            resultState = ResultState.IsBytes;
-                                        }
+                                        resultState = ResultState.IsString;
                                     }
                                     break;
                                 default:
-                                    return ValueParserResult.CreateError(decodeCommands, $"Other command unrecognized; should be STRING or BYTES {readcmd}");
+                                    return ValueParserResult.CreateError(decodeCommands, $"Other command unrecognized; should be String or Bytes {readcmd}");
                             }
                             break;
                     }
@@ -603,20 +579,13 @@ namespace BluetoothDeviceController.BleEditor
                     stritem = $"EXCEPTION reading data {e} index {i} command {command} len {dr.UnconsumedBufferLength}";
                     return ValueParserResult.CreateError(str + stritem, stritem);
                 }
-                BCBasic.BCValue resultValue = null;
                 switch (resultState)
                 {
-                    case ResultState.IsBytes:
-                        resultValue = new BCBasic.BCValue(byteArrayItem);
-                        valueList.SetProperty(name, resultValue);
-                        break;
                     case ResultState.IsDouble:
-                        resultValue = new BCBasic.BCValue(dvalue);
-                        valueList.SetProperty(name, resultValue);
+                        valueList.SetProperty(name, new BCBasic.BCValue(dvalue));
                         break;
                     case ResultState.IsString:
-                        resultValue = new BCBasic.BCValue(stritem);
-                        valueList.SetProperty(name, resultValue);
+                        valueList.SetProperty(name, new BCBasic.BCValue(stritem));
                         break;
                 }
 

@@ -34,25 +34,33 @@ namespace BluetoothDeviceController.BleEditor
             this.Loaded += CharacteristicEditorControl_Loaded;
         }
         private GattWriteOption WriteOption;
+        private string BytesFormat = "BYTES"; // can also be STRING
         private string DisplayFormat;
         private string DisplayFormatSecondary;
 
         private void CharacteristicEditorControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (NC == null) return;
-            var vps = ValueParserSplit.ParseLine(NC.Type);
-            if (vps.Count != 1) return; // if there are multiple values, give up and let the user struggle with HEX
-            DisplayFormat = vps[0].DisplayFormatPrimary;
-            DisplayFormatSecondary = vps[0].Get(1, 1);
-
-            foreach (var item in uiConvertType.Items)
+            if (NC != null)
             {
-                var tag = (item as ComboBoxItem).Tag as string;
-                if (tag == DisplayFormat)
+                SetDisplayType(NC.Type);
+                foreach (var item in uiConvertType.Items)
                 {
-                    uiConvertType.SelectedItem = item;
+                    var tag = (item as ComboBoxItem).Tag as string;
+                    if (tag == DisplayFormat)
+                    {
+                        uiConvertType.SelectedItem = item;
+                    }
                 }
             }
+        }
+
+        private void SetDisplayType(string type)
+        {
+            var vps = ValueParserSplit.ParseLine(type);
+            if (vps.Count != 1) return; // if there are multiple values, give up and let the user struggle with HEX
+            BytesFormat = vps[0].ByteFormatPrimary;
+            DisplayFormat = vps[0].DisplayFormatPrimary;
+            DisplayFormatSecondary = vps[0].Get(1, 1);
 
             if (DisplayFormat == "ASCII" && DisplayFormatSecondary == "LONG")
             {
@@ -66,6 +74,22 @@ namespace BluetoothDeviceController.BleEditor
         NameCharacteristic NC = null;
         GattDeviceService Service;
         GattCharacteristic Characteristic;
+        IBuffer CurrReadBuffer = null;
+
+        private void UpdateDisplayWithCurrReadBuffer(bool addData = true)
+        {
+            var bf = (string.IsNullOrEmpty(BytesFormat)) ? "BYTES" : BytesFormat;
+            var df = (string.IsNullOrEmpty(DisplayFormat)) ? "HEX" : DisplayFormat;
+            var df2 = (string.IsNullOrEmpty(DisplayFormatSecondary)) ? "" : DisplayFormatSecondary;
+            var displayType = $"{bf}|{df}^{df2}";
+            var result = ValueParser.Parse(CurrReadBuffer, displayType);
+            if (result.Result == ValueParserResult.ResultValues.Ok)
+            {
+                var data = result.UserString;
+                if (addData) AddData("Data", data);
+                uiEditBox.Text = data; // NOTE: what if I don't want hex?
+            }
+        }
         public async Task InitAsync(GattDeviceService service, GattCharacteristic characteristic)
         {
             Service = service;
@@ -119,9 +143,8 @@ namespace BluetoothDeviceController.BleEditor
                     if (buffer.Status == GattCommunicationStatus.Success)
                     {
                         //NOTE: also get the data as the nice version?
-                        var data = ValueParser.ConvertToStringHex(buffer.Value);
-                        AddData("Data", data);
-                        uiEditBox.Text = data; // NOTE: what if I don't want hex?
+                        CurrReadBuffer = buffer.Value;
+                        UpdateDisplayWithCurrReadBuffer();
                     }
                     else
                     {
@@ -268,5 +291,31 @@ namespace BluetoothDeviceController.BleEditor
             uiProgress.IsActive = false;
         }
 
+        private void OnConvertTypeChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Tags are DEC HEX ASCII
+            //if (!IsLoadedLocal) return;
+            var nremoved = e.RemovedItems.Count;
+            if (nremoved == 0) return;
+
+            var newtype = ((sender as ComboBox).SelectedItem as ComboBoxItem).Tag as string;
+            switch (newtype)
+            {
+                case "DEC":
+                    SetDisplayType("BYTES|DEC");
+                    UpdateDisplayWithCurrReadBuffer(false);
+                    break;
+                default:
+                case "HEX":
+                    SetDisplayType("BYTES|HEX");
+                    UpdateDisplayWithCurrReadBuffer(false);
+                    break;
+                case "ASCII":
+                    SetDisplayType("STRING|ASCII");
+                    UpdateDisplayWithCurrReadBuffer(false);
+                    break;
+            }
+
+        }
     }
 }

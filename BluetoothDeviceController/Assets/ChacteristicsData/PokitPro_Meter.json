@@ -1,0 +1,337 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name":"PokitPro",
+	  "ClassName": "PokitProMeter",
+	  "Links":[
+	  "https://help.pokitmeter.com/hc/en-us/community/posts/360023523213-Bluetooth-API-Documentation",
+	  "https://www.pokitinnovations.com/wp-content/uploads/D0005250-PokitMeter-Bluetooth-API-Documentation-0_02.pdf",
+		"https://github.com/pcolby/pokit/blob/6937d011c528b3a5f00c6e867ec91a71eaad5bcb/src/lib/uuids.h"
+	  ],
+      "Services": [
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true
+            },
+            {
+              "UUID": "00002b2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown1_DB_hash_maybe",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  F3 45 EF 2A E8 B9 88 1C 06 C8 44 6F 36 F8 13 00"
+              ]
+            },
+            {
+              "UUID": "00002b29-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown2_Client_Supported_Features",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Name: PokitPro",
+                "PokitPro"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manufacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  49 6E 67 65 6E 75 69 74 79 20 44 65 73 69 67 6E",
+                "Ingenuity Design"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 30 2E 30",
+                "10.0"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2E 32 2E 30",
+                "1.2.0"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2E 30 30",
+                "1.00"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  31 2E 30",
+                "1.0"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  33 36 34 39 00 00 00 00 00",
+                "3649\\0\\0\\0\\0\\0"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "57d3a771-267c-4394-8872-78223e92aec5",
+          "Name": "Service_Status",
+          "Characteristics": [
+            {
+              "UUID": "6974f5e5-0e54-45c3-97dd-29e4b5fb0849",
+              "Name": "Status_Device",
+              "Type": "U8|HEX|FirmwareMajor U8|HEX|FirmwareMinor U16|HEX|MaxInputVoltage U16|HEX|MaxInputCurrent U16|HEX|MaxInputResistance U16|HEX|MaxSamplingRate U16|HEX|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 02 52 03 0A 00 B8 0B E8 03 00 40 00 00 5C 02 72 09 AC 8B"
+              ]
+            },
+            {
+              "UUID": "3dba36e1-6120-4706-8dfd-ed9c16e569b6",
+              "Name": "Status_Status",
+              "Type": "U8|HEX|DeviceStatus F32|FIXED|BatteryLevel",
+			  "REM10 DeviceStatus" : "0=Idle 1=MM Vdc 2=MM Vac 3=MM AmpDC 4=MM AmpAC 5=MM ohm 6=MM Diode 7=MM Cont 8=MM Temp 9=DSO 10=Logger",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 6D E7 73 40 01 00 00"
+              ]
+            },
+            {
+              "UUID": "7f0375de-077e-4555-8f78-800494509cc3",
+              "Name": "Status_Device_Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  50 6F 6B 69 74 50 72 6F = PokitPro"
+              ]
+            },
+            {
+              "UUID": "ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e",
+              "Name": "Status_Flash_LED",
+              "Type": "U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|Beep",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  FF 00 00 00"
+              ]
+            },
+            {
+              "UUID": "aaf3f6d5-43d4-4a83-9510-dff3d858d4cc",
+              "Name": "Status_Light_LED",
+              "Type": "U8|HEX|Light",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            },
+            {
+              "UUID": "8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89",
+              "Name": "Unknown5",
+              "Type": "BYTES|HEX|Unknown5",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  02 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "e7481d2f-5781-442e-bb9a-fd4e3441dadc",
+          "Name": "Multimeter",
+          "Characteristics": [
+            {
+              "UUID": "53dc9a7a-bc19-4280-b76b-002d0e23b078",
+              "Name": "MM_Settings",
+              "Type": "U8|HEX|Mode U8|HEX|Range U32|HEX|Interval",
+              "IsWrite": true,
+			  "REM05": "mode 0=idle, 1=voltDC, 2=voltAC 3=ampDC,4=ampAC 5=ohm 6=diode 7=continuity 8=temp",
+			  "REM10": "05 FF 00 04 00 00 ",
+			  "REM20": "09 00 01 00 00 00 00"
+            },
+            {
+              "UUID": "047d3559-8bee-423a-b229-4417fa603b90",
+              "Name": "MM_Data",
+              "Type": "U8|HEX|Status F32|FIXED|Data U8|HEX|OperationMode U8|HEX|Range",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "1569801e-1425-4a7a-b617-a4f4ed719de6",
+          "Name": "DSO_Oscilloscope",
+          "Characteristics": [
+            {
+              "UUID": "a81af1b6-b8b3-4244-8859-3da368d2be39",
+              "Name": "DSO_Settings",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsWrite": true
+            },
+            {
+              "UUID": "98e14f8e-536e-4f24-b4f4-1debfed0a99e",
+              "Name": "DSO_Reading",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsNotify": true
+            },
+            {
+              "UUID": "970f00ba-f46f-4825-96a8-153a5cd0cda9",
+              "Name": "DSO_Metadata",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 10 27 00 00 00 00 40 42 0F 00 00 00 00 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "a5ff3566-1fd8-4e10-8362-590a578a4121",
+          "Name": "DataLogger",
+          "Characteristics": [
+            {
+              "UUID": "5f97c62b-a83b-46c6-b9cd-cac59e130a78",
+              "Name": "DataLogger_Settings",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsWrite": true
+            },
+            {
+              "UUID": "3c669dab-fc86-411c-9498-4f9415049cc0",
+              "Name": "DataLogger_Reading",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsNotify": true
+            },
+            {
+              "UUID": "9acada2e-3936-430b-a8f7-da407d97ca6e",
+              "Name": "DataLogger_MetaData",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 40 42 0F 00 00 00 00 00 30 38 00 00 00 00 00 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "6f53be2f-780b-49b8-a7c3-e8a052b3ae2c",
+          "Name": "Unknown7",
+          "Characteristics": [
+            {
+              "UUID": "0cd0f713-f5aa-4572-9e23-f8049f6bcaaa",
+              "Name": "Unknown0",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsWrite": true
+            },
+            {
+              "UUID": "b6728f91-409c-4d6c-864e-272a6a7a0204",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": true
+            },
+            {
+              "UUID": "5588e47b-cb81-4f7b-acc4-6029a3f39f72",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsWrite": true
+            }
+          ]
+        },
+        {
+          "UUID": "1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0",
+          "Name": "Silabs_Service_OTA",
+          "Characteristics": [
+            {
+              "UUID": "f7bf3564-fb6d-4e53-88a4-5e37e0326063",
+              "Name": "OTA_Control",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true
+            },
+            {
+              "UUID": "984227f3-34fc-4045-a5d0-2c581f81a153",
+              "Name": "OTA_Data",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5c:02:72:09:ac:8b\nCanPair:True IsPaired:False"
+    }
+  ]
+}

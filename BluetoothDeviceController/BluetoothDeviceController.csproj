@@ -658,7 +658,12 @@
     <Content Include="Assets\ChacteristicsData\Lionel_LionChief.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Assets\ChacteristicsData\Viatom_PC60FW_PulseOximeter.json" />
+    <Content Include="Assets\ChacteristicsData\PokitPro_Meter.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ChacteristicsData\Viatom_PC60FW_PulseOximeter.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ChacteristicsData\Wescale_KitchenScale.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

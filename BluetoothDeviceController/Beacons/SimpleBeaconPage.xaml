@@ -1,0 +1,34 @@
+﻿<Page
+    x:Class="BluetoothDeviceController.Beacons.SimpleBeaconPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController.Beacons"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock>Bluetooth Advertisement</TextBlock>
+        <!--
+        <TextBlock Grid.Row="1" Text="Time&#x09;Signal" />
+            -->
+        
+        <ScrollViewer Grid.Row="2">
+            <TextBlock x:Name="uiBeaconData" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+        </ScrollViewer>
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <CheckBox Content="Full details" IsChecked="False" x:Name="uiFullDetails" IsThreeState="False" />
+            <CheckBox Content="Track all" IsChecked="True" x:Name="uiTrackAll" IsThreeState="False" />
+            <CheckBox Content="Ignore Apple" IsChecked="True" x:Name="uiIgnoreApple" IsThreeState="False" />
+            <CheckBox Content="Pause" IsChecked="False" x:Name="uiPause" IsThreeState="False" />
+        </StackPanel>
+    </Grid>
+</Page>

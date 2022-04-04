@@ -70,6 +70,10 @@ namespace BluetoothDeviceController.BleEditor
             Service = service;
             Characteristic = characteristic;
             NC = BleNames.Get(device, service, characteristic);
+            if (characteristic.Uuid.ToString().Contains("aaf3f6d5"))
+            {
+                ; // Handy place to hang a debugger
+            }
 
             var props = characteristic.CharacteristicProperties;
             uiNotifyFlag.Visibility = props.HasFlag(GattCharacteristicProperties.Notify) ? Visibility.Visible : Visibility.Collapsed;
@@ -160,6 +164,12 @@ namespace BluetoothDeviceController.BleEditor
                 if (infostr.Contains("humi"))
                 {
                     ; // Handy line to hang a debugger on.
+                }
+                // What the heck -- as long as we're filling up the space with the long GUID,
+                // let's throw in the description (if it exists)
+                if (!String.IsNullOrWhiteSpace(characteristic.UserDescription))
+                {
+                    infostr += " " + characteristic.UserDescription;
                 }
                 uiInfo.Text = infostr;
                 uiInfo.Visibility = Visibility.Visible;

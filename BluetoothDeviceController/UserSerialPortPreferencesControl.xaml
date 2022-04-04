@@ -1,0 +1,33 @@
+﻿<UserControl
+    x:Class="BluetoothDeviceController.UserSerialPortPreferencesControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+    <UserControl.Resources>
+        <!-- You have to compile MainPage.Xaml.Cs for VS to find the local: class. -->
+        <local:TerminalLineEndConverter x:Key="TerminalLineEndConverter" />
+    </UserControl.Resources>
+
+    <StackPanel>
+        <TextBlock Style="{StaticResource TitleStyle}">Serial Port Settings</TextBlock>
+        <ComboBox  x:Name="TerminalLineEndConverterComboBox" Header="Line endings" MinWidth="180"
+                   SelectionChanged="OnLineEndChanged"
+                      ItemsSource="{Binding Source={StaticResource TerminalLineEndConverter}, Path=EnumValues}" 
+                      SelectedItem="{Binding LineEnd, Mode=TwoWay}">
+            <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock FontSize="14" Text="{Binding Converter={StaticResource TerminalLineEndConverter}}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <ComboBox x:Name="ShortcutIdComboBox" Header="Preferred Macro Set" SelectionChanged="OnMacroChanged" MinWidth="250">
+        </ComboBox>
+    </StackPanel>
+</UserControl>

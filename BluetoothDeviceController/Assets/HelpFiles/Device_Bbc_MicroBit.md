@@ -1,4 +1,4 @@
-﻿# BBC micro:bit 
+# BBC micro:bit 
 
 ![micro:bit](../DevicePictures/Bbc_MicroBit-175.png)
 
@@ -34,7 +34,7 @@ Other values are 0=unknown calibration 1=calibration requested 2=calibration OK 
 ## Using the IO Pins
 The BBN micro:bit IO Pins work differently than pins on many other Bluetooth data sensors. 
 
-1. You must ask for data for each pin. The PinInput field is a bitwise field that says which pins are input pins and should be read. For example, if you want to read in pin 0, you have to set the PinInput to 2**0 which is 1. If you want to read in pin 1, you have to set PinInput to 2**1 which is 2.
+1. You must ask for data for each pin. The PinInput field is a bitwise field that says which pins are input pins and should be read. For example, if you want to read in pin 0, you have to set the PinInput to 2^^0 which is 1. If you want to read in pin 1, you have to set PinInput to 2^^1 which is 2.
 2. You also have to set the PinAnalog in the same way. Every bit which is 1 will return an analog value.
 3. The data returned is a list of tuples; each tuple is a pin number and a pin values. Pins that haven't changed will not be returned. This means that the actual output needs more handling than some other devices
 
