@@ -1691,7 +1691,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
 
-        // Functions for Tranmit Power
+        // Functions for Transmit Power
 
 
         public class Transmit_PowerRecord : INotifyPropertyChanged

@@ -1,0 +1,29 @@
+﻿<UserControl
+    x:Class="BluetoothDeviceController.SearchFeedbackControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="50"
+    d:DesignWidth="400">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="0" x:Name="uiSearchButton" Content="Search" Padding="3" Click="OnSearch" />
+        <ProgressBar IsIndeterminate="True" ShowPaused="True" Grid.Column="1" x:Name="uiProgress" Width="150" Padding="3" />
+        <TextBlock Grid.Column="2" VerticalAlignment="Center" Padding="3">
+            Found=<Run x:Name="uiFound">0</Run>
+        </TextBlock>
+        <TextBlock Grid.Column="3" VerticalAlignment="Center" Padding="3">
+            All Found=<Run x:Name="uiFoundAll">0</Run>
+        </TextBlock>
+
+    </Grid>
+</UserControl>

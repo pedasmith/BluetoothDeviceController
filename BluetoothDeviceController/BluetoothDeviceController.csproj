@@ -198,6 +198,9 @@
       <DependentUpon>PerDeviceSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SearchFeedbackControl.xaml.cs">
+      <DependentUpon>SearchFeedbackControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SerialPort\SimpleTerminalControl.xaml.cs">
       <DependentUpon>SimpleTerminalControl.xaml</DependentUpon>
     </Compile>
@@ -869,6 +872,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PerDeviceSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchFeedbackControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

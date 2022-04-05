@@ -656,7 +656,7 @@
             </StackPanel>
         </controls:Expander>
 
-        <controls:Expander Header="Tranmit Power" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+        <controls:Expander Header="Transmit Power" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Transmit Power</TextBlock>

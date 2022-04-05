@@ -73,10 +73,43 @@
           "Name": "Generic Service",
           "Characteristics": [
             {
+              "UUID": "00002803-0000-1000-8000-00805f9b34fb",
+              "Name": "Server_Supported_Features",
+              "Type": "U8|HEX|FeatureBitmap0",
+              "REM_Byte0": "bit 0=enhanced ATT bearer",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  01"
+              ]
+            },
+            {
               "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
               "Name": "Service Changes",
               "Type": "U16|DEC|StartRange U16|DEC|EndRange",
               "IsIndicate": true
+            },
+            {
+              "UUID": "00002b29-0000-1000-8000-00805f9b34fb",
+              "Name": "Client_Supported_Features",
+              "Type": "U8|HEX|FeatureBitmap0",
+              "REM_Byte0": "bit 0=robust caching 1=enhanced ATT bearer 2=multiple value",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  01"
+              ]
+            },
+            {
+              "UUID": "00002b2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Database Hash",
+              "REM10": "https://community.silabs.com/s/question/0D51M00007xeOAUSA2/what-are-the-strange-characteristics-2b2a-and-2b29-in-the-generic-attribute-service?language=en_US",
+              "Type": "U32|HEX|Hash0 U32|HEX|Hash1 U32|HEX|Hash2 U32|HEX|Hash3",
+              "REM20": "Technically this is a uint128",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  F3 45 EF 2A E8 B9 88 1C 06 C8 44 6F 36 F8 13 00"
+              ]
             }
           ]
         },
@@ -116,7 +149,7 @@
         },
         {
           "UUID": "00001804-0000-1000-8000-00805f9b34fb",
-          "Name": "Tranmit Power",
+          "Name": "Transmit Power",
           "Characteristics": [
             {
               "UUID": "00002a07-0000-1000-8000-00805f9b34fb",

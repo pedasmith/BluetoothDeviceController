@@ -5,6 +5,7 @@ using BluetoothDeviceController.UserData;
 using Microsoft.Advertising.WinRT.UI;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,9 +30,18 @@ namespace BluetoothDeviceController
     {
         bool GetSearchActive();
         void StartSearch(UserPreferences.ReadSelection searchType);
+        void StartSearchDefault();
         void CancelSearch();
         event EventHandler DeviceEnumerationChanged;
         string GetCurrentSearchResults();
+    }
+    public enum FoundDeviceInfo { IsNew, IsDuplicate, IsOutOfRange, IsFilteredOut, IsError };
+
+    public interface IDoSearchFeedback // The SearchFeedbackControl
+    {
+        void StartSearchFeedback();
+        void StopSearchFeedback();
+        void FoundDevice(FoundDeviceInfo foundInfo);
     }
 
 
@@ -113,6 +123,8 @@ namespace BluetoothDeviceController
         public UserPreferences Preferences { get; } = new UserPreferences();
         public UserSerialPortPreferences SerialPortPreferences { get; } = new UserSerialPortPreferences();
         public string CurrJsonSearch { get; internal set; }
+        IDoSearchFeedback SearchFeedback { get; set; }  = null;
+
         public string GetCurrentSearchResults()
         {
             return CurrJsonSearch;
@@ -176,9 +188,15 @@ namespace BluetoothDeviceController
                 readSelection = UserPreferences.ReadSelection.Name; // Don't automaticaly get everything
             }
             NavView_Navigate("Help", "welcome.md", null);
+
+            SearchFeedback = uiSearchFeedback;
+            uiSearchFeedback.Search = this;
             StartSearch(readSelection);
+
             uiDock.DockParent = this;
         }
+
+
 
         /// <summary>
         /// Called when we've navigated to a new page. Maybe it's a specialty page, maybe not.
@@ -502,16 +520,20 @@ namespace BluetoothDeviceController
             {
                 uiNavigation.MenuItems.Remove(item);
             }
+            System.Diagnostics.Debug.WriteLine($"Clearing IdsInMenu");
+            MenuItemCache.Clear();
+            IdsInMenu.Clear();
+            ntsensor=0;
         }
 
-        private int FindDevice(DeviceInformation diToFind)
+        private int FindDevice(List<NavigationViewItem> list, DeviceInformation diToFind)
         {
             int idx = -1;
-            for (int i = 0; i < uiNavigation.MenuItems.Count && idx == -1; i++)
+            for (int i = 0; i < list.Count && idx == -1; i++)
             {
-                var nvi = uiNavigation.MenuItems[i] as NavigationViewItemBase;
+                var nvi = list[i] as NavigationViewItemBase;
                 var wrapper = nvi?.Tag as DeviceInformationWrapper;
-                if (wrapper != null && wrapper.di != null && wrapper.di.Id == diToFind.Id)
+                if (wrapper != null && wrapper.di != null && String.Compare(wrapper.di.Id, diToFind.Id, true, CultureInfo.InvariantCulture)==0)
                 {
                     return i;
                 }
@@ -586,6 +608,10 @@ namespace BluetoothDeviceController
             return name;
         }
 
+        List<NavigationViewItem> MenuItemCache = new List<NavigationViewItem>();
+        HashSet<string> IdsInMenu = new HashSet<string>();
+        int ntsensor = 0;
+
         /// <summary>
         /// Called both when a device is added and when it's being updated
         /// </summary>
@@ -604,28 +630,53 @@ namespace BluetoothDeviceController
                 if (name == null)
                 {
                     System.Diagnostics.Debug.WriteLine($"Device {id} not added because there's no name");
+                    SearchFeedback.FoundDevice(FoundDeviceInfo.IsError);
                     return;
                 }
-                idx = FindDevice(wrapper.di);
+                idx = FindDevice(MenuItemCache, wrapper.di);
+            }
+
+            if (IdsInMenu.Contains(id) && idx < 0)
+            {
+                ; // handy place to hang a debugger
+            }
+            if (name.Contains("T-Sensor"))
+            {
+                if (ntsensor > 0 && idx < 0)
+                {
+                    ; // handy place to hang a debugger
+                }
+                ntsensor++;
             }
 
             if (idx != -1)
             {
                 // Replace the old tag device information with this new one
-                var nvib = uiNavigation.MenuItems[idx] as NavigationViewItemBase;
+                var nvib = MenuItemCache[idx] as NavigationViewItemBase;
                 nvib.Tag = wrapper;
                 var entry = nvib.Content as DeviceMenuEntryControl;
                 if (entry != null)
                 {
                     entry.UpdateName(name);
+                    SearchFeedback.FoundDevice(FoundDeviceInfo.IsDuplicate);
                 }
-                //nvib.Content = name;
+                else
+                {
+                    SearchFeedback.FoundDevice(FoundDeviceInfo.IsError);
+                }
                 return;
             }
 
             // Otherwise make a new entry
             idx = FindListEnd();
             if (idx == -1) idx = 0; // Impossible; the list always includes the list-stat and list-end
+            var menu = new NavigationViewItem()
+            {
+                Tag = wrapper,
+            };
+            menu.HorizontalAlignment = HorizontalAlignment.Stretch;
+            MenuItemCache.Add(menu); // must add to cache before we do any awaits.
+
 
             var specialization = Specialization.Get(Specializations, name);
             if (specialization == null)
@@ -641,6 +692,7 @@ namespace BluetoothDeviceController
             {
                 // There's no specialization and the user asked for items with a specialization only.
                 // That means we shouldn't add this to the list.
+                SearchFeedback.FoundDevice(FoundDeviceInfo.IsFilteredOut);
                 System.Diagnostics.Debug.WriteLine($"Device {id} not added because there's no specialization");
                 return;
             }
@@ -648,13 +700,9 @@ namespace BluetoothDeviceController
             var icon = GetIconForName(name);
             var dmec = new DeviceMenuEntryControl(wrapper, name, specialization, icon);
             dmec.SettingsClick += OnDeviceSettingsClick;
-            var menu = new NavigationViewItem()
-            {
-                Content = dmec,
-                Tag = wrapper,
-            };
-            menu.HorizontalAlignment = HorizontalAlignment.Stretch;
+            menu.Content = dmec;
             uiNavigation.MenuItems.Insert(idx, menu);
+            SearchFeedback.FoundDevice(FoundDeviceInfo.IsNew);
         }
 
         const string OTHER = "🜹";
@@ -683,9 +731,14 @@ namespace BluetoothDeviceController
             const int SIGNAL_STRENGTH_THRESHOLD = -95;
 
             var bleAdvert = wrapper.BleAdvert.BleAdvert;
-            if (bleAdvert == null) return;
+            if (bleAdvert == null)
+            {
+                SearchFeedback.FoundDevice(FoundDeviceInfo.IsError); // filtered=false means it's not one we want. 
+                return;
+            }
             if (bleAdvert.RawSignalStrengthInDBm < SIGNAL_STRENGTH_THRESHOLD)
             {
+                SearchFeedback.FoundDevice(FoundDeviceInfo.IsOutOfRange); // filtered=false means it's not one we want. 
                 return;
             }
 
@@ -727,6 +780,7 @@ namespace BluetoothDeviceController
                 {
                     entry.Update(wrapper, name, specialization, null);
                 }
+                SearchFeedback.FoundDevice(FoundDeviceInfo.IsDuplicate);
                 return;
             }
 
@@ -744,6 +798,7 @@ namespace BluetoothDeviceController
             };
             menu.HorizontalAlignment = HorizontalAlignment.Stretch;
             uiNavigation.MenuItems.Insert(idx, menu);
+            SearchFeedback.FoundDevice(FoundDeviceInfo.IsNew); 
         }
 
         /// <summary>
@@ -793,13 +848,17 @@ namespace BluetoothDeviceController
         /// </summary>
         /// 
         public event EventHandler DeviceEnumerationChanged;
+        public void StartSearchDefault()
+        {
+            StartSearch(Preferences.DeviceReadSelection);
+        }
         public void StartSearch(UserPreferences.ReadSelection readType)
         {
             switch (Preferences.Scope)
             {
                 case UserPreferences.SearchScope.Bluetooth_Beacons:
                     // Navigate to a beacons page
-                    // tODO: navigate
+                    // TODO: navigate
                     var _page = typeof(Beacons.SimpleBeaconPage);
                     var di = new DeviceInformationWrapper((BleAdvertisementWrapper)null);
                     di.BeaconPreferences = new UserBeaconPreferences()
@@ -813,6 +872,7 @@ namespace BluetoothDeviceController
             ClearDevices();
             StartWatch();
             Task searchTask = null;
+            SearchFeedback.StartSearchFeedback();
             switch (Preferences.Scope)
             {
                 case UserPreferences.SearchScope.Bluetooth_Com_Device:
@@ -853,6 +913,8 @@ namespace BluetoothDeviceController
 
             MenuBleWatcher?.Stop();
             MenuBleWatcher = null;
+
+            SearchFeedback?.StopSearchFeedback();
         }
 
         enum WatcherType { DeviceInformationWatcher, BluetoothLEWatcher }
@@ -912,10 +974,16 @@ namespace BluetoothDeviceController
                     //TODO: watcher type!!!!
                     MenuBleWatcher = new BluetoothLEAdvertisementWatcher();
                     MenuBleWatcher.Received += MenuBleWatcher_Received;
+                    MenuBleWatcher.Stopped += MenuBleWatcher_Stopped;
                     MenuBleWatcher.Start();
                     break;
             }
             DeviceEnumerationChanged?.Invoke(this, new EventArgs());
+        }
+
+        private void MenuBleWatcher_Stopped(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementWatcherStoppedEventArgs args)
+        {
+            SearchFeedback.StopSearchFeedback();
         }
 
         Dictionary<ulong, BleAdvertisementWrapper> BleWrappers = new Dictionary<ulong, BleAdvertisementWrapper>();
@@ -954,6 +1022,7 @@ namespace BluetoothDeviceController
             System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Stopped");
             MenuDeviceInformationWatcher = null;
             DeviceEnumerationChanged?.Invoke(this, new EventArgs());
+            SearchFeedback?.StopSearchFeedback();
         }
 
         private void DeviceWatcher_EnumerationCompleted(DeviceWatcher sender, object args)
@@ -961,6 +1030,7 @@ namespace BluetoothDeviceController
             System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Enumeration Completed");
             MenuDeviceInformationWatcher = null;
             DeviceEnumerationChanged?.Invoke(this, new EventArgs());
+            SearchFeedback?.StopSearchFeedback();
         }
 
 
@@ -971,7 +1041,6 @@ namespace BluetoothDeviceController
             //object result;
             //bool got = args.Properties.TryGetValue("System.Devices.Aep.IsPresent", out result);
             var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
-            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} Added");
             await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
                 async () => {
                     try

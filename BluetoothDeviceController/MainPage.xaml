@@ -11,6 +11,10 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
         <NavigationView x:Name="uiNavigation" Grid.Row="0"
                         ItemInvoked="UiNavigation_ItemInvoked"
                         BackRequested="UiNavigation_BackRequested" CompactPaneLength="36" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed">
@@ -81,5 +85,6 @@
                 </Grid>
             </Grid>
         </NavigationView>
+        <local:SearchFeedbackControl Grid.Row="1" x:Name="uiSearchFeedback" />
     </Grid>
 </Page>

@@ -50,7 +50,7 @@ namespace BluetoothProtocols
             "Battery",
             "Link Loss",
             "Immediate Alert",
-            "Tranmit Power",
+            "Transmit Power",
             "Accelerometer",
             "Light",
             "Temperature",
