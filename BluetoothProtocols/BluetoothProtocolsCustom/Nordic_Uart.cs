@@ -43,6 +43,10 @@ namespace BluetoothDeviceController.BluetoothProtocolsCustom
             if (Device == null && DI != null)
             {
                 // Get the device information
+                if (DI.Id.Contains ("#RFCOMM"))
+                {
+                    return false; // Can't call BluetoothLEDevice.FromIdAsync from an RFCOMM device.
+                }
                 try
                 {
                     Device = await BluetoothLEDevice.FromIdAsync(DI.Id);

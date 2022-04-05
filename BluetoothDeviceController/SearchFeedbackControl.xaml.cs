@@ -46,14 +46,12 @@ namespace BluetoothDeviceController
             uiProgress.ShowPaused = false;
             nFound = 0;
             nFoundAll = 0;
-            // Not a toggle button: uiSearchButton.IsChecked = true;
         }
 
         public void StopSearchFeedback()
         {
             var task = this.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => {
                 uiProgress.ShowPaused = true;
-                // Not a toggle button: uiSearchButton.IsChecked = false;
             });
         }
 
@@ -66,7 +64,7 @@ namespace BluetoothDeviceController
             }
             var task = this.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => {
                 uiFound.Text = nFound.ToString();
-                uiFoundAll.Text = nFoundAll.ToString();
+                uiFoundAll.Text = (nFoundAll-nFound).ToString();
             });
 
         }

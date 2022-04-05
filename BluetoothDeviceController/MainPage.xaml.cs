@@ -35,7 +35,7 @@ namespace BluetoothDeviceController
         event EventHandler DeviceEnumerationChanged;
         string GetCurrentSearchResults();
     }
-    public enum FoundDeviceInfo { IsNew, IsDuplicate, IsOutOfRange, IsFilteredOut, IsError };
+    public enum FoundDeviceInfo { IsNew, IsDuplicate, IsOutOfRange, IsFilteredOutDb, IsFilteredOutNoName, IsError };
 
     public interface IDoSearchFeedback // The SearchFeedbackControl
     {
@@ -520,10 +520,7 @@ namespace BluetoothDeviceController
             {
                 uiNavigation.MenuItems.Remove(item);
             }
-            System.Diagnostics.Debug.WriteLine($"Clearing IdsInMenu");
             MenuItemCache.Clear();
-            IdsInMenu.Clear();
-            ntsensor=0;
         }
 
         private int FindDevice(List<NavigationViewItem> list, DeviceInformation diToFind)
@@ -609,8 +606,6 @@ namespace BluetoothDeviceController
         }
 
         List<NavigationViewItem> MenuItemCache = new List<NavigationViewItem>();
-        HashSet<string> IdsInMenu = new HashSet<string>();
-        int ntsensor = 0;
 
         /// <summary>
         /// Called both when a device is added and when it's being updated
@@ -630,24 +625,12 @@ namespace BluetoothDeviceController
                 if (name == null)
                 {
                     System.Diagnostics.Debug.WriteLine($"Device {id} not added because there's no name");
-                    SearchFeedback.FoundDevice(FoundDeviceInfo.IsError);
+                    SearchFeedback.FoundDevice(FoundDeviceInfo.IsFilteredOutNoName);
                     return;
                 }
                 idx = FindDevice(MenuItemCache, wrapper.di);
             }
 
-            if (IdsInMenu.Contains(id) && idx < 0)
-            {
-                ; // handy place to hang a debugger
-            }
-            if (name.Contains("T-Sensor"))
-            {
-                if (ntsensor > 0 && idx < 0)
-                {
-                    ; // handy place to hang a debugger
-                }
-                ntsensor++;
-            }
 
             if (idx != -1)
             {
@@ -692,7 +675,7 @@ namespace BluetoothDeviceController
             {
                 // There's no specialization and the user asked for items with a specialization only.
                 // That means we shouldn't add this to the list.
-                SearchFeedback.FoundDevice(FoundDeviceInfo.IsFilteredOut);
+                SearchFeedback.FoundDevice(FoundDeviceInfo.IsFilteredOutDb);
                 System.Diagnostics.Debug.WriteLine($"Device {id} not added because there's no specialization");
                 return;
             }
@@ -870,9 +853,9 @@ namespace BluetoothDeviceController
                     break;
             }
             ClearDevices();
-            StartWatch();
-            Task searchTask = null;
             SearchFeedback.StartSearchFeedback();
+            StartWatchForBluetoothDevices();
+            Task searchTask = null;
             switch (Preferences.Scope)
             {
                 case UserPreferences.SearchScope.Bluetooth_Com_Device:
@@ -899,7 +882,8 @@ namespace BluetoothDeviceController
 
         public bool GetSearchActive() 
         {
-            return MenuDeviceInformationWatcher != null;
+            var retval = MenuDeviceInformationWatcher != null || MenuBleWatcher != null;
+            return retval;
         }
         DeviceWatcher MenuDeviceInformationWatcher = null;
         BluetoothLEAdvertisementWatcher MenuBleWatcher = null;
@@ -918,7 +902,7 @@ namespace BluetoothDeviceController
         }
 
         enum WatcherType { DeviceInformationWatcher, BluetoothLEWatcher }
-        private void StartWatch()
+        private void StartWatchForBluetoothDevices()
         {
             // Query for extra properties you want returned
             // See https://docs.microsoft.com/en-us/windows/desktop/properties/devices-bumper
@@ -990,12 +974,9 @@ namespace BluetoothDeviceController
 
         private async void MenuBleWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
-            System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {args.Advertisement.LocalName} seen");
-            if (args.Advertisement.LocalName.Contains("Wescale"))
-            {
-                ; // Handy hook for debugger.
-            }
-            if (args.Advertisement.LocalName.StartsWith("LC"))
+            var name = args.Advertisement.LocalName;
+            System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {name} seen");
+            if (name.Contains("Wescale") || name.StartsWith("LC"))
             {
                 ; // Handy hook for debugger.
             }

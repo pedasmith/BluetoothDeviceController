@@ -43,7 +43,7 @@ namespace BluetoothWatcher.DeviceDisplays
             this.Loaded += Lionel_LionChiefControl_Loaded;
         }
 
-        private async void Lionel_LionChiefControl_Loaded(object sender, RoutedEventArgs e)
+        private void Lionel_LionChiefControl_Loaded(object sender, RoutedEventArgs e)
         {
             //TODO: bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
             //TODO: await DoReadDevice_Name();
@@ -60,8 +60,8 @@ namespace BluetoothWatcher.DeviceDisplays
 
         }
 
-        private string DeviceName = "Lionel_LionChief";
-        private string DeviceNameUser = "LC-0-1-0494-B69B";
+        //private string DeviceName = "Lionel_LionChief";
+        //private string DeviceNameUser = "LC-0-1-0494-B69B";
         int ncommand = 0;
         Lionel_LionChief_Custom bleDevice = new Lionel_LionChief_Custom();
 
