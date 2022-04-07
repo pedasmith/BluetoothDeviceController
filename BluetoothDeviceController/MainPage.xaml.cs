@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -125,12 +126,15 @@ namespace BluetoothDeviceController
         public string CurrJsonSearch { get; internal set; }
         IDoSearchFeedback SearchFeedback { get; set; }  = null;
 
+        public static MainPage TheMainPage = null;
+
         public string GetCurrentSearchResults()
         {
             return CurrJsonSearch;
         }
         public MainPage()
         {
+            TheMainPage = this;
             this.InitializeComponent();
             this.Loaded += MainPage_Loaded;
             Test();
@@ -1282,5 +1286,21 @@ namespace BluetoothDeviceController
             await dlg.ShowAsync();
         }
 
+        private void OnSearchCopyJson(object sender, RoutedEventArgs e)
+        {
+            var value = GetCurrentSearchResults();
+            if (String.IsNullOrEmpty(value)) return;
+            var dp = new DataPackage();
+            // Convert the list of individual items into a proper list.
+            value = @"{
+  ""AllDevices"": [
+" + value + @"
+  ]
+}";
+
+            dp.SetText(value);
+            dp.Properties.Title = "JSON Bluetooth data";
+            Clipboard.SetContent(dp);
+        }
     }
 }

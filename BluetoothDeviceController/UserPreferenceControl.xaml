@@ -16,7 +16,7 @@
         <local:ReadSelectionConverter x:Key="ReadSelectionConverter" />
     </UserControl.Resources>
     <StackPanel>
-        <TextBlock Style="{StaticResource TitleStyle}">Bluetooth Settings</TextBlock>
+        <TextBlock Style="{StaticResource TitleStyle}">Bluetooth Search Settings</TextBlock>
         <ComboBox  x:Name="SearchScopeComboBox" Header="Show which devices?" MinWidth="180"
                    SelectionChanged="OnSearchScopeChanged"
                       ItemsSource="{Binding Source={StaticResource SearchScopeConverter}, Path=EnumValues}" 
@@ -40,7 +40,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+        <StackPanel Orientation="Horizontal" Margin="0,20,0,0" Visibility="Collapsed">
             <StackPanel.Resources>
                 <Style TargetType="Button">
                     <Setter Property="MinWidth" Value="90" />
