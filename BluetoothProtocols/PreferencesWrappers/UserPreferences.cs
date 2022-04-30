@@ -23,12 +23,29 @@ namespace BluetoothDeviceController
         public enum ReadSelection { Address, Name, Everything } // Same as DeviceSearchType: Standard, NameRead, Everything
         public ReadSelection DeviceReadSelection { get; set; } = UserPreferences.ReadSelection.Name;
         public bool AutomaticallyReadData { get; set; } = true;
+        /// <summary>
+        /// When the user asks to scan for advertisements (beacons), the underlying WinRT API will scan forever. That's
+        /// not what most users will want. Instead scan for a limited amount of time. As of 2022-04-16, this isn't settable
+        /// by the user.
+        /// </summary>
+        public int AdvertisementScanTimeInMilliseconds { get; set; } = 5_000; // 5 seconds is a good amount of time
+
+        public bool BeaconFullDetails { get; set; } = false;
+        public bool BeaconTrackAll { get; set; } = false;
+        public bool BeaconIgnoreApple { get; set; } = true;
+        public double BeaconDbLevel { get; set; } = -80.0; // default min db level for beacon advert
 
 
         const string DisplayPreferenceSetting = "UserPreferenceDisplayPreference";
         const string SearchScopeSetting = "UserPreferenceSearchScope";
         const string ReadSelectionSetting = "UserPreferenceReadSelection";
         const string AutomaticallyReadDataSetting = "AutomaticallyReadData";
+
+        const string BeaconFullDetailsSetting = "UserPreferenceBeaconFullDetails";
+        const string BeaconTrackAllSetting = "UserPreferenceBeaconTrackAll";
+        const string BeaconIgnoreAppleSetting = "UserPreferenceBeaconIgnoreApple";
+        const string BeaconDbLevelSetting = "UserPreferenceBeaconDbLevel";
+
         public void ReadFromLocalSettings()
         {
             var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
@@ -48,6 +65,23 @@ namespace BluetoothDeviceController
             {
                 AutomaticallyReadData = (bool)localSettings.Values[AutomaticallyReadDataSetting];
             }
+
+            if (localSettings.Values.ContainsKey(BeaconFullDetailsSetting))
+            {
+                BeaconFullDetails = (bool)localSettings.Values[BeaconFullDetailsSetting];
+            }
+            if (localSettings.Values.ContainsKey(BeaconTrackAllSetting))
+            {
+                BeaconTrackAll = (bool)localSettings.Values[BeaconTrackAllSetting];
+            }
+            if (localSettings.Values.ContainsKey(BeaconIgnoreAppleSetting))
+            {
+                BeaconIgnoreApple = (bool)localSettings.Values[BeaconIgnoreAppleSetting];
+            }
+            if (localSettings.Values.ContainsKey(BeaconDbLevelSetting))
+            {
+                BeaconDbLevel = (double)localSettings.Values[BeaconDbLevelSetting];
+            }
         }
 
         public void SaveToLocalSettings()
@@ -57,6 +91,11 @@ namespace BluetoothDeviceController
             localSettings.Values[SearchScopeSetting] = (int)Scope;
             localSettings.Values[ReadSelectionSetting] = (int)DeviceReadSelection;
             localSettings.Values[AutomaticallyReadDataSetting] = AutomaticallyReadData;
+
+            localSettings.Values[BeaconFullDetailsSetting] = BeaconFullDetails;
+            localSettings.Values[BeaconTrackAllSetting] = BeaconTrackAll;
+            localSettings.Values[BeaconIgnoreAppleSetting] = BeaconIgnoreApple;
+            localSettings.Values[BeaconDbLevelSetting] = BeaconDbLevel;
         }
     }
 }

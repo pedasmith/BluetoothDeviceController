@@ -30,11 +30,11 @@ namespace BluetoothDeviceController
     public interface IDoSearch
     {
         bool GetSearchActive();
-        void StartSearch(UserPreferences.ReadSelection searchType);
+        void StartSearch(UserPreferences.ReadSelection searchType, UserPreferences.SearchScope scope);
         void StartSearchDefault();
         void CancelSearch();
         event EventHandler DeviceEnumerationChanged;
-        string GetCurrentSearchResults();
+        //string GetCurrentSearchResults();
     }
     public enum FoundDeviceInfo { IsNew, IsDuplicate, IsOutOfRange, IsFilteredOutDb, IsFilteredOutNoName, IsError };
 
@@ -128,7 +128,7 @@ namespace BluetoothDeviceController
 
         public static MainPage TheMainPage = null;
 
-        public string GetCurrentSearchResults()
+        public string ZZZZGetCurrentSearchResults()
         {
             return CurrJsonSearch;
         }
@@ -195,7 +195,7 @@ namespace BluetoothDeviceController
 
             SearchFeedback = uiSearchFeedback;
             uiSearchFeedback.Search = this;
-            StartSearch(readSelection);
+            StartSearch(readSelection, Preferences.Scope);
 
             uiDock.DockParent = this;
         }
@@ -609,6 +609,9 @@ namespace BluetoothDeviceController
             return name;
         }
 
+        // The list of devices in the menu on the left-hand side.
+        // We keep a list of them here because the UI doesn't update them
+        // very quickly.
         List<NavigationViewItem> MenuItemCache = new List<NavigationViewItem>();
 
         /// <summary>
@@ -707,7 +710,7 @@ namespace BluetoothDeviceController
             }
             return icon;
         }
-
+        private double SIGNAL_STRENGTH_THRESHOLD { get { return Preferences.BeaconDbLevel; } }
 
         /// <summary>
         /// Called when a device is added and when it's updated
@@ -715,8 +718,6 @@ namespace BluetoothDeviceController
         /// <param name="wrapper"></param>
         private void AddOrUpdateDeviceBle(DeviceInformationWrapper wrapper)
         {
-            const int SIGNAL_STRENGTH_THRESHOLD = -95;
-
             var bleAdvert = wrapper.BleAdvert.BleAdvert;
             if (bleAdvert == null)
             {
@@ -837,15 +838,15 @@ namespace BluetoothDeviceController
         public event EventHandler DeviceEnumerationChanged;
         public void StartSearchDefault()
         {
-            StartSearch(Preferences.DeviceReadSelection);
+            StartSearch(Preferences.DeviceReadSelection, Preferences.Scope);
         }
-        public void StartSearch(UserPreferences.ReadSelection readType)
+        public void StartSearch(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope)
         {
-            switch (Preferences.Scope)
+            switch (scope)
             {
                 case UserPreferences.SearchScope.Bluetooth_Beacons:
                     // Navigate to a beacons page
-                    // TODO: navigate
+                    // TODO: navigate [later: isn't this work completed? do I need to TODO?]
                     var _page = typeof(Beacons.SimpleBeaconPage);
                     var di = new DeviceInformationWrapper((BleAdvertisementWrapper)null);
                     di.BeaconPreferences = new UserBeaconPreferences()
@@ -858,9 +859,13 @@ namespace BluetoothDeviceController
             }
             ClearDevices();
             SearchFeedback.StartSearchFeedback();
-            StartWatchForBluetoothDevices();
+            StartWatchForBluetoothDevices(scope);
+
+            // In some cases, we also want to automatically read the device information.
+            // For the 'Everything' value, we read in all data and display it to the user.
+            // For the 'Name' value, we just read in name stuff and update the menu.
             Task searchTask = null;
-            switch (Preferences.Scope)
+            switch (scope)
             {
                 case UserPreferences.SearchScope.Bluetooth_Com_Device:
                     break;
@@ -896,6 +901,8 @@ namespace BluetoothDeviceController
 
         private void StopWatch()
         {
+            Timeout_BluetoothLEAdvertisementWatcher?.Stop();
+
             MenuDeviceInformationWatcher?.Stop();
             MenuDeviceInformationWatcher = null;
 
@@ -906,7 +913,7 @@ namespace BluetoothDeviceController
         }
 
         enum WatcherType { DeviceInformationWatcher, BluetoothLEWatcher }
-        private void StartWatchForBluetoothDevices()
+        private void StartWatchForBluetoothDevices(UserPreferences.SearchScope scope)
         {
             // Query for extra properties you want returned
             // See https://docs.microsoft.com/en-us/windows/desktop/properties/devices-bumper
@@ -925,7 +932,7 @@ namespace BluetoothDeviceController
             //var qstr = BluetoothLEDevice.GetDeviceSelectorFromPairingState(false);
             WatcherType watcherType = WatcherType.DeviceInformationWatcher;
             string qstr = "";
-            switch (Preferences.Scope) // get either Bluetooth LE or COM port things
+            switch (scope) // get either Bluetooth LE or COM port things
             {
                 case UserPreferences.SearchScope.Bluetooth_Com_Device:
                     qstr = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.SerialPort);
@@ -960,14 +967,30 @@ namespace BluetoothDeviceController
                     break;
                 case WatcherType.BluetoothLEWatcher:
                     //TODO: watcher type!!!!
+                    if (Timeout_BluetoothLEAdvertisementWatcher == null)
+                    {
+                        var dt = new DispatcherTimer();
+                        dt.Tick += Timeout_BluetoothLEAdvertisementWatcher_Tick;
+                        dt.Interval = TimeSpan.FromMilliseconds(Preferences.AdvertisementScanTimeInMilliseconds);
+                        Timeout_BluetoothLEAdvertisementWatcher = dt;
+                    }
                     MenuBleWatcher = new BluetoothLEAdvertisementWatcher();
                     MenuBleWatcher.Received += MenuBleWatcher_Received;
                     MenuBleWatcher.Stopped += MenuBleWatcher_Stopped;
                     MenuBleWatcher.Start();
+                    Timeout_BluetoothLEAdvertisementWatcher.Start();
                     break;
             }
             DeviceEnumerationChanged?.Invoke(this, new EventArgs());
         }
+
+        private void Timeout_BluetoothLEAdvertisementWatcher_Tick(object sender, object e)
+        {
+            Timeout_BluetoothLEAdvertisementWatcher.Stop();
+            CancelSearch(); // will call MenuBleWatcher?.Stop(); // will trigger MenuBleWatcher_Stopped
+        }
+
+        DispatcherTimer Timeout_BluetoothLEAdvertisementWatcher = null;
 
         private void MenuBleWatcher_Stopped(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementWatcherStoppedEventArgs args)
         {
@@ -1082,6 +1105,8 @@ namespace BluetoothDeviceController
 
             // Now go for realsie
             DeviceReadCts = new CancellationTokenSource();
+            // Special code for automation: wil do a complete sweep of all BT devices and fill in 
+            // the global CurrJsonSearch string variable of the devices.
             switch (searchType)
             {
                 case UserPreferences.ReadSelection.Everything:
@@ -1098,11 +1123,13 @@ namespace BluetoothDeviceController
         private async Task FullReadAsync(CancellationToken ct)
         {
             CurrJsonSearch = "";
+
+            var deviceJson = "";
             await Task.Delay(1000); // pause 1000 ms = 1 s to get some BT
-            int startidx = FindListStart() + 1;
-            int endidx = FindListEnd() - 1;
+            //int startidx = FindListStart() + 1;
+            //int endidx = FindListEnd() - 1;
             if (ct.IsCancellationRequested) return;
-            for (int i=startidx; i<endidx; i++)
+            for (int i=0; i< MenuItemCache.Count; i++)
             {
                 var nvi = uiNavigation.MenuItems[i] as NavigationViewItemBase;
                 var di = nvi?.Tag as DeviceInformationWrapper;
@@ -1125,129 +1152,131 @@ namespace BluetoothDeviceController
                     var json = editor?.JsonAsSingle;
                     if (!String.IsNullOrEmpty(json))
                     {
-                        if (CurrJsonSearch != "")
+                        if (deviceJson != "")
                         {
-                            CurrJsonSearch += ",\n";
+                            deviceJson += ",\n";
                         }
-                        CurrJsonSearch += json;
+                        deviceJson += json;
                     }
                 }
 
                 // Always re-get the end because it's always being updated.
-                endidx = FindListEnd() - 1;
+                // note that this is no longer needed since I just use the MenuItemCache which has an easy count. endidx = FindListEnd() - 1;
             }
 
             // Even on cancel show the text that we have.
-            if (!String.IsNullOrEmpty(CurrJsonSearch))
+            if (!String.IsNullOrEmpty(deviceJson))
             {
                 // Write it out!
-                var tb = new TextBlock()
-                {
-                    IsTextSelectionEnabled = true,
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = CurrJsonSearch,
-                };
-                var scroll = new ScrollViewer()
-                {
-                    Content = tb,
-                    MaxHeight = 400,
-                };
-                var cdb = new ContentDialog()
-                {
-                    Content = scroll,
-                    Title = "Raw Bluetooth devices",
-                    PrimaryButtonText = "OK",
-                };
-                try
-                {
-                    await (App.Current as App).WaitForAppLockAsync("JsonSearch");
-                    await cdb.ShowAsync();
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Exception: JsonSearch: {ex.Message}");
-                }
-                finally
-                {
-                    (App.Current as App).ReleaseAppLock("JsonSearch");
-                }
+                CurrJsonSearch = deviceJson;
+                await DisplayTextFromSearchAsync(deviceJson);
             }
         }
 
+        private async Task DisplayTextFromSearchAsync(string text)
+        {
+            var tb = new TextBlock()
+            {
+                IsTextSelectionEnabled = true,
+                TextWrapping = TextWrapping.Wrap,
+                Text = text,
+            };
+            var scroll = new ScrollViewer()
+            {
+                Content = tb,
+                MaxHeight = 400,
+            };
+            var cdb = new ContentDialog()
+            {
+                Content = scroll,
+                Title = "Raw Bluetooth devices",
+                PrimaryButtonText = "OK",
+            };
+            try
+            {
+                await (App.Current as App).WaitForAppLockAsync("JsonSearch");
+                await cdb.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception: JsonSearch: {ex.Message}");
+            }
+            finally
+            {
+                (App.Current as App).ReleaseAppLock("JsonSearch");
+            }
+        }
+
+        readonly Guid CommonConfigurationGuid1800 = BluetoothLEStandardServices.Display; //  Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"); // service
+        readonly Guid DeviceNameGuid2a00 = BluetoothLEStandardServices.Name;  // new Guid("00002a00-0000-1000-8000-00805f9b34fb"); // characteristic
 
         private async Task NameReadAsync(CancellationToken ct)
         {
-            CurrJsonSearch = "";
+            var deviceJson = "";
             await Task.Delay(1000); // pause 1000 ms = 1 s to get some BT
-            int startidx = FindListStart() + 1;
-            int endidx = FindListEnd() - 1;
+            //int startidx = FindListStart() + 1;
+            //int endidx = FindListEnd() - 1;
             if (ct.IsCancellationRequested) return;
 
-            var commonConfigurationGuid = BluetoothLEStandardServices.Display; //  Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"); // service
-            var deviceNameGuid = BluetoothLEStandardServices.Name;  // new Guid("00002a00-0000-1000-8000-00805f9b34fb"); // characteristic
 
-            for (int i = startidx; i < endidx; i++)
+            for (int i = 0; i < MenuItemCache.Count; i++)
             {
                 var nvi = uiNavigation.MenuItems[i] as NavigationViewItemBase;
                 var di = nvi?.Tag as DeviceInformationWrapper;
-                if (di != null)
+                if (di == null) continue;
+                try
                 {
-                    // Just do a query for the name
-                    try
+                    var ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
+                    if (ble == null) continue;
+                    if (!string.IsNullOrEmpty(ble.Name))
                     {
-                        var ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
-                        if (ble != null)
+                        if (deviceJson != "")
                         {
-                            if (string.IsNullOrEmpty(ble.Name))
+                            deviceJson += "\n,";
+                        }
+                        deviceJson += $"\"Existing_{ble.Name}\""; continue;
+                    }
+                    System.Diagnostics.Debug.WriteLine($"DEVICE: Get name for {di.di.Id}");
+                    var services = await ble.GetGattServicesForUuidAsync(CommonConfigurationGuid1800);
+                    if (services.Status != GattCommunicationStatus.Success) continue;
+
+                    foreach (var service in services.Services)
+                    {
+                        var characteristics = await service.GetCharacteristicsForUuidAsync(DeviceNameGuid2a00);
+                        if (characteristics.Status != GattCommunicationStatus.Success) continue;
+                        foreach (var characteristic in characteristics.Characteristics)
+                        {
+                            var read = await characteristic.ReadValueAsync();
+                            if (read.Status != GattCommunicationStatus.Success) continue;
+                            var name = BluetoothLEStandardServices.CharacteristicData.ValueAsString(BluetoothLEStandardServices.DisplayType.String, read.Value);
+                            System.Diagnostics.Debug.WriteLine($"  --> read name as {name}");
+
+                            var entry = nvi.Content as DeviceMenuEntryControl;
+                            if (entry != null)
                             {
-                                System.Diagnostics.Debug.WriteLine($"DEVICE: Get name for {di.di.Id}");
-                                var services = await ble.GetGattServicesForUuidAsync(commonConfigurationGuid);
-                                if (services.Status != GattCommunicationStatus.Success)
-                                {
-                                    continue;
-                                }
-
-                                foreach (var service in services.Services)
-                                {
-                                    var characteristics = await service.GetCharacteristicsForUuidAsync(deviceNameGuid);
-                                    if (characteristics.Status != GattCommunicationStatus.Success)
-                                    {
-                                        continue;
-                                    }
-                                    foreach (var characteristic in characteristics.Characteristics)
-                                    {
-                                        var read = await characteristic.ReadValueAsync();
-                                        if (read.Status != GattCommunicationStatus.Success)
-                                        {
-                                            continue;
-                                        }
-                                        var name = BluetoothLEStandardServices.CharacteristicData.ValueAsString(BluetoothLEStandardServices.DisplayType.String, read.Value);
-                                        System.Diagnostics.Debug.WriteLine($"  --> read name as {name}");
-
-                                        var entry = nvi.Content as DeviceMenuEntryControl;
-                                        if (entry != null)
-                                        {
-                                            await this.Dispatcher.RunAsync(
-                                                Windows.UI.Core.CoreDispatcherPriority.Normal, 
-                                                () => { entry.UpdateName(name); });
-                                        }
-
-                                    }
-                                }
+                                await this.Dispatcher.RunAsync(
+                                    Windows.UI.Core.CoreDispatcherPriority.Normal,
+                                    () => { entry.UpdateName(name); });
                             }
+                            if (deviceJson != "")
+                            {
+                                deviceJson += "\n,";
+                            }
+                            deviceJson += $"\"Found_{name}\"";
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"ERROR: unable to navigate {ex.Message}");
-                        // I don't know of any exceptions. But if there are any, supress them completely.
-                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR: unable to navigate {ex.Message}");
+                    // I don't know of any exceptions. But if there are any, supress them completely.
                 }
 
                 // Always re-get the end because it's always being updated.
-                endidx = FindListEnd() - 1;
+                // No need; now we use the MenuItemCache which has an easy count. endidx = FindListEnd() - 1;
             }
         }
+
 
         private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
         {
@@ -1286,9 +1315,9 @@ namespace BluetoothDeviceController
             await dlg.ShowAsync();
         }
 
-        private void OnSearchCopyJson(object sender, RoutedEventArgs e)
+        private void OnMenuAutomationSearchCopyJson(object sender, RoutedEventArgs e)
         {
-            var value = GetCurrentSearchResults();
+            var value = CurrJsonSearch;
             if (String.IsNullOrEmpty(value)) return;
             var dp = new DataPackage();
             // Convert the list of individual items into a proper list.
@@ -1301,6 +1330,44 @@ namespace BluetoothDeviceController
             dp.SetText(value);
             dp.Properties.Title = "JSON Bluetooth data";
             Clipboard.SetContent(dp);
+        }
+
+        private void MenuOnSweepBeaconAdvertisement(object sender, RoutedEventArgs e)
+        {
+            CancelSearch();
+            StartSearch(UserPreferences.ReadSelection.Name, UserPreferences.SearchScope.Bluetooth_Beacons);
+        }
+
+        private void MenuOnSweepBleName(object sender, RoutedEventArgs e)
+        {
+            CancelSearch();
+            StartSearch(UserPreferences.ReadSelection.Name, UserPreferences.SearchScope.All_bluetooth_devices);
+        }
+
+        private void MenuOnSweepBleFull(object sender, RoutedEventArgs e)
+        {
+            CancelSearch();
+            StartSearch(UserPreferences.ReadSelection.Everything, UserPreferences.SearchScope.All_bluetooth_devices);
+        }
+
+        // Stuff needed to keep the screen on
+        static Windows.System.Display.DisplayRequest CurrDisplayRequest = null;
+
+        private void MenuOnToggleScreenOn(object sender, RoutedEventArgs e)
+        {
+            if (CurrDisplayRequest == null)
+            {
+                CurrDisplayRequest = new Windows.System.Display.DisplayRequest();
+            }
+            var ischeck = uiMenuKeepScreenOn.IsChecked;
+            if (ischeck)
+            {
+                CurrDisplayRequest.RequestActive();
+            }
+            else
+            {
+                CurrDisplayRequest.RequestRelease();
+            }
         }
     }
 }

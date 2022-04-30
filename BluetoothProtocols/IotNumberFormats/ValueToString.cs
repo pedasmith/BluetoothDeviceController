@@ -1,10 +1,12 @@
-﻿using System;
+﻿using BluetoothDeviceController;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using static BluetoothDeviceController.DataReaderReadStringRobust;
 
 namespace BluetoothDeviceController.BleEditor
 {
@@ -534,33 +536,29 @@ namespace BluetoothDeviceController.BleEditor
                             {
                                 case "STRING":
                                     {
-                                        try
+                                        ReadStatus readStatus;
+                                        (stritem, readStatus) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength);
+                                        switch (readStatus)
                                         {
-                                            stritem = dr.ReadString(dr.UnconsumedBufferLength);
-                                            switch (displayFormat)
-                                            {
-                                                case "":
-                                                case "ASCII":
-                                                    stritem = EscapeString(stritem, displayFormatSecondary);
-                                                    break;
-                                                case "Eddystone":
-                                                    stritem = BluetoothDefinitionLanguage.Eddystone.EddystoneUrlToString(stritem);
-                                                    break;
-                                                default:
-                                                    return ValueParserResult.CreateError(decodeCommands, $"Unknown string format type {displayFormat}");
+                                            case ReadStatus.OK:
+                                                switch (displayFormat)
+                                                {
+                                                    case "":
+                                                    case "ASCII":
+                                                        stritem = EscapeString(stritem, displayFormatSecondary);
+                                                        break;
+                                                    case "Eddystone":
+                                                        stritem = BluetoothDefinitionLanguage.Eddystone.EddystoneUrlToString(stritem);
+                                                        break;
+                                                    default:
+                                                        return ValueParserResult.CreateError(decodeCommands, $"Unknown string format type {displayFormat}");
 
-                                            }
+                                                }
+                                                break;
+                                            case ReadStatus.Hex:
+                                                break;
                                         }
-                                        catch (Exception)
-                                        {
-                                            // The string can't be read. Let's try reading as a buffer instead.
-                                            IBuffer buffer = dr.ReadBuffer(dr.UnconsumedBufferLength);
-                                            for (uint ii = 0; ii < buffer.Length; ii++)
-                                            {
-                                                if (ii != 0) stritem += " ";
-                                                stritem += buffer.GetByte(ii).ToString("X2");
-                                            }
-                                        }
+
                                         resultState = ResultState.IsString;
                                     }
                                     break;

@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="300"
+    d:DesignHeight="400"
     d:DesignWidth="400">
     <UserControl.Resources>
         <!-- You have to compile MainPage.Xaml.Cs for VS to find the local: class. -->
@@ -48,7 +48,9 @@
             </StackPanel.Resources>
             <Button x:Name="uiSearchStart" Content="🔎 Search" Click="OnSearchStart" ToolTipService.ToolTip="Start search" />
             <Button x:Name="uiSearchCancel" Content="✘ Cancel" Click="OnSearchCancel" Margin="10,0,0,0" ToolTipService.ToolTip="Cancel current search" />
+            <!--
             <Button Content="✀" Click="OnCopyJson" Margin="10,0,0,0" ToolTipService.ToolTip="Copy current search results as JSON" />
+            -->
         </StackPanel>
 
         <CheckBox MinWidth="180" Content="Automatically read from device"
@@ -72,5 +74,12 @@
         <Grid HorizontalAlignment="Stretch">
             <CheckBox x:Name="uiKeepScreenOn" Content="Keep Screen On" IsChecked="False" Checked="OnKeepScreenOnChecked" Unchecked="OnKeepScreenOnChecked" />
         </Grid>
+
+        <StackPanel Orientation="Horizontal">
+            <CheckBox Content="Full details" x:Name="uiFullDetails" IsThreeState="False" IsChecked="{Binding BeaconFullDetails, Mode=TwoWay}" />
+            <CheckBox Content="Track all" x:Name="uiTrackAll" IsThreeState="False" IsChecked="{Binding BeaconTrackAll, Mode=TwoWay}" />
+            <CheckBox Content="Ignore Apple" x:Name="uiIgnoreApple" IsThreeState="False" IsChecked="{Binding BeaconIgnoreApple, Mode=TwoWay}" />
+        </StackPanel>
+        <Slider Header="Beacon Signal Strength (RSS) filter" Minimum="-110" Maximum="-40" TickFrequency="10" IsDirectionReversed="True" x:Name="uiBeaconDbLevel" Value="{Binding BeaconDbLevel, Mode=TwoWay}" />
     </StackPanel>
 </UserControl>

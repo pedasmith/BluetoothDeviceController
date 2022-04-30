@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Beacons;
+using BluetoothDeviceController;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -2685,7 +2686,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
 
                                         ulong salt = dr.ReadUInt32();
 
-                                        var name = dr.ReadString(dr.UnconsumedBufferLength);
+                                        var name = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength);
                                         sb.Append(name);
                                     }
                                     break;

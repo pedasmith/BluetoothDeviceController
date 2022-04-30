@@ -152,6 +152,9 @@
     <Compile Include="..\BluetoothDeviceController\Names\SerialConfig.cs">
       <Link>FromBluetoothDeviceController\Names\SerialConfig.cs</Link>
     </Compile>
+    <Compile Include="..\BluetoothDeviceController\Utilities\DataReaderReadStringRobust.cs">
+      <Link>Utilities\DataReaderReadStringRobust.cs</Link>
+    </Compile>
     <Compile Include="..\BluetoothDeviceController\Utilities\EnumUtilities.cs">
       <Link>Utilities\EnumUtilities.cs</Link>
     </Compile>

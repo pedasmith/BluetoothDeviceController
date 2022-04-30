@@ -12,10 +12,26 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <NavigationView x:Name="uiNavigation" Grid.Row="0"
+        
+        <!-- TOP MENU -->
+        <MenuBar>
+            <MenuBarItem Title="Automation">
+                <MenuFlyoutItem Text="Beacon/Advertisement Long-running sweep" Click="MenuOnSweepBeaconAdvertisement" />
+                <MenuFlyoutItem Text="Full BLE sweep" Click="MenuOnSweepBleFull" />
+                <MenuFlyoutItem Text="✀ Copy sweep results as JSON" Click="OnMenuAutomationSearchCopyJson"  />
+
+                <MenuFlyoutSeparator />
+                <ToggleMenuFlyoutItem x:Name="uiMenuKeepScreenOn" Text="Keep screen on" IsChecked="False" Click="MenuOnToggleScreenOn" />
+            </MenuBarItem>
+        </MenuBar>
+        
+        
+        <!-- NAVIGATION -->
+        <NavigationView x:Name="uiNavigation" Grid.Row="1"
                         ItemInvoked="UiNavigation_ItemInvoked"
                         BackRequested="UiNavigation_BackRequested" CompactPaneLength="36" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed">
             <NavigationView.MenuItems>
@@ -85,7 +101,9 @@
                 </Grid>
             </Grid>
         </NavigationView>
-        <Grid Grid.Row="1" >
+        
+        <!-- SEARCH + SEARCH FEEDBACK + COPY Search Results -->
+        <Grid Grid.Row="2" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
@@ -93,10 +111,6 @@
             </Grid.ColumnDefinitions>
             <local:SearchFeedbackControl x:Name="uiSearchFeedback" />
             <TextBlock Grid.Column="1" Text="|" />
-            <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <Button Content="✀" Click="OnSearchCopyJson" Margin="10,0,0,0" ToolTipService.ToolTip="Copy current search results as JSON" />
-            </StackPanel>
-
         </Grid>
     </Grid>
 </Page>

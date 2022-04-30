@@ -43,16 +43,35 @@ namespace BluetoothDeviceController
 
         public void StartSearchFeedback()
         {
+            //System.Diagnostics.Debug.WriteLine($"SearchFeedback: started");
             uiProgress.ShowPaused = false;
             nFound = 0;
             nFoundAll = 0;
         }
 
+        public static bool IsOnUIThread()
+        {
+            var dispather = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
+            var retval = dispather.HasThreadAccess;
+            return retval;
+        }
+
         public void StopSearchFeedback()
         {
-            var task = this.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => {
+            if (SearchFeedbackControl.IsOnUIThread())
+            {
+                //System.Diagnostics.Debug.WriteLine($"SearchFeedback: stopped (quickly)");
                 uiProgress.ShowPaused = true;
-            });
+            }
+            else
+            {
+                //System.Diagnostics.Debug.WriteLine($"SearchFeedback: stopping (wait for UI)");
+                var task = this.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => {
+                    System.Diagnostics.Debug.WriteLine($"SearchFeedback: stopped (for real)");
+                    uiProgress.ShowPaused = true;
+                });
+
+            }
         }
 
         public void FoundDevice(FoundDeviceInfo deviceInfo)

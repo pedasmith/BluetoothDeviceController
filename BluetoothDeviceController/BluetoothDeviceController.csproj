@@ -265,6 +265,7 @@
     <Compile Include="Specialization.cs" />
     <Compile Include="UserData\NameMapping.cs" />
     <Compile Include="UserData\UserNameMappings.cs" />
+    <Compile Include="Utilities\DataReaderReadStringRobust.cs" />
     <Compile Include="Utilities\EnumUtilities.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -68,7 +68,7 @@ namespace BluetoothDeviceController
         private void OnSearchStart(object sender, RoutedEventArgs e)
         {
             if (Search == null) return;
-            Search.StartSearch(Preferences.DeviceReadSelection);
+            Search.StartSearch(Preferences.DeviceReadSelection, Preferences.Scope);
             UpdateSearchUI();
         }
 
@@ -96,6 +96,8 @@ namespace BluetoothDeviceController
             }
         }
 
+#if NEVER_EVER_DEFINED
+
         private void OnCopyJson(object sender, RoutedEventArgs e)
         {
             var value = Search?.GetCurrentSearchResults();
@@ -112,6 +114,7 @@ namespace BluetoothDeviceController
             dp.Properties.Title = "JSON Bluetooth data";
             Clipboard.SetContent(dp);
         }
+#endif
 
         static Windows.System.Display.DisplayRequest CurrDisplayRequest = null;
 

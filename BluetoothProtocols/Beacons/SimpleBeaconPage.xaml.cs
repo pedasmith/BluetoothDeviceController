@@ -39,9 +39,9 @@ namespace BluetoothDeviceController.Beacons
 
         private void SimpleBeaconPage_Loaded(object sender, RoutedEventArgs e)
         {
-            var trackAll = false;
-            if (di.BeaconPreferences != null) trackAll = di.BeaconPreferences.DefaultTrackAll;
-            uiTrackAll.IsChecked = trackAll;
+            //var trackAll = MainPage.TheMainPage.Preferences.BeaconTrackAll;
+            //TODO: if (di.BeaconPreferences != null) trackAll = di.BeaconPreferences.DefaultTrackAll;
+            //uiTrackAll.IsChecked = trackAll;
         }
 
         DeviceInformationWrapper di = null;
@@ -49,7 +49,7 @@ namespace BluetoothDeviceController.Beacons
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             di = args.Parameter as DeviceInformationWrapper;
-            // When will this be null? When we've created a page generically instead of for a particular device.
+            // When will di.BleAdvert be null? When we've created a page generically instead of for a particular device.
             // This happens when you do a beacon search.
             if (di.BleAdvert != null) di.BleAdvert.UpdatedBleAdvertisement += BleAdvert_UpdatedBleAdvertisement;
             BleAdvertisementWrapper.UpdatedUniversalBleAdvertisement += BleAdvert_UpdatedUniversalBleAdvertisement;
@@ -57,8 +57,8 @@ namespace BluetoothDeviceController.Beacons
             if (di.BleAdvert == null)
             {
                 // Don't let the user switch off the track all.
-                uiTrackAll.Visibility = Visibility.Collapsed;
-                uiTrackAll.IsChecked = true; // belt and suspenders
+                //uiTrackAll.Visibility = Visibility.Collapsed;
+                //uiTrackAll.IsChecked = true; // belt and suspenders
             }
         }
 
@@ -66,11 +66,15 @@ namespace BluetoothDeviceController.Beacons
         {
             get
             {
-                var retval = uiTrackAll.IsChecked.Value;
+                //TODO: remove var retval = uiTrackAll.IsChecked.Value;
                 //if (di.BeaconPreferences != null) retval = di.BeaconPreferences.DefaultTrackAll;
+                var retval = MainPage.TheMainPage.Preferences.BeaconTrackAll;
                 return retval;
             }
         }
+        private bool IgnoreApple {  get { return MainPage.TheMainPage.Preferences.BeaconIgnoreApple; } }
+        private bool FullDetails {  get { return MainPage.TheMainPage.Preferences.BeaconFullDetails; } }
+        private double CLOSE_SIGNAL_STRENGTH { get { return MainPage.TheMainPage.Preferences.BeaconDbLevel; } }
 
         HashSet<ulong> BleAddressesSeen = new HashSet<ulong>();
         private async void BleAdvert_UpdatedUniversalBleAdvertisement(Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementReceivedEventArgs data)
@@ -94,12 +98,8 @@ namespace BluetoothDeviceController.Beacons
 
         private async Task UpdateUI(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, bool includeLeadingAddress = true)
         {
-            bool isFullDetails = uiFullDetails.IsChecked.Value;
-            isFullDetails = true; //TODO: should be remembered from one run to the next.
-
             // For debugging: include only close-by signals
-            const int CLOSE_SGINAL_STRENGTH = -90;
-            bool isClose = bleAdvert.RawSignalStrengthInDBm > CLOSE_SGINAL_STRENGTH;
+            bool isClose = bleAdvert.RawSignalStrengthInDBm > CLOSE_SIGNAL_STRENGTH;
             if (!isClose)
             {
                 return;
@@ -154,7 +154,7 @@ namespace BluetoothDeviceController.Beacons
                         case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
                         case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
                         case AdvertisementDataSectionParser.DataTypeValue.Flags:
-                            if (isFullDetails)
+                            if (FullDetails)
                             {
                                 string result;
                                 BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
@@ -226,8 +226,9 @@ namespace BluetoothDeviceController.Beacons
                 var txt = $"{header}\n{builder}\n";
                 var run = new Run() { Text = txt };
 
-                var suppress = isApple10 && uiIgnoreApple.IsChecked.Value;
-                // Just for debugging: suppress = (companyId != 1177);                 if (!suppress)
+                var suppress = isApple10 && IgnoreApple;
+                // Just for debugging: suppress = (companyId != 1177);
+                if (!suppress)
                 {
                     if (bold != null) uiBeaconData.Inlines.Add(bold);
                     uiBeaconData.Inlines.Add(run);
