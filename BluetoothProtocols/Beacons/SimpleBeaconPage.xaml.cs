@@ -270,8 +270,8 @@ namespace BluetoothDeviceController.Beacons
 
             AdvertisementHistory.Sort((item1, item2) =>
             {
-                var itemA = sortDirection == SortDirection.Ascending ? item1 : item2;
-                var itemB = sortDirection == SortDirection.Ascending ? item2 : item1;
+                var itemA = sortDirection == SortDirection.Ascending ? item2 : item1;
+                var itemB = sortDirection == SortDirection.Ascending ? item1 : item2;
                 switch (sortBy)
                 {
                     default:

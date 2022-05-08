@@ -196,6 +196,11 @@ namespace BluetoothDeviceController
             uiSearchFeedback.Search = this;
             StartSearch(readSelection, Preferences.Scope);
 
+            // Set the version number in the about box. https://stackoverflow.com/questions/28635208/retrieve-the-current-app-version-from-package
+            var version = Windows.ApplicationModel.Package.Current.Id.Version;
+            var versionStr = $"{version.Major}.{version.Minor}";
+            uiAboutVersion.Text = versionStr;
+
             uiDock.DockParent = this;
         }
 
@@ -271,7 +276,7 @@ namespace BluetoothDeviceController
 
         private async void NavView_Navigate(string navItemTag, string pagename, NavigationTransitionInfo transitionInfo)
         {
-            Type _page = null;
+            Type _pageType = null;
             if (navItemTag == "settings")
             {
                 //_page = typeof(SettingsPage);
@@ -305,7 +310,7 @@ namespace BluetoothDeviceController
             else
             {
                 var item = _pages.FirstOrDefault(p => p.Tag.Equals(navItemTag));
-                _page = item.Page;
+                _pageType = item.Page;
             }
 
             // Get the page type before navigation so you can prevent duplicate
@@ -313,13 +318,17 @@ namespace BluetoothDeviceController
             var preNavPageType = ContentFrame.CurrentSourcePageType;
 
             // Only navigate if the selected page isn't currently loaded.
-            if (_page != null)
+            if (_pageType != null)
             {
-                bool pageIsDifferentHelp = (_page == typeof(HelpPage)) && (pagename != HelpPage.NavigatedTo);
-                bool pageIsDifferentPage = !Type.Equals(preNavPageType, _page);
+                bool pageIsDifferentHelp = (_pageType == typeof(HelpPage)) && (pagename != HelpPage.NavigatedTo);
+                bool pageIsDifferentPage = !Type.Equals(preNavPageType, _pageType);
                 if ((pageIsDifferentPage || pageIsDifferentHelp))
                 {
-                    ContentFrame.Navigate(_page, pagename, transitionInfo);
+                    // Show the Filter menu for the beacon page if we should
+                    var pageIsBeacon = _pageType == typeof(Beacons.SimpleBeaconPage);
+                    uiFilterSimpleBeaconPage.Visibility = pageIsBeacon ? Visibility.Visible : Visibility.Collapsed;
+
+                    ContentFrame.Navigate(_pageType, pagename, transitionInfo);
                 }
             }
         }
@@ -414,9 +423,6 @@ namespace BluetoothDeviceController
                 // There's also a device information page, but it's not really useful at all.
             }
             SetParentScrolltype(scrollType);
-            // Show the Filter menu for the beacon page if we should
-            var pageIsBeacon = _pageType == typeof(Beacons.SimpleBeaconPage);
-            uiFilterSimpleBeaconPage.Visibility = pageIsBeacon ? Visibility.Visible : Visibility.Collapsed;
 
             // Get the page type before navigation so you can prevent duplicate
             // entries in the backstack. Except that I use the same page type for e.g. different Thingy devices.
@@ -432,6 +438,10 @@ namespace BluetoothDeviceController
                 {
                     MinimizeCurrentWindowToDeviceDock();
                 }
+                // Show the Filter menu for the beacon page if we should
+                var pageIsBeacon = _pageType == typeof(Beacons.SimpleBeaconPage);
+                uiFilterSimpleBeaconPage.Visibility = pageIsBeacon ? Visibility.Visible : Visibility.Collapsed;
+
                 ContentFrame.Navigate(_pageType, wrapper, transitionInfo);
             }
         }
@@ -505,6 +515,8 @@ namespace BluetoothDeviceController
 
         private void ClearDevices()
         {
+#if NEVER_EVER_DEFINED
+// Not using the clumsy old system of setting up a list-start and list-end values
             List<object> removelist = new List<object>();
             bool removing = false;
             foreach (var item in uiNavigation.MenuItems)
@@ -527,6 +539,8 @@ namespace BluetoothDeviceController
             {
                 uiNavigation.MenuItems.Remove(item);
             }
+#endif
+            uiNavigation.MenuItems.Clear();
             MenuItemCache.Clear();
         }
 
@@ -560,6 +574,8 @@ namespace BluetoothDeviceController
             return -1;
         }
 
+#if NEVER_EVER_DEFINED
+// Not using the old clumsy system of looking for LIST-START and LIST-END
         private int FindListStart()
         {
             for (int i = 0; i < uiNavigation.MenuItems.Count; i++)
@@ -572,7 +588,10 @@ namespace BluetoothDeviceController
             }
             return -1;
         }
+#endif
 
+#if NEVER_EVER_DEFINED
+// Not using the old clumsy system of looking for LIST-START and LIST-END
         private int FindListEnd()
         {
             for (int i = 0; i < uiNavigation.MenuItems.Count; i++)
@@ -585,7 +604,7 @@ namespace BluetoothDeviceController
             }
             return -1;
         }
-
+#endif
         /// <summary>
         /// Smart routine that returns the name of the device. Might return NULL if the device is an un-named one. 
         /// Uses the UserNameMapping as appropriate.
@@ -661,8 +680,12 @@ namespace BluetoothDeviceController
             }
 
             // Otherwise make a new entry
+#if NEVER_EVER_DEFINED
+// Not using the old clumsy system of looking for LIST-START and LIST-END
             idx = FindListEnd();
             if (idx == -1) idx = 0; // Impossible; the list always includes the list-stat and list-end
+#endif
+            idx = uiNavigation.MenuItems.Count(); // End of the list
             var menu = new NavigationViewItem()
             {
                 Tag = wrapper,
@@ -776,8 +799,12 @@ namespace BluetoothDeviceController
             }
 
             // Otherwise make a new entry
+#if NEVER_EVER_DEFINED
+// Not using the old clumsy system of looking for LIST-START and LIST-END
             idx = FindListEnd();
             if (idx == -1) idx = 0; // Impossible; the list always includes the list-stat and list-end
+#endif
+            idx = uiNavigation.MenuItems.Count(); // Add to the end of the list
 
             string icon = GetIconForName(name);
             var dmec = new DeviceMenuEntryControl(wrapper, name, specialization, icon);
@@ -850,14 +877,19 @@ namespace BluetoothDeviceController
                 case UserPreferences.SearchScope.Bluetooth_Beacons:
                     // Navigate to a beacons page
                     // TODO: navigate [later: isn't this work completed? do I need to TODO?]
-                    var _page = typeof(Beacons.SimpleBeaconPage);
+                    var _pageType = typeof(Beacons.SimpleBeaconPage);
                     var di = new DeviceInformationWrapper((BleAdvertisementWrapper)null);
                     di.BeaconPreferences = new UserBeaconPreferences()
                     {
                         DefaultTrackAll = true,
                     };
                     SetParentScrolltype(Specialization.ParentScrollType.ChildHandlesScrolling); // SimpleBeachPage knows how to scroll itself.
-                    ContentFrame.Navigate(_page, di);
+
+                    // Show the Filter menu for the beacon page if we should
+                    var pageIsBeacon = _pageType == typeof(Beacons.SimpleBeaconPage);
+                    uiFilterSimpleBeaconPage.Visibility = pageIsBeacon ? Visibility.Visible : Visibility.Collapsed;
+
+                    ContentFrame.Navigate(_pageType, di);
                     break;
             }
             ClearDevices();
@@ -1140,8 +1172,13 @@ namespace BluetoothDeviceController
                 if (di != null)
                 {
                     // Got a device to investigate.
-                    var _page = typeof(BleEditor.BleEditorPage);
-                    ContentFrame.Navigate(_page, di);
+                    var _pageType = typeof(BleEditor.BleEditorPage);
+
+                    // Show the Filter menu for the beacon page if we should
+                    var pageIsBeacon = _pageType == typeof(Beacons.SimpleBeaconPage);
+                    uiFilterSimpleBeaconPage.Visibility = pageIsBeacon ? Visibility.Visible : Visibility.Collapsed;
+
+                    ContentFrame.Navigate(_pageType, di);
                     var editor = ContentFrame.Content as BleEditor.BleEditorPage;
                     while (!editor.NavigationComplete && !ct.IsCancellationRequested)
                     {
@@ -1401,6 +1438,22 @@ namespace BluetoothDeviceController
         {
             SavedBeaconSortDirection = uiFilterSimpleBeaconPageAscending.IsChecked ? SimpleBeaconPage.SortDirection.Ascending : SimpleBeaconPage.SortDirection.Descending;
             await SimpleBeaconPage.TheSimpleBeaconPage.SortAsync(DEFAULT_SEARCH_DELAY_UX, SavedBeaconSortBy, SavedBeaconSortDirection);
+        }
+
+        private async void OnMenuHelpAbout(object sender, RoutedEventArgs e)
+        {
+            await uiDialogAbout.ShowAsync();
+        }
+
+        private void OnMenuHelpHelp(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as FrameworkElement).Tag as string;
+            NavView_Navigate(tag, "Help.md", null);
+        }
+
+        private void OnMenuHelpFeedback(object sender, RoutedEventArgs e)
+        {
+            OnRequestFeedback(null, null);
         }
     }
 }

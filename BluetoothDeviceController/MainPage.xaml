@@ -34,6 +34,11 @@
                 <MenuFlyoutSeparator />
                 <ToggleMenuFlyoutItem x:Name="uiFilterSimpleBeaconPageAscending" Text="Sort AZ" IsChecked="False" Click="OnClientFilterSimpleBeaconPageAscending" />
             </MenuBarItem>
+            <MenuBarItem Title="Help">
+                <MenuFlyoutItem Text="💁 Help" Tag="Help" Click="OnMenuHelpHelp" />
+                <MenuFlyoutItem Text="About" Click="OnMenuHelpAbout" />
+                <MenuFlyoutItem Text=" Leave Feedback" FontFamily="Segoe UI,Segoe MDL2 Assets" Tag="Feedback" Click="OnMenuHelpFeedback" />
+            </MenuBarItem>
         </MenuBar>
         
         
@@ -42,16 +47,20 @@
                         ItemInvoked="UiNavigation_ItemInvoked"
                         BackRequested="UiNavigation_BackRequested" CompactPaneLength="36" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed">
             <NavigationView.MenuItems>
+                <!--
                 <NavigationViewItem Content="💁 Help" Tag="Help" x:Name="uiMenuHelp" />
 
                 <NavigationViewItemSeparator Tag="LIST-START" />
 
                 <NavigationViewItemSeparator Tag="LIST-END" />
+                -->
 
             </NavigationView.MenuItems>
+            <!--
             <NavigationView.PaneFooter>
                 <NavigationViewItem FontFamily="Segoe UI,Segoe MDL2 Assets" Content=" Leave Feedback" Tag="Feedback" x:Name="uiMenuFeedback" Tapped="OnRequestFeedback" />
             </NavigationView.PaneFooter>
+            -->
             
             <Grid>
                 <Grid.RowDefinitions>
@@ -101,10 +110,8 @@
                                    FontSize="18"
                                    ToolTipService.ToolTip="Bluetooth Status" />
                             <ProgressRing x:Name="uiDeviceProgress" HorizontalAlignment="Right" />
-
                         </Grid>
                     </Border>
-                               
                 </Grid>
             </Grid>
         </NavigationView>
@@ -119,5 +126,21 @@
             <local:SearchFeedbackControl x:Name="uiSearchFeedback" />
             <TextBlock Grid.Column="1" Text="|" />
         </Grid>
+
+        <ContentDialog x:Name="uiDialogAbout" CloseButtonText="Ok">
+            <StackPanel>
+                <TextBlock FontSize="24" FontWeight="Bold">About Bluetooth Device Explorer</TextBlock>
+                <TextBlock TextWrapping="Wrap" IsTextSelectionEnabled="True">
+                    <Run>The Bluetooth Device Explorer lets you see and control Bluetooth device around you. Supported devices include different Bluetooth enabled lights, data sensors and robots.</Run>
+                    <LineBreak /><LineBreak /><Run>More </Run>
+                    <Hyperlink NavigateUri="https://shipwrecksoftware.wordpress.com/category/bluetooth/" >Bluetooth information </Hyperlink>
+                    <Run Text=" "/><Run>is at the Shipwreck Software blog</Run>
+                    
+                    
+                    <LineBreak /><LineBreak /><Run Text="Version: " /><Run x:Name="uiAboutVersion" />
+                </TextBlock>
+            </StackPanel>
+            
+        </ContentDialog>
     </Grid>
 </Page>
