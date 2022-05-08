@@ -15,14 +15,17 @@
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
         <Button Grid.Column="0" Content="Search" Padding="3" Click="OnSearch" Margin="0,0,10,0" />
         <ProgressBar IsIndeterminate="True" ShowPaused="True" Grid.Column="1" x:Name="uiProgress" Width="150" Padding="3" />
         <TextBlock Grid.Column="2" VerticalAlignment="Center" Padding="3">
             Found=<Run x:Name="uiFound">0</Run>
         </TextBlock>
-        <TextBlock Grid.Column="3" VerticalAlignment="Center" Padding="3">
-            Filtered out=<Run x:Name="uiFoundAll">0</Run>
+        <TextBlock Grid.Column="3" VerticalAlignment="Center" Padding="3" PointerPressed="OnFilterClick" >
+            <Run x:Name="uiFilteredOutText">Filtered out=</Run><Run x:Name="uiFoundAll">0</Run>
         </TextBlock>
+        <CheckBox Margin="20,0,0,0" Grid.Column="4" Content="Pause" IsChecked="False" x:Name="uiPause" IsThreeState="False" Unchecked="OnPauseUnchecked" Checked="OnPauseChecked" />
     </Grid>
 </UserControl>

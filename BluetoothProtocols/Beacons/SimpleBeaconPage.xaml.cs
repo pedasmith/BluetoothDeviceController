@@ -33,6 +33,7 @@ namespace BluetoothDeviceController.Beacons
     {
         public enum SortBy { Mac, Time, Rss, };
         public enum SortDirection { Ascending, Descending };
+
         public static SimpleBeaconPage TheSimpleBeaconPage = null;
 
         public SimpleBeaconPage()
@@ -74,32 +75,26 @@ namespace BluetoothDeviceController.Beacons
             {
                 //TODO: remove var retval = uiTrackAll.IsChecked.Value;
                 //if (di.BeaconPreferences != null) retval = di.BeaconPreferences.DefaultTrackAll;
+                //TODO: how doe this actually work?
                 var retval = UserPreferences.MainUserPreferences.BeaconTrackAll;
                 return retval;
             }
         }
-        private bool IgnoreApple { get { return UserPreferences.MainUserPreferences.BeaconIgnoreApple; } }
-        private bool FullDetails { get { return UserPreferences.MainUserPreferences.BeaconFullDetails; } }
-        private double CLOSE_SIGNAL_STRENGTH { get { return UserPreferences.MainUserPreferences.BeaconDbLevel; } }
+        private bool IgnoreApplePreference { get { return UserPreferences.MainUserPreferences.BeaconIgnoreApple; } }
+        private bool FullDetailsPreferrence { get { return UserPreferences.MainUserPreferences.BeaconFullDetails; } }
+        private double CloseSignalStrengthPreference { get { return UserPreferences.MainUserPreferences.BeaconDbLevel; } }
+
+        public bool IsPaused { get; set; } = false;
 
         HashSet<ulong> BleAddressesSeen = new HashSet<ulong>();
         private async void BleAdvert_UpdatedUniversalBleAdvertisement(Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementReceivedEventArgs data)
         {
-            // Only do this if the user wants to see all data...
-            var isPause = uiPause.IsChecked.Value;
-            if (TrackAll && !isPause)
-            {
-                await UpdateUI(data, TrackAll);
-            }
+            await UpdateUI(data, TrackAll, IsPaused);
         }
 
         private async void BleAdvert_UpdatedBleAdvertisement(Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementReceivedEventArgs data)
         {
-            var isPause = uiPause.IsChecked.Value;
-            if (!isPause)
-            {
-                await UpdateUI(data, TrackAll);
-            }
+            await UpdateUI(data, TrackAll, IsPaused);
         }
         private string AdvertisementToString(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, DateTime eventTime, bool includeLeadingAddress)
         {
@@ -137,7 +132,7 @@ namespace BluetoothDeviceController.Beacons
                     case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
                     case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
                     case AdvertisementDataSectionParser.DataTypeValue.Flags:
-                        if (FullDetails)
+                        if (FullDetailsPreferrence)
                         {
                             string result;
                             BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
@@ -216,7 +211,7 @@ namespace BluetoothDeviceController.Beacons
         List<SimpleBeaconHistory> AdvertisementHistory = new List<SimpleBeaconHistory>();
 
 
-        private async Task UpdateUI(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, bool includeLeadingAddress = true)
+        private async Task UpdateUI(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, bool includeLeadingAddress, bool isPaused)
         {
             var advertTime = DateTime.Now;
             var txt = AdvertisementToString(bleAdvert, advertTime, includeLeadingAddress);
@@ -235,7 +230,7 @@ namespace BluetoothDeviceController.Beacons
             var h = SimpleBeaconHistory.MakeFromAdvertisement(bleAdvert, advertTime, boldText, txt);
             AdvertisementHistory.Add(h);
 
-            var shouldIgnore = ShouldIgnore(h);
+            var shouldIgnore = isPaused || ShouldIgnore(h, CurrBleAddressFilter);
             if (shouldIgnore) return;
 
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -248,45 +243,69 @@ namespace BluetoothDeviceController.Beacons
             });
         }
 
-        bool ShouldIgnore(SimpleBeaconHistory item)
+        bool ShouldIgnore(SimpleBeaconHistory item, ulong bleAddressFilter)
         {
-
-            bool isClose = item.Args.RawSignalStrengthInDBm > CLOSE_SIGNAL_STRENGTH;
-            if (!isClose)
+            bool isTooFar = item.Args.RawSignalStrengthInDBm < CloseSignalStrengthPreference;
+            if (isTooFar)
+            {
+                return true;
+            }
+            if (bleAddressFilter != 0 && item.Address != bleAddressFilter)
             {
                 return true;
             }
             bool isApple10 = IsApple10(item.Args);
-            var suppress = isApple10 && IgnoreApple;
+            var suppress = isApple10 && IgnoreApplePreference;
+
             return suppress;
         }
-            
+
+        public int CurrMillisecondsDelay { get; set; } = 100;
+        public SortBy CurrSortBy { get; set; } = SortBy.Time;
+        public SortDirection CurrSortDirection { get; set; } = SortDirection.Ascending;
+        public ulong CurrBleAddressFilter { get; set; } = 0;
 
 
-        public async Task SortAsync (int millisecondsDelay, SortBy sortBy, SortDirection sortDirection)
+        public async Task SortAsync ()
         {
             uiBeaconData.Inlines.Clear();
-            await Task.Delay(millisecondsDelay); // 500 is good
+            await Task.Delay(CurrMillisecondsDelay); // 100 is good
 
             AdvertisementHistory.Sort((item1, item2) =>
             {
-                var itemA = sortDirection == SortDirection.Ascending ? item2 : item1;
-                var itemB = sortDirection == SortDirection.Ascending ? item1 : item2;
-                switch (sortBy)
+                var itemA = CurrSortDirection == SortDirection.Ascending ? item2 : item1;
+                var itemB = CurrSortDirection == SortDirection.Ascending ? item1 : item2;
+                int retval = 0;
+                switch (CurrSortBy)
                 {
                     default:
                     case SortBy.Mac:
-                        return itemA.Address.CompareTo(itemB.Address);
+                        retval = itemA.Address.CompareTo(itemB.Address);
+                        break;
                     case SortBy.Rss:
-                        return itemA.Args.RawSignalStrengthInDBm.CompareTo(itemB.Args.RawSignalStrengthInDBm);
+                        retval = itemA.Args.RawSignalStrengthInDBm.CompareTo(itemB.Args.RawSignalStrengthInDBm);
+                        break;
                     case SortBy.Time:
-                        return itemA.AdvertisementTime.CompareTo(itemB.AdvertisementTime);
+                        retval = itemA.AdvertisementTime.CompareTo(itemB.AdvertisementTime);
+                        break;
                 }
+                // e.g., sort by MAC address first and then by time. In the case where we sort by time first
+                // and they are equal, we'll ust sort by time again -- slightly wasteful, but NBD.
+                if (retval == 0)
+                {
+                    retval = itemA.AdvertisementTime.CompareTo(itemB.AdvertisementTime);
+                }
+                return retval;
             });
+            RedrawDisplay(); // will double-clear the uiBeaconData.Inlines, but that's OK
+        }
 
+        public void RedrawDisplay()
+        {
+            uiBeaconData.Inlines.Clear();
             foreach (var h in AdvertisementHistory)
             {
-                var shouldIgnore = ShouldIgnore(h);
+                var shouldIgnore = ShouldIgnore(h, CurrBleAddressFilter);
                 if (!shouldIgnore)
                 {
                     var lines = h.MakeRun();
@@ -297,5 +316,6 @@ namespace BluetoothDeviceController.Beacons
                 }
             }
         }
+
     }
 }

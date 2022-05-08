@@ -2735,6 +2735,9 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 companyId = dr.ReadUInt16();
                 switch (companyId)
                 {
+                    case 0x0006: // Microsoft
+                        //companyName = GetBluetoothCompanyIdentifier(companyId);
+                        break;
                     case 0x004C: // Apple
                         var appleIBeacon = Apple_IBeacon.Parse(section, txPower);
                         if (appleIBeacon.IsValid)

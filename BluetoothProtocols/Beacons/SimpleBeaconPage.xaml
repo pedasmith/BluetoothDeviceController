@@ -24,13 +24,13 @@
         <ScrollViewer Grid.Row="2">
             <TextBlock x:Name="uiBeaconData" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
         </ScrollViewer>
+        <!--
         <StackPanel Grid.Row="3" Orientation="Horizontal">
-            <!--
             <CheckBox Content="Full details" IsChecked="False" x:Name="uiFullDetails" IsThreeState="False" />
             <CheckBox Content="Track all" IsChecked="True" x:Name="uiTrackAll" IsThreeState="False" />
             <CheckBox Content="Ignore Apple" IsChecked="True" x:Name="uiIgnoreApple" IsThreeState="False" />
-            -->
             <CheckBox Content="Pause" IsChecked="False" x:Name="uiPause" IsThreeState="False" />
         </StackPanel>
+            -->
     </Grid>
 </Page>

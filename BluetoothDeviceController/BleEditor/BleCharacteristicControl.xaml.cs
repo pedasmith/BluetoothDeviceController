@@ -107,11 +107,13 @@ namespace BluetoothDeviceController.BleEditor
 
             }
 
+#if NEVER_EVER_DEFINED
             if (characteristic.Uuid == GoveeKeepaliveCharacteristicUuid)
             {
                 System.Diagnostics.Debug.WriteLine("DBG: got the one Govee Keepalive / humi_cmd characteristic");
                 ConstantlyWriteGoveeKeepalive (characteristic);
             }
+#endif
 
             var namestr = "";
             if (!String.IsNullOrEmpty(NC?.Name))
@@ -220,6 +222,7 @@ namespace BluetoothDeviceController.BleEditor
             }
         }
 
+        // NOTE: The keepalive here does absolutely nothing useful. This code should be removed.
         //static Guid GoveeKeepaliveCharacteristicUuid = Guid.Parse("494e5445-4c4c-495f-524f-434b535f2012"); // From OpenHab
         static Guid GoveeKeepaliveCharacteristicUuid = Guid.Parse("494e5445-4c4c-495f-524f-434b535f2014"); // Use the heartbeat one?
         Task GoveeTask = null;

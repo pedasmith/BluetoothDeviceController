@@ -129,5 +129,48 @@ namespace BluetoothDeviceController
                 uiFoundAll.Text = (nFoundAll - nFound).ToString();
             });
         }
+
+        private void OnFilterClick(object sender, PointerRoutedEventArgs e)
+        {
+            Search?.ListFilteredOut();
+        }
+
+        /// <summary>
+        /// Returns TRUE iff the pause checkbox is checked AND the control is visible. It should never be the case that it's invisible and checked
+        /// and the checked state matters.
+        /// </summary>
+        public bool GetIsPaused() 
+        { 
+            var retval = uiPause.IsChecked.GetValueOrDefault(false) && uiPause.Visibility == Visibility.Visible;
+            return retval;
+        }
+        public void SetPauseVisibility(bool visible)
+        {
+            uiPause.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void OnPauseChecked(object sender, RoutedEventArgs e)
+        {
+            Search.PauseCheckUpdated(true);
+        }
+
+        private void OnPauseUnchecked(object sender, RoutedEventArgs e)
+        {
+            Search.PauseCheckUpdated(false);
+        }
+
+        public void SetSearchFeedbackType(SearchFeedbackType feedbackType)
+        {
+            switch (feedbackType)
+            {
+                default:
+                case SearchFeedbackType.Normal:
+                    uiFilteredOutText.Text = "Filtered out=";
+                    break;
+                case SearchFeedbackType.Advertisement:
+                    uiFilteredOutText.Text = "Updated=";
+                    break;
+            }
+        }
     }
 }
