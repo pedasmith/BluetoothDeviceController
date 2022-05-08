@@ -1,4 +1,5 @@
-﻿using BluetoothDeviceController.Beacons;
+﻿using BluetoothDeviceController;
+using BluetoothDeviceController.Beacons;
 using BluetoothDeviceController.BluetoothDefinitionLanguage;
 using BluetoothDeviceController.BluetoothProtocolsCustom;
 using BluetoothProtocols;
@@ -40,9 +41,13 @@ namespace BluetoothWatcher
     {
         public MainPage()
         {
+            UserPreferences.MainUserPreferences = Preferences;
             this.InitializeComponent();
             this.Loaded += MainPage_Loaded;
         }
+        public UserPreferences Preferences { get; } = new UserPreferences();
+
+
         // // // BluetoothLEAdvertisementWatcher BleAdvertisementWatcher = null;
         AdvertisementWatcher BleWatcher = new AdvertisementWatcher();
         Dictionary<ulong, DeviceDisplays.RuuviDisplay> RuuviDisplays = new Dictionary<ulong, DeviceDisplays.RuuviDisplay>();

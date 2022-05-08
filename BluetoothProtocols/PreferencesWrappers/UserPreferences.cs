@@ -8,6 +8,7 @@ namespace BluetoothDeviceController
 {
     public class UserPreferences
     {
+        public static UserPreferences MainUserPreferences { get; set; } = null;
         public enum DisplayPreference {
             Specialized_Display,
             Device_Editor };
@@ -28,7 +29,8 @@ namespace BluetoothDeviceController
         /// not what most users will want. Instead scan for a limited amount of time. As of 2022-04-16, this isn't settable
         /// by the user.
         /// </summary>
-        public int AdvertisementScanTimeInMilliseconds { get; set; } = 5_000; // 5 seconds is a good amount of time
+        public int AdvertisementScanTimeInMilliseconds { get; set; } = 10_000; // 10 seconds is a good amount of time
+        // Was 5 seconds, but that felt too quick.
 
         public bool BeaconFullDetails { get; set; } = false;
         public bool BeaconTrackAll { get; set; } = false;

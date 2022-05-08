@@ -118,7 +118,7 @@ namespace BluetoothDeviceController.BleEditor
                     {
                         var knownDevice = BleNames.GetDevice(ble.Name);
                         BleDeviceId = ble.DeviceId;
-                        var upref = di.UserPreferences ?? MainPage.TheMainPage.Preferences;
+                        var upref = di.UserPreferences ?? UserPreferences.MainUserPreferences;
                         await DisplayBluetooth(knownDevice, di, ble, upref.AutomaticallyReadData);
                     }
                 }

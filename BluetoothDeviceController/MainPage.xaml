@@ -27,6 +27,13 @@
                 <MenuFlyoutSeparator />
                 <ToggleMenuFlyoutItem x:Name="uiMenuKeepScreenOn" Text="Keep screen on" IsChecked="False" Click="MenuOnToggleScreenOn" />
             </MenuBarItem>
+            <MenuBarItem Title="Filter" x:Name="uiFilterSimpleBeaconPage">
+                <MenuFlyoutItem Text="Sort by MAC address" Click="MenuOnFilterBeaconSortByMac" />
+                <MenuFlyoutItem Text="Sort by Time" Click="MenuOnFilterBeaconSortByTime" />
+                <MenuFlyoutItem Text="Sort by RSS" Click="MenuOnFilterBeaconSortByRSS" />
+                <MenuFlyoutSeparator />
+                <ToggleMenuFlyoutItem x:Name="uiFilterSimpleBeaconPageAscending" Text="Sort AZ" IsChecked="False" Click="OnClientFilterSimpleBeaconPageAscending" />
+            </MenuBarItem>
         </MenuBar>
         
         

@@ -1,5 +1,6 @@
 ﻿using BluetoothDeviceController.BleEditor;
 using BluetoothDeviceController.BluetoothDefinitionLanguage;
+using BluetoothProtocols.Beacons;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,8 +31,13 @@ namespace BluetoothDeviceController.Beacons
     /// </summary>
     public sealed partial class SimpleBeaconPage : Page
     {
+        public enum SortBy { Mac, Time, Rss, };
+        public enum SortDirection { Ascending, Descending };
+        public static SimpleBeaconPage TheSimpleBeaconPage = null;
+
         public SimpleBeaconPage()
         {
+            TheSimpleBeaconPage = this;
             this.InitializeComponent();
             this.DataContext = this;
             this.Loaded += SimpleBeaconPage_Loaded;
@@ -68,13 +74,13 @@ namespace BluetoothDeviceController.Beacons
             {
                 //TODO: remove var retval = uiTrackAll.IsChecked.Value;
                 //if (di.BeaconPreferences != null) retval = di.BeaconPreferences.DefaultTrackAll;
-                var retval = MainPage.TheMainPage.Preferences.BeaconTrackAll;
+                var retval = UserPreferences.MainUserPreferences.BeaconTrackAll;
                 return retval;
             }
         }
-        private bool IgnoreApple {  get { return MainPage.TheMainPage.Preferences.BeaconIgnoreApple; } }
-        private bool FullDetails {  get { return MainPage.TheMainPage.Preferences.BeaconFullDetails; } }
-        private double CLOSE_SIGNAL_STRENGTH { get { return MainPage.TheMainPage.Preferences.BeaconDbLevel; } }
+        private bool IgnoreApple { get { return UserPreferences.MainUserPreferences.BeaconIgnoreApple; } }
+        private bool FullDetails { get { return UserPreferences.MainUserPreferences.BeaconFullDetails; } }
+        private double CLOSE_SIGNAL_STRENGTH { get { return UserPreferences.MainUserPreferences.BeaconDbLevel; } }
 
         HashSet<ulong> BleAddressesSeen = new HashSet<ulong>();
         private async void BleAdvert_UpdatedUniversalBleAdvertisement(Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementReceivedEventArgs data)
@@ -95,146 +101,201 @@ namespace BluetoothDeviceController.Beacons
                 await UpdateUI(data, TrackAll);
             }
         }
+        private string AdvertisementToString(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, DateTime eventTime, bool includeLeadingAddress)
+        {
+            var address = BluetoothAddress.AsString(bleAdvert.BluetoothAddress);
+
+            var time24 = eventTime.ToString("HH:mm:ss.f");
+            var indent = "    ";
+
+            sbyte transmitPower = 0;
+            bool haveTransmitPower = false;
+            bool isApple10 = false;
+            string appearance = "";
+            string completeLocalName = "";
+            UInt16 companyId = 0xFFFF;
+
+            var builder = new StringBuilder();
+            foreach (var section in bleAdvert.Advertisement.DataSections)
+            {
+                var dtv = AdvertisementDataSectionParser.ConvertDataTypeValue(section.DataType);
+                switch (dtv)
+                {
+                    case AdvertisementDataSectionParser.DataTypeValue.Appearance:
+                        appearance = AdvertisementDataSectionParser.ParseAppearance(section);
+                        break;
+                    case AdvertisementDataSectionParser.DataTypeValue.CompleteLocalName:
+                        {
+                            var dr = DataReader.FromBuffer(section.Data);
+                            completeLocalName = dr.ReadString(dr.UnconsumedBufferLength);
+                        }
+                        break;
+                    case AdvertisementDataSectionParser.DataTypeValue.TxPowerLevel:
+                        transmitPower = AdvertisementDataSectionParser.ParseTxPowerLevel(section);
+                        haveTransmitPower = true;
+                        break;
+                    case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
+                    case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
+                    case AdvertisementDataSectionParser.DataTypeValue.Flags:
+                        if (FullDetails)
+                        {
+                            string result;
+                            BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
+                            (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
+                            builder.Append(result);
+                        }
+                        break;
+                    case AdvertisementDataSectionParser.DataTypeValue.ManufacturerData:
+                        {
+                            string result;
+                            BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
+                            (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
+                            isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
+                            builder.Append(result);
+
+                        }
+                        break;
+                    default:
+                        {
+                            string result;
+                            BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
+                            (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
+                            isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
+                            builder.Append(result);
+                            if (bleAdvert.Advertisement.LocalName.Contains("Govee") || completeLocalName.Contains("Govee"))
+                            {
+                                ;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            // Pull data from the ManufacturerData
+            // Never need to pull data from ManufacturerData; it's already here
+            // via the DataSections item.
+
+            // We don't know all of the header information until later
+            //TODO: microsoft manufacturer data includes swiftpair!
+            if (!completeLocalName.Contains("Govee") && !completeLocalName.Contains("LC")) // just for debugging
+            {
+                // TODO: just for some debugging: return;
+            }
+            var header = $"{address}\t{time24}\t{bleAdvert.RawSignalStrengthInDBm}";
+            if (haveTransmitPower) header += $"\t{transmitPower.ToString()}";
+            header += "\t" + appearance;
+            if (completeLocalName != "") header += "\t" + completeLocalName;
+            var txt = $"{header}\n{builder}\n";
+            return txt;
+        }
+
+        private bool IsApple10(BluetoothLEAdvertisementReceivedEventArgs bleAdvert)
+        {
+
+            sbyte transmitPower = 0;
+            bool isApple10 = false;
+
+            var builder = new StringBuilder();
+            foreach (var section in bleAdvert.Advertisement.DataSections)
+            {
+                var dtv = AdvertisementDataSectionParser.ConvertDataTypeValue(section.DataType);
+                switch (dtv)
+                {
+                    case AdvertisementDataSectionParser.DataTypeValue.ManufacturerData:
+                        {
+                            var manufacturerType = BluetoothCompanyIdentifier.ParseManufacturerDataType(section, transmitPower);
+                            isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
+                        }
+                        break;
+                }
+            }
+
+            return isApple10;
+        }
+
+        List<SimpleBeaconHistory> AdvertisementHistory = new List<SimpleBeaconHistory>();
+
 
         private async Task UpdateUI(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, bool includeLeadingAddress = true)
         {
-            // For debugging: include only close-by signals
-            bool isClose = bleAdvert.RawSignalStrengthInDBm > CLOSE_SIGNAL_STRENGTH;
-            if (!isClose)
+            var advertTime = DateTime.Now;
+            var txt = AdvertisementToString(bleAdvert, advertTime, includeLeadingAddress);
+            string boldText = null;
+            bool isNewAddress = BleAddressesSeen.Add(bleAdvert.BluetoothAddress); // add returns false if already present
+            if (isNewAddress)
             {
-                return;
+                var (name, id, description) = BleAdvertisementFormat.GetBleName(null, bleAdvert);
+                //var str = $"New device: addr={addrstring}";
+                //if (name != addrstring) str += ($" name={name}");
+                //if (id != name) str += ($" id={id}");
+                //str += ($" d={description}\n");
+                boldText = (isNewAddress ? "New device: " : "") + description + "\n";
             }
+
+            var h = SimpleBeaconHistory.MakeFromAdvertisement(bleAdvert, advertTime, boldText, txt);
+            AdvertisementHistory.Add(h);
+
+            var shouldIgnore = ShouldIgnore(h);
+            if (shouldIgnore) return;
 
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                bool isNewAddress = BleAddressesSeen.Add(bleAdvert.BluetoothAddress); // add returns false if already present
-                var address = BluetoothAddress.AsString(bleAdvert.BluetoothAddress);
-
-                var eventTime = DateTime.Now;
-                var time24 = eventTime.ToString("HH:mm:ss.f");
-                var indent = "    ";
-
-                sbyte transmitPower = 0;
-                bool haveTransmitPower = false;
-                bool isApple10 = false; 
-                string appearance = "";
-                string completeLocalName = "";
-                UInt16 companyId = 0xFFFF;
-
-                var builder = new StringBuilder();
-                Run bold = null;
-                if (isNewAddress)
+                var lines = h.MakeRun();
+                foreach (var run in lines)
                 {
-                    var (name, id, description) = BleAdvertisementFormat.GetBleName(null, bleAdvert);
-                    //var str = $"New device: addr={addrstring}";
-                    //if (name != addrstring) str += ($" name={name}");
-                    //if (id != name) str += ($" id={id}");
-                    //str += ($" d={description}\n");
-                    var str = (isNewAddress ? "New device: " : "") + description + "\n";
-                    bold = new Run() { Text = str, FontWeight = FontWeights.Bold };
-                }
-                foreach (var section in bleAdvert.Advertisement.DataSections)
-                {
-                    var dtv = AdvertisementDataSectionParser.ConvertDataTypeValue(section.DataType);
-                    switch (dtv)
-                    {
-                        case AdvertisementDataSectionParser.DataTypeValue.Appearance:
-                            appearance = AdvertisementDataSectionParser.ParseAppearance(section);
-                            break;
-                        case AdvertisementDataSectionParser.DataTypeValue.CompleteLocalName:
-                            {
-                                var dr = DataReader.FromBuffer(section.Data);
-                                completeLocalName = dr.ReadString(dr.UnconsumedBufferLength);
-                            }
-                            break;
-                        case AdvertisementDataSectionParser.DataTypeValue.TxPowerLevel:
-                            transmitPower = AdvertisementDataSectionParser.ParseTxPowerLevel(section);
-                            haveTransmitPower = true;
-                            break;
-                        case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
-                        case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
-                        case AdvertisementDataSectionParser.DataTypeValue.Flags:
-                            if (FullDetails)
-                            {
-                                string result;
-                                BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
-                                (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
-                                builder.Append(result);
-                            }
-                            break;
-                        case AdvertisementDataSectionParser.DataTypeValue.ManufacturerData:
-                            {
-                                string result;
-                                BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
-                                (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
-                                isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
-                                builder.Append(result);
-
-                            }
-                            break;
-                        default:
-                            {
-                                string result;
-                                BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
-                                (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
-                                isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
-                                builder.Append(result);
-                                if (bleAdvert.Advertisement.LocalName.Contains ("Govee") || completeLocalName.Contains ("Govee"))
-                                {
-                                    ;
-                                }
-                            }
-                            break;
-                    }
-                }
-
-                // Pull data from the ManufacturerData
-                // Never need to pull data from ManufacturerData; it's already here
-                // via the DataSections item.
-#if NEVER_EVER_DEFINED
-                var mds = new StringBuilder();
-                if (bleAdvert.Advertisement.ManufacturerData.Count == 0)
-                {
-                    mds.Append("    No manufacturer data\n");
-                }
-                else
-                {
-                    foreach (var md in bleAdvert.Advertisement.ManufacturerData)
-                    {
-                        var company = md.CompanyId;
-                        var data = md.Data.ToArray();
-                        mds.Append($"    ManufacturerData: {company:X}: ");
-                        foreach (var b in data)
-                        {
-                            mds.Append($"{b:X2} ");
-                        }
-                        mds.Append("\n");
-                    }
-                }
-                builder.Append(mds);
-#endif
-                // We don't know all of the header information until later
-                //TODO: microsoft manufacturer data includes swiftpair!
-                if (!completeLocalName.Contains ("Govee") && !completeLocalName.Contains ("LC")) // just for debugging
-                {
-                    // TODO: just for some debugging: return;
-                }
-                var header = $"{address}\t{time24}\t{bleAdvert.RawSignalStrengthInDBm}";
-                if (haveTransmitPower) header += $"\t{transmitPower.ToString()}";
-                header += "\t" + appearance;
-                if (completeLocalName != "") header += "\t" + completeLocalName;
-                var txt = $"{header}\n{builder}\n";
-                var run = new Run() { Text = txt };
-
-                var suppress = isApple10 && IgnoreApple;
-                // Just for debugging: suppress = (companyId != 1177);
-                if (!suppress)
-                {
-                    if (bold != null) uiBeaconData.Inlines.Add(bold);
                     uiBeaconData.Inlines.Add(run);
                 }
             });
+        }
 
+        bool ShouldIgnore(SimpleBeaconHistory item)
+        {
+
+            bool isClose = item.Args.RawSignalStrengthInDBm > CLOSE_SIGNAL_STRENGTH;
+            if (!isClose)
+            {
+                return true;
+            }
+            bool isApple10 = IsApple10(item.Args);
+            var suppress = isApple10 && IgnoreApple;
+            return suppress;
+        }
+            
+
+
+        public async Task SortAsync (int millisecondsDelay, SortBy sortBy, SortDirection sortDirection)
+        {
+            uiBeaconData.Inlines.Clear();
+            await Task.Delay(millisecondsDelay); // 500 is good
+
+            AdvertisementHistory.Sort((item1, item2) =>
+            {
+                var itemA = sortDirection == SortDirection.Ascending ? item1 : item2;
+                var itemB = sortDirection == SortDirection.Ascending ? item2 : item1;
+                switch (sortBy)
+                {
+                    default:
+                    case SortBy.Mac:
+                        return itemA.Address.CompareTo(itemB.Address);
+                    case SortBy.Rss:
+                        return itemA.Args.RawSignalStrengthInDBm.CompareTo(itemB.Args.RawSignalStrengthInDBm);
+                    case SortBy.Time:
+                        return itemA.AdvertisementTime.CompareTo(itemB.AdvertisementTime);
+                }
+            });
+
+            foreach (var h in AdvertisementHistory)
+            {
+                var shouldIgnore = ShouldIgnore(h);
+                if (!shouldIgnore)
+                {
+                    var lines = h.MakeRun();
+                    foreach (var run in lines)
+                    {
+                        uiBeaconData.Inlines.Add(run);
+                    }
+                }
+            }
         }
     }
 }

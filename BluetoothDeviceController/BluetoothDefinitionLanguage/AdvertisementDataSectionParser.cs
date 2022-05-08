@@ -172,7 +172,27 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             if (!string.IsNullOrWhiteSpace(str)) str = indent + str;
             return (str, manufacturerType, companyId);
         }
-
+        public static BluetoothCompanyIdentifier.CommonManufacturerType ParseManufacturerType(BluetoothLEAdvertisementDataSection section, sbyte txPower, string indent)
+        {
+            byte b = section.DataType;
+            DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value
+            BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
+            try
+            {
+                switch (dtv)
+                {
+                    case DataTypeValue.ManufacturerData:
+                        manufacturerType = BluetoothCompanyIdentifier.ParseManufacturerDataType(section, txPower);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return manufacturerType;
+        }
         /// <summary>
         /// Gotta say, the flags data is pretty uninteresting. Maybe only show flags
         /// when there's a special switch set?

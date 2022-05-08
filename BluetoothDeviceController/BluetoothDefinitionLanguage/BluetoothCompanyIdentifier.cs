@@ -2715,5 +2715,54 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             }
         }
 
+        /// <summary>
+        /// Parses an manufacturerer section (not just any section!) and returns the company type.
+        /// This is really just to find if a beacon is one with a known specialty and in particular the Apple10 type
+        /// which is often filtered out of the beacon display.
+        /// </summary>
+        /// <param name="section"></param>
+        /// <param name="txPower"></param>
+        /// <returns></returns>
+        public static CommonManufacturerType ParseManufacturerDataType(BluetoothLEAdvertisementDataSection section, sbyte txPower)
+        {
+            CommonManufacturerType manufacturerType = CommonManufacturerType.Other;
+            UInt16 companyId = 0xFFFF;
+            try
+            {
+                var bytes = section.Data.ToArray();
+                var dr = DataReader.FromBuffer(section.Data);
+                dr.ByteOrder = ByteOrder.LittleEndian; // bluetooth defaults to little endian.
+                companyId = dr.ReadUInt16();
+                switch (companyId)
+                {
+                    case 0x004C: // Apple
+                        var appleIBeacon = Apple_IBeacon.Parse(section, txPower);
+                        if (appleIBeacon.IsValid)
+                        {
+                            ;
+                        }
+                        else if (appleIBeacon.IsApple10)
+                        {
+                            manufacturerType = CommonManufacturerType.Apple10;
+                        }
+                        break;
+
+                    case 0x0499: // Ruuvi
+                        manufacturerType = CommonManufacturerType.Ruuvi;
+                        break;
+                    default:
+                        var companyName = GetBluetoothCompanyIdentifier(companyId);
+                        System.Diagnostics.Debug.WriteLine($"NOTE: saw company {companyId:X4}={companyName}");
+                        break;
+                }
+                return manufacturerType;
+            }
+            catch (Exception)
+            {
+                return manufacturerType;
+            }
+        }
+
+
     }
 }

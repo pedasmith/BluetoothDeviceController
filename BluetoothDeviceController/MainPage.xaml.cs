@@ -126,15 +126,14 @@ namespace BluetoothDeviceController
         public string CurrJsonSearch { get; internal set; }
         IDoSearchFeedback SearchFeedback { get; set; }  = null;
 
-        public static MainPage TheMainPage = null;
-
+ 
         public string ZZZZGetCurrentSearchResults()
         {
             return CurrJsonSearch;
         }
         public MainPage()
         {
-            TheMainPage = this;
+            UserPreferences.MainUserPreferences = Preferences;
             this.InitializeComponent();
             this.Loaded += MainPage_Loaded;
             Test();
@@ -415,6 +414,10 @@ namespace BluetoothDeviceController
                 // There's also a device information page, but it's not really useful at all.
             }
             SetParentScrolltype(scrollType);
+            // Show the Filter menu for the beacon page if we should
+            var pageIsBeacon = _pageType == typeof(Beacons.SimpleBeaconPage);
+            uiFilterSimpleBeaconPage.Visibility = pageIsBeacon ? Visibility.Visible : Visibility.Collapsed;
+
             // Get the page type before navigation so you can prevent duplicate
             // entries in the backstack. Except that I use the same page type for e.g. different Thingy devices.
             var preNavPageType = ContentFrame.CurrentSourcePageType;
@@ -994,6 +997,7 @@ namespace BluetoothDeviceController
 
         private void MenuBleWatcher_Stopped(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementWatcherStoppedEventArgs args)
         {
+            // Might well be a duplicate; the timer (Timeout_BluetoothLEAdvertisementWatcher_Tick) will already have called CancelSearch()
             SearchFeedback.StopSearchFeedback();
         }
 
@@ -1368,6 +1372,35 @@ namespace BluetoothDeviceController
             {
                 CurrDisplayRequest.RequestRelease();
             }
+        }
+
+        SimpleBeaconPage.SortBy SavedBeaconSortBy = SimpleBeaconPage.SortBy.Time;
+        SimpleBeaconPage.SortDirection SavedBeaconSortDirection = SimpleBeaconPage.SortDirection.Ascending;
+
+
+        const int DEFAULT_SEARCH_DELAY_UX = 500;
+        private async void MenuOnFilterBeaconSortByMac(object sender, RoutedEventArgs e)
+        {
+            SavedBeaconSortBy = SimpleBeaconPage.SortBy.Mac;
+            await SimpleBeaconPage.TheSimpleBeaconPage.SortAsync(DEFAULT_SEARCH_DELAY_UX, SavedBeaconSortBy, SavedBeaconSortDirection);
+        }
+
+        private async void MenuOnFilterBeaconSortByTime(object sender, RoutedEventArgs e)
+        {
+            SavedBeaconSortBy = SimpleBeaconPage.SortBy.Time;
+            await SimpleBeaconPage.TheSimpleBeaconPage.SortAsync(DEFAULT_SEARCH_DELAY_UX, SavedBeaconSortBy, SavedBeaconSortDirection);
+        }
+
+        private async void MenuOnFilterBeaconSortByRSS(object sender, RoutedEventArgs e)
+        {
+            SavedBeaconSortBy = SimpleBeaconPage.SortBy.Rss;
+            await SimpleBeaconPage.TheSimpleBeaconPage.SortAsync(DEFAULT_SEARCH_DELAY_UX, SavedBeaconSortBy, SavedBeaconSortDirection);
+        }
+
+        private async void OnClientFilterSimpleBeaconPageAscending(object sender, RoutedEventArgs e)
+        {
+            SavedBeaconSortDirection = uiFilterSimpleBeaconPageAscending.IsChecked ? SimpleBeaconPage.SortDirection.Ascending : SimpleBeaconPage.SortDirection.Descending;
+            await SimpleBeaconPage.TheSimpleBeaconPage.SortAsync(DEFAULT_SEARCH_DELAY_UX, SavedBeaconSortBy, SavedBeaconSortDirection);
         }
     }
 }

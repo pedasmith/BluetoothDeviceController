@@ -25,9 +25,43 @@ namespace BluetoothDeviceController
             this.InitializeComponent();
         }
 
+        /// <summary>
+        /// Returns TRUE iff the current thread is the UI thread
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsOnUIThread()
+        {
+            var dispather = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
+            var retval = dispather.HasThreadAccess;
+            return retval;
+        }
+
+        /// <summary>
+        /// Calls the given function either directly or on the UI thread the TryRunAsync(). The resulting task is just thrown away.
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="priority"></param>
+        public static void CallOnUIThread(Action f, Windows.UI.Core.CoreDispatcherPriority priority = Windows.UI.Core.CoreDispatcherPriority.Low)
+        {
+            if (IsOnUIThread())
+            {
+                f();
+            }
+            else
+            {
+                var dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
+                var task = dispatcher.TryRunAsync(priority, () => { f(); });
+            }
+        }
+
         int nFound = 0;
         int nFoundAll = 0;
 
+        /// <summary>
+        /// Tells the main app to start a search; the main windows will eventually tell this control what's going on.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnSearch(object sender, RoutedEventArgs e)
         {
             if (Search == null) return;
@@ -47,17 +81,19 @@ namespace BluetoothDeviceController
             uiProgress.ShowPaused = false;
             nFound = 0;
             nFoundAll = 0;
+            UpdateUI();
         }
 
-        public static bool IsOnUIThread()
-        {
-            var dispather = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
-            var retval = dispather.HasThreadAccess;
-            return retval;
-        }
+
 
         public void StopSearchFeedback()
         {
+            CallOnUIThread( () => {
+                System.Diagnostics.Debug.WriteLine($"SearchFeedback: stopped");
+                uiProgress.ShowPaused = true;
+            });
+
+#if NEVER_EVER_DEFINED
             if (SearchFeedbackControl.IsOnUIThread())
             {
                 //System.Diagnostics.Debug.WriteLine($"SearchFeedback: stopped (quickly)");
@@ -72,6 +108,7 @@ namespace BluetoothDeviceController
                 });
 
             }
+#endif
         }
 
         public void FoundDevice(FoundDeviceInfo deviceInfo)
@@ -81,11 +118,16 @@ namespace BluetoothDeviceController
             {
                 nFound++;
             }
-            var task = this.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => {
-                uiFound.Text = nFound.ToString();
-                uiFoundAll.Text = (nFoundAll-nFound).ToString();
-            });
+            UpdateUI();
 
+        }
+
+        private void UpdateUI()
+        {
+            CallOnUIThread(() => {
+                uiFound.Text = nFound.ToString();
+                uiFoundAll.Text = (nFoundAll - nFound).ToString();
+            });
         }
     }
 }

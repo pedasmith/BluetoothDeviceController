@@ -21,6 +21,7 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\Ruuvi_Tag.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\Ruuvi_Tag_v1_Helper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\SimpleBeaconHistory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\SimpleBeaconPage.xaml.cs">
       <DependentUpon>SimpleBeaconPage.xaml</DependentUpon>
     </Compile>
