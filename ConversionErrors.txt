@@ -1,4 +1,6 @@
-Dear tim Brice and Todd Hall of the Weather Service,
+Sent 2021-05-21; I got a very nice answer back.
+
+Dear Tim Brice and Todd Hall of the Weather Service,
 
 While looking at the conversion formulas at https://www.weather.gov/media/epz/wxcalc/pressureConversion.pdf
 (this is pointed to from https://www.weather.gov/epz/wxcalc_pressureconvert), I couldn't help but notice the following errors:
@@ -36,7 +38,7 @@ The PDF gives the constant to convert PinHg to Ppsi as 0.491154. The JavaScript 
 
 
 
-I was using your PDF in an attempt to make my own conversion routines. I wanted to copy-and-paste your exact numbers into my code to avoid any typos, and then tested against your JavaScript. T
+I was using your PDF in an attempt to make my own conversion routines. I wanted to copy-and-paste your exact numbers into my code to avoid any typos, and then tested against your JavaScript. 
 
 Thanks,
 Peter Smith

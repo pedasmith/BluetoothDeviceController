@@ -31,19 +31,37 @@ namespace BluetoothDeviceController.Names
             }
             return false; // nothing matches; return false.
         }
+        /// <summary>
+        /// Name of the device. This will be used to match actual devices and should not include e.g., the MAC address of the device
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Should be [maker]_[device]. Be consistant with other devices. This is used directly to make C# class names, so it must be a valid C# class name.
+        /// </summary>
         public string ClassName { get; set; }
         public string GetClassName() { return String.IsNullOrEmpty(ClassName) ? (Name ?? "") : ClassName; }
+        /// <summary>
+        /// Additions to the class definitions; it generally blank or "partial". See the TI SensorTag 1350 for examples.
+        /// </summary>
         public string ClassModifiers { get; set; }
+        /// <summary>
+        /// User-supplied description of the device
+        /// </summary>
         public string Description { get; set; }
+        /// <summary>
+        /// The default PIN for the device. Many devices don't require PIN values.
+        /// </summary>
         public string DefaultPin { get; set; }
+        /// <summary>
+        /// List of aliases for the device; used by the Triones bulb.
+        /// </summary>
         public List<string> Aliases { get; set; } = new List<string>(); // Must not be null
         public IList<String> Links { get; } = new List<String>();
         public IList<NameService> Services { get; } = new List<NameService>();
 
         public NameService GetService (string uuid)
         {
-            foreach (var service in Services)
+            foreach (NameService service in Services)
             {
                 if (string.Compare(service.UUID, uuid, StringComparison.InvariantCultureIgnoreCase) == 0)
                 {

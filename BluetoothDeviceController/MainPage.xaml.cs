@@ -67,14 +67,15 @@ namespace BluetoothDeviceController
         const string ALARM = "⏰";
         const string BEACON = "⛯"; // MAP SYMBOL FOR LIGHTHOUSE //"🖄";
         const string CAR = "🚗";
-        const string DATA = "📈"; //"🥼";
+        const string DATA = "📈"; 
+        const string DICE = "🎲"; 
         const string HEALTH = "🏥"; //"🥼";
         const string LIGHT = "💡";
         const string LIGHTNING = "🖄"; // envelope with lightning
         const string ROBOT = ""; // Part of the Segoe MDL2 Assets FontFamily
         const string TRAIN = "🚂";
         const string UART = "🖀";
-        const string WAND = "🖉"; // yeah, a pencil isn't reall a wand.
+        const string WAND = "🖉"; // yeah, a pencil isn't really a wand.
         const string WATER = "🚰";
 
         
@@ -86,10 +87,11 @@ namespace BluetoothDeviceController
             // Fun specializations
             new Specialization (typeof(SpecialtyPages.Kano_WandPage), new string[] { "Kano-Wand" }, WAND, "Kano Wand", "Kano coding kit Harry Potter Wand"),
             new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { "Puck" }, UART, "Espruino (puck)", "Puck.js: a UART-based Espruino device", Specialization.ParentScrollType.ChildHandlesScrolling),
-            new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { Nordic_Uart.SpecializationName }, UART, "UART Comm port", "Nordic UART comm port", Specialization.ParentScrollType.ChildHandlesScrolling),
+            new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { Nordic_Uart.SpecializationName }, UART, "BLE UART COM port", "Nordic UART comm port", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPagesCustom.CraftyRobot_SmartibotPage), new string[] { "Smartibot" }, ROBOT, "Smartibot", "Smartibot espruino-based robot", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPages.Elegoo_MiniCarPage), new string[] { "ELEGOO BT16" }, CAR, "Elegoo Mini-Car", "Elegoo small robot car"),
             new Specialization (typeof(SpecialtyPages.Lionel_LionChiefPage), new string[] { "LC" }, TRAIN, "LionChief Train", "Lionel Train Controller"),
+            new Specialization (typeof(SpecialtyPages.Particula_GoDicePage), new string[] { "GoDice" }, DICE, "Particula GoDice", "GoDice 6-sided game dice"),
             new Specialization (typeof(SpecialtyPages.WilliamWeilerEngineering_SkoobotPage), new string[] { "Skoobot" }, ROBOT, "Skoobot", "Skoobot tiny robot"),
 
             // Lights
@@ -187,6 +189,9 @@ namespace BluetoothDeviceController
             ContentFrame.Navigated += ContentFrame_Navigated;
             Preferences.ReadFromLocalSettings();
             SerialPortPreferences.ReadFromLocalSettings();
+            UpdateUIFromPreferences();
+
+            
 
             // must set up searchfeedback before first navigation
             SearchFeedback = uiSearchFeedback;
@@ -213,6 +218,10 @@ namespace BluetoothDeviceController
             uiDock.DockParent = this;
         }
 
+        private void UpdateUIFromPreferences()
+        {
+            uiMenuFilterSimpleBeaconPageAscending.IsChecked = Preferences.MenuFilterSortDirection == SimpleBeaconPage.SortDirection.Ascending;
+        }
 
 
         /// <summary>
@@ -225,6 +234,7 @@ namespace BluetoothDeviceController
             var content = ContentFrame.Content as HasId;
             var hasmin = (content != null);
             uiMinimizeButton.Visibility = hasmin ? Visibility.Visible : Visibility.Collapsed;
+            uiDeviceStatusBox.Visibility = hasmin ? Visibility.Visible : Visibility.Collapsed;
 
             var handleStatus = ContentFrame.Content as SpecialtyPages.ISetHandleStatus;
             handleStatus?.SetHandleStatus(this);
@@ -613,7 +623,7 @@ namespace BluetoothDeviceController
         List<NavigationViewItem> MenuItemCache = new List<NavigationViewItem>();
 
         /// <summary>
-        /// Called both when a device is added and when it's being updated
+        /// Adds device to navigation list. Called both when a device is added and when it's being updated
         /// </summary>
         /// <param name="wrapper"></param>
         /// <returns></returns>
@@ -660,8 +670,8 @@ namespace BluetoothDeviceController
             var menu = new NavigationViewItem()
             {
                 Tag = wrapper,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
             };
-            menu.HorizontalAlignment = HorizontalAlignment.Stretch;
             MenuItemCache.Add(menu); // must add to cache before we do any awaits.
 
 
@@ -1397,7 +1407,7 @@ namespace BluetoothDeviceController
         }
 
         SimpleBeaconPage.SortBy SavedBeaconSortBy = SimpleBeaconPage.SortBy.Time;
-        SimpleBeaconPage.SortDirection SavedBeaconSortDirection = SimpleBeaconPage.SortDirection.Ascending;
+        // Can delete any time: Sort direction is in preferences now: SimpleBeaconPage.SortDirection SavedBeaconSortDirection = SimpleBeaconPage.SortDirection.Ascending;
         ulong SavedBeaconFilter = 0;
 
 
@@ -1422,7 +1432,14 @@ namespace BluetoothDeviceController
 
         private async void OnClientFilterSimpleBeaconPageAscending(object sender, RoutedEventArgs e)
         {
-            SavedBeaconSortDirection = uiFilterSimpleBeaconPageAscending.IsChecked ? SimpleBeaconPage.SortDirection.Ascending : SimpleBeaconPage.SortDirection.Descending;
+            // Might be called while we're still loading. But it's not called? Evn through there's a callback, and
+            // other UI elements are called when they are set while loading?
+            if (!this.IsLoaded)
+            {
+                return;
+            }
+            Preferences.MenuFilterSortDirection  = uiMenuFilterSimpleBeaconPageAscending.IsChecked ? SimpleBeaconPage.SortDirection.Ascending : SimpleBeaconPage.SortDirection.Descending;
+            Preferences.SaveToLocalSettings();
             await UpdateSimpleBeaconPage();
         }
 
@@ -1430,7 +1447,7 @@ namespace BluetoothDeviceController
         {
             SimpleBeaconPage.TheSimpleBeaconPage.CurrMillisecondsDelay = DEFAULT_SEARCH_DELAY_UX;
             SimpleBeaconPage.TheSimpleBeaconPage.CurrSortBy = SavedBeaconSortBy;
-            SimpleBeaconPage.TheSimpleBeaconPage.CurrSortDirection = SavedBeaconSortDirection;
+            SimpleBeaconPage.TheSimpleBeaconPage.CurrSortDirection = Preferences.MenuFilterSortDirection;
             SimpleBeaconPage.TheSimpleBeaconPage.CurrBleAddressFilter = SavedBeaconFilter;
 
             await SimpleBeaconPage.TheSimpleBeaconPage.SortAsync();
@@ -1459,6 +1476,16 @@ namespace BluetoothDeviceController
         {
         }
 
-
+        private async void MenuOnGenerateCode(object sender, RoutedEventArgs e)
+        {
+            var dlg = new ContentDialog()
+            {
+                Content = new GenerateCodeControl(),
+                PrimaryButtonText = "OK",
+                Title = "Generate Code from JSON descriptions",
+                Width = 500,
+            };
+            await dlg.ShowAsync();
+        }
     }
 }

@@ -743,7 +743,7 @@ typeof([[CHARACTERISTICNAME]]Record).GetProperty(""[[DATANAME]]""),", // DATA4_L
 ";
         public static string[] PageCSharp_CharacteristicRead_DataTemplates = new string[] { @"
                 var [[DATANAME]] = valueList.GetValue(""[[DATANAME]]"");
-                if ([[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsDouble || [[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if ([[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsDouble || [[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsString || [[DATANAME]].IsArray)
                 {
                     record.[[DATANAME]] = ([[VARIABLETYPE_DS]])[[DATANAME]].[[AS_DOUBLE_OR_STRING]];
                     [[CHARACTERISTICNAME]]_[[DATANAME]].Text = record.[[DATANAME]].ToString(); // ""N0""); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
@@ -922,7 +922,7 @@ typeof([[CHARACTERISTICNAME]]Record).GetProperty(""[[DATANAME]]""),", // DATA4_L
 
         public static string[] PageCSharp_CharacteristicNotify_DataTemplates = new string[] { @"
                 var [[DATANAME]] = valueList.GetValue(""[[DATANAME]]"");
-                if ([[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsDouble || [[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if ([[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsDouble || [[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsString || [[DATANAME]].IsArray)
                 {
                     record.[[DATANAME]] = ([[VARIABLETYPE_DS]])[[DATANAME]].[[AS_DOUBLE_OR_STRING]];
                     [[CHARACTERISTICNAME]]_[[DATANAME]].Text = record.[[DATANAME]].ToString(); // ""N0""); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?

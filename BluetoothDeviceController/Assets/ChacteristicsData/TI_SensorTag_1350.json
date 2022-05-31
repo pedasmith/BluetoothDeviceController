@@ -5,7 +5,6 @@
       "ClassName": "TI_SensorTag_1350",
       "ClassModifiers": "partial",
       "Description": "The TI 1350 and 2650 are the latest in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth",
-      "Aliases": [],
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

@@ -78,16 +78,23 @@ namespace BluetoothDeviceController.BleEditor
 
         private void UpdateDisplayWithCurrReadBuffer(bool addData = true)
         {
-            var bf = (string.IsNullOrEmpty(BytesFormat)) ? "BYTES" : BytesFormat;
-            var df = (string.IsNullOrEmpty(DisplayFormat)) ? "HEX" : DisplayFormat;
-            var df2 = (string.IsNullOrEmpty(DisplayFormatSecondary)) ? "" : DisplayFormatSecondary;
-            var displayType = $"{bf}|{df}^{df2}";
-            var result = ValueParser.Parse(CurrReadBuffer, displayType);
-            if (result.Result == ValueParserResult.ResultValues.Ok)
+            if (CurrReadBuffer != null)
             {
-                var data = result.UserString;
-                if (addData) AddData("Data", data);
-                uiEditBox.Text = data; // NOTE: what if I don't want hex?
+                var bf = (string.IsNullOrEmpty(BytesFormat)) ? "BYTES" : BytesFormat;
+                var df = (string.IsNullOrEmpty(DisplayFormat)) ? "HEX" : DisplayFormat;
+                var df2 = (string.IsNullOrEmpty(DisplayFormatSecondary)) ? "" : DisplayFormatSecondary;
+                var displayType = $"{bf}|{df}^{df2}";
+                var result = ValueParser.Parse(CurrReadBuffer, displayType);
+                if (result.Result == ValueParserResult.ResultValues.Ok)
+                {
+                    var data = result.UserString;
+                    if (addData) AddData("Data", data);
+                    uiEditBox.Text = data; // NOTE: what if I don't want hex?
+                }
+            }
+            else
+            {
+                uiEditBox.Text = ""; // TODO: maybe save the last value and display that?
             }
         }
         public async Task InitAsync(GattDeviceService service, GattCharacteristic characteristic)

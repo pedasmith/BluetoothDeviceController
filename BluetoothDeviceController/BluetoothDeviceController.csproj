@@ -242,6 +242,9 @@
     <Compile Include="SpecialtyPages\Nordic_ThingyPage.xaml.cs">
       <DependentUpon>Nordic_ThingyPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPages\Paticula_GoDice.xaml.cs">
+      <DependentUpon>Paticula_GoDice.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SpecialtyPages\Protocentral_SensythingPage.xaml.cs">
       <DependentUpon>Protocentral_SensythingPage.xaml</DependentUpon>
     </Compile>
@@ -671,6 +674,9 @@
     <Content Include="Assets\ChacteristicsData\Wescale_KitchenScale.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ChacteristicsData\Particula_GoDice.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\HelpFiles\Device_Elegoo_MiniCar.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -941,6 +947,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPages\Nordic_ThingyPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPages\Paticula_GoDice.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -4,7 +4,6 @@
       "Name": "Dotti",
       "ClassName": "Witti_Dotti",
       "ClassModifiers": "partial",
-      "Aliases": [],
       "Links": [
         "https://www.wittidesign.com/products/dotti-one",
         "https://www.wittidesign.com/pages/video-tutorials-dotti",
@@ -233,7 +232,6 @@
       "Name": "Notti",
       "ClassName": "Witti_Notti",
       "ClassModifiers": "partial",
-      "Aliases": [],
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

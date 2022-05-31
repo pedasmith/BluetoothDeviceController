@@ -8,7 +8,7 @@
       "Links": [
         "https://github.com/madhead/saberlight/blob/master/protocols/Triones/protocol.md",
         "https://github.com/hunsly/Ledblee-Triones-control",
-        "https://github.com/Betree/magicblue/wiki/Characteristics-list"
+        "https://github.com/Betree/magicblue/wiki/Characteristics-list",
       ],
 
       "Services": [
@@ -104,6 +104,7 @@
               "UUID": "0000ffd9-0000-1000-8000-00805f9b34fb",
               "Name": "Triones Command",
               "Type": "BYTES|HEX",
+              "IsWriteWithoutResponse": true,
               "SampleCommands": [
                 ""
               ]

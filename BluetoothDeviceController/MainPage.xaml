@@ -23,6 +23,9 @@
                 <MenuFlyoutItem Text="Beacon/Advertisement Long-running sweep" Click="MenuOnSweepBeaconAdvertisement" />
                 <MenuFlyoutItem Text="Full BLE sweep" Click="MenuOnSweepBleFull" />
                 <MenuFlyoutItem Text="✀ Copy sweep results as JSON" Click="OnMenuAutomationSearchCopyJson"  />
+                
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="📰 Generate code from Bluetooth" Click="MenuOnGenerateCode" ToolTipService.ToolTip="Generate code from Bluetooth" />
 
                 <MenuFlyoutSeparator />
                 <ToggleMenuFlyoutItem x:Name="uiMenuKeepScreenOn" Text="Keep screen on" IsChecked="False" Click="MenuOnToggleScreenOn" />
@@ -32,7 +35,7 @@
                 <MenuFlyoutItem Text="Sort by Time" Click="MenuOnFilterBeaconSortByTime" />
                 <MenuFlyoutItem Text="Sort by RSS" Click="MenuOnFilterBeaconSortByRSS" />
                 <MenuFlyoutSeparator />
-                <ToggleMenuFlyoutItem x:Name="uiFilterSimpleBeaconPageAscending" Text="Sort AZ" IsChecked="False" Click="OnClientFilterSimpleBeaconPageAscending" />
+                <ToggleMenuFlyoutItem x:Name="uiMenuFilterSimpleBeaconPageAscending" Text="Sort AZ" IsChecked="True" Click="OnClientFilterSimpleBeaconPageAscending" />
             </MenuBarItem>
             <MenuBarItem Title="Help">
                 <MenuFlyoutItem Text="💁 Help" Tag="Help" Click="OnMenuHelpHelp" />
@@ -83,7 +86,9 @@
                               HorizontalAlignment="Left" VerticalAlignment="Top"
                               Width="160" Height="600"  />
 
+                <!-- moved to the Automation menu
                 <Button Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="📰" Click="OnGenerateCode" ToolTipService.ToolTip="Generate code from Bluetooth" />
+                -->
 
                 <!-- The contents have to have a higher Z order. Otherwise if the user
                 makes a chart, the little "flag" with current cursor values will be behind
@@ -103,7 +108,7 @@
                             Grid.Row="1" 
                             HorizontalAlignment="Right" VerticalAlignment="Top"
                             Click="OnMinimizeWindow"/>
-                    <Border Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                    <Border x:Name="uiDeviceStatusBox" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
                             BorderBrush="Black" Background="OldLace" Opacity=".8" >
                         <Grid>
                             <TextBlock x:Name="uiDeviceStatus" Text="Bluetooth device status" 

@@ -41,6 +41,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Mipow_Playbulb_BTL201.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Mipow_Playbulb_BTL201_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Nordic_Thingy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Particula_GoDice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Protocentral_Sensything.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Samico_BloodPressure_BG512.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\TI_beLight_2540.cs" />

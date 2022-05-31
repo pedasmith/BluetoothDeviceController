@@ -14,10 +14,15 @@ namespace BluetoothDeviceController
             Device_Editor };
         public DisplayPreference Display { get; set; } = DisplayPreference.Specialized_Display;
         public enum SearchScope {  
-            Has_specialized_display, 
+            [enumUtilities.Display("Bluetooth COM port")]
             Bluetooth_Com_Device, 
+            [enumUtilities.Display("BLE advertisements and beacons")]
             Bluetooth_Beacons,
+            [enumUtilities.Display("BLE known device types")]
+            Has_specialized_display,
+            [enumUtilities.Display("BLE devices with names")]
             Device_is_named, 
+            [enumUtilities.Display("All BLE devices")]
             All_bluetooth_devices };
         public SearchScope Scope { get; set; } = SearchScope.Has_specialized_display;
 
@@ -37,6 +42,11 @@ namespace BluetoothDeviceController
         public bool BeaconIgnoreApple { get; set; } = true;
         public double BeaconDbLevel { get; set; } = -80.0; // default min db level for beacon advert
 
+        /// <summary>
+        /// The setting from Menu / Filter / Sort AZ; is Ascending[D] or Descending 
+        /// </summary>
+        public Beacons.SimpleBeaconPage.SortDirection MenuFilterSortDirection { get; set; } = Beacons.SimpleBeaconPage.SortDirection.Ascending;
+
 
         const string DisplayPreferenceSetting = "UserPreferenceDisplayPreference";
         const string SearchScopeSetting = "UserPreferenceSearchScope";
@@ -48,6 +58,11 @@ namespace BluetoothDeviceController
         const string BeaconIgnoreAppleSetting = "UserPreferenceBeaconIgnoreApple";
         const string BeaconDbLevelSetting = "UserPreferenceBeaconDbLevel";
 
+        const string MenuFilterSortDirectionSetting = "MenuFilterSortDirection";
+
+        /// <summary>
+        /// Read from the LocalSettings saved settings into this object. This should always be in parallel to the Save... 
+        /// </summary>
         public void ReadFromLocalSettings()
         {
             var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
@@ -84,6 +99,10 @@ namespace BluetoothDeviceController
             {
                 BeaconDbLevel = (double)localSettings.Values[BeaconDbLevelSetting];
             }
+            if (localSettings.Values.ContainsKey(MenuFilterSortDirectionSetting))
+            {
+                MenuFilterSortDirection = (Beacons.SimpleBeaconPage.SortDirection)localSettings.Values[MenuFilterSortDirectionSetting];
+            }
         }
 
         public void SaveToLocalSettings()
@@ -98,6 +117,8 @@ namespace BluetoothDeviceController
             localSettings.Values[BeaconTrackAllSetting] = BeaconTrackAll;
             localSettings.Values[BeaconIgnoreAppleSetting] = BeaconIgnoreApple;
             localSettings.Values[BeaconDbLevelSetting] = BeaconDbLevel;
+
+            localSettings.Values[MenuFilterSortDirectionSetting] = (int)MenuFilterSortDirection;
         }
     }
 }

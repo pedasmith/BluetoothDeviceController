@@ -2,9 +2,7 @@
   "AllDevices": [
     {
       "Name": "Espruino SMARTIBOT",
-      "Aliases": [
-        "Smartibot"
-      ],
+      "Aliases": [ "Smartibot" ],
       "ClassName": "CraftyRobot_Smartibot",
       "ClassModifiers": "partial",
       "Description": "Robot with a carboard shell. The interior robot is a typical Espruino JavaScript-based bot. Communications are via a TX and RX characteristic.",
