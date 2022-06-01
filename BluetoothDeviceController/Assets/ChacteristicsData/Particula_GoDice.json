@@ -67,7 +67,7 @@
         {
           "UUID": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
           "Name": "DiceTransmit",
-          "Priority": 10,
+          "Priority": 5,
           "Description":  "Sends commands to the dice and gets events back",
           "Characteristics": [
             {

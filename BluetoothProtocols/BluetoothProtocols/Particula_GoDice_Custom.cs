@@ -6,8 +6,10 @@ namespace BluetoothProtocols
 {
     public partial class Particula_GoDice
     {
-        public enum Commands {  BatteryLevel = 0x03, GetColor = 0x17, SetColor = 0x08 };
-        public enum DiceColors {  Black = 0, Red=1, Green=2, Blue = 3, Yellow = 4, Orange = 5 };
+        public enum Commands { BatteryLevel = 0x03, GetColor = 0x17, SetColor = 0x08 };
+        public enum DiceColors { Black = 0, Red = 1, Green = 2, Blue = 3, Yellow = 4, Orange = 5 };
+
+        public static List<string> DiceFaces = new List<String>() { "⚀", "⚁", "⚂", "⚃", "⚄", "⚅" };
 
         public event EventHandler<int> OnBatteryLevel;
         public event EventHandler<int> OnColor;

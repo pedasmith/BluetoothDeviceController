@@ -75,10 +75,20 @@
             </StackPanel>
             <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/Particula_GoDice.PNG" />
         </Grid>
+        
+        <StackPanel Orientation="Horizontal">
+            <TextBlock>
+                <Run x:Name="uiDieIcon" FontSize="40" Text="..." />
+                <Run  FontSize="40" Text="    " />
+                <Run x:Name="uiDieText" FontSize="25" Text="" />
+            </TextBlock>
+        </StackPanel>
+        
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
 
-        <controls:Expander Header="DiceTransmit" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+
+        <controls:Expander Header="DiceTransmit" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Transmit</TextBlock>

@@ -56,6 +56,8 @@ namespace BluetoothDeviceController.SpecialtyPages
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
                     uiRollValue.Text = "Rolling!";
+                    uiDieIcon.Text = "...";
+                    uiDieText.Text = "Rolling";
                 });
             };
             bleDevice.OnRollStable += async (obj, dieRoll) => {
@@ -63,6 +65,16 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     uiRollValue.Text = dieRoll.ToString();
                     uiRollTypeValue.Text = "(good roll)";
+                    if (dieRoll >= 1 && dieRoll <= 6)
+                    {
+                        uiDieIcon.Text = $"{Particula_GoDice.DiceFaces[dieRoll - 1]}";
+                        uiDieText.Text = $"{dieRoll.ToString()}";
+                    }
+                    else
+                    {
+                        uiDieIcon.Text = $"❌";
+                        uiDieText.Text = $"Tilt  ({dieRoll.ToString()})";
+                    }
                 });
             };
             bleDevice.OnFakeStable += async (obj, dieRoll) => {
@@ -70,6 +82,8 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     uiRollValue.Text = dieRoll.ToString();
                     uiRollTypeValue.Text = "(fake stable)";
+                    uiDieIcon.Text = $"❌";
+                    uiDieText.Text = $"Tilt  ({dieRoll.ToString()}) F";
                 });
             };
             bleDevice.OnMoveStable += async (obj, dieRoll) => {
@@ -77,6 +91,8 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     uiRollValue.Text = dieRoll.ToString();
                     uiRollTypeValue.Text = "(moved)";
+                    uiDieIcon.Text = $"❌";
+                    uiDieText.Text = $"Tilt  ({dieRoll.ToString()}) M";
                 });
             };
             bleDevice.OnTiltStable += async (obj, dieRoll) => {
@@ -84,8 +100,12 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     uiRollValue.Text = dieRoll.ToString();
                     uiRollTypeValue.Text = "(tilted)";
+                    uiDieIcon.Text = $"❌";
+                    uiDieText.Text = $"Tilt  ({dieRoll.ToString()})";
                 });
             };
+
+            await DoNotifyReceive();
         }
 
         public string GetId()
