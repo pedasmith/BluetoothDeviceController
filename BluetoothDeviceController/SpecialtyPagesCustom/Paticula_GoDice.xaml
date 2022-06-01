@@ -103,6 +103,19 @@
                     <Button Content="Notify" Click="OnNotifyReceive" />
 
                 </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center">
+                    <Run>Battery Level: </Run>
+                    <Run x:Name="uiBatteryLevelValue">(not set)</Run>
+                    </TextBlock>
+                    <Button Content="Get Battery Level" Click="OnGetBatteryLevel" />
+                </StackPanel>
+                <TextBlock>
+                    <Run>Roll: </Run>
+                    <Run x:Name="uiRollValue">(not set)</Run>
+                    <Run Text="   "></Run>
+                    <Run x:Name="uiRollTypeValue"></Run>
+                </TextBlock>
 
 
 

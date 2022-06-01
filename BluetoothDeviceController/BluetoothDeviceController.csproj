@@ -242,7 +242,7 @@
     <Compile Include="SpecialtyPages\Nordic_ThingyPage.xaml.cs">
       <DependentUpon>Nordic_ThingyPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SpecialtyPages\Paticula_GoDice.xaml.cs">
+    <Compile Include="SpecialtyPagesCustom\Paticula_GoDice.xaml.cs">
       <DependentUpon>Paticula_GoDice.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPages\Protocentral_SensythingPage.xaml.cs">
@@ -950,7 +950,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SpecialtyPages\Paticula_GoDice.xaml">
+    <Page Include="SpecialtyPagesCustom\Paticula_GoDice.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

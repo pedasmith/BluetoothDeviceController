@@ -1,7 +1,7 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "GoDice_",
+      "Name": "GoDice",
 	  "ClassName": "Particula_GoDice",
 	  "ClassModifiers": "partial",
 	  "Description": "Bluetooth-enable dice (like for playing games). The colors can be set and the position and state of the dice can be detected.",

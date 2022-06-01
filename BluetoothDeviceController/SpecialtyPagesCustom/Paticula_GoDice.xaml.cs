@@ -46,6 +46,46 @@ namespace BluetoothDeviceController.SpecialtyPages
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
             await DoReadDevice_Name();
 
+            bleDevice.OnBatteryLevel += async (obj, batteryLevel) => {
+                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    uiBatteryLevelValue.Text = batteryLevel.ToString();
+                });
+            };
+            bleDevice.OnRollStart += async (obj, e) => {
+                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    uiRollValue.Text = "Rolling!";
+                });
+            };
+            bleDevice.OnRollStable += async (obj, dieRoll) => {
+                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    uiRollValue.Text = dieRoll.ToString();
+                    uiRollTypeValue.Text = "(good roll)";
+                });
+            };
+            bleDevice.OnFakeStable += async (obj, dieRoll) => {
+                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    uiRollValue.Text = dieRoll.ToString();
+                    uiRollTypeValue.Text = "(fake stable)";
+                });
+            };
+            bleDevice.OnMoveStable += async (obj, dieRoll) => {
+                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    uiRollValue.Text = dieRoll.ToString();
+                    uiRollTypeValue.Text = "(moved)";
+                });
+            };
+            bleDevice.OnTiltStable += async (obj, dieRoll) => {
+                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    uiRollValue.Text = dieRoll.ToString();
+                    uiRollTypeValue.Text = "(tilted)";
+                });
+            };
         }
 
         public string GetId()
@@ -770,6 +810,12 @@ namespace BluetoothDeviceController.SpecialtyPages
                         record.DiceEvent = (string)DiceEvent.AsString;
                         Receive_DiceEvent.Text = record.DiceEvent.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                     }
+                    if (DiceEvent.IsArray)
+                    {
+                        // Kind of convoluted: set the arrray back to the bleDevice for processing. This will fire a message.
+                        BCBasic.BCValueList message = DiceEvent.AsArray;
+                        bleDevice.HandleReceiveMessageCustom(message);
+                    }
 
                     var addResult = ReceiveRecordData.AddRecord(record);
 
@@ -783,6 +829,11 @@ namespace BluetoothDeviceController.SpecialtyPages
             SetStatusActive(true);
             await bleDevice.EnsureCharacteristicAsync(true);
             SetStatusActive(false);
+        }
+
+        private void OnGetBatteryLevel(object sender, RoutedEventArgs e)
+        {
+            // TODO: call the method!
         }
     }
 }
