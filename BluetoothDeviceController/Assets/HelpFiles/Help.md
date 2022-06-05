@@ -76,7 +76,12 @@ There are a wide variety of Espruino and other programmable Bluetooth devices. T
 recognize devices that use the Nordic UART system; this includes many of the Espruino-based
 devices that are programmable in JavaScript.
 
-* [PuckJs](Device_Espruino_PuckJs.md)
+* [Puckjs](Device_Espruino_Puckjs.md)
+
+## Toys, Games and Other devices
+Other devices that can be controled with this program include
+
+* [Particula GoDice](Device_Particula_GoDice.md)
 
 ## Protocol details
 

@@ -59,7 +59,7 @@ namespace BluetoothDeviceController.Names
             return null;
         }
 
-        // Read in data from the Assets\CharacteristicsData.json file. Note the mis-spelling Assets\Chacteristics!!
+        // Read in data from the Assets\CharacteristicsData.json file. 
         public async Task InitAsync()
         {
             AllDevices = new NameAllBleDevices();
@@ -69,13 +69,13 @@ namespace BluetoothDeviceController.Names
             await InitSerialAsync();
         }
 
-        // Read in data from the Assets\CharacteristicsData.json file. Note the mis-spelling Assets\Chacteristics!!
+        // Read in data from the Assets\CharacteristicsData.json file.
         private async Task InitBleAsync()
         {
             string path = "";
             try
             {
-                string dname = @"Assets\ChacteristicsData\";
+                string dname = @"Assets\CharacteristicsData\";
 
                 // Read in the Default device. 
                 DefaultDevice = await InitBleDefault(dname);

@@ -31,7 +31,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             this.DataContext = this;
         }
         private string DeviceName = "Particula_GoDice";
-        private string DeviceNameUser = "GoDice_";
+        private string DeviceNameUser = "GoDice";
 
         int ncommand = 0;
         Particula_GoDice bleDevice = new Particula_GoDice();
@@ -50,16 +50,21 @@ namespace BluetoothDeviceController.SpecialtyPages
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
                     uiBatteryLevelValue.Text = batteryLevel.ToString();
+                    var levelGlyph = Particula_GoDice.BatteryLevelToGlyph(batteryLevel);
+                    uiBatteryLevelGlyph.Text = levelGlyph;
+                    uiBatteryLevelPercent.Text = $"{batteryLevel}%";
                 });
             };
             bleDevice.OnRollStart += async (obj, e) => {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
                     uiRollValue.Text = "Rolling!";
-                    uiDieIcon.Text = "...";
+                    uiDieIcon.Text = "···";
                     uiDieText.Text = "Rolling";
                 });
             };
+
+            const string TiltGlyph = "⌧"; // Too large: "❌";
             bleDevice.OnRollStable += async (obj, dieRoll) => {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
@@ -72,7 +77,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     }
                     else
                     {
-                        uiDieIcon.Text = $"❌";
+                        uiDieIcon.Text = TiltGlyph;
                         uiDieText.Text = $"Tilt  ({dieRoll.ToString()})";
                     }
                 });
@@ -82,7 +87,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     uiRollValue.Text = dieRoll.ToString();
                     uiRollTypeValue.Text = "(fake stable)";
-                    uiDieIcon.Text = $"❌";
+                    uiDieIcon.Text = TiltGlyph;
                     uiDieText.Text = $"Tilt  ({dieRoll.ToString()}) F";
                 });
             };
@@ -91,7 +96,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     uiRollValue.Text = dieRoll.ToString();
                     uiRollTypeValue.Text = "(moved)";
-                    uiDieIcon.Text = $"❌";
+                    uiDieIcon.Text = TiltGlyph;
                     uiDieText.Text = $"Tilt  ({dieRoll.ToString()}) M";
                 });
             };
@@ -100,12 +105,13 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     uiRollValue.Text = dieRoll.ToString();
                     uiRollTypeValue.Text = "(tilted)";
-                    uiDieIcon.Text = $"❌";
+                    uiDieIcon.Text = TiltGlyph;
                     uiDieText.Text = $"Tilt  ({dieRoll.ToString()})";
                 });
             };
 
-            await DoNotifyReceive();
+            await DoNotifyReceive(); // Set up the notify on incoming events
+            OnGetBatteryLevel(null, null);
         }
 
         public string GetId()
@@ -302,6 +308,12 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     record.Device_Name = (string)Device_Name.AsString;
                     Device_Name_Device_Name.Text = record.Device_Name.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+
+                    var color = Particula_GoDice.GetDiceColorFromName(record.Device_Name);
+                    if (color != "?") // Returned when the name doesn't really match e.g., when it's GoDice_Proto_Test (whoops)
+                    {
+                        uiDiceName.Text = color;
+                    }
                 }
 
 
@@ -851,9 +863,38 @@ namespace BluetoothDeviceController.SpecialtyPages
             SetStatusActive(false);
         }
 
-        private void OnGetBatteryLevel(object sender, RoutedEventArgs e)
+        private async void OnGetBatteryLevel(object sender, RoutedEventArgs e)
         {
-            // TODO: call the method!
+            await bleDevice.GetBatteryLevelAsync();
+        }
+
+        private async void OnUpdateBatteryLevel(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            await bleDevice.GetBatteryLevelAsync();
+        }
+        private async void OnFlashLed1(object sender, RoutedEventArgs e)
+        {
+            // Don't hide when flashing LED uiColor1Flyout.Hide();
+
+            var led1 = uiLed1Color.Color;
+            var led2 = uiLed1Color.Color;
+            await bleDevice.SetDiceColorAsync(led1.R, led1.G, led1.B, led2.R, led2.G, led2.B);
+            await Task.Delay(500);
+            await bleDevice.SetDiceColorAsync(0,0,0, 0,0,0);
+        }
+
+        private async void OnOkLed1(object sender, RoutedEventArgs e)
+        {
+            uiColor1Flyout.Hide();
+
+            var led1 = uiLed1Color.Color;
+            var led2 = uiLed1Color.Color;
+            await bleDevice.SetDiceColorAsync(led1.R, led1.G, led1.B, led2.R, led2.G, led2.B);
+        }
+
+        private void OnCancelLed1(object sender, RoutedEventArgs e)
+        {
+            uiColor1Flyout.Hide();
         }
     }
 }

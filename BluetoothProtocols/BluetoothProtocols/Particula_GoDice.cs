@@ -429,6 +429,7 @@ namespace BluetoothProtocols
                         var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
 
                         Receive = parseResult.ValueList.GetValue("DiceEvent").AsString;
+                        System.Diagnostics.Debug.WriteLine("SDD: " + parseResult.AsString);
 
                         ReceiveEvent?.Invoke(parseResult);
                     };

@@ -89,13 +89,30 @@
               "IsNotify": true,
 
               "Examples": [
+                "[6 1] = Dice color ",
                 "[66 97 116 battery] = 'Bat' battery level",
                 "[67 111 108 color] = 'Col' dice color 0=black 1=red 2=green 3=blue 4=yellow 5=orange",
                 "[70 83 x y z] = 'FS' fake stable",
                 "[77 83 x y z] = 'MS' move stable",
                 "[82] = 'R' roll started",
                 "[83 x y z] = 'S' Stable roll",
-                "[84 83 x y z] = 'TS' tilt stable"
+                "[84 83 x y z] = 'TS' tilt stable",
+                "------------",
+                "Additional events found by poking bytes into the DiceCommand",
+                "------------",
+                "command|result",
+                "-----|-----",
+                "0x13 | Dice flashes!",
+                "0x18 | Returns 'Char\\0'. ",
+                "0x19 | Returns three results: battery, color, and the last die roll",
+                "0x21 | Returns 'TEST_FINISHED'",
+                "0x22 | Returns 'HANDSHAKE'",
+                "0x23 | Returns \\06\\01",
+                "0x24 | Returns IMU_PASS",
+                "0x25 | Returns \\05\\01",
+                "0x26 | Kills the connection right away",
+                "0x27 | Returns \\07\\01",
+                "0x2B | Returns 'Ver\\03'. Note that the name on the Die is GoDice_/MAC/_/Color/_v03"
               ]
             }
           ]

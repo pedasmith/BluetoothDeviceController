@@ -116,6 +116,16 @@ Like the SwitchCount characteristic, this says how many devices your controller 
 
 You will probably not have them all hooked up at once. Controls that aren't hooked up can be left to their initial values.
 
+### TODO: ControlConfig Characteristic (byte[])
+
+Each Arduino output pin can provide outputs in different ways.
+
+Configuration|Code|Notes
+-----|-----|-----
+Digital|D|Is a digital output, either 0 or 1
+Analog (PWM)|P|Is an analog output of the PWM type. This is often used for
+
+
 ### Command Characteristic (byte) 09a9ef97-5e6d-498f-bdf9-7c0ed1f41333 (W/R)
 
 The Command characteristic lets you control certain aspects of the RRScale controller.

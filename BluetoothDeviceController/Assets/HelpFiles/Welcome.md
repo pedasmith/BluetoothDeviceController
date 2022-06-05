@@ -17,6 +17,7 @@ and more devices -- please leave feedback to request specific devices!
 
 ## Data sensors that can be read
 [![BBC micro:bit](../DevicePictures/Bbc_MicroBit-175.png)](Device_Bbc_MicroBit.md)
+[![Kano Wand](../DevicePictures/Kano_Wand-175.png)](Device_Kano_Wand.md)
 [![Nordic Thingy](../DevicePictures/Nordic_Thingy-175.png)](Device_Nordic_Thingy.md)
 [![Pyle PHBPBW40](../DevicePictures/Samico_BloodPressure_BG512-175.png)](Device_Samico_BloodPressure_BG512.md)
 [![RuuviTag](../DevicePictures/Ruuvi_RuuviTag-175.png)](Device_Ruuvi_RuuviTag.md)
@@ -26,14 +27,20 @@ and more devices -- please leave feedback to request specific devices!
 [![TI Original Sensor Tag](../DevicePictures/TI_SensorTag_2541-175.png)](Device_TI_SensorTag_2541.md)
 
 
-## Other devices
+## Robots devices
 [![BERO](../DevicePictures/RealityRobotics_Bero-175.png)](Device_RealityRobotics_Bero.md)
 [![Elegoo MiniCar](../DevicePictures/Elegoo_MiniCar-175.png)](Device_Elegoo_MiniCar.md)
-[![Kano Wand](../DevicePictures/Kano_Wand-175.png)](Device_Kano_Wand.md)
 [![LittleBot](../DevicePictures/SlantRobotics-LittleBot-175.png)](Device_SlantRobotics_LittleBot.md)
-[![PuckJs](../DevicePictures/Device_Espruino_PuckJs-175.png)](Device_Espruino_PuckJs.md)
 [![Skoobot](../DevicePictures/WilliamWeilerEngineering_Skoobot-175.png)](Device_WilliamWeilerEngineering_Skoobot.md)
 [![Smartibot](../DevicePictures/CraftyRobot_Smartibot-175.png)](Device_CraftyRobot_Smartibot.md)
+
+## Programmable devices
+
+[![PuckJs](../DevicePictures/Espruino_PuckJs-175.png)](Device_Espruino_Puckjs.md)
+
+## Toys and games
+
+[![GoDice](../DevicePictures/Particula_GoDice-175.png)](Device_Particula_GoDice.md)
 
 ## More help
 [Help](Help.md)

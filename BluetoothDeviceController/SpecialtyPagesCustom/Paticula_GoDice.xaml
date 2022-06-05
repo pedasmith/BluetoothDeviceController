@@ -7,6 +7,7 @@
     xmlns:charts="using:BluetoothDeviceController.Charts"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Page.Resources>
@@ -68,7 +69,8 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0">
-                <TextBlock Style="{StaticResource TitleStyle}">GoDice_ device</TextBlock>
+                <TextBlock  Style="{StaticResource TitleStyle}">
+                    <Run x:Name="uiDiceName" Text="GoDice" /><Run Text=" game die"></Run></TextBlock>
                 <TextBlock Style="{StaticResource AboutStyle}">
                     Bluetooth-enable dice (like for playing games). The colors can be set and the position and state of the dice can be detected.
                 </TextBlock>
@@ -78,10 +80,43 @@
         
         <StackPanel Orientation="Horizontal">
             <TextBlock>
-                <Run x:Name="uiDieIcon" FontSize="40" Text="..." />
-                <Run  FontSize="40" Text="    " />
+                <Run x:Name="uiDieIcon" FontSize="120" Text="···" />
+            </TextBlock>
+            <TextBlock VerticalAlignment="Center" Margin="50,20,0,0">
                 <Run x:Name="uiDieText" FontSize="25" Text="" />
             </TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Tapped="OnUpdateBatteryLevel" HorizontalAlignment="Center">
+                <Run FontFamily="Segoe MDL2 Assets" FontSize="20" Text="" x:Name="uiBatteryLevelGlyph" />
+                <Run FontSize="15" x:Name="uiBatteryLevelPercent" Text="" />
+            </TextBlock>
+            <Button Content="Set Dice LED" Margin="20,0,0,0">
+                <Button.Flyout>
+                    <Flyout x:Name="uiColor1Flyout">
+                        <Flyout.FlyoutPresenterStyle>
+                            <Style TargetType="FlyoutPresenter">
+                                <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
+                                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                                <Setter Property="IsTabStop" Value="True"/>
+                                <Setter Property="TabNavigation" Value="Cycle"/>
+                            </Style>
+                        </Flyout.FlyoutPresenterStyle>
+                        <StackPanel>
+                            <muxc:ColorPicker x:Name="uiLed1Color"
+                                          IsColorPreviewVisible="True"
+                                          IsHexInputVisible="True"
+                                          ColorSpectrumShape="Ring"
+                            />
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Flash" Click="OnFlashLed1" />
+                                <Button Content="Set Color" Click="OnOkLed1" />
+                                <Button Content="Cancel" Click="OnCancelLed1" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
         </StackPanel>
         
         <ProgressRing x:Name="uiProgress" />

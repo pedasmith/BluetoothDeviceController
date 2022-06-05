@@ -6,7 +6,7 @@ The Notti from Witti designs is a small rechargeable desktop indicator light. Yo
 its color and can set it up as an alarm: it will turn on slowly switch to a color you specify
 at a time you specify.
 
-There are three four for Triones devices: setup, alarm, color, and changing color. 
+There are three or four for Triones devices: setup, alarm, color, and changing color. 
 
 # Setup screen
 ![Setup screen](../ScreenShots/Light_Witti_Notti_Setup.png)
@@ -35,5 +35,5 @@ The Changing Color tab lets you set a slow rythm of changing colors on your Nott
 
 
 # Links
-Some useful links to learn more about the TI beLight kit
+Some useful links to learn more about the Witti Notti device
 * [Witti designs](https://www.wittidesign.com/products/notti)
