@@ -48,7 +48,11 @@
               "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
               "Name": "Connection Parameter",
               "IsRead": true,
-              "Type": "BYTES|HEX|ConnectionParameter"
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms U16^1.15_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "REM10": "See Core_v5.3 page 1361 section 12.3 for PPCP and vol6 part B section 2.4.2.16. 0xFFFF means no preference",
+              "REM20": "Interval values are in steps of 1.25 ms '' connInterval = Interval_Min * 1.25 ms ''",
+              "REM30": "Latency is ust latency directly (in ms?)",
+              "REM40": "Timeout ''connSupervisionTimeout = Timeout * 10 ms''"
             },
             {
               "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",

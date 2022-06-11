@@ -32,7 +32,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="BluetoothDeviceController.App">
       <uap:VisualElements
-        DisplayName="Bluetooth Device Explorer"
+        DisplayName="Bluetooth Device Controller"
         Square150x150Logo="Assets\Icons\Square150x150Logo.png"
         Square44x44Logo="Assets\Icons\Square44x44Logo.png"
         Description="Finds and displays data from a variety of Bluetooth data sensors including the TI SensorTag, controls a variety of Bluetooth lights, and controls robots from SmartiBot, LittleBot, BERO and Skoobot"

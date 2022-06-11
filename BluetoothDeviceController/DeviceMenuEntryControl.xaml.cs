@@ -77,6 +77,10 @@ namespace BluetoothDeviceController
                 ToolTipService.SetToolTip(uiIconBlock, specialization.Description);
                 ToolTipService.SetToolTip(uiDescriptionBlock, specialization.Description);
             }
+
+            // Hide the settings button when we know it won't have any effect.
+            var noUsefulSettings = Wrapper == null || Wrapper.di == null;
+            uiSettings.Visibility = noUsefulSettings ? Visibility.Collapsed : Visibility.Visible;
         }
 
         public void UpdateName(string text)

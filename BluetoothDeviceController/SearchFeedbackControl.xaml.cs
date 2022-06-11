@@ -25,34 +25,7 @@ namespace BluetoothDeviceController
             this.InitializeComponent();
         }
 
-        /// <summary>
-        /// Returns TRUE iff the current thread is the UI thread
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsOnUIThread()
-        {
-            var dispather = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
-            var retval = dispather.HasThreadAccess;
-            return retval;
-        }
 
-        /// <summary>
-        /// Calls the given function either directly or on the UI thread the TryRunAsync(). The resulting task is just thrown away.
-        /// </summary>
-        /// <param name="f"></param>
-        /// <param name="priority"></param>
-        public static void CallOnUIThread(Action f, Windows.UI.Core.CoreDispatcherPriority priority = Windows.UI.Core.CoreDispatcherPriority.Low)
-        {
-            if (IsOnUIThread())
-            {
-                f();
-            }
-            else
-            {
-                var dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
-                var task = dispatcher.TryRunAsync(priority, () => { f(); });
-            }
-        }
 
         int nFound = 0;
         int nFoundAll = 0;
@@ -71,7 +44,7 @@ namespace BluetoothDeviceController
             }
             else
             {
-                Search.StartSearchDefault();
+                Search.StartSearchWithUserPreferences();
             }
         }
 
@@ -79,6 +52,7 @@ namespace BluetoothDeviceController
         {
             //System.Diagnostics.Debug.WriteLine($"SearchFeedback: started");
             uiProgress.ShowPaused = false;
+            SetPauseVisibility(true);
             nFound = 0;
             nFoundAll = 0;
             UpdateUI();
@@ -88,27 +62,11 @@ namespace BluetoothDeviceController
 
         public void StopSearchFeedback()
         {
-            CallOnUIThread( () => {
+            Utilities.UIThreadHelper.CallOnUIThread( () => {
                 System.Diagnostics.Debug.WriteLine($"SearchFeedback: stopped");
+                SetPauseVisibility(false);
                 uiProgress.ShowPaused = true;
             });
-
-#if NEVER_EVER_DEFINED
-            if (SearchFeedbackControl.IsOnUIThread())
-            {
-                //System.Diagnostics.Debug.WriteLine($"SearchFeedback: stopped (quickly)");
-                uiProgress.ShowPaused = true;
-            }
-            else
-            {
-                //System.Diagnostics.Debug.WriteLine($"SearchFeedback: stopping (wait for UI)");
-                var task = this.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => {
-                    System.Diagnostics.Debug.WriteLine($"SearchFeedback: stopped (for real)");
-                    uiProgress.ShowPaused = true;
-                });
-
-            }
-#endif
         }
 
         public void FoundDevice(FoundDeviceInfo deviceInfo)
@@ -124,7 +82,7 @@ namespace BluetoothDeviceController
 
         private void UpdateUI()
         {
-            CallOnUIThread(() => {
+            Utilities.UIThreadHelper.CallOnUIThread(() => {
                 uiFound.Text = nFound.ToString();
                 uiFoundAll.Text = (nFoundAll - nFound).ToString();
             });

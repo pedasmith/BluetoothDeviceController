@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BluetoothDeviceController
+﻿namespace BluetoothDeviceController
 {
     public class UserPreferences
     {
@@ -13,13 +7,13 @@ namespace BluetoothDeviceController
             Specialized_Display,
             Device_Editor };
         public DisplayPreference Display { get; set; } = DisplayPreference.Specialized_Display;
-        public enum SearchScope {  
-            [enumUtilities.Display("Bluetooth COM port")]
-            Bluetooth_Com_Device, 
-            [enumUtilities.Display("BLE advertisements and beacons")]
-            Bluetooth_Beacons,
+        public enum SearchScope {
             [enumUtilities.Display("BLE known device types")]
             Has_specialized_display,
+            [enumUtilities.Display("BLE advertisements and beacons")]
+            Bluetooth_Beacons,
+            [enumUtilities.Display("Bluetooth COM port")]
+            Bluetooth_Com_Device, 
             [enumUtilities.Display("BLE devices with names")]
             Device_is_named, 
             [enumUtilities.Display("All BLE devices")]
@@ -38,7 +32,9 @@ namespace BluetoothDeviceController
         // Was 5 seconds, but that felt too quick.
 
         public bool BeaconFullDetails { get; set; } = false;
-        public bool BeaconTrackAll { get; set; } = false;
+        // BeaconTrackAll was used with the old UX to track all adverts or not. But now the advert page is done differently: all adverts are tracked and stored
+        // and the advert page just filters based on context. It had also been used in the UX to show or not show the BT address, but now I just always show it.
+        //public bool BeaconTrackAll { get; set; } = false;
         public bool BeaconIgnoreApple { get; set; } = true;
         public double BeaconDbLevel { get; set; } = -80.0; // default min db level for beacon advert
 
@@ -54,7 +50,7 @@ namespace BluetoothDeviceController
         const string AutomaticallyReadDataSetting = "AutomaticallyReadData";
 
         const string BeaconFullDetailsSetting = "UserPreferenceBeaconFullDetails";
-        const string BeaconTrackAllSetting = "UserPreferenceBeaconTrackAll";
+        //const string BeaconTrackAllSetting = "UserPreferenceBeaconTrackAll";
         const string BeaconIgnoreAppleSetting = "UserPreferenceBeaconIgnoreApple";
         const string BeaconDbLevelSetting = "UserPreferenceBeaconDbLevel";
 
@@ -87,10 +83,10 @@ namespace BluetoothDeviceController
             {
                 BeaconFullDetails = (bool)localSettings.Values[BeaconFullDetailsSetting];
             }
-            if (localSettings.Values.ContainsKey(BeaconTrackAllSetting))
-            {
-                BeaconTrackAll = (bool)localSettings.Values[BeaconTrackAllSetting];
-            }
+            //if (localSettings.Values.ContainsKey(BeaconTrackAllSetting))
+            //{
+            //    BeaconTrackAll = (bool)localSettings.Values[BeaconTrackAllSetting];
+            //}
             if (localSettings.Values.ContainsKey(BeaconIgnoreAppleSetting))
             {
                 BeaconIgnoreApple = (bool)localSettings.Values[BeaconIgnoreAppleSetting];
@@ -114,7 +110,7 @@ namespace BluetoothDeviceController
             localSettings.Values[AutomaticallyReadDataSetting] = AutomaticallyReadData;
 
             localSettings.Values[BeaconFullDetailsSetting] = BeaconFullDetails;
-            localSettings.Values[BeaconTrackAllSetting] = BeaconTrackAll;
+            //localSettings.Values[BeaconTrackAllSetting] = BeaconTrackAll;
             localSettings.Values[BeaconIgnoreAppleSetting] = BeaconIgnoreApple;
             localSettings.Values[BeaconDbLevelSetting] = BeaconDbLevel;
 

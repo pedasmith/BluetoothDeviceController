@@ -105,7 +105,7 @@ namespace BluetoothDeviceController.BleEditor
                     var advert = di.BleAdvert.AdvertisementType == BleAdvertisementWrapper.BleAdvertisementType.BluetoothLE ? $"({di.BleAdvert.BleAdvert.BluetoothAddress}) " : "";
                     var dlg = new ContentDialog() { 
                         Title = "Unable to switch to device", 
-                        Content = $"The selected device {advert}cannot be displayed",
+                        Content = $"The selected device {advert} cannot be displayed",
                         CloseButtonText = "Ok"
                     };
                     await dlg.ShowAsync();

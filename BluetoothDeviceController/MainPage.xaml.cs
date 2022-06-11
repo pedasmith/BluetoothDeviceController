@@ -31,7 +31,7 @@ namespace BluetoothDeviceController
     {
         bool GetSearchActive();
         void StartSearch(UserPreferences.ReadSelection searchType, UserPreferences.SearchScope scope);
-        void StartSearchDefault();
+        void StartSearchWithUserPreferences();
         void CancelSearch();
         event EventHandler DeviceEnumerationChanged;
         //string GetCurrentSearchResults();
@@ -204,7 +204,7 @@ namespace BluetoothDeviceController
             var readSelection = Preferences.DeviceReadSelection;
             if (readSelection == UserPreferences.ReadSelection.Everything)
             {
-                readSelection = UserPreferences.ReadSelection.Name; // Don't automaticaly get everything
+                readSelection = UserPreferences.ReadSelection.Name; // Don't automaticaly get everything on startup
             }
             NavView_Navigate("Help", "welcome.md", null);
 
@@ -439,7 +439,7 @@ namespace BluetoothDeviceController
                 }
                 else
                 {
-                    var deviceName = GetDeviceInformationName(wrapper?.di);
+                    var (deviceName, hasDeviceName) = GetDeviceInformationName(wrapper?.di);
 
                     var specialization = Specialization.Get(Specializations, deviceName);
                     if (specialization == null && wrapper != null)
@@ -597,24 +597,21 @@ namespace BluetoothDeviceController
         /// </summary>
         /// <param name="di"></param>
         /// <returns></returns>
-        private static string GetDeviceInformationName(DeviceInformation di, bool keepUnnamed = true)
+        private static (string name, bool hasName) GetDeviceInformationName(DeviceInformation di)
         {
             // Preferred names, in order, are the mapping name, the di.Name and the di.Id.
             var mapping = UserNameMappings.Get(di.Id);
             var name = mapping?.Name ?? null;
+            var hasName = true;
             if (String.IsNullOrEmpty(name)) name = di.Name;
             if (String.IsNullOrEmpty(name)) name = di.Id;
 
             if (name.StartsWith("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-"))
             {
-                if (!keepUnnamed)
-                {
-                    // These are sometimes interesting, but mostly are not
-                    return null;
-                }
+                hasName = false;
                 name = name.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "Address:");
             }
-            return name;
+            return (name, hasName);
         }
 
         // The list of devices in the menu on the left-hand side.
@@ -635,9 +632,10 @@ namespace BluetoothDeviceController
             if (wrapper.di != null)
             {
                 id = wrapper.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
-                var includeAll = Preferences.Scope == UserPreferences.SearchScope.All_bluetooth_devices;
-                name = GetDeviceInformationName(wrapper.di, includeAll); // gets null for unnamed devices unless we want all devices.
-                if (name == null)
+                var isAll_bluetooth_devices = Preferences.Scope == UserPreferences.SearchScope.All_bluetooth_devices;
+                bool hasDeviceName;
+                (name, hasDeviceName) = GetDeviceInformationName(wrapper.di);
+                if (!hasDeviceName && !isAll_bluetooth_devices)
                 {
                     System.Diagnostics.Debug.WriteLine($"Device {id} not added because there's no name");
                     SearchFeedback.FoundDevice(FoundDeviceInfo.IsFilteredOutNoName);
@@ -758,13 +756,13 @@ namespace BluetoothDeviceController
             {
                 specialization = Specialization.Get(Specializations, "Beacon"); // This will get the SimpleBeaconPage
                 specialization.ShortDescription = description;
-
-                // Not eddystone or ruuvitag. Let's do the event so it can be seen
-                // by the SimpleBeaconPage. 
-                SimpleBeaconPage.TheSimpleBeaconPage.IsPaused = SearchFeedback.GetIsPaused(); // Transfer the search feedback UX value to the SimpleBeaconPage.
-                // Yes, this is pretty awkwarrd.
-                wrapper.BleAdvert.Event(bleAdvert);
             }
+
+            // Not eddystone or ruuvitag. Let's do the event so it can be seen
+            // by the SimpleBeaconPage. 
+            SimpleBeaconPage.TheSimpleBeaconPage.IsPaused = SearchFeedback.GetIsPaused(); // Transfer the search feedback UX value to the SimpleBeaconPage.
+            // Yes, this is pretty awkwarrd.
+            wrapper.BleAdvert.Event(bleAdvert);
 
             if (idx != -1)
             {
@@ -803,10 +801,8 @@ namespace BluetoothDeviceController
         {
             if (di == null) return; // The tag is always a DeviceInformation
             if (di.di == null) return;
-            var name = GetDeviceInformationName(di.di);
-
-            var oldName = GetDeviceInformationName(di.di, true);
-            var perdevice = new PerDeviceSettings(di.di, oldName);
+            var (deviceName, hasDeviceName) = GetDeviceInformationName(di.di);
+            var perdevice = new PerDeviceSettings(di.di, deviceName);
 
             var cd = new ContentDialog()
             {
@@ -843,10 +839,15 @@ namespace BluetoothDeviceController
         /// </summary>
         /// 
         public event EventHandler DeviceEnumerationChanged;
-        public void StartSearchDefault()
+        public void StartSearchWithUserPreferences()
         {
             StartSearch(Preferences.DeviceReadSelection, Preferences.Scope);
         }
+        /// <summary>
+        /// Primary function to kick off a search for devices (both automation and UX 'search now' button.
+        /// </summary>
+        /// <param name="readType">only used for the BLE scope items</param>
+        /// <param name="scope">Can be any value: the BLE (has_specialty, named, all), advert (beacon) or COM types.</param>
         public void StartSearch(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope)
         {
             switch (scope)
@@ -929,7 +930,7 @@ namespace BluetoothDeviceController
             SearchFeedback?.StopSearchFeedback();
         }
 
-        enum WatcherType { DeviceInformationWatcher, BluetoothLEWatcher }
+        enum WatcherType { DeviceInformationWatcher, BluetoothLEAdvertisementWatcher }
         private void StartWatchForBluetoothDevices(UserPreferences.SearchScope scope)
         {
             // Query for extra properties you want returned
@@ -955,7 +956,7 @@ namespace BluetoothDeviceController
                     qstr = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.SerialPort);
                     break;
                 case UserPreferences.SearchScope.Bluetooth_Beacons:
-                    watcherType = WatcherType.BluetoothLEWatcher;
+                    watcherType = WatcherType.BluetoothLEAdvertisementWatcher;
                     break;
                 default:
                     qstr = "System.Devices.Aep.ProtocolId:=\"{BB7BB05E-5972-42B5-94FC-76EAA7084D49}\"";
@@ -982,7 +983,7 @@ namespace BluetoothDeviceController
                     // Start the watcher.
                     MenuDeviceInformationWatcher.Start();
                     break;
-                case WatcherType.BluetoothLEWatcher:
+                case WatcherType.BluetoothLEAdvertisementWatcher:
                     if (Timeout_BluetoothLEAdvertisementWatcher == null)
                     {
                         var dt = new DispatcherTimer();
@@ -1025,7 +1026,7 @@ namespace BluetoothDeviceController
         {
             var name = args.Advertisement.LocalName;
             System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {name} seen");
-            if (name.Contains("Wescale") || name.StartsWith("LC"))
+            if (name.Contains("Wescale") || name.StartsWith("LC") || name.StartsWith("GoDice"))
             {
                 ; // Handy hook for debugger.
             }
@@ -1107,8 +1108,12 @@ namespace BluetoothDeviceController
             }
         }
 
-
-        private async Task StartDeviceReadAsync(UserPreferences.ReadSelection searchType)
+        /// <summary>
+        /// Called from StartSearch. Starts a task to read data from devices; only valid for Name and Everthing (not Address)
+        /// </summary>
+        /// <param name="readType">must be name or everthing</param>
+        /// <returns></returns>
+        private async Task StartDeviceReadAsync(UserPreferences.ReadSelection readType)
         {
             // Step one: if we're already running, kill the old task
             if (DeviceReadTask != null)
@@ -1129,20 +1134,24 @@ namespace BluetoothDeviceController
             DeviceReadCts = new CancellationTokenSource();
             // Special code for automation: wil do a complete sweep of all BT devices and fill in 
             // the global CurrJsonSearch string variable of the devices.
-            switch (searchType)
+            switch (readType)
             {
-                case UserPreferences.ReadSelection.Everything:
-                    DeviceReadTask = FullReadAsync(DeviceReadCts.Token);
-                    break;
                 case UserPreferences.ReadSelection.Name:
-                    DeviceReadTask = NameReadAsync(DeviceReadCts.Token);
+                    DeviceReadTask = ReadNameAsync(DeviceReadCts.Token);
+                    break;
+                case UserPreferences.ReadSelection.Everything:
+                    DeviceReadTask = ReadEverythingAsync(DeviceReadCts.Token);
                     break;
             }
         }
 
 
-
-        private async Task FullReadAsync(CancellationToken ct)
+        /// <summary>
+        /// For each item in the MenuItemCache, display is on the screen and grab the appropriate JSON. JSON is displayed in the end.
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        private async Task ReadEverythingAsync(CancellationToken ct)
         {
             CurrJsonSearch = "";
 
@@ -1239,7 +1248,10 @@ namespace BluetoothDeviceController
         readonly Guid CommonConfigurationGuid1800 = BluetoothLEStandardServices.Display; //  Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"); // service
         readonly Guid DeviceNameGuid2a00 = BluetoothLEStandardServices.Name;  // new Guid("00002a00-0000-1000-8000-00805f9b34fb"); // characteristic
 
-        private async Task NameReadAsync(CancellationToken ct)
+        /// <summary>
+        /// Reads just the name from the list of devices in the MenuItemCache and also all services and characteristics
+        /// </summary>
+        private async Task ReadNameAsync(CancellationToken ct)
         {
             var deviceJson = "";
             await Task.Delay(1000); // pause 1000 ms = 1 s to get some BT
@@ -1266,17 +1278,26 @@ namespace BluetoothDeviceController
                         deviceJson += $"\"Existing_{ble.Name}\""; continue;
                     }
                     System.Diagnostics.Debug.WriteLine($"DEVICE: Get name for {di.di.Id}");
+
+                    // This looks like it's reading lots of services and characteristics, but it's not.
+                    // It's only reading Service 1800 (common configuration) Chara 2a00 (device name).
+                    // The loops are there because 'technically' there could be multiple services and
+                    // characteristics with the same ID. In practice, never.
                     var services = await ble.GetGattServicesForUuidAsync(CommonConfigurationGuid1800);
                     if (services.Status != GattCommunicationStatus.Success) continue;
 
+                    int nservice = 0;
+                    int ncharacteristic = 0;
                     foreach (var service in services.Services)
                     {
                         var characteristics = await service.GetCharacteristicsForUuidAsync(DeviceNameGuid2a00);
                         if (characteristics.Status != GattCommunicationStatus.Success) continue;
+                        nservice++;
                         foreach (var characteristic in characteristics.Characteristics)
                         {
                             var read = await characteristic.ReadValueAsync();
                             if (read.Status != GattCommunicationStatus.Success) continue;
+                            ncharacteristic++;
                             var name = BluetoothLEStandardServices.CharacteristicData.ValueAsString(BluetoothLEStandardServices.DisplayType.String, read.Value);
                             System.Diagnostics.Debug.WriteLine($"  --> read name as {name}");
 
@@ -1293,6 +1314,10 @@ namespace BluetoothDeviceController
                             }
                             deviceJson += $"\"Found_{name}\"";
                         }
+                    }
+                    if (nservice > 1 || ncharacteristic > 1)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"  SURPRISE: ble={ble.Name} nservice={nservice} ncharacteristic={ncharacteristic}");
                     }
                 }
                 catch (Exception ex)

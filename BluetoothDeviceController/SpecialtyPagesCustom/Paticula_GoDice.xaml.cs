@@ -438,6 +438,29 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
+
+
+
+        // Functions called from the expander
+        private void OnKeepCountConnection_Parameter(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1) return;
+            int value;
+            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+            if (!ok) return;
+            Connection_ParameterRecordData.MaxLength = value;
+
+
+        }
+
+        private void OnAlgorithmConnection_Parameter(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1) return;
+            int value;
+            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+            if (!ok) return;
+            Connection_ParameterRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+        }
         public class Connection_ParameterRecord : INotifyPropertyChanged
         {
             public Connection_ParameterRecord()
@@ -453,8 +476,17 @@ namespace BluetoothDeviceController.SpecialtyPages
             private DateTime _EventTime;
             public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
 
-            private string _ConnectionParameter;
-            public string ConnectionParameter { get { return _ConnectionParameter; } set { if (value == _ConnectionParameter) return; _ConnectionParameter = value; OnPropertyChanged(); } }
+            private double _Interval_Min;
+            public double Interval_Min { get { return _Interval_Min; } set { if (value == _Interval_Min) return; _Interval_Min = value; OnPropertyChanged(); } }
+
+            private double _Interval_Max;
+            public double Interval_Max { get { return _Interval_Max; } set { if (value == _Interval_Max) return; _Interval_Max = value; OnPropertyChanged(); } }
+
+            private double _Latency;
+            public double Latency { get { return _Latency; } set { if (value == _Latency) return; _Latency = value; OnPropertyChanged(); } }
+
+            private double _Timeout;
+            public double Timeout { get { return _Timeout; } set { if (value == _Timeout) return; _Timeout = value; OnPropertyChanged(); } }
 
             private String _Note;
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
@@ -478,34 +510,16 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
         // Functions called from the expander
-        private void OnKeepCountConnection_Parameter(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Connection_ParameterRecordData.MaxLength = value;
 
-
-        }
-
-        private void OnAlgorithmConnection_Parameter(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Connection_ParameterRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
         private void OnCopyConnection_Parameter(object sender, RoutedEventArgs e)
         {
             // Copy the contents over...
             var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,ConnectionParameter,Notes\n");
+            sb.Append("EventDate,EventTime,Interval_Min,Interval_Max,Latency,Timeout,Notes\n");
             foreach (var row in Connection_ParameterRecordData)
             {
                 var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.ConnectionParameter},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Interval_Min},{row.Interval_Max},{row.Latency},{row.Timeout},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
             }
             var str = sb.ToString();
             var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
@@ -533,11 +547,32 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                 var record = new Connection_ParameterRecord();
 
-                var ConnectionParameter = valueList.GetValue("ConnectionParameter");
-                if (ConnectionParameter.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ConnectionParameter.CurrentType == BCBasic.BCValue.ValueType.IsString || ConnectionParameter.IsArray)
+                var Interval_Min = valueList.GetValue("Interval_Min");
+                if (Interval_Min.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Interval_Min.CurrentType == BCBasic.BCValue.ValueType.IsString || Interval_Min.IsArray)
                 {
-                    record.ConnectionParameter = (string)ConnectionParameter.AsString;
-                    Connection_Parameter_ConnectionParameter.Text = record.ConnectionParameter.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    record.Interval_Min = (double)Interval_Min.AsDouble;
+                    Connection_Parameter_Interval_Min.Text = record.Interval_Min.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                }
+
+                var Interval_Max = valueList.GetValue("Interval_Max");
+                if (Interval_Max.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Interval_Max.CurrentType == BCBasic.BCValue.ValueType.IsString || Interval_Max.IsArray)
+                {
+                    record.Interval_Max = (double)Interval_Max.AsDouble;
+                    Connection_Parameter_Interval_Max.Text = record.Interval_Max.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                }
+
+                var Latency = valueList.GetValue("Latency");
+                if (Latency.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Latency.CurrentType == BCBasic.BCValue.ValueType.IsString || Latency.IsArray)
+                {
+                    record.Latency = (double)Latency.AsDouble;
+                    Connection_Parameter_Latency.Text = record.Latency.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                }
+
+                var Timeout = valueList.GetValue("Timeout");
+                if (Timeout.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Timeout.CurrentType == BCBasic.BCValue.ValueType.IsString || Timeout.IsArray)
+                {
+                    record.Timeout = (double)Timeout.AsDouble;
+                    Connection_Parameter_Timeout.Text = record.Timeout.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                 }
 
 

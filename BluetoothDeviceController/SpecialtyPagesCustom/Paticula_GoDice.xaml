@@ -199,10 +199,15 @@
 
 
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Connection Parameter</TextBlock>
                 <StackPanel Orientation="Horizontal">
 
-                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_ConnectionParameter" Text="*" Header="ConnectionParameter" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_Interval_Min" Text="*" Header="Interval Min" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_Interval_Max" Text="*" Header="Interval Max" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_Latency" Text="*" Header="Latency" Style="{StaticResource HEXStyle}"/>
+
+                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_Timeout" Text="*" Header="Timeout" Style="{StaticResource HEXStyle}"/>
 
 
                     <Button Content="Read" Click="OnReadConnection_Parameter" />

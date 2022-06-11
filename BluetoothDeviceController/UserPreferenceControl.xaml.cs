@@ -85,6 +85,20 @@ namespace BluetoothDeviceController
             if (e.AddedItems.Count != 1) return;
             var scope = (UserPreferences.SearchScope)e.AddedItems[0];
 
+            uiAdvertisementSettings.Visibility = Visibility.Collapsed;
+            uiBleSettings.Visibility = Visibility.Collapsed;
+            switch (scope)
+            {
+                case UserPreferences.SearchScope.All_bluetooth_devices:
+                case UserPreferences.SearchScope.Has_specialized_display:
+                case UserPreferences.SearchScope.Device_is_named:
+                    uiBleSettings.Visibility = Visibility.Visible;
+                    break;
+
+                case UserPreferences.SearchScope.Bluetooth_Beacons:
+                    uiAdvertisementSettings.Visibility = Visibility.Visible;
+                    break;
+            }
             switch (scope)
             {
                 case UserPreferences.SearchScope.All_bluetooth_devices:

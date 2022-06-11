@@ -154,8 +154,29 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                         var db = ParseTxPowerLevel(section);
                         str = $"{db}";
                         break;
-                    default:
-                        printAsHex = true;
+                    case DataTypeValue.ServiceData:
+                        {
+                            var dr = DataReader.FromBuffer(section.Data);
+                            dr.ByteOrder = ByteOrder.LittleEndian;
+                            if (dr.UnconsumedBufferLength >= 2)
+                            {
+                                var addr = dr.ReadUInt16();
+                                switch (addr)
+                                {
+                                    case 0xFD6F:
+                                        // Is a COVID tracking value.
+                                        str = "COVID tracking value (hidden):\n"; // See https://covid19-static.cdn-apple.com/applications/covid19/current/static/contact-tracing/pdf/ExposureNotification-BluetoothSpecificationv1.2.pdf?1 for details
+                                        break;
+                                    default:
+                                        printAsHex = true;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                printAsHex = true;
+                            }
+                        }
                         break;
                 }
                 if (printAsHex)

@@ -134,9 +134,9 @@
 
         <ContentDialog x:Name="uiDialogAbout" CloseButtonText="Ok">
             <StackPanel>
-                <TextBlock FontSize="24" FontWeight="Bold">About Bluetooth Device Explorer</TextBlock>
+                <TextBlock FontSize="24" FontWeight="Bold">About Bluetooth Device Controller</TextBlock>
                 <TextBlock TextWrapping="Wrap" IsTextSelectionEnabled="True">
-                    <Run>The Bluetooth Device Explorer lets you see and control Bluetooth device around you. Supported devices include different Bluetooth enabled lights, data sensors and robots.</Run>
+                    <Run>The Bluetooth Device Controller lets you see and control Bluetooth device around you. Supported devices include different Bluetooth enabled lights, data sensors and robots.</Run>
                     <LineBreak /><LineBreak /><Run>More </Run>
                     <Hyperlink NavigateUri="https://shipwrecksoftware.wordpress.com/category/bluetooth/" >Bluetooth information </Hyperlink>
                     <Run Text=" "/><Run>is at the Shipwreck Software blog</Run>

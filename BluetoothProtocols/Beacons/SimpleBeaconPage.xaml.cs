@@ -69,34 +69,23 @@ namespace BluetoothDeviceController.Beacons
             }
         }
 
-        private bool TrackAll
-        {
-            get
-            {
-                //TODO: remove var retval = uiTrackAll.IsChecked.Value;
-                //if (di.BeaconPreferences != null) retval = di.BeaconPreferences.DefaultTrackAll;
-                //TODO: how doe this actually work?
-                var retval = UserPreferences.MainUserPreferences.BeaconTrackAll;
-                return retval;
-            }
-        }
-        private bool IgnoreApplePreference { get { return UserPreferences.MainUserPreferences.BeaconIgnoreApple; } }
-        private bool FullDetailsPreferrence { get { return UserPreferences.MainUserPreferences.BeaconFullDetails; } }
-        private double CloseSignalStrengthPreference { get { return UserPreferences.MainUserPreferences.BeaconDbLevel; } }
 
+        /// <summary>
+        /// Set by the main page via the Search settings; when set will pause updates to the advert page
+        /// </summary>
         public bool IsPaused { get; set; } = false;
 
         HashSet<ulong> BleAddressesSeen = new HashSet<ulong>();
         private async void BleAdvert_UpdatedUniversalBleAdvertisement(Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementReceivedEventArgs data)
         {
-            await UpdateUI(data, TrackAll, IsPaused);
+            await UpdateUI(data, IsPaused);
         }
 
         private async void BleAdvert_UpdatedBleAdvertisement(Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementReceivedEventArgs data)
         {
-            await UpdateUI(data, TrackAll, IsPaused);
+            await UpdateUI(data, IsPaused);
         }
-        private string AdvertisementToString(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, DateTime eventTime, bool includeLeadingAddress)
+        private string AdvertisementToString(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, DateTime eventTime)
         {
             var address = BluetoothAddress.AsString(bleAdvert.BluetoothAddress);
 
@@ -132,7 +121,7 @@ namespace BluetoothDeviceController.Beacons
                     case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
                     case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
                     case AdvertisementDataSectionParser.DataTypeValue.Flags:
-                        if (FullDetailsPreferrence)
+                        if (UserPreferences.MainUserPreferences.BeaconFullDetails)
                         {
                             string result;
                             BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
@@ -211,10 +200,11 @@ namespace BluetoothDeviceController.Beacons
         List<SimpleBeaconHistory> AdvertisementHistory = new List<SimpleBeaconHistory>();
 
 
-        private async Task UpdateUI(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, bool includeLeadingAddress, bool isPaused)
+        private async Task UpdateUI(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, bool isPaused)
         {
+            //bool includeLeadingAddress = true; // or UserPreferences.MainUserPreferences.BeaconTrackAll
             var advertTime = DateTime.Now;
-            var txt = AdvertisementToString(bleAdvert, advertTime, includeLeadingAddress);
+            var txt = AdvertisementToString(bleAdvert, advertTime);
             string boldText = null;
             bool isNewAddress = BleAddressesSeen.Add(bleAdvert.BluetoothAddress); // add returns false if already present
             if (isNewAddress)
@@ -245,7 +235,7 @@ namespace BluetoothDeviceController.Beacons
 
         bool ShouldIgnore(SimpleBeaconHistory item, ulong bleAddressFilter)
         {
-            bool isTooFar = item.Args.RawSignalStrengthInDBm < CloseSignalStrengthPreference;
+            bool isTooFar = item.Args.RawSignalStrengthInDBm < UserPreferences.MainUserPreferences.BeaconDbLevel;
             if (isTooFar)
             {
                 return true;
@@ -255,7 +245,7 @@ namespace BluetoothDeviceController.Beacons
                 return true;
             }
             bool isApple10 = IsApple10(item.Args);
-            var suppress = isApple10 && IgnoreApplePreference;
+            var suppress = isApple10 && UserPreferences.MainUserPreferences.BeaconIgnoreApple;
 
             return suppress;
         }

@@ -14,6 +14,16 @@
         <local:DisplayPreferenceConverter x:Key="DisplayPreferenceConverter" />
         <local:SearchScopeConverter x:Key="SearchScopeConverter" />
         <local:ReadSelectionConverter x:Key="ReadSelectionConverter" />
+
+        <Style TargetType="Border">
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Padding" Value="5" />
+        </Style>
+        <Style TargetType="Slider">
+            <Setter Property="Margin" Value="10,0,10,0" />
+        </Style>
     </UserControl.Resources>
     <StackPanel>
         <TextBlock Style="{StaticResource TitleStyle}">Bluetooth Search Settings</TextBlock>
@@ -29,17 +39,9 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <ComboBox  Name="DisplayPreferenceComboBox" Header="Preferred display?" MinWidth="180"
-                       ItemsSource="{Binding Source={StaticResource DisplayPreferenceConverter}, Path=EnumValues}" 
-                      SelectedItem="{Binding Display, Mode=TwoWay}">
-            <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock FontSize="14" Text="{Binding Converter={StaticResource DisplayPreferenceConverter}}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
 
+
+        <!-- Removed! -->
         <StackPanel Orientation="Horizontal" Margin="0,20,0,0" Visibility="Collapsed">
             <StackPanel.Resources>
                 <Style TargetType="Button">
@@ -53,33 +55,73 @@
             -->
         </StackPanel>
 
-        <CheckBox MinWidth="180" Content="Automatically read from device"
+        <Border x:Name="uiBleSettings" >
+            <StackPanel>
+                <ComboBox  Name="DisplayPreferenceComboBox" Header="Preferred display?" MinWidth="180"
+                       ItemsSource="{Binding Source={StaticResource DisplayPreferenceConverter}, Path=EnumValues}" 
+                      SelectedItem="{Binding Display, Mode=TwoWay}">
+                    <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="14" Text="{Binding Converter={StaticResource DisplayPreferenceConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <CheckBox MinWidth="180" Content="Automatically read from device"
                   IsChecked="{Binding AutomaticallyReadData, Mode=TwoWay}"
                   />
 
-        <!-- Address Name Everything -->
-        <ComboBox  Name="ReadSelectionComboBox"  MinWidth="180" Margin="0,4,0,0"
+                <!-- Address Name Everything -->
+                <ComboBox  Name="ReadSelectionComboBox"  MinWidth="180" Margin="0,4,0,0"
                        ItemsSource="{Binding Source={StaticResource ReadSelectionConverter}, Path=EnumValues}" 
                       SelectedItem="{Binding DeviceReadSelection, Mode=TwoWay}">
-            <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock FontSize="14" Text="{Binding Converter={StaticResource ReadSelectionConverter}}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>        
-        <!--
+                    <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="14" Text="{Binding Converter={StaticResource ReadSelectionConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <!--
         <CheckBox x:Name="uiReadFromEach" IsEnabled="False" Content="Attempt to read from each device" IsChecked="False" />
         -->
+            </StackPanel>
+        </Border>
+
+
+
+        <Border x:Name="uiAdvertisementSettings" >
+            <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Content="Full details" x:Name="uiFullDetails" IsThreeState="False" IsChecked="{Binding BeaconFullDetails, Mode=TwoWay}" />
+                <!-- <CheckBox Content="Track all" x:Name="uiTrackAll" IsThreeState="False" IsChecked="{Binding BeaconTrackAll, Mode=TwoWay}" /> -->
+                <CheckBox Content="Ignore Apple" x:Name="uiIgnoreApple" IsThreeState="False" IsChecked="{Binding BeaconIgnoreApple, Mode=TwoWay}" />
+            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="0,20,0,0" />
+                    </Style>
+                    <Style TargetType="Slider">
+                        <Setter Property="Margin" Value="10,0,10,0" />
+                    </Style>
+                </Grid.Resources>
+                <TextBlock Grid.Column="0">-110</TextBlock>
+                <Slider Grid.Column="1" Header="Beacon Signal Strength (RSS) filter" Minimum="-110" Maximum="-40" TickFrequency="10" IsDirectionReversed="True" x:Name="uiBeaconDbLevel" Value="{Binding BeaconDbLevel, Mode=TwoWay}" />
+                <TextBlock Grid.Column="2">-40</TextBlock>
+            </Grid>
+            </StackPanel>
+        </Border>
+
         <Grid HorizontalAlignment="Stretch">
             <CheckBox x:Name="uiKeepScreenOn" Content="Keep Screen On" IsChecked="False" Checked="OnKeepScreenOnChecked" Unchecked="OnKeepScreenOnChecked" />
         </Grid>
-
-        <StackPanel Orientation="Horizontal">
-            <CheckBox Content="Full details" x:Name="uiFullDetails" IsThreeState="False" IsChecked="{Binding BeaconFullDetails, Mode=TwoWay}" />
-            <CheckBox Content="Track all" x:Name="uiTrackAll" IsThreeState="False" IsChecked="{Binding BeaconTrackAll, Mode=TwoWay}" />
-            <CheckBox Content="Ignore Apple" x:Name="uiIgnoreApple" IsThreeState="False" IsChecked="{Binding BeaconIgnoreApple, Mode=TwoWay}" />
-        </StackPanel>
-        <Slider Header="Beacon Signal Strength (RSS) filter" Minimum="-110" Maximum="-40" TickFrequency="10" IsDirectionReversed="True" x:Name="uiBeaconDbLevel" Value="{Binding BeaconDbLevel, Mode=TwoWay}" />
     </StackPanel>
 </UserControl>

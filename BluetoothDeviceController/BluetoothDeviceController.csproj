@@ -270,6 +270,7 @@
     <Compile Include="UserData\UserNameMappings.cs" />
     <Compile Include="Utilities\DataReaderReadStringRobust.cs" />
     <Compile Include="Utilities\EnumUtilities.cs" />
+    <Compile Include="Utilities\UIThreadHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

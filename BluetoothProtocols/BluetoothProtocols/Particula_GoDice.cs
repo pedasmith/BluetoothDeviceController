@@ -299,12 +299,36 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-        private string _Connection_Parameter = null;
-        private bool _Connection_Parameter_set = false;
-        public string Connection_Parameter
+        private double _Connection_Parameter_Interval_Min = 0;
+        private bool _Connection_Parameter_Interval_Min_set = false;
+        public double Connection_Parameter_Interval_Min
         {
-            get { return _Connection_Parameter; }
-            internal set { if (_Connection_Parameter_set && value == _Connection_Parameter) return; _Connection_Parameter = value; _Connection_Parameter_set = true; OnPropertyChanged(); }
+            get { return _Connection_Parameter_Interval_Min; }
+            internal set { if (_Connection_Parameter_Interval_Min_set && value == _Connection_Parameter_Interval_Min) return; _Connection_Parameter_Interval_Min = value; _Connection_Parameter_Interval_Min_set = true; OnPropertyChanged(); }
+        }
+
+        private double _Connection_Parameter_Interval_Max = 0;
+        private bool _Connection_Parameter_Interval_Max_set = false;
+        public double Connection_Parameter_Interval_Max
+        {
+            get { return _Connection_Parameter_Interval_Max; }
+            internal set { if (_Connection_Parameter_Interval_Max_set && value == _Connection_Parameter_Interval_Max) return; _Connection_Parameter_Interval_Max = value; _Connection_Parameter_Interval_Max_set = true; OnPropertyChanged(); }
+        }
+
+        private double _Connection_Parameter_Latency = 0;
+        private bool _Connection_Parameter_Latency_set = false;
+        public double Connection_Parameter_Latency
+        {
+            get { return _Connection_Parameter_Latency; }
+            internal set { if (_Connection_Parameter_Latency_set && value == _Connection_Parameter_Latency) return; _Connection_Parameter_Latency = value; _Connection_Parameter_Latency_set = true; OnPropertyChanged(); }
+        }
+
+        private double _Connection_Parameter_Timeout = 0;
+        private bool _Connection_Parameter_Timeout_set = false;
+        public double Connection_Parameter_Timeout
+        {
+            get { return _Connection_Parameter_Timeout; }
+            internal set { if (_Connection_Parameter_Timeout_set && value == _Connection_Parameter_Timeout) return; _Connection_Parameter_Timeout = value; _Connection_Parameter_Timeout_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -318,10 +342,16 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(2, "Connection_Parameter", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "BYTES|HEX|ConnectionParameter";
+            var datameaning = "U16^1.25_*|DEC|Interval_Min|ms U16^1.15_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
 
-            Connection_Parameter = parseResult.ValueList.GetValue("ConnectionParameter").AsString;
+            Connection_Parameter_Interval_Min = parseResult.ValueList.GetValue("Interval_Min").AsDouble;
+
+            Connection_Parameter_Interval_Max = parseResult.ValueList.GetValue("Interval_Max").AsDouble;
+
+            Connection_Parameter_Latency = parseResult.ValueList.GetValue("Latency").AsDouble;
+
+            Connection_Parameter_Timeout = parseResult.ValueList.GetValue("Timeout").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
