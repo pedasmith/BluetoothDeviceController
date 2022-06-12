@@ -15,6 +15,8 @@ using Windows.Devices.Enumeration;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Windows.Media.SpeechSynthesis;
+using Windows.Media.Core;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -35,6 +37,8 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         int ncommand = 0;
         Particula_GoDice bleDevice = new Particula_GoDice();
+        const string TiltGlyph = "⌧"; // Too large: "❌";
+
         protected async override void OnNavigatedTo(NavigationEventArgs args)
         {
             SetStatusActive(true);
@@ -46,72 +50,146 @@ namespace BluetoothDeviceController.SpecialtyPages
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
             await DoReadDevice_Name();
 
-            bleDevice.OnBatteryLevel += async (obj, batteryLevel) => {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    uiBatteryLevelValue.Text = batteryLevel.ToString();
-                    var levelGlyph = Particula_GoDice.BatteryLevelToGlyph(batteryLevel);
-                    uiBatteryLevelGlyph.Text = levelGlyph;
-                    uiBatteryLevelPercent.Text = $"{batteryLevel}%";
-                });
-            };
-            bleDevice.OnRollStart += async (obj, e) => {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    uiRollValue.Text = "Rolling!";
-                    uiDieIcon.Text = "···";
-                    uiDieText.Text = "Rolling";
-                });
-            };
-
-            const string TiltGlyph = "⌧"; // Too large: "❌";
-            bleDevice.OnRollStable += async (obj, dieRoll) => {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    uiRollValue.Text = dieRoll.ToString();
-                    uiRollTypeValue.Text = "(good roll)";
-                    if (dieRoll >= 1 && dieRoll <= 6)
-                    {
-                        uiDieIcon.Text = $"{Particula_GoDice.DiceFaces[dieRoll - 1]}";
-                        uiDieText.Text = $"{dieRoll.ToString()}";
-                    }
-                    else
-                    {
-                        uiDieIcon.Text = TiltGlyph;
-                        uiDieText.Text = $"Tilt  ({dieRoll.ToString()})";
-                    }
-                });
-            };
-            bleDevice.OnFakeStable += async (obj, dieRoll) => {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    uiRollValue.Text = dieRoll.ToString();
-                    uiRollTypeValue.Text = "(fake stable)";
-                    uiDieIcon.Text = TiltGlyph;
-                    uiDieText.Text = $"Tilt  ({dieRoll.ToString()}) F";
-                });
-            };
-            bleDevice.OnMoveStable += async (obj, dieRoll) => {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    uiRollValue.Text = dieRoll.ToString();
-                    uiRollTypeValue.Text = "(moved)";
-                    uiDieIcon.Text = TiltGlyph;
-                    uiDieText.Text = $"Tilt  ({dieRoll.ToString()}) M";
-                });
-            };
-            bleDevice.OnTiltStable += async (obj, dieRoll) => {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    uiRollValue.Text = dieRoll.ToString();
-                    uiRollTypeValue.Text = "(tilted)";
-                    uiDieIcon.Text = TiltGlyph;
-                    uiDieText.Text = $"Tilt  ({dieRoll.ToString()})";
-                });
-            };
+            bleDevice.OnBatteryLevel += DoOnBatteryLevel;
+            bleDevice.OnRollStart += DoOnRollStart;
+            bleDevice.OnRollStable += DoOnRollStable;
+            bleDevice.OnFakeStable += DoOnFakeStable;
+            bleDevice.OnMoveStable += DoOnMoveStable;
+            bleDevice.OnTiltStable += DoOntiltStable;
 
             await DoNotifyReceive(); // Set up the notify on incoming events
             OnGetBatteryLevel(null, null);
+
+            // The object for controlling the speech synthesis engine (voice).
+            synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
+        }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            bleDevice.Status.OnBluetoothStatus -= bleDevice_OnBluetoothStatus;
+            bleDevice.NotifyReceiveRemoveCharacteristicCallback();
+            bleDevice.OnBatteryLevel -= DoOnBatteryLevel;
+            bleDevice.OnRollStart -= DoOnRollStart;
+            bleDevice.OnRollStable -= DoOnRollStable;
+            bleDevice.OnFakeStable -= DoOnFakeStable;
+            bleDevice.OnMoveStable -= DoOnMoveStable;
+            bleDevice.OnTiltStable -= DoOntiltStable;
+
+            if (ReceiveNotifySetup) { bleDevice.ReceiveEvent -= BleDevice_ReceiveEvent; ReceiveNotifySetup = false; }
+
+        }
+
+        private async void DoOnRollStart(object obj, EventArgs args)
+        {
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                uiRollValue.Text = "Rolling!";
+                uiDieIcon.Text = "···";
+                uiDieText.Text = "Rolling";
+            });
+        }
+
+        private async void DoOnBatteryLevel(object obj, int batteryLevel)
+        {
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                uiBatteryLevelValue.Text = batteryLevel.ToString();
+                var levelGlyph = Particula_GoDice.BatteryLevelToGlyph(batteryLevel);
+                uiBatteryLevelGlyph.Text = levelGlyph;
+                uiBatteryLevelPercent.Text = $"{batteryLevel}%";
+            });
+        }
+
+        private async void DoOnRollStable(object obj, int dieRoll)
+        {
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            {
+                uiRollValue.Text = dieRoll.ToString();
+                uiRollTypeValue.Text = "(good roll)";
+                if (dieRoll >= 1 && dieRoll <= 6)
+                {
+                    uiDieIcon.Text = $"{Particula_GoDice.DiceFaces[dieRoll - 1]}";
+                    uiDieText.Text = $"{dieRoll.ToString()}";
+
+                    // Generate the audio stream from plain text.
+                    await SpeakAsync($"Rolled {dieRoll}");
+                }
+                else
+                {
+                    uiDieIcon.Text = TiltGlyph;
+                    uiDieText.Text = $"Tilt  ({dieRoll.ToString()})";
+
+                    // Generate the audio stream from plain text.
+                    await SpeakAsync($"bad roll");
+                }
+            });
+        }
+
+        private async void DoOnFakeStable(object obj, int dieRoll)
+        {
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            {
+                uiRollValue.Text = dieRoll.ToString();
+                uiRollTypeValue.Text = "(fake stable)";
+                uiDieIcon.Text = TiltGlyph;
+                uiDieText.Text = $"Tilt  ({dieRoll.ToString()}) F";
+
+                // Generate the audio stream from plain text.
+                await SpeakAsync($"bad roll");
+            });
+        }
+
+        private async void DoOnMoveStable(object obj, int dieRoll)
+        {
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            {
+                uiRollValue.Text = dieRoll.ToString();
+                uiRollTypeValue.Text = "(moved)";
+                uiDieIcon.Text = TiltGlyph;
+                uiDieText.Text = $"Tilt  ({dieRoll.ToString()}) M";
+
+                // Generate the audio stream from plain text.
+                await SpeakAsync($"bad roll");
+
+                // Send the stream to the media object.
+            });
+        }
+
+        private async void DoOntiltStable(object obj, int dieRoll)
+        {
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            {
+                uiRollValue.Text = dieRoll.ToString();
+                uiRollTypeValue.Text = "(tilted)";
+                uiDieIcon.Text = TiltGlyph;
+                uiDieText.Text = $"Tilt  ({dieRoll.ToString()})";
+
+                // Generate the audio stream from plain text.
+                await SpeakAsync($"bad roll");
+
+            });
+        }
+
+
+
+
+        SpeechSynthesizer synth;
+
+        private async Task SpeakAsync(string text)
+        {
+            var shouldSpeak = uiSpeakRolls.IsChecked.Value;
+            if (!shouldSpeak) return;
+
+            // Generate the audio stream from plain text.
+            SpeechSynthesisStream stream = await synth.SynthesizeTextToStreamAsync(text);
+
+            // Send the stream to the media object.
+            var mediaElement = uiTalkingDice;
+            // Send the stream to the media object.
+            mediaElement.SetSource(stream, stream.ContentType);
+            mediaElement.Play();
+            //mediaElement.Source = MediaSource.CreateFromStream(stream, stream.ContentType);
+
         }
 
         public string GetId()

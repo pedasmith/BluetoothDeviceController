@@ -42,18 +42,21 @@
 
 
         <!-- Removed! -->
+        <!--
         <StackPanel Orientation="Horizontal" Margin="0,20,0,0" Visibility="Collapsed">
             <StackPanel.Resources>
                 <Style TargetType="Button">
                     <Setter Property="MinWidth" Value="90" />
                 </Style>
             </StackPanel.Resources>
+            
             <Button x:Name="uiSearchStart" Content="🔎 Search" Click="OnSearchStart" ToolTipService.ToolTip="Start search" />
             <Button x:Name="uiSearchCancel" Content="✘ Cancel" Click="OnSearchCancel" Margin="10,0,0,0" ToolTipService.ToolTip="Cancel current search" />
-            <!--
+        </StackPanel>
+    -->
+        <!-- was in the stackpanel above
             <Button Content="✀" Click="OnCopyJson" Margin="10,0,0,0" ToolTipService.ToolTip="Copy current search results as JSON" />
             -->
-        </StackPanel>
 
         <Border x:Name="uiBleSettings" >
             <StackPanel>
@@ -72,16 +75,18 @@
                   />
 
                 <!-- Address Name Everything -->
+                <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
+                <!-- Removed 2022-06-11 because it's not useful for the end-user.
                 <ComboBox  Name="ReadSelectionComboBox"  MinWidth="180" Margin="0,4,0,0"
                        ItemsSource="{Binding Source={StaticResource ReadSelectionConverter}, Path=EnumValues}" 
                       SelectedItem="{Binding DeviceReadSelection, Mode=TwoWay}">
-                    <!-- In order to display the strings from the DisplayAttribute you need to add a converter. -->
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock FontSize="14" Text="{Binding Converter={StaticResource ReadSelectionConverter}}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
+                -->
                 <!--
         <CheckBox x:Name="uiReadFromEach" IsEnabled="False" Content="Attempt to read from each device" IsChecked="False" />
         -->
@@ -120,8 +125,10 @@
             </StackPanel>
         </Border>
 
+        <!-- Remove 2022-06-11; it's part of the automation menu now.
         <Grid HorizontalAlignment="Stretch">
             <CheckBox x:Name="uiKeepScreenOn" Content="Keep Screen On" IsChecked="False" Checked="OnKeepScreenOnChecked" Unchecked="OnKeepScreenOnChecked" />
         </Grid>
+        -->
     </StackPanel>
 </UserControl>

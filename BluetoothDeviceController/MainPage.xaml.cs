@@ -201,14 +201,15 @@ namespace BluetoothDeviceController
             AllBleNames = new BleNames();
             await AllBleNames.InitAsync();
             await UserNameMappings.InitAsync();
-            var readSelection = Preferences.DeviceReadSelection;
-            if (readSelection == UserPreferences.ReadSelection.Everything)
-            {
-                readSelection = UserPreferences.ReadSelection.Name; // Don't automaticaly get everything on startup
-            }
+            // Always start with a 'name' style read. Nothing else truly makes sense.
+            //var readSelection = Preferences.DeviceReadSelection;
+            //if (readSelection == UserPreferences.ReadSelection.Everything)
+            //{
+            //    readSelection = UserPreferences.ReadSelection.Name; // Don't automaticaly get everything on startup
+            //}
             NavView_Navigate("Help", "welcome.md", null);
 
-            StartSearch(readSelection, Preferences.Scope);
+            StartSearch(UserPreferences.ReadSelection.Name, Preferences.Scope);
 
             // Set the version number in the about box. https://stackoverflow.com/questions/28635208/retrieve-the-current-app-version-from-package
             var version = Windows.ApplicationModel.Package.Current.Id.Version;
@@ -632,7 +633,7 @@ namespace BluetoothDeviceController
             if (wrapper.di != null)
             {
                 id = wrapper.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
-                var isAll_bluetooth_devices = Preferences.Scope == UserPreferences.SearchScope.All_bluetooth_devices;
+                var isAll_bluetooth_devices = Preferences.Scope == UserPreferences.SearchScope.Ble_All_ble_devices;
                 bool hasDeviceName;
                 (name, hasDeviceName) = GetDeviceInformationName(wrapper.di);
                 if (!hasDeviceName && !isAll_bluetooth_devices)
@@ -683,7 +684,7 @@ namespace BluetoothDeviceController
                 }
             }
 
-            if (specialization == null && Preferences.Scope == UserPreferences.SearchScope.Has_specialized_display)
+            if (specialization == null && Preferences.Scope == UserPreferences.SearchScope.Ble_Has_specialized_display)
             {
                 // There's no specialization and the user asked for items with a specialization only.
                 // That means we shouldn't add this to the list.
@@ -841,7 +842,8 @@ namespace BluetoothDeviceController
         public event EventHandler DeviceEnumerationChanged;
         public void StartSearchWithUserPreferences()
         {
-            StartSearch(Preferences.DeviceReadSelection, Preferences.Scope);
+            // Always do a Name search.
+            StartSearch(UserPreferences.ReadSelection.Name, Preferences.Scope);
         }
         /// <summary>
         /// Primary function to kick off a search for devices (both automation and UX 'search now' button.
@@ -1402,13 +1404,13 @@ namespace BluetoothDeviceController
         private void MenuOnSweepBleName(object sender, RoutedEventArgs e)
         {
             CancelSearch();
-            StartSearch(UserPreferences.ReadSelection.Name, UserPreferences.SearchScope.All_bluetooth_devices);
+            StartSearch(UserPreferences.ReadSelection.Name, UserPreferences.SearchScope.Ble_All_ble_devices);
         }
 
         private void MenuOnSweepBleFull(object sender, RoutedEventArgs e)
         {
             CancelSearch();
-            StartSearch(UserPreferences.ReadSelection.Everything, UserPreferences.SearchScope.All_bluetooth_devices);
+            StartSearch(UserPreferences.ReadSelection.Everything, UserPreferences.SearchScope.Ble_All_ble_devices);
         }
 
         // Stuff needed to keep the screen on

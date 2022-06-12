@@ -10,7 +10,9 @@ The Particula GoDice are normal-looking 6-sided dice that include Bluetooth comm
 
 Every time you roll a die, the results will show up on the screen with both an image and the number. Also shown is the last known battery level; click the battery percent for it to update. 
 
-You can also click the 
+You can also click the Set Dice LEd button to set the color of the dice.
+
+The DiceTransmit and Common Configuration settings are for advanced use and show some of the Bluetooth protocol details for the dice.
 
 
 

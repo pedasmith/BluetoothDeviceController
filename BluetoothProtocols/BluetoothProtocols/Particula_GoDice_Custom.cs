@@ -93,26 +93,26 @@ namespace BluetoothProtocols
             else if (Match(message, "FS"))
             {
                 var die = DieRoll(message, 3);
-                OnFakeStable(this, die);
+                OnFakeStable?.Invoke(this, die);
             }
             else if (Match(message, "MS"))
             {
                 var die = DieRoll(message, 3);
-                OnMoveStable(this, die);
+                OnMoveStable?.Invoke(this, die);
             }
             else if (Match(message, "R"))
             {
-                OnRollStart(this, null);
+                OnRollStart?.Invoke(this, null);
             }
             else if (Match(message, "S"))
             {
                 var die = DieRoll(message, 2);
-                OnRollStable(this, die);
+                OnRollStable?.Invoke(this, die);
             }
             else if (Match(message, "TS"))
             {
                 var die = DieRoll(message, 3);
-                OnTiltStable(this, die);
+                OnTiltStable?.Invoke(this, die);
             }
 
         }

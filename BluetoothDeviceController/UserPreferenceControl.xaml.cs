@@ -55,8 +55,8 @@ namespace BluetoothDeviceController
         private void UpdateSearchUI()
         {
             if (Search == null) return;
-            uiSearchStart.IsEnabled = !Search.GetSearchActive();
-            uiSearchCancel.IsEnabled = !uiSearchStart.IsEnabled;
+            //uiSearchStart.IsEnabled = !Search.GetSearchActive();
+            //uiSearchCancel.IsEnabled = !uiSearchStart.IsEnabled;
         }
 
         public void SetPreferences (UserPreferences pref)
@@ -65,6 +65,8 @@ namespace BluetoothDeviceController
             this.DataContext = Preferences;
         }
 
+#if NEVER_EVER_DEFINED
+// Search start is via the search feedback control now, not the settings dialog.
         private void OnSearchStart(object sender, RoutedEventArgs e)
         {
             if (Search == null) return;
@@ -78,7 +80,7 @@ namespace BluetoothDeviceController
             Search.CancelSearch();
             UpdateSearchUI();
         }
-
+#endif
 
         private void OnSearchScopeChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -89,9 +91,9 @@ namespace BluetoothDeviceController
             uiBleSettings.Visibility = Visibility.Collapsed;
             switch (scope)
             {
-                case UserPreferences.SearchScope.All_bluetooth_devices:
-                case UserPreferences.SearchScope.Has_specialized_display:
-                case UserPreferences.SearchScope.Device_is_named:
+                case UserPreferences.SearchScope.Ble_All_ble_devices:
+                case UserPreferences.SearchScope.Ble_Has_specialized_display:
+                case UserPreferences.SearchScope.Ble_Device_is_named:
                     uiBleSettings.Visibility = Visibility.Visible;
                     break;
 
@@ -99,15 +101,17 @@ namespace BluetoothDeviceController
                     uiAdvertisementSettings.Visibility = Visibility.Visible;
                     break;
             }
+#if NEVER_EVER_DEFINED
             switch (scope)
             {
-                case UserPreferences.SearchScope.All_bluetooth_devices:
+                case UserPreferences.SearchScope.Ble_All_ble_devices:
                     ReadSelectionComboBox.IsEnabled = true;
                     break;
                 default:
                     ReadSelectionComboBox.IsEnabled = false;
                     break;
             }
+#endif
         }
 
 #if NEVER_EVER_DEFINED
@@ -130,6 +134,9 @@ namespace BluetoothDeviceController
         }
 #endif
 
+#if NEVER_EVER_DEFINED
+// Removed 2022-06-11 because it's part of the automation menu now
+
         static Windows.System.Display.DisplayRequest CurrDisplayRequest = null;
 
         private void OnKeepScreenOnChecked(object sender, RoutedEventArgs e)
@@ -148,6 +155,7 @@ namespace BluetoothDeviceController
                 CurrDisplayRequest.RequestRelease();
             }
         }
+#endif
 
     }
 }

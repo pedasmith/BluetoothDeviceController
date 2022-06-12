@@ -453,16 +453,7 @@ namespace BluetoothProtocols
                 {
                     // Only set the event callback once
                     NotifyReceive_ValueChanged_Set = true;
-                    ch.ValueChanged += (sender, args) =>
-                    {
-                        var datameaning = "BYTES|HEX|DiceEvent";
-                        var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
-                        Receive = parseResult.ValueList.GetValue("DiceEvent").AsString;
-                        System.Diagnostics.Debug.WriteLine("SDD: " + parseResult.AsString);
-
-                        ReceiveEvent?.Invoke(parseResult);
-                    };
+                    ch.ValueChanged += NotifyReceiveCallback; // Moved callbak to a named routine
                 }
 
             }
@@ -475,6 +466,23 @@ namespace BluetoothProtocols
 
             return true;
         }
+        private void NotifyReceiveCallback(GattCharacteristic sender, GattValueChangedEventArgs args) //TODO: code moved fro mthe anonymous callback function
+        {
+            var datameaning = "BYTES|HEX|DiceEvent";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
 
+            Receive = parseResult.ValueList.GetValue("DiceEvent").AsString;
+            System.Diagnostics.Debug.WriteLine("SDD: GD462: " + parseResult.AsString);
+
+            ReceiveEvent?.Invoke(parseResult);
+        }
+
+        public void NotifyReceiveRemoveCharacteristicCallback() // TODO: Added function to remove the callback
+        {
+            var ch = Characteristics[5];
+            NotifyReceive_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyReceiveCallback; // Moved callbak to a named routine
+        }
     }
+
 }

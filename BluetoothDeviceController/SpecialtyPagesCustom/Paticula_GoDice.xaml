@@ -7,7 +7,7 @@
     xmlns:charts="using:BluetoothDeviceController.Charts"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls" xmlns:media="using:Windows.Media"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Page.Resources>
@@ -85,6 +85,8 @@
             <TextBlock VerticalAlignment="Center" Margin="50,20,0,0">
                 <Run x:Name="uiDieText" FontSize="25" Text="" />
             </TextBlock>
+            <MediaElement   x:Name="uiTalkingDice" AutoPlay="True" Margin="20,0,0,0" />
+            <MediaPlayerElement  x:Name="ZZZuiTalkingDice" AutoPlay="True" Margin="20,0,0,0" />
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBlock Tapped="OnUpdateBatteryLevel" HorizontalAlignment="Center">
@@ -117,6 +119,7 @@
                     </Flyout>
                 </Button.Flyout>
             </Button>
+            <ToggleButton x:Name="uiSpeakRolls" Content="Speak Dice Roll" Margin="20,0,0,0" IsChecked="true" />
         </StackPanel>
         
         <ProgressRing x:Name="uiProgress" />

@@ -9,18 +9,19 @@
         public DisplayPreference Display { get; set; } = DisplayPreference.Specialized_Display;
         public enum SearchScope {
             [enumUtilities.Display("BLE known device types")]
-            Has_specialized_display,
+            Ble_Has_specialized_display,
             [enumUtilities.Display("BLE advertisements and beacons")]
             Bluetooth_Beacons,
             [enumUtilities.Display("Bluetooth COM port")]
             Bluetooth_Com_Device, 
             [enumUtilities.Display("BLE devices with names")]
-            Device_is_named, 
+            Ble_Device_is_named, 
             [enumUtilities.Display("All BLE devices")]
-            All_bluetooth_devices };
-        public SearchScope Scope { get; set; } = SearchScope.Has_specialized_display;
+            Ble_All_ble_devices };
+        public SearchScope Scope { get; set; } = SearchScope.Ble_Has_specialized_display;
 
         public enum ReadSelection { Address, Name, Everything } // Same as DeviceSearchType: Standard, NameRead, Everything
+        // Name is the typical; Everything is used by 
         public ReadSelection DeviceReadSelection { get; set; } = UserPreferences.ReadSelection.Name;
         public bool AutomaticallyReadData { get; set; } = true;
         /// <summary>
