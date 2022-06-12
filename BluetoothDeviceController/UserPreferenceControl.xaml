@@ -70,7 +70,7 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <CheckBox MinWidth="180" Content="Automatically read from device"
+                <CheckBox MinWidth="180" Content="When editing, automatically read from device"
                   IsChecked="{Binding AutomaticallyReadData, Mode=TwoWay}"
                   />
 

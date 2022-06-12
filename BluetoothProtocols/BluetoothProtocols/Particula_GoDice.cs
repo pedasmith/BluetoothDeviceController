@@ -14,12 +14,15 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Bluetooth-enable dice (like for playing games). The colors can be set and the position and state of the dice can be detected..
-    /// This class was automatically generated 5/30/2022 5:04 PM
+    /// This class was automatically generated 6/12/2022 10:08 AM
     /// </summary>
 
     public partial class Particula_GoDice : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
+        // Link: https://getgocube.com/products/godice-full-pack/
+        // Link: https://www.kickstarter.com/projects/1928372437/godice-your-favorite-dice-games-reimagined
+        // Link: https://github.com/ParticulaCode/GoDiceJavaScriptAPI
 
 
         public BluetoothLEDevice ble { get; set; } = null;
@@ -34,18 +37,15 @@ namespace BluetoothProtocols
 
         Guid[] ServiceGuids = new Guid[] {
             Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"),
-            Guid.Parse("00001801-0000-1000-8000-00805f9b34fb"),
             Guid.Parse("6e400001-b5a3-f393-e0a9-e50e24dcca9e"),
 
         };
         String[] ServiceNames = new string[] {
             "Common Configuration",
-            "Generic Service",
             "DiceTransmit",
 
         };
         GattDeviceService[] Services = new GattDeviceService[] {
-            null,
             null,
             null,
 
@@ -79,7 +79,6 @@ namespace BluetoothProtocols
         };
         List<HashSet<int>> MapServiceToCharacteristic = new List<HashSet<int>>() {
             new HashSet<int>(){ 0, 1, 2, 3,  },
-            new HashSet<int>(){  },
             new HashSet<int>(){ 4, 5,  },
 
         };
@@ -453,7 +452,7 @@ namespace BluetoothProtocols
                 {
                     // Only set the event callback once
                     NotifyReceive_ValueChanged_Set = true;
-                    ch.ValueChanged += NotifyReceiveCallback; // Moved callbak to a named routine
+                    ch.ValueChanged += NotifyReceiveCallback;
                 }
 
             }
@@ -466,23 +465,26 @@ namespace BluetoothProtocols
 
             return true;
         }
-        private void NotifyReceiveCallback(GattCharacteristic sender, GattValueChangedEventArgs args) //TODO: code moved fro mthe anonymous callback function
+
+        private void NotifyReceiveCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var datameaning = "BYTES|HEX|DiceEvent";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
 
             Receive = parseResult.ValueList.GetValue("DiceEvent").AsString;
-            System.Diagnostics.Debug.WriteLine("SDD: GD462: " + parseResult.AsString);
 
             ReceiveEvent?.Invoke(parseResult);
+
         }
 
-        public void NotifyReceiveRemoveCharacteristicCallback() // TODO: Added function to remove the callback
+        public void NotifyReceiveRemoveCharacteristicCallback()
         {
             var ch = Characteristics[5];
+            if (ch == null) return;
             NotifyReceive_ValueChanged_Set = false;
-            ch.ValueChanged -= NotifyReceiveCallback; // Moved callbak to a named routine
+            ch.ValueChanged -= NotifyReceiveCallback;
         }
-    }
 
+
+    }
 }

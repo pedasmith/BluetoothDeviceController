@@ -636,6 +636,12 @@
     <Content Include="Assets\ScreenShots\Device_WilliamWeilerEngineering_Skoobot.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ScreenShots\Settings_Advertisements.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ScreenShots\Settings_DisplayType.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\SerialData\RealityRobots_BERO.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

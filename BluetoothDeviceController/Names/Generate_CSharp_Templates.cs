@@ -233,13 +233,7 @@ namespace BluetoothProtocols
                 {
                     // Only set the event callback once
                     Notify[[CHARACTERISTICNAME]]_ValueChanged_Set = true;
-                    ch.ValueChanged += (sender, args) =>
-                    {
-                        var datameaning = ""[[CHARACTERISTICTYPE]]"";
-                        var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-[[SET_PROPERTY_VALUES]]
-                        [[CHARACTERISTICNAME]]Event?.Invoke(parseResult);
-                    };
+                    ch.ValueChanged += Notify[[CHARACTERISTICNAME]]Callback;
                 }
 
             }
@@ -252,6 +246,24 @@ namespace BluetoothProtocols
 
             return true;
         }
+
+        private void Notify[[CHARACTERISTICNAME]]Callback(GattCharacteristic sender, GattValueChangedEventArgs args) 
+        {
+            var datameaning = ""[[CHARACTERISTICTYPE]]"";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+[[SET_PROPERTY_VALUES]]
+            [[CHARACTERISTICNAME]]Event?.Invoke(parseResult);
+
+        }
+
+        public void Notify[[CHARACTERISTICNAME]]RemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[[[CHARACTERISTICINDEX]]];
+            if (ch == null) return;
+            Notify[[CHARACTERISTICNAME]]_ValueChanged_Set = false;
+            ch.ValueChanged -= Notify[[CHARACTERISTICNAME]]Callback;
+        }
+
 ";
 
         public static string Protocol_ReadMethodTemplate = @"

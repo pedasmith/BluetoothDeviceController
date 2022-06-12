@@ -14,6 +14,21 @@ lets you also list show Bluetooth devices where *Device is named* (roughly speak
 these are devices that your PC has paired with). You can also show *All bluetooth devices*
 which will include all nearby Bluetooth devices which are emitting data. You'll often see that
 there are a lot of phones that you can detect.
+![Settings Which Devices](../ScreenShots/Settings_DisplayType.png)
+
+The *Bluetooth COM port* expert setting is for when you need to directly control a "communications port"
+type Bluetooth device. 
+
+# BLE Advertisements
+When you ask to see Beacons and Advertisements (to see the range of Bluetooth devices in your area),
+you can customize the devices you see
+
+![Advertisement Settings](../ScreenShots/Settings_Advertisements.png)
+
+When *Full Displays* is checked, you'll see more data about each advertisement
+When *Ignore Apple* is checked, advertisements from Apple phones will be supressed.
+You can see only closer devices with the Beacon Signal Strength slider. Move the slider to the left (-110) 
+to see more devices, and to the right (-40) to see only the closer devices.
 
 # Preferred display
 Normally a device with a known specialization (like the [TI_CC1350SensorTag](../Device_TI_1350SensorTag.md)
