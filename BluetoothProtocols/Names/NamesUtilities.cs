@@ -64,6 +64,11 @@ namespace Utilities
             var ok = Bytes.TryParse(text, style, format, out result);
             return ok;
         }
+        public static bool TryParseSingle(string text, System.Globalization.NumberStyles style, IFormatProvider format, out Single result)
+        {
+            var ok = Single.TryParse(text, style, format, out result);
+            return ok;
+        }
         public static bool TryParseDouble(string text, System.Globalization.NumberStyles style, IFormatProvider format, out Double result)
         {
             var ok = Double.TryParse(text, style, format, out result);

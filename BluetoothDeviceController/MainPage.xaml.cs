@@ -105,6 +105,7 @@ namespace BluetoothDeviceController
 
             // Data Sensors
             new Specialization (typeof(SpecialtyPages.Bbc_MicroBitPage), new string[] { "BBC micro:bit" }, DATA, "BBC micro:bit", "micro:bit with data program"),
+            new Specialization (typeof(SpecialtyPages.PokitProMeterPage), new string[] { "PokitPro" }, DATA, "Pokit Pro multimeter", "Pokit Pro multimeter and digital oscilloscope"),
 
             // Health Sensors
             new Specialization (typeof(SpecialtyPages.Samico_BloodPressure_BG512Page), new string[] { "Samico BP" }, HEALTH, "Pyle / Samico", "Blood pressure cuff"),
@@ -441,6 +442,10 @@ namespace BluetoothDeviceController
                 else
                 {
                     var (deviceName, hasDeviceName) = GetDeviceInformationName(wrapper?.di);
+                    if (deviceName.StartsWith("Pokit"))
+                    {
+                        ;// handy hook for debugging
+                    }
 
                     var specialization = Specialization.Get(Specializations, deviceName);
                     if (specialization == null && wrapper != null)
@@ -1164,7 +1169,7 @@ namespace BluetoothDeviceController
             if (ct.IsCancellationRequested) return;
             for (int i=0; i< MenuItemCache.Count; i++)
             {
-                var nvi = uiNavigation.MenuItems[i] as NavigationViewItemBase;
+                var nvi = MenuItemCache[i] as NavigationViewItemBase;
                 var di = nvi?.Tag as DeviceInformationWrapper;
                 if (di != null)
                 {
@@ -1264,7 +1269,7 @@ namespace BluetoothDeviceController
 
             for (int i = 0; i < MenuItemCache.Count; i++)
             {
-                var nvi = uiNavigation.MenuItems[i] as NavigationViewItemBase;
+                var nvi = MenuItemCache[i] as NavigationViewItemBase;
                 var di = nvi?.Tag as DeviceInformationWrapper;
                 if (di == null) continue;
                 try

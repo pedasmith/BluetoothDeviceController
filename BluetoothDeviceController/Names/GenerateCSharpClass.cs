@@ -866,6 +866,10 @@ namespace BluetoothDeviceController.Names
                                 paramlist += $"UInt32 {name}";
                                 arglist += $"            dw.WriteUInt32({name});\n";
                                 break;
+                            case "F32":
+                                paramlist += $"float {name}";
+                                arglist += $"            dw.WriteSingle({name});\n";
+                                break;
                             default:
                                 if (format[0] == 'O')
                                 {

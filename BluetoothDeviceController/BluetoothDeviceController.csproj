@@ -210,6 +210,12 @@
     <Compile Include="SpecialtyPagesCustom\CraftyRobot_SmartibotPage.xaml.cs">
       <DependentUpon>CraftyRobot_SmartibotPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPagesCustom\MultiMeterControl.xaml.cs">
+      <DependentUpon>MultiMeterControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialtyPagesCustom\Pokit_ProPage.xaml.cs">
+      <DependentUpon>Pokit_ProPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SpecialtyPagesCustom\UartPage.xaml.cs">
       <DependentUpon>UartPage.xaml</DependentUpon>
     </Compile>
@@ -916,6 +922,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPagesCustom\CraftyRobot_SmartibotPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPagesCustom\MultiMeterControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPagesCustom\Pokit_ProPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

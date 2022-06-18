@@ -2,12 +2,16 @@
   "AllDevices": [
     {
       "Name":"PokitPro",
-	  "ClassName": "PokitProMeter",
-	  "Links":[
-	  "https://help.pokitmeter.com/hc/en-us/community/posts/360023523213-Bluetooth-API-Documentation",
-	  "https://www.pokitinnovations.com/wp-content/uploads/D0005250-PokitMeter-Bluetooth-API-Documentation-0_02.pdf",
-		"https://github.com/pcolby/pokit/blob/6937d011c528b3a5f00c6e867ec91a71eaad5bcb/src/lib/uuids.h"
-	  ],
+      "ClassName": "PokitProMeter",
+      "ClassModifiers": "partial",
+      "Description": "Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display.",
+
+      "Links": [
+        "https://help.pokitmeter.com/hc/en-us/community/posts/360023523213-Bluetooth-API-Documentation",
+        "https://www.pokitinnovations.com/wp-content/uploads/D0005250-PokitMeter-Bluetooth-API-Documentation-0_02.pdf",
+        "https://github.com/pcolby/pokit/blob/6937d011c528b3a5f00c6e867ec91a71eaad5bcb/src/lib/uuids.h",
+        "https://github.com/pcolby/qtpokit"
+      ],
       "Services": [
         {
           "UUID": "00001801-0000-1000-8000-00805f9b34fb",
@@ -18,7 +22,7 @@
               "UUID": "00002803-0000-1000-8000-00805f9b34fb",
               "Name": "Server_Supported_Features",
               "Type": "U8|HEX|FeatureBitmap0",
-			  "REM_Byte0":"bit 0=enhanced ATT bearer",
+	      		  "REM_Byte0":"bit 0=enhanced ATT bearer",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -35,7 +39,7 @@
               "UUID": "00002b29-0000-1000-8000-00805f9b34fb",
               "Name": "Client_Supported_Features",
               "Type": "U8|HEX|FeatureBitmap0",
-			  "REM_Byte0":"bit 0=robust caching 1=enhanced ATT bearer 2=multiple value",
+			        "REM_Byte0":"bit 0=robust caching 1=enhanced ATT bearer 2=multiple value",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -45,9 +49,9 @@
             {
               "UUID": "00002b2a-0000-1000-8000-00805f9b34fb",
               "Name": "Database Hash",
-			  "REM10":"https://community.silabs.com/s/question/0D51M00007xeOAUSA2/what-are-the-strange-characteristics-2b2a-and-2b29-in-the-generic-attribute-service?language=en_US",
+      			  "REM10":"https://community.silabs.com/s/question/0D51M00007xeOAUSA2/what-are-the-strange-characteristics-2b2a-and-2b29-in-the-generic-attribute-service?language=en_US",
               "Type": "U32|HEX|Hash0 U32|HEX|Hash1 U32|HEX|Hash2 U32|HEX|Hash3",
-			  "REM20":"Technically this is a uint128",
+      			  "REM20":"Technically this is a uint128",
               "IsRead": true,
               "ExampleData": [
                 "Value:  F3 45 EF 2A E8 B9 88 1C 06 C8 44 6F 36 F8 13 00"
@@ -167,7 +171,7 @@
               "UUID": "3dba36e1-6120-4706-8dfd-ed9c16e569b6",
               "Name": "Status_Status",
               "Type": "U8|HEX|DeviceStatus F32|FIXED|BatteryLevel",
-			  "REM10 DeviceStatus" : "0=Idle 1=MM Vdc 2=MM Vac 3=MM AmpDC 4=MM AmpAC 5=MM ohm 6=MM Diode 7=MM Cont 8=MM Temp 9=DSO 10=Logger",
+		      	  "REM10 DeviceStatus" : "0=Idle 1=MM Vdc 2=MM Vac 3=MM AmpDC 4=MM AmpAC 5=MM ohm 6=MM Diode 7=MM Cont 8=MM Temp 9=DSO 10=Logger",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -207,8 +211,8 @@
             },
             {
               "UUID": "8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89",
-              "Name": "Unknown5",
-              "Type": "BYTES|HEX|Unknown5",
+              "Name": "UnknownStatusValues",
+              "Type": "BYTES|HEX|StatusUnknown5",
               "IsRead": true,
               "IsWrite": true,
               "IsNotify": true,
@@ -221,15 +225,17 @@
         {
           "UUID": "e7481d2f-5781-442e-bb9a-fd4e3441dadc",
           "Name": "Multimeter",
+          "Priority":  40,
           "Characteristics": [
             {
               "UUID": "53dc9a7a-bc19-4280-b76b-002d0e23b078",
               "Name": "MM_Settings",
-              "Type": "U8|HEX|Mode U8|HEX|Range U32|HEX|Interval",
+              "Type": "U8|HEX|Mode U8|HEX|Range U32|HEX|Interval|ms",
               "IsWrite": true,
-			  "REM05": "mode 0=idle, 1=voltDC, 2=voltAC 3=ampDC,4=ampAC 5=ohm 6=diode 7=continuity 8=temp",
-			  "REM10": "05 FF 00 04 00 00 ",
-			  "REM20": "09 00 01 00 00 00 00"
+              "REM05": "mode 0=idle, 1=voltDC, 2=voltAC 3=ampDC,4=ampAC 5=ohm 6=diode 7=continuity 8=temp",
+	      		  "REM10": "05 FF 00 04 00 00 ",
+              "REM20": "09 00 01 00 00 00 00",
+              "REM30":  "range v 0=...300mv 1=300mv..2V 2=2..6V 3=6v..12v"
             },
             {
               "UUID": "047d3559-8bee-423a-b229-4417fa603b90",
@@ -238,7 +244,8 @@
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
-                "Value:  00 00 00 00 00 00 00"
+                "Value:  00 00 00 00 00 00 00",
+                "REM10: Status "
               ]
             }
           ]
@@ -246,23 +253,25 @@
         {
           "UUID": "1569801e-1425-4a7a-b617-a4f4ed719de6",
           "Name": "DSO_Oscilloscope",
+          "Priority": 30,
           "Characteristics": [
             {
               "UUID": "a81af1b6-b8b3-4244-8859-3da368d2be39",
               "Name": "DSO_Settings",
-              "Type": "BYTES|HEX|Unknown0",
+              "Type": "U8|HEX|DsoTriggerType F32|FIXED|DsoTriggerLevel U8|HEX|DsoMode U8|HEX|DsoRange U32|DEC|DsoSamplingWindow|ms U16|DEC|DsoNSamples",
               "IsWrite": true
             },
             {
               "UUID": "98e14f8e-536e-4f24-b4f4-1debfed0a99e",
               "Name": "DSO_Reading",
-              "Type": "BYTES|HEX|Unknown1",
-              "IsNotify": true
+              "Type": "BYTES|HEX|DsoDataRaw",
+              "IsNotify": true,
+              "REM": "Is a series of int16 which are multiplied by DsoDataScale to get actual data"
             },
             {
               "UUID": "970f00ba-f46f-4825-96a8-153a5cd0cda9",
               "Name": "DSO_Metadata",
-              "Type": "BYTES|HEX|Unknown2",
+              "Type": "U8|HEX|DsoStatus F32|FIXED|DsoDataScale U8|HEX|DsoDataMode U8|HEX|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -273,24 +282,26 @@
         },
         {
           "UUID": "a5ff3566-1fd8-4e10-8362-590a578a4121",
-          "Name": "DataLogger",
+          "Name": "DataLogger_Dlog",
+          "Priority": 20,
           "Characteristics": [
             {
               "UUID": "5f97c62b-a83b-46c6-b9cd-cac59e130a78",
               "Name": "DataLogger_Settings",
-              "Type": "BYTES|HEX|Unknown0",
+              "Type": "U8|HEX|DlogCommand U16|HEX|DlogReserved1 U8|HEX|DlogMode U8|HEX|DlogRange U16|DEC|DlogUpdateInterval|s U32|DEC|DlogTimestamp",
               "IsWrite": true
             },
             {
               "UUID": "3c669dab-fc86-411c-9498-4f9415049cc0",
               "Name": "DataLogger_Reading",
-              "Type": "BYTES|HEX|Unknown1",
-              "IsNotify": true
+              "Type": "BYTES|HEX|DlogData",
+              "IsNotify": true,
+              "REM": "Is a series of int16 which are multiplied by DsoDataScale to get actual data"
             },
             {
               "UUID": "9acada2e-3936-430b-a8f7-da407d97ca6e",
               "Name": "DataLogger_MetaData",
-              "Type": "BYTES|HEX|Unknown2",
+              "Type": "U8|HEX|DlogStatus F32|FIXED|DlogScale U8|HEx|DlogMode U8|HEX|DlogRange U16|DEC|DlogCurrLogging|us U16|DEC|DlogCurrNSample U32|DEC|DlogCurrTimestamp",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -301,25 +312,25 @@
         },
         {
           "UUID": "6f53be2f-780b-49b8-a7c3-e8a052b3ae2c",
-          "Name": "Unknown7",
+          "Name": "CalibrationService",
           "Characteristics": [
             {
               "UUID": "0cd0f713-f5aa-4572-9e23-f8049f6bcaaa",
-              "Name": "Unknown0",
-              "Type": "BYTES|HEX|Unknown0",
+              "Name": "CalbrateTemperature",
+              "Type": "BYTES|HEX|CalibrateUnknown0",
               "IsWrite": true
             },
             {
               "UUID": "b6728f91-409c-4d6c-864e-272a6a7a0204",
-              "Name": "Unknown1",
-              "Type": "BYTES|HEX|Unknown1",
+              "Name": "CalibrateUnknown1",
+              "Type": "BYTES|HEX|CalibrateUnknown1",
               "IsRead": true,
               "IsWrite": true
             },
             {
               "UUID": "5588e47b-cb81-4f7b-acc4-6029a3f39f72",
-              "Name": "Unknown2",
-              "Type": "BYTES|HEX|Unknown2",
+              "Name": "CalibrrateUnknown2",
+              "Type": "BYTES|HEX|CalibrrateUnknown2",
               "IsWrite": true
             }
           ]
