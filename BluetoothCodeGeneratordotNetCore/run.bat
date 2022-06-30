@@ -1,0 +1,1 @@
+".\bin\Debug\net6.0-windows10.0.19041.0\BluetoothCodeGeneratordotNetCore" -inputTemplates Templates -output output

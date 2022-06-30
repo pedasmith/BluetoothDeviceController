@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using Windows.Devices.Bluetooth.Advertisement;
+
+#if NETCOREAPP
+using Microsoft.UI.Text;
+using Microsoft.UI.Xaml.Documents;
+#else
 using Windows.UI.Text;
 using Windows.UI.Xaml.Documents;
+#endif
 
 namespace BluetoothProtocols.Beacons
 {

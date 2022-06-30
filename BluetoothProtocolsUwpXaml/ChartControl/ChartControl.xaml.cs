@@ -46,7 +46,18 @@ namespace BluetoothDeviceController.Charts
         private const double DEFAULT_YMAX = 100.0;
 
 
-
+        public static Windows.UI.Color ConvertColor(string color)
+        {
+            foreach (var item in typeof(Windows.UI.Colors).GetProperties())
+            {
+                if (color == item.Name)
+                {
+                    return (Windows.UI.Color)item.GetValue(null, null);
+                    ;
+                }
+            }
+            return Windows.UI.Colors.Aquamarine;
+        }
         public double GetYMin(int index) 
         {
             switch (UISpec?.chartYAxisCombined ?? UISpecifications.YMinMaxCombined.Combined)
@@ -159,7 +170,7 @@ namespace BluetoothDeviceController.Charts
                 var newIndex = Lines.Count; // if 1 line already exists, then this new line will be index [2]
                 var name = (Names != null && Names.Count > newIndex) ? Names[newIndex] : "";
                 var lineDefault = UISpec.chartLineDefaults.ContainsKey(name) ? UISpec.chartLineDefaults[name] : null;
-                var color = (lineDefault == null) ? GetDefaultLineColor(Lines.Count) : ChartLineDefaults.ConvertColor(lineDefault.stroke);
+                var color = (lineDefault == null) ? GetDefaultLineColor(Lines.Count) : ConvertColor(lineDefault.stroke);
                 var polyline = new Polyline()
                 {
                     Fill = null,

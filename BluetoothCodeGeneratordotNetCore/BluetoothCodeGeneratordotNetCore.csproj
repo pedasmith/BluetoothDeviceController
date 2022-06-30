@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+	  <CsWinRTWindowsMetadata>10.0.19041.0</CsWinRTWindowsMetadata>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>BluetoothCodeGenerator</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Templates\CSharp_BT_template.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\AdvancedCalculator\BCBasic\BCBasic.Shared\BCValue.cs" Link="BCBasic\BCValue.cs" />
+    <Compile Include="..\..\AdvancedCalculator\BCBasic\BCBasic.Shared\BCValueList.cs" Link="BCBasic\BCValueList.cs" />
+    <Compile Include="..\BluetoothDeviceController\BCBasic\MockClasses.cs" Link="BCBasic\MockClasses.cs" />
+    <Compile Include="..\BluetoothDeviceController\Utilities\DataReaderReadStringRobust.cs" Link="Utilities\DataReaderReadStringRobust.cs" />
+    <Compile Include="..\BluetoothDeviceController\Utilities\EnumUtilities.cs" Link="Utilities\EnumUtilities.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\CSharp_BT_template.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Toolkit.Parsers" Version="6.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="BCBasic\" />
+    <Folder Include="Utilities\" />
+  </ItemGroup>
+
+  <Import Project="..\TemplateExpander\TemplateExpander.projitems" Label="Shared" />
+
+  <Import Project="..\BluetoothProtocols\BluetoothProtocols.projitems" Label="Shared" />
+
+</Project>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace BluetoothDeviceController.Names
 {
@@ -69,7 +70,10 @@ namespace BluetoothDeviceController.Names
             return $"Settings {Name} Min={Min} Init={Init} Max={Max}";
         }
     }
-
+    public interface IWriteCharacteristic
+    {
+        Task<GattWriteResult> DoWriteString(string str);
+    }
     public class Command
     {
         public string Label { get; set; } = null;

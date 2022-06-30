@@ -5,8 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using Utilities;
 using Windows.Storage.Streams;
-using static BluetoothDeviceController.DataReaderReadStringRobust;
+using static Utilities.DataReaderReadStringRobust;
 
 namespace BluetoothDeviceController.BleEditor
 {

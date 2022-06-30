@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "BluetoothCodeGeneratordotNetCore": {
+      "commandName": "Project",
+      "commandLineArgs": "-inputTemplates Templates -output output\r\n",
+      "workingDirectory": "C:\\bin\\My Small Utils\\Shipwreck\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore"
+    }
+  }
+}

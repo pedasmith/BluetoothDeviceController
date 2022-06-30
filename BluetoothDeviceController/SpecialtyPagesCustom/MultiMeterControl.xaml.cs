@@ -201,7 +201,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 uiMMSetting.Text = "...";
                 uiMMValue.Text = "updating";
                 await bleDevice.WriteMM_Settings((byte)PokitProMeter.MMMode.Idle, range, interval);
-                await RemoveCallbacksAsync()
+                await RemoveCallbacksAsync();
             }
         }
 

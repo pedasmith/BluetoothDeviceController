@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28606.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothDeviceController", "BluetoothDeviceController\BluetoothDeviceController.csproj", "{F60B4B0B-5303-49BE-AD26-666746D5FB28}"
 EndProject
@@ -9,23 +9,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothWatcher", "Bluetoo
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BluetoothProtocols", "BluetoothProtocols\BluetoothProtocols.shproj", "{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "TemplateExpander", "TemplateExpander\TemplateExpander.shproj", "{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BluetoothProtocolsUwpXaml", "BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.shproj", "{A2E9E462-E4BF-4BF6-81EC-7529B830456B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothCodeGeneratordotNetCore", "BluetoothCodeGeneratordotNetCore\BluetoothCodeGeneratordotNetCore.csproj", "{D8A1EB9E-1194-424A-8532-37DA12A26DE1}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		BluetoothProtocols\BluetoothProtocols.projitems*{190aa0de-8e65-4a8a-8d69-4ea539c572f2}*SharedItemsImports = 13
-		BluetoothProtocols\BluetoothProtocols.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
-		BluetoothProtocols\BluetoothProtocols.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
 		Debug|ARM64 = Debug|ARM64
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|ARM = Release|ARM
 		Release|ARM64 = Release|ARM64
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Debug|ARM.ActiveCfg = Debug|ARM
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Debug|ARM.Build.0 = Debug|ARM
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Debug|ARM.Deploy.0 = Debug|ARM
@@ -38,6 +42,7 @@ Global
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Debug|x86.ActiveCfg = Debug|x86
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Debug|x86.Build.0 = Debug|x86
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Debug|x86.Deploy.0 = Debug|x86
+		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|Any CPU.ActiveCfg = Release|x86
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|ARM.ActiveCfg = Release|ARM
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|ARM.Build.0 = Release|ARM
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|ARM.Deploy.0 = Release|ARM
@@ -50,6 +55,7 @@ Global
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|x86.ActiveCfg = Release|x86
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|x86.Build.0 = Release|x86
 		{F60B4B0B-5303-49BE-AD26-666746D5FB28}.Release|x86.Deploy.0 = Release|x86
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|ARM.ActiveCfg = Debug|ARM
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|ARM.Build.0 = Debug|ARM
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|ARM.Deploy.0 = Debug|ARM
@@ -62,6 +68,7 @@ Global
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|x86.ActiveCfg = Debug|x86
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|x86.Build.0 = Debug|x86
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Debug|x86.Deploy.0 = Debug|x86
+		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|Any CPU.ActiveCfg = Release|x86
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|ARM.ActiveCfg = Release|ARM
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|ARM.Build.0 = Release|ARM
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|ARM.Deploy.0 = Release|ARM
@@ -74,11 +81,42 @@ Global
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x86.ActiveCfg = Release|x86
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x86.Build.0 = Release|x86
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x86.Deploy.0 = Release|x86
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|ARM.Build.0 = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|x64.Build.0 = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|x86.Build.0 = Debug|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|ARM.ActiveCfg = Release|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|ARM.Build.0 = Release|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|ARM64.Build.0 = Release|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|x64.ActiveCfg = Release|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|x64.Build.0 = Release|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|x86.ActiveCfg = Release|Any CPU
+		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62DCA7A6-8C59-4330-98B9-0EF91B6BAD39}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		BluetoothProtocols\BluetoothProtocols.projitems*{190aa0de-8e65-4a8a-8d69-4ea539c572f2}*SharedItemsImports = 13
+		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{a2e9e462-e4bf-4bf6-81ec-7529b830456b}*SharedItemsImports = 13
+		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
+		BluetoothProtocols\BluetoothProtocols.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
+		BluetoothProtocols\BluetoothProtocols.projitems*{d8a1eb9e-1194-424a-8532-37da12a26de1}*SharedItemsImports = 5
+		TemplateExpander\TemplateExpander.projitems*{d8a1eb9e-1194-424a-8532-37da12a26de1}*SharedItemsImports = 5
+		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
+		BluetoothProtocols\BluetoothProtocols.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
+		TemplateExpander\TemplateExpander.projitems*{fdc6fd5f-de83-4594-a154-c01b655bf7f1}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

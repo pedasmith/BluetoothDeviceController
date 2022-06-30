@@ -51,18 +51,7 @@ namespace BluetoothDeviceController.Names
     public class ChartLineDefaults
     {
         public string stroke = "Green";
-        public static Windows.UI.Color ConvertColor(string color)
-        {
-            foreach (var item in typeof(Windows.UI.Colors).GetProperties())
-            {
-                if (color == item.Name)
-                {
-                    return (Windows.UI.Color)item.GetValue(null, null);
-                    ;
-                }
-            }
-            return Windows.UI.Colors.Aquamarine;
-        }
+
     }
 
     public class UISpecifications

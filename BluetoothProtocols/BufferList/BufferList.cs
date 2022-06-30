@@ -161,7 +161,7 @@ namespace BluetoothWatcher.BufferList
             nerror += TestSimple();
             return nerror;
         }
-
+#if !CORE_ONLY
         class BufferListResults : IAsyncOperationWithProgress<IBuffer, uint>
         {
             Buffer retval = null;
@@ -191,5 +191,6 @@ namespace BluetoothWatcher.BufferList
 
             public AsyncStatus Status => AsyncStatus.Completed;
         }
+#endif
     }
 }

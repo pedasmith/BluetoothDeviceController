@@ -39,10 +39,12 @@
         public bool BeaconIgnoreApple { get; set; } = true;
         public double BeaconDbLevel { get; set; } = -80.0; // default min db level for beacon advert
 
+        public enum SortBy { Mac, Time, Rss, };
+        public enum SortDirection { Ascending, Descending };
         /// <summary>
         /// The setting from Menu / Filter / Sort AZ; is Ascending[D] or Descending 
         /// </summary>
-        public Beacons.SimpleBeaconPage.SortDirection MenuFilterSortDirection { get; set; } = Beacons.SimpleBeaconPage.SortDirection.Ascending;
+        public SortDirection MenuFilterSortDirection { get; set; } = SortDirection.Ascending;
 
 
         const string DisplayPreferenceSetting = "UserPreferenceDisplayPreference";
@@ -98,7 +100,7 @@
             }
             if (localSettings.Values.ContainsKey(MenuFilterSortDirectionSetting))
             {
-                MenuFilterSortDirection = (Beacons.SimpleBeaconPage.SortDirection)localSettings.Values[MenuFilterSortDirectionSetting];
+                MenuFilterSortDirection = (UserPreferences.SortDirection)localSettings.Values[MenuFilterSortDirectionSetting];
             }
         }
 

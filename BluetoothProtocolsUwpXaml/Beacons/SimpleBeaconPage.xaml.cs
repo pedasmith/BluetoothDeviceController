@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using static BluetoothDeviceController.UserPreferences;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -31,8 +32,7 @@ namespace BluetoothDeviceController.Beacons
     /// </summary>
     public sealed partial class SimpleBeaconPage : Page
     {
-        public enum SortBy { Mac, Time, Rss, };
-        public enum SortDirection { Ascending, Descending };
+
 
         public static SimpleBeaconPage TheSimpleBeaconPage = null;
 

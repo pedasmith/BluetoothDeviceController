@@ -222,7 +222,7 @@ namespace BluetoothDeviceController
 
         private void UpdateUIFromPreferences()
         {
-            uiMenuFilterSimpleBeaconPageAscending.IsChecked = Preferences.MenuFilterSortDirection == SimpleBeaconPage.SortDirection.Ascending;
+            uiMenuFilterSimpleBeaconPageAscending.IsChecked = Preferences.MenuFilterSortDirection == UserPreferences.SortDirection.Ascending;
         }
 
 
@@ -1438,7 +1438,7 @@ namespace BluetoothDeviceController
             }
         }
 
-        SimpleBeaconPage.SortBy SavedBeaconSortBy = SimpleBeaconPage.SortBy.Time;
+        UserPreferences.SortBy SavedBeaconSortBy = UserPreferences.SortBy.Time;
         // Can delete any time: Sort direction is in preferences now: SimpleBeaconPage.SortDirection SavedBeaconSortDirection = SimpleBeaconPage.SortDirection.Ascending;
         ulong SavedBeaconFilter = 0;
 
@@ -1446,19 +1446,19 @@ namespace BluetoothDeviceController
         const int DEFAULT_SEARCH_DELAY_UX = 100; // TOO SLOW: 500
         private async void MenuOnFilterBeaconSortByMac(object sender, RoutedEventArgs e)
         {
-            SavedBeaconSortBy = SimpleBeaconPage.SortBy.Mac;
+            SavedBeaconSortBy = UserPreferences.SortBy.Mac;
             await UpdateSimpleBeaconPage();
         }
 
         private async void MenuOnFilterBeaconSortByTime(object sender, RoutedEventArgs e)
         {
-            SavedBeaconSortBy = SimpleBeaconPage.SortBy.Time;
+            SavedBeaconSortBy = UserPreferences.SortBy.Time;
             await UpdateSimpleBeaconPage();
         }
 
         private async void MenuOnFilterBeaconSortByRSS(object sender, RoutedEventArgs e)
         {
-            SavedBeaconSortBy = SimpleBeaconPage.SortBy.Rss;
+            SavedBeaconSortBy = UserPreferences.SortBy.Rss;
             await UpdateSimpleBeaconPage();
         }
 
@@ -1470,7 +1470,7 @@ namespace BluetoothDeviceController
             {
                 return;
             }
-            Preferences.MenuFilterSortDirection  = uiMenuFilterSimpleBeaconPageAscending.IsChecked ? SimpleBeaconPage.SortDirection.Ascending : SimpleBeaconPage.SortDirection.Descending;
+            Preferences.MenuFilterSortDirection  = uiMenuFilterSimpleBeaconPageAscending.IsChecked ? UserPreferences.SortDirection.Ascending : UserPreferences.SortDirection.Descending;
             Preferences.SaveToLocalSettings();
             await UpdateSimpleBeaconPage();
         }

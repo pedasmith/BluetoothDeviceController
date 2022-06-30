@@ -16,10 +16,7 @@ using Windows.UI.Xaml.Input;
 
 namespace BluetoothDeviceController.BleEditor
 {
-    public interface IWriteCharacteristic
-    { 
-        Task<GattWriteResult> DoWriteString(string str);
-    }
+
 
     public sealed partial class BleCharacteristicControl : UserControl, IWriteCharacteristic
     {

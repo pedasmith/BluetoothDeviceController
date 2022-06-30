@@ -2,8 +2,40 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+
 using Windows.UI.Xaml.Data;
+
+#if NETCOREAPP
+using System.Runtime.InteropServices;
+using Windows.Foundation;
+using Windows.Foundation.Metadata;
+
+
+namespace Windows.UI.Xaml.Data
+{
+    //
+    // Summary:
+    //     Exposes methods that allow the data to be modified as it passes through the binding
+    //     engine.
+    //[ComImport]
+    [WebHostHidden]
+    [Windows.Foundation.Metadata.Guid(3874684656u, 1810, 18559, 179, 19, 243, 0, 184, 215, 154, 161)]
+    [ContractVersion(typeof(UniversalApiContract), 65536u)]
+    public interface IValueConverter
+    {
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        object Convert([In] object value, [In] Type targetType, [In] object parameter, [In] string language);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        object ConvertBack([In] object value, [In] Type targetType, [In] object parameter, [In] string language);
+    }
+}
+#endif
+
 //  
+
+
 /// <summary> 
 /// Using the C# enumUtilities class(es) to bind an enum to a ComboBox 
 /// </summary> 
@@ -127,3 +159,4 @@ namespace enumUtilities
         }
     }
 }
+

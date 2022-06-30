@@ -13,19 +13,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\BleAdvertisementFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\BluetoothAddress.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\Eddystone.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Beacons\EddystonePage.xaml.cs">
-      <DependentUpon>EddystonePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Beacons\RuuvitagPage.xaml.cs">
-      <DependentUpon>RuuvitagPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\Ruuvi_Tag.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\Ruuvi_Tag_v1_Helper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Beacons\SimpleBeaconHistory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Beacons\SimpleBeaconPage.xaml.cs">
-      <DependentUpon>SimpleBeaconPage.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\BluetoothAppearance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\BluetoothServiceRegistration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\Eddystone.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Nordic_Uart.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs" />
@@ -62,9 +54,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Witti_Notti.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Witti_Notti_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BufferList\BufferList.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Charts\ChartControl.xaml.cs">
-      <DependentUpon>ChartControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Charts\DataCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueCalculate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueToString.cs" />
@@ -77,38 +66,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Names\NameDevice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Names\NameService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Names\NamesUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Names\SerialConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\DeviceInformationWrapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserBeaconPreferences.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserPreferences.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferences.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferencesControl.xaml.cs">
-      <DependentUpon>UserSerialPortPreferencesControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)SerialPort\BluetoothCommTerminalAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SerialPort\ITerminal.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SerialPort\nRFUartTerminalAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SerialPort\SerialConfig.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="$(MSBuildThisFileDirectory)Beacons\EddystonePage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)Beacons\RuuvitagPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)Beacons\SimpleBeaconPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)Charts\ChartControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferencesControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
 </Project>
