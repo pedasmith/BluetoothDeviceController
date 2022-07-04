@@ -83,9 +83,17 @@ namespace BluetoothCodeGenerator
                                 // For each BT info, make the needed macros.
                                 // This is just stubbed out for now.
                                 var btdata = CreateMockBt.Create();
+                                Expander.ExpandChildTemplatesIntoMacros(child, btdata);
 
-                                var fname = Expander.ExpandMacroTextOne(child.OptionFileName, 0, btdata);
-                                Log($"Writing file {fname}");
+                                var fname = Expander.ExpandMacroAll(child.OptionFileName, btdata);
+                                var outfilename = args.OutputDirectory + "\\" + fname;
+                                Log($"Writing file {fname} as {outfilename}");
+
+                                var codeTemplate = child.Code;
+                                var code = Expander.ExpandMacroAll(codeTemplate, btdata);
+                                Log($"Length starts as {codeTemplate.Length} and becomes {code.Length}");
+                                File.WriteAllText(outfilename, code);
+
                             }
                         }
                     }

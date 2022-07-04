@@ -1,7 +1,7 @@
 ﻿# Protocol FileName=[[CLASSNAME]].cs
 
 ```
-//From template: Protocol_Body
+//From template: Protocol_Body v2022-07-02 9:54
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -164,18 +164,18 @@ namespace BluetoothProtocols
 
 
 
-        [[METHOD+LIST]]
+[[METHOD+LIST]]
     }
 }
 ```
 
-## LINKS Type=list Source=links
+## LINKS Type=list Source=LINKS
 
 ```
-    // Link: TEXT
+    // Link: [[TEXT]]
 ```
 
-## Protocol+ServiceListTemplate
+## SERVICE+CHARACTERISTIC+LIST
 
 ```
         Guid[] ServiceGuids = new Guid[] {
@@ -185,6 +185,7 @@ namespace BluetoothProtocols
 [[SERVICE+NAME+LIST]]
         };
         GattDeviceService[] Services = new GattDeviceService[] {
+            // here!here is where SERVICE+LIST will be expanded 
 [[SERVICE+LIST]]
         };
         Guid[] CharacteristicGuids = new Guid[] {
@@ -200,6 +201,38 @@ namespace BluetoothProtocols
 [[HASH+LIST]]
         };
 ```
+
+## SERVICE+GUID+LIST Type=list Source=Services Code="           Guid.Parse(\"{[[UUID]]}\"),"
+## SERVICE+NAME+LIST Type=list Source=Services Code="            \"[[Name]]\","
+## SERVICE+LIST Type=list Source=Services Code="            null,"
+## CHARACTERISTIC+GUID+LIST Type=list Source=Services/Characteristics Code="            Guid.Parse(\"[[UUID]]\"), // #[[COUNT]] is [[Name]]"
+## CHARACTERISTIC+NAME+LIST Type=list Source=Services/Characteristics Code="            \"[[Name]]\", // #[[COUNT]] is [[UUID]]"
+## CHARACTERISTIC+LIST Type=list Source=Services/Characteristics Code="            null,"
+## HASH+LIST Type=list Source=Services/Characteristics Code="[[COUNT]], " Trim=true CodeWrap="            new HashSet<int>(){ [[TEXT]] },"
+
+## METHOD+LIST Type=list Source=Services/Characteristics
+
+```
+        /// <summary>
+        /// Reads data for Service [[../Name]] Characteristic [[Name]]
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<BCBasic.BCValueList> Read[[Name]](BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            if (!await EnsureCharacteristicAsync()) return null;
+            IBuffer result = await ReadAsync([[COUNT]], "[[Name]]", cacheMode);
+            if (result == null) return null;
+
+            var datameaning = "[[CHARACTERISTICTYPE]]";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+[[SET+PROPERTY+VALUES]]
+            // Hint: get the data that's been read with e.g. 
+            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
+            return parseResult.ValueList;
+        }
+```
+
 
 ## Protocol+NotifyMethodTemplate
 ```

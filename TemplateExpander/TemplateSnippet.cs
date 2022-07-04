@@ -11,10 +11,35 @@ namespace TemplateExpander
     /// </summary>
     public class TemplateSnippet
     {
-        public string Name { get; set; }
-        public string Code { get; set; }
-        public bool OptionTrim { get; set; } = false;
-        public string OptionFileName { get; set; } = "";
+        public string Name { get; internal set; }
+        public string Code { get; internal set; }
+        public string CodeWrap { get; internal set; }
+        public string CodeWithTrim
+        {
+            get
+            {
+                // The Markdown parser is a little wierd. It starts the code with the first line
+                // after the back-ticks, and doesn't include the \n before the last set of back-ticks.
+                // So "trim" is the default and I have to add a \n as needed.
+                if (OptionTrim) return Code;
+                return Code + "\r\n";
+            }
+        }
+        public string CodeWrapWithTrim
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(CodeWrap)) return CodeWrap;
+                if (OptionTrimWrap) return CodeWrap;
+                return CodeWrap + "\r\n";
+            }
+        }
+        public bool OptionTrim { get; internal set; } = false;
+        public bool OptionTrimWrap { get; internal set; } = false;
+        public string OptionFileName { get; internal set; } = "";
+        public enum TypeOfExpansion {  Normal, List};
+        public TypeOfExpansion OptionType { get; internal set; } = TypeOfExpansion.Normal;
+        public string OptionSource { get; internal set; } = "";
         public Dictionary<string, string> Macros { get; } = new Dictionary<string, string>();
         public Dictionary<string, TemplateSnippet> Children { get; }  = new Dictionary<string, TemplateSnippet>();
         public void AddChildViaMacro(TemplateSnippet child, string childId="UUID")
@@ -38,6 +63,20 @@ namespace TemplateExpander
             var name = (Macros.Count).ToString();
             Macros.Add(name, text);
         }
+        /// <summary>
+        /// Add (or replace) the macro 'name' as 'text'
+        /// </summary>
+        public void AddMacro(string name, string text)
+        {
+            if (Macros.ContainsKey(name))
+            {
+                Macros[name] = text;
+            }
+            else
+            {
+                Macros.Add(name, text);
+            }
+        }
 
         public TemplateSnippet Parent { get; set; }
         public string Errors { get; internal set; } = "";
@@ -59,17 +98,99 @@ namespace TemplateExpander
         }
 
         /// <summary>
+        /// Split header like [[SERVICE+LIST Type=list Source=Services Code="            \"[[NAME]\","]]
+        /// into [SERIVCE+LIST][Type=list][Source=Services][Code=            "[[NAME]]",]
+        /// Note how the quotes are handled!
+        /// </summary>
+        /// <param name="header"></param>
+        /// <returns></returns>
+        enum State { Normal, Quote, };
+        private static string[] HeaderSplit(string md)
+        {
+            var retval = new List<string>();
+            State state = State.Normal;
+            int nbackslash = 0;
+            var found = "";
+            for (int i=0; i<md.Length; i++)
+            {
+                var ch = md[i];
+                if (ch == '\\')
+                {
+                    nbackslash++;
+                    if (nbackslash >= 2) // two backslashes is zero backslashes.
+                    {
+                        found += "\\";
+                        nbackslash = 0;
+                    }
+                }
+                else
+                {
+                    switch (state)
+                    {
+                        case State.Normal:
+                            switch (ch)
+                            {
+                                case ' ':
+                                    retval.Add(found);
+                                    found = "";
+                                    break;
+                                case '"':
+                                    if (nbackslash > 0)
+                                    {
+                                        found += ch; // e.g., Code=value=\"[[NAME]]\", with no spaces
+                                    }
+                                    else
+                                    {
+                                        state = State.Quote;
+                                    }
+                                    break;
+                                default:
+                                    found += ch;
+                                    break;
+                            }
+                            break;
+                        case State.Quote:
+                            switch (ch)
+                            {
+                                case '"':
+                                    if (nbackslash > 0)
+                                    {
+                                        found += ch; // e.g., code="  \"[[NAME]]\""
+                                    }
+                                    else
+                                    {
+                                        state = State.Normal;
+                                    }
+                                    break;
+                                default:
+                                    found += ch;
+                                    break;
+                            }
+                            break;
+                    }
+                    nbackslash = 0;
+                }
+            }
+            if (found.Length > 0)
+            {
+                retval.Add(found);
+                found = "";
+            }
+            return retval.ToArray();
+        }
+
+        /// <summary>
         /// Create a TemplateSnippet from a # NAME OPTION=VALUE OPTION=VALUE markdown line. Does not handle the back-tck code snippet bits.
         /// </summary>
         /// <param name="md"></param>
         public static TemplateSnippet ParseFromMD(string md)
         {
             var retval = new TemplateSnippet();
-            var items = md.Trim().Split(new char[] { ' ' });
+            var items = HeaderSplit(md.Trim());
             retval.Name = items[0];
             for (int i=1; i<items.Length; i++)
             {
-                var opts = items[i].Split(new char[] { '=' });
+                var opts = items[i].Split(new char[] { '=' }, 2);
                 if (opts.Length != 2)
                 {
                     retval.Errors += $"ERROR: option {items[i]} isn't in format NAME=OPTION";
@@ -78,8 +199,17 @@ namespace TemplateExpander
                 {
                     switch (opts[0])
                     {
+                        case "Code":
+                            retval.Code = opts[1];
+                            break;
+                        case "CodeWrap":
+                            retval.CodeWrap = opts[1];
+                            break;
                         case "FileName":
                             retval.OptionFileName = opts[1];
+                            break;
+                        case "Source":
+                            retval.OptionSource = opts[1];
                             break;
                         case "Trim":
                             switch (opts[1])
@@ -91,7 +221,35 @@ namespace TemplateExpander
                                     retval.OptionTrim = false;
                                     break;
                                 default:
-                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be true of false\n";
+                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be true or false\n";
+                                    break;
+                            }
+                            break;
+                        case "TrimWrap":
+                            switch (opts[1])
+                            {
+                                case "true":
+                                    retval.OptionTrimWrap = true;
+                                    break;
+                                case "false":
+                                    retval.OptionTrimWrap = false;
+                                    break;
+                                default:
+                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be true or false\n";
+                                    break;
+                            }
+                            break;
+                        case "Type":
+                            switch (opts[1])
+                            {
+                                case "list":
+                                    retval.OptionType = TypeOfExpansion.List;
+                                    break;
+                                case "expand":
+                                    retval.OptionType = TypeOfExpansion.Normal;
+                                    break;
+                                default:
+                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be list or expand [default]\n";
                                     break;
                             }
                             break;
