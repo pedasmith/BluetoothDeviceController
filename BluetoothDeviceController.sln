@@ -13,7 +13,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "TemplateExpander", "Templat
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BluetoothProtocolsUwpXaml", "BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.shproj", "{A2E9E462-E4BF-4BF6-81EC-7529B830456B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothCodeGeneratordotNetCore", "BluetoothCodeGeneratordotNetCore\BluetoothCodeGeneratordotNetCore.csproj", "{D8A1EB9E-1194-424A-8532-37DA12A26DE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BluetoothCodeGeneratordotNetCore", "BluetoothCodeGeneratordotNetCore\BluetoothCodeGeneratordotNetCore.csproj", "{D8A1EB9E-1194-424A-8532-37DA12A26DE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

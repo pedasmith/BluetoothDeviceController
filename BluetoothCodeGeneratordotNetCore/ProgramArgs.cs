@@ -11,7 +11,7 @@ namespace BluetoothCodeGenerator
         public enum CommandType { Error, Help, Run }
         public CommandType Command { get; internal set; } = CommandType.Help;
         public string ErrorMessage { get; internal set; } = "";
-
+        public string InputJsonFile { get; internal set; } = "";
         public string InputTemplateDirectory { get; internal set; } = ".\\";
         public string OutputDirectory { get; internal set; } = ".\\output";
         public static ProgramArgs ParseFromArgs(string[] args)
@@ -25,6 +25,17 @@ namespace BluetoothCodeGenerator
                     case "/?":
                     case "--help":
                         retval.Command = CommandType.Help;
+                        break;
+                    case "-inputJsonFile":
+                        if (i + 1 >= args.Length)
+                        {
+                            retval.Command = CommandType.Error;
+                            retval.ErrorMessage = "Error: missing {args[i]} argument at {args[i]}";
+                        }
+                        else
+                        {
+                            retval.InputJsonFile = args[++i];
+                        }
                         break;
                     case "-inputTemplates":
                         if (i + 1 >= args.Length)

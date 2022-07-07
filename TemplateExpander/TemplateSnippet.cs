@@ -13,6 +13,8 @@ namespace TemplateExpander
     {
         public string Name { get; internal set; }
         public string Code { get; internal set; }
+        public string CodeListSubZero { get; internal set; }
+        public string CodeListZero { get; internal set; }
         public string CodeWrap { get; internal set; }
         public string CodeWithTrim
         {
@@ -29,17 +31,33 @@ namespace TemplateExpander
         {
             get
             {
-                if (string.IsNullOrEmpty(CodeWrap)) return CodeWrap;
-                if (OptionTrimWrap) return CodeWrap;
-                return CodeWrap + "\r\n";
+                var text = CodeWrap;
+                if (string.IsNullOrEmpty(text)) return text;
+                if (OptionTrimWrap) return text;
+                return text + "\r\n";
             }
         }
+        public string CodeListSubZeroWithTrim
+        {
+            get
+            {
+                var text = CodeListSubZero;
+                if (string.IsNullOrEmpty(text)) return text;
+                if (OptionTrimListSubZero) return text;
+                return text + "\r\n";
+            }
+        }
+        public string OptionFileName { get; internal set; } = "";
+        public string OptionIf { get; internal set; }
         public bool OptionTrim { get; internal set; } = false;
         public bool OptionTrimWrap { get; internal set; } = false;
-        public string OptionFileName { get; internal set; } = "";
+        public bool OptionTrimListSubZero { get; internal set; } = false;
         public enum TypeOfExpansion {  Normal, List};
         public TypeOfExpansion OptionType { get; internal set; } = TypeOfExpansion.Normal;
         public string OptionSource { get; internal set; } = "";
+
+
+
         public Dictionary<string, string> Macros { get; } = new Dictionary<string, string>();
         public Dictionary<string, TemplateSnippet> Children { get; }  = new Dictionary<string, TemplateSnippet>();
         public void AddChildViaMacro(TemplateSnippet child, string childId="UUID")
@@ -202,11 +220,20 @@ namespace TemplateExpander
                         case "Code":
                             retval.Code = opts[1];
                             break;
+                        case "CodeListSubZero":
+                            retval.CodeListSubZero = opts[1];
+                            break;
+                        case "CodeListZero":
+                            retval.CodeListZero = opts[1];
+                            break;
                         case "CodeWrap":
                             retval.CodeWrap = opts[1];
                             break;
                         case "FileName":
                             retval.OptionFileName = opts[1];
+                            break;
+                        case "If":
+                            retval.OptionIf = opts[1];
                             break;
                         case "Source":
                             retval.OptionSource = opts[1];
@@ -219,6 +246,20 @@ namespace TemplateExpander
                                     break;
                                 case "false":
                                     retval.OptionTrim = false;
+                                    break;
+                                default:
+                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be true or false\n";
+                                    break;
+                            }
+                            break;
+                        case "TrimListSubZero":
+                            switch (opts[1])
+                            {
+                                case "true":
+                                    retval.OptionTrimListSubZero = true;
+                                    break;
+                                case "false":
+                                    retval.OptionTrimListSubZero = false;
                                     break;
                                 default:
                                     retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be true or false\n";

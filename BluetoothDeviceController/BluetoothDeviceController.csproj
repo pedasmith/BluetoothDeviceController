@@ -166,9 +166,7 @@
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothUnit.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothServiceUuid16Bit.cs" />
-    <Compile Include="BluetoothDefinitionLanguage\BluetoothAppearance.cs" />
     <Compile Include="BluetoothDefinitionLanguage\Device.cs" />
-    <Compile Include="BluetoothDefinitionLanguage\Eddystone.cs" />
     <Compile Include="BluetoothLEStandardServices.cs" />
     <Compile Include="DeviceInformationPage.xaml.cs">
       <DependentUpon>DeviceInformationPage.xaml</DependentUpon>

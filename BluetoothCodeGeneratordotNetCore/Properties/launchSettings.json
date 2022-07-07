@@ -2,7 +2,7 @@
   "profiles": {
     "BluetoothCodeGeneratordotNetCore": {
       "commandName": "Project",
-      "commandLineArgs": "-inputTemplates Templates -output output\r\n",
+      "commandLineArgs": "-inputJsonFile \"C:\\bin\\My Small Utils\\Shipwreck\\BluetoothDeviceController\\BluetoothDeviceController\\Assets\\CharacteristicsData\\TI_SensorTag_1350.json\" -inputTemplates Templates -output output\r\n",
       "workingDirectory": "C:\\bin\\My Small Utils\\Shipwreck\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore"
     }
   }

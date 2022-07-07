@@ -7,7 +7,30 @@ namespace TemplateExpander
     class Expander
     {
         /// <summary>
-        /// Given a string to expand (like CLASSNAME), expand it.
+        /// Given text with embedded macros, keep on expanding it until it's all expanded. Will stop after 
+        /// a large preset value (5000?) and returns an error so we don't do an infinite loop.
+        /// </summary>
+        public static string ExpandMacroAll(string text, TemplateSnippet macros)
+        {
+            var retval = text;
+            int startIndex = 0;
+            int nloop = 0;
+            while (startIndex >= 0 && nloop < 5000)
+            {
+                retval = ExpandMacroTextOne(retval, ref startIndex, macros);
+                nloop++;
+            }
+            if (nloop >= 5000)
+            {
+                retval = $"ERROR: too many macro expansions at {startIndex}\n" + retval;
+            }
+            return retval;
+        }
+        
+        
+        
+        /// <summary>
+        /// Given a string of the name of a macro to expand (like CLASSNAME), expand it.
         /// </summary>
         private static string ExpandMacroOne (string macro, TemplateSnippet macros)
         {
@@ -49,7 +72,7 @@ namespace TemplateExpander
         /// <param name="startIndex">starting index; will be updated as needed</param>
         /// <param name="macros"></param>
         /// <returns></returns>
-        public static string ExpandMacroTextOne(string text, ref int startIndex, TemplateSnippet macros)
+        private static string ExpandMacroTextOne(string text, ref int startIndex, TemplateSnippet macros)
         {
             var retval = text;
             var nextMacro = retval.IndexOf("[[", startIndex);
@@ -79,20 +102,9 @@ namespace TemplateExpander
             return retval;
         }
 
-        public static string ExpandTemplate(TemplateSnippet snippet, TemplateSnippet macros)
-        {
-            // Example: ## LINKS Type=list Source=links
-            var retval = snippet.Code;
 
-            return retval;
-        }
-        private static string ExpandList(string[] sourceList, string itemTemplate, string itemWrapTemplate, TemplateSnippet macros)
-        {
-            int count = 0;
-            return ExpandListRecursive(sourceList, 0, itemTemplate, itemWrapTemplate, macros, ref count);
-        }
 
-        private static string ExpandListRecursive (string[] sourceList, int sourceIndex, string itemTemplate, string itemWrapTemplate, TemplateSnippet macros, ref int count)
+        private static string ExpandListRecursive (string[] sourceList, int sourceIndex, string itemTemplate, string itemWrapTemplate, string itemListSubZero, TemplateSnippet macros, ref int count)
         {
             var source = sourceList[sourceIndex];
             var expand = "";
@@ -107,20 +119,21 @@ namespace TemplateExpander
                     expand += itemExpand;
                 }
             }
-            else if (data.Children.Count > 0) // Loop through the children.
+            else // if (data.Children.Count > 0) // Loop through the children.
             {
-                // are we at the bottom of the sourceList yet?
+                // are we still in the middle of the list?
                 if (sourceIndex < (sourceList.Length - 1))
                 {
                     // Must keep going deeper.
                     foreach (var item in data.Children)
                     {
                         var childMacros = item.Value;
-                        var itemExpand = ExpandListRecursive(sourceList, sourceIndex + 1, itemTemplate, itemWrapTemplate, childMacros, ref count);
+                        var itemExpand = ExpandListRecursive(sourceList, sourceIndex + 1, itemTemplate, itemWrapTemplate, itemListSubZero, childMacros, ref count);
                         expand += itemExpand;
                     }
+                    // If the non-bottom items have no expansion, that's neither an error nor wrapped.
                 }
-                else
+                else // At the bottom; do the real expansion
                 {
                     foreach (var item in data.Children)
                     {
@@ -132,22 +145,35 @@ namespace TemplateExpander
                     }
 
                     // If we're at the end of the bottom expansion, apply the code wrap.
-                    if (!string.IsNullOrEmpty(itemWrapTemplate) && sourceIndex == sourceList.Length - 1)
+                    if (!string.IsNullOrEmpty(itemWrapTemplate))
                     {
                         macros.AddMacro("TEXT", expand);
                         var wrapExpand = Expander.ExpandMacroAll(itemWrapTemplate, macros);
                         expand = wrapExpand;
                     }
+
+                    if (data.Children.Count == 0)
+                    {
+                        if (string.IsNullOrEmpty(itemListSubZero))
+                        {
+                            expand = $"[[ERROR: {source} has no macros and no children]]";
+                        }
+                        else
+                        {
+                            expand = ExpandMacroAll (itemListSubZero, macros);
+                        }
+                    }
                 }
-            }
-            else
-            {
-                expand = $"[[ERROR: {source} has no macros and no children]]";
             }
 
             return expand;
         }
 
+        /// <summary>
+        /// Given a bunch of templates, expand them into the macro using data from the macros
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="macros"></param>
         public static void ExpandChildTemplatesIntoMacros(TemplateSnippet parent, TemplateSnippet macros)
         {
             foreach (var kv in parent.Children)
@@ -156,6 +182,7 @@ namespace TemplateExpander
                 var template = child.Code;
                 // Type of expansion depends on the Type=list
                 string expand = $"[[ERROR failed to expand {kv.Key}]]";
+                bool matchesIf = true;
                 switch (child.OptionType)
                 {
                     case TemplateSnippet.TypeOfExpansion.List:
@@ -165,32 +192,61 @@ namespace TemplateExpander
                             // work any other way; the data is per-device but the 
                             // templates are not.
                             var source = child.OptionSource.Split(new char[] { '/' });
-                            expand = ExpandList(source, child.CodeWithTrim, child.CodeWrapWithTrim, macros);
+                            var count = 0;
+                            //expand = ExpandList(source, child.CodeWithTrim, child.CodeWrapWithTrim, macros, out count);
+                            expand = ExpandListRecursive(source, 0, child.CodeWithTrim, child.CodeWrapWithTrim, child.CodeListSubZeroWithTrim, macros, ref count);
+
+                            if (!string.IsNullOrEmpty(child.OptionIf))
+                            {
+                                var exp = TemplateExpression.Parse(child.OptionIf);
+                                if (exp.Error != "")
+                                {
+                                    expand = exp.Error;
+                                    matchesIf = true;
+                                }
+                                else
+                                {
+                                    exp.SetBuiltInValue("Source.Length", count.ToString());
+                                    matchesIf = exp.Eval(macros);
+                                }
+                            }
+                            if (count == 0) // top-level expansion resulted in no results
+                            {
+                                if (!string.IsNullOrEmpty(child.CodeListZero))
+                                {
+                                    expand = child.CodeListZero; // no trim?
+                                }
+                            }
+
                         }
                         break;
                     case TemplateSnippet.TypeOfExpansion.Normal:
                         expand = ExpandMacroAll(template, macros);
+                        if (!string.IsNullOrEmpty(child.OptionIf))
+                        {
+                            var exp = TemplateExpression.Parse(child.OptionIf);
+                            if (exp.Error != "")
+                            {
+                                expand = exp.Error;
+                                matchesIf = true;
+                            }
+                            else
+                            {
+                                matchesIf = exp.Eval(macros);
+                            }
+                        }
                         break;
                 }
-                macros.AddMacro(kv.Key, expand);
+                if (matchesIf)
+                {
+                    macros.AddMacro(kv.Key, expand);
+                }
+                else
+                {
+                    ; // handy place to hang a debugger.
+                }
             }
         }
 
-        public static string ExpandMacroAll(string text, TemplateSnippet macros)
-        {
-            var retval = text;
-            int startIndex = 0;
-            int nloop = 0;
-            while (startIndex >= 0 && nloop < 5000)
-            {
-                retval = ExpandMacroTextOne(retval, ref startIndex, macros);
-                nloop++;
-            }
-            if (nloop >= 5000)
-            {
-                retval = $"ERROR: too many macro expansions at {startIndex}\n" + retval;
-            }
-            return retval;
-        }
     }
 }

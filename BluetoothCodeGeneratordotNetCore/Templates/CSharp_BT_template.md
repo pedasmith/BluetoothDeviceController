@@ -169,11 +169,13 @@ namespace BluetoothProtocols
 }
 ```
 
-## LINKS Type=list Source=LINKS
+## LINKS Type=list Source=LINKS CodeListZero="        // No links for this device"
 
 ```
     // Link: [[TEXT]]
 ```
+
+
 
 ## SERVICE+CHARACTERISTIC+LIST
 
@@ -185,7 +187,6 @@ namespace BluetoothProtocols
 [[SERVICE+NAME+LIST]]
         };
         GattDeviceService[] Services = new GattDeviceService[] {
-            // here!here is where SERVICE+LIST will be expanded 
 [[SERVICE+LIST]]
         };
         Guid[] CharacteristicGuids = new Guid[] {
@@ -205,16 +206,21 @@ namespace BluetoothProtocols
 ## SERVICE+GUID+LIST Type=list Source=Services Code="           Guid.Parse(\"{[[UUID]]}\"),"
 ## SERVICE+NAME+LIST Type=list Source=Services Code="            \"[[Name]]\","
 ## SERVICE+LIST Type=list Source=Services Code="            null,"
-## CHARACTERISTIC+GUID+LIST Type=list Source=Services/Characteristics Code="            Guid.Parse(\"[[UUID]]\"), // #[[COUNT]] is [[Name]]"
-## CHARACTERISTIC+NAME+LIST Type=list Source=Services/Characteristics Code="            \"[[Name]]\", // #[[COUNT]] is [[UUID]]"
-## CHARACTERISTIC+LIST Type=list Source=Services/Characteristics Code="            null,"
-## HASH+LIST Type=list Source=Services/Characteristics Code="[[COUNT]], " Trim=true CodeWrap="            new HashSet<int>(){ [[TEXT]] },"
+## CHARACTERISTIC+GUID+LIST Type=list Source=Services/Characteristics Code="            Guid.Parse(\"[[UUID]]\"), // #[[COUNT]] is [[Name]]" CodeListSubZero="            // No characteristics for [[Name]]"
+## CHARACTERISTIC+NAME+LIST Type=list Source=Services/Characteristics Code="            \"[[Name]]\", // #[[COUNT]] is [[UUID]]" CodeListSubZero="            // No characteristics for [[Name]]"
+## CHARACTERISTIC+LIST Type=list Source=Services/Characteristics Code="            null," CodeListSubZero="            // No characteristics for [[Name]]"
+## HASH+LIST Type=list Source=Services/Characteristics Code="[[COUNT]], " Trim=true CodeWrap="            new HashSet<int>(){ [[TEXT]] }," CodeListSubZero="            // No characteristics for [[Name]]"
 
 ## METHOD+LIST Type=list Source=Services/Characteristics
 
+In my **TODO:** list
+- Each characteristic might have read, write and notify; these have to be conditionally applied
+- The characteristic has two names: the one in the JSON (Name) and one that's OK for programming.
+- How should I handle the argument lists?
+
 ```
         /// <summary>
-        /// Reads data for Service [[../Name]] Characteristic [[Name]]
+        /// Reads data for Service=[[../Name]] Characteristic=[[Name]]
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -224,7 +230,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync([[COUNT]], "[[Name]]", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "[[CHARACTERISTICTYPE]]";
+            var datameaning = "[[Type]]";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
 [[SET+PROPERTY+VALUES]]
             // Hint: get the data that's been read with e.g. 

@@ -15,13 +15,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\RuuvitagPage.xaml.cs">
       <DependentUpon>RuuvitagPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\SimpleBeaconHistory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\SimpleBeaconPage.xaml.cs">
       <DependentUpon>SimpleBeaconPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)ChartControl\ChartControl.xaml.cs">
       <DependentUpon>ChartControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferences.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferencesControl.xaml.cs">
       <DependentUpon>UserSerialPortPreferencesControl.xaml</DependentUpon>
     </Compile>

@@ -1,4 +1,5 @@
-﻿using Microsoft.Toolkit.Parsers.Markdown;
+﻿using BluetoothDeviceController.Names;
+using Microsoft.Toolkit.Parsers.Markdown;
 using Microsoft.Toolkit.Parsers.Markdown.Blocks;
 using System;
 using System.Collections.Generic;
@@ -70,7 +71,30 @@ namespace BluetoothCodeGenerator
                             return;
                         }
 
-                        // Now write all files
+                        // Read in the JSON file
+                        TemplateSnippet jsonData = null;
+                        if (args.InputJsonFile != "")
+                        {
+                            try
+                            {
+                                // Read in the Default device. 
+                                //DefaultDevice = await InitBleDefault(dname);
+
+                                var contents = File.ReadAllText(args.InputJsonFile);
+                                var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllBleDevices>(contents);
+                                jsonData = BtJsonToMacro.Convert(newlist.AllDevices[0]); // TODO: for now, just convert the one
+                                //InitSingleBleFile(AllDevices, file, DefaultDevice);
+                                //InitSingleBleFile(AllRawDevices, file, null); // read in a device without adding in default services
+
+                            }
+                            catch (Exception)
+                            {
+                                Log($"Error: {NAME}: unable to read JSON files from {args.InputJsonFile}");
+                                return;
+                            }
+                        }
+
+                        // Now write all files based on the template snippets.
                         foreach (var item in allSnippets.Children)
                         {
                             var child = item.Value;
@@ -82,7 +106,7 @@ namespace BluetoothCodeGenerator
                             {
                                 // For each BT info, make the needed macros.
                                 // This is just stubbed out for now.
-                                var btdata = CreateMockBt.Create();
+                                var btdata = jsonData; // Switch to closer to the real thing! CreateMockBt.Create();
                                 Expander.ExpandChildTemplatesIntoMacros(child, btdata);
 
                                 var fname = Expander.ExpandMacroAll(child.OptionFileName, btdata);
