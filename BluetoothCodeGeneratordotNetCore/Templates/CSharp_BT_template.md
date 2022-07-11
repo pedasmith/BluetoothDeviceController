@@ -13,6 +13,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
 
+
 namespace BluetoothProtocols
 {
     /// <summary>
@@ -203,31 +204,119 @@ namespace BluetoothProtocols
         };
 ```
 
-## SERVICE+GUID+LIST Type=list Source=Services Code="           Guid.Parse(\"{[[UUID]]}\"),"
+## SERVICE+GUID+LIST Type=list Source=Services Code="           Guid.Parse(\"[[UUID]]\"),"
 ## SERVICE+NAME+LIST Type=list Source=Services Code="            \"[[Name]]\","
 ## SERVICE+LIST Type=list Source=Services Code="            null,"
-## CHARACTERISTIC+GUID+LIST Type=list Source=Services/Characteristics Code="            Guid.Parse(\"[[UUID]]\"), // #[[COUNT]] is [[Name]]" CodeListSubZero="            // No characteristics for [[Name]]"
-## CHARACTERISTIC+NAME+LIST Type=list Source=Services/Characteristics Code="            \"[[Name]]\", // #[[COUNT]] is [[UUID]]" CodeListSubZero="            // No characteristics for [[Name]]"
+## CHARACTERISTIC+GUID+LIST Type=list Source=Services/Characteristics Code="            Guid.Parse(\"[[UUID]]\"), // #[[Count.Child]] is [[Name]]" CodeListSubZero="            // No characteristics for [[Name]]"
+## CHARACTERISTIC+NAME+LIST Type=list Source=Services/Characteristics Code="            \"[[Name]]\", // #[[Count.Child]] is [[UUID]]" CodeListSubZero="            // No characteristics for [[Name]]"
 ## CHARACTERISTIC+LIST Type=list Source=Services/Characteristics Code="            null," CodeListSubZero="            // No characteristics for [[Name]]"
 ## HASH+LIST Type=list Source=Services/Characteristics Code="[[COUNT]], " Trim=true CodeWrap="            new HashSet<int>(){ [[TEXT]] }," CodeListSubZero="            // No characteristics for [[Name]]"
 
-## METHOD+LIST Type=list Source=Services/Characteristics
-
-In my **TODO:** list
-- Each characteristic might have read, write and notify; these have to be conditionally applied
-- The characteristic has two names: the one in the JSON (Name) and one that's OK for programming.
-- How should I handle the argument lists?
+## SET+PROPERTY+VALUES Type=list Source=Services/Characteristics/Properties ListOutput=parent CodeListZero="            // No properties for this characteristic"
 
 ```
+            [[CHDATANAME]] = parseResult.ValueList.GetValue("[[DATANAME]]").[[AS+DOUBLE+OR+STRING]];
+```
+
+
+
+## METHOD+NOTIFY If="[[Verbs]] contains :InNo:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero="// Notify not needed for [[Name]]"
+
+```
+        // Returns a string with the status; starts with OK for good status.
         /// <summary>
-        /// Reads data for Service=[[../Name]] Characteristic=[[Name]]
+        /// Event for notifications; [[Name.dotNet]]Event += _my function_
+        /// </summary>
+        public event BluetoothDataEvent [[Name.dotNet]]Event = null;
+        /// <summary>
+        /// We only want to set the internal callback once, and never need to remove it.
+        /// </summary>
+        
+        private bool Notify[[Name.dotNet]]_ValueChanged_Set = false;
+
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+
+        public async Task<bool> Notify[[Name.dotNet]]Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            if (!await EnsureCharacteristicAsync()) return false;
+            var ch = Characteristics[[[COUNTALL]]];
+            if (ch == null) return false;
+            GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
+            try
+            {
+                result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+                if (!Notify[[Name.dotNet]]_ValueChanged_Set)
+                {
+                    // Only set the event callback once
+                    Notify[[Name.dotNet]]_ValueChanged_Set = true;
+                    ch.ValueChanged += Notify[[Name.dotNet]]Callback;
+                }
+
+            }
+            catch (Exception e)
+            {
+                Status.ReportStatus($"Notify[[Name.dotNet]]: {e.Message}", result);
+                return false;
+            }
+            Status.ReportStatus($"Notify[[Name.dotNet]]: set notification", result);
+
+            return true;
+        }
+
+        private void Notify[[Name.dotNet]]Callback(GattCharacteristic sender, GattValueChangedEventArgs args) 
+        {
+            var datameaning = "[[CHARACTERISTICTYPE]]";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+[[SET+PROPERTY+VALUES]]
+            [[Name.dotNet]]Event?.Invoke(parseResult);
+
+        }
+
+        public void Notify[[Name.dotNet]]RemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[[[COUNTALL]]];
+            if (ch == null) return;
+            Notify[[Name.dotNet]]_ValueChanged_Set = false;
+            ch.ValueChanged -= Notify[[Name.dotNet]]Callback;
+        }
+
+
+```
+
+## METHOD+PROPERTY Type=list If="[[Verbs]] contains :RdInNo:" Type=list ListOutput=parent Source=Services/Characteristics/Properties CodeListSubZero="// Properties not needed for [[Name]]"
+
+```
+        private [[VARIABLETYPE+DS]] _[[CHDATANAME]] = [[DOUBLE+OR+STRING+DEFAULT]];
+        private bool _[[CHDATANAME]]_set = false;
+        public [[VARIABLETYPE+DS]] [[CHDATANAME]]
+        {
+            get { return _[[CHDATANAME]]; }
+            internal set { if (_[[CHDATANAME]]_set && value == _[[CHDATANAME]]) return; _[[CHDATANAME]] = value; _[[CHDATANAME]]_set = true; OnPropertyChanged(); }
+        }
+```
+
+## METHOD+READ If="[[Verbs]] contains :Read:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero="// Read not needed for [[Name]]"
+
+Replace the simple Reads Data comment with this better snippet.
+ TODO:         /// Reads data for Characteristic=[[Name]] Service=[[../Name]] 
+
+```
+// Template: METHOD+READ
+
+        /// <summary>
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> Read[[Name]](BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> Read[[Name.dotNet]](BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync([[COUNT]], "[[Name]]", cacheMode);
+            IBuffer result = await ReadAsync([[COUNTALL]], "[[Name.dotNet]]", cacheMode);
             if (result == null) return null;
 
             var datameaning = "[[Type]]";
@@ -239,105 +328,22 @@ In my **TODO:** list
         }
 ```
 
-
-## Protocol+NotifyMethodTemplate
+## WRITE+PARAMS If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteParams CodeListSubZero="// Write not needed for [[Name]]" CodeListSeparator=", " Trim=true 
 ```
-        // Returns a string with the status; starts with OK for good status.
-        /// <summary>
-        /// Event for notifications; [[CHARACTERISTICNAME]]Event += _my function_
-        /// </summary>
-        public event BluetoothDataEvent [[CHARACTERISTICNAME]]Event = null;
-        /// <summary>
-        /// We only want to set the internal callback once, and never need to remove it.
-        /// </summary>
-        
-        private bool Notify[[CHARACTERISTICNAME]]_ValueChanged_Set = false;
-
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-
-        public async Task<bool> Notify[[CHARACTERISTICNAME]]Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[[[CHARACTERISTICINDEX]]];
-            if (ch == null) return false;
-            GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
-            try
-            {
-                result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-                if (!Notify[[CHARACTERISTICNAME]]_ValueChanged_Set)
-                {
-                    // Only set the event callback once
-                    Notify[[CHARACTERISTICNAME]]_ValueChanged_Set = true;
-                    ch.ValueChanged += Notify[[CHARACTERISTICNAME]]Callback;
-                }
-
-            }
-            catch (Exception e)
-            {
-                Status.ReportStatus($"Notify[[CHARACTERISTICNAME]]: {e.Message}", result);
-                return false;
-            }
-            Status.ReportStatus($"Notify[[CHARACTERISTICNAME]]: set notification", result);
-
-            return true;
-        }
-
-        private void Notify[[CHARACTERISTICNAME]]Callback(GattCharacteristic sender, GattValueChangedEventArgs args) 
-        {
-            var datameaning = "[[CHARACTERISTICTYPE]]";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-[[SET+PROPERTY+VALUES]]
-            [[CHARACTERISTICNAME]]Event?.Invoke(parseResult);
-
-        }
-
-        public void Notify[[CHARACTERISTICNAME]]RemoveCharacteristicCallback() 
-        {
-            var ch = Characteristics[[[CHARACTERISTICINDEX]]];
-            if (ch == null) return;
-            Notify[[CHARACTERISTICNAME]]_ValueChanged_Set = false;
-            ch.ValueChanged -= Notify[[CHARACTERISTICNAME]]Callback;
-        }
-
-";
+[[VARIABLETYPEPARAM]] [[DATANAME]]
 ```
 
-## Protocol+ReadMethodTemplate
-```
-        /// <summary>
-        /// Reads data 
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> Read[[CHARACTERISTICNAME]](BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync([[CHARACTERISTICINDEX]], "[[CHARACTERISTICNAME]]", cacheMode);
-            if (result == null) return null;
+The parameter list for writing data to the device.
 
-            var datameaning = "[[CHARACTERISTICTYPE]]";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-[[SET+PROPERTY+VALUES]]
-            // Hint: get the data that's been read with e.g. 
-            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
-            return parseResult.ValueList;
-        }
+## METHOD+WRITE If="[[Verbs]] contains :WrWw:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero="// Write not needed for [[Name]]"
 ```
-
-## Protocol+WriteMethodTemplate
-```
-//From template: Protocol+WriteMethodTemplate
+//From template: Protocol_WriteMethodTemplate
         /// <summary>
-        /// Writes data for [[CHARACTERISTICNAME]]
+        /// Writes data for [[Name.dotNet]]
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task Write[[CHARACTERISTICNAME]]([[PARAMS]])
+        public async Task Write[[Name.dotNet]]([[WRITE+PARAMS]])
         {
             if (!await EnsureCharacteristicAsync()) return;
 
@@ -345,7 +351,7 @@ In my **TODO:** list
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-[[ARGS]]
+[[DATAWRITER]]
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
             for (int i=0; i<command.Length; i+= MAXBYTES)
@@ -353,27 +359,39 @@ In my **TODO:** list
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync([[CHARACTERISTICINDEX]], "[[CHARACTERISTICNAME]]", subcommand, [[WRITEMODE]]);
+                await WriteCommandAsync([[COUNTALL]], "[[Name.dotNet]]", subcommand, [[WRITEMODE]]);
             }
             // original: await DoWriteAsync(data);
         }
 ```
+
+## DATAWRITER If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteParams CodeListSubZero="// Write not needed for [[Name]]" Trim=false
+```
+            [[ARGDWCALL]]( [[ARGDWCALLCAST]] [[DATANAME]]);
+```
+
+## METHOD+LIST Type=list Source=Services/Characteristics CodeListSubZero="// No methods for [[Name]]"
+
+In my **TODO:** list
+- Each characteristic might have read, write and notify; these have to be conditionally applied
+- How should I handle the argument lists?
+
+```
+[[METHOD+PROPERTY]]
+[[METHOD+READ]]
+[[METHOD+NOTIFY]]
+[[METHOD+WRITE]]
+
+```
+
+
 
 ## Protocol+DataPropertySetTemplate
 ```
             [[CHDATANAME]] = parseResult.ValueList.GetValue("[[DATANAME]]").[[AS+DOUBLE+OR+STRING]];
 ```
 
-## Protocol+DataPropertyTemplate
-```
-        private [[VARIABLETYPE+DS]] _[[CHDATANAME]] = [[DOUBLE+OR+STRING+DEFAULT]];
-        private bool _[[CHDATANAME]]_set = false;
-        public [[VARIABLETYPE+DS]] [[CHDATANAME]]
-        {
-            get { return _[[CHDATANAME]]; }
-            internal set { if (_[[CHDATANAME]]_set && value == _[[CHDATANAME]]) return; _[[CHDATANAME]] = value; _[[CHDATANAME]]_set = true; OnPropertyChanged(); }
-        }
-```
+
 
 ## Protocol+FunctionTemplate
 ```
@@ -594,7 +612,7 @@ In my **TODO:** list
 ```
 
 
-## PageXamlFunctionButtonTemplate = 
+## PageXamlFunctionButtonTemplate 
 ```
 [[TAB]]<Button Content="[[LABEL]]" Click="[[FUNCTIONNAME]]_ButtonClick" />
 ```
@@ -852,7 +870,7 @@ typeof([[CHARACTERISTICNAME]]Record).GetProperty("[[DATANAME]]"),
 ```
 
 LIST!!
-## PageCSharp+CharacteristicRead+DataTemplates =
+## PageCSharp+CharacteristicRead+DataTemplates
 ```
                 var [[DATANAME]] = valueList.GetValue("[[DATANAME]]");
                 if ([[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsDouble || [[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsString || [[DATANAME]].IsArray)

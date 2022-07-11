@@ -11,8 +11,13 @@ namespace TemplateExpander
     /// </summary>
     public class TemplateSnippet
     {
+        public TemplateSnippet(string name)
+        {
+            Name = name;
+        }
         public string Name { get; internal set; }
         public string Code { get; internal set; }
+        public string CodeListSeparator { get; internal set; } = "";
         public string CodeListSubZero { get; internal set; }
         public string CodeListZero { get; internal set; }
         public string CodeWrap { get; internal set; }
@@ -55,7 +60,8 @@ namespace TemplateExpander
         public enum TypeOfExpansion {  Normal, List};
         public TypeOfExpansion OptionType { get; internal set; } = TypeOfExpansion.Normal;
         public string OptionSource { get; internal set; } = "";
-
+        public enum TypeOfListOutput { Global, Parent, Child };
+        public TypeOfListOutput OptionListOutput { get; internal set; } = TypeOfListOutput.Global;
 
 
         public Dictionary<string, string> Macros { get; } = new Dictionary<string, string>();
@@ -203,9 +209,8 @@ namespace TemplateExpander
         /// <param name="md"></param>
         public static TemplateSnippet ParseFromMD(string md)
         {
-            var retval = new TemplateSnippet();
             var items = HeaderSplit(md.Trim());
-            retval.Name = items[0];
+            var retval = new TemplateSnippet(items[0]);
             for (int i=1; i<items.Length; i++)
             {
                 var opts = items[i].Split(new char[] { '=' }, 2);
@@ -219,6 +224,9 @@ namespace TemplateExpander
                     {
                         case "Code":
                             retval.Code = opts[1];
+                            break;
+                        case "CodeListSeparator":
+                            retval.CodeListSeparator = opts[1];
                             break;
                         case "CodeListSubZero":
                             retval.CodeListSubZero = opts[1];
@@ -234,6 +242,23 @@ namespace TemplateExpander
                             break;
                         case "If":
                             retval.OptionIf = opts[1];
+                            break;
+                        case "ListOutput":
+                            switch (opts[1])
+                            {
+                                case "child":
+                                    retval.OptionListOutput = TypeOfListOutput.Child;
+                                    break;
+                                case "global":
+                                    retval.OptionListOutput = TypeOfListOutput.Global;
+                                    break;
+                                case "parent":
+                                    retval.OptionListOutput = TypeOfListOutput.Parent;
+                                    break;
+                                default:
+                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be child or parent or global [default]\n";
+                                    break;
+                            }
                             break;
                         case "Source":
                             retval.OptionSource = opts[1];
@@ -295,6 +320,7 @@ namespace TemplateExpander
                             }
                             break;
                         default:
+                            retval.Errors += $"ERROR: unknown option {opts[0]}={opts[1]}\n";
                             break;
                     }
                 }

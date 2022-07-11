@@ -62,7 +62,7 @@ namespace BluetoothCodeGenerator
                             return;
                         }
 
-                        TemplateSnippet allSnippets = new TemplateSnippet();
+                        TemplateSnippet allSnippets = new TemplateSnippet("allSnippets");
 
                         int nerror = TemplateSnippet.ReadAllFiles(files, allSnippets);
                         if (nerror > 0)

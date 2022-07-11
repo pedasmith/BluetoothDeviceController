@@ -263,6 +263,23 @@ namespace BluetoothDeviceController.Names
         /// </summary>
         public bool AutoNotify { get; set; } = false;
         public bool IsIndicate { get; set; }
+        public string Verbs
+        {
+            get
+            {
+                var retval =  ":" +
+                    (IsRead ? "Read:" : "") +
+                    (IsWrite ? "Write:" : "") +
+                    (IsWriteWithoutResponse ? "WriteWithoutResponse:" : "") +
+                    (IsIndicate ? "Indicate:" : "") +
+                    (IsNotify ? "Notify:" : "") +
+                    ((IsRead || IsIndicate || IsNotify) ? "RdInNo:" : "") + // Often has the same needs in generated code
+                    ((IsIndicate || IsNotify) ? "InNo:" : "") + // Often has the same needs in generated code
+                    ((IsWrite || IsWriteWithoutResponse) ? "WrWw:" : "") +
+                    "";
+                return retval;
+            }
+        }
 
 
         public List<string> ExampleData { get; set; } = new List<string>();

@@ -33,12 +33,27 @@ this code block will be ignored
 !!```
 ```
 
+## Expansion types
+
+There are multiple ways expansion can work
+
+Type|Where placed|Details
+-----|-----|-----|-----
+Global|top-level|This is the default and doesn't need any options
+Global-List|top-level|Done when Type=list and a Source is provided. Each child in the Source list will be visited and expanded, and the results all concatenated together. This is used by, e.g., the LINKS to make a single top-level (global) list of links.
+Parent-List|above the child|Done when Type=list and a Source is provided and ListOutput=parent
+Child|at the child level|Done when Type=list and a Source is provided and the ListOutput=child. 
+
 ## Allowed options
 
 ### Code="Template Code"
 
 Use this instead of the full template with backticks when you want to have a more condensed set of macros
 for your templates
+
+### CodeListSeparator=", "
+
+Used to separate list elements
 
 ### CodeListSubZero="Template code"
 
@@ -61,17 +76,35 @@ The CodeWrap is generally used with lists. It lets you surround the resulting li
 
 ### If="Source.Length > 0"
 
-Will expand this template only when the If expression is true. The expression, unlike many, must be seperated by spaces. 
+Quick and simple If statement for expansion. Will expand this template only when the If expression is true. The expression, unlike many, must be seperated by spaces. Strings are just strings, which makes dealing with spaces impossible (for example, you can't have an If that compares to the string "example string with spaces".
+
+Example: If="[[Verb]] contains :RdInNo:"
+
+#### Special values
 
 Value|Meaning
 -----|-----
-Source.Length|length of the 
+Source.Length|length of the replaced text
 
-#### Opcodes
+
+#### Numberic Opcodes
 
 Opcode|Meaning
 ----|----
 \>|Greater-than
+
+#### String Opcodes
+
+Opcode|Meaning
+----|----
+==|Equals
+!=|Not-equals
+contains|The left string contains the right string. Compare is case-insensitive
+!contains|The left string does not contain the right string. Compare is case-insensitive
+
+### ListOutput=parent or child or global (default)
+
+Says where to place the result of expanding a Type=list expansion
 
 
 ### Trim=true|false (says whether to trim the CR off of the template)
@@ -87,3 +120,6 @@ Macro|Value
 -----|-----
 TEXT|Text of the source
 COUNT|Current list element index (starting at 0)
+Child.Count|Current list element for just the bottom level of expansion
+
+If there's an If expression and it's false, the counts will not be incremented. 

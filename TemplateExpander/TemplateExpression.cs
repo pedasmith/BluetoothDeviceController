@@ -21,6 +21,7 @@ namespace TemplateExpander
         }
         public bool Eval(TemplateSnippet macros)
         {
+            bool retval = false;
             var left = Expander.ExpandMacroAll(Left, macros);
             var right = Expander.ExpandMacroAll(Right, macros);
             if (BuiltInValues.ContainsKey(left)) left = BuiltInValues[left];
@@ -48,6 +49,16 @@ namespace TemplateExpander
                 {
                     case "==": return left == right;
                     case "!=": return left != right;
+                    case "contains": 
+                        retval = left.ToLower().Contains(right.ToLower()); 
+                        return retval;
+                    case "!contains": 
+                        if (right == ":")
+                        {
+                            ; // handy place to hang a debugger.
+                        }
+                        return !left.ToLower().Contains(right.ToLower());
+                        // TODO: report failure!
                 }
 
             }
