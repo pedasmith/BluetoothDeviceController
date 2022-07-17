@@ -25,8 +25,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\BleHome_SensorBug.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\BluetoothCommunicationStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\BluetoothStatusHandler.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\CraftyRoboty_Smartibot.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Elegoo_Mini_Car.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\CraftyRobot_Smartibot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Elegoo_MiniCar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Kano_Wand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Lionel_LionChief.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Lionel_LionChief_Custom.cs" />
@@ -35,8 +35,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Nordic_Thingy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Particula_GoDice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Particula_GoDice_Custom.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Pokit_pro.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Pokit_Pro_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Pokit_ProMeter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Pokit_ProMeter_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Protocentral_Sensything.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\Samico_BloodPressure_BG512.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocols\TI_beLight_2540.cs" />

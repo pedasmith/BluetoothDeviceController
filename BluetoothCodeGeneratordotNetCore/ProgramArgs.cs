@@ -12,6 +12,7 @@ namespace BluetoothCodeGenerator
         public CommandType Command { get; internal set; } = CommandType.Help;
         public string ErrorMessage { get; internal set; } = "";
         public string InputJsonFile { get; internal set; } = "";
+        public string InputJsonDirectory { get; internal set; } = "";
         public string InputTemplateDirectory { get; internal set; } = ".\\";
         public string OutputDirectory { get; internal set; } = ".\\output";
         public static ProgramArgs ParseFromArgs(string[] args)
@@ -20,11 +21,23 @@ namespace BluetoothCodeGenerator
             retval.Command = CommandType.Run;
             for (int i = 0; i < args.Length; i++)
             {
+                //Console.WriteLine($"Verbose: reading argument {args[i]}");
                 switch (args[i])
                 {
                     case "/?":
                     case "--help":
                         retval.Command = CommandType.Help;
+                        break;
+                    case "-inputJsonDirectory":
+                        if (i + 1 >= args.Length)
+                        {
+                            retval.Command = CommandType.Error;
+                            retval.ErrorMessage = "Error: missing {args[i]} argument at {args[i]}";
+                        }
+                        else
+                        {
+                            retval.InputJsonDirectory = args[++i];
+                        }
                         break;
                     case "-inputJsonFile":
                         if (i + 1 >= args.Length)

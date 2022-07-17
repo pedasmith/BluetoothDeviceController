@@ -173,7 +173,7 @@ namespace BluetoothCodeGenerator
         {
             TemplateSnippet retval = new TemplateSnippet(bt.Name);
             retval.Macros.Add("DeviceName", bt.Name);
-            retval.Macros.Add("CLASSNAME", bt.ClassName);
+            retval.Macros.Add("CLASSNAME", bt.ClassName ?? bt.Name?.DotNetSafe());
             retval.Macros.Add("DESCRIPTION", bt.Description);
             retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::hh:mm"));
             retval.Macros.Add("CLASSMODIFIERS", bt.ClassModifiers);
@@ -346,6 +346,7 @@ namespace BluetoothCodeGenerator
                             paramts.AddChild("ValueNames", vns);
                             foreach (var (vname, vvalue) in param.ValueNames)
                             {
+                                //TODO:: this was the old way andcan be deleted (it was removed before it was even used!)
                                 //var enumvalue = new TemplateSnippet(vname);
                                 //vns.AddChild(vname, enumvalue);
                                 //enumvalue.AddMacro("EnumName", vname);

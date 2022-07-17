@@ -2,6 +2,7 @@
   "AllDevices": [
     {
       "Name": "Flic",
+	  "CompletionStatus": "Unusable",
       "ClassName":  "Flic_Flic2",
       "Services": [
         {

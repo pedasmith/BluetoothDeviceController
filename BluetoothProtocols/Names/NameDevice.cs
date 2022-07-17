@@ -35,6 +35,8 @@ namespace BluetoothDeviceController.Names
         /// Name of the device. This will be used to match actual devices and should not include e.g., the MAC address of the device
         /// </summary>
         public string Name { get; set; }
+        public enum CompletionStatusEnum {  Usable, Unusable};
+        public CompletionStatusEnum CompletionStatus { get; set; } = CompletionStatusEnum.Usable;
         /// <summary>
         /// Should be [maker]_[device]. Be consistant with other devices. This is used directly to make C# class names, so it must be a valid C# class name.
         /// </summary>

@@ -2,6 +2,7 @@
   "AllDevices": [
     {
       "Name": "PC-60F_SN109400",
+	  "CompletionStatus": "Unusable",
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

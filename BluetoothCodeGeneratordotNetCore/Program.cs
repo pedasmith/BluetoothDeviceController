@@ -31,6 +31,45 @@ namespace BluetoothCodeGenerator
             Log(text, Verbose.Verbose);
         }
 
+        private static void ReadJsonFile(string filename, List<TemplateSnippet> outputList)
+        {
+            if (filename != "")
+            {
+                try
+                {
+                    // Read in the Default device. 
+                    //DefaultDevice = await InitBleDefault(dname);
+
+                    var contents = File.ReadAllText(filename);
+                    var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllBleDevices>(contents);
+                    if (newlist.AllDevices.Count == 0)
+                    {
+                        Log($"Error: {NAME}: JSON file has no devices for file {filename}");
+                    }
+                    foreach (var nameDevice in newlist.AllDevices)
+                    {
+                        if (filename.Contains ("Gems"))
+                        {
+                            ; // handy place to put a debugger.
+                        }
+                        if (nameDevice.CompletionStatus == NameDevice.CompletionStatusEnum.Unusable)
+                        {
+                            Log($"Note: {nameDevice.Name} is marked as Unusable");
+                            continue;
+                        }
+                        outputList.Add(BtJsonToMacro.Convert(nameDevice));
+                    }
+                    //InitSingleBleFile(AllDevices, file, DefaultDevice);
+                    //InitSingleBleFile(AllRawDevices, file, null); // read in a device without adding in default services
+
+                }
+                catch (Exception e)
+                {
+                    Log($"Error: {NAME}: unable to read JSON file from {filename}; reason {e.Message}");
+                    return;
+                }
+            }
+        }
 
         static void Main(string[] rawargs)
         {
@@ -72,24 +111,28 @@ namespace BluetoothCodeGenerator
                         }
 
                         // Read in the JSON file
-                        TemplateSnippet jsonData = null;
+                        List<TemplateSnippet> jsonData = new List<TemplateSnippet>();
                         if (args.InputJsonFile != "")
+                        {
+                            ReadJsonFile(args.InputJsonFile, jsonData);
+                        }
+                        if (args.InputJsonDirectory != "")
                         {
                             try
                             {
-                                // Read in the Default device. 
-                                //DefaultDevice = await InitBleDefault(dname);
-
-                                var contents = File.ReadAllText(args.InputJsonFile);
-                                var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllBleDevices>(contents);
-                                jsonData = BtJsonToMacro.Convert(newlist.AllDevices[0]); // TODO: for now, just convert the one
-                                //InitSingleBleFile(AllDevices, file, DefaultDevice);
-                                //InitSingleBleFile(AllRawDevices, file, null); // read in a device without adding in default services
-
+                                files = Directory.EnumerateFiles(args.InputJsonDirectory);
+                                foreach (var file in files)
+                                {
+                                    if (file.EndsWith(".json"))
+                                    {
+                                        Log($"Verbose: read in file {file}");
+                                        ReadJsonFile(file, jsonData);
+                                    }
+                                }
                             }
                             catch (Exception)
                             {
-                                Log($"Error: {NAME}: unable to read JSON files from {args.InputJsonFile}");
+                                Log($"Error: {NAME}: unable to get files from {args.InputJsonDirectory}");
                                 return;
                             }
                         }
@@ -106,23 +149,35 @@ namespace BluetoothCodeGenerator
                             {
                                 // For each BT info, make the needed macros.
                                 // This is just stubbed out for now.
-                                var btdata = jsonData; // Switch to closer to the real thing! CreateMockBt.Create();
-                                Expander.ExpandChildTemplatesIntoMacros(child, btdata);
+                                Log($"Verbose: jsonData length {jsonData.Count}");
+                                foreach (var btdata in jsonData)
+                                {
+                                    if (string.IsNullOrEmpty (btdata.Name)
+                                        || btdata.Name.StartsWith("##"))
+                                    {
+                                        continue; // skip it. Can legit be this way (e.g., default is like this)
+                                    }
+                                    //var btdata = jsonData; // Switch to closer to the real thing! CreateMockBt.Create();
+                                    Expander.ExpandChildTemplatesIntoMacros(child, btdata);
 
-                                var fname = Expander.ExpandMacroAll(child.OptionFileName, btdata);
-                                var outfilename = args.OutputDirectory + "\\" + fname;
-                                Log($"Writing file {fname} as {outfilename}");
+                                    var fname = Expander.ExpandMacroAll(child.OptionFileName, btdata);
+                                    var outfilename = args.OutputDirectory + "\\" + fname;
+                                    Log($"Writing file {fname} as {outfilename}");
+                                    if (fname == ".cs")
+                                    {
+                                        ; // handy place to hang a debugger.
+                                    }
 
-                                var codeTemplate = child.Code;
-                                var code = Expander.ExpandMacroAll(codeTemplate, btdata);
-                                Log($"Length starts as {codeTemplate.Length} and becomes {code.Length}");
-                                File.WriteAllText(outfilename, code);
-
+                                    var codeTemplate = child.Code;
+                                    var code = Expander.ExpandMacroAll(codeTemplate, btdata);
+                                    Log($"Length starts as {codeTemplate.Length} and becomes {code.Length}");
+                                    File.WriteAllText(outfilename, code);
+                                }
                             }
                         }
                     }
                     break;
-            }
+            } // end switch on the command type (run, error, help, etc.)
         }
     }
 }

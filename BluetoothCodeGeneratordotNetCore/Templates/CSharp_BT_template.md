@@ -220,7 +220,7 @@ namespace BluetoothProtocols
 
 
 
-## METHOD+NOTIFY If="[[Verbs]] contains :InNo:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero="// Notify not needed for [[Name]]"
+## METHOD+NOTIFY If="[[Verbs]] contains :InNo:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero=""
 
 ```
         // Returns a string with the status; starts with OK for good status.
@@ -288,7 +288,7 @@ namespace BluetoothProtocols
 
 ```
 
-## METHOD+PROPERTY Type=list If="[[Verbs]] contains :RdInNo:" Type=list ListOutput=parent Source=Services/Characteristics/Properties CodeListSubZero="// Properties not needed for [[Name]]"
+## METHOD+PROPERTY Type=list If="[[Verbs]] contains :RdInNo:" Type=list ListOutput=parent Source=Services/Characteristics/Properties CodeListSubZero=""
 
 ```
         private [[VARIABLETYPE+DS]] _[[CHDATANAME]] = [[DOUBLE+OR+STRING+DEFAULT]];
@@ -300,14 +300,12 @@ namespace BluetoothProtocols
         }
 ```
 
-## METHOD+READ If="[[Verbs]] contains :Read:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero="// Read not needed for [[Name]]"
+## METHOD+READ If="[[Verbs]] contains :Read:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero=""
 
 Replace the simple Reads Data comment with this better snippet.
  TODO:         /// Reads data for Characteristic=[[Name]] Service=[[../Name]] 
 
 ```
-// Template: METHOD+READ
-
         /// <summary>
         /// Reads data
         /// </summary>
@@ -328,16 +326,15 @@ Replace the simple Reads Data comment with this better snippet.
         }
 ```
 
-## WRITE+PARAMS If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteParams CodeListSubZero="// Write not needed for [[Name]]" CodeListSeparator=", " Trim=true 
+## WRITE+PARAMS If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteParams CodeListSubZero="" CodeListSeparator=", " Trim=true 
 ```
 [[VARIABLETYPEPARAM]] [[DATANAME]]
 ```
 
 The parameter list for writing data to the device.
 
-## METHOD+WRITE If="[[Verbs]] contains :WrWw:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero="// Write not needed for [[Name]]"
+## METHOD+WRITE If="[[Verbs]] contains :WrWw:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero=""
 ```
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for [[Name.dotNet]]
         /// </summary>
@@ -354,18 +351,21 @@ The parameter list for writing data to the device.
 [[DATAWRITER]]
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync([[COUNTALL]], "[[Name.dotNet]]", command, [[WRITEMODE]]);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync([[COUNTALL]], "[[Name.dotNet]]", subcommand, [[WRITEMODE]]);
             }
-            // original: await DoWriteAsync(data);
         }
 ```
 
-## DATAWRITER If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteParams CodeListSubZero="// Write not needed for [[Name]]" Trim=false
+## DATAWRITER If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteParams CodeListSubZero="" Trim=false
 ```
             [[ARGDWCALL]]( [[ARGDWCALLCAST]] [[DATANAME]]);
 ```
@@ -403,7 +403,7 @@ The parameter list for writing data to the device.
 ```
 
 
-## METHOD+COMMANDS Type=list ListOutput=parent Source=Services/Characteristics/Commands CodeListZero="//No commands" CodeListSubZero="//No commands needed for [[Name]]"
+## METHOD+COMMANDS Type=list ListOutput=parent Source=Services/Characteristics/Commands CodeListZero="//No commands" CodeListSubZero=""
 ```
         //From template:Protocol_FunctionTemplate
 [[FUNCTION+ENUMS]]

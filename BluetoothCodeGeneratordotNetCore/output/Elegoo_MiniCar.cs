@@ -15,7 +15,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Robot with a wooden shell. The interior robot is a typical Arduino bot. Communications are via pretend Serial port ffe1/ffe2..
-    /// This class was automatically generated 2022-07-16::02:24
+    /// This class was automatically generated 2022-07-17::09:41
     /// </summary>
 
     public partial class Elegoo_MiniCar : INotifyPropertyChanged
@@ -203,7 +203,6 @@ namespace BluetoothProtocols
             internal set { if (_Result_set && value == _Result) return; _Result = value; _Result_set = true; OnPropertyChanged(); }
         }
 
-// Read not needed for Result
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
@@ -268,17 +267,11 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyResultCallback;
         }
 
-// Write not needed for Result
 
-//No commands needed for Result
 
-// Properties not needed for Command
 
-// Read not needed for Command
 
-// Notify not needed for Command
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Command
         /// </summary>
@@ -296,14 +289,17 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(1, "Command", command, GattWriteOption.WriteWithoutResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(1, "Command", subcommand, GattWriteOption.WriteWithoutResponse);
             }
-            // original: await DoWriteAsync(data);
         }
 
         //From template:Protocol_FunctionTemplate

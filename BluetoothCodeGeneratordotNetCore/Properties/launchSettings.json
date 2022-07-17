@@ -2,7 +2,7 @@
   "profiles": {
     "BluetoothCodeGeneratordotNetCore": {
       "commandName": "Project",
-      "commandLineArgs": "-inputJsonFile \"C:\\bin\\My Small Utils\\Shipwreck\\BluetoothDeviceController\\BluetoothDeviceController\\Assets\\CharacteristicsData\\Elegoo_Mini_Car.json\" -inputTemplates Templates -output output\r\n",
+      "commandLineArgs": " -inputJsonDirectory \"C:\\bin\\My Small Utils\\Shipwreck\\BluetoothDeviceController\\BluetoothDeviceController\\Assets\\CharacteristicsData\" -inputTemplates Templates -output output\r\n",
       "workingDirectory": "C:\\bin\\My Small Utils\\Shipwreck\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore",
       "remoteDebugEnabled": true
     }

@@ -2,6 +2,7 @@
   "AllDevices": [
     {
       "Name": "SBT5007(L)",
+	  "CompletionStatus": "Unusable",
       "REM": "This popped up one day in my Bluetooth scans",
       "Links": [
         "https://github.com/aydinakcasu/ChromeBluetooth",

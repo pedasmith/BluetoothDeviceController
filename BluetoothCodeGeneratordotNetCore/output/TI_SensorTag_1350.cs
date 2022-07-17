@@ -15,7 +15,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The TI 1350 and 2650 are the latest in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth.
-    /// This class was automatically generated 2022-07-12::11:10
+    /// This class was automatically generated 2022-07-17::09:41
     /// </summary>
 
     public partial class TI_SensorTag_1350 : INotifyPropertyChanged
@@ -336,8 +336,6 @@ namespace BluetoothProtocols
             internal set { if (_Device_Name_set && value == _Device_Name) return; _Device_Name = value; _Device_Name_set = true; OnPropertyChanged(); }
         }
 
-// Template: METHOD+READ
-
         /// <summary>
         /// Reads data
         /// </summary>
@@ -358,9 +356,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Device Name
 
-// Write not needed for Device Name
+
 
         private double _Appearance = 0;
         private bool _Appearance_set = false;
@@ -369,8 +366,6 @@ namespace BluetoothProtocols
             get { return _Appearance; }
             internal set { if (_Appearance_set && value == _Appearance) return; _Appearance = value; _Appearance_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -392,9 +387,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Appearance
 
-// Write not needed for Appearance
+
 
         private string _Connection_Parameter = null;
         private bool _Connection_Parameter_set = false;
@@ -403,8 +397,6 @@ namespace BluetoothProtocols
             get { return _Connection_Parameter; }
             internal set { if (_Connection_Parameter_set && value == _Connection_Parameter) return; _Connection_Parameter = value; _Connection_Parameter_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -426,9 +418,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Connection Parameter
 
-// Write not needed for Connection Parameter
+
 
         private string _System_ID = "";
         private bool _System_ID_set = false;
@@ -437,8 +428,6 @@ namespace BluetoothProtocols
             get { return _System_ID; }
             internal set { if (_System_ID_set && value == _System_ID) return; _System_ID = value; _System_ID_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -460,9 +449,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for System ID
 
-// Write not needed for System ID
+
 
         private string _Model_Number = "";
         private bool _Model_Number_set = false;
@@ -471,8 +459,6 @@ namespace BluetoothProtocols
             get { return _Model_Number; }
             internal set { if (_Model_Number_set && value == _Model_Number) return; _Model_Number = value; _Model_Number_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -494,9 +480,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Model Number
 
-// Write not needed for Model Number
+
 
         private string _Serial_Number = "";
         private bool _Serial_Number_set = false;
@@ -505,8 +490,6 @@ namespace BluetoothProtocols
             get { return _Serial_Number; }
             internal set { if (_Serial_Number_set && value == _Serial_Number) return; _Serial_Number = value; _Serial_Number_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -528,9 +511,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Serial Number
 
-// Write not needed for Serial Number
+
 
         private string _Firmware_Revision = "";
         private bool _Firmware_Revision_set = false;
@@ -539,8 +521,6 @@ namespace BluetoothProtocols
             get { return _Firmware_Revision; }
             internal set { if (_Firmware_Revision_set && value == _Firmware_Revision) return; _Firmware_Revision = value; _Firmware_Revision_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -562,9 +542,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Firmware Revision
 
-// Write not needed for Firmware Revision
+
 
         private string _Hardware_Revision = "";
         private bool _Hardware_Revision_set = false;
@@ -573,8 +552,6 @@ namespace BluetoothProtocols
             get { return _Hardware_Revision; }
             internal set { if (_Hardware_Revision_set && value == _Hardware_Revision) return; _Hardware_Revision = value; _Hardware_Revision_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -596,9 +573,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Hardware Revision
 
-// Write not needed for Hardware Revision
+
 
         private string _Software_Revision = "";
         private bool _Software_Revision_set = false;
@@ -607,8 +583,6 @@ namespace BluetoothProtocols
             get { return _Software_Revision; }
             internal set { if (_Software_Revision_set && value == _Software_Revision) return; _Software_Revision = value; _Software_Revision_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -630,9 +604,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Software Revision
 
-// Write not needed for Software Revision
+
 
         private string _Manufacturer_Name = "";
         private bool _Manufacturer_Name_set = false;
@@ -641,8 +614,6 @@ namespace BluetoothProtocols
             get { return _Manufacturer_Name; }
             internal set { if (_Manufacturer_Name_set && value == _Manufacturer_Name) return; _Manufacturer_Name = value; _Manufacturer_Name_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -664,9 +635,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Manufacturer Name
 
-// Write not needed for Manufacturer Name
+
 
         private double _Regulatory_List_BodyType = 0;
         private bool _Regulatory_List_BodyType_set = false;
@@ -690,8 +660,6 @@ namespace BluetoothProtocols
             internal set { if (_Regulatory_List_Data_set && value == _Regulatory_List_Data) return; _Regulatory_List_Data = value; _Regulatory_List_Data_set = true; OnPropertyChanged(); }
         }
 
-// Template: METHOD+READ
-
         /// <summary>
         /// Reads data
         /// </summary>
@@ -714,9 +682,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Regulatory List
 
-// Write not needed for Regulatory List
+
 
         private string _PnP_ID = "";
         private bool _PnP_ID_set = false;
@@ -725,8 +692,6 @@ namespace BluetoothProtocols
             get { return _PnP_ID; }
             internal set { if (_PnP_ID_set && value == _PnP_ID) return; _PnP_ID = value; _PnP_ID_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -748,9 +713,8 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for PnP ID
 
-// Write not needed for PnP ID
+
 
         private double _BatteryLevel = 0;
         private bool _BatteryLevel_set = false;
@@ -759,8 +723,6 @@ namespace BluetoothProtocols
             get { return _BatteryLevel; }
             internal set { if (_BatteryLevel_set && value == _BatteryLevel) return; _BatteryLevel = value; _BatteryLevel_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -845,7 +807,7 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyBatteryLevelCallback;
         }
 
-// Write not needed for BatteryLevel
+
 
         private double _IR_Data_ObjTemp = 0;
         private bool _IR_Data_ObjTemp_set = false;
@@ -861,8 +823,6 @@ namespace BluetoothProtocols
             get { return _IR_Data_AmbTemp; }
             internal set { if (_IR_Data_AmbTemp_set && value == _IR_Data_AmbTemp) return; _IR_Data_AmbTemp = value; _IR_Data_AmbTemp_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -949,7 +909,7 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyIR_DataCallback;
         }
 
-// Write not needed for IR Data
+
 
         private double _IR_Service_Config = 0;
         private bool _IR_Service_Config_set = false;
@@ -958,8 +918,6 @@ namespace BluetoothProtocols
             get { return _IR_Service_Config; }
             internal set { if (_IR_Service_Config_set && value == _IR_Service_Config) return; _IR_Service_Config = value; _IR_Service_Config_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -981,9 +939,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for IR Service Config
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for IR_Service_Config
         /// </summary>
@@ -1001,15 +957,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(14, "IR_Service_Config", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(14, "IR_Service_Config", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _IR_Service_Period = 0;
         private bool _IR_Service_Period_set = false;
@@ -1018,8 +978,6 @@ namespace BluetoothProtocols
             get { return _IR_Service_Period; }
             internal set { if (_IR_Service_Period_set && value == _IR_Service_Period) return; _IR_Service_Period = value; _IR_Service_Period_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1041,9 +999,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for IR Service Period
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for IR_Service_Period
         /// </summary>
@@ -1061,15 +1017,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(15, "IR_Service_Period", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(15, "IR_Service_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Humidity_Data_Temp = 0;
         private bool _Humidity_Data_Temp_set = false;
@@ -1085,8 +1045,6 @@ namespace BluetoothProtocols
             get { return _Humidity_Data_Humidity; }
             internal set { if (_Humidity_Data_Humidity_set && value == _Humidity_Data_Humidity) return; _Humidity_Data_Humidity = value; _Humidity_Data_Humidity_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1173,7 +1131,7 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyHumidity_DataCallback;
         }
 
-// Write not needed for Humidity Data
+
 
         private double _Humidity_Config = 0;
         private bool _Humidity_Config_set = false;
@@ -1182,8 +1140,6 @@ namespace BluetoothProtocols
             get { return _Humidity_Config; }
             internal set { if (_Humidity_Config_set && value == _Humidity_Config) return; _Humidity_Config = value; _Humidity_Config_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1205,9 +1161,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Humidity Config
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Humidity_Config
         /// </summary>
@@ -1225,15 +1179,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(17, "Humidity_Config", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(17, "Humidity_Config", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Humidity_Period = 0;
         private bool _Humidity_Period_set = false;
@@ -1242,8 +1200,6 @@ namespace BluetoothProtocols
             get { return _Humidity_Period; }
             internal set { if (_Humidity_Period_set && value == _Humidity_Period) return; _Humidity_Period = value; _Humidity_Period_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1265,9 +1221,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Humidity Period
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Humidity_Period
         /// </summary>
@@ -1285,15 +1239,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(18, "Humidity_Period", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(18, "Humidity_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Barometer_Data_Temp = 0;
         private bool _Barometer_Data_Temp_set = false;
@@ -1309,8 +1267,6 @@ namespace BluetoothProtocols
             get { return _Barometer_Data_Pressure; }
             internal set { if (_Barometer_Data_Pressure_set && value == _Barometer_Data_Pressure) return; _Barometer_Data_Pressure = value; _Barometer_Data_Pressure_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1397,7 +1353,7 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyBarometer_DataCallback;
         }
 
-// Write not needed for Barometer Data
+
 
         private double _Barometer_Config = 0;
         private bool _Barometer_Config_set = false;
@@ -1406,8 +1362,6 @@ namespace BluetoothProtocols
             get { return _Barometer_Config; }
             internal set { if (_Barometer_Config_set && value == _Barometer_Config) return; _Barometer_Config = value; _Barometer_Config_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1429,9 +1383,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Barometer Config
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Barometer_Config
         /// </summary>
@@ -1449,15 +1401,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(20, "Barometer_Config", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(20, "Barometer_Config", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Barometer_Period = 0;
         private bool _Barometer_Period_set = false;
@@ -1466,8 +1422,6 @@ namespace BluetoothProtocols
             get { return _Barometer_Period; }
             internal set { if (_Barometer_Period_set && value == _Barometer_Period) return; _Barometer_Period = value; _Barometer_Period_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1489,9 +1443,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Barometer Period
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Barometer_Period
         /// </summary>
@@ -1509,15 +1461,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(21, "Barometer_Period", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(21, "Barometer_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Accelerometer_Data_GyroX = 0;
         private bool _Accelerometer_Data_GyroX_set = false;
@@ -1582,8 +1538,6 @@ namespace BluetoothProtocols
             get { return _Accelerometer_Data_MagnetometerZ; }
             internal set { if (_Accelerometer_Data_MagnetometerZ_set && value == _Accelerometer_Data_MagnetometerZ) return; _Accelerometer_Data_MagnetometerZ = value; _Accelerometer_Data_MagnetometerZ_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1684,7 +1638,7 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyAccelerometer_DataCallback;
         }
 
-// Write not needed for Accelerometer Data
+
 
         private double _Accelerometer_Config = 0;
         private bool _Accelerometer_Config_set = false;
@@ -1693,8 +1647,6 @@ namespace BluetoothProtocols
             get { return _Accelerometer_Config; }
             internal set { if (_Accelerometer_Config_set && value == _Accelerometer_Config) return; _Accelerometer_Config = value; _Accelerometer_Config_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1716,9 +1668,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Accelerometer Config
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Accelerometer_Config
         /// </summary>
@@ -1736,15 +1686,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(23, "Accelerometer_Config", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(23, "Accelerometer_Config", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Accelerometer_Period = 0;
         private bool _Accelerometer_Period_set = false;
@@ -1753,8 +1707,6 @@ namespace BluetoothProtocols
             get { return _Accelerometer_Period; }
             internal set { if (_Accelerometer_Period_set && value == _Accelerometer_Period) return; _Accelerometer_Period = value; _Accelerometer_Period_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1776,9 +1728,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Accelerometer Period
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Accelerometer_Period
         /// </summary>
@@ -1796,15 +1746,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(24, "Accelerometer_Period", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(24, "Accelerometer_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Optical_Service_Data = 0;
         private bool _Optical_Service_Data_set = false;
@@ -1813,8 +1767,6 @@ namespace BluetoothProtocols
             get { return _Optical_Service_Data; }
             internal set { if (_Optical_Service_Data_set && value == _Optical_Service_Data) return; _Optical_Service_Data = value; _Optical_Service_Data_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1899,7 +1851,7 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyOptical_Service_DataCallback;
         }
 
-// Write not needed for Optical Service Data
+
 
         private double _Optical_Service_Config = 0;
         private bool _Optical_Service_Config_set = false;
@@ -1908,8 +1860,6 @@ namespace BluetoothProtocols
             get { return _Optical_Service_Config; }
             internal set { if (_Optical_Service_Config_set && value == _Optical_Service_Config) return; _Optical_Service_Config = value; _Optical_Service_Config_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1931,9 +1881,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Optical Service Config
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Optical_Service_Config
         /// </summary>
@@ -1951,15 +1899,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(26, "Optical_Service_Config", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(26, "Optical_Service_Config", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Optical_Service_Period = 0;
         private bool _Optical_Service_Period_set = false;
@@ -1968,8 +1920,6 @@ namespace BluetoothProtocols
             get { return _Optical_Service_Period; }
             internal set { if (_Optical_Service_Period_set && value == _Optical_Service_Period) return; _Optical_Service_Period = value; _Optical_Service_Period_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -1991,9 +1941,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Optical Service Period
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Optical_Service_Period
         /// </summary>
@@ -2011,15 +1959,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(27, "Optical_Service_Period", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(27, "Optical_Service_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Key_Press_State = 0;
         private bool _Key_Press_State_set = false;
@@ -2029,7 +1981,6 @@ namespace BluetoothProtocols
             internal set { if (_Key_Press_State_set && value == _Key_Press_State) return; _Key_Press_State = value; _Key_Press_State_set = true; OnPropertyChanged(); }
         }
 
-// Read not needed for Key Press State
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
@@ -2094,7 +2045,7 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyKey_Press_StateCallback;
         }
 
-// Write not needed for Key Press State
+
 
         private string _IO_Service_Data = null;
         private bool _IO_Service_Data_set = false;
@@ -2103,8 +2054,6 @@ namespace BluetoothProtocols
             get { return _IO_Service_Data; }
             internal set { if (_IO_Service_Data_set && value == _IO_Service_Data) return; _IO_Service_Data = value; _IO_Service_Data_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -2126,9 +2075,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for IO Service Data
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for IO_Service_Data
         /// </summary>
@@ -2146,15 +2093,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(29, "IO_Service_Data", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(29, "IO_Service_Data", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _IO_Service_Config = 0;
         private bool _IO_Service_Config_set = false;
@@ -2163,8 +2114,6 @@ namespace BluetoothProtocols
             get { return _IO_Service_Config; }
             internal set { if (_IO_Service_Config_set && value == _IO_Service_Config) return; _IO_Service_Config = value; _IO_Service_Config_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -2186,9 +2135,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for IO Service Config
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for IO_Service_Config
         /// </summary>
@@ -2206,15 +2153,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(30, "IO_Service_Config", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(30, "IO_Service_Config", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private string _Register_Data = null;
         private bool _Register_Data_set = false;
@@ -2223,8 +2174,6 @@ namespace BluetoothProtocols
             get { return _Register_Data; }
             internal set { if (_Register_Data_set && value == _Register_Data) return; _Register_Data = value; _Register_Data_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -2246,9 +2195,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Register Data
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Register_Data
         /// </summary>
@@ -2266,15 +2213,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(31, "Register_Data", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(31, "Register_Data", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private string _Register_Address = null;
         private bool _Register_Address_set = false;
@@ -2283,8 +2234,6 @@ namespace BluetoothProtocols
             get { return _Register_Address; }
             internal set { if (_Register_Address_set && value == _Register_Address) return; _Register_Address = value; _Register_Address_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -2306,9 +2255,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Register Address
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Register_Address
         /// </summary>
@@ -2326,15 +2273,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(32, "Register_Address", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(32, "Register_Address", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private string _Register_Device_ID = null;
         private bool _Register_Device_ID_set = false;
@@ -2343,8 +2294,6 @@ namespace BluetoothProtocols
             get { return _Register_Device_ID; }
             internal set { if (_Register_Device_ID_set && value == _Register_Device_ID) return; _Register_Device_ID = value; _Register_Device_ID_set = true; OnPropertyChanged(); }
         }
-
-// Template: METHOD+READ
 
         /// <summary>
         /// Reads data
@@ -2366,9 +2315,7 @@ namespace BluetoothProtocols
             return parseResult.ValueList;
         }
 
-// Notify not needed for Register Device ID
 
-//From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Register_Device_ID
         /// </summary>
@@ -2386,15 +2333,19 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i=0; i<command.Length; i+= MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(33, "Register_Device_ID", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
                 await WriteCommandAsync(33, "Register_Device_ID", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
 
     }

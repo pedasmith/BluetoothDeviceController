@@ -1,4 +1,5 @@
-﻿using System;
+//From template: Protocol_Body v2022-07-02 9:54
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -7,18 +8,20 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
+using BluetoothDeviceController.Names;
+
 
 namespace BluetoothProtocols
 {
     /// <summary>
-    /// The TI 1350 and 2650 are the latest in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth.
-    /// This class was automatically generated 1/4/2020 11:30 AM
+    /// The TI 1352 is the latest 2019 version in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth.
+    /// This class was automatically generated 2022-07-17::09:41
     /// </summary>
 
-    public partial class TI_SensorTag_1350 : INotifyPropertyChanged
+    public partial class TI_SensorTag_1352 : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-
+        // No links for this device
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();
@@ -29,38 +32,31 @@ namespace BluetoothProtocols
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
         Guid[] ServiceGuids = new Guid[] {
-            Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"),
-            Guid.Parse("0000180a-0000-1000-8000-00805f9b34fb"),
-            Guid.Parse("0000180f-0000-1000-8000-00805f9b34fb"),
-            Guid.Parse("f000aa00-0451-4000-b000-000000000000"),
-            Guid.Parse("f000aa20-0451-4000-b000-000000000000"),
-            Guid.Parse("f000aa40-0451-4000-b000-000000000000"),
-            Guid.Parse("f000aa80-0451-4000-b000-000000000000"),
-            Guid.Parse("f000aa70-0451-4000-b000-000000000000"),
-            Guid.Parse("0000ffe0-0000-1000-8000-00805f9b34fb"),
-            Guid.Parse("f000aa64-0451-4000-b000-000000000000"),
-            Guid.Parse("f000ac00-0451-4000-b000-000000000000"),
+           Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"),
+           Guid.Parse("0000180a-0000-1000-8000-00805f9b34fb"),
+           Guid.Parse("f000aa00-0451-4000-b000-000000000000"),
+           Guid.Parse("f000aa20-0451-4000-b000-000000000000"),
+           Guid.Parse("f000aa70-0451-4000-b000-000000000000"),
+           Guid.Parse("f0001110-0451-4000-b000-000000000000"),
+           Guid.Parse("f0001120-0451-4000-b000-000000000000"),
+           Guid.Parse("f000180f-0451-4000-b000-000000000000"),
+           Guid.Parse("f000ffa0-0451-4000-b000-000000000000"),
 
         };
         String[] ServiceNames = new string[] {
             "Common Configuration",
             "Device Info",
-            "Battery",
-            "IR Service",
+            "Temperature",
             "Humidity",
-            "Barometer",
-            "Accelerometer",
             "Optical Service",
-            "Key Press",
-            "IO Service",
-            "Register service",
+            "LED",
+            "Button",
+            "Battery",
+            "Accelerometer",
 
         };
         GattDeviceService[] Services = new GattDeviceService[] {
-            null,
-            null,
             null,
             null,
             null,
@@ -76,6 +72,8 @@ namespace BluetoothProtocols
             Guid.Parse("00002a00-0000-1000-8000-00805f9b34fb"), // #0 is Device Name
             Guid.Parse("00002a01-0000-1000-8000-00805f9b34fb"), // #1 is Appearance
             Guid.Parse("00002a04-0000-1000-8000-00805f9b34fb"), // #2 is Connection Parameter
+            Guid.Parse("00002aa6-0000-1000-8000-00805f9b34fb"), // #3 is Central Address Resolution
+            Guid.Parse("00002ac9-0000-1000-8000-00805f9b34fb"), // #4 is Resolvable Private Address Only
             Guid.Parse("00002a23-0000-1000-8000-00805f9b34fb"), // #0 is System ID
             Guid.Parse("00002a24-0000-1000-8000-00805f9b34fb"), // #1 is Model Number
             Guid.Parse("00002a25-0000-1000-8000-00805f9b34fb"), // #2 is Serial Number
@@ -85,34 +83,34 @@ namespace BluetoothProtocols
             Guid.Parse("00002a29-0000-1000-8000-00805f9b34fb"), // #6 is Manufacturer Name
             Guid.Parse("00002a2a-0000-1000-8000-00805f9b34fb"), // #7 is Regulatory List
             Guid.Parse("00002a50-0000-1000-8000-00805f9b34fb"), // #8 is PnP ID
-            Guid.Parse("00002a19-0000-1000-8000-00805f9b34fb"), // #0 is BatteryLevel
-            Guid.Parse("f000aa01-0451-4000-b000-000000000000"), // #0 is IR Data
-            Guid.Parse("f000aa02-0451-4000-b000-000000000000"), // #1 is IR Service Config
-            Guid.Parse("f000aa03-0451-4000-b000-000000000000"), // #2 is IR Service Period
+            Guid.Parse("f000aa01-0451-4000-b000-000000000000"), // #0 is Temperature Data
+            Guid.Parse("f000aa02-0451-4000-b000-000000000000"), // #1 is Temperature Conf.
+            Guid.Parse("f000aa03-0451-4000-b000-000000000000"), // #2 is Temperature Period
             Guid.Parse("f000aa21-0451-4000-b000-000000000000"), // #0 is Humidity Data
-            Guid.Parse("f000aa22-0451-4000-b000-000000000000"), // #1 is Humidity Config
+            Guid.Parse("f000aa22-0451-4000-b000-000000000000"), // #1 is Humidity Conf.
             Guid.Parse("f000aa23-0451-4000-b000-000000000000"), // #2 is Humidity Period
-            Guid.Parse("f000aa41-0451-4000-b000-000000000000"), // #0 is Barometer Data
-            Guid.Parse("f000aa42-0451-4000-b000-000000000000"), // #1 is Barometer Config
-            Guid.Parse("f000aa44-0451-4000-b000-000000000000"), // #2 is Barometer Period
-            Guid.Parse("f000aa81-0451-4000-b000-000000000000"), // #0 is Accelerometer Data
-            Guid.Parse("f000aa82-0451-4000-b000-000000000000"), // #1 is Accelerometer Config
-            Guid.Parse("f000aa83-0451-4000-b000-000000000000"), // #2 is Accelerometer Period
-            Guid.Parse("f000aa71-0451-4000-b000-000000000000"), // #0 is Optical Service Data
-            Guid.Parse("f000aa72-0451-4000-b000-000000000000"), // #1 is Optical Service Config
-            Guid.Parse("f000aa73-0451-4000-b000-000000000000"), // #2 is Optical Service Period
-            Guid.Parse("0000ffe1-0000-1000-8000-00805f9b34fb"), // #0 is Key Press State
-            Guid.Parse("f000aa65-0451-4000-b000-000000000000"), // #0 is IO Service Data
-            Guid.Parse("f000aa66-0451-4000-b000-000000000000"), // #1 is IO Service Config
-            Guid.Parse("f000ac01-0451-4000-b000-000000000000"), // #0 is Register Data
-            Guid.Parse("f000ac02-0451-4000-b000-000000000000"), // #1 is Register Address
-            Guid.Parse("f000ac03-0451-4000-b000-000000000000"), // #2 is Register Device ID
+            Guid.Parse("f000aa71-0451-4000-b000-000000000000"), // #0 is Light Data
+            Guid.Parse("f000aa72-0451-4000-b000-000000000000"), // #1 is Light Conf.
+            Guid.Parse("f000aa73-0451-4000-b000-000000000000"), // #2 is Light Period
+            Guid.Parse("f0001111-0451-4000-b000-000000000000"), // #0 is Red
+            Guid.Parse("f0001112-0451-4000-b000-000000000000"), // #1 is Green
+            Guid.Parse("f0001113-0451-4000-b000-000000000000"), // #2 is Blue
+            Guid.Parse("f0001121-0451-4000-b000-000000000000"), // #0 is Button 0
+            Guid.Parse("f0001122-0451-4000-b000-000000000000"), // #1 is Button 1
+            Guid.Parse("f0002a19-0451-4000-b000-000000000000"), // #0 is Battery Data
+            Guid.Parse("f000ffa1-0451-4000-b000-000000000000"), // #0 is Accel Enable
+            Guid.Parse("f000ffa2-0451-4000-b000-000000000000"), // #1 is Accel Range
+            Guid.Parse("f000ffa3-0451-4000-b000-000000000000"), // #2 is X
+            Guid.Parse("f000ffa4-0451-4000-b000-000000000000"), // #3 is Y
+            Guid.Parse("f000ffa5-0451-4000-b000-000000000000"), // #4 is Z
 
         };
         String[] CharacteristicNames = new string[] {
             "Device Name", // #0 is 00002a00-0000-1000-8000-00805f9b34fb
             "Appearance", // #1 is 00002a01-0000-1000-8000-00805f9b34fb
             "Connection Parameter", // #2 is 00002a04-0000-1000-8000-00805f9b34fb
+            "Central Address Resolution", // #3 is 00002aa6-0000-1000-8000-00805f9b34fb
+            "Resolvable Private Address Only", // #4 is 00002ac9-0000-1000-8000-00805f9b34fb
             "System ID", // #0 is 00002a23-0000-1000-8000-00805f9b34fb
             "Model Number", // #1 is 00002a24-0000-1000-8000-00805f9b34fb
             "Serial Number", // #2 is 00002a25-0000-1000-8000-00805f9b34fb
@@ -122,28 +120,26 @@ namespace BluetoothProtocols
             "Manufacturer Name", // #6 is 00002a29-0000-1000-8000-00805f9b34fb
             "Regulatory List", // #7 is 00002a2a-0000-1000-8000-00805f9b34fb
             "PnP ID", // #8 is 00002a50-0000-1000-8000-00805f9b34fb
-            "BatteryLevel", // #0 is 00002a19-0000-1000-8000-00805f9b34fb
-            "IR Data", // #0 is f000aa01-0451-4000-b000-000000000000
-            "IR Service Config", // #1 is f000aa02-0451-4000-b000-000000000000
-            "IR Service Period", // #2 is f000aa03-0451-4000-b000-000000000000
+            "Temperature Data", // #0 is f000aa01-0451-4000-b000-000000000000
+            "Temperature Conf.", // #1 is f000aa02-0451-4000-b000-000000000000
+            "Temperature Period", // #2 is f000aa03-0451-4000-b000-000000000000
             "Humidity Data", // #0 is f000aa21-0451-4000-b000-000000000000
-            "Humidity Config", // #1 is f000aa22-0451-4000-b000-000000000000
+            "Humidity Conf.", // #1 is f000aa22-0451-4000-b000-000000000000
             "Humidity Period", // #2 is f000aa23-0451-4000-b000-000000000000
-            "Barometer Data", // #0 is f000aa41-0451-4000-b000-000000000000
-            "Barometer Config", // #1 is f000aa42-0451-4000-b000-000000000000
-            "Barometer Period", // #2 is f000aa44-0451-4000-b000-000000000000
-            "Accelerometer Data", // #0 is f000aa81-0451-4000-b000-000000000000
-            "Accelerometer Config", // #1 is f000aa82-0451-4000-b000-000000000000
-            "Accelerometer Period", // #2 is f000aa83-0451-4000-b000-000000000000
-            "Optical Service Data", // #0 is f000aa71-0451-4000-b000-000000000000
-            "Optical Service Config", // #1 is f000aa72-0451-4000-b000-000000000000
-            "Optical Service Period", // #2 is f000aa73-0451-4000-b000-000000000000
-            "Key Press State", // #0 is 0000ffe1-0000-1000-8000-00805f9b34fb
-            "IO Service Data", // #0 is f000aa65-0451-4000-b000-000000000000
-            "IO Service Config", // #1 is f000aa66-0451-4000-b000-000000000000
-            "Register Data", // #0 is f000ac01-0451-4000-b000-000000000000
-            "Register Address", // #1 is f000ac02-0451-4000-b000-000000000000
-            "Register Device ID", // #2 is f000ac03-0451-4000-b000-000000000000
+            "Light Data", // #0 is f000aa71-0451-4000-b000-000000000000
+            "Light Conf.", // #1 is f000aa72-0451-4000-b000-000000000000
+            "Light Period", // #2 is f000aa73-0451-4000-b000-000000000000
+            "Red", // #0 is f0001111-0451-4000-b000-000000000000
+            "Green", // #1 is f0001112-0451-4000-b000-000000000000
+            "Blue", // #2 is f0001113-0451-4000-b000-000000000000
+            "Button 0", // #0 is f0001121-0451-4000-b000-000000000000
+            "Button 1", // #1 is f0001122-0451-4000-b000-000000000000
+            "Battery Data", // #0 is f0002a19-0451-4000-b000-000000000000
+            "Accel Enable", // #0 is f000ffa1-0451-4000-b000-000000000000
+            "Accel Range", // #1 is f000ffa2-0451-4000-b000-000000000000
+            "X", // #2 is f000ffa3-0451-4000-b000-000000000000
+            "Y", // #3 is f000ffa4-0451-4000-b000-000000000000
+            "Z", // #4 is f000ffa5-0451-4000-b000-000000000000
 
         };
         GattCharacteristic[] Characteristics = new GattCharacteristic[] {
@@ -184,28 +180,26 @@ namespace BluetoothProtocols
 
         };
         List<HashSet<int>> MapServiceToCharacteristic = new List<HashSet<int>>() {
-            new HashSet<int>(){ 0, 1, 2,  },
-            new HashSet<int>(){ 3, 4, 5, 6, 7, 8, 9, 10, 11,  },
-            new HashSet<int>(){ 12,  },
-            new HashSet<int>(){ 13, 14, 15,  },
-            new HashSet<int>(){ 16, 17, 18,  },
-            new HashSet<int>(){ 19, 20, 21,  },
-            new HashSet<int>(){ 22, 23, 24,  },
-            new HashSet<int>(){ 25, 26, 27,  },
+            new HashSet<int>(){ 0, 1, 2, 3, 4,  },
+            new HashSet<int>(){ 5, 6, 7, 8, 9, 10, 11, 12, 13,  },
+            new HashSet<int>(){ 14, 15, 16,  },
+            new HashSet<int>(){ 17, 18, 19,  },
+            new HashSet<int>(){ 20, 21, 22,  },
+            new HashSet<int>(){ 23, 24, 25,  },
+            new HashSet<int>(){ 26, 27,  },
             new HashSet<int>(){ 28,  },
-            new HashSet<int>(){ 29, 30,  },
-            new HashSet<int>(){ 31, 32, 33,  },
+            new HashSet<int>(){ 29, 30, 31, 32, 33,  },
 
         };
-
 
         bool readCharacteristics = false;
         public async Task<bool> EnsureCharacteristicAsync(bool forceReread = false)
         {
             if (Characteristics.Length == 0) return false;
+            if (ble == null) return false; // might not be initialized yet
 
             GattCharacteristicsResult lastResult = null;
-            if (forceReread)
+            if (forceReread) 
             {
                 readCharacteristics = false;
             }
@@ -326,7 +320,6 @@ namespace BluetoothProtocols
 
 
 
-
         private string _Device_Name = "";
         private bool _Device_Name_set = false;
         public string Device_Name
@@ -336,7 +329,7 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -348,13 +341,15 @@ namespace BluetoothProtocols
 
             var datameaning = "STRING|ASCII|Device_Name";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Device_Name = parseResult.ValueList.GetValue("Device_Name").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private double _Appearance = 0;
         private bool _Appearance_set = false;
@@ -365,7 +360,7 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -377,13 +372,15 @@ namespace BluetoothProtocols
 
             var datameaning = "U16|Speciality^Appearance|Appearance";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Appearance = parseResult.ValueList.GetValue("Appearance").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Connection_Parameter = null;
         private bool _Connection_Parameter_set = false;
@@ -394,7 +391,7 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -406,13 +403,77 @@ namespace BluetoothProtocols
 
             var datameaning = "BYTES|HEX|ConnectionParameter";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Connection_Parameter = parseResult.ValueList.GetValue("ConnectionParameter").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
+
+        private double _Central_Address_Resolution = 0;
+        private bool _Central_Address_Resolution_set = false;
+        public double Central_Address_Resolution
+        {
+            get { return _Central_Address_Resolution; }
+            internal set { if (_Central_Address_Resolution_set && value == _Central_Address_Resolution) return; _Central_Address_Resolution = value; _Central_Address_Resolution_set = true; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<BCBasic.BCValueList> ReadCentral_Address_Resolution(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            if (!await EnsureCharacteristicAsync()) return null;
+            IBuffer result = await ReadAsync(3, "Central_Address_Resolution", cacheMode);
+            if (result == null) return null;
+
+            var datameaning = "U8|DEC|AddressResolutionSupported";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            Central_Address_Resolution = parseResult.ValueList.GetValue("AddressResolutionSupported").AsDouble;
+
+            // Hint: get the data that's been read with e.g. 
+            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
+            return parseResult.ValueList;
+        }
+
+
+
+
+        private double _Resolvable_Private_Address_Only = 0;
+        private bool _Resolvable_Private_Address_Only_set = false;
+        public double Resolvable_Private_Address_Only
+        {
+            get { return _Resolvable_Private_Address_Only; }
+            internal set { if (_Resolvable_Private_Address_Only_set && value == _Resolvable_Private_Address_Only) return; _Resolvable_Private_Address_Only = value; _Resolvable_Private_Address_Only_set = true; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<BCBasic.BCValueList> ReadResolvable_Private_Address_Only(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            if (!await EnsureCharacteristicAsync()) return null;
+            IBuffer result = await ReadAsync(4, "Resolvable_Private_Address_Only", cacheMode);
+            if (result == null) return null;
+
+            var datameaning = "U8|HEX|ResolvablePrivateAddressFlag";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            Resolvable_Private_Address_Only = parseResult.ValueList.GetValue("ResolvablePrivateAddressFlag").AsDouble;
+
+            // Hint: get the data that's been read with e.g. 
+            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
+            return parseResult.ValueList;
+        }
+
+
+
 
         private string _System_ID = "";
         private bool _System_ID_set = false;
@@ -423,25 +484,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadSystem_ID(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(3, "System_ID", cacheMode);
+            IBuffer result = await ReadAsync(5, "System_ID", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "STRING|ASCII";
+            var datameaning = "STRING|ASCII|SystemId";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            System_ID = parseResult.ValueList.GetValue("param0").AsString;
+            System_ID = parseResult.ValueList.GetValue("SystemId").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Model_Number = "";
         private bool _Model_Number_set = false;
@@ -452,25 +515,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadModel_Number(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(4, "Model_Number", cacheMode);
+            IBuffer result = await ReadAsync(6, "Model_Number", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "STRING|ASCII";
+            var datameaning = "STRING|ASCII|ModelNumber";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Model_Number = parseResult.ValueList.GetValue("param0").AsString;
+            Model_Number = parseResult.ValueList.GetValue("ModelNumber").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Serial_Number = "";
         private bool _Serial_Number_set = false;
@@ -481,25 +546,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadSerial_Number(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(5, "Serial_Number", cacheMode);
+            IBuffer result = await ReadAsync(7, "Serial_Number", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "STRING|ASCII";
+            var datameaning = "STRING|ASCII|SerialNumber";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Serial_Number = parseResult.ValueList.GetValue("param0").AsString;
+            Serial_Number = parseResult.ValueList.GetValue("SerialNumber").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Firmware_Revision = "";
         private bool _Firmware_Revision_set = false;
@@ -510,25 +577,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadFirmware_Revision(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(6, "Firmware_Revision", cacheMode);
+            IBuffer result = await ReadAsync(8, "Firmware_Revision", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "STRING|ASCII";
+            var datameaning = "STRING|ASCII|FirmwareRevision";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Firmware_Revision = parseResult.ValueList.GetValue("param0").AsString;
+            Firmware_Revision = parseResult.ValueList.GetValue("FirmwareRevision").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Hardware_Revision = "";
         private bool _Hardware_Revision_set = false;
@@ -539,25 +608,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadHardware_Revision(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(7, "Hardware_Revision", cacheMode);
+            IBuffer result = await ReadAsync(9, "Hardware_Revision", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "STRING|ASCII";
+            var datameaning = "STRING|ASCII|HardwareRevision";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Hardware_Revision = parseResult.ValueList.GetValue("param0").AsString;
+            Hardware_Revision = parseResult.ValueList.GetValue("HardwareRevision").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Software_Revision = "";
         private bool _Software_Revision_set = false;
@@ -568,25 +639,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadSoftware_Revision(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(8, "Software_Revision", cacheMode);
+            IBuffer result = await ReadAsync(10, "Software_Revision", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "STRING|ASCII";
+            var datameaning = "STRING|ASCII|SoftwareRevision";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Software_Revision = parseResult.ValueList.GetValue("param0").AsString;
+            Software_Revision = parseResult.ValueList.GetValue("SoftwareRevision").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Manufacturer_Name = "";
         private bool _Manufacturer_Name_set = false;
@@ -597,25 +670,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadManufacturer_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(9, "Manufacturer_Name", cacheMode);
+            IBuffer result = await ReadAsync(11, "Manufacturer_Name", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "STRING|ASCII";
+            var datameaning = "STRING|ASCII|ManufacturerName";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Manufacturer_Name = parseResult.ValueList.GetValue("param0").AsString;
+            Manufacturer_Name = parseResult.ValueList.GetValue("ManufacturerName").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private double _Regulatory_List_BodyType = 0;
         private bool _Regulatory_List_BodyType_set = false;
@@ -624,7 +699,6 @@ namespace BluetoothProtocols
             get { return _Regulatory_List_BodyType; }
             internal set { if (_Regulatory_List_BodyType_set && value == _Regulatory_List_BodyType) return; _Regulatory_List_BodyType = value; _Regulatory_List_BodyType_set = true; OnPropertyChanged(); }
         }
-
         private double _Regulatory_List_BodyStructure = 0;
         private bool _Regulatory_List_BodyStructure_set = false;
         public double Regulatory_List_BodyStructure
@@ -632,7 +706,6 @@ namespace BluetoothProtocols
             get { return _Regulatory_List_BodyStructure; }
             internal set { if (_Regulatory_List_BodyStructure_set && value == _Regulatory_List_BodyStructure) return; _Regulatory_List_BodyStructure = value; _Regulatory_List_BodyStructure_set = true; OnPropertyChanged(); }
         }
-
         private string _Regulatory_List_Data = "";
         private bool _Regulatory_List_Data_set = false;
         public string Regulatory_List_Data
@@ -642,29 +715,29 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadRegulatory_List(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(10, "Regulatory_List", cacheMode);
+            IBuffer result = await ReadAsync(12, "Regulatory_List", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Regulatory_List_BodyType = parseResult.ValueList.GetValue("BodyType").AsDouble;
-
             Regulatory_List_BodyStructure = parseResult.ValueList.GetValue("BodyStructure").AsDouble;
-
             Regulatory_List_Data = parseResult.ValueList.GetValue("Data").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _PnP_ID = "";
         private bool _PnP_ID_set = false;
@@ -675,141 +748,50 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadPnP_ID(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(11, "PnP_ID", cacheMode);
+            IBuffer result = await ReadAsync(13, "PnP_ID", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "STRING|ASCII";
+            var datameaning = "STRING|ASCII|PnPID";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            PnP_ID = parseResult.ValueList.GetValue("param0").AsString;
+            PnP_ID = parseResult.ValueList.GetValue("PnPID").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
 
-        private double _BatteryLevel = 0;
-        private bool _BatteryLevel_set = false;
-        public double BatteryLevel
+
+
+
+        private double _Temperature_Data = 0.0;
+        private bool _Temperature_Data_set = false;
+        public double Temperature_Data
         {
-            get { return _BatteryLevel; }
-            internal set { if (_BatteryLevel_set && value == _BatteryLevel) return; _BatteryLevel = value; _BatteryLevel_set = true; OnPropertyChanged(); }
+            get { return _Temperature_Data; }
+            internal set { if (_Temperature_Data_set && value == _Temperature_Data) return; _Temperature_Data = value; _Temperature_Data_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadBatteryLevel(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadTemperature_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(12, "BatteryLevel", cacheMode);
+            IBuffer result = await ReadAsync(14, "Temperature_Data", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "I8|DEC|BatteryLevel|%";
+            var datameaning = "F32|FIXED|Temperature|C";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            BatteryLevel = parseResult.ValueList.GetValue("BatteryLevel").AsDouble;
-
-            // Hint: get the data that's been read with e.g. 
-            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
-            return parseResult.ValueList;
-        }
-
-        // Returns a string with the status; starts with OK for good status.
-        /// <summary>
-        /// Event for notifications; BatteryLevelEvent += _my function_
-        /// </summary>
-        public event BluetoothDataEvent BatteryLevelEvent = null;
-        /// <summary>
-        /// We only want to set the internal callback once, and never need to remove it.
-        /// </summary>
-
-        private bool NotifyBatteryLevel_ValueChanged_Set = false;
-
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-
-        public async Task<bool> NotifyBatteryLevelAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[12];
-            if (ch == null) return false;
-            GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
-            try
-            {
-                result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-                if (!NotifyBatteryLevel_ValueChanged_Set)
-                {
-                    // Only set the event callback once
-                    NotifyBatteryLevel_ValueChanged_Set = true;
-                    ch.ValueChanged += (sender, args) =>
-                    {
-                        var datameaning = "I8|DEC|BatteryLevel|%";
-                        var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
-                        BatteryLevel = parseResult.ValueList.GetValue("BatteryLevel").AsDouble;
-
-                        BatteryLevelEvent?.Invoke(parseResult);
-                    };
-                }
-
-            }
-            catch (Exception e)
-            {
-                Status.ReportStatus($"NotifyBatteryLevel: {e.Message}", result);
-                return false;
-            }
-            Status.ReportStatus($"NotifyBatteryLevel: set notification", result);
-
-            return true;
-        }
-
-        private double _IR_Data_ObjTemp = 0;
-        private bool _IR_Data_ObjTemp_set = false;
-        public double IR_Data_ObjTemp
-        {
-            get { return _IR_Data_ObjTemp; }
-            internal set { if (_IR_Data_ObjTemp_set && value == _IR_Data_ObjTemp) return; _IR_Data_ObjTemp = value; _IR_Data_ObjTemp_set = true; OnPropertyChanged(); }
-        }
-
-        private double _IR_Data_AmbTemp = 0;
-        private bool _IR_Data_AmbTemp_set = false;
-        public double IR_Data_AmbTemp
-        {
-            get { return _IR_Data_AmbTemp; }
-            internal set { if (_IR_Data_AmbTemp_set && value == _IR_Data_AmbTemp) return; _IR_Data_AmbTemp = value; _IR_Data_AmbTemp_set = true; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// Reads data 
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadIR_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(13, "IR_Data", cacheMode);
-            if (result == null) return null;
-
-            var datameaning = "I16^4_/_0.03125_*|FIXED|ObjTemp|C I16^4_/_0.03125_*|FIXED|AmbTemp|C";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            IR_Data_ObjTemp = parseResult.ValueList.GetValue("ObjTemp").AsDouble;
-
-            IR_Data_AmbTemp = parseResult.ValueList.GetValue("AmbTemp").AsDouble;
+            Temperature_Data = parseResult.ValueList.GetValue("Temperature").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
@@ -818,14 +800,14 @@ namespace BluetoothProtocols
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
-        /// Event for notifications; IR_DataEvent += _my function_
+        /// Event for notifications; Temperature_DataEvent += _my function_
         /// </summary>
-        public event BluetoothDataEvent IR_DataEvent = null;
+        public event BluetoothDataEvent Temperature_DataEvent = null;
         /// <summary>
         /// We only want to set the internal callback once, and never need to remove it.
         /// </summary>
 
-        private bool NotifyIR_Data_ValueChanged_Set = false;
+        private bool NotifyTemperature_Data_ValueChanged_Set = false;
 
         /// <summary>
         /// Sets up the notifications; 
@@ -834,78 +816,88 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
 
-        public async Task<bool> NotifyIR_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyTemperature_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
             if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[13];
+            var ch = Characteristics[14];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
             {
                 result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-                if (!NotifyIR_Data_ValueChanged_Set)
+                if (!NotifyTemperature_Data_ValueChanged_Set)
                 {
                     // Only set the event callback once
-                    NotifyIR_Data_ValueChanged_Set = true;
-                    ch.ValueChanged += (sender, args) =>
-                    {
-                        var datameaning = "I16^4_/_0.03125_*|FIXED|ObjTemp|C I16^4_/_0.03125_*|FIXED|AmbTemp|C";
-                        var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
-                        IR_Data_ObjTemp = parseResult.ValueList.GetValue("ObjTemp").AsDouble;
-
-                        IR_Data_AmbTemp = parseResult.ValueList.GetValue("AmbTemp").AsDouble;
-
-                        IR_DataEvent?.Invoke(parseResult);
-                    };
+                    NotifyTemperature_Data_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyTemperature_DataCallback;
                 }
 
             }
             catch (Exception e)
             {
-                Status.ReportStatus($"NotifyIR_Data: {e.Message}", result);
+                Status.ReportStatus($"NotifyTemperature_Data: {e.Message}", result);
                 return false;
             }
-            Status.ReportStatus($"NotifyIR_Data: set notification", result);
+            Status.ReportStatus($"NotifyTemperature_Data: set notification", result);
 
             return true;
         }
 
-        private double _IR_Service_Config = 0;
-        private bool _IR_Service_Config_set = false;
-        public double IR_Service_Config
+        private void NotifyTemperature_DataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            get { return _IR_Service_Config; }
-            internal set { if (_IR_Service_Config_set && value == _IR_Service_Config) return; _IR_Service_Config = value; _IR_Service_Config_set = true; OnPropertyChanged(); }
+            var datameaning = "F32|FIXED|Temperature|C";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            Temperature_Data = parseResult.ValueList.GetValue("Temperature").AsDouble;
+
+            Temperature_DataEvent?.Invoke(parseResult);
+
+        }
+
+        public void NotifyTemperature_DataRemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[14];
+            if (ch == null) return;
+            NotifyTemperature_Data_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyTemperature_DataCallback;
+        }
+
+
+
+        private double _Temperature_Conf = 0;
+        private bool _Temperature_Conf_set = false;
+        public double Temperature_Conf
+        {
+            get { return _Temperature_Conf; }
+            internal set { if (_Temperature_Conf_set && value == _Temperature_Conf) return; _Temperature_Conf = value; _Temperature_Conf_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadIR_Service_Config(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadTemperature_Conf(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(14, "IR_Service_Config", cacheMode);
+            IBuffer result = await ReadAsync(15, "Temperature_Conf", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|Enable";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            IR_Service_Config = parseResult.ValueList.GetValue("Enable").AsDouble;
+            Temperature_Conf = parseResult.ValueList.GetValue("Enable").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
 
+
         /// <summary>
-        /// Writes data for IR_Service_Config
+        /// Writes data for Temperature_Conf
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteIR_Service_Config(byte Enable)
+        public async Task WriteTemperature_Conf(byte Enable)
         {
             if (!await EnsureCharacteristicAsync()) return;
 
@@ -913,47 +905,59 @@ namespace BluetoothProtocols
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Enable);
+            dw.WriteByte(  Enable);
 
             var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(14, "IR_Service_Config", command, GattWriteOption.WriteWithResponse);
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(15, "Temperature_Conf", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(15, "Temperature_Conf", subcommand, GattWriteOption.WriteWithResponse);
+            }
         }
 
-        private double _IR_Service_Period = 0;
-        private bool _IR_Service_Period_set = false;
-        public double IR_Service_Period
+
+        private double _Temperature_Period = 0;
+        private bool _Temperature_Period_set = false;
+        public double Temperature_Period
         {
-            get { return _IR_Service_Period; }
-            internal set { if (_IR_Service_Period_set && value == _IR_Service_Period) return; _IR_Service_Period = value; _IR_Service_Period_set = true; OnPropertyChanged(); }
+            get { return _Temperature_Period; }
+            internal set { if (_Temperature_Period_set && value == _Temperature_Period) return; _Temperature_Period = value; _Temperature_Period_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadIR_Service_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadTemperature_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(15, "IR_Service_Period", cacheMode);
+            IBuffer result = await ReadAsync(16, "Temperature_Period", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|DEC|Period|10ms";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            IR_Service_Period = parseResult.ValueList.GetValue("Period").AsDouble;
+            Temperature_Period = parseResult.ValueList.GetValue("Period").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
 
+
         /// <summary>
-        /// Writes data for IR_Service_Period
+        /// Writes data for Temperature_Period
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteIR_Service_Period(byte Period)
+        public async Task WriteTemperature_Period(byte Period)
         {
             if (!await EnsureCharacteristicAsync()) return;
 
@@ -961,45 +965,46 @@ namespace BluetoothProtocols
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Period);
+            dw.WriteByte(  Period);
 
             var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(15, "IR_Service_Period", command, GattWriteOption.WriteWithResponse);
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(16, "Temperature_Period", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(16, "Temperature_Period", subcommand, GattWriteOption.WriteWithResponse);
+            }
         }
 
-        private double _Humidity_Data_Temp = 0;
-        private bool _Humidity_Data_Temp_set = false;
-        public double Humidity_Data_Temp
-        {
-            get { return _Humidity_Data_Temp; }
-            internal set { if (_Humidity_Data_Temp_set && value == _Humidity_Data_Temp) return; _Humidity_Data_Temp = value; _Humidity_Data_Temp_set = true; OnPropertyChanged(); }
-        }
 
-        private double _Humidity_Data_Humidity = 0;
-        private bool _Humidity_Data_Humidity_set = false;
-        public double Humidity_Data_Humidity
+        private double _Humidity_Data = 0.0;
+        private bool _Humidity_Data_set = false;
+        public double Humidity_Data
         {
-            get { return _Humidity_Data_Humidity; }
-            internal set { if (_Humidity_Data_Humidity_set && value == _Humidity_Data_Humidity) return; _Humidity_Data_Humidity = value; _Humidity_Data_Humidity_set = true; OnPropertyChanged(); }
+            get { return _Humidity_Data; }
+            internal set { if (_Humidity_Data_set && value == _Humidity_Data) return; _Humidity_Data = value; _Humidity_Data_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadHumidity_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(16, "Humidity_Data", cacheMode);
+            IBuffer result = await ReadAsync(17, "Humidity_Data", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U16^DU_3_ZE_175.72_*_65536_/_46.85_-_SW_2_JZ_PO_NP|FIXED|Temp U16^DU_3_ZE_125.0_*_65536_/_6.0_-_SW_2_JZ_PO_NP|FIXED|Humidity";
+            var datameaning = "F32|FIXED|Humidty|Percent";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Humidity_Data_Temp = parseResult.ValueList.GetValue("Temp").AsDouble;
-
-            Humidity_Data_Humidity = parseResult.ValueList.GetValue("Humidity").AsDouble;
+            Humidity_Data = parseResult.ValueList.GetValue("Humidty").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
@@ -1027,7 +1032,7 @@ namespace BluetoothProtocols
         public async Task<bool> NotifyHumidity_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
             if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[16];
+            var ch = Characteristics[17];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1037,17 +1042,7 @@ namespace BluetoothProtocols
                 {
                     // Only set the event callback once
                     NotifyHumidity_Data_ValueChanged_Set = true;
-                    ch.ValueChanged += (sender, args) =>
-                    {
-                        var datameaning = "U16^DU_3_ZE_175.72_*_65536_/_46.85_-_SW_2_JZ_PO_NP|FIXED|Temp U16^DU_3_ZE_125.0_*_65536_/_6.0_-_SW_2_JZ_PO_NP|FIXED|Humidity";
-                        var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
-                        Humidity_Data_Temp = parseResult.ValueList.GetValue("Temp").AsDouble;
-
-                        Humidity_Data_Humidity = parseResult.ValueList.GetValue("Humidity").AsDouble;
-
-                        Humidity_DataEvent?.Invoke(parseResult);
-                    };
+                    ch.ValueChanged += NotifyHumidity_DataCallback;
                 }
 
             }
@@ -1061,41 +1056,61 @@ namespace BluetoothProtocols
             return true;
         }
 
-        private double _Humidity_Config = 0;
-        private bool _Humidity_Config_set = false;
-        public double Humidity_Config
+        private void NotifyHumidity_DataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            get { return _Humidity_Config; }
-            internal set { if (_Humidity_Config_set && value == _Humidity_Config) return; _Humidity_Config = value; _Humidity_Config_set = true; OnPropertyChanged(); }
+            var datameaning = "F32|FIXED|Humidty|Percent";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            Humidity_Data = parseResult.ValueList.GetValue("Humidty").AsDouble;
+
+            Humidity_DataEvent?.Invoke(parseResult);
+
+        }
+
+        public void NotifyHumidity_DataRemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[17];
+            if (ch == null) return;
+            NotifyHumidity_Data_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyHumidity_DataCallback;
+        }
+
+
+
+        private double _Humidity_Conf = 0;
+        private bool _Humidity_Conf_set = false;
+        public double Humidity_Conf
+        {
+            get { return _Humidity_Conf; }
+            internal set { if (_Humidity_Conf_set && value == _Humidity_Conf) return; _Humidity_Conf = value; _Humidity_Conf_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadHumidity_Config(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadHumidity_Conf(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(17, "Humidity_Config", cacheMode);
+            IBuffer result = await ReadAsync(18, "Humidity_Conf", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|Enable";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Humidity_Config = parseResult.ValueList.GetValue("Enable").AsDouble;
+            Humidity_Conf = parseResult.ValueList.GetValue("Enable").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
 
+
         /// <summary>
-        /// Writes data for Humidity_Config
+        /// Writes data for Humidity_Conf
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteHumidity_Config(byte Enable)
+        public async Task WriteHumidity_Conf(byte Enable)
         {
             if (!await EnsureCharacteristicAsync()) return;
 
@@ -1103,11 +1118,23 @@ namespace BluetoothProtocols
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Enable);
+            dw.WriteByte(  Enable);
 
             var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(17, "Humidity_Config", command, GattWriteOption.WriteWithResponse);
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(18, "Humidity_Conf", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(18, "Humidity_Conf", subcommand, GattWriteOption.WriteWithResponse);
+            }
         }
+
 
         private double _Humidity_Period = 0;
         private bool _Humidity_Period_set = false;
@@ -1118,25 +1145,25 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadHumidity_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(18, "Humidity_Period", cacheMode);
+            IBuffer result = await ReadAsync(19, "Humidity_Period", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|DEC|Period|10ms";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Humidity_Period = parseResult.ValueList.GetValue("Period").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
 
         /// <summary>
         /// Writes data for Humidity_Period
@@ -1151,45 +1178,46 @@ namespace BluetoothProtocols
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Period);
+            dw.WriteByte(  Period);
 
             var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(18, "Humidity_Period", command, GattWriteOption.WriteWithResponse);
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(19, "Humidity_Period", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(19, "Humidity_Period", subcommand, GattWriteOption.WriteWithResponse);
+            }
         }
 
-        private double _Barometer_Data_Temp = 0;
-        private bool _Barometer_Data_Temp_set = false;
-        public double Barometer_Data_Temp
-        {
-            get { return _Barometer_Data_Temp; }
-            internal set { if (_Barometer_Data_Temp_set && value == _Barometer_Data_Temp) return; _Barometer_Data_Temp = value; _Barometer_Data_Temp_set = true; OnPropertyChanged(); }
-        }
 
-        private double _Barometer_Data_Pressure = 0;
-        private bool _Barometer_Data_Pressure_set = false;
-        public double Barometer_Data_Pressure
+        private double _Light_Data = 0.0;
+        private bool _Light_Data_set = false;
+        public double Light_Data
         {
-            get { return _Barometer_Data_Pressure; }
-            internal set { if (_Barometer_Data_Pressure_set && value == _Barometer_Data_Pressure) return; _Barometer_Data_Pressure = value; _Barometer_Data_Pressure_set = true; OnPropertyChanged(); }
+            get { return _Light_Data; }
+            internal set { if (_Light_Data_set && value == _Light_Data) return; _Light_Data = value; _Light_Data_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadBarometer_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadLight_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(19, "Barometer_Data", cacheMode);
+            IBuffer result = await ReadAsync(20, "Light_Data", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "I24^100_/|FIXED|Temp|C I24^100_/|FIXED|Pressure|hPa";
+            var datameaning = "F32|FIXED^N0|Lux";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Barometer_Data_Temp = parseResult.ValueList.GetValue("Temp").AsDouble;
-
-            Barometer_Data_Pressure = parseResult.ValueList.GetValue("Pressure").AsDouble;
+            Light_Data = parseResult.ValueList.GetValue("Lux").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
@@ -1198,14 +1226,14 @@ namespace BluetoothProtocols
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
-        /// Event for notifications; Barometer_DataEvent += _my function_
+        /// Event for notifications; Light_DataEvent += _my function_
         /// </summary>
-        public event BluetoothDataEvent Barometer_DataEvent = null;
+        public event BluetoothDataEvent Light_DataEvent = null;
         /// <summary>
         /// We only want to set the internal callback once, and never need to remove it.
         /// </summary>
 
-        private bool NotifyBarometer_Data_ValueChanged_Set = false;
+        private bool NotifyLight_Data_ValueChanged_Set = false;
 
         /// <summary>
         /// Sets up the notifications; 
@@ -1214,78 +1242,88 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
 
-        public async Task<bool> NotifyBarometer_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyLight_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
             if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[19];
+            var ch = Characteristics[20];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
             {
                 result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-                if (!NotifyBarometer_Data_ValueChanged_Set)
+                if (!NotifyLight_Data_ValueChanged_Set)
                 {
                     // Only set the event callback once
-                    NotifyBarometer_Data_ValueChanged_Set = true;
-                    ch.ValueChanged += (sender, args) =>
-                    {
-                        var datameaning = "I24^100_/|FIXED|Temp|C I24^100_/|FIXED|Pressure|hPa";
-                        var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
-                        Barometer_Data_Temp = parseResult.ValueList.GetValue("Temp").AsDouble;
-
-                        Barometer_Data_Pressure = parseResult.ValueList.GetValue("Pressure").AsDouble;
-
-                        Barometer_DataEvent?.Invoke(parseResult);
-                    };
+                    NotifyLight_Data_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyLight_DataCallback;
                 }
 
             }
             catch (Exception e)
             {
-                Status.ReportStatus($"NotifyBarometer_Data: {e.Message}", result);
+                Status.ReportStatus($"NotifyLight_Data: {e.Message}", result);
                 return false;
             }
-            Status.ReportStatus($"NotifyBarometer_Data: set notification", result);
+            Status.ReportStatus($"NotifyLight_Data: set notification", result);
 
             return true;
         }
 
-        private double _Barometer_Config = 0;
-        private bool _Barometer_Config_set = false;
-        public double Barometer_Config
+        private void NotifyLight_DataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            get { return _Barometer_Config; }
-            internal set { if (_Barometer_Config_set && value == _Barometer_Config) return; _Barometer_Config = value; _Barometer_Config_set = true; OnPropertyChanged(); }
+            var datameaning = "F32|FIXED^N0|Lux";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            Light_Data = parseResult.ValueList.GetValue("Lux").AsDouble;
+
+            Light_DataEvent?.Invoke(parseResult);
+
+        }
+
+        public void NotifyLight_DataRemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[20];
+            if (ch == null) return;
+            NotifyLight_Data_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyLight_DataCallback;
+        }
+
+
+
+        private string _Light_Conf = null;
+        private bool _Light_Conf_set = false;
+        public string Light_Conf
+        {
+            get { return _Light_Conf; }
+            internal set { if (_Light_Conf_set && value == _Light_Conf) return; _Light_Conf = value; _Light_Conf_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadBarometer_Config(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadLight_Conf(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(20, "Barometer_Config", cacheMode);
+            IBuffer result = await ReadAsync(21, "Light_Conf", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U8|HEX|Enable";
+            var datameaning = "BYTES|HEX|Enable";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Barometer_Config = parseResult.ValueList.GetValue("Enable").AsDouble;
+            Light_Conf = parseResult.ValueList.GetValue("Enable").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
 
+
         /// <summary>
-        /// Writes data for Barometer_Config
+        /// Writes data for Light_Conf
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteBarometer_Config(byte Enable)
+        public async Task WriteLight_Conf(byte[] Enable)
         {
             if (!await EnsureCharacteristicAsync()) return;
 
@@ -1293,47 +1331,59 @@ namespace BluetoothProtocols
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Enable);
+            dw.WriteBytes(  Enable);
 
             var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(20, "Barometer_Config", command, GattWriteOption.WriteWithResponse);
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(21, "Light_Conf", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(21, "Light_Conf", subcommand, GattWriteOption.WriteWithResponse);
+            }
         }
 
-        private double _Barometer_Period = 0;
-        private bool _Barometer_Period_set = false;
-        public double Barometer_Period
+
+        private string _Light_Period = null;
+        private bool _Light_Period_set = false;
+        public string Light_Period
         {
-            get { return _Barometer_Period; }
-            internal set { if (_Barometer_Period_set && value == _Barometer_Period) return; _Barometer_Period = value; _Barometer_Period_set = true; OnPropertyChanged(); }
+            get { return _Light_Period; }
+            internal set { if (_Light_Period_set && value == _Light_Period) return; _Light_Period = value; _Light_Period_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadBarometer_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadLight_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(21, "Barometer_Period", cacheMode);
+            IBuffer result = await ReadAsync(22, "Light_Period", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U8|DEC|Period|10ms";
+            var datameaning = "BYTES|HEX|Light_Period";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Barometer_Period = parseResult.ValueList.GetValue("Period").AsDouble;
+            Light_Period = parseResult.ValueList.GetValue("Light_Period").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
 
+
         /// <summary>
-        /// Writes data for Barometer_Period
+        /// Writes data for Light_Period
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteBarometer_Period(byte Period)
+        public async Task WriteLight_Period(byte[] Light_Period)
         {
             if (!await EnsureCharacteristicAsync()) return;
 
@@ -1341,115 +1391,226 @@ namespace BluetoothProtocols
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Period);
+            dw.WriteBytes(  Light_Period);
 
             var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(21, "Barometer_Period", command, GattWriteOption.WriteWithResponse);
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(22, "Light_Period", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(22, "Light_Period", subcommand, GattWriteOption.WriteWithResponse);
+            }
         }
 
-        private double _Accelerometer_Data_GyroX = 0;
-        private bool _Accelerometer_Data_GyroX_set = false;
-        public double Accelerometer_Data_GyroX
-        {
-            get { return _Accelerometer_Data_GyroX; }
-            internal set { if (_Accelerometer_Data_GyroX_set && value == _Accelerometer_Data_GyroX) return; _Accelerometer_Data_GyroX = value; _Accelerometer_Data_GyroX_set = true; OnPropertyChanged(); }
-        }
 
-        private double _Accelerometer_Data_GyroY = 0;
-        private bool _Accelerometer_Data_GyroY_set = false;
-        public double Accelerometer_Data_GyroY
+        private double _Red = 0;
+        private bool _Red_set = false;
+        public double Red
         {
-            get { return _Accelerometer_Data_GyroY; }
-            internal set { if (_Accelerometer_Data_GyroY_set && value == _Accelerometer_Data_GyroY) return; _Accelerometer_Data_GyroY = value; _Accelerometer_Data_GyroY_set = true; OnPropertyChanged(); }
-        }
-
-        private double _Accelerometer_Data_GyroZ = 0;
-        private bool _Accelerometer_Data_GyroZ_set = false;
-        public double Accelerometer_Data_GyroZ
-        {
-            get { return _Accelerometer_Data_GyroZ; }
-            internal set { if (_Accelerometer_Data_GyroZ_set && value == _Accelerometer_Data_GyroZ) return; _Accelerometer_Data_GyroZ = value; _Accelerometer_Data_GyroZ_set = true; OnPropertyChanged(); }
-        }
-
-        private double _Accelerometer_Data_AccX = 0;
-        private bool _Accelerometer_Data_AccX_set = false;
-        public double Accelerometer_Data_AccX
-        {
-            get { return _Accelerometer_Data_AccX; }
-            internal set { if (_Accelerometer_Data_AccX_set && value == _Accelerometer_Data_AccX) return; _Accelerometer_Data_AccX = value; _Accelerometer_Data_AccX_set = true; OnPropertyChanged(); }
-        }
-
-        private double _Accelerometer_Data_AccY = 0;
-        private bool _Accelerometer_Data_AccY_set = false;
-        public double Accelerometer_Data_AccY
-        {
-            get { return _Accelerometer_Data_AccY; }
-            internal set { if (_Accelerometer_Data_AccY_set && value == _Accelerometer_Data_AccY) return; _Accelerometer_Data_AccY = value; _Accelerometer_Data_AccY_set = true; OnPropertyChanged(); }
-        }
-
-        private double _Accelerometer_Data_AccZ = 0;
-        private bool _Accelerometer_Data_AccZ_set = false;
-        public double Accelerometer_Data_AccZ
-        {
-            get { return _Accelerometer_Data_AccZ; }
-            internal set { if (_Accelerometer_Data_AccZ_set && value == _Accelerometer_Data_AccZ) return; _Accelerometer_Data_AccZ = value; _Accelerometer_Data_AccZ_set = true; OnPropertyChanged(); }
-        }
-
-        private double _Accelerometer_Data_MagnetometerX = 0;
-        private bool _Accelerometer_Data_MagnetometerX_set = false;
-        public double Accelerometer_Data_MagnetometerX
-        {
-            get { return _Accelerometer_Data_MagnetometerX; }
-            internal set { if (_Accelerometer_Data_MagnetometerX_set && value == _Accelerometer_Data_MagnetometerX) return; _Accelerometer_Data_MagnetometerX = value; _Accelerometer_Data_MagnetometerX_set = true; OnPropertyChanged(); }
-        }
-
-        private double _Accelerometer_Data_MagnetometerY = 0;
-        private bool _Accelerometer_Data_MagnetometerY_set = false;
-        public double Accelerometer_Data_MagnetometerY
-        {
-            get { return _Accelerometer_Data_MagnetometerY; }
-            internal set { if (_Accelerometer_Data_MagnetometerY_set && value == _Accelerometer_Data_MagnetometerY) return; _Accelerometer_Data_MagnetometerY = value; _Accelerometer_Data_MagnetometerY_set = true; OnPropertyChanged(); }
-        }
-
-        private double _Accelerometer_Data_MagnetometerZ = 0;
-        private bool _Accelerometer_Data_MagnetometerZ_set = false;
-        public double Accelerometer_Data_MagnetometerZ
-        {
-            get { return _Accelerometer_Data_MagnetometerZ; }
-            internal set { if (_Accelerometer_Data_MagnetometerZ_set && value == _Accelerometer_Data_MagnetometerZ) return; _Accelerometer_Data_MagnetometerZ = value; _Accelerometer_Data_MagnetometerZ_set = true; OnPropertyChanged(); }
+            get { return _Red; }
+            internal set { if (_Red_set && value == _Red) return; _Red = value; _Red_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadAccelerometer_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadRed(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(22, "Accelerometer_Data", cacheMode);
+            IBuffer result = await ReadAsync(23, "Red", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "I16^500_*_65536_/|FIXED^N3|GyroX|dps I16^500_*_65536_/|FIXED^N3|GyroY|dps I16^500_*_65536_/|FIXED^N3|GyroZ|dps I16^8_*_32768_/|FIXED^N3|AccX|g I16^8_*_32768_/|FIXED^N3|AccY|g I16^8_*_32768_/|FIXED^N3|AccZ|g I16|DEC|MagnetometerX|microTesla I16|DEC|MagnetometerY|microTesla I16|DEC|MagnetometerZ|microTesla";
+            var datameaning = "U8|HEX|Red";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            Red = parseResult.ValueList.GetValue("Red").AsDouble;
 
-            Accelerometer_Data_GyroX = parseResult.ValueList.GetValue("GyroX").AsDouble;
+            // Hint: get the data that's been read with e.g. 
+            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
+            return parseResult.ValueList;
+        }
 
-            Accelerometer_Data_GyroY = parseResult.ValueList.GetValue("GyroY").AsDouble;
 
-            Accelerometer_Data_GyroZ = parseResult.ValueList.GetValue("GyroZ").AsDouble;
+        /// <summary>
+        /// Writes data for Red
+        /// </summary>
+        /// <param name="Period"></param>
+        /// <returns></returns>
+        public async Task WriteRed(byte Red)
+        {
+            if (!await EnsureCharacteristicAsync()) return;
 
-            Accelerometer_Data_AccX = parseResult.ValueList.GetValue("AccX").AsDouble;
+            var dw = new DataWriter();
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            dw.ByteOrder = ByteOrder.LittleEndian;
+            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
+            dw.WriteByte(  Red);
 
-            Accelerometer_Data_AccY = parseResult.ValueList.GetValue("AccY").AsDouble;
+            var command = dw.DetachBuffer().ToArray();
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(23, "Red", command, GattWriteOption.WriteWithoutResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(23, "Red", subcommand, GattWriteOption.WriteWithoutResponse);
+            }
+        }
 
-            Accelerometer_Data_AccZ = parseResult.ValueList.GetValue("AccZ").AsDouble;
 
-            Accelerometer_Data_MagnetometerX = parseResult.ValueList.GetValue("MagnetometerX").AsDouble;
+        private double _Green = 0;
+        private bool _Green_set = false;
+        public double Green
+        {
+            get { return _Green; }
+            internal set { if (_Green_set && value == _Green) return; _Green = value; _Green_set = true; OnPropertyChanged(); }
+        }
 
-            Accelerometer_Data_MagnetometerY = parseResult.ValueList.GetValue("MagnetometerY").AsDouble;
+        /// <summary>
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<BCBasic.BCValueList> ReadGreen(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            if (!await EnsureCharacteristicAsync()) return null;
+            IBuffer result = await ReadAsync(24, "Green", cacheMode);
+            if (result == null) return null;
 
-            Accelerometer_Data_MagnetometerZ = parseResult.ValueList.GetValue("MagnetometerZ").AsDouble;
+            var datameaning = "U8|HEX|Green";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            Green = parseResult.ValueList.GetValue("Green").AsDouble;
+
+            // Hint: get the data that's been read with e.g. 
+            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
+            return parseResult.ValueList;
+        }
+
+
+        /// <summary>
+        /// Writes data for Green
+        /// </summary>
+        /// <param name="Period"></param>
+        /// <returns></returns>
+        public async Task WriteGreen(byte Green)
+        {
+            if (!await EnsureCharacteristicAsync()) return;
+
+            var dw = new DataWriter();
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            dw.ByteOrder = ByteOrder.LittleEndian;
+            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
+            dw.WriteByte(  Green);
+
+            var command = dw.DetachBuffer().ToArray();
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(24, "Green", command, GattWriteOption.WriteWithoutResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(24, "Green", subcommand, GattWriteOption.WriteWithoutResponse);
+            }
+        }
+
+
+        private double _Blue = 0;
+        private bool _Blue_set = false;
+        public double Blue
+        {
+            get { return _Blue; }
+            internal set { if (_Blue_set && value == _Blue) return; _Blue = value; _Blue_set = true; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<BCBasic.BCValueList> ReadBlue(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            if (!await EnsureCharacteristicAsync()) return null;
+            IBuffer result = await ReadAsync(25, "Blue", cacheMode);
+            if (result == null) return null;
+
+            var datameaning = "U8|HEX|Blue";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            Blue = parseResult.ValueList.GetValue("Blue").AsDouble;
+
+            // Hint: get the data that's been read with e.g. 
+            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
+            return parseResult.ValueList;
+        }
+
+
+        /// <summary>
+        /// Writes data for Blue
+        /// </summary>
+        /// <param name="Period"></param>
+        /// <returns></returns>
+        public async Task WriteBlue(byte Blue)
+        {
+            if (!await EnsureCharacteristicAsync()) return;
+
+            var dw = new DataWriter();
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            dw.ByteOrder = ByteOrder.LittleEndian;
+            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
+            dw.WriteByte(  Blue);
+
+            var command = dw.DetachBuffer().ToArray();
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(25, "Blue", command, GattWriteOption.WriteWithoutResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(25, "Blue", subcommand, GattWriteOption.WriteWithoutResponse);
+            }
+        }
+
+
+        private double _Button_0 = 0;
+        private bool _Button_0_set = false;
+        public double Button_0
+        {
+            get { return _Button_0; }
+            internal set { if (_Button_0_set && value == _Button_0) return; _Button_0 = value; _Button_0_set = true; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<BCBasic.BCValueList> ReadButton_0(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            if (!await EnsureCharacteristicAsync()) return null;
+            IBuffer result = await ReadAsync(26, "Button_0", cacheMode);
+            if (result == null) return null;
+
+            var datameaning = "U8|HEX|Button0";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            Button_0 = parseResult.ValueList.GetValue("Button0").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
@@ -1458,14 +1619,14 @@ namespace BluetoothProtocols
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
-        /// Event for notifications; Accelerometer_DataEvent += _my function_
+        /// Event for notifications; Button_0Event += _my function_
         /// </summary>
-        public event BluetoothDataEvent Accelerometer_DataEvent = null;
+        public event BluetoothDataEvent Button_0Event = null;
         /// <summary>
         /// We only want to set the internal callback once, and never need to remove it.
         /// </summary>
 
-        private bool NotifyAccelerometer_Data_ValueChanged_Set = false;
+        private bool NotifyButton_0_ValueChanged_Set = false;
 
         /// <summary>
         /// Sets up the notifications; 
@@ -1474,176 +1635,75 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
 
-        public async Task<bool> NotifyAccelerometer_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyButton_0Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
             if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[22];
+            var ch = Characteristics[26];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
             {
                 result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-                if (!NotifyAccelerometer_Data_ValueChanged_Set)
+                if (!NotifyButton_0_ValueChanged_Set)
                 {
                     // Only set the event callback once
-                    NotifyAccelerometer_Data_ValueChanged_Set = true;
-                    ch.ValueChanged += (sender, args) =>
-                    {
-                        var datameaning = "I16^500_*_65536_/|FIXED^N3|GyroX|dps I16^500_*_65536_/|FIXED^N3|GyroY|dps I16^500_*_65536_/|FIXED^N3|GyroZ|dps I16^8_*_32768_/|FIXED^N3|AccX|g I16^8_*_32768_/|FIXED^N3|AccY|g I16^8_*_32768_/|FIXED^N3|AccZ|g I16|DEC|MagnetometerX|microTesla I16|DEC|MagnetometerY|microTesla I16|DEC|MagnetometerZ|microTesla";
-                        var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
-                        Accelerometer_Data_GyroX = parseResult.ValueList.GetValue("GyroX").AsDouble;
-
-                        Accelerometer_Data_GyroY = parseResult.ValueList.GetValue("GyroY").AsDouble;
-
-                        Accelerometer_Data_GyroZ = parseResult.ValueList.GetValue("GyroZ").AsDouble;
-
-                        Accelerometer_Data_AccX = parseResult.ValueList.GetValue("AccX").AsDouble;
-
-                        Accelerometer_Data_AccY = parseResult.ValueList.GetValue("AccY").AsDouble;
-
-                        Accelerometer_Data_AccZ = parseResult.ValueList.GetValue("AccZ").AsDouble;
-
-                        Accelerometer_Data_MagnetometerX = parseResult.ValueList.GetValue("MagnetometerX").AsDouble;
-
-                        Accelerometer_Data_MagnetometerY = parseResult.ValueList.GetValue("MagnetometerY").AsDouble;
-
-                        Accelerometer_Data_MagnetometerZ = parseResult.ValueList.GetValue("MagnetometerZ").AsDouble;
-
-                        Accelerometer_DataEvent?.Invoke(parseResult);
-                    };
+                    NotifyButton_0_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyButton_0Callback;
                 }
 
             }
             catch (Exception e)
             {
-                Status.ReportStatus($"NotifyAccelerometer_Data: {e.Message}", result);
+                Status.ReportStatus($"NotifyButton_0: {e.Message}", result);
                 return false;
             }
-            Status.ReportStatus($"NotifyAccelerometer_Data: set notification", result);
+            Status.ReportStatus($"NotifyButton_0: set notification", result);
 
             return true;
         }
 
-        private double _Accelerometer_Config = 0;
-        private bool _Accelerometer_Config_set = false;
-        public double Accelerometer_Config
+        private void NotifyButton_0Callback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            get { return _Accelerometer_Config; }
-            internal set { if (_Accelerometer_Config_set && value == _Accelerometer_Config) return; _Accelerometer_Config = value; _Accelerometer_Config_set = true; OnPropertyChanged(); }
+            var datameaning = "U8|HEX|Button0";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            Button_0 = parseResult.ValueList.GetValue("Button0").AsDouble;
+
+            Button_0Event?.Invoke(parseResult);
+
+        }
+
+        public void NotifyButton_0RemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[26];
+            if (ch == null) return;
+            NotifyButton_0_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyButton_0Callback;
+        }
+
+
+
+        private double _Button_1 = 0;
+        private bool _Button_1_set = false;
+        public double Button_1
+        {
+            get { return _Button_1; }
+            internal set { if (_Button_1_set && value == _Button_1) return; _Button_1 = value; _Button_1_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadAccelerometer_Config(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadButton_1(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(23, "Accelerometer_Config", cacheMode);
+            IBuffer result = await ReadAsync(27, "Button_1", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U16|HEX|Enable";
+            var datameaning = "U8|HEX|Button1";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Accelerometer_Config = parseResult.ValueList.GetValue("Enable").AsDouble;
-
-            // Hint: get the data that's been read with e.g. 
-            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
-            return parseResult.ValueList;
-        }
-
-        /// <summary>
-        /// Writes data for Accelerometer_Config
-        /// </summary>
-        /// <param name="Period"></param>
-        /// <returns></returns>
-        public async Task WriteAccelerometer_Config(UInt16 Enable)
-        {
-            if (!await EnsureCharacteristicAsync()) return;
-
-            var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
-            dw.ByteOrder = ByteOrder.LittleEndian;
-            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteUInt16(Enable);
-
-            var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(23, "Accelerometer_Config", command, GattWriteOption.WriteWithResponse);
-        }
-
-        private double _Accelerometer_Period = 0;
-        private bool _Accelerometer_Period_set = false;
-        public double Accelerometer_Period
-        {
-            get { return _Accelerometer_Period; }
-            internal set { if (_Accelerometer_Period_set && value == _Accelerometer_Period) return; _Accelerometer_Period = value; _Accelerometer_Period_set = true; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// Reads data 
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadAccelerometer_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(24, "Accelerometer_Period", cacheMode);
-            if (result == null) return null;
-
-            var datameaning = "U8|DEC|Period|10ms";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Accelerometer_Period = parseResult.ValueList.GetValue("Period").AsDouble;
-
-            // Hint: get the data that's been read with e.g. 
-            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
-            return parseResult.ValueList;
-        }
-
-        /// <summary>
-        /// Writes data for Accelerometer_Period
-        /// </summary>
-        /// <param name="Period"></param>
-        /// <returns></returns>
-        public async Task WriteAccelerometer_Period(byte Period)
-        {
-            if (!await EnsureCharacteristicAsync()) return;
-
-            var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
-            dw.ByteOrder = ByteOrder.LittleEndian;
-            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Period);
-
-            var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(24, "Accelerometer_Period", command, GattWriteOption.WriteWithResponse);
-        }
-
-        private double _Optical_Service_Data = 0;
-        private bool _Optical_Service_Data_set = false;
-        public double Optical_Service_Data
-        {
-            get { return _Optical_Service_Data; }
-            internal set { if (_Optical_Service_Data_set && value == _Optical_Service_Data) return; _Optical_Service_Data = value; _Optical_Service_Data_set = true; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// Reads data 
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadOptical_Service_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(25, "Optical_Service_Data", cacheMode);
-            if (result == null) return null;
-
-            var datameaning = "U16^DU_12_RS_15_AN_2_XY_0.01_*_SW_4095_AN_*|FIXED^N1|Lux";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Optical_Service_Data = parseResult.ValueList.GetValue("Lux").AsDouble;
+            Button_1 = parseResult.ValueList.GetValue("Button1").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
@@ -1652,14 +1712,14 @@ namespace BluetoothProtocols
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
-        /// Event for notifications; Optical_Service_DataEvent += _my function_
+        /// Event for notifications; Button_1Event += _my function_
         /// </summary>
-        public event BluetoothDataEvent Optical_Service_DataEvent = null;
+        public event BluetoothDataEvent Button_1Event = null;
         /// <summary>
         /// We only want to set the internal callback once, and never need to remove it.
         /// </summary>
 
-        private bool NotifyOptical_Service_Data_ValueChanged_Set = false;
+        private bool NotifyButton_1_ValueChanged_Set = false;
 
         /// <summary>
         /// Sets up the notifications; 
@@ -1668,155 +1728,91 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
 
-        public async Task<bool> NotifyOptical_Service_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyButton_1Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
             if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[25];
+            var ch = Characteristics[27];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
             {
                 result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-                if (!NotifyOptical_Service_Data_ValueChanged_Set)
+                if (!NotifyButton_1_ValueChanged_Set)
                 {
                     // Only set the event callback once
-                    NotifyOptical_Service_Data_ValueChanged_Set = true;
-                    ch.ValueChanged += (sender, args) =>
-                    {
-                        var datameaning = "U16^DU_12_RS_15_AN_2_XY_0.01_*_SW_4095_AN_*|FIXED^N1|Lux";
-                        var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
-                        Optical_Service_Data = parseResult.ValueList.GetValue("Lux").AsDouble;
-
-                        Optical_Service_DataEvent?.Invoke(parseResult);
-                    };
+                    NotifyButton_1_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyButton_1Callback;
                 }
 
             }
             catch (Exception e)
             {
-                Status.ReportStatus($"NotifyOptical_Service_Data: {e.Message}", result);
+                Status.ReportStatus($"NotifyButton_1: {e.Message}", result);
                 return false;
             }
-            Status.ReportStatus($"NotifyOptical_Service_Data: set notification", result);
+            Status.ReportStatus($"NotifyButton_1: set notification", result);
 
             return true;
         }
 
-        private double _Optical_Service_Config = 0;
-        private bool _Optical_Service_Config_set = false;
-        public double Optical_Service_Config
+        private void NotifyButton_1Callback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            get { return _Optical_Service_Config; }
-            internal set { if (_Optical_Service_Config_set && value == _Optical_Service_Config) return; _Optical_Service_Config = value; _Optical_Service_Config_set = true; OnPropertyChanged(); }
+            var datameaning = "U8|HEX|Button1";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            Button_1 = parseResult.ValueList.GetValue("Button1").AsDouble;
+
+            Button_1Event?.Invoke(parseResult);
+
+        }
+
+        public void NotifyButton_1RemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[27];
+            if (ch == null) return;
+            NotifyButton_1_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyButton_1Callback;
+        }
+
+
+
+        private double _Battery_Data = 0;
+        private bool _Battery_Data_set = false;
+        public double Battery_Data
+        {
+            get { return _Battery_Data; }
+            internal set { if (_Battery_Data_set && value == _Battery_Data) return; _Battery_Data = value; _Battery_Data_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadOptical_Service_Config(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadBattery_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(26, "Optical_Service_Config", cacheMode);
+            IBuffer result = await ReadAsync(28, "Battery_Data", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U8|HEX|Enable";
+            var datameaning = "I8|DEC|BatteryLevel|%";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Optical_Service_Config = parseResult.ValueList.GetValue("Enable").AsDouble;
+            Battery_Data = parseResult.ValueList.GetValue("BatteryLevel").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
-        }
-
-        /// <summary>
-        /// Writes data for Optical_Service_Config
-        /// </summary>
-        /// <param name="Period"></param>
-        /// <returns></returns>
-        public async Task WriteOptical_Service_Config(byte Enable)
-        {
-            if (!await EnsureCharacteristicAsync()) return;
-
-            var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
-            dw.ByteOrder = ByteOrder.LittleEndian;
-            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Enable);
-
-            var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(26, "Optical_Service_Config", command, GattWriteOption.WriteWithResponse);
-        }
-
-        private double _Optical_Service_Period = 0;
-        private bool _Optical_Service_Period_set = false;
-        public double Optical_Service_Period
-        {
-            get { return _Optical_Service_Period; }
-            internal set { if (_Optical_Service_Period_set && value == _Optical_Service_Period) return; _Optical_Service_Period = value; _Optical_Service_Period_set = true; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// Reads data 
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadOptical_Service_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(27, "Optical_Service_Period", cacheMode);
-            if (result == null) return null;
-
-            var datameaning = "U8|DEC|Period|10ms";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            Optical_Service_Period = parseResult.ValueList.GetValue("Period").AsDouble;
-
-            // Hint: get the data that's been read with e.g. 
-            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
-            return parseResult.ValueList;
-        }
-
-        /// <summary>
-        /// Writes data for Optical_Service_Period
-        /// </summary>
-        /// <param name="Period"></param>
-        /// <returns></returns>
-        public async Task WriteOptical_Service_Period(byte Period)
-        {
-            if (!await EnsureCharacteristicAsync()) return;
-
-            var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
-            dw.ByteOrder = ByteOrder.LittleEndian;
-            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Period);
-
-            var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(27, "Optical_Service_Period", command, GattWriteOption.WriteWithResponse);
-        }
-
-        private double _Key_Press_State = 0;
-        private bool _Key_Press_State_set = false;
-        public double Key_Press_State
-        {
-            get { return _Key_Press_State; }
-            internal set { if (_Key_Press_State_set && value == _Key_Press_State) return; _Key_Press_State = value; _Key_Press_State_set = true; OnPropertyChanged(); }
         }
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
-        /// Event for notifications; Key_Press_StateEvent += _my function_
+        /// Event for notifications; Battery_DataEvent += _my function_
         /// </summary>
-        public event BluetoothDataEvent Key_Press_StateEvent = null;
+        public event BluetoothDataEvent Battery_DataEvent = null;
         /// <summary>
         /// We only want to set the internal callback once, and never need to remove it.
         /// </summary>
 
-        private bool NotifyKey_Press_State_ValueChanged_Set = false;
+        private bool NotifyBattery_Data_ValueChanged_Set = false;
 
         /// <summary>
         /// Sets up the notifications; 
@@ -1825,7 +1821,7 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
 
-        public async Task<bool> NotifyKey_Press_StateAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyBattery_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
             if (!await EnsureCharacteristicAsync()) return false;
             var ch = Characteristics[28];
@@ -1834,67 +1830,79 @@ namespace BluetoothProtocols
             try
             {
                 result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-                if (!NotifyKey_Press_State_ValueChanged_Set)
+                if (!NotifyBattery_Data_ValueChanged_Set)
                 {
                     // Only set the event callback once
-                    NotifyKey_Press_State_ValueChanged_Set = true;
-                    ch.ValueChanged += (sender, args) =>
-                    {
-                        var datameaning = "U8|HEX";
-                        var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
-                        Key_Press_State = parseResult.ValueList.GetValue("param0").AsDouble;
-
-                        Key_Press_StateEvent?.Invoke(parseResult);
-                    };
+                    NotifyBattery_Data_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyBattery_DataCallback;
                 }
 
             }
             catch (Exception e)
             {
-                Status.ReportStatus($"NotifyKey_Press_State: {e.Message}", result);
+                Status.ReportStatus($"NotifyBattery_Data: {e.Message}", result);
                 return false;
             }
-            Status.ReportStatus($"NotifyKey_Press_State: set notification", result);
+            Status.ReportStatus($"NotifyBattery_Data: set notification", result);
 
             return true;
         }
 
-        private string _IO_Service_Data = null;
-        private bool _IO_Service_Data_set = false;
-        public string IO_Service_Data
+        private void NotifyBattery_DataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            get { return _IO_Service_Data; }
-            internal set { if (_IO_Service_Data_set && value == _IO_Service_Data) return; _IO_Service_Data = value; _IO_Service_Data_set = true; OnPropertyChanged(); }
+            var datameaning = "I8|DEC|BatteryLevel|%";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            Battery_Data = parseResult.ValueList.GetValue("BatteryLevel").AsDouble;
+
+            Battery_DataEvent?.Invoke(parseResult);
+
+        }
+
+        public void NotifyBattery_DataRemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[28];
+            if (ch == null) return;
+            NotifyBattery_Data_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyBattery_DataCallback;
+        }
+
+
+
+        private string _Accel_Enable = null;
+        private bool _Accel_Enable_set = false;
+        public string Accel_Enable
+        {
+            get { return _Accel_Enable; }
+            internal set { if (_Accel_Enable_set && value == _Accel_Enable) return; _Accel_Enable = value; _Accel_Enable_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadIO_Service_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadAccel_Enable(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(29, "IO_Service_Data", cacheMode);
+            IBuffer result = await ReadAsync(29, "Accel_Enable", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "BYTES|HEX";
+            var datameaning = "BYTES|HEX|Enable";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            IO_Service_Data = parseResult.ValueList.GetValue("param0").AsString;
+            Accel_Enable = parseResult.ValueList.GetValue("Enable").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
 
+
         /// <summary>
-        /// Writes data for IO_Service_Data
+        /// Writes data for Accel_Enable
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteIO_Service_Data(byte[] param0)
+        public async Task WriteAccel_Enable(byte[] Enable)
         {
             if (!await EnsureCharacteristicAsync()) return;
 
@@ -1902,203 +1910,277 @@ namespace BluetoothProtocols
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(param0);
+            dw.WriteBytes(  Enable);
 
             var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(29, "IO_Service_Data", command, GattWriteOption.WriteWithResponse);
+            const int MAXBYTES = 20;
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(29, "Accel_Enable", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
+            {
+                // So many calculations and copying just to get a slice
+                var maxCount = Math.Min(MAXBYTES, command.Length - i);
+                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+                await WriteCommandAsync(29, "Accel_Enable", subcommand, GattWriteOption.WriteWithResponse);
+            }
         }
 
-        private double _IO_Service_Config = 0;
-        private bool _IO_Service_Config_set = false;
-        public double IO_Service_Config
+
+        private double _Accel_Range = 0;
+        private bool _Accel_Range_set = false;
+        public double Accel_Range
         {
-            get { return _IO_Service_Config; }
-            internal set { if (_IO_Service_Config_set && value == _IO_Service_Config) return; _IO_Service_Config = value; _IO_Service_Config_set = true; OnPropertyChanged(); }
+            get { return _Accel_Range; }
+            internal set { if (_Accel_Range_set && value == _Accel_Range) return; _Accel_Range = value; _Accel_Range_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadIO_Service_Config(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadAccel_Range(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(30, "IO_Service_Config", cacheMode);
+            IBuffer result = await ReadAsync(30, "Accel_Range", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U8|HEX";
+            var datameaning = "U16|HEX|Accel_Range";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
-            IO_Service_Config = parseResult.ValueList.GetValue("param0").AsDouble;
+            Accel_Range = parseResult.ValueList.GetValue("Accel_Range").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
 
+
+
+
+        private double _X = 0;
+        private bool _X_set = false;
+        public double X
+        {
+            get { return _X; }
+            internal set { if (_X_set && value == _X) return; _X = value; _X_set = true; OnPropertyChanged(); }
+        }
+
+
+        // Returns a string with the status; starts with OK for good status.
         /// <summary>
-        /// Writes data for IO_Service_Config
+        /// Event for notifications; XEvent += _my function_
         /// </summary>
-        /// <param name="Period"></param>
-        /// <returns></returns>
-        public async Task WriteIO_Service_Config(byte param0)
-        {
-            if (!await EnsureCharacteristicAsync()) return;
+        public event BluetoothDataEvent XEvent = null;
+        /// <summary>
+        /// We only want to set the internal callback once, and never need to remove it.
+        /// </summary>
 
-            var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
-            dw.ByteOrder = ByteOrder.LittleEndian;
-            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(param0);
-
-            var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(30, "IO_Service_Config", command, GattWriteOption.WriteWithResponse);
-        }
-
-        private string _Register_Data = null;
-        private bool _Register_Data_set = false;
-        public string Register_Data
-        {
-            get { return _Register_Data; }
-            internal set { if (_Register_Data_set && value == _Register_Data) return; _Register_Data = value; _Register_Data_set = true; OnPropertyChanged(); }
-        }
+        private bool NotifyX_ValueChanged_Set = false;
 
         /// <summary>
-        /// Reads data 
+        /// Sets up the notifications; 
+        /// Will call Status
         /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadRegister_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+
+        public async Task<bool> NotifyXAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(31, "Register_Data", cacheMode);
-            if (result == null) return null;
+            if (!await EnsureCharacteristicAsync()) return false;
+            var ch = Characteristics[31];
+            if (ch == null) return false;
+            GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
+            try
+            {
+                result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+                if (!NotifyX_ValueChanged_Set)
+                {
+                    // Only set the event callback once
+                    NotifyX_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyXCallback;
+                }
 
-            var datameaning = "BYTES|HEX";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            }
+            catch (Exception e)
+            {
+                Status.ReportStatus($"NotifyX: {e.Message}", result);
+                return false;
+            }
+            Status.ReportStatus($"NotifyX: set notification", result);
 
-            Register_Data = parseResult.ValueList.GetValue("param0").AsString;
-
-            // Hint: get the data that's been read with e.g. 
-            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
-            return parseResult.ValueList;
+            return true;
         }
+
+        private void NotifyXCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
+        {
+            var datameaning = "I16^1000_/|FIXED|AccelX";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            X = parseResult.ValueList.GetValue("AccelX").AsDouble;
+
+            XEvent?.Invoke(parseResult);
+
+        }
+
+        public void NotifyXRemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[31];
+            if (ch == null) return;
+            NotifyX_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyXCallback;
+        }
+
+
+
+        private double _Y = 0;
+        private bool _Y_set = false;
+        public double Y
+        {
+            get { return _Y; }
+            internal set { if (_Y_set && value == _Y) return; _Y = value; _Y_set = true; OnPropertyChanged(); }
+        }
+
+
+        // Returns a string with the status; starts with OK for good status.
+        /// <summary>
+        /// Event for notifications; YEvent += _my function_
+        /// </summary>
+        public event BluetoothDataEvent YEvent = null;
+        /// <summary>
+        /// We only want to set the internal callback once, and never need to remove it.
+        /// </summary>
+
+        private bool NotifyY_ValueChanged_Set = false;
 
         /// <summary>
-        /// Writes data for Register_Data
+        /// Sets up the notifications; 
+        /// Will call Status
         /// </summary>
-        /// <param name="Period"></param>
-        /// <returns></returns>
-        public async Task WriteRegister_Data(byte[] param0)
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+
+        public async Task<bool> NotifyYAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync()) return false;
+            var ch = Characteristics[32];
+            if (ch == null) return false;
+            GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
+            try
+            {
+                result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+                if (!NotifyY_ValueChanged_Set)
+                {
+                    // Only set the event callback once
+                    NotifyY_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyYCallback;
+                }
 
-            var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
-            dw.ByteOrder = ByteOrder.LittleEndian;
-            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(param0);
+            }
+            catch (Exception e)
+            {
+                Status.ReportStatus($"NotifyY: {e.Message}", result);
+                return false;
+            }
+            Status.ReportStatus($"NotifyY: set notification", result);
 
-            var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(31, "Register_Data", command, GattWriteOption.WriteWithResponse);
+            return true;
         }
 
-        private string _Register_Address = null;
-        private bool _Register_Address_set = false;
-        public string Register_Address
+        private void NotifyYCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            get { return _Register_Address; }
-            internal set { if (_Register_Address_set && value == _Register_Address) return; _Register_Address = value; _Register_Address_set = true; OnPropertyChanged(); }
+            var datameaning = "I16^1000_/|FIXED|AccelY";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            Y = parseResult.ValueList.GetValue("AccelY").AsDouble;
+
+            YEvent?.Invoke(parseResult);
+
         }
+
+        public void NotifyYRemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[32];
+            if (ch == null) return;
+            NotifyY_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyYCallback;
+        }
+
+
+
+        private double _Z = 0;
+        private bool _Z_set = false;
+        public double Z
+        {
+            get { return _Z; }
+            internal set { if (_Z_set && value == _Z) return; _Z = value; _Z_set = true; OnPropertyChanged(); }
+        }
+
+
+        // Returns a string with the status; starts with OK for good status.
+        /// <summary>
+        /// Event for notifications; ZEvent += _my function_
+        /// </summary>
+        public event BluetoothDataEvent ZEvent = null;
+        /// <summary>
+        /// We only want to set the internal callback once, and never need to remove it.
+        /// </summary>
+
+        private bool NotifyZ_ValueChanged_Set = false;
 
         /// <summary>
-        /// Reads data 
+        /// Sets up the notifications; 
+        /// Will call Status
         /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadRegister_Address(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+
+        public async Task<bool> NotifyZAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(32, "Register_Address", cacheMode);
-            if (result == null) return null;
+            if (!await EnsureCharacteristicAsync()) return false;
+            var ch = Characteristics[33];
+            if (ch == null) return false;
+            GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
+            try
+            {
+                result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+                if (!NotifyZ_ValueChanged_Set)
+                {
+                    // Only set the event callback once
+                    NotifyZ_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyZCallback;
+                }
 
-            var datameaning = "BYTES|HEX";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            }
+            catch (Exception e)
+            {
+                Status.ReportStatus($"NotifyZ: {e.Message}", result);
+                return false;
+            }
+            Status.ReportStatus($"NotifyZ: set notification", result);
 
-            Register_Address = parseResult.ValueList.GetValue("param0").AsString;
-
-            // Hint: get the data that's been read with e.g. 
-            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
-            return parseResult.ValueList;
+            return true;
         }
 
-        /// <summary>
-        /// Writes data for Register_Address
-        /// </summary>
-        /// <param name="Period"></param>
-        /// <returns></returns>
-        public async Task WriteRegister_Address(byte[] param0)
+        private void NotifyZCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            var datameaning = "I16^1000_/|FIXED|AccelZ";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            Z = parseResult.ValueList.GetValue("AccelZ").AsDouble;
 
-            var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
-            dw.ByteOrder = ByteOrder.LittleEndian;
-            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(param0);
+            ZEvent?.Invoke(parseResult);
 
-            var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(32, "Register_Address", command, GattWriteOption.WriteWithResponse);
         }
 
-        private string _Register_Device_ID = null;
-        private bool _Register_Device_ID_set = false;
-        public string Register_Device_ID
+        public void NotifyZRemoveCharacteristicCallback() 
         {
-            get { return _Register_Device_ID; }
-            internal set { if (_Register_Device_ID_set && value == _Register_Device_ID) return; _Register_Device_ID = value; _Register_Device_ID_set = true; OnPropertyChanged(); }
+            var ch = Characteristics[33];
+            if (ch == null) return;
+            NotifyZ_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyZCallback;
         }
 
-        /// <summary>
-        /// Reads data 
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadRegister_Device_ID(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(33, "Register_Device_ID", cacheMode);
-            if (result == null) return null;
 
-            var datameaning = "BYTES|HEX";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
 
-            Register_Device_ID = parseResult.ValueList.GetValue("param0").AsString;
-
-            // Hint: get the data that's been read with e.g. 
-            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
-            return parseResult.ValueList;
-        }
-
-        /// <summary>
-        /// Writes data for Register_Device_ID
-        /// </summary>
-        /// <param name="Period"></param>
-        /// <returns></returns>
-        public async Task WriteRegister_Device_ID(byte[] param0)
-        {
-            if (!await EnsureCharacteristicAsync()) return;
-
-            var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
-            dw.ByteOrder = ByteOrder.LittleEndian;
-            dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(param0);
-
-            var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(33, "Register_Device_ID", command, GattWriteOption.WriteWithResponse);
-        }
 
     }
 }

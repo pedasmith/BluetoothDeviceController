@@ -2,7 +2,7 @@
   "AllDevices": [
     {
       "Name":"PokitPro",
-      "ClassName": "PokitProMeter",
+      "ClassName": "Pokit_ProMeter",
       "ClassModifiers": "partial",
       "Description": "Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display.",
 

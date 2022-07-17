@@ -2,6 +2,7 @@
   "AllDevices": [
     {
       "Name": "TailorToys PowerUp",
+	  "CompletionStatus": "Unusable",
       "Links": [
         "https://github.com/TobyRich/lib-smartlink-android/blob/master/Smartlink/src/main/java/lib/smartlink/BLEService.java"
       ],

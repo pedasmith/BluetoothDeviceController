@@ -318,6 +318,7 @@
           "UUID": "0000fe59-0000-1000-8000-00805f9b34fb",
           "Name": "FirmwareUpdate",
           "Description": null,
+          "Suppress": true,
           "Characteristics": [
             {
               "UUID": "8ec90003-f315-4f60-9fb8-838830daea50",
