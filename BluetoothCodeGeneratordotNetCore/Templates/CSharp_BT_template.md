@@ -370,6 +370,64 @@ The parameter list for writing data to the device.
             [[ARGDWCALL]]( [[ARGDWCALLCAST]] [[DATANAME]]);
 ```
 
+## FUNCTION+ENUM+INITS Type=list ListOutput=parent Source=Services/Characteristics/Commands/Parameters/ValueNames CodeListSubZero=""
+```
+            [[NAME]] = [[TEXT]],
+```
+
+## FUNCTION+ENUMS Type=list ListOutput=parent Source=Services/Characteristics/Commands/Parameters CodeListSubZero="" CodeListZero="//No enums" If="[[FUNCTION+ENUM+INITS]] length> 0"
+```
+        public enum Command_[[FUNCTIONNAME]]_[[Name.dotNet]]
+        {
+[[FUNCTION+ENUM+INITS]]
+        }
+```
+
+## FUNCTION+PARAMS Type=list ListOutput=parent Source=Services/Characteristics/Commands/Parameters Trim=true CodeListSubZero="" CodeListSeparator=", "
+```
+[[VARIABLETYPE]] [[Name.dotNet]]
+```
+
+## FUNCTION+ADDVARIABLES Type=list ListOutput=parent Source=Services/Characteristics/Commands/Parameters CodeListSubZero=""
+```
+                command.Parameters.Add("[[Name.dotNet]]",
+                    new VariableDescription()
+                    {
+                        Init = [[FUNCTIONPARAMINIT]],
+                    });
+```
+
+## FUNCTION+SETVARIABLES Type=list ListOutput=parent Source=Services/Characteristics/Commands/Parameters CodeListSubZero=""
+```
+            command.Parameters["[[Name.dotNet]]"].CurrValue = (double)[[Name.dotNet]];
+```
+
+
+## METHOD+COMMANDS Type=list ListOutput=parent Source=Services/Characteristics/Commands CodeListZero="//No commands" CodeListSubZero="//No commands needed for [[Name]]"
+```
+        //From template:Protocol_FunctionTemplate
+[[FUNCTION+ENUMS]]
+        Command command_[[../Name.dotNet]]_[[FUNCTIONNAME]] = null;
+        public Command [[../Name.dotNet]]_[[FUNCTIONNAME]]_Init()
+        {
+            if (command_[[../Name.dotNet]]_[[FUNCTIONNAME]] == null)
+            {
+                var command = new Command();
+[[FUNCTION+ADDVARIABLES]]
+                command.InitVariables();
+                command.Compute = "[[Compute]]";
+                command_[[../Name.dotNet]]_[[FUNCTIONNAME]] = command;
+            }
+            return command_[[../Name.dotNet]]_[[FUNCTIONNAME]];
+        }
+        public async Task [[../Name.dotNet]]_[[FUNCTIONNAME]]([[FUNCTION+PARAMS]])
+        {
+            var command = [[../Name.dotNet]]_[[FUNCTIONNAME]]_Init();
+[[FUNCTION+SETVARIABLES]]
+            var computed_string = command.DoCompute();
+            await Write[[../Name.dotNet]](computed_string);
+        }
+```
 ## METHOD+LIST Type=list Source=Services/Characteristics CodeListSubZero="// No methods for [[Name]]"
 
 In my **TODO:** list
@@ -381,44 +439,22 @@ In my **TODO:** list
 [[METHOD+READ]]
 [[METHOD+NOTIFY]]
 [[METHOD+WRITE]]
+[[METHOD+COMMANDS]]
 
 ```
 
 
 
-## Protocol+DataPropertySetTemplate
+## ZZZ_MOVED_Protocol+DataPropertySetTemplate
 ```
             [[CHDATANAME]] = parseResult.ValueList.GetValue("[[DATANAME]]").[[AS+DOUBLE+OR+STRING]];
 ```
 
 
 
-## Protocol+FunctionTemplate
-```
-        //From template:Protocol_FunctionTemplate
-[[PROTOCOL+FUNCTION+ENUMS]]
-        Command command_[[CHARACTERISTICNAME]]_[[FUNCTIONNAME]] = null;
-        public Command [[CHARACTERISTICNAME]]_[[FUNCTIONNAME]]_Init()
-        {
-            if (command_[[CHARACTERISTICNAME]]_[[FUNCTIONNAME]] == null)
-            {
-                var command = new Command();
-[[FUNCTION+ADDVARIABLES]]
-                command.InitVariables();
-                command.Compute = "[[FUNCTION+COMPUTE]]";
-                command_[[CHARACTERISTICNAME]]_[[FUNCTIONNAME]] = command;
-            }
-            return command_[[CHARACTERISTICNAME]]_[[FUNCTIONNAME]];
-        }
-        public async Task [[CHARACTERISTICNAME]]_[[FUNCTIONNAME]]([[FUNCTION+PARAMS]])
-        {
-            var command = [[CHARACTERISTICNAME]]_[[FUNCTIONNAME]]_Init();
-[[FUNCTION+SETVARIABLES]]
-            var computed_string = command.DoCompute();
-            await Write[[CHARACTERISTICNAME]](computed_string);
-```
 
-## Protocol+Function+AddVariableTemplate
+
+## ZZZ+Protocol+Function+AddVariableTemplate
 ```
                 command.Parameters.Add("[[FUNCTIONPARAMNAME]]",
                     new VariableDescription()
@@ -427,11 +463,11 @@ In my **TODO:** list
                     });
 ```
 
-## Protocol+Function+SetVariableTemplate
+## ZZZ+Protocol+Function+SetVariableTemplate
 ```
             command.Parameters["[[FUNCTIONPARAMNAME]]"].CurrValue = (double)[[FUNCTIONPARAMNAME]];";
 ```
-## Protocol+Function+Enum
+## ZZZ+OLD+Protocol+Function+Enum
 ```
         public enum [[CHARACTERISTICNAME]]_[[FUNCTIONNAME]]_[[FUNCTIONPARAMNAME]]
         {

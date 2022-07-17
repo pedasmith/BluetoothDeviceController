@@ -15,7 +15,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The TI 1350 and 2650 are the latest in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth.
-    /// This class was automatically generated 2022-07-10::10:37
+    /// This class was automatically generated 2022-07-12::11:10
     /// </summary>
 
     public partial class TI_SensorTag_1350 : INotifyPropertyChanged

@@ -18,7 +18,7 @@ namespace TemplateExpander
         public string Name { get; internal set; }
         public string Code { get; internal set; }
         public string CodeListSeparator { get; internal set; } = "";
-        public string CodeListSubZero { get; internal set; }
+        public string CodeListSubZero { get; internal set; } = null;
         public string CodeListZero { get; internal set; }
         public string CodeWrap { get; internal set; }
         public string CodeWithTrim
@@ -79,7 +79,15 @@ namespace TemplateExpander
         }
         public void AddChild(string name, TemplateSnippet child)
         {
-            Children.Add(name, child);
+            if (Children.ContainsKey(name))
+            {
+                Console.WriteLine($"ERROR: adding child {name} twice is an error.");
+                Children[name] = child;
+            }
+            else
+            {
+                Children.Add(name, child);
+            }
             child.Parent = this;
         }
         public void AddMacroNumber(string text)
@@ -213,6 +221,7 @@ namespace TemplateExpander
             var retval = new TemplateSnippet(items[0]);
             for (int i=1; i<items.Length; i++)
             {
+                if (string.IsNullOrWhiteSpace(items[i])) continue; // happens when the header has several spaces in a row.
                 var opts = items[i].Split(new char[] { '=' }, 2);
                 if (opts.Length != 2)
                 {

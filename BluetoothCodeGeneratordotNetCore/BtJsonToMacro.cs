@@ -303,6 +303,59 @@ namespace BluetoothCodeGenerator
                         }
                     }
 
+                    // Commands
+                    var cmds = new TemplateSnippet("Commands");
+                    ch.AddChild("Commands", cmds); // always add, even if it's got nothing in it.
+                    foreach (var (dataname, command) in btCharacteristic.Commands)
+                    {
+                        var pr = new TemplateSnippet(dataname);
+                        cmds.AddChild(dataname, pr);
+
+                        pr.AddMacro("FUNCTIONNAME", dataname);
+                        pr.AddMacro("Name.dotNet", dataname.DotNetSafe());
+                        pr.AddMacro("Label", command.Label);
+                        pr.AddMacro("Alt", command.Alt); // e.g., "Obstacle Avoidance Mode"
+                        pr.AddMacro("Compute", command.Compute); // e.g., "${OA[?]}"
+
+                        var prms = new TemplateSnippet("Parameters");
+                        pr.AddChild("Parameters", prms);
+                        foreach (var (pname, param) in command.Parameters)
+                        {
+                            var paramts = new TemplateSnippet(pname);
+                            prms.AddChild(pname, paramts);
+                            var name = param.Name;
+                            if (string.IsNullOrWhiteSpace(name)) name = pname;
+
+                            paramts.AddMacro("Name", name);
+                            paramts.AddMacro("Name.dotNet", name.DotNetSafe());
+                            paramts.AddMacro("FUNCTIONPARAMINIT", param.Init.ToString());
+
+                            var variableType = "";
+                            var issigned = param.Min < 0;
+                            var sbytestr = issigned ? "s" : "";
+                            var sintstr = issigned ? "" : "u";
+                            if (param.ValueNames.Count > 0) variableType = "Command_[[FUNCTIONNAME]]_[[Name.dotNet]]";
+                            else if (param.Max <= 255) variableType = $"{sbytestr}byte";
+                            else if (param.Max <= 65535) variableType = $"{sintstr}short";
+                            else variableType = $"{sintstr}int";
+                            paramts.AddMacro("VARIABLETYPE", variableType);
+
+
+                            // All of the "Enums" a.k.a. ValueNames
+                            var vns = new TemplateSnippet("ValueNames");
+                            paramts.AddChild("ValueNames", vns);
+                            foreach (var (vname, vvalue) in param.ValueNames)
+                            {
+                                //var enumvalue = new TemplateSnippet(vname);
+                                //vns.AddChild(vname, enumvalue);
+                                //enumvalue.AddMacro("EnumName", vname);
+                                //enumvalue.AddMacro("EnumValue", vvalue.ToString());
+                                vns.AddMacro(vname.DotNetSafe(), vvalue.ToString()); // should be simple, not the complexity of the first attempt.
+                            }
+                        }
+                    }
+
+
                 }
             }
 

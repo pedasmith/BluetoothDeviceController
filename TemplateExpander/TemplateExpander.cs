@@ -119,15 +119,168 @@ namespace TemplateExpander
             var expand = "";
 
             var data = macros.Children[source];
+            // Not at the bottom; must keep going deeper (and will return from this code block)
+            if (sourceIndex < (sourceList.Length - 1))
+            {
+                foreach (var item in data.Children)
+                {
+                    var childMacros = item.Value;
+                    var itemExpand = ExpandListRecursive(sourceList, sourceIndex + 1, template, childMacros, ref count, ref countAll);
+                    expand += itemExpand;
+                }
+                // If the non-bottom items have no expansion, that's neither an error nor wrapped.
+                return expand;
+            }
+
+            // We're at the bottom of the sourceList, so do the expansion for real.
+            int childCount = 0;
+            int childCountAll = 0;
             if (data.Macros.Count > 0)
             {
                 foreach (var item in data.Macros)
                 {
+                    macros.AddMacro("NAME", item.Key);
                     macros.AddMacro("TEXT", item.Value);
                     var itemExpand = Expander.ExpandMacroAll(itemTemplate, macros);
                     if (expand != "") expand += template.CodeListSeparator;
                     expand += itemExpand;
                 }
+                count += data.Macros.Count;
+                countAll += data.Macros.Count;
+                childCount += data.Macros.Count;
+                childCountAll += data.Macros.Count;
+            }
+            else // Loop through the children, not the macros
+            {
+                foreach (var item in data.Children)
+                {
+                    var childMacros = item.Value;
+                    childMacros.AddMacro("COUNT", count.ToString());
+                    childMacros.AddMacro("Count.Child", childCount.ToString());
+                    childMacros.AddMacro("COUNTALL", countAll.ToString());
+                    childMacros.AddMacro("CountAll.Child", childCountAll.ToString());
+                    bool matchesIf = true;
+
+                    var itemExpand = Expander.ExpandMacroAll(itemTemplate, childMacros);
+
+                    if (itemTemplate.Contains ("BREAK:"))
+                    {
+                        ; // handy place to hang a debugger.
+                    }
+
+                    if (!string.IsNullOrEmpty(template.OptionIf))
+                    {
+                        var optionIfExpression = TemplateExpression.Parse(template.OptionIf);
+                        if (optionIfExpression.Error != "")
+                        {
+                            expand = optionIfExpression.Error;
+                            matchesIf = true;
+                        }
+                        else
+                        {
+                            optionIfExpression.SetBuiltInValue("Source.Length", count.ToString());
+                            matchesIf = optionIfExpression.Eval(childMacros);
+                        }
+                    }
+
+                    if (matchesIf)
+                    {
+                        if (childCount > 0) expand += template.CodeListSeparator;
+                        // Wait to bump these; items removed by the If aren't counted (except for countAll)
+                        count++;
+                        countAll++;
+                        childCount++;
+                        childCountAll++;
+
+                        expand += itemExpand;
+
+                        // If this is a ListOutput=child expansion, then add the expansion to the macro here.
+                        if (template.OptionListOutput == TemplateSnippet.TypeOfListOutput.Child)
+                        {
+                            childMacros.AddMacro(template.Name, itemExpand);
+                            expand = ""; // reset it
+                        }
+                    }
+                    else
+                    {
+                        // countAll includes items removed from the If.
+                        countAll++;
+                        childCountAll++;
+
+                        // If this is a ListOutput=child expansion, then add the expansion to the macro here.
+                        if (template.OptionListOutput == TemplateSnippet.TypeOfListOutput.Child)
+                        {
+                            if (!string.IsNullOrEmpty(template.CodeListSubZeroWithTrim))
+                            {
+                                itemExpand = Expander.ExpandMacroAll(template.CodeListSubZeroWithTrim, childMacros);
+                                childMacros.AddMacro(template.Name, itemExpand);
+                                expand = ""; // reset it
+                            }
+                        }
+                    }
+                } // end for each child
+
+                // If we're at the end of the bottom expansion, apply the code wrap.
+                if (!string.IsNullOrEmpty(itemWrapTemplate))
+                {
+                    macros.AddMacro("TEXT", expand);
+                    var wrapExpand = Expander.ExpandMacroAll(itemWrapTemplate, macros);
+                    expand = wrapExpand;
+                }
+            } // end if should loop through child (not macro)
+
+            // Handle the case of having no children. By default this is an error,
+            // but the template author can fix it with CodeListSubZero
+            // Child expansions don't consider this an error.
+            if (childCountAll == 0 && template.OptionListOutput != TemplateSnippet.TypeOfListOutput.Child)
+            {
+                if (itemListSubZero == null)
+                {
+                    expand = $"[[ERROR: {source} has no macros and no children; parent={data.Parent.Name} template={template.Name}]]";
+                }
+                else
+                {
+                    expand = ExpandMacroAll(itemListSubZero, macros);
+                }
+            }
+
+            // If this is a ListOutput=parent expansion, then add the expansion to the macro here.
+            if (template.OptionListOutput == TemplateSnippet.TypeOfListOutput.Parent)
+            {
+                macros.AddMacro(template.Name, expand);
+                expand = ""; // reset it
+            }
+
+            return expand;
+        }
+
+        private static string ZZZOrigExpandListRecursive(string[] sourceList, int sourceIndex, TemplateSnippet template, TemplateSnippet macros, ref int count, ref int countAll)
+        {
+            var itemTemplate = template.CodeWithTrim;
+            var itemWrapTemplate = template.CodeWrapWithTrim;
+            var itemListSubZero = template.CodeListSubZeroWithTrim;
+
+            var source = sourceList[sourceIndex];
+            var expand = "";
+
+            var data = macros.Children[source];
+            if (data.Macros.Count > 0)
+            {
+                foreach (var item in data.Macros)
+                {
+                    macros.AddMacro("NAME", item.Key);
+                    macros.AddMacro("TEXT", item.Value);
+                    var itemExpand = Expander.ExpandMacroAll(itemTemplate, macros);
+                    if (expand != "") expand += template.CodeListSeparator;
+                    expand += itemExpand;
+
+                    if (item.Key == "Right")
+                    {
+                        ; // handy hook for a debugger.
+                    }
+                }
+                count += data.Macros.Count;
+                countAll += data.Macros.Count;
             }
             else // Loop through the children.
             {
@@ -145,6 +298,11 @@ namespace TemplateExpander
                 }
                 else // At the bottom; do the real expansion
                 {
+                    if (itemTemplate.Contains("BREAK:"))
+                    {
+                        ; // Handy place for a debugger.
+                    }
+
                     int childCount = 0;
                     int childCountAll = 0;
                     foreach (var item in data.Children)
@@ -227,13 +385,13 @@ namespace TemplateExpander
                     // Child expansions don't consider this an error.
                     if (data.Children.Count == 0 && template.OptionListOutput != TemplateSnippet.TypeOfListOutput.Child)
                     {
-                        if (string.IsNullOrEmpty(itemListSubZero))
+                        if (itemListSubZero == null)
                         {
                             expand = $"[[ERROR: {source} has no macros and no children; parent={data.Parent.Name} template={template.Name}]]";
                         }
                         else
                         {
-                            expand = ExpandMacroAll (itemListSubZero, macros);
+                            expand = ExpandMacroAll(itemListSubZero, macros);
                         }
                     }
 
@@ -248,7 +406,6 @@ namespace TemplateExpander
 
             return expand;
         }
-
         /// <summary>
         /// Primary template expander: given a bunch of templates, expand them into the macro using data from the macros
         /// </summary>
@@ -260,6 +417,15 @@ namespace TemplateExpander
             {
                 var child = kv.Value;
                 var template = child.Code;
+
+                if(child.Name.StartsWith("ZZZ"))
+                {
+                    continue; // ignore all templates that start with ZZZ.
+                }
+                if (child.Name.Contains("LINKS"))
+                {
+                    ;
+                }
                 // Type of expansion depends on the Type=list
                 string expand = $"[[ERROR failed to expand {kv.Key}]]";
                 bool matchesIf = true;
@@ -320,6 +486,7 @@ namespace TemplateExpander
                 if (matchesIf)
                 {
                     macros.AddMacro(kv.Key, expand);
+                
                 }
             }
         }

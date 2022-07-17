@@ -10,6 +10,11 @@ namespace TemplateExpander
         string Opcode { get; set; } = "";
         string Right { get; set; } = "";
         public string Error { get; internal set; } = "";
+
+        public override string ToString()
+        {
+            return $"{Left} {Opcode} {Right}";
+        }
         private Dictionary<string, string> BuiltInValues = new Dictionary<string, string>();
         /// <summary>
         /// Normally used to set the Source.Length value
@@ -58,10 +63,12 @@ namespace TemplateExpander
                             ; // handy place to hang a debugger.
                         }
                         return !left.ToLower().Contains(right.ToLower());
-                        // TODO: report failure!
+                    case "length>":
+                        return left.Length > rightVal;
                 }
 
             }
+            Console.Write($"ERROR: unknown opcode <<{Opcode}>>");
             return false;
 
         }

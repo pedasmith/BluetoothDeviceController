@@ -1,0 +1,486 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "ELEGOO BT16",
+      "ClassName": "Elegoo_MiniCar",
+      "ClassModifiers": "partial",
+      "Description": "Robot with a wooden shell. The interior robot is a typical Arduino bot. Communications are via pretend Serial port ffe1/ffe2.",
+      "Links": [
+        "https://www.elegoo.com/",
+        "https://www.elegoo.com/product/elegoo-robotic-wooden-car-kit-with-nanoarduino-compatible-line-tracking-avoiding-obstacle-mobile-controlling-and-graphical-programming-intelligent-and-educational-toy-car-kitstem-toys-for-kids/",
+        "https://www.elegoo.com/tutorial/Elegoo%20Robot%20miniCar%20Kit%20V1.0.2020.01.07.zip"
+      ],
+      "Services": [
+        {
+          "UUID": "0000ffe0-0000-1000-8000-00805f9b34fb",
+          "Name": "Car",
+          "Priority":  10,
+          "Characteristics": [
+            {
+              "UUID": "0000ffe1-0000-1000-8000-00805f9b34fb",
+              "Name": "Result",
+              "Type": "STRING|ASCII|Result",
+              "IsNotify": true
+            },
+            {
+              "UUID": "0000ffe2-0000-1000-8000-00805f9b34fb",
+              "Name": "Command",
+              "Type": "STRING|ASCII|Command",
+              "IsWriteWithoutResponse": true,
+
+              "REM": "REM: UIType, Target, Set[], Label",
+              "UIList": [
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "ObstacleAvoidance"
+                },
+                { "UIType": "RowStart" },
+                {
+                  "UIType": "RadioFor",
+                  "Target": "LineTrack Sensor"
+                },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "LineTrack"
+                },
+                { "UIType": "RowEnd" },
+
+
+                {
+                  "UIType": "RowStart",
+                  "N": 3
+                },
+                {
+                  "UIType": "SliderFor",
+                  "Target": "Sport Speed"
+                },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Sport",
+                  "FunctionName": "Sport_Forward",
+                  "Set": [ "Sport Direction Forward" ],
+                  "Label": "⇑"
+                },
+                { "UIType": "Blank" },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Sport",
+                  "FunctionName": "Sport_Left",
+                  "Set": [ "Sport Direction Left" ],
+                  "LAbel": "⇐"
+                },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Sport",
+                  "FunctionName": "Sport_Stop",
+                  "Set": [ "Sport Direction Stop" ],
+                  "Label": "🛑"
+                },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Sport",
+                  "FunctionName": "Sport_Right",
+                  "Set": [ "Sport Direction Right" ],
+                  "Label": "⇒"
+                },
+                { "UIType": "Blank" },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Sport",
+                  "FunctionName": "Sport_Backward",
+                  "Set": [ "Sport Direction Backward" ],
+                  "Label": "⇓"
+                },
+                { "UIType": "RowEnd" },
+                { "UIType": "RowStart" },
+                {
+                  "UIType": "SliderFor",
+                  "Target": "Beep2 Tone"
+                },
+                {
+                  "UIType": "SliderFor",
+                  "Target": "Beep2 Duration"
+                },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Beep2",
+                  "Label": "Beep"
+                },
+                { "UIType": "RowEnd" },
+
+                { "UIType": "RowStart" },
+                {
+                  "UIType": "SliderFor",
+                  "Target": "RGB R",
+                  "ComputeTarget": "RGB"
+                },
+                {
+                  "UIType": "SliderFor",
+                  "Target": "RGB G",
+                  "ComputeTarget": "RGB"
+                },
+                {
+                  "UIType": "SliderFor",
+                  "Target": "RGB B",
+                  "ComputeTarget": "RGB"
+                },
+                { "UIType": "RowEnd" },
+
+                { "UIType": "RowStart" },
+                {
+                  "UIType": "SliderFor",
+                  "Target": "RGB Duration"
+                },
+                {
+                  "UIType": "ComboBoxFor",
+                  "Target": "RGB Lights"
+                },
+                {
+                  "UIType": "ComboBoxFor",
+                  "Target": "RGB Mode"
+                },
+                { "UIType": "RowEnd" },
+
+                { "UIType": "RowStart" },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Clear",
+                  "FunctionName": "Clear_All",
+                  "Set": [ "Clear ClearMode All" ],
+                  "Label": "Clear"
+                },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Clear",
+                  "FunctionName": "Clear_Lights Off",
+                  "Set": [ "Clear ClearMode Lights_Off" ],
+                  "Label": "Lights"
+                },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Clear",
+                  "FunctionName": "Clear_Stop",
+                  "Set": [ "Clear ClearMode Stop" ],
+                  "Label": "Stop"
+                },
+                {
+                  "UIType": "ButtonFor",
+                  "Target": "Clear",
+                  "FunctionName": "Clear_Mute",
+                  "Set": [ "Clear ClearMode Mute" ],
+                  "Label": "Mute"
+                },
+                { "UIType": "RowEnd" }
+
+              ],
+              "Commands": {
+                "ObstacleAvoidance": {
+                  "Label": "Obstacle",
+                  "Alt": "Obstacle Avoidance Mode",
+                  "Compute": "${OA[?]}"
+                },
+                "LineTrack": {
+                  "Parameters": {
+                    "Sensor": {
+                      "Label": "Sensor",
+                      "Init": 0,
+                      "ValueNames": {
+                        "Left": 0,
+                        "Right": 1
+                      }
+                    }
+                  },
+                  "Label": "Line Track",
+                  "Compute": "${LT[ $Sensor_GN $][?]}"
+                },
+                "Sport": {
+                  "Parameters": {
+                    "Direction": {
+                      "Label": "Direction",
+                      "ValueNames": {
+                        "Stop": 0,
+                        "Forward": 1,
+                        "Backward": 2,
+                        "Left": 3,
+                        "Right": 4
+                      },
+                      "Init": 1
+                    },
+                    "Speed": {
+                      "Label": "Speed",
+                      "Min": 0,
+                      "Max": 255,
+                      "Init": 255
+                    }
+                  },
+                  "Label": "Sport Mode",
+                  "Compute": "${TURN[ $Direction_GN $][ $Speed_GN $]}"
+                },
+                "Sport2": {
+                  "Parameters": {
+                    "Direction": {
+                      "Label": "Direction",
+                      "ValueNames": {
+                        "Stop": 0,
+                        "Forward": 1,
+                        "Backward": 2,
+                        "Left": 3,
+                        "Right": 4
+                      },
+                      "Init": 1
+                    },
+                    "Speed": {
+                      "Label": "Speed",
+                      "Min": 0,
+                      "Max": 255,
+                      "Init": 100
+                    },
+                    "Light": {
+                      "Label": "Light",
+                      "ValueNames": {
+                        "Off": 0,
+                        "White": 1,
+                        "Purple A020F0": 2
+                      },
+                      "Init": 0
+                    }
+                  },
+                  "Label": "Sport Mode 2",
+                  "Compute": "${TURNS[ $Direction_GN $][ $Speed_GN $][ $Light_GN $]}"
+                },
+                "Move": {
+                  "Parameters": {
+                    "Motor": {
+                      "Label": "Motor",
+                      "ValueNames": {
+                        "All": 0,
+                        "Left": 1,
+                        "Right": 2
+                      },
+                      "Init": 0
+                    },
+                    "Direction": {
+                      "Label": "Direction",
+                      "ValueNames": {
+                        "Stop": 0,
+                        "Forward": 1,
+                        "Reverse": 2,
+                        "No Execution": 3
+                      },
+                      "Init": 1
+                    },
+                    "Speed": {
+                      "Label": "Speed",
+                      "Min": 0,
+                      "Max": 255,
+                      "Init": 100,
+                      "ALT": "300 means no change"
+                    }
+                  },
+                  "Label": "Move",
+                  "Compute": "${MOVE[ $Motor_GN $][ $Direction_GN $][ $Speed_GN $]}"
+                },
+                "Move2": {
+                  "Parameters": {
+                    "LeftDirection": {
+                      "Label": "Left Direction",
+                      "ValueNames": {
+                        "Stop": 0,
+                        "Forward": 1,
+                        "Reverse": 2,
+                        "No Execution": 3
+                      },
+                      "Init": 1
+                    },
+                    "LeftSpeed": {
+                      "Label": "Left Speed",
+                      "Min": 0,
+                      "Max": 255,
+                      "Init": 100,
+                      "ALT": "300 means no change"
+                    },
+                    "RightDirection": {
+                      "Label": "Right Direction",
+                      "ValueNames": {
+                        "Stop": 0,
+                        "Forward": 1,
+                        "Reverse": 2,
+                        "No Execution": 3
+                      },
+                      "Init": 1
+                    },
+                    "RightSpeed": {
+                      "Label": "Right Speed",
+                      "Min": 0,
+                      "Max": 255,
+                      "Init": 100,
+                      "ALT": "300 means no change"
+                    }
+                  },
+                  "Label": "Move 2",
+                  "Compute": "${MOVES[ $LeftDirection_GN $][ $LeftSpeed_GN $][ $RightDirection_GN $][ $RightSpeed_GN $]}"
+                },
+
+                "Beep": {
+                  "Parameters": {
+                    "Song": {
+                      "Label": "Song",
+                      "ValueNames": {
+                        "Off": 0,
+                        "Frère Jacques": 1
+                      },
+                      "Init": 1
+                    }
+                  },
+                  "Label": "Beep",
+                  "Compute": "${BEEP[ $Song_GN $]}"
+                },
+                "Beep2": {
+                  "Parameters": {
+                    "Tone": {
+                      "Label": "Beep Tone",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100
+                    },
+                    "Duration": {
+                      "Label": "Duration in milliseconds",
+                      "Min": 0,
+                      "Max": 65535,
+                      "Init": 250
+                    }
+                  },
+                  "Label": "Beep Advanced",
+                  "Compute": "${BEEPS[ $Tone_GN $][ $Duration_GN_1000_/ $]}"
+                },
+                "RGB": {
+                  "Parameters": {
+                    "R": {
+                      "Label": "Red",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100
+                    },
+                    "G": {
+                      "Label": "Green",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100
+                    },
+                    "B": {
+                      "Label": "Blue",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100
+                    },
+                    "Lights": {
+                      "Label": "Lights",
+                      "ValueNames": {
+                        "Both": 0,
+                        "Left": 1,
+                        "Right": 2
+                      },
+                      "Init": 0
+                    },
+                    "Duration": {
+                      "Label": "Duration",
+                      "Min": 0,
+                      "Max": 255,
+                      "Init": 100
+                    },
+                    "Mode": {
+                      "Label": "Flashing",
+                      "ValueNames": {
+                        "Solid": 0,
+                        "Flashing": 1
+                      },
+                      "Init": 0
+                    }
+                  },
+                  "Label": "Lights",
+                  "Compute": "${RGB[ $R_GN $][ $G_GN $][ $B_GN $][ $Lights_GN $][ $Duration_GN $][ $Mode_GN $]}"
+                },
+                "RGBSet": {
+                  "Parameters": {
+                    "LeftRGB": {
+                      "Label": "Left RGB",
+                      "InitString": "FF8800"
+                    },
+                    "LeftMode": {
+                      "Label": "Left Flashing",
+                      "ValueNames": {
+                        "Solid": 0,
+                        "Flashing": 1
+                      },
+                      "Init": 0
+                    },
+                    "RightRGB": {
+                      "Label": "Right RGB",
+                      "InitString": "FF8800"
+                    },
+                    "RightMode": {
+                      "Label": "Right Flashing",
+                      "ValueNames": {
+                        "Solid": 0,
+                        "Flashing": 1
+                      },
+                      "Init": 0
+                    }
+                  },
+                  "Label": "RGB Set",
+                  "Compute": "${RGBS[ $LeftRGB_GS $][ $LeftMode_GN $][ $RightRGB_GS $][ $RightMode_GN $]}"
+                },
+                "Brightness": {
+                  "Parameters": {
+                    "Brightness": {
+                      "Label": "Brightness",
+                      "Min": 1,
+                      "Max": 255,
+                      "Init": 100
+                    }
+                  },
+                  "Label": "Brightness",
+                  "Compute": "${RGBB[ $Brightness_GN $]}"
+                },
+                "Key": {
+                  "Parameters": {
+                    "KeyMode": {
+                      "Label": "Start Card",
+                      "ValueNames": {
+                        "Standby": 0,
+                        "Line Tracking": 1,
+                        "Obstacle Avoidance": 2,
+                        "Auto-follow": 3,
+                        "Explorer": 4
+                      },
+                      "Init": 0
+                    }
+                  },
+                  "Label": "Key",
+                  "Compute": "${KEY[ $KeyMode_GN $]}"
+                },
+                "Clear": {
+                  "Parameters": {
+                    "ClearMode": {
+                      "Label": "Clear what?",
+                      "ValueNames": {
+                        "All": 0,
+                        "Lights_Off": 1,
+                        "Stop": 2,
+                        "Mute": 3
+                      },
+                      "Init": 0
+                    }
+                  },
+                  "Label": "Clear car",
+                  "Compute": "${CLEAR[ $ClearMode_GN $]}"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLEbc:83:85:22:5a:70-48:87:2d:11:40:b0\nCanPair:True IsPaired:False"
+    }
+  ]
+}
