@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Utilities;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -22,6 +23,23 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 {
     public sealed partial class MultiMeterControl : UserControl
     {
+        public enum ConnectionState {  Off, Configuring, Configured, GotData, GotDataStale, Deconfiguring, Failed };
+        public ConnectionState _BtConnectionState = ConnectionState.Off;
+        private void UpdateConnectionState()
+        {
+            uiState.Text = BtConnectionState.ToString();
+        }
+        public ConnectionState BtConnectionState { 
+            get { return _BtConnectionState; }
+            internal set
+            {
+                if (_BtConnectionState == value) return;
+                _BtConnectionState = value;
+                UIThreadHelper.CallOnUIThread(UpdateConnectionState);
+            }
+        }
+        PokitProMeter bleDevice = null;
+
         public MultiMeterControl()
         {
             this.InitializeComponent();
@@ -31,13 +49,14 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
         public async Task SetMeter(PokitProMeter value)
         {
+            BtConnectionState = ConnectionState.Off; // Assume the new value isn't connected
             bleDevice = value;
             await ConnectCallbacksAsync();
         }
 
-        PokitProMeter bleDevice = null;
         private void MultiMeterControl_Loaded(object sender, RoutedEventArgs e)
         {
+            UpdateConnectionState();
         }
 
         private void SetStatus(string text)
@@ -47,6 +66,10 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
         private async Task ConnectCallbacksAsync()
         {
+            if (BtConnectionState != ConnectionState.Off && BtConnectionState != ConnectionState.Failed)
+            {
+                return; 
+            }
             if (bleDevice == null)
             {
                 return;
@@ -64,7 +87,9 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             // Copied from the Pokit_ProPage.xaml.cs
             bleDevice.MM_DataEvent += BleDevice_MM_DataEvent;
+            BtConnectionState = ConnectionState.Configuring;
             var result = await bleDevice.NotifyMM_DataAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+            BtConnectionState = result ? ConnectionState.Configured : ConnectionState.Failed;
 
         }
         private async Task RemoveCallbacksAsync()
@@ -86,7 +111,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             bleDevice.MM_DataEvent -= BleDevice_MM_DataEvent;
             var result = await bleDevice.NotifyMM_DataAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
-
+            BtConnectionState = result ? ConnectionState.Off : ConnectionState.Failed;
         }
 
 
@@ -97,6 +122,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             GattClientCharacteristicConfigurationDescriptorValue.None,
         };
+#if NEVER_EER_DEFINED
         int MM_DataNotifyIndex = 0;
         private async Task DoNotifyMM_Data()
         {
@@ -111,24 +137,19 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 var notifyType = NotifyMM_DataSettings[MM_DataNotifyIndex];
                 MM_DataNotifyIndex = (MM_DataNotifyIndex + 1) % NotifyMM_DataSettings.Length;
                 var result = await bleDevice.NotifyMM_DataAsync(notifyType);
-
-
-
             }
             catch (Exception ex)
             {
                 SetStatus($"Error: exception: {ex.Message}");
             }
         }
-        private async void BleDevice_MM_DataEvent(BleEditor.ValueParserResult data)
+#endif
+        private void BleDevice_MM_DataEvent(BleEditor.ValueParserResult data)
         {
+            BtConnectionState = ConnectionState.GotData;
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    bleDevice.HandleMMMessageCustom(); // CHANGE: divert for event processing
-
-                });
+                UIThreadHelper.CallOnUIThread(bleDevice.HandleMMMessageCustom);
             }
         }
         private void BleDevice_OnMMOther(object sender, PokitProMeter.MMData e)
@@ -191,20 +212,28 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             var mode = GetCurrentMMMode(PokitProMeter.MMMode.VoltAC);
             var start = (sender as ToggleButton).IsChecked.Value;
             byte range = 255; // autorange for all settings
-            UInt32 interval = 100; // ms 
+            UInt32 interval = 100; // ms ; TODO: should be settable?
+            if (bleDevice == null) return;
             if (start)
             {
+                BtConnectionState = ConnectionState.Configuring;
                 await bleDevice.WriteMM_Settings((byte)mode, range, interval);
             }
             else
             {
+                BtConnectionState = ConnectionState.Deconfiguring;
                 uiMMSetting.Text = "...";
-                uiMMValue.Text = "updating";
+                uiMMValue.Text = "...";
                 await bleDevice.WriteMM_Settings((byte)PokitProMeter.MMMode.Idle, range, interval);
                 await RemoveCallbacksAsync();
             }
         }
 
+        /// <summary>
+        /// Gets the current mode the user requested (e.g., VoltDC, etc.)
+        /// </summary>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         private PokitProMeter.MMMode GetCurrentMMMode(PokitProMeter.MMMode defaultValue)
         {
             if (uiMMModeVDC.IsChecked.Value) return PokitProMeter.MMMode.VoltDC;
@@ -217,12 +246,18 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             return defaultValue;
         }
 
+        /// <summary>
+        /// Called when the user 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnMMModeChecked(object sender, RoutedEventArgs e)
         {
             if (!this.IsLoaded) return;
 
             if (uiMMRunButton.IsChecked.Value)
             {
+                BtConnectionState = ConnectionState.Configuring;
                 OnMMRunClick(uiMMRunButton, null);
             }
             else

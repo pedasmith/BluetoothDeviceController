@@ -119,7 +119,7 @@
                     </Style>
                 </Grid.Resources>
                 <TextBlock Grid.Column="0">-110</TextBlock>
-                <Slider Grid.Column="1" Header="Beacon Signal Strength (RSS) filter" Minimum="-110" Maximum="-40" TickFrequency="10" IsDirectionReversed="True" x:Name="uiBeaconDbLevel" Value="{Binding BeaconDbLevel, Mode=TwoWay}" />
+                <Slider Grid.Column="1" Header="Beacon Signal Strength (RSS) filter" Minimum="-110" Maximum="-40" TickFrequency="10" IsDirectionReversed="False" x:Name="uiBeaconDbLevel" Value="{Binding BeaconDbLevel, Mode=TwoWay}" />
                 <TextBlock Grid.Column="2">-40</TextBlock>
             </Grid>
             </StackPanel>

@@ -15,7 +15,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The original smaller (upright) TI SensorTag. As of 2017, it's obsolete. The CC2541 SensorTag is the first Bluetooth Smart development kit focused on wireless sensor applications and it is the only development kit targeted for smart phone app developers. The SensorTag can be used as reference design and development platform for a variety of smart phone accessories..
-    /// This class was automatically generated 2022-07-17::09:41
+    /// This class was automatically generated 2022-07-24::10:01
     /// </summary>
 
     public partial class TI_SensorTag_2541 : INotifyPropertyChanged
@@ -191,12 +191,134 @@ namespace BluetoothProtocols
             new HashSet<int>(){ 33,  },
 
         };
+        List<int> MapCharacteristicToService = new List<int>() {
+            0, // Characteristic 0
+            0, // Characteristic 1
+            0, // Characteristic 2
+            0, // Characteristic 3
+            0, // Characteristic 4
+            1, // Characteristic 5
+            1, // Characteristic 6
+            1, // Characteristic 7
+            1, // Characteristic 8
+            1, // Characteristic 9
+            1, // Characteristic 10
+            1, // Characteristic 11
+            1, // Characteristic 12
+            1, // Characteristic 13
+            2, // Characteristic 14
+            2, // Characteristic 15
+            2, // Characteristic 16
+            3, // Characteristic 17
+            3, // Characteristic 18
+            3, // Characteristic 19
+            4, // Characteristic 20
+            4, // Characteristic 21
+            4, // Characteristic 22
+            5, // Characteristic 23
+            5, // Characteristic 24
+            5, // Characteristic 25
+            6, // Characteristic 26
+            6, // Characteristic 27
+            6, // Characteristic 28
+            6, // Characteristic 29
+            7, // Characteristic 30
+            7, // Characteristic 31
+            7, // Characteristic 32
+            8, // Characteristic 33
+            
+        };
+        public enum CharacteristicsEnum {
+            All_enum = -1,
+            Device_Name_Common_Configuration_enum = 0,
+            Appearance_Common_Configuration_enum = 1,
+            Privacy_Common_Configuration_enum = 2,
+            Reconnect_Address_Common_Configuration_enum = 3,
+            Connection_Parameter_Common_Configuration_enum = 4,
+            System_ID_Device_Info_enum = 5,
+            Model_Number_Device_Info_enum = 6,
+            Serial_Number_Device_Info_enum = 7,
+            Firmware_Revision_Device_Info_enum = 8,
+            Hardware_Revision_Device_Info_enum = 9,
+            Software_Revision_Device_Info_enum = 10,
+            Manufacturer_Name_Device_Info_enum = 11,
+            Regulatory_List_Device_Info_enum = 12,
+            PnP_ID_Device_Info_enum = 13,
+            IR_Data_IR_Service_enum = 14,
+            IR_Service_Configure_IR_Service_enum = 15,
+            IR_Service_Period_IR_Service_enum = 16,
+            Accelerometer_Data_Accelerometer_enum = 17,
+            Accelerometer_Configure_Accelerometer_enum = 18,
+            Accelerometer_Period_Accelerometer_enum = 19,
+            Humidity_Data_Humidity_enum = 20,
+            Humidity_Configure_Humidity_enum = 21,
+            Humidity_Period_Humidity_enum = 22,
+            Magnetometer_Data_Magnetometer_enum = 23,
+            Magnetometer_Configure_Magnetometer_enum = 24,
+            Magnetometer_Period_Magnetometer_enum = 25,
+            Barometer_Data_Barometer_enum = 26,
+            Barometer_Configure_Barometer_enum = 27,
+            Barometer_Calibration_Barometer_enum = 28,
+            Barometer_Period_Barometer_enum = 29,
+            Gyroscope_Data_Gyroscope_enum = 30,
+            Gyroscope_Configure_Gyroscope_enum = 31,
+            Gyroscope_Period_Gyroscope_enum = 32,
+            Key_Press_State_Key_Press_enum = 33,
+
+        };
+
+        public async Task<GattCharacteristicsResult> EnsureCharacteristicOne(GattDeviceService service, CharacteristicsEnum characteristicIndex)
+        {
+            var characteristicsStatus = await service.GetCharacteristicsForUuidAsync(CharacteristicGuids[(int)characteristicIndex]);
+            Characteristics[(int)characteristicIndex] = null;
+            if (characteristicsStatus.Status != GattCommunicationStatus.Success)
+            {
+                Status.ReportStatus($"unable to get characteristic for {CharacteristicNames[(int)characteristicIndex]}", characteristicsStatus);
+                return null;
+            }
+            if (characteristicsStatus.Characteristics.Count == 0)
+            {
+                Status.ReportStatus($"unable to get any characteristics for {CharacteristicNames[(int)characteristicIndex]}", characteristicsStatus);
+            }
+            else if (characteristicsStatus.Characteristics.Count != 1)
+            {
+                Status.ReportStatus($"unable to get correct characteristics count ({characteristicsStatus.Characteristics.Count}) for {CharacteristicNames[(int)characteristicIndex]}", characteristicsStatus);
+            }
+            else
+            {
+                Characteristics[(int)characteristicIndex] = characteristicsStatus.Characteristics[0];
+            }
+            return characteristicsStatus;
+        }
 
         bool readCharacteristics = false;
-        public async Task<bool> EnsureCharacteristicAsync(bool forceReread = false)
+        public async Task<bool> EnsureCharacteristicAsync(CharacteristicsEnum characteristicIndex = CharacteristicsEnum.All_enum, bool forceReread = false)
         {
             if (Characteristics.Length == 0) return false;
             if (ble == null) return false; // might not be initialized yet
+
+            if (characteristicIndex != CharacteristicsEnum.All_enum)
+            {
+                var serviceIndex = MapCharacteristicToService[(int)characteristicIndex];
+                var serviceStatus = await ble.GetGattServicesForUuidAsync(ServiceGuids[serviceIndex]);
+                if (serviceStatus.Status != GattCommunicationStatus.Success)
+                {
+                    Status.ReportStatus($"Unable to get service {ServiceNames[serviceIndex]}", serviceStatus);
+                    return false;
+                }
+                if (serviceStatus.Services.Count != 1)
+                {
+                    Status.ReportStatus($"Unable to get valid service count ({serviceStatus.Services.Count}) for {ServiceNames[serviceIndex]}", serviceStatus);
+                    return false;
+                }
+                var service = serviceStatus.Services[0];
+                var characteristicsStatus = await EnsureCharacteristicOne(service, characteristicIndex);
+                if (characteristicsStatus.Status != GattCommunicationStatus.Success)
+                {
+                    return false;
+                }
+                return true;
+            }
 
             GattCharacteristicsResult lastResult = null;
             if (forceReread) 
@@ -220,28 +342,12 @@ namespace BluetoothProtocols
                     }
                     var service = serviceStatus.Services[0];
                     var characteristicIndexSet = MapServiceToCharacteristic[serviceIndex];
-                    foreach (var characteristicIndex in characteristicIndexSet)
+                    foreach (var index in characteristicIndexSet)
                     {
-                        var characteristicsStatus = await service.GetCharacteristicsForUuidAsync(CharacteristicGuids[characteristicIndex]);
+                        var characteristicsStatus = await EnsureCharacteristicOne(service, (CharacteristicsEnum)index);
                         if (characteristicsStatus.Status != GattCommunicationStatus.Success)
                         {
-                            Status.ReportStatus($"unable to get characteristic for {CharacteristicNames[characteristicIndex]}", characteristicsStatus);
                             return false;
-                        }
-                        if (characteristicsStatus.Characteristics.Count == 0)
-                        {
-                            Status.ReportStatus($"unable to get any characteristics for {CharacteristicNames[characteristicIndex]}", characteristicsStatus);
-                            Characteristics[characteristicIndex] = null;
-                        }
-                        else if (characteristicsStatus.Characteristics.Count != 1)
-                        {
-                            Status.ReportStatus($"unable to get correct characteristics count ({characteristicsStatus.Characteristics.Count}) for {CharacteristicNames[characteristicIndex]}", characteristicsStatus);
-                            Characteristics[characteristicIndex] = null;
-                        }
-                        else
-                        {
-                            Characteristics[characteristicIndex] = characteristicsStatus.Characteristics[0];
-                            lastResult = characteristicsStatus;
                         }
                         lastResult = characteristicsStatus;
                     }
@@ -255,6 +361,7 @@ namespace BluetoothProtocols
             return readCharacteristics;
         }
 
+
         /// <summary>
         /// Primary method used to for any bluetooth characteristic WriteValueAsync() calls.
         /// There's only one characteristic we use, so just use the one global.
@@ -262,12 +369,12 @@ namespace BluetoothProtocols
         /// <param name="method" ></param>
         /// <param name="command" ></param>
         /// <returns></returns>
-        private async Task WriteCommandAsync(int characteristicIndex, string method, byte[] command, GattWriteOption writeOption)
+        private async Task WriteCommandAsync(CharacteristicsEnum characteristicIndex, string method, byte[] command, GattWriteOption writeOption)
         {
             GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
             try
             {
-                result = await Characteristics[characteristicIndex].WriteValueAsync(command.AsBuffer(), writeOption);
+                result = await Characteristics[(int)characteristicIndex].WriteValueAsync(command.AsBuffer(), writeOption);
             }
             catch (Exception)
             {
@@ -287,13 +394,13 @@ namespace BluetoothProtocols
         /// <param name="method" >Name of the actual method; is just used for logging</param>
         /// <param name="cacheMode" >Type of caching</param>
         /// <returns></returns>
-        private async Task<IBuffer> ReadAsync(int characteristicIndex, string method, BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        private async Task<IBuffer> ReadAsync(CharacteristicsEnum characteristicIndex, string method, BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             GattReadResult readResult;
             IBuffer buffer = null;
             try
             {
-                readResult = await Characteristics[characteristicIndex].ReadValueAsync(cacheMode);
+                readResult = await Characteristics[(int)characteristicIndex].ReadValueAsync(cacheMode);
                 if (readResult.Status == GattCommunicationStatus.Success)
                 {
                     buffer = readResult.Value;
@@ -335,8 +442,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadDevice_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(0, "Device_Name", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum, "Device_Name", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII|Device_Name";
@@ -366,8 +473,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadAppearance(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(1, "Appearance", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Appearance_Common_Configuration_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Appearance_Common_Configuration_enum, "Appearance", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U16|Speciality^Appearance|Appearance";
@@ -397,8 +504,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadPrivacy(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(2, "Privacy", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Privacy_Common_Configuration_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Privacy_Common_Configuration_enum, "Privacy", cacheMode);
             if (result == null) return null;
 
             var datameaning = "BYTES|HEX|Privacy";
@@ -428,8 +535,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadReconnect_Address(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(3, "Reconnect_Address", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Reconnect_Address_Common_Configuration_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Reconnect_Address_Common_Configuration_enum, "Reconnect_Address", cacheMode);
             if (result == null) return null;
 
             var datameaning = "BYTES|HEX|ReconnectAddress";
@@ -449,7 +556,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteReconnect_Address(byte[] ReconnectAddress)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Reconnect_Address_Common_Configuration_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -461,14 +568,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(3, "Reconnect_Address", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Reconnect_Address_Common_Configuration_enum, "Reconnect_Address", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(3, "Reconnect_Address", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Reconnect_Address_Common_Configuration_enum, "Reconnect_Address", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -488,8 +595,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadConnection_Parameter(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(4, "Connection_Parameter", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Connection_Parameter_Common_Configuration_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Connection_Parameter_Common_Configuration_enum, "Connection_Parameter", cacheMode);
             if (result == null) return null;
 
             var datameaning = "BYTES|HEX|ConnectionParameter";
@@ -519,8 +626,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadSystem_ID(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(5, "System_ID", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.System_ID_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.System_ID_Device_Info_enum, "System_ID", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
@@ -550,8 +657,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadModel_Number(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(6, "Model_Number", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Model_Number_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Model_Number_Device_Info_enum, "Model_Number", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
@@ -581,8 +688,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadSerial_Number(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(7, "Serial_Number", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Serial_Number_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Serial_Number_Device_Info_enum, "Serial_Number", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
@@ -612,8 +719,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadFirmware_Revision(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(8, "Firmware_Revision", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Firmware_Revision_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Firmware_Revision_Device_Info_enum, "Firmware_Revision", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
@@ -643,8 +750,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadHardware_Revision(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(9, "Hardware_Revision", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Hardware_Revision_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Hardware_Revision_Device_Info_enum, "Hardware_Revision", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
@@ -674,8 +781,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadSoftware_Revision(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(10, "Software_Revision", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Software_Revision_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Software_Revision_Device_Info_enum, "Software_Revision", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
@@ -705,8 +812,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadManufacturer_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(11, "Manufacturer_Name", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Manufacturer_Name_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Manufacturer_Name_Device_Info_enum, "Manufacturer_Name", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
@@ -750,8 +857,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadRegulatory_List(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(12, "Regulatory_List", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Regulatory_List_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Regulatory_List_Device_Info_enum, "Regulatory_List", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data";
@@ -783,8 +890,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadPnP_ID(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(13, "PnP_ID", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.PnP_ID_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.PnP_ID_Device_Info_enum, "PnP_ID", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
@@ -821,8 +928,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadIR_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(14, "IR_Data", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.IR_Data_IR_Service_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.IR_Data_IR_Service_enum, "IR_Data", cacheMode);
             if (result == null) return null;
 
             var datameaning = "I16|HEX|ObjTemp|C I16|HEX|AmbientTemp|C";
@@ -855,8 +962,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyIR_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[14];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.IR_Data_IR_Service_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.IR_Data_IR_Service_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -916,8 +1023,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadIR_Service_Configure(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(15, "IR_Service_Configure", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.IR_Service_Configure_IR_Service_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.IR_Service_Configure_IR_Service_enum, "IR_Service_Configure", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|IRConfigure";
@@ -937,7 +1044,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteIR_Service_Configure(byte IRConfigure)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.IR_Service_Configure_IR_Service_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -949,14 +1056,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(15, "IR_Service_Configure", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.IR_Service_Configure_IR_Service_enum, "IR_Service_Configure", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(15, "IR_Service_Configure", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.IR_Service_Configure_IR_Service_enum, "IR_Service_Configure", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -976,8 +1083,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadIR_Service_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(16, "IR_Service_Period", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.IR_Service_Period_IR_Service_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.IR_Service_Period_IR_Service_enum, "IR_Service_Period", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|DEC|IRPeriod";
@@ -997,7 +1104,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteIR_Service_Period(byte IRPeriod)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.IR_Service_Period_IR_Service_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -1009,14 +1116,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(16, "IR_Service_Period", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.IR_Service_Period_IR_Service_enum, "IR_Service_Period", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(16, "IR_Service_Period", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.IR_Service_Period_IR_Service_enum, "IR_Service_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -1050,8 +1157,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadAccelerometer_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(17, "Accelerometer_Data", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Accelerometer_Data_Accelerometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Accelerometer_Data_Accelerometer_enum, "Accelerometer_Data", cacheMode);
             if (result == null) return null;
 
             var datameaning = "I8^64_/|FIXED|AccelX|g I8^64_/|FIXED|AccelY|g I8^64_/_IV|FIXED|AccelZ|g";
@@ -1085,8 +1192,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyAccelerometer_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[17];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Accelerometer_Data_Accelerometer_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.Accelerometer_Data_Accelerometer_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1147,8 +1254,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadAccelerometer_Configure(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(18, "Accelerometer_Configure", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Accelerometer_Configure_Accelerometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Accelerometer_Configure_Accelerometer_enum, "Accelerometer_Configure", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|AccelerometerConfigure";
@@ -1168,7 +1275,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteAccelerometer_Configure(byte AccelerometerConfigure)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Accelerometer_Configure_Accelerometer_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -1180,14 +1287,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(18, "Accelerometer_Configure", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Accelerometer_Configure_Accelerometer_enum, "Accelerometer_Configure", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(18, "Accelerometer_Configure", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Accelerometer_Configure_Accelerometer_enum, "Accelerometer_Configure", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -1207,8 +1314,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadAccelerometer_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(19, "Accelerometer_Period", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Accelerometer_Period_Accelerometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Accelerometer_Period_Accelerometer_enum, "Accelerometer_Period", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|DEC|AccelerometerPeriod";
@@ -1228,7 +1335,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteAccelerometer_Period(byte AccelerometerPeriod)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Accelerometer_Period_Accelerometer_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -1240,14 +1347,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(19, "Accelerometer_Period", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Accelerometer_Period_Accelerometer_enum, "Accelerometer_Period", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(19, "Accelerometer_Period", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Accelerometer_Period_Accelerometer_enum, "Accelerometer_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -1274,8 +1381,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadHumidity_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(20, "Humidity_Data", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Humidity_Data_Humidity_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Humidity_Data_Humidity_enum, "Humidity_Data", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U16^175.72_*_65536_/_46.86_-|FIXED|Temp U16^125.0_*_65536_/_6.0_-|FIXED|Humidity";
@@ -1308,8 +1415,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyHumidity_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[20];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Humidity_Data_Humidity_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.Humidity_Data_Humidity_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1369,8 +1476,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadHumidity_Configure(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(21, "Humidity_Configure", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Humidity_Configure_Humidity_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Humidity_Configure_Humidity_enum, "Humidity_Configure", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|HumidityConfigure";
@@ -1390,7 +1497,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteHumidity_Configure(byte HumidityConfigure)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Humidity_Configure_Humidity_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -1402,14 +1509,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(21, "Humidity_Configure", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Humidity_Configure_Humidity_enum, "Humidity_Configure", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(21, "Humidity_Configure", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Humidity_Configure_Humidity_enum, "Humidity_Configure", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -1429,8 +1536,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadHumidity_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(22, "Humidity_Period", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Humidity_Period_Humidity_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Humidity_Period_Humidity_enum, "Humidity_Period", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|DEC|HumidityPeriod";
@@ -1450,7 +1557,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteHumidity_Period(byte HumidityPeriod)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Humidity_Period_Humidity_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -1462,14 +1569,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(22, "Humidity_Period", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Humidity_Period_Humidity_enum, "Humidity_Period", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(22, "Humidity_Period", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Humidity_Period_Humidity_enum, "Humidity_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -1503,8 +1610,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadMagnetometer_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(23, "Magnetometer_Data", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Magnetometer_Data_Magnetometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Magnetometer_Data_Magnetometer_enum, "Magnetometer_Data", cacheMode);
             if (result == null) return null;
 
             var datameaning = "I16^2000_*_65536_/_IV|FIXED|X I16^2000_*_65536_/_IV|FIXED|Y I16^2000_*_65536_/|FIXED|Z";
@@ -1538,8 +1645,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyMagnetometer_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[23];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Magnetometer_Data_Magnetometer_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.Magnetometer_Data_Magnetometer_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1600,8 +1707,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadMagnetometer_Configure(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(24, "Magnetometer_Configure", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Magnetometer_Configure_Magnetometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Magnetometer_Configure_Magnetometer_enum, "Magnetometer_Configure", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|MagnetometerConfigure";
@@ -1621,7 +1728,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteMagnetometer_Configure(byte MagnetometerConfigure)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Magnetometer_Configure_Magnetometer_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -1633,14 +1740,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(24, "Magnetometer_Configure", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Magnetometer_Configure_Magnetometer_enum, "Magnetometer_Configure", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(24, "Magnetometer_Configure", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Magnetometer_Configure_Magnetometer_enum, "Magnetometer_Configure", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -1660,8 +1767,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadMagnetometer_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(25, "Magnetometer_Period", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Magnetometer_Period_Magnetometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Magnetometer_Period_Magnetometer_enum, "Magnetometer_Period", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|DEC|MagnetometerPeriod";
@@ -1681,7 +1788,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteMagnetometer_Period(byte MagnetometerPeriod)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Magnetometer_Period_Magnetometer_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -1693,14 +1800,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(25, "Magnetometer_Period", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Magnetometer_Period_Magnetometer_enum, "Magnetometer_Period", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(25, "Magnetometer_Period", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Magnetometer_Period_Magnetometer_enum, "Magnetometer_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -1727,8 +1834,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadBarometer_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(26, "Barometer_Data", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Barometer_Data_Barometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Barometer_Data_Barometer_enum, "Barometer_Data", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U16|HEX|TempRaw U16|HEX|PressureRaw";
@@ -1761,8 +1868,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyBarometer_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[26];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Barometer_Data_Barometer_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.Barometer_Data_Barometer_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1822,8 +1929,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadBarometer_Configure(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(27, "Barometer_Configure", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Barometer_Configure_Barometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Barometer_Configure_Barometer_enum, "Barometer_Configure", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|BarometerConfigure";
@@ -1843,7 +1950,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteBarometer_Configure(byte BarometerConfigure)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Barometer_Configure_Barometer_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -1855,14 +1962,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(27, "Barometer_Configure", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Barometer_Configure_Barometer_enum, "Barometer_Configure", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(27, "Barometer_Configure", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Barometer_Configure_Barometer_enum, "Barometer_Configure", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -1882,8 +1989,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadBarometer_Calibration(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(28, "Barometer_Calibration", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Barometer_Calibration_Barometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Barometer_Calibration_Barometer_enum, "Barometer_Calibration", cacheMode);
             if (result == null) return null;
 
             var datameaning = "BYTES|HEX|BarometerCalibration";
@@ -1913,8 +2020,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadBarometer_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(29, "Barometer_Period", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Barometer_Period_Barometer_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Barometer_Period_Barometer_enum, "Barometer_Period", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|DEC|BarometerPeriod";
@@ -1958,8 +2065,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadGyroscope_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(30, "Gyroscope_Data", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Gyroscope_Data_Gyroscope_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Gyroscope_Data_Gyroscope_enum, "Gyroscope_Data", cacheMode);
             if (result == null) return null;
 
             var datameaning = "I16^500_*_65536_/_IV|FIXED|X I16^500_*_65536_/|FIXED|Y I16^500_*_65536_/|FIXED|Z";
@@ -1993,8 +2100,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyGyroscope_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[30];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Gyroscope_Data_Gyroscope_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.Gyroscope_Data_Gyroscope_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -2055,8 +2162,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadGyroscope_Configure(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(31, "Gyroscope_Configure", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Gyroscope_Configure_Gyroscope_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Gyroscope_Configure_Gyroscope_enum, "Gyroscope_Configure", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|GyroscopeConfigure";
@@ -2076,7 +2183,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteGyroscope_Configure(byte GyroscopeConfigure)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Gyroscope_Configure_Gyroscope_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -2088,14 +2195,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(31, "Gyroscope_Configure", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Gyroscope_Configure_Gyroscope_enum, "Gyroscope_Configure", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(31, "Gyroscope_Configure", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Gyroscope_Configure_Gyroscope_enum, "Gyroscope_Configure", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -2115,8 +2222,8 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadGyroscope_Period(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(32, "Gyroscope_Period", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Gyroscope_Period_Gyroscope_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Gyroscope_Period_Gyroscope_enum, "Gyroscope_Period", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|DEC|GyroscopePeriod";
@@ -2136,7 +2243,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteGyroscope_Period(byte GyroscopePeriod)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Gyroscope_Period_Gyroscope_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
@@ -2148,14 +2255,14 @@ namespace BluetoothProtocols
             const int MAXBYTES = 20;
             if (command.Length <= MAXBYTES) //TODO: make sure this works
             {
-                await WriteCommandAsync(32, "Gyroscope_Period", command, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Gyroscope_Period_Gyroscope_enum, "Gyroscope_Period", command, GattWriteOption.WriteWithResponse);
             }
             else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(32, "Gyroscope_Period", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Gyroscope_Period_Gyroscope_enum, "Gyroscope_Period", subcommand, GattWriteOption.WriteWithResponse);
             }
         }
 
@@ -2189,8 +2296,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyKey_Press_StateAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[33];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Key_Press_State_Key_Press_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.Key_Press_State_Key_Press_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
