@@ -41,11 +41,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="BCBasic\" />
-    <Folder Include="Utilities\" />
-  </ItemGroup>
-
   <Import Project="..\TemplateExpander\TemplateExpander.projitems" Label="Shared" />
 
   <Import Project="..\BluetoothProtocols\BluetoothProtocols.projitems" Label="Shared" />

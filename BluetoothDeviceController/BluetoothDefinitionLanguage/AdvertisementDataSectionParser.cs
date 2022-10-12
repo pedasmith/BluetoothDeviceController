@@ -94,7 +94,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             UInt16 companyId = 0xFFFF;
             DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value
             object speciality = null;
-            BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
+            var manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
             try
             {
                 var printAsHex = false;

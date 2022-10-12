@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -99,9 +100,35 @@ namespace BluetoothDeviceController.Beacons
             string completeLocalName = "";
             UInt16 companyId = 0xFFFF;
 
+            // Check for extended adverts
+            var advertExtended = "";
+            switch (bleAdvert.AdvertisementType)
+            {
+                case BluetoothLEAdvertisementType.ScanResponse:
+                    advertExtended += "ScanResponse";
+                    break;
+                case BluetoothLEAdvertisementType.Extended:
+                    advertExtended += "Extended";
+                    break;
+                default:
+                    if (bleAdvert.IsScannable)
+                    {
+                        advertExtended += "IsScannable";
+                    }
+                    break;
+            }
+            if (bleAdvert.AdvertisementType == BluetoothLEAdvertisementType.Extended)
+            {
+                // Docs say to look at properties: https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.advertisement.bluetoothleadvertisementreceivedeventargs?view=winrt-22621
+                ; // Handy spot for a debugger. Maybe a Govee extended advert?
+
+            }
+
+
             var builder = new StringBuilder();
             foreach (var section in bleAdvert.Advertisement.DataSections)
             {
+                var manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other; // only set for some parses.
                 var dtv = AdvertisementDataSectionParser.ConvertDataTypeValue(section.DataType);
                 switch (dtv)
                 {
@@ -109,10 +136,8 @@ namespace BluetoothDeviceController.Beacons
                         appearance = AdvertisementDataSectionParser.ParseAppearance(section);
                         break;
                     case AdvertisementDataSectionParser.DataTypeValue.CompleteLocalName:
-                        {
-                            var dr = DataReader.FromBuffer(section.Data);
-                            completeLocalName = dr.ReadString(dr.UnconsumedBufferLength);
-                        }
+                        DataReaderReadStringRobust.ReadStatus rs;
+                        (completeLocalName, rs) = DataReaderReadStringRobust.ReadStringEntire(DataReader.FromBuffer(section.Data));
                         break;
                     case AdvertisementDataSectionParser.DataTypeValue.TxPowerLevel:
                         transmitPower = AdvertisementDataSectionParser.ParseTxPowerLevel(section);
@@ -121,10 +146,10 @@ namespace BluetoothDeviceController.Beacons
                     case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
                     case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
                     case AdvertisementDataSectionParser.DataTypeValue.Flags:
+                    default:
                         if (UserPreferences.MainUserPreferences.BeaconFullDetails)
                         {
                             string result;
-                            BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
                             (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
                             builder.Append(result);
                         }
@@ -132,28 +157,18 @@ namespace BluetoothDeviceController.Beacons
                     case AdvertisementDataSectionParser.DataTypeValue.ManufacturerData:
                         {
                             string result;
-                            BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
                             (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
-                            isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
                             builder.Append(result);
 
                         }
                         break;
-                    default:
-                        {
-                            string result;
-                            BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType;
-                            (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
-                            isApple10 = manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
-                            builder.Append(result);
-                            if (bleAdvert.Advertisement.LocalName.Contains("Govee") || completeLocalName.Contains("Govee"))
-                            {
-                                ;
-                            }
-                        }
-                        break;
+                }
+                if (manufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10)
+                {
+                    isApple10 = true;
                 }
             }
+
 
             // Pull data from the ManufacturerData
             // Never need to pull data from ManufacturerData; it's already here
@@ -167,6 +182,7 @@ namespace BluetoothDeviceController.Beacons
             }
             var header = $"{address}\t{time24}\t{bleAdvert.RawSignalStrengthInDBm}";
             if (haveTransmitPower) header += $"\t{transmitPower.ToString()}";
+            if (advertExtended != "") header += $"\t{advertExtended}";
             header += "\t" + appearance;
             if (completeLocalName != "") header += "\t" + completeLocalName;
             var txt = $"{header}\n{builder}\n";

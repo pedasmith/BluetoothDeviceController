@@ -33,5 +33,9 @@ namespace Utilities
             }
             return (stritem, readStatus);
         }
+        public static (string, ReadStatus) ReadStringEntire(DataReader dr)
+        {
+            return ReadString(dr, dr.UnconsumedBufferLength);
+        }
     }
 }

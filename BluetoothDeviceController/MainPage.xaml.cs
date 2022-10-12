@@ -15,6 +15,7 @@ using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
+using Windows.Foundation.Metadata;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -748,6 +749,10 @@ namespace BluetoothDeviceController
             {
                 ; // Hand hook for debugger.
             }
+            if (bleAdvert.Advertisement.LocalName.StartsWith("Govee"))
+            {
+                ; // Hand hook for debugger.
+            }
             int idx = FindDeviceBle(bleAdvert);
 
             var (name, id, description) = BleAdvertisementFormat.GetBleName(wrapper, bleAdvert);
@@ -999,6 +1004,15 @@ namespace BluetoothDeviceController
                         Timeout_BluetoothLEAdvertisementWatcher = dt;
                     }
                     MenuBleWatcher = new BluetoothLEAdvertisementWatcher();
+                    var mode = MenuBleWatcher.ScanningMode;
+                    if (ApiInformation.IsPropertyPresent("Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementWatcher", "ScanningMode"))
+                    {
+                        MenuBleWatcher.ScanningMode = BluetoothLEScanningMode.Active;
+                    }
+                    if (ApiInformation.IsPropertyPresent("Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementWatcher", "AllowExtendedAdvertisements"))
+                    {
+                        MenuBleWatcher.AllowExtendedAdvertisements = true;
+                    }
                     MenuBleWatcher.Received += MenuBleWatcher_Received;
                     MenuBleWatcher.Stopped += MenuBleWatcher_Stopped;
                     MenuBleWatcher.Start();
@@ -1024,6 +1038,7 @@ namespace BluetoothDeviceController
 
         Dictionary<ulong, BleAdvertisementWrapper> BleWrappers = new Dictionary<ulong, BleAdvertisementWrapper>();
 
+        ulong Debug_Addr = 0;
         /// <summary>
         /// Got a new BLE beacon advertisement! Add it to the display page
         /// </summary>
@@ -1033,9 +1048,17 @@ namespace BluetoothDeviceController
         {
             var name = args.Advertisement.LocalName;
             System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {name} seen");
-            if (name.Contains("Wescale") || name.StartsWith("LC") || name.StartsWith("GoDice"))
+            if (name.Contains("Wescale") || name.StartsWith("LC") || name.StartsWith("Govee"))
             {
                 ; // Handy hook for debugger.
+            }
+            if (Debug_Addr != 0 && Debug_Addr == args.BluetoothAddress)
+            {
+                ; // Breakpoint
+            }
+            else if (name.StartsWith ("Govee") && Debug_Addr == 0)
+            {
+                Debug_Addr = args.BluetoothAddress;
             }
 
             // Get the appropriate ble advert wrapper (or make a new one)

@@ -2606,7 +2606,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             return $"CompanyId={companyId}";
         }
 
-        public enum CommonManufacturerType {  Other, Apple10, Ruuvi}
+        public enum CommonManufacturerType {  Other, Apple10, Govee, Microsoft, Ruuvi}
         public static (string result, CommonManufacturerType, UInt16 companyId, object specialty) ParseManufacturerData(BluetoothLEAdvertisementDataSection section, sbyte txPower)
         {
             CommonManufacturerType manufacturerType = CommonManufacturerType.Other;
@@ -2619,10 +2619,25 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 dr.ByteOrder = ByteOrder.LittleEndian; // bluetooth defaults to little endian.
                 companyId = dr.ReadUInt16();
                 var companyName = GetBluetoothCompanyIdentifier(companyId);
+
+                // TODO: just for now, dump the Apple stuff and switch to Govee (while I sort out how Govee works
+                if (companyId == 0x004C)
+                {
+                    companyId = 0xEC88;
+                    companyName = "(was apple)";
+                }
+                else if (companyId == 0xEC88)
+                {
+                    companyName = "(is EC88?)";
+                }
+
                 var sb = new StringBuilder();
                 sb.Append(companyName);
                 sb.Append(": ");
                 bool displayAsHex = true ;
+
+
+
                 switch (companyId)
                 {
                     case 0x004C: // Apple
@@ -2655,6 +2670,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                             // Example: 01 09 21 0A 86 1F 7F B5 31 B8 4D 49 4E 49 4E 54 2D 4D 41 58 46 4C 4F 41 54
                             //             \t  ! \n -- -- -- --  1 --  M  I  N  I  N  T  -  M  A  X  F  L  O  A  T  
                             // First two bytes are 06 00 for Microsoft
+                            manufacturerType = CommonManufacturerType.Microsoft;
                             if (dr.UnconsumedBufferLength < 1)
                             {
                                 // not enough data.
@@ -2691,6 +2707,29 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                                         sb.Append(name);
                                     }
                                     break;
+                            }
+                        }
+                        break;
+                    case 0xEC88: // TODO: Somehow a GOVEE device?
+                        {
+                            //var padding = dr.ReadByte();
+                            //var encode = dr.ReadUInt32();
+                            //var temp = ((double)(encode / 1000)) / 10.0; // result is degrees c
+                            //var hum = ((double)(encode % 1000)) / 10.0; // now it's percent
+                            if (dr.UnconsumedBufferLength > 16)
+                            {
+                                var pre = dr.ReadInt16();
+                                var (strName, nameOk) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength - 4);
+                                var (strPost, postOk) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength);
+                                sb.Append($"Pre={pre} Str={strName} Post={strPost} ");
+                            }
+                            else
+                            {
+                                var junk = dr.ReadByte();
+                                var temp = dr.ReadInt16() / 100.0;
+                                var hum = dr.ReadInt16() / 100.0;
+                                var bat = dr.ReadByte();
+                                sb.Append($"Temp={temp} Hum={hum}% Bat={bat}% (junk={junk}) ");
                             }
                         }
                         break;
