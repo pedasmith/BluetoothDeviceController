@@ -39,15 +39,16 @@ namespace BluetoothProtocols
                 case MMMode.Temperature: OnMMTemperature?.Invoke(this, mmdata); break;
                 default: OnMMOther?.Invoke(this, mmdata); break;
             }
-
         }
 
         public class MMData
         {
             public float Value;
+            public float RawValue;
             public MMMode Mode;
-            //TODO: implement these! public float RangeMin;
-            //public float RangeMax;
+            public float RangeMin;
+            public float RangeMax;
+            public float Range {  get { return RangeMax - RangeMin; } }
             public MMStatus Status;
 
 
@@ -61,8 +62,68 @@ namespace BluetoothProtocols
                 var retval = new MMData();
                 retval.Mode = (MMMode)source.MM_Data_OperationMode;
                 retval.Status = CalculateStatus(retval.Mode, source.MM_Data_Status);
-                retval.Value = (float)source.MM_Data_Data;
+                retval.RawValue = (float)source.MM_Data_Data;
+                SetRange(source, retval); // Will also set Value
+                Log($"Pokit: got data {retval.ToString()}");
                 return retval;
+            }
+
+            public override string ToString()
+            {
+                return $"MM: {Value} Mode={Mode} Range={RangeMin}::{RangeMax} ";
+            }
+
+            private static void Log(string text)
+            {
+                System.Diagnostics.Debug.WriteLine(text);
+            }
+
+            private static MMData SetRange(PokitProMeter source, MMData dest)
+            {
+                bool canSetValue = true;
+                switch (dest.Mode)
+                {
+                    case MMMode.VoltAC:
+                    case MMMode.VoltDC:
+                        switch ((int)source.MM_Data_Range)
+                        {
+                            case 0: dest.RangeMin = 0; dest.RangeMax = 0.3f; break;
+                            case 1: dest.RangeMin = 0.3f; dest.RangeMax = 2.0f; break;
+                            case 2: dest.RangeMin = 2.0f; dest.RangeMax = 6.0f; break;
+                            case 3: dest.RangeMin = 6.0f; dest.RangeMax = 12.0f; break;
+                            case 4: dest.RangeMin = 12.0f; dest.RangeMax = 30.0f; break;
+                            case 5: dest.RangeMin = 30.0f; dest.RangeMax = 60.0f; break;
+                            default: dest.RangeMin = 1000; dest.RangeMax = 1010; break; // set to out-of-range
+                        }
+                        break;
+
+                    case MMMode.Resistance:
+                        switch ((int)source.MM_Data_Range)
+                        {
+                            case 0: dest.RangeMin = 0; dest.RangeMax = 160; break;
+                            case 1: dest.RangeMin = 160; dest.RangeMax = 330; break;
+                            case 2: dest.RangeMin = 330; dest.RangeMax = 890; break;
+                            case 3: dest.RangeMin = 890; dest.RangeMax = 1_500; break;
+                            case 4: dest.RangeMin = 1_500; dest.RangeMax = 10_000; break;
+                            case 5: dest.RangeMin = 10_000; dest.RangeMax = 100_000; break;
+                            case 6: dest.RangeMin = 100_000; dest.RangeMax = 470_000; break;
+                            case 7: dest.RangeMin = 470_000; dest.RangeMax = 1_000_000; break;
+                            default: dest.RangeMin = 0; dest.RangeMax = 1099; break;
+                        }
+                        break;
+                    default:
+                        dest.RangeMin = 1020; dest.RangeMax = 1030; break; // Set to out-of-range
+
+                }
+                if (canSetValue)
+                {
+                    dest.Value = (dest.RawValue * dest.Range) + dest.RangeMin;
+                }
+                else
+                {
+                    dest.Value = dest.RawValue; // Provide something?
+                }
+                return dest;
             }
 
 

@@ -44,6 +44,7 @@
             </GridView>
             <StackPanel Grid.Row="5" Grid.ColumnSpan="3" Orientation="Horizontal">
                 <ToggleButton Content="Run" x:Name="uiMMRunButton"  Click="OnMMRunClick" />
+                <TextBlock x:Name="uiState" Width="200" />
             </StackPanel>
         </Grid>
     </Border>

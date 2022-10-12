@@ -132,14 +132,14 @@ namespace BluetoothDeviceController.Beacons
                 var dtv = AdvertisementDataSectionParser.ConvertDataTypeValue(section.DataType);
                 switch (dtv)
                 {
-                    case AdvertisementDataSectionParser.DataTypeValue.Appearance:
+                    case AdvertisementDataSectionParser.DataTypeValue.Appearance: // 0x19==25
                         appearance = AdvertisementDataSectionParser.ParseAppearance(section);
                         break;
                     case AdvertisementDataSectionParser.DataTypeValue.CompleteLocalName:
                         DataReaderReadStringRobust.ReadStatus rs;
                         (completeLocalName, rs) = DataReaderReadStringRobust.ReadStringEntire(DataReader.FromBuffer(section.Data));
                         break;
-                    case AdvertisementDataSectionParser.DataTypeValue.TxPowerLevel:
+                    case AdvertisementDataSectionParser.DataTypeValue.TxPowerLevel: //0x0a==10
                         transmitPower = AdvertisementDataSectionParser.ParseTxPowerLevel(section);
                         haveTransmitPower = true;
                         break;
@@ -154,7 +154,7 @@ namespace BluetoothDeviceController.Beacons
                             builder.Append(result);
                         }
                         break;
-                    case AdvertisementDataSectionParser.DataTypeValue.ManufacturerData:
+                    case AdvertisementDataSectionParser.DataTypeValue.ManufacturerData://0xFF==255==-1
                         {
                             string result;
                             (result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);

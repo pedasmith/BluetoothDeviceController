@@ -188,6 +188,7 @@ namespace BluetoothCodeGenerator
 
                 var service = new TemplateSnippet(btService.Name);
                 service.Macros.Add("Name", btService.Name);
+                service.Macros.Add("Name.dotNet", btService.Name.DotNetSafe());
                 service.Macros.Add("ServiceName", btService.Name);
                 service.Macros.Add("UUID", btService.UUID);
                 services.AddChildViaMacro(service); // have to wait until the UUID macro is added

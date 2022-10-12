@@ -1,4 +1,4 @@
-﻿//From template: Protocol_Body
+//From template: Protocol_Body v2022-07-02 9:54
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,20 +10,21 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
 
+
 namespace BluetoothProtocols
 {
     /// <summary>
     /// Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display..
-    /// This class was automatically generated 6/12/2022 10:01 PM
+    /// This class was automatically generated 2022-07-24::10:01
     /// </summary>
 
     public partial class PokitProMeter : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // Link: https://help.pokitmeter.com/hc/en-us/community/posts/360023523213-Bluetooth-API-Documentation
-        // Link: https://www.pokitinnovations.com/wp-content/uploads/D0005250-PokitMeter-Bluetooth-API-Documentation-0_02.pdf
-        // Link: https://github.com/pcolby/pokit/blob/6937d011c528b3a5f00c6e867ec91a71eaad5bcb/src/lib/uuids.h
-        // Link: https://github.com/pcolby/qtpokit
+    // Link: https://help.pokitmeter.com/hc/en-us/community/posts/360023523213-Bluetooth-API-Documentation
+    // Link: https://www.pokitinnovations.com/wp-content/uploads/D0005250-PokitMeter-Bluetooth-API-Documentation-0_02.pdf
+    // Link: https://github.com/pcolby/pokit/blob/6937d011c528b3a5f00c6e867ec91a71eaad5bcb/src/lib/uuids.h
+    // Link: https://github.com/pcolby/qtpokit
 
 
         public BluetoothLEDevice ble { get; set; } = null;
@@ -31,21 +32,20 @@ namespace BluetoothProtocols
 
         // For the INotifyPropertyChanged values
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
         Guid[] ServiceGuids = new Guid[] {
-            Guid.Parse("00001801-0000-1000-8000-00805f9b34fb"),
-            Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"),
-            Guid.Parse("0000180a-0000-1000-8000-00805f9b34fb"),
-            Guid.Parse("57d3a771-267c-4394-8872-78223e92aec5"),
-            Guid.Parse("e7481d2f-5781-442e-bb9a-fd4e3441dadc"),
-            Guid.Parse("1569801e-1425-4a7a-b617-a4f4ed719de6"),
-            Guid.Parse("a5ff3566-1fd8-4e10-8362-590a578a4121"),
-            Guid.Parse("6f53be2f-780b-49b8-a7c3-e8a052b3ae2c"),
-            Guid.Parse("1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0"),
+           Guid.Parse("00001801-0000-1000-8000-00805f9b34fb"),
+           Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"),
+           Guid.Parse("0000180a-0000-1000-8000-00805f9b34fb"),
+           Guid.Parse("57d3a771-267c-4394-8872-78223e92aec5"),
+           Guid.Parse("e7481d2f-5781-442e-bb9a-fd4e3441dadc"),
+           Guid.Parse("1569801e-1425-4a7a-b617-a4f4ed719de6"),
+           Guid.Parse("a5ff3566-1fd8-4e10-8362-590a578a4121"),
+           Guid.Parse("6f53be2f-780b-49b8-a7c3-e8a052b3ae2c"),
+           Guid.Parse("1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0"),
 
         };
         String[] ServiceNames = new string[] {
@@ -186,16 +186,131 @@ namespace BluetoothProtocols
             new HashSet<int>(){ 29, 30,  },
 
         };
+        List<int> MapCharacteristicToService = new List<int>() {
+            0, // Characteristic 0
+            0, // Characteristic 1
+            0, // Characteristic 2
+            0, // Characteristic 3
+            1, // Characteristic 4
+            1, // Characteristic 5
+            2, // Characteristic 6
+            2, // Characteristic 7
+            2, // Characteristic 8
+            2, // Characteristic 9
+            2, // Characteristic 10
+            2, // Characteristic 11
+            3, // Characteristic 12
+            3, // Characteristic 13
+            3, // Characteristic 14
+            3, // Characteristic 15
+            3, // Characteristic 16
+            3, // Characteristic 17
+            4, // Characteristic 18
+            4, // Characteristic 19
+            5, // Characteristic 20
+            5, // Characteristic 21
+            5, // Characteristic 22
+            6, // Characteristic 23
+            6, // Characteristic 24
+            6, // Characteristic 25
+            7, // Characteristic 26
+            7, // Characteristic 27
+            7, // Characteristic 28
+            8, // Characteristic 29
+            8, // Characteristic 30
+            
+        };
+        public enum CharacteristicsEnum {
+            All_enum = -1,
+            Server_Supported_Features_Generic_Service_enum = 0,
+            Service_Changes_Generic_Service_enum = 1,
+            Client_Supported_Features_Generic_Service_enum = 2,
+            Database_Hash_Generic_Service_enum = 3,
+            Device_Name_Common_Configuration_enum = 4,
+            Appearance_Common_Configuration_enum = 5,
+            Manufacturer_Name_Device_Info_enum = 6,
+            Model_Number_Device_Info_enum = 7,
+            Firmware_Revision_Device_Info_enum = 8,
+            Software_Revision_Device_Info_enum = 9,
+            Hardware_Revision_Device_Info_enum = 10,
+            Serial_Number_Device_Info_enum = 11,
+            Status_Device_Service_Status_enum = 12,
+            Status_Status_Service_Status_enum = 13,
+            Status_Device_Name_Service_Status_enum = 14,
+            Status_Flash_LED_Service_Status_enum = 15,
+            Status_Light_LED_Service_Status_enum = 16,
+            UnknownStatusValues_Service_Status_enum = 17,
+            MM_Settings_Multimeter_enum = 18,
+            MM_Data_Multimeter_enum = 19,
+            DSO_Settings_DSO_Oscilloscope_enum = 20,
+            DSO_Reading_DSO_Oscilloscope_enum = 21,
+            DSO_Metadata_DSO_Oscilloscope_enum = 22,
+            DataLogger_Settings_DataLogger_Dlog_enum = 23,
+            DataLogger_Reading_DataLogger_Dlog_enum = 24,
+            DataLogger_MetaData_DataLogger_Dlog_enum = 25,
+            CalbrateTemperature_CalibrationService_enum = 26,
+            CalibrateUnknown1_CalibrationService_enum = 27,
+            CalibrrateUnknown2_CalibrationService_enum = 28,
+            OTA_Control_Silabs_Service_OTA_enum = 29,
+            OTA_Data_Silabs_Service_OTA_enum = 30,
 
+        };
+
+        public async Task<GattCharacteristicsResult> EnsureCharacteristicOne(GattDeviceService service, CharacteristicsEnum characteristicIndex)
+        {
+            var characteristicsStatus = await service.GetCharacteristicsForUuidAsync(CharacteristicGuids[(int)characteristicIndex]);
+            Characteristics[(int)characteristicIndex] = null;
+            if (characteristicsStatus.Status != GattCommunicationStatus.Success)
+            {
+                Status.ReportStatus($"unable to get characteristic for {CharacteristicNames[(int)characteristicIndex]}", characteristicsStatus);
+                return null;
+            }
+            if (characteristicsStatus.Characteristics.Count == 0)
+            {
+                Status.ReportStatus($"unable to get any characteristics for {CharacteristicNames[(int)characteristicIndex]}", characteristicsStatus);
+            }
+            else if (characteristicsStatus.Characteristics.Count != 1)
+            {
+                Status.ReportStatus($"unable to get correct characteristics count ({characteristicsStatus.Characteristics.Count}) for {CharacteristicNames[(int)characteristicIndex]}", characteristicsStatus);
+            }
+            else
+            {
+                Characteristics[(int)characteristicIndex] = characteristicsStatus.Characteristics[0];
+            }
+            return characteristicsStatus;
+        }
 
         bool readCharacteristics = false;
-        public async Task<bool> EnsureCharacteristicAsync(bool forceReread = false)
+        public async Task<bool> EnsureCharacteristicAsync(CharacteristicsEnum characteristicIndex = CharacteristicsEnum.All_enum, bool forceReread = false)
         {
             if (Characteristics.Length == 0) return false;
             if (ble == null) return false; // might not be initialized yet
 
+            if (characteristicIndex != CharacteristicsEnum.All_enum)
+            {
+                var serviceIndex = MapCharacteristicToService[(int)characteristicIndex];
+                var serviceStatus = await ble.GetGattServicesForUuidAsync(ServiceGuids[serviceIndex]);
+                if (serviceStatus.Status != GattCommunicationStatus.Success)
+                {
+                    Status.ReportStatus($"Unable to get service {ServiceNames[serviceIndex]}", serviceStatus);
+                    return false;
+                }
+                if (serviceStatus.Services.Count != 1)
+                {
+                    Status.ReportStatus($"Unable to get valid service count ({serviceStatus.Services.Count}) for {ServiceNames[serviceIndex]}", serviceStatus);
+                    return false;
+                }
+                var service = serviceStatus.Services[0];
+                var characteristicsStatus = await EnsureCharacteristicOne(service, characteristicIndex);
+                if (characteristicsStatus.Status != GattCommunicationStatus.Success)
+                {
+                    return false;
+                }
+                return true;
+            }
+
             GattCharacteristicsResult lastResult = null;
-            if (forceReread)
+            if (forceReread) 
             {
                 readCharacteristics = false;
             }
@@ -216,28 +331,12 @@ namespace BluetoothProtocols
                     }
                     var service = serviceStatus.Services[0];
                     var characteristicIndexSet = MapServiceToCharacteristic[serviceIndex];
-                    foreach (var characteristicIndex in characteristicIndexSet)
+                    foreach (var index in characteristicIndexSet)
                     {
-                        var characteristicsStatus = await service.GetCharacteristicsForUuidAsync(CharacteristicGuids[characteristicIndex]);
+                        var characteristicsStatus = await EnsureCharacteristicOne(service, (CharacteristicsEnum)index);
                         if (characteristicsStatus.Status != GattCommunicationStatus.Success)
                         {
-                            Status.ReportStatus($"unable to get characteristic for {CharacteristicNames[characteristicIndex]}", characteristicsStatus);
                             return false;
-                        }
-                        if (characteristicsStatus.Characteristics.Count == 0)
-                        {
-                            Status.ReportStatus($"unable to get any characteristics for {CharacteristicNames[characteristicIndex]}", characteristicsStatus);
-                            Characteristics[characteristicIndex] = null;
-                        }
-                        else if (characteristicsStatus.Characteristics.Count != 1)
-                        {
-                            Status.ReportStatus($"unable to get correct characteristics count ({characteristicsStatus.Characteristics.Count}) for {CharacteristicNames[characteristicIndex]}", characteristicsStatus);
-                            Characteristics[characteristicIndex] = null;
-                        }
-                        else
-                        {
-                            Characteristics[characteristicIndex] = characteristicsStatus.Characteristics[0];
-                            lastResult = characteristicsStatus;
                         }
                         lastResult = characteristicsStatus;
                     }
@@ -251,6 +350,7 @@ namespace BluetoothProtocols
             return readCharacteristics;
         }
 
+
         /// <summary>
         /// Primary method used to for any bluetooth characteristic WriteValueAsync() calls.
         /// There's only one characteristic we use, so just use the one global.
@@ -258,12 +358,12 @@ namespace BluetoothProtocols
         /// <param name="method" ></param>
         /// <param name="command" ></param>
         /// <returns></returns>
-        private async Task WriteCommandAsync(int characteristicIndex, string method, byte[] command, GattWriteOption writeOption)
+        private async Task WriteCommandAsync(CharacteristicsEnum characteristicIndex, string method, byte[] command, GattWriteOption writeOption)
         {
             GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
             try
             {
-                result = await Characteristics[characteristicIndex].WriteValueAsync(command.AsBuffer(), writeOption);
+                result = await Characteristics[(int)characteristicIndex].WriteValueAsync(command.AsBuffer(), writeOption);
             }
             catch (Exception)
             {
@@ -283,13 +383,13 @@ namespace BluetoothProtocols
         /// <param name="method" >Name of the actual method; is just used for logging</param>
         /// <param name="cacheMode" >Type of caching</param>
         /// <returns></returns>
-        private async Task<IBuffer> ReadAsync(int characteristicIndex, string method, BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        private async Task<IBuffer> ReadAsync(CharacteristicsEnum characteristicIndex, string method, BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             GattReadResult readResult;
             IBuffer buffer = null;
             try
             {
-                readResult = await Characteristics[characteristicIndex].ReadValueAsync(cacheMode);
+                readResult = await Characteristics[(int)characteristicIndex].ReadValueAsync(cacheMode);
                 if (readResult.Status == GattCommunicationStatus.Success)
                 {
                     buffer = readResult.Value;
@@ -316,7 +416,6 @@ namespace BluetoothProtocols
 
 
 
-
         private double _Server_Supported_Features = 0;
         private bool _Server_Supported_Features_set = false;
         public double Server_Supported_Features
@@ -326,26 +425,26 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadServer_Supported_Features(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(0, "Server_Supported_Features", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Server_Supported_Features_Generic_Service_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Server_Supported_Features_Generic_Service_enum, "Server_Supported_Features", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|FeatureBitmap0";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Server_Supported_Features = parseResult.ValueList.GetValue("FeatureBitmap0").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
         /// <summary>
         /// Writes data for Server_Supported_Features
         /// </summary>
@@ -353,25 +452,96 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteServer_Supported_Features(byte FeatureBitmap0)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Server_Supported_Features_Generic_Service_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(FeatureBitmap0);
+            dw.WriteByte(  FeatureBitmap0);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.Server_Supported_Features_Generic_Service_enum, "Server_Supported_Features", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(0, "Server_Supported_Features", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Server_Supported_Features_Generic_Service_enum, "Server_Supported_Features", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
+
+
+
+        // Returns a string with the status; starts with OK for good status.
+        /// <summary>
+        /// Event for notifications; Service_ChangesEvent += _my function_
+        /// </summary>
+        public event BluetoothDataEvent Service_ChangesEvent = null;
+        /// <summary>
+        /// We only want to set the internal callback once, and never need to remove it.
+        /// </summary>
+
+        private bool NotifyService_Changes_ValueChanged_Set = false;
+
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+
+        public async Task<bool> NotifyService_ChangesAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Service_Changes_Generic_Service_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.Service_Changes_Generic_Service_enum];
+            if (ch == null) return false;
+            GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
+            try
+            {
+                result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+                if (!NotifyService_Changes_ValueChanged_Set)
+                {
+                    // Only set the event callback once
+                    NotifyService_Changes_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyService_ChangesCallback;
+                }
+
+            }
+            catch (Exception e)
+            {
+                Status.ReportStatus($"NotifyService_Changes: {e.Message}", result);
+                return false;
+            }
+            Status.ReportStatus($"NotifyService_Changes: set notification", result);
+
+            return true;
+        }
+
+        private void NotifyService_ChangesCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
+        {
+            var datameaning = "U16|DEC|StartRange U16|DEC|EndRange";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            // No properties for this characteristic
+
+            Service_ChangesEvent?.Invoke(parseResult);
+
+        }
+
+        public void NotifyService_ChangesRemoveCharacteristicCallback() 
+        {
+            var ch = Characteristics[1];
+            if (ch == null) return;
+            NotifyService_Changes_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyService_ChangesCallback;
+        }
+
+
 
         private double _Client_Supported_Features = 0;
         private bool _Client_Supported_Features_set = false;
@@ -382,26 +552,26 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadClient_Supported_Features(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(2, "Client_Supported_Features", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Client_Supported_Features_Generic_Service_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Client_Supported_Features_Generic_Service_enum, "Client_Supported_Features", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|FeatureBitmap0";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Client_Supported_Features = parseResult.ValueList.GetValue("FeatureBitmap0").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
         /// <summary>
         /// Writes data for Client_Supported_Features
         /// </summary>
@@ -409,25 +579,29 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteClient_Supported_Features(byte FeatureBitmap0)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Client_Supported_Features_Generic_Service_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(FeatureBitmap0);
+            dw.WriteByte(  FeatureBitmap0);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.Client_Supported_Features_Generic_Service_enum, "Client_Supported_Features", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(2, "Client_Supported_Features", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Client_Supported_Features_Generic_Service_enum, "Client_Supported_Features", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Database_Hash_Hash0 = 0;
         private bool _Database_Hash_Hash0_set = false;
@@ -436,7 +610,6 @@ namespace BluetoothProtocols
             get { return _Database_Hash_Hash0; }
             internal set { if (_Database_Hash_Hash0_set && value == _Database_Hash_Hash0) return; _Database_Hash_Hash0 = value; _Database_Hash_Hash0_set = true; OnPropertyChanged(); }
         }
-
         private double _Database_Hash_Hash1 = 0;
         private bool _Database_Hash_Hash1_set = false;
         public double Database_Hash_Hash1
@@ -444,7 +617,6 @@ namespace BluetoothProtocols
             get { return _Database_Hash_Hash1; }
             internal set { if (_Database_Hash_Hash1_set && value == _Database_Hash_Hash1) return; _Database_Hash_Hash1 = value; _Database_Hash_Hash1_set = true; OnPropertyChanged(); }
         }
-
         private double _Database_Hash_Hash2 = 0;
         private bool _Database_Hash_Hash2_set = false;
         public double Database_Hash_Hash2
@@ -452,7 +624,6 @@ namespace BluetoothProtocols
             get { return _Database_Hash_Hash2; }
             internal set { if (_Database_Hash_Hash2_set && value == _Database_Hash_Hash2) return; _Database_Hash_Hash2 = value; _Database_Hash_Hash2_set = true; OnPropertyChanged(); }
         }
-
         private double _Database_Hash_Hash3 = 0;
         private bool _Database_Hash_Hash3_set = false;
         public double Database_Hash_Hash3
@@ -462,31 +633,30 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadDatabase_Hash(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(3, "Database_Hash", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Database_Hash_Generic_Service_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Database_Hash_Generic_Service_enum, "Database_Hash", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U32|HEX|Hash0 U32|HEX|Hash1 U32|HEX|Hash2 U32|HEX|Hash3";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Database_Hash_Hash0 = parseResult.ValueList.GetValue("Hash0").AsDouble;
-
             Database_Hash_Hash1 = parseResult.ValueList.GetValue("Hash1").AsDouble;
-
             Database_Hash_Hash2 = parseResult.ValueList.GetValue("Hash2").AsDouble;
-
             Database_Hash_Hash3 = parseResult.ValueList.GetValue("Hash3").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Device_Name = "";
         private bool _Device_Name_set = false;
@@ -497,26 +667,26 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadDevice_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(4, "Device_Name", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum, "Device_Name", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII|Device_Name";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Device_Name = parseResult.ValueList.GetValue("Device_Name").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
         /// <summary>
         /// Writes data for Device_Name
         /// </summary>
@@ -524,25 +694,29 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteDevice_Name(String Device_Name)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteString(Device_Name);
+            dw.WriteString(  Device_Name);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum, "Device_Name", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(4, "Device_Name", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum, "Device_Name", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Appearance = 0;
         private bool _Appearance_set = false;
@@ -553,25 +727,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadAppearance(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(5, "Appearance", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Appearance_Common_Configuration_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Appearance_Common_Configuration_enum, "Appearance", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U16|Speciality^Appearance|Appearance";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Appearance = parseResult.ValueList.GetValue("Appearance").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Manufacturer_Name = "";
         private bool _Manufacturer_Name_set = false;
@@ -582,25 +758,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadManufacturer_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(6, "Manufacturer_Name", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Manufacturer_Name_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Manufacturer_Name_Device_Info_enum, "Manufacturer_Name", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Manufacturer_Name = parseResult.ValueList.GetValue("param0").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Model_Number = "";
         private bool _Model_Number_set = false;
@@ -611,25 +789,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadModel_Number(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(7, "Model_Number", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Model_Number_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Model_Number_Device_Info_enum, "Model_Number", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Model_Number = parseResult.ValueList.GetValue("param0").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Firmware_Revision = "";
         private bool _Firmware_Revision_set = false;
@@ -640,25 +820,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadFirmware_Revision(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(8, "Firmware_Revision", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Firmware_Revision_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Firmware_Revision_Device_Info_enum, "Firmware_Revision", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Firmware_Revision = parseResult.ValueList.GetValue("param0").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Software_Revision = "";
         private bool _Software_Revision_set = false;
@@ -669,25 +851,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadSoftware_Revision(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(9, "Software_Revision", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Software_Revision_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Software_Revision_Device_Info_enum, "Software_Revision", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Software_Revision = parseResult.ValueList.GetValue("param0").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Hardware_Revision = "";
         private bool _Hardware_Revision_set = false;
@@ -698,25 +882,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadHardware_Revision(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(10, "Hardware_Revision", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Hardware_Revision_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Hardware_Revision_Device_Info_enum, "Hardware_Revision", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Hardware_Revision = parseResult.ValueList.GetValue("param0").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private string _Serial_Number = "";
         private bool _Serial_Number_set = false;
@@ -727,25 +913,27 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadSerial_Number(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(11, "Serial_Number", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Serial_Number_Device_Info_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Serial_Number_Device_Info_enum, "Serial_Number", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Serial_Number = parseResult.ValueList.GetValue("param0").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private double _Status_Device_FirmwareMajor = 0;
         private bool _Status_Device_FirmwareMajor_set = false;
@@ -754,7 +942,6 @@ namespace BluetoothProtocols
             get { return _Status_Device_FirmwareMajor; }
             internal set { if (_Status_Device_FirmwareMajor_set && value == _Status_Device_FirmwareMajor) return; _Status_Device_FirmwareMajor = value; _Status_Device_FirmwareMajor_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Device_FirmwareMinor = 0;
         private bool _Status_Device_FirmwareMinor_set = false;
         public double Status_Device_FirmwareMinor
@@ -762,7 +949,6 @@ namespace BluetoothProtocols
             get { return _Status_Device_FirmwareMinor; }
             internal set { if (_Status_Device_FirmwareMinor_set && value == _Status_Device_FirmwareMinor) return; _Status_Device_FirmwareMinor = value; _Status_Device_FirmwareMinor_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Device_MaxInputVoltage = 0;
         private bool _Status_Device_MaxInputVoltage_set = false;
         public double Status_Device_MaxInputVoltage
@@ -770,7 +956,6 @@ namespace BluetoothProtocols
             get { return _Status_Device_MaxInputVoltage; }
             internal set { if (_Status_Device_MaxInputVoltage_set && value == _Status_Device_MaxInputVoltage) return; _Status_Device_MaxInputVoltage = value; _Status_Device_MaxInputVoltage_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Device_MaxInputCurrent = 0;
         private bool _Status_Device_MaxInputCurrent_set = false;
         public double Status_Device_MaxInputCurrent
@@ -778,7 +963,6 @@ namespace BluetoothProtocols
             get { return _Status_Device_MaxInputCurrent; }
             internal set { if (_Status_Device_MaxInputCurrent_set && value == _Status_Device_MaxInputCurrent) return; _Status_Device_MaxInputCurrent = value; _Status_Device_MaxInputCurrent_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Device_MaxInputResistance = 0;
         private bool _Status_Device_MaxInputResistance_set = false;
         public double Status_Device_MaxInputResistance
@@ -786,7 +970,6 @@ namespace BluetoothProtocols
             get { return _Status_Device_MaxInputResistance; }
             internal set { if (_Status_Device_MaxInputResistance_set && value == _Status_Device_MaxInputResistance) return; _Status_Device_MaxInputResistance = value; _Status_Device_MaxInputResistance_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Device_MaxSamplingRate = 0;
         private bool _Status_Device_MaxSamplingRate_set = false;
         public double Status_Device_MaxSamplingRate
@@ -794,7 +977,6 @@ namespace BluetoothProtocols
             get { return _Status_Device_MaxSamplingRate; }
             internal set { if (_Status_Device_MaxSamplingRate_set && value == _Status_Device_MaxSamplingRate) return; _Status_Device_MaxSamplingRate = value; _Status_Device_MaxSamplingRate_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Device_DeviceBufferSize = 0;
         private bool _Status_Device_DeviceBufferSize_set = false;
         public double Status_Device_DeviceBufferSize
@@ -802,7 +984,6 @@ namespace BluetoothProtocols
             get { return _Status_Device_DeviceBufferSize; }
             internal set { if (_Status_Device_DeviceBufferSize_set && value == _Status_Device_DeviceBufferSize) return; _Status_Device_DeviceBufferSize = value; _Status_Device_DeviceBufferSize_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Device_Reserved01 = 0;
         private bool _Status_Device_Reserved01_set = false;
         public double Status_Device_Reserved01
@@ -810,7 +991,6 @@ namespace BluetoothProtocols
             get { return _Status_Device_Reserved01; }
             internal set { if (_Status_Device_Reserved01_set && value == _Status_Device_Reserved01) return; _Status_Device_Reserved01 = value; _Status_Device_Reserved01_set = true; OnPropertyChanged(); }
         }
-
         private string _Status_Device_MacAddress = null;
         private bool _Status_Device_MacAddress_set = false;
         public string Status_Device_MacAddress
@@ -820,41 +1000,35 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadStatus_Device(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(12, "Status_Device", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Device_Service_Status_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Status_Device_Service_Status_enum, "Status_Device", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|FirmwareMajor U8|HEX|FirmwareMinor U16|HEX|MaxInputVoltage U16|HEX|MaxInputCurrent U16|HEX|MaxInputResistance U16|HEX|MaxSamplingRate U16|HEX|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Status_Device_FirmwareMajor = parseResult.ValueList.GetValue("FirmwareMajor").AsDouble;
-
             Status_Device_FirmwareMinor = parseResult.ValueList.GetValue("FirmwareMinor").AsDouble;
-
             Status_Device_MaxInputVoltage = parseResult.ValueList.GetValue("MaxInputVoltage").AsDouble;
-
             Status_Device_MaxInputCurrent = parseResult.ValueList.GetValue("MaxInputCurrent").AsDouble;
-
             Status_Device_MaxInputResistance = parseResult.ValueList.GetValue("MaxInputResistance").AsDouble;
-
             Status_Device_MaxSamplingRate = parseResult.ValueList.GetValue("MaxSamplingRate").AsDouble;
-
             Status_Device_DeviceBufferSize = parseResult.ValueList.GetValue("DeviceBufferSize").AsDouble;
-
             Status_Device_Reserved01 = parseResult.ValueList.GetValue("Reserved01").AsDouble;
-
             Status_Device_MacAddress = parseResult.ValueList.GetValue("MacAddress").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
+
+
+
 
         private double _Status_Status_DeviceStatus = 0;
         private bool _Status_Status_DeviceStatus_set = false;
@@ -863,7 +1037,6 @@ namespace BluetoothProtocols
             get { return _Status_Status_DeviceStatus; }
             internal set { if (_Status_Status_DeviceStatus_set && value == _Status_Status_DeviceStatus) return; _Status_Status_DeviceStatus = value; _Status_Status_DeviceStatus_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Status_BatteryLevel = 0.0;
         private bool _Status_Status_BatteryLevel_set = false;
         public double Status_Status_BatteryLevel
@@ -873,21 +1046,19 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadStatus_Status(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(13, "Status_Status", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Status_Service_Status_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Status_Status_Service_Status_enum, "Status_Status", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|DeviceStatus F32|FIXED|BatteryLevel";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Status_Status_DeviceStatus = parseResult.ValueList.GetValue("DeviceStatus").AsDouble;
-
             Status_Status_BatteryLevel = parseResult.ValueList.GetValue("BatteryLevel").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
@@ -915,8 +1086,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyStatus_StatusAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[13];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Status_Service_Status_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.Status_Status_Service_Status_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -940,26 +1111,25 @@ namespace BluetoothProtocols
             return true;
         }
 
-        private void NotifyStatus_StatusCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyStatus_StatusCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = "U8|HEX|DeviceStatus F32|FIXED|BatteryLevel";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
             Status_Status_DeviceStatus = parseResult.ValueList.GetValue("DeviceStatus").AsDouble;
-
             Status_Status_BatteryLevel = parseResult.ValueList.GetValue("BatteryLevel").AsDouble;
 
             Status_StatusEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifyStatus_StatusRemoveCharacteristicCallback()
+        public void NotifyStatus_StatusRemoveCharacteristicCallback() 
         {
             var ch = Characteristics[13];
             if (ch == null) return;
             NotifyStatus_Status_ValueChanged_Set = false;
             ch.ValueChanged -= NotifyStatus_StatusCallback;
         }
+
 
 
         private string _Status_Device_Name = "";
@@ -971,26 +1141,26 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadStatus_Device_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(14, "Status_Device_Name", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Device_Name_Service_Status_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Status_Device_Name_Service_Status_enum, "Status_Device_Name", cacheMode);
             if (result == null) return null;
 
             var datameaning = "STRING|ASCII|Device_Name";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Status_Device_Name = parseResult.ValueList.GetValue("Device_Name").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
         /// <summary>
         /// Writes data for Status_Device_Name
         /// </summary>
@@ -998,25 +1168,29 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteStatus_Device_Name(String Device_Name)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Device_Name_Service_Status_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteString(Device_Name);
+            dw.WriteString(  Device_Name);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.Status_Device_Name_Service_Status_enum, "Status_Device_Name", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(14, "Status_Device_Name", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Status_Device_Name_Service_Status_enum, "Status_Device_Name", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Status_Flash_LED_Red = 0;
         private bool _Status_Flash_LED_Red_set = false;
@@ -1025,7 +1199,6 @@ namespace BluetoothProtocols
             get { return _Status_Flash_LED_Red; }
             internal set { if (_Status_Flash_LED_Red_set && value == _Status_Flash_LED_Red) return; _Status_Flash_LED_Red = value; _Status_Flash_LED_Red_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Flash_LED_Green = 0;
         private bool _Status_Flash_LED_Green_set = false;
         public double Status_Flash_LED_Green
@@ -1033,7 +1206,6 @@ namespace BluetoothProtocols
             get { return _Status_Flash_LED_Green; }
             internal set { if (_Status_Flash_LED_Green_set && value == _Status_Flash_LED_Green) return; _Status_Flash_LED_Green = value; _Status_Flash_LED_Green_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Flash_LED_Blue = 0;
         private bool _Status_Flash_LED_Blue_set = false;
         public double Status_Flash_LED_Blue
@@ -1041,7 +1213,6 @@ namespace BluetoothProtocols
             get { return _Status_Flash_LED_Blue; }
             internal set { if (_Status_Flash_LED_Blue_set && value == _Status_Flash_LED_Blue) return; _Status_Flash_LED_Blue = value; _Status_Flash_LED_Blue_set = true; OnPropertyChanged(); }
         }
-
         private double _Status_Flash_LED_Beep = 0;
         private bool _Status_Flash_LED_Beep_set = false;
         public double Status_Flash_LED_Beep
@@ -1051,32 +1222,29 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadStatus_Flash_LED(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(15, "Status_Flash_LED", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Flash_LED_Service_Status_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Status_Flash_LED_Service_Status_enum, "Status_Flash_LED", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|Beep";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Status_Flash_LED_Red = parseResult.ValueList.GetValue("Red").AsDouble;
-
             Status_Flash_LED_Green = parseResult.ValueList.GetValue("Green").AsDouble;
-
             Status_Flash_LED_Blue = parseResult.ValueList.GetValue("Blue").AsDouble;
-
             Status_Flash_LED_Beep = parseResult.ValueList.GetValue("Beep").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
         /// <summary>
         /// Writes data for Status_Flash_LED
         /// </summary>
@@ -1084,28 +1252,32 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteStatus_Flash_LED(byte Red, byte Green, byte Blue, byte Beep)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Flash_LED_Service_Status_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Red);
-            dw.WriteByte(Green);
-            dw.WriteByte(Blue);
-            dw.WriteByte(Beep);
+            dw.WriteByte(  Red);
+            dw.WriteByte(  Green);
+            dw.WriteByte(  Blue);
+            dw.WriteByte(  Beep);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.Status_Flash_LED_Service_Status_enum, "Status_Flash_LED", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(15, "Status_Flash_LED", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Status_Flash_LED_Service_Status_enum, "Status_Flash_LED", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _Status_Light_LED = 0;
         private bool _Status_Light_LED_set = false;
@@ -1116,19 +1288,18 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadStatus_Light_LED(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(16, "Status_Light_LED", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Light_LED_Service_Status_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Status_Light_LED_Service_Status_enum, "Status_Light_LED", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|Light";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             Status_Light_LED = parseResult.ValueList.GetValue("Light").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
@@ -1156,8 +1327,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyStatus_Light_LEDAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[16];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Light_LED_Service_Status_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.Status_Light_LED_Service_Status_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1181,18 +1352,17 @@ namespace BluetoothProtocols
             return true;
         }
 
-        private void NotifyStatus_Light_LEDCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyStatus_Light_LEDCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = "U8|HEX|Light";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
             Status_Light_LED = parseResult.ValueList.GetValue("Light").AsDouble;
 
             Status_Light_LEDEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifyStatus_Light_LEDRemoveCharacteristicCallback()
+        public void NotifyStatus_Light_LEDRemoveCharacteristicCallback() 
         {
             var ch = Characteristics[16];
             if (ch == null) return;
@@ -1200,7 +1370,6 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyStatus_Light_LEDCallback;
         }
 
-        //From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for Status_Light_LED
         /// </summary>
@@ -1208,25 +1377,29 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteStatus_Light_LED(byte Light)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Status_Light_LED_Service_Status_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Light);
+            dw.WriteByte(  Light);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.Status_Light_LED_Service_Status_enum, "Status_Light_LED", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(16, "Status_Light_LED", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.Status_Light_LED_Service_Status_enum, "Status_Light_LED", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private string _UnknownStatusValues = null;
         private bool _UnknownStatusValues_set = false;
@@ -1237,19 +1410,18 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadUnknownStatusValues(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(17, "UnknownStatusValues", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.UnknownStatusValues_Service_Status_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.UnknownStatusValues_Service_Status_enum, "UnknownStatusValues", cacheMode);
             if (result == null) return null;
 
             var datameaning = "BYTES|HEX|StatusUnknown5";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             UnknownStatusValues = parseResult.ValueList.GetValue("StatusUnknown5").AsString;
 
             // Hint: get the data that's been read with e.g. 
@@ -1277,8 +1449,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyUnknownStatusValuesAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[17];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.UnknownStatusValues_Service_Status_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.UnknownStatusValues_Service_Status_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1302,18 +1474,17 @@ namespace BluetoothProtocols
             return true;
         }
 
-        private void NotifyUnknownStatusValuesCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyUnknownStatusValuesCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = "BYTES|HEX|StatusUnknown5";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
             UnknownStatusValues = parseResult.ValueList.GetValue("StatusUnknown5").AsString;
 
             UnknownStatusValuesEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifyUnknownStatusValuesRemoveCharacteristicCallback()
+        public void NotifyUnknownStatusValuesRemoveCharacteristicCallback() 
         {
             var ch = Characteristics[17];
             if (ch == null) return;
@@ -1321,7 +1492,6 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyUnknownStatusValuesCallback;
         }
 
-        //From template: Protocol_WriteMethodTemplate
         /// <summary>
         /// Writes data for UnknownStatusValues
         /// </summary>
@@ -1329,26 +1499,33 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteUnknownStatusValues(byte[] StatusUnknown5)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.UnknownStatusValues_Service_Status_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(StatusUnknown5);
+            dw.WriteBytes(  StatusUnknown5);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.UnknownStatusValues_Service_Status_enum, "UnknownStatusValues", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(17, "UnknownStatusValues", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.UnknownStatusValues_Service_Status_enum, "UnknownStatusValues", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
+
+
+
         /// <summary>
         /// Writes data for MM_Settings
         /// </summary>
@@ -1356,27 +1533,31 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteMM_Settings(byte Mode, byte Range, UInt32 Interval)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.MM_Settings_Multimeter_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(Mode);
-            dw.WriteByte(Range);
-            dw.WriteUInt32(Interval);
+            dw.WriteByte(  Mode);
+            dw.WriteByte(  Range);
+            dw.WriteUInt32(  Interval);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.MM_Settings_Multimeter_enum, "MM_Settings", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(18, "MM_Settings", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.MM_Settings_Multimeter_enum, "MM_Settings", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private double _MM_Data_Status = 0;
         private bool _MM_Data_Status_set = false;
@@ -1385,7 +1566,6 @@ namespace BluetoothProtocols
             get { return _MM_Data_Status; }
             internal set { if (_MM_Data_Status_set && value == _MM_Data_Status) return; _MM_Data_Status = value; _MM_Data_Status_set = true; OnPropertyChanged(); }
         }
-
         private double _MM_Data_Data = 0.0;
         private bool _MM_Data_Data_set = false;
         public double MM_Data_Data
@@ -1393,7 +1573,6 @@ namespace BluetoothProtocols
             get { return _MM_Data_Data; }
             internal set { if (_MM_Data_Data_set && value == _MM_Data_Data) return; _MM_Data_Data = value; _MM_Data_Data_set = true; OnPropertyChanged(); }
         }
-
         private double _MM_Data_OperationMode = 0;
         private bool _MM_Data_OperationMode_set = false;
         public double MM_Data_OperationMode
@@ -1401,7 +1580,6 @@ namespace BluetoothProtocols
             get { return _MM_Data_OperationMode; }
             internal set { if (_MM_Data_OperationMode_set && value == _MM_Data_OperationMode) return; _MM_Data_OperationMode = value; _MM_Data_OperationMode_set = true; OnPropertyChanged(); }
         }
-
         private double _MM_Data_Range = 0;
         private bool _MM_Data_Range_set = false;
         public double MM_Data_Range
@@ -1411,25 +1589,21 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadMM_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(19, "MM_Data", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.MM_Data_Multimeter_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.MM_Data_Multimeter_enum, "MM_Data", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|Status F32|FIXED|Data U8|HEX|OperationMode U8|HEX|Range";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             MM_Data_Status = parseResult.ValueList.GetValue("Status").AsDouble;
-
             MM_Data_Data = parseResult.ValueList.GetValue("Data").AsDouble;
-
             MM_Data_OperationMode = parseResult.ValueList.GetValue("OperationMode").AsDouble;
-
             MM_Data_Range = parseResult.ValueList.GetValue("Range").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
@@ -1457,8 +1631,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyMM_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[19];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.MM_Data_Multimeter_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.MM_Data_Multimeter_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1482,24 +1656,20 @@ namespace BluetoothProtocols
             return true;
         }
 
-        private void NotifyMM_DataCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyMM_DataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = "U8|HEX|Status F32|FIXED|Data U8|HEX|OperationMode U8|HEX|Range";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
             MM_Data_Status = parseResult.ValueList.GetValue("Status").AsDouble;
-
             MM_Data_Data = parseResult.ValueList.GetValue("Data").AsDouble;
-
             MM_Data_OperationMode = parseResult.ValueList.GetValue("OperationMode").AsDouble;
-
             MM_Data_Range = parseResult.ValueList.GetValue("Range").AsDouble;
 
             MM_DataEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifyMM_DataRemoveCharacteristicCallback()
+        public void NotifyMM_DataRemoveCharacteristicCallback() 
         {
             var ch = Characteristics[19];
             if (ch == null) return;
@@ -1507,7 +1677,11 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyMM_DataCallback;
         }
 
-        //From template: Protocol_WriteMethodTemplate
+
+
+
+
+
         /// <summary>
         /// Writes data for DSO_Settings
         /// </summary>
@@ -1515,30 +1689,34 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteDSO_Settings(byte DsoTriggerType, float DsoTriggerLevel, byte DsoMode, byte DsoRange, UInt32 DsoSamplingWindow, UInt16 DsoNSamples)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.DSO_Settings_DSO_Oscilloscope_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(DsoTriggerType);
-            dw.WriteSingle(DsoTriggerLevel);
-            dw.WriteByte(DsoMode);
-            dw.WriteByte(DsoRange);
-            dw.WriteUInt32(DsoSamplingWindow);
-            dw.WriteUInt16(DsoNSamples);
+            dw.WriteByte(  DsoTriggerType);
+            dw.WriteSingle(  DsoTriggerLevel);
+            dw.WriteByte(  DsoMode);
+            dw.WriteByte(  DsoRange);
+            dw.WriteUInt32(  DsoSamplingWindow);
+            dw.WriteUInt16(  DsoNSamples);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.DSO_Settings_DSO_Oscilloscope_enum, "DSO_Settings", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(20, "DSO_Settings", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.DSO_Settings_DSO_Oscilloscope_enum, "DSO_Settings", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private string _DSO_Reading = null;
         private bool _DSO_Reading_set = false;
@@ -1547,6 +1725,7 @@ namespace BluetoothProtocols
             get { return _DSO_Reading; }
             internal set { if (_DSO_Reading_set && value == _DSO_Reading) return; _DSO_Reading = value; _DSO_Reading_set = true; OnPropertyChanged(); }
         }
+
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
@@ -1568,8 +1747,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyDSO_ReadingAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[21];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.DSO_Reading_DSO_Oscilloscope_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.DSO_Reading_DSO_Oscilloscope_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1593,24 +1772,24 @@ namespace BluetoothProtocols
             return true;
         }
 
-        private void NotifyDSO_ReadingCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyDSO_ReadingCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = "BYTES|HEX|DsoDataRaw";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
             DSO_Reading = parseResult.ValueList.GetValue("DsoDataRaw").AsString;
 
             DSO_ReadingEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifyDSO_ReadingRemoveCharacteristicCallback()
+        public void NotifyDSO_ReadingRemoveCharacteristicCallback() 
         {
             var ch = Characteristics[21];
             if (ch == null) return;
             NotifyDSO_Reading_ValueChanged_Set = false;
             ch.ValueChanged -= NotifyDSO_ReadingCallback;
         }
+
 
 
         private double _DSO_Metadata_DsoStatus = 0;
@@ -1620,7 +1799,6 @@ namespace BluetoothProtocols
             get { return _DSO_Metadata_DsoStatus; }
             internal set { if (_DSO_Metadata_DsoStatus_set && value == _DSO_Metadata_DsoStatus) return; _DSO_Metadata_DsoStatus = value; _DSO_Metadata_DsoStatus_set = true; OnPropertyChanged(); }
         }
-
         private double _DSO_Metadata_DsoDataScale = 0.0;
         private bool _DSO_Metadata_DsoDataScale_set = false;
         public double DSO_Metadata_DsoDataScale
@@ -1628,7 +1806,6 @@ namespace BluetoothProtocols
             get { return _DSO_Metadata_DsoDataScale; }
             internal set { if (_DSO_Metadata_DsoDataScale_set && value == _DSO_Metadata_DsoDataScale) return; _DSO_Metadata_DsoDataScale = value; _DSO_Metadata_DsoDataScale_set = true; OnPropertyChanged(); }
         }
-
         private double _DSO_Metadata_DsoDataMode = 0;
         private bool _DSO_Metadata_DsoDataMode_set = false;
         public double DSO_Metadata_DsoDataMode
@@ -1636,7 +1813,6 @@ namespace BluetoothProtocols
             get { return _DSO_Metadata_DsoDataMode; }
             internal set { if (_DSO_Metadata_DsoDataMode_set && value == _DSO_Metadata_DsoDataMode) return; _DSO_Metadata_DsoDataMode = value; _DSO_Metadata_DsoDataMode_set = true; OnPropertyChanged(); }
         }
-
         private double _DSO_Metadata_DsoDataRange = 0;
         private bool _DSO_Metadata_DsoDataRange_set = false;
         public double DSO_Metadata_DsoDataRange
@@ -1644,7 +1820,6 @@ namespace BluetoothProtocols
             get { return _DSO_Metadata_DsoDataRange; }
             internal set { if (_DSO_Metadata_DsoDataRange_set && value == _DSO_Metadata_DsoDataRange) return; _DSO_Metadata_DsoDataRange = value; _DSO_Metadata_DsoDataRange_set = true; OnPropertyChanged(); }
         }
-
         private double _DSO_Metadata_DsoDataSamplingWindow = 0;
         private bool _DSO_Metadata_DsoDataSamplingWindow_set = false;
         public double DSO_Metadata_DsoDataSamplingWindow
@@ -1652,7 +1827,6 @@ namespace BluetoothProtocols
             get { return _DSO_Metadata_DsoDataSamplingWindow; }
             internal set { if (_DSO_Metadata_DsoDataSamplingWindow_set && value == _DSO_Metadata_DsoDataSamplingWindow) return; _DSO_Metadata_DsoDataSamplingWindow = value; _DSO_Metadata_DsoDataSamplingWindow_set = true; OnPropertyChanged(); }
         }
-
         private double _DSO_Metadata_DsoDataNsamples = 0;
         private bool _DSO_Metadata_DsoDataNsamples_set = false;
         public double DSO_Metadata_DsoDataNsamples
@@ -1660,7 +1834,6 @@ namespace BluetoothProtocols
             get { return _DSO_Metadata_DsoDataNsamples; }
             internal set { if (_DSO_Metadata_DsoDataNsamples_set && value == _DSO_Metadata_DsoDataNsamples) return; _DSO_Metadata_DsoDataNsamples = value; _DSO_Metadata_DsoDataNsamples_set = true; OnPropertyChanged(); }
         }
-
         private double _DSO_Metadata_DsoSamplingRate = 0;
         private bool _DSO_Metadata_DsoSamplingRate_set = false;
         public double DSO_Metadata_DsoSamplingRate
@@ -1670,31 +1843,24 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadDSO_Metadata(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(22, "DSO_Metadata", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.DSO_Metadata_DSO_Oscilloscope_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.DSO_Metadata_DSO_Oscilloscope_enum, "DSO_Metadata", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|DsoStatus F32|FIXED|DsoDataScale U8|HEX|DsoDataMode U8|HEX|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             DSO_Metadata_DsoStatus = parseResult.ValueList.GetValue("DsoStatus").AsDouble;
-
             DSO_Metadata_DsoDataScale = parseResult.ValueList.GetValue("DsoDataScale").AsDouble;
-
             DSO_Metadata_DsoDataMode = parseResult.ValueList.GetValue("DsoDataMode").AsDouble;
-
             DSO_Metadata_DsoDataRange = parseResult.ValueList.GetValue("DsoDataRange").AsDouble;
-
             DSO_Metadata_DsoDataSamplingWindow = parseResult.ValueList.GetValue("DsoDataSamplingWindow").AsDouble;
-
             DSO_Metadata_DsoDataNsamples = parseResult.ValueList.GetValue("DsoDataNsamples").AsDouble;
-
             DSO_Metadata_DsoSamplingRate = parseResult.ValueList.GetValue("DsoSamplingRate").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
@@ -1722,8 +1888,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyDSO_MetadataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[22];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.DSO_Metadata_DSO_Oscilloscope_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.DSO_Metadata_DSO_Oscilloscope_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1747,30 +1913,23 @@ namespace BluetoothProtocols
             return true;
         }
 
-        private void NotifyDSO_MetadataCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyDSO_MetadataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = "U8|HEX|DsoStatus F32|FIXED|DsoDataScale U8|HEX|DsoDataMode U8|HEX|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
             DSO_Metadata_DsoStatus = parseResult.ValueList.GetValue("DsoStatus").AsDouble;
-
             DSO_Metadata_DsoDataScale = parseResult.ValueList.GetValue("DsoDataScale").AsDouble;
-
             DSO_Metadata_DsoDataMode = parseResult.ValueList.GetValue("DsoDataMode").AsDouble;
-
             DSO_Metadata_DsoDataRange = parseResult.ValueList.GetValue("DsoDataRange").AsDouble;
-
             DSO_Metadata_DsoDataSamplingWindow = parseResult.ValueList.GetValue("DsoDataSamplingWindow").AsDouble;
-
             DSO_Metadata_DsoDataNsamples = parseResult.ValueList.GetValue("DsoDataNsamples").AsDouble;
-
             DSO_Metadata_DsoSamplingRate = parseResult.ValueList.GetValue("DsoSamplingRate").AsDouble;
 
             DSO_MetadataEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifyDSO_MetadataRemoveCharacteristicCallback()
+        public void NotifyDSO_MetadataRemoveCharacteristicCallback() 
         {
             var ch = Characteristics[22];
             if (ch == null) return;
@@ -1778,7 +1937,11 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyDSO_MetadataCallback;
         }
 
-        //From template: Protocol_WriteMethodTemplate
+
+
+
+
+
         /// <summary>
         /// Writes data for DataLogger_Settings
         /// </summary>
@@ -1786,30 +1949,34 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteDataLogger_Settings(byte DlogCommand, UInt16 DlogReserved1, byte DlogMode, byte DlogRange, UInt16 DlogUpdateInterval, UInt32 DlogTimestamp)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.DataLogger_Settings_DataLogger_Dlog_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(DlogCommand);
-            dw.WriteUInt16(DlogReserved1);
-            dw.WriteByte(DlogMode);
-            dw.WriteByte(DlogRange);
-            dw.WriteUInt16(DlogUpdateInterval);
-            dw.WriteUInt32(DlogTimestamp);
+            dw.WriteByte(  DlogCommand);
+            dw.WriteUInt16(  DlogReserved1);
+            dw.WriteByte(  DlogMode);
+            dw.WriteByte(  DlogRange);
+            dw.WriteUInt16(  DlogUpdateInterval);
+            dw.WriteUInt32(  DlogTimestamp);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.DataLogger_Settings_DataLogger_Dlog_enum, "DataLogger_Settings", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(23, "DataLogger_Settings", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.DataLogger_Settings_DataLogger_Dlog_enum, "DataLogger_Settings", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private string _DataLogger_Reading = null;
         private bool _DataLogger_Reading_set = false;
@@ -1818,6 +1985,7 @@ namespace BluetoothProtocols
             get { return _DataLogger_Reading; }
             internal set { if (_DataLogger_Reading_set && value == _DataLogger_Reading) return; _DataLogger_Reading = value; _DataLogger_Reading_set = true; OnPropertyChanged(); }
         }
+
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
@@ -1839,8 +2007,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyDataLogger_ReadingAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[24];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.DataLogger_Reading_DataLogger_Dlog_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.DataLogger_Reading_DataLogger_Dlog_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -1864,24 +2032,24 @@ namespace BluetoothProtocols
             return true;
         }
 
-        private void NotifyDataLogger_ReadingCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyDataLogger_ReadingCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = "BYTES|HEX|DlogData";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
             DataLogger_Reading = parseResult.ValueList.GetValue("DlogData").AsString;
 
             DataLogger_ReadingEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifyDataLogger_ReadingRemoveCharacteristicCallback()
+        public void NotifyDataLogger_ReadingRemoveCharacteristicCallback() 
         {
             var ch = Characteristics[24];
             if (ch == null) return;
             NotifyDataLogger_Reading_ValueChanged_Set = false;
             ch.ValueChanged -= NotifyDataLogger_ReadingCallback;
         }
+
 
 
         private double _DataLogger_MetaData_DlogStatus = 0;
@@ -1891,7 +2059,6 @@ namespace BluetoothProtocols
             get { return _DataLogger_MetaData_DlogStatus; }
             internal set { if (_DataLogger_MetaData_DlogStatus_set && value == _DataLogger_MetaData_DlogStatus) return; _DataLogger_MetaData_DlogStatus = value; _DataLogger_MetaData_DlogStatus_set = true; OnPropertyChanged(); }
         }
-
         private double _DataLogger_MetaData_DlogScale = 0.0;
         private bool _DataLogger_MetaData_DlogScale_set = false;
         public double DataLogger_MetaData_DlogScale
@@ -1899,7 +2066,6 @@ namespace BluetoothProtocols
             get { return _DataLogger_MetaData_DlogScale; }
             internal set { if (_DataLogger_MetaData_DlogScale_set && value == _DataLogger_MetaData_DlogScale) return; _DataLogger_MetaData_DlogScale = value; _DataLogger_MetaData_DlogScale_set = true; OnPropertyChanged(); }
         }
-
         private double _DataLogger_MetaData_DlogMode = 0;
         private bool _DataLogger_MetaData_DlogMode_set = false;
         public double DataLogger_MetaData_DlogMode
@@ -1907,7 +2073,6 @@ namespace BluetoothProtocols
             get { return _DataLogger_MetaData_DlogMode; }
             internal set { if (_DataLogger_MetaData_DlogMode_set && value == _DataLogger_MetaData_DlogMode) return; _DataLogger_MetaData_DlogMode = value; _DataLogger_MetaData_DlogMode_set = true; OnPropertyChanged(); }
         }
-
         private double _DataLogger_MetaData_DlogRange = 0;
         private bool _DataLogger_MetaData_DlogRange_set = false;
         public double DataLogger_MetaData_DlogRange
@@ -1915,7 +2080,6 @@ namespace BluetoothProtocols
             get { return _DataLogger_MetaData_DlogRange; }
             internal set { if (_DataLogger_MetaData_DlogRange_set && value == _DataLogger_MetaData_DlogRange) return; _DataLogger_MetaData_DlogRange = value; _DataLogger_MetaData_DlogRange_set = true; OnPropertyChanged(); }
         }
-
         private double _DataLogger_MetaData_DlogCurrLogging = 0;
         private bool _DataLogger_MetaData_DlogCurrLogging_set = false;
         public double DataLogger_MetaData_DlogCurrLogging
@@ -1923,7 +2087,6 @@ namespace BluetoothProtocols
             get { return _DataLogger_MetaData_DlogCurrLogging; }
             internal set { if (_DataLogger_MetaData_DlogCurrLogging_set && value == _DataLogger_MetaData_DlogCurrLogging) return; _DataLogger_MetaData_DlogCurrLogging = value; _DataLogger_MetaData_DlogCurrLogging_set = true; OnPropertyChanged(); }
         }
-
         private double _DataLogger_MetaData_DlogCurrNSample = 0;
         private bool _DataLogger_MetaData_DlogCurrNSample_set = false;
         public double DataLogger_MetaData_DlogCurrNSample
@@ -1931,7 +2094,6 @@ namespace BluetoothProtocols
             get { return _DataLogger_MetaData_DlogCurrNSample; }
             internal set { if (_DataLogger_MetaData_DlogCurrNSample_set && value == _DataLogger_MetaData_DlogCurrNSample) return; _DataLogger_MetaData_DlogCurrNSample = value; _DataLogger_MetaData_DlogCurrNSample_set = true; OnPropertyChanged(); }
         }
-
         private double _DataLogger_MetaData_DlogCurrTimestamp = 0;
         private bool _DataLogger_MetaData_DlogCurrTimestamp_set = false;
         public double DataLogger_MetaData_DlogCurrTimestamp
@@ -1941,31 +2103,24 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadDataLogger_MetaData(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(25, "DataLogger_MetaData", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.DataLogger_MetaData_DataLogger_Dlog_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.DataLogger_MetaData_DataLogger_Dlog_enum, "DataLogger_MetaData", cacheMode);
             if (result == null) return null;
 
             var datameaning = "U8|HEX|DlogStatus F32|FIXED|DlogScale U8|HEx|DlogMode U8|HEX|DlogRange U16|DEC|DlogCurrLogging|us U16|DEC|DlogCurrNSample U32|DEC|DlogCurrTimestamp";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             DataLogger_MetaData_DlogStatus = parseResult.ValueList.GetValue("DlogStatus").AsDouble;
-
             DataLogger_MetaData_DlogScale = parseResult.ValueList.GetValue("DlogScale").AsDouble;
-
             DataLogger_MetaData_DlogMode = parseResult.ValueList.GetValue("DlogMode").AsDouble;
-
             DataLogger_MetaData_DlogRange = parseResult.ValueList.GetValue("DlogRange").AsDouble;
-
             DataLogger_MetaData_DlogCurrLogging = parseResult.ValueList.GetValue("DlogCurrLogging").AsDouble;
-
             DataLogger_MetaData_DlogCurrNSample = parseResult.ValueList.GetValue("DlogCurrNSample").AsDouble;
-
             DataLogger_MetaData_DlogCurrTimestamp = parseResult.ValueList.GetValue("DlogCurrTimestamp").AsDouble;
 
             // Hint: get the data that's been read with e.g. 
@@ -1993,8 +2148,8 @@ namespace BluetoothProtocols
 
         public async Task<bool> NotifyDataLogger_MetaDataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            if (!await EnsureCharacteristicAsync()) return false;
-            var ch = Characteristics[25];
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.DataLogger_MetaData_DataLogger_Dlog_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.DataLogger_MetaData_DataLogger_Dlog_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
@@ -2018,30 +2173,23 @@ namespace BluetoothProtocols
             return true;
         }
 
-        private void NotifyDataLogger_MetaDataCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyDataLogger_MetaDataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = "U8|HEX|DlogStatus F32|FIXED|DlogScale U8|HEx|DlogMode U8|HEX|DlogRange U16|DEC|DlogCurrLogging|us U16|DEC|DlogCurrNSample U32|DEC|DlogCurrTimestamp";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-
             DataLogger_MetaData_DlogStatus = parseResult.ValueList.GetValue("DlogStatus").AsDouble;
-
             DataLogger_MetaData_DlogScale = parseResult.ValueList.GetValue("DlogScale").AsDouble;
-
             DataLogger_MetaData_DlogMode = parseResult.ValueList.GetValue("DlogMode").AsDouble;
-
             DataLogger_MetaData_DlogRange = parseResult.ValueList.GetValue("DlogRange").AsDouble;
-
             DataLogger_MetaData_DlogCurrLogging = parseResult.ValueList.GetValue("DlogCurrLogging").AsDouble;
-
             DataLogger_MetaData_DlogCurrNSample = parseResult.ValueList.GetValue("DlogCurrNSample").AsDouble;
-
             DataLogger_MetaData_DlogCurrTimestamp = parseResult.ValueList.GetValue("DlogCurrTimestamp").AsDouble;
 
             DataLogger_MetaDataEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifyDataLogger_MetaDataRemoveCharacteristicCallback()
+        public void NotifyDataLogger_MetaDataRemoveCharacteristicCallback() 
         {
             var ch = Characteristics[25];
             if (ch == null) return;
@@ -2049,7 +2197,11 @@ namespace BluetoothProtocols
             ch.ValueChanged -= NotifyDataLogger_MetaDataCallback;
         }
 
-        //From template: Protocol_WriteMethodTemplate
+
+
+
+
+
         /// <summary>
         /// Writes data for CalbrateTemperature
         /// </summary>
@@ -2057,25 +2209,29 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteCalbrateTemperature(byte[] CalibrateUnknown0)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.CalbrateTemperature_CalibrationService_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(CalibrateUnknown0);
+            dw.WriteBytes(  CalibrateUnknown0);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.CalbrateTemperature_CalibrationService_enum, "CalbrateTemperature", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(26, "CalbrateTemperature", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.CalbrateTemperature_CalibrationService_enum, "CalbrateTemperature", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
 
         private string _CalibrateUnknown1 = null;
         private bool _CalibrateUnknown1_set = false;
@@ -2086,26 +2242,26 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Reads data 
+        /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadCalibrateUnknown1(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            if (!await EnsureCharacteristicAsync()) return null;
-            IBuffer result = await ReadAsync(27, "CalibrateUnknown1", cacheMode);
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.CalibrateUnknown1_CalibrationService_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.CalibrateUnknown1_CalibrationService_enum, "CalibrateUnknown1", cacheMode);
             if (result == null) return null;
 
             var datameaning = "BYTES|HEX|CalibrateUnknown1";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-
             CalibrateUnknown1 = parseResult.ValueList.GetValue("CalibrateUnknown1").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
             return parseResult.ValueList;
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
         /// <summary>
         /// Writes data for CalibrateUnknown1
         /// </summary>
@@ -2113,26 +2269,33 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteCalibrateUnknown1(byte[] CalibrateUnknown1)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.CalibrateUnknown1_CalibrationService_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(CalibrateUnknown1);
+            dw.WriteBytes(  CalibrateUnknown1);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.CalibrateUnknown1_CalibrationService_enum, "CalibrateUnknown1", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(27, "CalibrateUnknown1", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.CalibrateUnknown1_CalibrationService_enum, "CalibrateUnknown1", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
+
+
+
         /// <summary>
         /// Writes data for CalibrrateUnknown2
         /// </summary>
@@ -2140,26 +2303,33 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteCalibrrateUnknown2(byte[] CalibrrateUnknown2)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.CalibrrateUnknown2_CalibrationService_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(CalibrrateUnknown2);
+            dw.WriteBytes(  CalibrrateUnknown2);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.CalibrrateUnknown2_CalibrationService_enum, "CalibrrateUnknown2", command, GattWriteOption.WriteWithResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(28, "CalibrrateUnknown2", subcommand, GattWriteOption.WriteWithResponse);
+                await WriteCommandAsync(CharacteristicsEnum.CalibrrateUnknown2_CalibrationService_enum, "CalibrrateUnknown2", subcommand, GattWriteOption.WriteWithResponse);
             }
-            // original: await DoWriteAsync(data);
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
+
+
+
         /// <summary>
         /// Writes data for OTA_Control
         /// </summary>
@@ -2167,26 +2337,33 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteOTA_Control(byte[] Unknown0)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.OTA_Control_Silabs_Service_OTA_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(Unknown0);
+            dw.WriteBytes(  Unknown0);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.OTA_Control_Silabs_Service_OTA_enum, "OTA_Control", command, GattWriteOption.WriteWithoutResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(29, "OTA_Control", subcommand, GattWriteOption.WriteWithoutResponse);
+                await WriteCommandAsync(CharacteristicsEnum.OTA_Control_Silabs_Service_OTA_enum, "OTA_Control", subcommand, GattWriteOption.WriteWithoutResponse);
             }
-            // original: await DoWriteAsync(data);
         }
-        //From template: Protocol_WriteMethodTemplate
+
+
+
+
+
         /// <summary>
         /// Writes data for OTA_Data
         /// </summary>
@@ -2194,25 +2371,30 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task WriteOTA_Data(byte[] Unknown1)
         {
-            if (!await EnsureCharacteristicAsync()) return;
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.OTA_Data_Silabs_Service_OTA_enum)) return;
 
             var dw = new DataWriter();
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteBytes(Unknown1);
+            dw.WriteBytes(  Unknown1);
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            for (int i = 0; i < command.Length; i += MAXBYTES)
+            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            {
+                await WriteCommandAsync(CharacteristicsEnum.OTA_Data_Silabs_Service_OTA_enum, "OTA_Data", command, GattWriteOption.WriteWithoutResponse);
+            }
+            else for (int i=0; i<command.Length; i+= MAXBYTES)
             {
                 // So many calculations and copying just to get a slice
                 var maxCount = Math.Min(MAXBYTES, command.Length - i);
                 var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(30, "OTA_Data", subcommand, GattWriteOption.WriteWithoutResponse);
+                await WriteCommandAsync(CharacteristicsEnum.OTA_Data_Silabs_Service_OTA_enum, "OTA_Data", subcommand, GattWriteOption.WriteWithoutResponse);
             }
-            // original: await DoWriteAsync(data);
         }
+
+
 
     }
 }

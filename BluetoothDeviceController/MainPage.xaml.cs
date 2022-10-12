@@ -340,7 +340,7 @@ namespace BluetoothDeviceController
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Exception: SettingsDlg: {ex.Message}");
+                    Log($"Exception: SettingsDlg: {ex.Message}");
                 }
                 finally
                 {
@@ -644,7 +644,7 @@ namespace BluetoothDeviceController
                 (name, hasDeviceName) = GetDeviceInformationName(wrapper.di);
                 if (!hasDeviceName && !isAll_bluetooth_devices)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Device {id} not added because there's no name");
+                    Log($"Device {id} not added because there's no name");
                     SearchFeedback.FoundDevice(FoundDeviceInfo.IsFilteredOutNoName);
                     return;
                 }
@@ -695,7 +695,7 @@ namespace BluetoothDeviceController
                 // There's no specialization and the user asked for items with a specialization only.
                 // That means we shouldn't add this to the list.
                 SearchFeedback.FoundDevice(FoundDeviceInfo.IsFilteredOutDb);
-                System.Diagnostics.Debug.WriteLine($"Device {id} not added because there's no specialization");
+                Log($"Device {id} not added because there's no specialization");
                 return;
             }
 
@@ -735,13 +735,13 @@ namespace BluetoothDeviceController
                 SearchFeedback.FoundDevice(FoundDeviceInfo.IsError); // filtered=false means it's not one we want. 
                 return;
             }
-            if (bleAdvert.RawSignalStrengthInDBm < SIGNAL_STRENGTH_THRESHOLD)
+            if (bleAdvert.RawSignalStrengthInDBm <= SIGNAL_STRENGTH_THRESHOLD)
             {
                 SearchFeedback.FoundDevice(FoundDeviceInfo.IsOutOfRange); // filtered=false means it's not one we want. 
                 return;
             }
 
-            if (bleAdvert.Advertisement.LocalName.Contains ("Wescale"))
+            if (bleAdvert.Advertisement.LocalName.Contains ("Govee"))
             {
                 ; // Hand hook for debugger.
             }
@@ -767,6 +767,22 @@ namespace BluetoothDeviceController
             {
                 specialization = Specialization.Get(Specializations, "Beacon"); // This will get the SimpleBeaconPage
                 specialization.ShortDescription = description;
+
+                if (bleAdvert.Advertisement.LocalName.Contains("Govee"))
+                {
+                    foreach (var md in bleAdvert.Advertisement.ManufacturerData)
+                    {
+                        var dr = DataReader.FromBuffer(md.Data);
+                        var (hx, status) = Utilities.DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength);
+                        specialization.ShortDescription += $"\nTODO: company={md.CompanyId} string={hx}";
+                    }
+                    foreach (var section in bleAdvert.Advertisement.DataSections)
+                    {
+                        specialization.ShortDescription += $"\nTODO: section={section.DataType}";
+                    }
+                    ; // Hand hook for debugger.
+                }
+
             }
 
             // Not eddystone or ruuvitag. Let's do the event so it can be seen
@@ -829,7 +845,7 @@ namespace BluetoothDeviceController
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Exception: JsonSearch: {ex.Message}");
+                Log($"Exception: JsonSearch: {ex.Message}");
             }
             finally
             {
@@ -943,7 +959,7 @@ namespace BluetoothDeviceController
         }
 
         enum WatcherType { DeviceInformationWatcher, BluetoothLEAdvertisementWatcher }
-        private void StartWatchForBluetoothDevices(UserPreferences.SearchScope scope)
+        private async void StartWatchForBluetoothDevices(UserPreferences.SearchScope scope)
         {
             // Query for extra properties you want returned
             // See https://docs.microsoft.com/en-us/windows/desktop/properties/devices-bumper
@@ -982,6 +998,14 @@ namespace BluetoothDeviceController
                         requestedProperties,
                         DeviceInformationKind.AssociationEndpoint);
 
+                    if (Timeout_BluetoothLEAdvertisementWatcher == null)
+                    {
+                        var dt = new DispatcherTimer();
+                        dt.Tick += Timeout_BluetoothLEAdvertisementWatcher_Tick;
+                        dt.Interval = TimeSpan.FromMilliseconds(Preferences.AdvertisementScanTimeInMilliseconds);
+                        Timeout_BluetoothLEAdvertisementWatcher = dt;
+                    }
+
                     // Register event handlers before starting the watcher.
                     // Added, Updated and Removed are required to get all nearby devices
                     MenuDeviceInformationWatcher.Added += DeviceWatcher_Added;
@@ -1017,14 +1041,47 @@ namespace BluetoothDeviceController
                     MenuBleWatcher.Stopped += MenuBleWatcher_Stopped;
                     MenuBleWatcher.Start();
                     Timeout_BluetoothLEAdvertisementWatcher.Start();
+
+                    await ListAllAdapters();
+
                     break;
             }
             DeviceEnumerationChanged?.Invoke(this, new EventArgs());
         }
 
+        private async Task ListAllAdapters()
+        {
+            // List stuff about the radio
+            Log("List all adapters");
+            var defaultAdapter = await BluetoothAdapter.GetDefaultAsync();
+
+            var selector = BluetoothAdapter.GetDeviceSelector();
+            var adapterList = await DeviceInformation.FindAllAsync(selector);
+            foreach (var di in adapterList)
+            {
+                var adapter = await BluetoothAdapter.FromIdAsync(di.Id);
+                var isDefault = defaultAdapter.BluetoothAddress == adapter.BluetoothAddress;
+                var radio = await adapter.GetRadioAsync();
+                var (diname, hasdiname) = GetDeviceInformationName(di);
+                Log($"    Adapter: {diname} {adapter.DeviceId} default?={isDefault} address={BluetoothAddress.AsString(adapter.BluetoothAddress)}");
+                Log($"        MaxAdvertisementDataLength={adapter.MaxAdvertisementDataLength}");
+                Log($"        IsExtendedAdvertisingSupported={adapter.IsExtendedAdvertisingSupported}");
+                Log($"        IsAdvertisementOffloadSupported={adapter.IsAdvertisementOffloadSupported}");
+                Log($"        IsLowEnergySupported={adapter.IsLowEnergySupported}");
+                Log($"        IsClassicSupported={adapter.IsClassicSupported}");
+                Log($"        IsCentralRoleSupported={adapter.IsCentralRoleSupported}");
+                Log($"        IsPeripheralRoleSupported={adapter.IsPeripheralRoleSupported}");
+                Log($"        Radio Name={radio.Name}");
+                Log($"        Radio State={radio.State}");
+                Log($"        Radio Kind={radio.Kind}");
+                Log("");
+            }
+        }
+
         private void Timeout_BluetoothLEAdvertisementWatcher_Tick(object sender, object e)
         {
-            Timeout_BluetoothLEAdvertisementWatcher.Stop();
+            MenuDeviceInformationWatcher?.Stop();
+            Timeout_BluetoothLEAdvertisementWatcher?.Stop();
             CancelSearch(); // will call MenuBleWatcher?.Stop(); // will trigger MenuBleWatcher_Stopped
         }
 
@@ -1080,15 +1137,20 @@ namespace BluetoothDeviceController
 
         private void DeviceWatcher_Stopped(DeviceWatcher sender, object args)
         {
-            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Stopped");
+            Log($"DeviceWatcher: Stopped");
             MenuDeviceInformationWatcher = null;
             DeviceEnumerationChanged?.Invoke(this, new EventArgs());
             SearchFeedback?.StopSearchFeedback();
         }
 
+        private void Log(string text)
+        {
+            System.Diagnostics.Debug.WriteLine(text);
+        }
+
         private void DeviceWatcher_EnumerationCompleted(DeviceWatcher sender, object args)
         {
-            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Enumeration Completed");
+            Log($"DeviceWatcher: Enumeration Completed");
             MenuDeviceInformationWatcher = null;
             DeviceEnumerationChanged?.Invoke(this, new EventArgs());
             SearchFeedback?.StopSearchFeedback();
@@ -1117,7 +1179,7 @@ namespace BluetoothDeviceController
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {
             var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
-            System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} Removed");
+            Log($"DeviceWatcher: Device {id} Removed");
         }
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
@@ -1130,11 +1192,11 @@ namespace BluetoothDeviceController
             {
                 ;
                 var strvalue = (int)strength;
-                System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} updated strength {strength}");
+                Log($"DeviceWatcher: Device {id} updated strength {strength}");
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine($"DeviceWatcher: Device {id} updated ");
+                Log($"DeviceWatcher: Device {id} updated ");
             }
         }
 
@@ -1267,7 +1329,7 @@ namespace BluetoothDeviceController
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Exception: JsonSearch: {ex.Message}");
+                Log($"Exception: JsonSearch: {ex.Message}");
             }
             finally
             {
@@ -1307,7 +1369,7 @@ namespace BluetoothDeviceController
                         }
                         deviceJson += $"\"Existing_{ble.Name}\""; continue;
                     }
-                    System.Diagnostics.Debug.WriteLine($"DEVICE: Get name for {di.di.Id}");
+                    Log($"DEVICE: Get name for {di.di.Id}");
 
                     // This looks like it's reading lots of services and characteristics, but it's not.
                     // It's only reading Service 1800 (common configuration) Chara 2a00 (device name).
@@ -1329,7 +1391,7 @@ namespace BluetoothDeviceController
                             if (read.Status != GattCommunicationStatus.Success) continue;
                             ncharacteristic++;
                             var name = BluetoothLEStandardServices.CharacteristicData.ValueAsString(BluetoothLEStandardServices.DisplayType.String, read.Value);
-                            System.Diagnostics.Debug.WriteLine($"  --> read name as {name}");
+                            Log($"  --> read name as {name}");
 
                             var entry = nvi.Content as DeviceMenuEntryControl;
                             if (entry != null)
@@ -1347,12 +1409,12 @@ namespace BluetoothDeviceController
                     }
                     if (nservice > 1 || ncharacteristic > 1)
                     {
-                        System.Diagnostics.Debug.WriteLine($"  SURPRISE: ble={ble.Name} nservice={nservice} ncharacteristic={ncharacteristic}");
+                        Log($"  SURPRISE: ble={ble.Name} nservice={nservice} ncharacteristic={ncharacteristic}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"ERROR: unable to navigate {ex.Message}");
+                    Log($"ERROR: unable to navigate {ex.Message}");
                     // I don't know of any exceptions. But if there are any, supress them completely.
                 }
 
@@ -1377,14 +1439,14 @@ namespace BluetoothDeviceController
         private void OnAdRefreshed(object sender, RoutedEventArgs e)
         {
             var ad = sender as AdControl;
-            System.Diagnostics.Debug.WriteLine($"NOTE: AdControl Refresh {ad.Name}");
+            Log($"NOTE: AdControl Refresh {ad.Name}");
             ;
         }
 
         private void OnAdErrorOccurred(object sender, Microsoft.Advertising.WinRT.UI.AdErrorEventArgs e)
         {
             var ad = sender as AdControl;
-            System.Diagnostics.Debug.WriteLine($"NOTE: AdControl Error {ad.Name} Message:{e.ErrorMessage} ErrorCode:{e.ErrorCode}");
+            Log($"NOTE: AdControl Error {ad.Name} Message:{e.ErrorMessage} ErrorCode:{e.ErrorCode}");
             ;
         }
 
