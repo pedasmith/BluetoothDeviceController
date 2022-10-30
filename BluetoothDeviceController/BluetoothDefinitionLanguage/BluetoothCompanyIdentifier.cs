@@ -2606,8 +2606,9 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             return $"CompanyId={companyId}";
         }
 
-        public enum CommonManufacturerType {  Other, Apple10, Govee, Microsoft, Ruuvi}
-        public static (string result, CommonManufacturerType, UInt16 companyId, object specialty) ParseManufacturerData(BluetoothLEAdvertisementDataSection section, sbyte txPower)
+        public enum CommonManufacturerType {  Other, Apple10, Govee, Microsoft, MicrosoftRome, Ruuvi}
+        public static (string result, CommonManufacturerType, UInt16 companyId, object specialty) 
+            ParseManufacturerData(BluetoothLEAdvertisementDataSection section, sbyte txPower, CommonManufacturerType parseAs)
         {
             CommonManufacturerType manufacturerType = CommonManufacturerType.Other;
             UInt16 companyId = 0xFFFF;
@@ -2621,14 +2622,17 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 var companyName = GetBluetoothCompanyIdentifier(companyId);
 
                 // TODO: just for now, dump the Apple stuff and switch to Govee (while I sort out how Govee works
-                if (companyId == 0x004C)
+                if (parseAs == CommonManufacturerType.Govee)
                 {
-                    companyId = 0xEC88;
-                    companyName = "(was apple)";
-                }
-                else if (companyId == 0xEC88)
-                {
-                    companyName = "(is EC88?)";
+                    if (companyId == 0x004C)
+                    {
+                        companyId = 0xEC88;
+                        companyName = "Apple Compat Data:";
+                    }
+                    else if (companyId == 0xEC88)
+                    {
+                        companyName = "Govee Data:";
+                    }
                 }
 
                 var sb = new StringBuilder();
@@ -2647,6 +2651,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                             sb.Append(appleIBeacon.ToString());
                             sb.Append("\n");
                             displayAsHex = false; // we have a better display
+                            speciality = appleIBeacon;
                         }
                         else if (appleIBeacon.IsApple10)
                         {
@@ -2710,7 +2715,8 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                             }
                         }
                         break;
-                    case 0xEC88: // TODO: Somehow a GOVEE device?
+                    case 0xEC88: // Govee device advertisement scan response is for anufacturer 0xEC88
+                        if (parseAs == CommonManufacturerType.Govee)
                         {
                             //var padding = dr.ReadByte();
                             //var encode = dr.ReadUInt32();
@@ -2727,10 +2733,15 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                             {
                                 var junk = dr.ReadByte();
                                 var temp = dr.ReadInt16() / 100.0;
+                                var tempF = (temp * 9.0 / 5.0) + 32.0;
                                 var hum = dr.ReadInt16() / 100.0;
                                 var bat = dr.ReadByte();
-                                sb.Append($"Temp={temp} Hum={hum}% Bat={bat}% (junk={junk}) ");
+                                sb.Append($"Temp={temp}℃ ({tempF}℉) Hum={hum}% Bat={bat}% (junk={junk}) ");
                             }
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"NOTE: saw company {companyId:X4}={companyName} (Govee?)");
                         }
                         break;
                     default:
@@ -2766,7 +2777,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
         public static CommonManufacturerType ParseManufacturerDataType(BluetoothLEAdvertisementDataSection section, sbyte txPower)
         {
             CommonManufacturerType manufacturerType = CommonManufacturerType.Other;
-            UInt16 companyId = 0xFFFF;
+            UInt16 companyId; // Not need to initialize = 0xFFFF;
             try
             {
                 var bytes = section.Data.ToArray();
@@ -2776,7 +2787,19 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 switch (companyId)
                 {
                     case 0x0006: // Microsoft
-                        //companyName = GetBluetoothCompanyIdentifier(companyId);
+                        {
+                            manufacturerType = CommonManufacturerType.Microsoft;
+                            if (dr.UnconsumedBufferLength >= 1)
+                            {
+                                var beaconId = dr.ReadByte();
+                                switch (beaconId) // Microsoft Beacon Id
+                                {
+                                    case 0x01: // computer name
+                                        manufacturerType = CommonManufacturerType.MicrosoftRome;
+                                        break;
+                                }
+                            }
+                        }
                         break;
                     case 0x004C: // Apple
                         var appleIBeacon = Apple_IBeacon.Parse(section, txPower);
@@ -2794,8 +2817,8 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                         manufacturerType = CommonManufacturerType.Ruuvi;
                         break;
                     default:
-                        var companyName = GetBluetoothCompanyIdentifier(companyId);
-                        System.Diagnostics.Debug.WriteLine($"NOTE: saw company {companyId:X4}={companyName}");
+                        //var companyName = GetBluetoothCompanyIdentifier(companyId);
+                        //No point in this diagnostic: System.Diagnostics.Debug.WriteLine($"NOTE: saw company {companyId:X4}={companyName}");
                         break;
                 }
                 return manufacturerType;

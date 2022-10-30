@@ -3,6 +3,7 @@ using BluetoothDeviceController.BluetoothProtocolsCustom;
 using BluetoothDeviceController.Names;
 using BluetoothDeviceController.UserData;
 using Microsoft.Advertising.WinRT.UI;
+using SearchControllers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -57,7 +58,7 @@ namespace BluetoothDeviceController
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page, IDoSearch, IDockParent, SpecialtyPages.IHandleStatus
+    public sealed partial class MainPage : Page, IDoSearch, IDockParent, SpecialtyPages.IHandleStatus, IDeviceDisplay
     {
 #if DEBUG
         const bool ALLOW_AD = false;
@@ -144,6 +145,8 @@ namespace BluetoothDeviceController
         }
         public MainPage()
         {
+            BTAdvertisementWatcher.DeviceDisplay = this;
+
             UserPreferences.MainUserPreferences = Preferences;
             this.InitializeComponent();
             this.Loaded += MainPage_Loaded;
@@ -155,6 +158,8 @@ namespace BluetoothDeviceController
             Searching,
             NotSearching,
         };
+#if NEVER_EVER_DEFINED
+//NOTE: code was added but not completed?
         private SearchStatus _CurrSearchStatus = SearchStatus.NotSearching;
         public SearchStatus CurrSearchStatus
         {
@@ -171,6 +176,7 @@ namespace BluetoothDeviceController
                 }
             }
         }
+#endif
 
         private int Test()
         {
@@ -198,6 +204,8 @@ namespace BluetoothDeviceController
             // must set up searchfeedback before first navigation
             SearchFeedback = uiSearchFeedback;
             uiSearchFeedback.Search = this;
+            BTAdvertisementWatcher.SearchFeedback = SearchFeedback;
+            BTAdvertisementWatcher.Dispatcher = this.Dispatcher;
 
             // It might look like AllBleNames is never used. In reality, this initializes a static class.
             AllBleNames = new BleNames();
@@ -556,8 +564,9 @@ namespace BluetoothDeviceController
             handleStatus?.SetHandleStatus(this); // start handling the status again.
         }
 
-#endregion // DOCK
+        #endregion // DOCK
 
+        #region DEVICE_MANAGEMENT
         /// <summary>
         /// All of the device management methods
         /// </summary>
@@ -722,12 +731,13 @@ namespace BluetoothDeviceController
             }
             return icon;
         }
+        #endregion 
         private double SIGNAL_STRENGTH_THRESHOLD { get { return Preferences.BeaconDbLevel; } }
         /// <summary>
         /// Called when a device is added and when it's updated
         /// </summary>
         /// <param name="wrapper"></param>
-        private void AddOrUpdateDeviceBle(DeviceInformationWrapper wrapper)
+        public void AddOrUpdateDeviceBle(DeviceInformationWrapper wrapper)
         {
             var bleAdvert = wrapper.BleAdvert.BleAdvert;
             if (bleAdvert == null)
@@ -749,10 +759,6 @@ namespace BluetoothDeviceController
             {
                 ; // Hand hook for debugger.
             }
-            if (bleAdvert.Advertisement.LocalName.StartsWith("Govee"))
-            {
-                ; // Hand hook for debugger.
-            }
             int idx = FindDeviceBle(bleAdvert);
 
             var (name, id, description) = BleAdvertisementFormat.GetBleName(wrapper, bleAdvert);
@@ -767,29 +773,19 @@ namespace BluetoothDeviceController
             {
                 specialization = Specialization.Get(Specializations, "Beacon"); // This will get the SimpleBeaconPage
                 specialization.ShortDescription = description;
-
-                if (bleAdvert.Advertisement.LocalName.Contains("Govee"))
+                var isScanable = bleAdvert.IsScannable;
+                var isScanResponse = bleAdvert.IsScanResponse;
+                if (isScanable && bleAdvert.Advertisement.LocalName.Contains("Govee"))
                 {
-                    foreach (var md in bleAdvert.Advertisement.ManufacturerData)
-                    {
-                        var dr = DataReader.FromBuffer(md.Data);
-                        var (hx, status) = Utilities.DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength);
-                        specialization.ShortDescription += $"\nTODO: company={md.CompanyId} string={hx}";
-                    }
-                    foreach (var section in bleAdvert.Advertisement.DataSections)
-                    {
-                        specialization.ShortDescription += $"\nTODO: section={section.DataType}";
-                    }
-                    ; // Hand hook for debugger.
+                    ; // handy place to hang a debugger
                 }
-
             }
 
             // Not eddystone or ruuvitag. Let's do the event so it can be seen
             // by the SimpleBeaconPage. 
             SimpleBeaconPage.TheSimpleBeaconPage.IsPaused = SearchFeedback.GetIsPaused(); // Transfer the search feedback UX value to the SimpleBeaconPage.
-            // Yes, this is pretty awkwarrd.
-            wrapper.BleAdvert.Event(bleAdvert);
+            // Yes, this is pretty awkward.
+            wrapper.BleAdvert.Event(wrapper.BleAdvert);
 
             if (idx != -1)
             {
@@ -937,11 +933,11 @@ namespace BluetoothDeviceController
 
         public bool GetSearchActive() 
         {
-            var retval = MenuDeviceInformationWatcher != null || MenuBleWatcher != null;
+            var retval = MenuDeviceInformationWatcher != null || BTAdvertisementWatcher.IsActive;
             return retval;
         }
         DeviceWatcher MenuDeviceInformationWatcher = null;
-        BluetoothLEAdvertisementWatcher MenuBleWatcher = null;
+        SearchControllers.BTAdvertisementController BTAdvertisementWatcher = new SearchControllers.BTAdvertisementController();
         Task DeviceReadTask = null;
         CancellationTokenSource DeviceReadCts = null;
 
@@ -952,9 +948,7 @@ namespace BluetoothDeviceController
             MenuDeviceInformationWatcher?.Stop();
             MenuDeviceInformationWatcher = null;
 
-            MenuBleWatcher?.Stop();
-            MenuBleWatcher = null;
-
+            BTAdvertisementWatcher?.Stop();
             SearchFeedback?.StopSearchFeedback();
         }
 
@@ -1027,19 +1021,7 @@ namespace BluetoothDeviceController
                         dt.Interval = TimeSpan.FromMilliseconds(Preferences.AdvertisementScanTimeInMilliseconds);
                         Timeout_BluetoothLEAdvertisementWatcher = dt;
                     }
-                    MenuBleWatcher = new BluetoothLEAdvertisementWatcher();
-                    var mode = MenuBleWatcher.ScanningMode;
-                    if (ApiInformation.IsPropertyPresent("Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementWatcher", "ScanningMode"))
-                    {
-                        MenuBleWatcher.ScanningMode = BluetoothLEScanningMode.Active;
-                    }
-                    if (ApiInformation.IsPropertyPresent("Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementWatcher", "AllowExtendedAdvertisements"))
-                    {
-                        MenuBleWatcher.AllowExtendedAdvertisements = true;
-                    }
-                    MenuBleWatcher.Received += MenuBleWatcher_Received;
-                    MenuBleWatcher.Stopped += MenuBleWatcher_Stopped;
-                    MenuBleWatcher.Start();
+                    BTAdvertisementWatcher.Start(); 
                     Timeout_BluetoothLEAdvertisementWatcher.Start();
 
                     await ListAllAdapters();
@@ -1082,58 +1064,10 @@ namespace BluetoothDeviceController
         {
             MenuDeviceInformationWatcher?.Stop();
             Timeout_BluetoothLEAdvertisementWatcher?.Stop();
-            CancelSearch(); // will call MenuBleWatcher?.Stop(); // will trigger MenuBleWatcher_Stopped
+            CancelSearch(); // will call BTAdvertisementWatcher?.Stop() // will call MenuBleWatcher?.Stop(); // will trigger MenuBleWatcher_Stopped
         }
 
         DispatcherTimer Timeout_BluetoothLEAdvertisementWatcher = null;
-
-        private void MenuBleWatcher_Stopped(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementWatcherStoppedEventArgs args)
-        {
-            // Might well be a duplicate; the timer (Timeout_BluetoothLEAdvertisementWatcher_Tick) will already have called CancelSearch()
-            SearchFeedback.StopSearchFeedback();
-        }
-
-        Dictionary<ulong, BleAdvertisementWrapper> BleWrappers = new Dictionary<ulong, BleAdvertisementWrapper>();
-
-        ulong Debug_Addr = 0;
-        /// <summary>
-        /// Got a new BLE beacon advertisement! Add it to the display page
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private async void MenuBleWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
-        {
-            var name = args.Advertisement.LocalName;
-            System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {name} seen");
-            if (name.Contains("Wescale") || name.StartsWith("LC") || name.StartsWith("Govee"))
-            {
-                ; // Handy hook for debugger.
-            }
-            if (Debug_Addr != 0 && Debug_Addr == args.BluetoothAddress)
-            {
-                ; // Breakpoint
-            }
-            else if (name.StartsWith ("Govee") && Debug_Addr == 0)
-            {
-                Debug_Addr = args.BluetoothAddress;
-            }
-
-            // Get the appropriate ble advert wrapper (or make a new one)
-            BleAdvertisementWrapper wrapper = null;
-            BleWrappers.TryGetValue(args.BluetoothAddress, out wrapper);
-            if (wrapper == null)
-            {
-                wrapper = new BleAdvertisementWrapper();
-                wrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.BluetoothLE;
-                BleWrappers.Add(args.BluetoothAddress, wrapper);
-            }
-            wrapper.BleAdvert = args;
-            var diwrapper = new DeviceInformationWrapper(wrapper);
-
-            await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
-                () => { AddOrUpdateDeviceBle(diwrapper); }
-                );
-        }
 
         private void DeviceWatcher_Stopped(DeviceWatcher sender, object args)
         {

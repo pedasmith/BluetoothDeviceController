@@ -116,7 +116,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
 
         // Copied from the Pokit_ProPage.xaml.cs file
-        bool MM_DataNotifySetup = false;
+       //TODO: bool MM_DataNotifySetup = false;
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyMM_DataSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
 

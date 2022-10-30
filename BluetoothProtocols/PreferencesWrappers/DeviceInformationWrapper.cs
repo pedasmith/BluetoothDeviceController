@@ -14,27 +14,56 @@ namespace BluetoothDeviceController
         /// <summary>
         /// Which exact type of advertisement is this?
         /// </summary>
-        public enum BleAdvertisementType { None, BluetoothLE, Eddystone, RuuviTag }
+        public enum BleAdvertisementType { None, BluetoothLE, Eddystone, Govee, RuuviTag }
         public BleAdvertisementType AdvertisementType { get; set; } = BleAdvertisementType.None;
+        /// <summary>
+        /// When an advert is a scan response, we should include the original advert. Among other things,
+        /// it's how we know that an scan response is a Govee response.
+        /// </summary>
+        public BluetoothLEAdvertisementReceivedEventArgs BleOriginalAdvert { get; set; } = null;
         public BluetoothLEAdvertisementReceivedEventArgs BleAdvert { get; set; } = null;
         public string EddystoneUrl { get; set; }
 
         public delegate void BluetoothLEAdvertisementEvent(BluetoothLEAdvertisementReceivedEventArgs data);
+        public delegate void BluetoothLEAdvertisementWrapperEvent(BleAdvertisementWrapper data);
         public event BluetoothLEAdvertisementEvent UpdatedBleAdvertisement = null;
         // All wrappers use the same static Universal advertisement
         public static event BluetoothLEAdvertisementEvent UpdatedUniversalBleAdvertisement = null;
-        public void Event(BluetoothLEAdvertisementReceivedEventArgs results)
+
+        public event BluetoothLEAdvertisementWrapperEvent UpdatedBleAdvertisementWrapper = null;
+        public static event BluetoothLEAdvertisementWrapperEvent UpdatedUniversalBleAdvertisementWrapper = null;
+
+        /// <summary>
+        /// There's a matrix of events: the per-wrapper events which either take the wrapper or the raw advertisement,
+        /// and the universal events which can take the wrapper or the raw advertisement.
+        /// </summary>
+        /// <param name="advertisementWrapper"></param>
+        public void Event(BleAdvertisementWrapper advertisementWrapper)
         {
-            if (UpdatedBleAdvertisement == null)
+            if (UpdatedBleAdvertisement == null && UpdatedBleAdvertisementWrapper == null)
             {
-                UpdatedUniversalBleAdvertisement?.Invoke(results);
+                if (UpdatedUniversalBleAdvertisementWrapper != null)
+                {
+                    // Best universal (aka static) version uses the wrapper which has more data
+                    UpdatedUniversalBleAdvertisementWrapper.Invoke(advertisementWrapper);
+                }
+                else
+                {
+                    UpdatedUniversalBleAdvertisement?.Invoke(advertisementWrapper.BleAdvert);
+                }
             }
             else
             {
-                UpdatedBleAdvertisement.Invoke(results);
+                if (UpdatedBleAdvertisementWrapper != null)
+                {
+                    UpdatedBleAdvertisementWrapper.Invoke(advertisementWrapper);
+                }
+                else
+                {
+                    UpdatedBleAdvertisement.Invoke(advertisementWrapper.BleAdvert);
+                }
             }
         }
-
         public delegate void BluetoothEddystoneAdvertisementEvent(string data);
         public event BluetoothEddystoneAdvertisementEvent UpdatedEddystoneAdvertisement = null;
         public void Event(string results)

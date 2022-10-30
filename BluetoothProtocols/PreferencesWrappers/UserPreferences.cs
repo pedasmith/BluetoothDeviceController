@@ -37,6 +37,7 @@
         // and the advert page just filters based on context. It had also been used in the UX to show or not show the BT address, but now I just always show it.
         //public bool BeaconTrackAll { get; set; } = false;
         public bool BeaconIgnoreApple { get; set; } = true;
+        public bool BeaconIgnoreMicrosoftRome { get; set; } = true; // TODO: Save/Restore and add to UX
         public double BeaconDbLevel { get; set; } = -80.0; // default min db level for beacon advert
 
         public enum SortBy { Mac, Time, Rss, };
@@ -55,6 +56,7 @@
         const string BeaconFullDetailsSetting = "UserPreferenceBeaconFullDetails";
         //const string BeaconTrackAllSetting = "UserPreferenceBeaconTrackAll";
         const string BeaconIgnoreAppleSetting = "UserPreferenceBeaconIgnoreApple";
+        const string BeaconIgnoreMicrosoftRomeSetting = "UserPreferenceBeaconIgnoreMicrosoftRome";
         const string BeaconDbLevelSetting = "UserPreferenceBeaconDbLevel";
 
         const string MenuFilterSortDirectionSetting = "MenuFilterSortDirection";
@@ -94,6 +96,10 @@
             {
                 BeaconIgnoreApple = (bool)localSettings.Values[BeaconIgnoreAppleSetting];
             }
+            if (localSettings.Values.ContainsKey(BeaconIgnoreMicrosoftRomeSetting))
+            {
+                BeaconIgnoreMicrosoftRome = (bool)localSettings.Values[BeaconIgnoreMicrosoftRomeSetting];
+            }
             if (localSettings.Values.ContainsKey(BeaconDbLevelSetting))
             {
                 BeaconDbLevel = (double)localSettings.Values[BeaconDbLevelSetting];
@@ -115,6 +121,7 @@
             localSettings.Values[BeaconFullDetailsSetting] = BeaconFullDetails;
             //localSettings.Values[BeaconTrackAllSetting] = BeaconTrackAll;
             localSettings.Values[BeaconIgnoreAppleSetting] = BeaconIgnoreApple;
+            localSettings.Values[BeaconIgnoreMicrosoftRomeSetting] = BeaconIgnoreMicrosoftRome;
             localSettings.Values[BeaconDbLevelSetting] = BeaconDbLevel;
 
             localSettings.Values[MenuFilterSortDirectionSetting] = (int)MenuFilterSortDirection;

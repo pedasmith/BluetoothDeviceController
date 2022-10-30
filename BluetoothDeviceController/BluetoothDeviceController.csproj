@@ -1053,6 +1053,7 @@
   <ItemGroup />
   <Import Project="..\BluetoothProtocols\BluetoothProtocols.projitems" Label="Shared" />
   <Import Project="..\BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems" Label="Shared" />
+  <Import Project="..\SearchControllers\SearchControllers.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

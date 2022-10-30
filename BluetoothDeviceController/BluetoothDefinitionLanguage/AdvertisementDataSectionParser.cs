@@ -87,7 +87,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             return db;
         }
 
-        public static (string result, BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType, UInt16 companyId) Parse(BluetoothLEAdvertisementDataSection section, sbyte txPower, string indent)
+        public static (string result, BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType, UInt16 companyId) Parse(BluetoothLEAdvertisementDataSection section, sbyte txPower, BluetoothCompanyIdentifier.CommonManufacturerType parseAs, string indent)
         {
             string str = "??";
             byte b = section.DataType;
@@ -95,13 +95,14 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value
             object speciality = null;
             var manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
+            var printAsHex = false;
+            var hexPrefix = "";
             try
             {
-                var printAsHex = false;
                 switch (dtv)
                 {
                     case DataTypeValue.ManufacturerData:
-                        (str, manufacturerType, companyId, speciality) = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower);
+                        (str, manufacturerType, companyId, speciality) = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower, parseAs);
                         break;
                     case DataTypeValue.Flags:
                         str = ParseFlags(section);
@@ -179,16 +180,16 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                         }
                         break;
                 }
-                if (printAsHex)
-                {
-                    var result = ValueParser.Parse(section.Data, "BYTES|HEX");
-                    str = $"section {dtv.ToString()} data={result.AsString}\n";
-                }
             }
             catch (Exception)
             {
-                var result = ValueParser.Parse(section.Data, "BYTES|HEX");
-                str = $"error section {section.DataType} data={result.AsString}\n";
+                printAsHex = true;
+                hexPrefix = "error ";
+            }
+            if (printAsHex)
+            {
+                var hexstr = ValueParser.Parse(section.Data, "BYTES|HEX");
+                str = $"{hexPrefix}section {dtv.ToString()} data={hexstr.AsString}\n";
             }
             if (!string.IsNullOrWhiteSpace(str)) str = indent + str;
             return (str, manufacturerType, companyId);

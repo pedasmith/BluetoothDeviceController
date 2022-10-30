@@ -219,6 +219,7 @@ namespace BluetoothDeviceController.BleEditor
             }
         }
 
+#if NEVER_EVER_DEFINED
         // NOTE: The keepalive here does absolutely nothing useful. This code should be removed.
         //static Guid GoveeKeepaliveCharacteristicUuid = Guid.Parse("494e5445-4c4c-495f-524f-434b535f2012"); // From OpenHab
         static Guid GoveeKeepaliveCharacteristicUuid = Guid.Parse("494e5445-4c4c-495f-524f-434b535f2014"); // Use the heartbeat one?
@@ -255,6 +256,7 @@ namespace BluetoothDeviceController.BleEditor
           });
         }
 
+#endif
 
         const double ElementMinWidth = 150;
         Thickness ElementMargin = new Thickness(2);
