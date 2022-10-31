@@ -288,7 +288,16 @@ namespace BluetoothDeviceController
                         {
                             SavedBeaconFilter = di.BleAdvert.BleAdvert.BluetoothAddress;
                         }
-                        await UpdateSimpleBeaconPage();
+                        // TODO: maybe display the specialized page?
+                        // Maybe use the actual list that we've got?
+                        if (di?.BleAdvert?.AdvertisementType == BleAdvertisementWrapper.BleAdvertisementType.Govee)
+                        {
+                            await NavView_NavigateAsync(di, args.RecommendedNavigationTransitionInfo);
+                        }
+                        else
+                        {
+                            await UpdateSimpleBeaconPage();
+                        }
                     }
                 }
                 else // Should display its own unique page
@@ -404,23 +413,23 @@ namespace BluetoothDeviceController
         /// <summary>
         /// Primary call to show a page for a specific bluetooth device.
         /// </summary>
-        /// <param name="wrapper"></param>
+        /// <param name="deviceWrapper"></param>
         /// <param name="transitionInfo"></param>
-        private async Task NavView_NavigateAsync(DeviceInformationWrapper wrapper, NavigationTransitionInfo transitionInfo)
+        private async Task NavView_NavigateAsync(DeviceInformationWrapper deviceWrapper, NavigationTransitionInfo transitionInfo)
         {
             Type _pageType = null;
             var preftype = Preferences.Display;
             var scrollType = Specialization.ParentScrollType.ParentShouldScroll;
-            if (wrapper != null) wrapper.UserPreferences = Preferences;
+            if (deviceWrapper != null) deviceWrapper.UserPreferences = Preferences;
             if (Preferences.Scope == UserPreferences.SearchScope.Bluetooth_Com_Device)
             {
                 _pageType = typeof(SerialPort.SimpleTerminalPage);
                 scrollType = Specialization.ParentScrollType.ChildHandlesScrolling;
-                wrapper.SerialPortPreferences = SerialPortPreferences;
+                deviceWrapper.SerialPortPreferences = SerialPortPreferences;
             }
             else if (Preferences.Scope == UserPreferences.SearchScope.Bluetooth_Beacons)
             {
-                var ble = wrapper.BleAdvert;
+                var ble = deviceWrapper.BleAdvert;
                 if (ble != null)
                 {
                     switch (ble.AdvertisementType)
@@ -447,22 +456,22 @@ namespace BluetoothDeviceController
             }
             else if (preftype == UserPreferences.DisplayPreference.Specialized_Display)
             {
-                if (wrapper?.di == null)
+                if (deviceWrapper?.di == null)
                 {
 
                 }
                 else
                 {
-                    var (deviceName, hasDeviceName) = GetDeviceInformationName(wrapper?.di);
+                    var (deviceName, hasDeviceName) = GetDeviceInformationName(deviceWrapper?.di);
                     if (deviceName.StartsWith("Pokit"))
                     {
                         ;// handy hook for debugging
                     }
 
                     var specialization = Specialization.Get(Specializations, deviceName);
-                    if (specialization == null && wrapper != null)
+                    if (specialization == null && deviceWrapper != null)
                     {
-                        var isUart = await wrapper.IsNordicUartAsync();
+                        var isUart = await deviceWrapper.IsNordicUartAsync();
                         if (isUart)
                         {
                             specialization = Specialization.Get(Specializations, Nordic_Uart.SpecializationName);
@@ -492,7 +501,7 @@ namespace BluetoothDeviceController
             {
                 // Not super pleased with this; there's a strong assumption that the bluetooth device id will match the deviceinfo id.
                 // That's not actually required.
-                if (!NewPageIsSameIdAsCurrentPage(wrapper?.di?.Id ?? null))
+                if (!NewPageIsSameIdAsCurrentPage(deviceWrapper?.di?.Id ?? null))
                 {
                     MinimizeCurrentWindowToDeviceDock();
                 }
@@ -502,7 +511,7 @@ namespace BluetoothDeviceController
                 SearchFeedback.SetPauseVisibility(pageIsBeacon);
                 SearchFeedback.SetSearchFeedbackType(pageIsBeacon ? SearchFeedbackType.Advertisement : SearchFeedbackType.Normal);
 
-                ContentFrame.Navigate(_pageType, wrapper, transitionInfo);
+                ContentFrame.Navigate(_pageType, deviceWrapper, transitionInfo);
             }
         }
 
@@ -765,10 +774,8 @@ namespace BluetoothDeviceController
             }
             int idx = FindDeviceBle(bleAdvert);
 
-            // IP: fixing the callbacks! Horribly, will call events when wrapper != null
             var (name, id, description) = BleAdvertisementFormat.GetBleName(bleAdvertWrapper);
             bleAdvertWrapper.CallCorrectEvent();
-
 
             var specialization = Specialization.Get(Specializations, name);
             if (specialization != null && string.IsNullOrEmpty(specialization.ShortDescription))

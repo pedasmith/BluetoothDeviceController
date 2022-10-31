@@ -18,7 +18,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\Ruuvi_Tag_v1_Helper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\BluetoothAppearance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\BluetoothServiceRegistration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\BluetoothServiceUuid16Bit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\Eddystone.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Nordic_Uart.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs" />

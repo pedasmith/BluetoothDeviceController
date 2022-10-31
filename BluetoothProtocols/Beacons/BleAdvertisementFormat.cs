@@ -31,6 +31,7 @@ namespace BluetoothDeviceController.Beacons
             if (govee != null && govee.IsValid)
             {
                 bleWrapper.GoveeDataRecord = govee; // only set if it's valid.
+                bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Govee;
             }
 
 

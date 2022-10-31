@@ -162,9 +162,7 @@
       <DependentUpon>VariableControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCharacteristic.cs" />
-    <Compile Include="BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothUnit.cs" />
-    <Compile Include="BluetoothDefinitionLanguage\BluetoothServiceUuid16Bit.cs" />
     <Compile Include="BluetoothDefinitionLanguage\Device.cs" />
     <Compile Include="BluetoothLEStandardServices.cs" />
     <Compile Include="DeviceInformationPage.xaml.cs">
