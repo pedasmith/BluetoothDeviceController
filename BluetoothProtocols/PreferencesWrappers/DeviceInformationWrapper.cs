@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Beacons;
+using BluetoothProtocols.Beacons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,18 @@ namespace BluetoothDeviceController
 {
     public class BleAdvertisementWrapper
     {
+        public BleAdvertisementWrapper() { }
+         public BleAdvertisementWrapper(BluetoothLEAdvertisementReceivedEventArgs advert)
+        {
+            BleAdvert = advert;
+        }
         /// <summary>
         /// Which exact type of advertisement is this?
         /// </summary>
         public enum BleAdvertisementType { None, BluetoothLE, Eddystone, Govee, RuuviTag }
+        public enum BleAdvertisementEddystoneSubtype {  None, Uid, Url, Tlm, Eid };
         public BleAdvertisementType AdvertisementType { get; set; } = BleAdvertisementType.None;
+        public BleAdvertisementEddystoneSubtype AdvertisementEddystoneSubtype { get; set; } = BleAdvertisementEddystoneSubtype.None;
         /// <summary>
         /// When an advert is a scan response, we should include the original advert. Among other things,
         /// it's how we know that an scan response is a Govee response.
@@ -23,6 +31,8 @@ namespace BluetoothDeviceController
         public BluetoothLEAdvertisementReceivedEventArgs BleOriginalAdvert { get; set; } = null;
         public BluetoothLEAdvertisementReceivedEventArgs BleAdvert { get; set; } = null;
         public string EddystoneUrl { get; set; }
+        public Govee GoveeDataRecord { get; set; }
+        public Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord RuuviDataRecord { get; set; }
 
         public delegate void BluetoothLEAdvertisementEvent(BluetoothLEAdvertisementReceivedEventArgs data);
         public delegate void BluetoothLEAdvertisementWrapperEvent(BleAdvertisementWrapper data);
@@ -76,6 +86,42 @@ namespace BluetoothDeviceController
         public void Event(Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord results)
         {
             UpdatedRuuviAdvertisement?.Invoke(results);
+        }
+        public delegate void GoveeAdvertisementEvent(Govee data);
+        public event GoveeAdvertisementEvent UpdatedGoveeAdvertisement = null;
+        public void Event(Govee results)
+        {
+            UpdatedGoveeAdvertisement?.Invoke(results);
+        }
+
+        public void CallCorrectEvent()
+        {
+            switch (AdvertisementType)
+            {
+                case BleAdvertisementWrapper.BleAdvertisementType.Eddystone:
+                    switch (AdvertisementEddystoneSubtype)
+                    {
+                        case BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.Uid:
+                            Event("UID: <data>");
+                            break;
+                        case BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.Eid:
+                            Event("EID: <data>");
+                            break;
+                        case BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.Tlm:
+                            Event("TLM: <data>");
+                            break;
+                        case BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.Url:
+                            Event(EddystoneUrl);
+                            break;
+                    }
+                    break;
+                case BleAdvertisementWrapper.BleAdvertisementType.Govee:
+                    Event(GoveeDataRecord);
+                    break;
+                case BleAdvertisementWrapper.BleAdvertisementType.RuuviTag:
+                    Event(RuuviDataRecord);
+                    break;
+            }
         }
 
         public override string ToString()

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 using Utilities;
+using BluetoothProtocols.Beacons;
 
 namespace BluetoothDeviceController.BluetoothDefinitionLanguage
 {
@@ -2621,10 +2622,9 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 companyId = dr.ReadUInt16();
                 var companyName = GetBluetoothCompanyIdentifier(companyId);
 
-                // TODO: just for now, dump the Apple stuff and switch to Govee (while I sort out how Govee works
-                if (parseAs == CommonManufacturerType.Govee)
+                if (parseAs == CommonManufacturerType.Govee) // Later: handle this more generically.
                 {
-                    if (companyId == 0x004C)
+                    if (companyId == 0x004C) // Totally not clear what they are doing.
                     {
                         companyId = 0xEC88;
                         companyName = "Apple Compat Data:";
@@ -2715,29 +2715,20 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                             }
                         }
                         break;
-                    case 0xEC88: // Govee device advertisement scan response is for anufacturer 0xEC88
+                    case 0xEC88: // Govee device advertisement scan response is for manufacturer 0xEC88
                         if (parseAs == CommonManufacturerType.Govee)
                         {
-                            //var padding = dr.ReadByte();
-                            //var encode = dr.ReadUInt32();
-                            //var temp = ((double)(encode / 1000)) / 10.0; // result is degrees c
-                            //var hum = ((double)(encode % 1000)) / 10.0; // now it's percent
-                            if (dr.UnconsumedBufferLength > 16)
+
+                            var data = Govee.Parse(section);
+                            if (!data.IsValid)
                             {
-                                var pre = dr.ReadInt16();
-                                var (strName, nameOk) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength - 4);
-                                var (strPost, postOk) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength);
-                                sb.Append($"Pre={pre} Str={strName} Post={strPost} ");
+                                sb.Append(data.EncodeMessage); // will be some kind of error message.
                             }
                             else
                             {
-                                var junk = dr.ReadByte();
-                                var temp = dr.ReadInt16() / 100.0;
-                                var tempF = (temp * 9.0 / 5.0) + 32.0;
-                                var hum = dr.ReadInt16() / 100.0;
-                                var bat = dr.ReadByte();
-                                sb.Append($"Temp={temp}℃ ({tempF}℉) Hum={hum}% Bat={bat}% (junk={junk}) ");
+                                sb.Append(data.EncodeMessage); // valid temp and humidity
                             }
+                            displayAsHex = false;
                         }
                         else
                         {

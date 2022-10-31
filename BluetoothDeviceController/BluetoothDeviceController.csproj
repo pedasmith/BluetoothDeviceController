@@ -161,7 +161,6 @@
     <Compile Include="BleEditor\VariableControl.xaml.cs">
       <DependentUpon>VariableControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCharacteristic.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs" />
     <Compile Include="BluetoothDefinitionLanguage\BluetoothUnit.cs" />

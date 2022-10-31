@@ -25,7 +25,11 @@ namespace BluetoothDeviceController.Beacons
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             var di = args.Parameter as DeviceInformationWrapper;
-            di.BleAdvert.UpdatedRuuviAdvertisement += Di_UpdatedRuuviAdvertisement;
+            if (di.BleAdvert != null)
+            {
+                di.BleAdvert.UpdatedRuuviAdvertisement += Di_UpdatedRuuviAdvertisement;
+                di.BleAdvert.UpdatedGoveeAdvertisement += Di_UpdatedGoveeAdvertisement;
+            }
             InitializeCharts();
         }
 
@@ -76,7 +80,27 @@ typeof(Ruuvi_DataRecord).GetProperty("Humidity"),
                 Ruuvi_DataChart.AddYTime<Ruuvi_DataRecord>(addResult, Ruuvi_DataRecordData);
             });
         }
+        private async void Di_UpdatedGoveeAdvertisement(BluetoothProtocols.Beacons.Govee goveeRecord)
+        {
+            //TODO: make a more generic data type?
+            var record = new Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord();
+            record.Pressure = 0;
+            record.Temperature = goveeRecord.TemperatureInDegreesC;
+            record.Humidity = goveeRecord.HumidityInPercent;
 
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                // Add to the text box!
+                uiResults.Text += record.ToString() + "\n";
+
+                Ruuvi_Data_Temperature.Text = record.Temperature.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                Ruuvi_Data_Humidity.Text = record.Humidity.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                Ruuvi_Data_Pressure.Text = record.Pressure.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+
+                var addResult = Ruuvi_DataRecordData.AddRecord(record);
+                Ruuvi_DataChart.AddYTime<Ruuvi_DataRecord>(addResult, Ruuvi_DataRecordData);
+            });
+        }
         public DataCollection<Ruuvi_DataRecord> Ruuvi_DataRecordData { get; } = new DataCollection<Ruuvi_DataRecord>();
         
 

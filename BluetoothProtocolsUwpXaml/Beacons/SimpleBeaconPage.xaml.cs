@@ -59,7 +59,11 @@ namespace BluetoothDeviceController.Beacons
             di = args.Parameter as DeviceInformationWrapper;
             // When will di.BleAdvert be null? When we've created a page generically instead of for a particular device.
             // This happens when you do a beacon search.
-            if (di.BleAdvert != null) di.BleAdvert.UpdatedBleAdvertisement += BleAdvert_UpdatedBleAdvertisement;
+            if (di.BleAdvert != null)
+            {
+                di.BleAdvert.UpdatedBleAdvertisement += BleAdvert_UpdatedBleAdvertisement;
+                di.BleAdvert.UpdatedBleAdvertisementWrapper += BleAdvert_UpdatedBleAdvertisementWrapper;
+            }
             BleAdvertisementWrapper.UpdatedUniversalBleAdvertisement += BleAdvert_UpdatedUniversalBleAdvertisement;
             BleAdvertisementWrapper.UpdatedUniversalBleAdvertisementWrapper += BleAdvert_UpdatedUniversalBleAdvertisementWrapper;
 
@@ -71,6 +75,11 @@ namespace BluetoothDeviceController.Beacons
             }
         }
 
+        private void BleAdvert_UpdatedBleAdvertisementWrapper(BleAdvertisementWrapper data)
+        {
+            throw new NotImplementedException();
+        }
+
 
         /// <summary>
         /// Set by the main page via the Search settings; when set will pause updates to the advert page
@@ -80,7 +89,8 @@ namespace BluetoothDeviceController.Beacons
         HashSet<ulong> BleAddressesSeen = new HashSet<ulong>();
         private async void BleAdvert_UpdatedUniversalBleAdvertisement(Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementReceivedEventArgs data)
         {
-            await UpdateUI(data, BluetoothCompanyIdentifier.CommonManufacturerType.Other, IsPaused);
+            var wrapper = new BleAdvertisementWrapper(data);
+            await UpdateUI(wrapper, BluetoothCompanyIdentifier.CommonManufacturerType.Other, IsPaused);
         }
         private async void BleAdvert_UpdatedUniversalBleAdvertisementWrapper(BleAdvertisementWrapper data)
         {
@@ -90,11 +100,12 @@ namespace BluetoothDeviceController.Beacons
                 //Future work: be more generic here. Right now this is super specific.
                 parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Govee;
             }
-            await UpdateUI(data.BleAdvert, parseAs, IsPaused);
+            await UpdateUI(data, parseAs, IsPaused);
         }
         private async void BleAdvert_UpdatedBleAdvertisement(Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementReceivedEventArgs data)
         {
-            await UpdateUI(data, BluetoothCompanyIdentifier.CommonManufacturerType.Other, IsPaused);
+            var wrapper = new BleAdvertisementWrapper(data);
+            await UpdateUI(wrapper, BluetoothCompanyIdentifier.CommonManufacturerType.Other, IsPaused);
         }
         private string AdvertisementToString(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, BluetoothCompanyIdentifier.CommonManufacturerType parseAs, DateTime eventTime)
         {
@@ -253,16 +264,18 @@ namespace BluetoothDeviceController.Beacons
         List<SimpleBeaconHistory> AdvertisementHistory = new List<SimpleBeaconHistory>();
 
 
-        private async Task UpdateUI(BluetoothLEAdvertisementReceivedEventArgs bleAdvert, BluetoothCompanyIdentifier.CommonManufacturerType parseAs, bool isPaused)
+        private async Task UpdateUI(BleAdvertisementWrapper bleAdvertWrapper, BluetoothCompanyIdentifier.CommonManufacturerType parseAs, bool isPaused)
         {
             //bool includeLeadingAddress = true; // or UserPreferences.MainUserPreferences.BeaconTrackAll
+            BluetoothLEAdvertisementReceivedEventArgs bleAdvert = bleAdvertWrapper.BleAdvert;
+
             var advertTime = DateTime.Now;
             var txt = AdvertisementToString(bleAdvert, parseAs, advertTime);
             string boldText = null;
             bool isNewAddress = BleAddressesSeen.Add(bleAdvert.BluetoothAddress); // add returns false if already present
             if (isNewAddress)
             {
-                var (name, id, description) = BleAdvertisementFormat.GetBleName(null, bleAdvert);
+                var (name, id, description) = BleAdvertisementFormat.GetBleName(bleAdvertWrapper);
                 //var str = $"New device: addr={addrstring}";
                 //if (name != addrstring) str += ($" name={name}");
                 //if (id != name) str += ($" id={id}");

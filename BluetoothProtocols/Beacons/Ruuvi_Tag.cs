@@ -22,7 +22,7 @@ namespace BluetoothDeviceController.Beacons
         public byte MovementCounter { get; set; }
         public UInt16 MovementSequenceCounter { get; set; }
 
-        public static Ruuvi_Tag FromRuuvi_DataRecord (Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord dr)
+        public static Ruuvi_Tag ZZZFromRuuvi_DataRecord (Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord dr)
         {
             if (dr == null) return null;
             var retval = new Ruuvi_Tag()

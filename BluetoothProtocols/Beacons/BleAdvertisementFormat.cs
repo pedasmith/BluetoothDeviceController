@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothProtocols.Beacons;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,18 +12,27 @@ namespace BluetoothDeviceController.Beacons
     public static class BleAdvertisementFormat
     {
 
+
         /// <summary>
-        /// Warning: in addition to its normal function, this function ALSO triggers events. Yes, it's gross, and yes, I'm sorry. This only happens when wrapper is non-null
+        /// This used to be gross and also trigger events. It doesn't any more
         /// </summary>
-        /// <param name="wrapper"></param>
+        /// <param name="deviceWrapper"></param>
         /// <param name="ble"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        private static string CustomizeWrapperFromAdvertisement(DeviceInformationWrapper wrapper, BluetoothLEAdvertisementReceivedEventArgs ble, string name)
+        private static string CustomizeWrapperFromAdvertisement(BleAdvertisementWrapper bleWrapper, string name)
         {
             // Lets's see if it's an Eddystone beacon...
             // https://github.com/google/eddystone
             // https://github.com/google/eddystone/blob/master/protocol-specification.md
+
+            var ble = bleWrapper.BleAdvert;
+            var govee = Govee.Parse(bleWrapper);
+            if (govee != null && govee.IsValid)
+            {
+                bleWrapper.GoveeDataRecord = govee; // only set if it's valid.
+            }
+
 
             foreach (var section in ble.Advertisement.DataSections)
             {
@@ -41,22 +51,32 @@ namespace BluetoothDeviceController.Beacons
                             const int TypeURL = 0x10;
                             const int TypeTLM = 0x20;
                             const int TypeEID = 0x40;
+                            bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Eddystone;
                             switch (EddystoneFrameType)
                             {
+                                default:
+                                    bleWrapper.AdvertisementEddystoneSubtype = BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.None;
+                                    break;
                                 case TypeUID:
-                                    wrapper?.BleAdvert.Event("UID: <data>");
+                                    bleWrapper.AdvertisementEddystoneSubtype = BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.Uid;
+                                    //TODO: Fixing: deviceWrapper?.BleAdvert.Event("UID: <data>");
                                     break;
                                 case TypeTLM:
-                                    wrapper?.BleAdvert.Event("TLM: <data>");
+                                    bleWrapper.AdvertisementEddystoneSubtype = BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.Tlm;
+                                    //TODO: fixing: deviceWrapper?.BleAdvert.Event("TLM: <data>");
                                     break;
                                 case TypeEID:
-                                    wrapper?.BleAdvert.Event("EID: <data>");
+                                    bleWrapper.AdvertisementEddystoneSubtype = BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.Eid;
+                                    //TODO: Fixing: deviceWrapper?.BleAdvert.Event("EID: <data>");
                                     break;
                                 case TypeURL: // 0x10: An Eddystone-URL
                                     // https://github.com/google/eddystone/tree/master/eddystone-url
                                     var result = BluetoothDeviceController.Beacons.Eddystone.ParseEddystoneUrlArgs(section.Data);
                                     name = result.Success ? result.Url : "Invalid eddystone!";
-                                    if (wrapper != null) wrapper.BleAdvert.EddystoneUrl = name;
+
+                                    bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Eddystone;
+                                    bleWrapper.AdvertisementEddystoneSubtype = BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.Url;
+                                    bleWrapper.EddystoneUrl = name;
                                     if (result.Success && result.Url.StartsWith("https://ruu.vi/#"))
                                     {
                                         //foundValues.Add(AdvertisementType.RuuviTag);
@@ -66,20 +86,20 @@ namespace BluetoothDeviceController.Beacons
                                         {
                                             name = ruuvi.ToString(); // Make a new user-friendly string
                                         }
-                                        if (wrapper != null) wrapper.BleAdvert.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.RuuviTag;
+                                        bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.RuuviTag;
+                                        bleWrapper.RuuviDataRecord = ruuvi.Data;
                                         // TODO: this is actually weird; it should be done somewhere else.
                                         // This function is all about setting up the wrapper, not actually
                                         // triggering events!
-                                        wrapper?.BleAdvert.Event(ruuvi.Data);
+                                        //TODO: fixing: deviceWrapper?.BleAdvert.Event(ruuvi.Data);
                                     }
                                     else
                                     {
-                                        if (wrapper != null) wrapper.BleAdvert.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Eddystone;
                                         name = $"Eddystone {result.Url}";
                                         // TODO: this is actually weird; it should be done somewhere else.
                                         // This function is all about setting up the wrapper, not actually
                                         // triggering events!
-                                        wrapper?.BleAdvert.Event(result.Url);
+                                        //TODO: fixing: deviceWrapper?.BleAdvert.Event(result.Url);
                                     }
                                     break;
                             }
@@ -101,12 +121,20 @@ namespace BluetoothDeviceController.Beacons
             }
             return true; ;
         }
-        public static (string name, string id, string description) GetBleName(DeviceInformationWrapper wrapper, BluetoothLEAdvertisementReceivedEventArgs bleAdvert)
+
+        /// <summary>
+        /// Horribly, this not only returns some data, but will also call the wrapper.Event() calls via CustomizeWrapperFromAdvertisement if the wrapper is not null.
+        /// </summary>
+        /// <param name="deviceWrapper"></param>
+        /// <param name="bleAdvert"></param>
+        /// <returns></returns>
+        public static (string name, string id, string description) GetBleName(BleAdvertisementWrapper bleAdvertWrapper)
         {
+            BluetoothLEAdvertisementReceivedEventArgs bleAdvert = bleAdvertWrapper.BleAdvert;
             string name = "???";
             string id = "??-??";
             string description = "??--??";
-            if (bleAdvert == null || (wrapper != null && wrapper.BleAdvert == null))
+            if (bleAdvert == null)
             {
                 return (name, id, description);
             }
@@ -117,9 +145,8 @@ namespace BluetoothDeviceController.Beacons
                 // BAD: There's a device where the LocalName is 13 NUL chars!
                 name = id;
             }
-            name = CustomizeWrapperFromAdvertisement(wrapper, bleAdvert, name);
+            name = CustomizeWrapperFromAdvertisement(bleAdvertWrapper, name);
             description = AsDescription (bleAdvert);
-
             return (name, id, description);
         }
 

@@ -129,7 +129,7 @@ namespace BluetoothDeviceController
             // RuuviTag and other EddyStone data sensors
             new Specialization (typeof(Beacons.SimpleBeaconPage), new string[] { "Beacon" }, LIGHTNING, "", "Advertisement", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(Beacons.EddystonePage), new string[] { "Eddystone" }, BEACON, "", "Eddystone beacon", Specialization.ParentScrollType.ChildHandlesScrolling),
-            new Specialization (typeof(Beacons.RuuvitagPage), new string[] { "Ruuvi" }, DATA, "", "RuuviTag environmental sensor"),
+            new Specialization (typeof(Beacons.RuuvitagPage), new string[] { "Govee_H5074_", "Ruuvi" }, DATA, "", "Environmental sensor"),
         };
 
         public BleNames AllBleNames { get; set; }
@@ -150,7 +150,7 @@ namespace BluetoothDeviceController
             UserPreferences.MainUserPreferences = Preferences;
             this.InitializeComponent();
             this.Loaded += MainPage_Loaded;
-            Test();
+            MainPage.Test();
         }
 
         public enum SearchStatus
@@ -178,7 +178,7 @@ namespace BluetoothDeviceController
         }
 #endif
 
-        private int Test()
+        private static int Test()
         {
             int NError = 0;
             NError += GuidGetCommon.Test();
@@ -315,7 +315,9 @@ namespace BluetoothDeviceController
         }
 
 
-        // List of ValueTuple holding the Navigation Tag and the relative Navigation Page
+        /// <summary>
+        /// List of ValueTuple holding the Navigation Tag and the relative Navigation Page. Used in NavView_Navigate for Help.
+        /// </summary>
         private readonly List<(string Tag, Type Page)> _pages = new List<(string Tag, Type Page)>
         {
             ( "Help", typeof (HelpPage)),
@@ -423,6 +425,7 @@ namespace BluetoothDeviceController
                 {
                     switch (ble.AdvertisementType)
                     {
+                        case BleAdvertisementWrapper.BleAdvertisementType.Govee:
                         case BleAdvertisementWrapper.BleAdvertisementType.RuuviTag:
                             _pageType = typeof(Beacons.RuuvitagPage);
                             break;
@@ -622,10 +625,10 @@ namespace BluetoothDeviceController
             if (String.IsNullOrEmpty(name)) name = di.Name;
             if (String.IsNullOrEmpty(name)) name = di.Id;
 
-            if (name.StartsWith("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-"))
+            if (name.StartsWith("BluetoothLE#BluetoothLE"))
             {
                 hasName = false;
-                name = name.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "Address:");
+                name = "Address:" + NiceId(name);
             }
             return (name, hasName);
         }
@@ -647,7 +650,7 @@ namespace BluetoothDeviceController
             string id = "??-??";
             if (wrapper.di != null)
             {
-                id = wrapper.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
+                id = NiceId (wrapper.di.Id);
                 var isAll_bluetooth_devices = Preferences.Scope == UserPreferences.SearchScope.Ble_All_ble_devices;
                 bool hasDeviceName;
                 (name, hasDeviceName) = GetDeviceInformationName(wrapper.di);
@@ -736,10 +739,11 @@ namespace BluetoothDeviceController
         /// <summary>
         /// Called when a device is added and when it's updated
         /// </summary>
-        /// <param name="wrapper"></param>
-        public void AddOrUpdateDeviceBle(DeviceInformationWrapper wrapper)
+        /// <param name="deviceWrapper"></param>
+        public void AddOrUpdateDeviceBle(DeviceInformationWrapper deviceWrapper)
         {
-            var bleAdvert = wrapper.BleAdvert.BleAdvert;
+            var bleAdvert = deviceWrapper.BleAdvert.BleAdvert;
+            var bleAdvertWrapper = deviceWrapper.BleAdvert;
             if (bleAdvert == null)
             {
                 SearchFeedback.FoundDevice(FoundDeviceInfo.IsError); // filtered=false means it's not one we want. 
@@ -761,7 +765,9 @@ namespace BluetoothDeviceController
             }
             int idx = FindDeviceBle(bleAdvert);
 
-            var (name, id, description) = BleAdvertisementFormat.GetBleName(wrapper, bleAdvert);
+            // IP: fixing the callbacks! Horribly, will call events when wrapper != null
+            var (name, id, description) = BleAdvertisementFormat.GetBleName(bleAdvertWrapper);
+            bleAdvertWrapper.CallCorrectEvent();
 
 
             var specialization = Specialization.Get(Specializations, name);
@@ -785,17 +791,17 @@ namespace BluetoothDeviceController
             // by the SimpleBeaconPage. 
             SimpleBeaconPage.TheSimpleBeaconPage.IsPaused = SearchFeedback.GetIsPaused(); // Transfer the search feedback UX value to the SimpleBeaconPage.
             // Yes, this is pretty awkward.
-            wrapper.BleAdvert.Event(wrapper.BleAdvert);
+            deviceWrapper.BleAdvert.Event(deviceWrapper.BleAdvert); // TODO: why is this called again?
 
             if (idx != -1)
             {
                 // Replace the old tag device information with this new one
                 var nvib = uiNavigation.MenuItems[idx] as NavigationViewItemBase;
-                nvib.Tag = wrapper;
+                nvib.Tag = deviceWrapper;
                 var entry = nvib.Content as DeviceMenuEntryControl;
                 if (entry != null)
                 {
-                    entry.Update(wrapper, name, specialization, null);
+                    entry.Update(deviceWrapper, name, specialization, null);
                 }
                 SearchFeedback.FoundDevice(FoundDeviceInfo.IsDuplicate);
                 return;
@@ -805,12 +811,12 @@ namespace BluetoothDeviceController
             idx = uiNavigation.MenuItems.Count(); // Add to the end of the list
 
             string icon = GetIconForName(name);
-            var dmec = new DeviceMenuEntryControl(wrapper, name, specialization, icon);
+            var dmec = new DeviceMenuEntryControl(deviceWrapper, name, specialization, icon);
             dmec.SettingsClick += OnDeviceSettingsClick;
             var menu = new NavigationViewItem()
             {
                 Content = dmec,
-                Tag = wrapper,
+                Tag = deviceWrapper,
             };
             menu.HorizontalAlignment = HorizontalAlignment.Stretch;
             uiNavigation.MenuItems.Insert(idx, menu);
@@ -1090,14 +1096,20 @@ namespace BluetoothDeviceController
             SearchFeedback?.StopSearchFeedback();
         }
 
-
+        private static string NiceId (string id) // was DeviceInformation args)
+        {
+            var retval = id;
+            var idx = retval.IndexOf('-');
+            if (retval.StartsWith ("BluetoothLE#BluetoothLE") && idx >=0)
+            {
+                retval = retval.Substring(idx + 1);
+            }
+            return retval;
+        }
 
         private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
-            //Testing the IsPresent value.
-            //object result;
-            //bool got = args.Properties.TryGetValue("System.Devices.Aep.IsPresent", out result);
-            var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
+            var id = NiceId(args.Id);
             await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
                 async () => {
                     try
@@ -1112,12 +1124,12 @@ namespace BluetoothDeviceController
         }
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
+            var id = NiceId(args.Id);
             Log($"DeviceWatcher: Device {id} Removed");
         }
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            var id = args.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "");
+            var id = NiceId(args.Id);
 
             // Play around with getting a strength value!
             object strength = null;
@@ -1158,7 +1170,7 @@ namespace BluetoothDeviceController
 
             // Now go for realsie
             DeviceReadCts = new CancellationTokenSource();
-            // Special code for automation: wil do a complete sweep of all BT devices and fill in 
+            // Special code for automation: will do a complete sweep of all BT devices and fill in 
             // the global CurrJsonSearch string variable of the devices.
             switch (readType)
             {
@@ -1351,9 +1363,6 @@ namespace BluetoothDeviceController
                     Log($"ERROR: unable to navigate {ex.Message}");
                     // I don't know of any exceptions. But if there are any, supress them completely.
                 }
-
-                // Always re-get the end because it's always being updated.
-                // No need; now we use the MenuItemCache which has an easy count. endidx = FindListEnd() - 1;
             }
         }
         public void PauseCheckUpdated(bool newIsChecked)
@@ -1384,12 +1393,14 @@ namespace BluetoothDeviceController
             ;
         }
 
+        #region MENU
         private async void OnRequestFeedback(object sender, TappedRoutedEventArgs e)
         {
             var launcher = Microsoft.Services.Store.Engagement.StoreServicesFeedbackLauncher.GetDefault();
             await launcher.LaunchAsync();
         }
 
+#if NEVER_EVER_DEFINED
         private async void OnGenerateCode(object sender, RoutedEventArgs e)
         {
             var dlg = new ContentDialog()
@@ -1401,7 +1412,7 @@ namespace BluetoothDeviceController
             };
             await dlg.ShowAsync();
         }
-
+#endif
         private void OnMenuAutomationSearchCopyJson(object sender, RoutedEventArgs e)
         {
             var value = CurrJsonSearch;
@@ -1459,6 +1470,10 @@ namespace BluetoothDeviceController
 
         UserPreferences.SortBy SavedBeaconSortBy = UserPreferences.SortBy.Time;
         // Can delete any time: Sort direction is in preferences now: SimpleBeaconPage.SortDirection SavedBeaconSortDirection = SimpleBeaconPage.SortDirection.Ascending;
+
+        /// <summary>
+        /// Controls whether we're showing all beacons, or just the selected on. Is toggled in UiNavigation_ItemInvoked when an item is clicked.
+        /// </summary>
         ulong SavedBeaconFilter = 0;
 
 
@@ -1527,6 +1542,11 @@ namespace BluetoothDeviceController
         {
         }
 
+        /// <summary>
+        /// Hardly needed any more now that we have the newer command-line code generation tool BluetoothCodeGeneratordotNetCore
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void MenuOnGenerateCode(object sender, RoutedEventArgs e)
         {
             var dlg = new ContentDialog()
@@ -1538,5 +1558,6 @@ namespace BluetoothDeviceController
             };
             await dlg.ShowAsync();
         }
+#endregion MENU
     }
 }

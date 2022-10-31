@@ -13,8 +13,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\BleAdvertisementFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\BluetoothAddress.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\Eddystone.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\Govee.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\Ruuvi_Tag.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beacons\Ruuvi_Tag_v1_Helper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\BluetoothAppearance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\BluetoothServiceRegistration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothDefinitionLanguage\Eddystone.cs" />
