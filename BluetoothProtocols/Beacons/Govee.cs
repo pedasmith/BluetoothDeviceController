@@ -10,15 +10,14 @@ using static BluetoothDeviceController.BluetoothDefinitionLanguage.Advertisement
 
 namespace BluetoothProtocols.Beacons
 {
-    public class Govee
+    public class Govee : SensorDataRecord
     {
+
         public bool IsValid { get; set; } = true;
         public UInt16 CompanyId { get; set; } // will by 0xEC88 for the Govee HS5074
         public enum SensorType { Other, HS5074 };
         public SensorType TagType { get; set; } = SensorType.Other;
-        public double TemperatureInDegreesC { get; set; }
-        public double TemperatureInDegreesF { get { return (TemperatureInDegreesC * 9.0 / 5.0) + 32.0; } }
-        public double HumidityInPercent { get; set; }
+        public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
         public double BatteryInPercent { get; set; }
         public string EncodeMessage { get; set; }
 
@@ -80,10 +79,11 @@ namespace BluetoothProtocols.Beacons
                 else
                 {
                     var junk = dr.ReadByte();
-                    retval.TemperatureInDegreesC = dr.ReadInt16() / 100.0;
-                    retval.HumidityInPercent = dr.ReadInt16() / 100.0;
+                    retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                    retval.Temperature = dr.ReadInt16() / 100.0;
+                    retval.Humidity = dr.ReadInt16() / 100.0;
                     retval.BatteryInPercent = dr.ReadByte();
-                    retval.EncodeMessage = $"Temp={retval.TemperatureInDegreesC}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.HumidityInPercent}% Bat={retval.BatteryInPercent}% (junk={junk}) ";
+                    retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk}) ";
                 }
 
             }
@@ -96,7 +96,7 @@ namespace BluetoothProtocols.Beacons
         }
         public override string ToString()
         {
-            return $"Temperaure={TemperatureInDegreesC} Humidity={HumidityInPercent}% "
+            return $"Temperaure={Temperature} Humidity={Humidity}% "
                 + $"Battery={BatteryInPercent}";
         }
 

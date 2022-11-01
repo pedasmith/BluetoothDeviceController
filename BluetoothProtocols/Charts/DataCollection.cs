@@ -32,6 +32,7 @@ namespace BluetoothDeviceController.Charts
     public class DataCollection<T> : ObservableCollection<T>, ISummarizeValue
     {
         public RemoveRecordAlgorithm RemoveAlgorithm = RemoveRecordAlgorithm.RemoveRandom;
+        public System.Reflection.PropertyInfo[] TProperties = null;
 
         private int _MaxLength = 10000;// about 1 reading every 10 seconds for an entire day
         public int MaxLength { get { return _MaxLength; } set { if (value == _MaxLength) return; ResetSizeForNewMaxLength(value); _MaxLength = value; } }
@@ -49,7 +50,8 @@ namespace BluetoothDeviceController.Charts
             var item = this[index];
 
             string retval = "";
-            foreach (var property in typeof(T).GetProperties())
+            var list = TProperties ?? typeof(T).GetProperties();
+            foreach (var property in list)
             {
                 try
                 {
@@ -94,7 +96,9 @@ namespace BluetoothDeviceController.Charts
                     }
                     else
                     {
-                        retval += $"\n{property.Name}:\t {str}";
+                        var tabs = "\t";
+                        if (property.Name.Length < 11) tabs += "\t";
+                        retval += $"\n{property.Name}:{tabs} {str}";
                     }
                 }
                 catch (Exception ex)

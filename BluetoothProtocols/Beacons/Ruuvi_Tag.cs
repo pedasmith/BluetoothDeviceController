@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothProtocols;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,7 @@ namespace BluetoothDeviceController.Beacons
         public byte MovementCounter { get; set; }
         public UInt16 MovementSequenceCounter { get; set; }
 
-        public static Ruuvi_Tag ZZZFromRuuvi_DataRecord (Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord dr)
+        public static Ruuvi_Tag ZZZFromRuuvi_DataRecord (SensorDataRecord dr)
         {
             if (dr == null) return null;
             var retval = new Ruuvi_Tag()

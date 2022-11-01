@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Beacons;
+using BluetoothProtocols;
 using BluetoothProtocols.Beacons;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace BluetoothDeviceController
         public BluetoothLEAdvertisementReceivedEventArgs BleAdvert { get; set; } = null;
         public string EddystoneUrl { get; set; }
         public Govee GoveeDataRecord { get; set; }
-        public Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord RuuviDataRecord { get; set; }
+        public SensorDataRecord RuuviDataRecord { get; set; }
 
         public delegate void BluetoothLEAdvertisementEvent(BluetoothLEAdvertisementReceivedEventArgs data);
         public delegate void BluetoothLEAdvertisementWrapperEvent(BleAdvertisementWrapper data);
@@ -81,18 +82,13 @@ namespace BluetoothDeviceController
             UpdatedEddystoneAdvertisement?.Invoke(results);
         }
 
-        public delegate void RuuviAdvertisementEvent(Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord data);
+        public delegate void RuuviAdvertisementEvent(SensorDataRecord data);
         public event RuuviAdvertisementEvent UpdatedRuuviAdvertisement = null;
-        public void Event(Ruuvi_Tag_v1_Helper.Ruuvi_DataRecord results)
+        public void Event(SensorDataRecord results)
         {
             UpdatedRuuviAdvertisement?.Invoke(results);
         }
-        public delegate void GoveeAdvertisementEvent(Govee data);
-        public event GoveeAdvertisementEvent UpdatedGoveeAdvertisement = null;
-        public void Event(Govee results)
-        {
-            UpdatedGoveeAdvertisement?.Invoke(results);
-        }
+
 
         public void CallCorrectEvent()
         {

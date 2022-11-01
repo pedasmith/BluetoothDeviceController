@@ -55,7 +55,7 @@
     </Page.Resources>
 
     <StackPanel>
-        <TextBlock Style="{StaticResource HeaderStyle}">RuuviTag</TextBlock>
+        <TextBlock Style="{StaticResource HeaderStyle}">Sensor Data</TextBlock>
         <ScrollViewer MaxHeight="100">
             <TextBlock x:Name="uiResults" TextWrapping="Wrap" IsTextSelectionEnabled="True" />
         </ScrollViewer>
@@ -65,29 +65,29 @@
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Barometer Data</TextBlock>
                 <StackPanel Orientation="Horizontal">
-                    <TextBox IsReadOnly="True" x:Name="Ruuvi_Data_Temperature" Text="*" Header="Temperature" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Ruuvi_Data_Pressure" Text="*" Header="Pressure" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Ruuvi_Data_Humidity" Text="*" Header="Humidity" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_Temperature" Text="*" Header="Temperature" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_Pressure" Text="*" Header="Pressure" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_Humidity" Text="*" Header="Humidity" Style="{StaticResource HEXStyle}"/>
                 </StackPanel>
 
-                <controls:Expander Header="Ruuvi Data Data tracker" IsExpanded="true" MinWidth="550" HorizontalAlignment="Left">
+                <controls:Expander Header="Sensor Data tracker" IsExpanded="true" MinWidth="550" HorizontalAlignment="Left">
                     <StackPanel MinWidth="550">
-                        <charts:ChartControl Height="200" Width="500" x:Name="Ruuvi_DataChart" />
-                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="Ruuvi_DataGrid" ItemsSource="{Binding Ruuvi_DataRecordData}" />
-                        <TextBox  x:Name="Ruuvi_Data_Notebox" KeyDown="OnRuuvi_Data_NoteKeyDown" />
+                        <charts:ChartControl Height="200" Width="500" x:Name="Sensor_DataChart" />
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="Sensor_DataGrid" ItemsSource="{Binding Sensor_DataRecordData}" />
+                        <TextBox  x:Name="Sensor_Data_Notebox" KeyDown="OnSensor_Data_NoteKeyDown" />
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                            <ComboBox SelectionChanged="OnKeepCountRuuvi_Data" Header="Keep how many items?" SelectedIndex="2">
+                            <ComboBox SelectionChanged="OnKeepCountSensor_Data" Header="Keep how many items?" SelectedIndex="2">
                                 <ComboBoxItem Tag="10">10</ComboBoxItem>
                                 <ComboBoxItem Tag="100">100</ComboBoxItem>
                                 <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
                                 <ComboBoxItem Tag="10000">10K</ComboBoxItem>
                             </ComboBox>
                             <Rectangle Width="5" />
-                            <ComboBox SelectionChanged="OnAlgorithmRuuvi_Data" Header="Remove algorithm?" SelectedIndex="0">
+                            <ComboBox SelectionChanged="OnAlgorithmSensor_Data" Header="Remove algorithm?" SelectedIndex="0">
                                 <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
                                 <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
                             </ComboBox>
-                            <Button Content = "Copy" Click="OnCopyRuuvi_Data" />
+                            <Button Content = "Copy" Click="OnCopySensor_Data" />
                         </StackPanel>
                     </StackPanel>
                 </controls:Expander>
