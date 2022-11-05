@@ -39,6 +39,7 @@ namespace BluetoothDeviceController
         //string GetCurrentSearchResults();
         void ListFilteredOut();
         void PauseCheckUpdated(bool newIsChecked);
+        void ClearDisplay();
     }
     public enum FoundDeviceInfo { IsNew, IsDuplicate, IsOutOfRange, IsFilteredOutDb, IsFilteredOutNoName, IsError };
 
@@ -269,44 +270,57 @@ namespace BluetoothDeviceController
 
         private async void UiNavigation_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            var di = args.InvokedItemContainer.Tag as DeviceInformationWrapper;
-            if (di != null)
+            var deviceWrapper = args.InvokedItemContainer.Tag as DeviceInformationWrapper;
+            if (deviceWrapper != null)
             {
-                if (di.BleAdvert != null)
+                if (deviceWrapper.BleAdvert != null)
                 {
-                    // Should filter to show just this device
-                    // The page should be the SimpleBeaconPage
-                    var isBeaconPage = ContentFrame.CurrentSourcePageType == typeof(Beacons.SimpleBeaconPage);
+                    // There are two states:
+                    // -- all devices, or target just the one
+                    // -- speciality page, or the simple beacon page
+                    // Transitions are:
+                    // all-->one: if the one is govee, display it, otherwise simple beacon page
+                    // one-->all: simple beacon page
+                    var newAddr = deviceWrapper.BleAdvert.BleAdvert.BluetoothAddress;
+                    SavedBeaconFilter = (SavedBeaconFilter == newAddr) ? 0 : deviceWrapper.BleAdvert.BleAdvert.BluetoothAddress;
+                    // TODO: maybe display the specialized page?
+                    // Maybe use the actual list that we've got?
+
                     var bp = ContentFrame.Content as SimpleBeaconPage;
-                    if (isBeaconPage && bp != null)
+                    if (SavedBeaconFilter == 0)
                     {
-                        if (SavedBeaconFilter == di.BleAdvert.BleAdvert.BluetoothAddress)
+                        // End state is to be a SimpleBeaconPage.
+                        if (bp == null) // wasn't a simple beacon page before, so have to transition to one.
                         {
-                            SavedBeaconFilter = 0; // toggle the value
-                        }
-                        else
-                        {
-                            SavedBeaconFilter = di.BleAdvert.BleAdvert.BluetoothAddress;
-                        }
-                        // TODO: maybe display the specialized page?
-                        // Maybe use the actual list that we've got?
-                        if (di?.BleAdvert?.AdvertisementType == BleAdvertisementWrapper.BleAdvertisementType.Govee)
-                        {
-                            await NavView_NavigateAsync(di, args.RecommendedNavigationTransitionInfo);
+                            await NavView_NavigateAsync(null, null);
+                            // TODO: Don't specifiy the device wrapper -- if you include the device wrapper
                         }
                         else
                         {
                             await UpdateSimpleBeaconPage();
                         }
                     }
+                    else
+                    {
+                        if (deviceWrapper?.BleAdvert?.AdvertisementType == BleAdvertisementWrapper.BleAdvertisementType.Govee)
+                        {
+                            await NavView_NavigateAsync(deviceWrapper, args.RecommendedNavigationTransitionInfo);
+                        }
+                        else
+                        {
+                            await UpdateSimpleBeaconPage();
+                        }
+                    }
+                    return;
                 }
                 else // Should display its own unique page
                 {
-                    await NavView_NavigateAsync(di, args.RecommendedNavigationTransitionInfo);
+                    await NavView_NavigateAsync(deviceWrapper, args.RecommendedNavigationTransitionInfo);
                     return;
                 }
             }
 
+            //NOTE: are these ever invoked?
             var tag = args.InvokedItemContainer.Tag as string;
             switch (tag)
             {
@@ -333,6 +347,9 @@ namespace BluetoothDeviceController
             // e.g. ("home", typeof(HomePage)),
         };
 
+        /// <summary>
+        /// Navigate to a string (e.g., "settings" or "Help")
+        /// </summary>
         private async void NavView_Navigate(string navItemTag, string pagename, NavigationTransitionInfo transitionInfo)
         {
             Type _pageType = null;
@@ -429,7 +446,7 @@ namespace BluetoothDeviceController
             }
             else if (Preferences.Scope == UserPreferences.SearchScope.Bluetooth_Beacons)
             {
-                var ble = deviceWrapper.BleAdvert;
+                var ble = deviceWrapper?.BleAdvert;
                 if (ble != null)
                 {
                     switch (ble.AdvertisementType)
@@ -627,7 +644,7 @@ namespace BluetoothDeviceController
         /// <returns></returns>
         private static (string name, bool hasName) GetDeviceInformationName(DeviceInformation di)
         {
-            // Preferred names, in order, are the mapping name, the di.Name and the di.Id.
+            // Preferred names, in order, are the mapping name, the navigateTo.Name and the navigateTo.Id.
             var mapping = UserNameMappings.Get(di.Id);
             var name = mapping?.Name ?? null;
             var hasName = true;
@@ -880,6 +897,9 @@ namespace BluetoothDeviceController
             // Always do a Name search.
             StartSearch(UserPreferences.ReadSelection.Name, Preferences.Scope);
         }
+        private int StartSearchCount = 0; // Started since the last 'clear'
+        private UserPreferences.ReadSelection LastSearchReadType;
+        private UserPreferences.SearchScope LastSearchScope;
         /// <summary>
         /// Primary function to kick off a search for devices (both automation and UX 'search now' button.
         /// </summary>
@@ -887,32 +907,63 @@ namespace BluetoothDeviceController
         /// <param name="scope">Can be any value: the BLE (has_specialty, named, all), advert (beacon) or COM types.</param>
         public void StartSearch(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope)
         {
+            // Track whether or no we should clear the screen. We clean the screen and the list
+            // when it's a "new" search
+            bool shouldClear = true;
+            if (StartSearchCount > 0)
+            {
+                if (readType == LastSearchReadType
+                    && scope == LastSearchScope)
+                {
+                    shouldClear = false; // user just click search/scan again, so we want to update the results.
+                }
+            }
+            LastSearchReadType = readType;
+            LastSearchScope = scope;
+            StartSearchCount++;
+
             switch (scope)
             {
                 case UserPreferences.SearchScope.Bluetooth_Beacons:
                     // Navigate to a beacons page
                     var _pageType = typeof(Beacons.SimpleBeaconPage);
-                    var di = new DeviceInformationWrapper((BleAdvertisementWrapper)null);
-                    di.BeaconPreferences = new UserBeaconPreferences()
+                    var currPageType = ContentFrame.Content.GetType();
+                    if (_pageType != currPageType)
                     {
-                        DefaultTrackAll = true,
-                    };
+                        //TODO: actually, keep the old page shouldClear = true;
+                    }
+                    DeviceInformationWrapper navigateTo = null;
+                    if (shouldClear)
+                    {
+                        navigateTo = new DeviceInformationWrapper((BleAdvertisementWrapper)null);
+                        navigateTo.BeaconPreferences = new UserBeaconPreferences()
+                        {
+                            DefaultTrackAll = true,
+                        };
+                    }
+
                     SetParentScrolltype(Specialization.ParentScrollType.ChildHandlesScrolling); // SimpleBeachPage knows how to scroll itself.
 
                     // Show the Filter menu for the beacon page if we should
                     var pageIsBeacon = _pageType == typeof(Beacons.SimpleBeaconPage);
                     uiFilterSimpleBeaconPage.Visibility = pageIsBeacon ? Visibility.Visible : Visibility.Collapsed;
                     SearchFeedback.SetPauseVisibility(pageIsBeacon);
-                    SearchFeedback.SetSearchFeedbackType(pageIsBeacon ? SearchFeedbackType.Advertisement : SearchFeedbackType.Normal);
-
-                    ContentFrame.Navigate(_pageType, di);
+                    SearchFeedback.SetSearchFeedbackType(pageIsBeacon ? SearchFeedbackType.Advertisement : SearchFeedbackType.Normal)
+                        ;
+                    if (navigateTo != null)
+                    {
+                        ContentFrame.Navigate(_pageType, navigateTo);
+                    }
                     break;
                 default:
                     SearchFeedback.SetPauseVisibility(false); // not a beacon, so don't display the pause
                     SearchFeedback.SetSearchFeedbackType(false ? SearchFeedbackType.Advertisement : SearchFeedbackType.Normal);
                     break;
             }
-            ClearDevices();
+            if (shouldClear)
+            {
+                ClearDevices();
+            }
             SearchFeedback.StartSearchFeedback();
             StartWatchForBluetoothDevices(scope);
 
@@ -943,7 +994,14 @@ namespace BluetoothDeviceController
         {
             StopWatch();
         }
-
+        public void ClearDisplay()
+        {
+            //TODO: how to clear the SimpleconPage display?
+            StartSearchCount = 0;
+            ClearDevices();
+            var sbp = ContentFrame.Content as Beacons.SimpleBeaconPage;
+            sbp?.ClearDisplay(); // if it's a SimpleBeaconPage then clear it. Don't clear anything else.
+        }
         public bool GetSearchActive() 
         {
             var retval = MenuDeviceInformationWatcher != null || BTAdvertisementWatcher.IsActive;

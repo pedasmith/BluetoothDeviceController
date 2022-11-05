@@ -18,7 +18,7 @@
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
-        <Button Grid.Column="0" Content="Search" Padding="3" Click="OnSearch" Margin="0,0,10,0" />
+        <Button Grid.Column="0" Content="Scan" Padding="3" Click="OnSearch" Margin="0,0,10,0" />
         <ProgressBar IsIndeterminate="True" ShowPaused="True" Grid.Column="1" x:Name="uiProgress" Width="150" Padding="3" />
         <TextBlock Grid.Column="2" VerticalAlignment="Center" Padding="3">
             Found=<Run x:Name="uiFound">0</Run>
@@ -27,5 +27,6 @@
             <Run x:Name="uiFilteredOutText">Filtered out=</Run><Run x:Name="uiFoundAll">0</Run>
         </TextBlock>
         <CheckBox Margin="20,0,0,0" Grid.Column="4" Content="Pause" IsChecked="False" x:Name="uiPause" IsThreeState="False" Unchecked="OnPauseUnchecked" Checked="OnPauseChecked" />
+        <Button Margin="0,0,0,0" Grid.Column="5" Content="Clear" x:Name="uiClear" Click="OnClear" />
     </Grid>
 </UserControl>

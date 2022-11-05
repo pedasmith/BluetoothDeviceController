@@ -566,8 +566,8 @@ namespace BluetoothDeviceController.SpecialtyPages
         protected async override void OnNavigatedTo(NavigationEventArgs args)
         {
             SetStatusActive (true);
-            var di = args.Parameter as DeviceInformationWrapper;
-            var ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
+            var DeviceWrapper = args.Parameter as DeviceInformationWrapper;
+            var ble = await BluetoothLEDevice.FromIdAsync(DeviceWrapper.DeviceWrapper.Id);
             SetStatusActive (false);
 
             bleDevice.ble = ble;

@@ -44,6 +44,7 @@ namespace BluetoothDeviceController
             }
             else
             {
+                // Is most likely MainPage.Xaml.cs about line 875: public void StartSearchWithUserPreferences()
                 Search.StartSearchWithUserPreferences();
             }
         }
@@ -129,6 +130,11 @@ namespace BluetoothDeviceController
                     uiFilteredOutText.Text = "Updated=";
                     break;
             }
+        }
+
+        private void OnClear(object sender, RoutedEventArgs e)
+        {
+            Search?.ClearDisplay();
         }
     }
 }

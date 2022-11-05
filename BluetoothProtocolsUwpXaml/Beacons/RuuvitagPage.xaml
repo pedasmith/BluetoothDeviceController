@@ -56,7 +56,7 @@
 
     <StackPanel>
         <TextBlock Style="{StaticResource HeaderStyle}">Sensor Data</TextBlock>
-        <ScrollViewer MaxHeight="100">
+        <ScrollViewer MaxHeight="100" MinHeight="100">
             <TextBlock x:Name="uiResults" TextWrapping="Wrap" IsTextSelectionEnabled="True" />
         </ScrollViewer>
         
@@ -73,7 +73,8 @@
                 <controls:Expander Header="Sensor Data tracker" IsExpanded="true" MinWidth="550" HorizontalAlignment="Left">
                     <StackPanel MinWidth="550">
                         <charts:ChartControl Height="200" Width="500" x:Name="Sensor_DataChart" />
-                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="Sensor_DataGrid" ItemsSource="{Binding Sensor_DataRecordData}" />
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="Sensor_DataGrid" 
+                                           AutoGeneratingColumn="SensorDataGrid_AutoGeneratingColumn"/>
                         <TextBox  x:Name="Sensor_Data_Notebox" KeyDown="OnSensor_Data_NoteKeyDown" />
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                             <ComboBox SelectionChanged="OnKeepCountSensor_Data" Header="Keep how many items?" SelectedIndex="2">

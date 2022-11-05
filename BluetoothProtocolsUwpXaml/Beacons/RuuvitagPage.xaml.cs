@@ -23,6 +23,7 @@ namespace BluetoothDeviceController.Beacons
             this.InitializeComponent();
             this.DataContext = this;
         }
+        int index = 0;
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
             var di = args.Parameter as DeviceInformationWrapper;
@@ -30,8 +31,10 @@ namespace BluetoothDeviceController.Beacons
             {
                 di.BleAdvert.UpdatedRuuviAdvertisement += Di_UpdatedRuuviAdvertisement;
             }
+            index = 0;
         }
         bool chartsInitialized = false;
+        List<string> SensorPropertyNames = new List<string>();
         private void InitializeCharts(SensorDataRecord firstRecord=null)
         {
             if (chartsInitialized) return;
@@ -39,27 +42,26 @@ namespace BluetoothDeviceController.Beacons
             var EventTimeProperty = typeof(SensorDataRecord).GetProperty("EventTime");
             var chartProperties = new List<System.Reflection.PropertyInfo>();
             var noteProperties = new List<System.Reflection.PropertyInfo>();
-            var names = new List<string>();
 
             if (firstRecord == null)
             {
-                names.Add("Temperature");
-                names.Add("Pressure");
-                names.Add("Humidity");
+                SensorPropertyNames.Add("Temperature");
+                SensorPropertyNames.Add("Pressure");
+                SensorPropertyNames.Add("Humidity");
             }
             else
             {
-                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature)) names.Add("Temperature");
-                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Pressure)) names.Add("Pressure");
-                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity)) names.Add("Humidity");
+                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature)) SensorPropertyNames.Add("Temperature");
+                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Pressure)) SensorPropertyNames.Add("Pressure");
+                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity)) SensorPropertyNames.Add("Humidity");
             }
             noteProperties.Add(EventTimeProperty);
-            foreach (var name in names)
+            foreach (var name in SensorPropertyNames)
             {
                 noteProperties.Add(typeof(SensorDataRecord).GetProperty(name));
                 chartProperties.Add(typeof(SensorDataRecord).GetProperty(name));
             }
-            Sensor_DataChart.SetDataProperties(chartProperties, EventTimeProperty, names);
+            Sensor_DataChart.SetDataProperties(chartProperties, EventTimeProperty, SensorPropertyNames);
             Sensor_DataChart.SetTitle("Sensor Data Chart");
             Sensor_DataChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
             {
@@ -76,22 +78,28 @@ namespace BluetoothDeviceController.Beacons
             };
 
             // Update the UX as needed
-            if (!names.Contains("Temperature")) Sensor_Data_Temperature.Visibility = Visibility.Collapsed;
-            if (!names.Contains("Pressure")) Sensor_Data_Pressure.Visibility = Visibility.Collapsed;
-            if (!names.Contains("Humidity")) Sensor_Data_Humidity.Visibility = Visibility.Collapsed;
+            if (!SensorPropertyNames.Contains("Temperature")) Sensor_Data_Temperature.Visibility = Visibility.Collapsed;
+            if (!SensorPropertyNames.Contains("Pressure")) Sensor_Data_Pressure.Visibility = Visibility.Collapsed;
+            if (!SensorPropertyNames.Contains("Humidity")) Sensor_Data_Humidity.Visibility = Visibility.Collapsed;
 
             // Have to add the EventTime so that the summary box is correct.
             SensorDataRecordData.TProperties = noteProperties.ToArray();
+
+            Sensor_DataGrid.ItemsSource = SensorDataRecordData; // Have to delay setting the ItemsSource until SensorPropertyNames is set.
         }
+
 
         private async void Di_UpdatedRuuviAdvertisement(SensorDataRecord record)
         {
+            var now = DateTime.Now;
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => 
             {
                 // Add to the text box!
                 InitializeCharts(record);
 
-                uiResults.Text += record.ToString() + "\n";
+                if (index % 5 == 0) uiResults.Text = ""; // clear every n-th item
+                index++;
+                uiResults.Text += $"{index}: {now} {record}\n";
 
                 Sensor_Data_Temperature.Text = record.Temperature.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                 Sensor_Data_Humidity.Text = record.Humidity.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
@@ -103,7 +111,6 @@ namespace BluetoothDeviceController.Beacons
         }
         private async void Di_UpdatedGoveeAdvertisement(BluetoothProtocols.Beacons.Govee goveeRecord)
         {
-            //TODO: make a more generic data type?
             var record = goveeRecord as SensorDataRecord;
 
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -172,6 +179,27 @@ namespace BluetoothDeviceController.Beacons
             var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
             if (!ok) return;
             SensorDataRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+        }
+
+        private void SensorDataGrid_AutoGeneratingColumn(object sender, Microsoft.Toolkit.Uwp.UI.Controls.DataGridAutoGeneratingColumnEventArgs e)
+        {
+            var colName = e.Column.Header.ToString();
+            switch (colName)
+            {
+                case "EventTime": // keep this
+                case "Note":
+                    break;
+                case "IsSensorPresent": // never keep this
+                    e.Cancel = true;
+                    break;
+                default:
+                    // Only include columns which are included in the sensor data record.
+                    if (!SensorPropertyNames.Contains (colName))
+                    {
+                        e.Cancel = true;
+                    }
+                    break;
+            }
         }
     }
 }

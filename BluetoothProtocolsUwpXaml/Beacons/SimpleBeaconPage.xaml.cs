@@ -48,26 +48,29 @@ namespace BluetoothDeviceController.Beacons
         private void SimpleBeaconPage_Loaded(object sender, RoutedEventArgs e)
         {
             //var trackAll = MainPage.TheMainPage.Preferences.BeaconTrackAll;
-            //TODO: if (di.BeaconPreferences != null) trackAll = di.BeaconPreferences.DefaultTrackAll;
+            //TODO: if (DeviceWrapper.BeaconPreferences != null) trackAll = DeviceWrapper.BeaconPreferences.DefaultTrackAll;
             //uiTrackAll.IsChecked = trackAll;
         }
 
-        DeviceInformationWrapper di = null;
+        DeviceInformationWrapper DeviceWrapper = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs args)
         {
-            di = args.Parameter as DeviceInformationWrapper;
-            // When will di.BleAdvert be null? When we've created a page generically instead of for a particular device.
+            DeviceWrapper = args.Parameter as DeviceInformationWrapper;
+            // When will DeviceWrapper.BleAdvert be null? When we've created a page generically instead of for a particular device.
             // This happens when you do a beacon search.
-            if (di.BleAdvert != null)
+            // DeviceWrapper will be null when we re-navigate to a SimpleBeaconPage after displaying a specific page.
+            // When we try to re-display the SimpleBeaconPage, we only have a devicewrapper that's intended for
+            // a specific page and it won't show the right page.
+            if (DeviceWrapper?.BleAdvert != null)
             {
-                di.BleAdvert.UpdatedBleAdvertisement += BleAdvert_UpdatedBleAdvertisement;
-                di.BleAdvert.UpdatedBleAdvertisementWrapper += BleAdvert_UpdatedBleAdvertisementWrapper;
+                DeviceWrapper.BleAdvert.UpdatedBleAdvertisement += BleAdvert_UpdatedBleAdvertisement;
+                DeviceWrapper.BleAdvert.UpdatedBleAdvertisementWrapper += BleAdvert_UpdatedBleAdvertisementWrapper;
             }
             BleAdvertisementWrapper.UpdatedUniversalBleAdvertisement += BleAdvert_UpdatedUniversalBleAdvertisement;
             BleAdvertisementWrapper.UpdatedUniversalBleAdvertisementWrapper += BleAdvert_UpdatedUniversalBleAdvertisementWrapper;
 
-            if (di.BleAdvert == null)
+            if (DeviceWrapper?.BleAdvert == null)
             {
                 // Don't let the user switch off the track all.
                 //uiTrackAll.Visibility = Visibility.Collapsed;
@@ -77,7 +80,7 @@ namespace BluetoothDeviceController.Beacons
 
         private void BleAdvert_UpdatedBleAdvertisementWrapper(BleAdvertisementWrapper data)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); //TODO: should not throw! Is this ever called?
         }
 
 
@@ -358,6 +361,11 @@ namespace BluetoothDeviceController.Beacons
             RedrawDisplay(); // will double-clear the uiBeaconData.Inlines, but that's OK
         }
 
+        public void ClearDisplay()
+        {
+            AdvertisementHistory.Clear();
+            RedrawDisplay();
+        }
         public void RedrawDisplay()
         {
             uiBeaconData.Inlines.Clear();
@@ -374,6 +382,5 @@ namespace BluetoothDeviceController.Beacons
                 }
             }
         }
-
     }
 }
