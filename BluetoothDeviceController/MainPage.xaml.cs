@@ -772,12 +772,12 @@ namespace BluetoothDeviceController
             var bleAdvertWrapper = deviceWrapper.BleAdvert;
             if (bleAdvert == null)
             {
-                SearchFeedback.FoundDevice(FoundDeviceInfo.IsError); // filtered=false means it's not one we want. 
+                SearchFeedback.FoundDevice(FoundDeviceInfo.IsError); // send in reason for why it's filtered
                 return;
             }
             if (bleAdvert.RawSignalStrengthInDBm <= SIGNAL_STRENGTH_THRESHOLD)
             {
-                SearchFeedback.FoundDevice(FoundDeviceInfo.IsOutOfRange); // filtered=false means it's not one we want. 
+                SearchFeedback.FoundDevice(FoundDeviceInfo.IsOutOfRange); // send in reason for why it's filtered
                 return;
             }
 

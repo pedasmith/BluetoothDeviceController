@@ -35,13 +35,14 @@ namespace BluetoothDeviceController.Beacons
         }
         bool chartsInitialized = false;
         List<string> SensorPropertyNames = new List<string>();
+        // List of Properties for each of the SensorPropertiesNames
+        List<System.Reflection.PropertyInfo> ChartProperties = new List<System.Reflection.PropertyInfo>();
         private void InitializeCharts(SensorDataRecord firstRecord=null)
         {
             if (chartsInitialized) return;
             chartsInitialized = true;
             var EventTimeProperty = typeof(SensorDataRecord).GetProperty("EventTime");
-            var chartProperties = new List<System.Reflection.PropertyInfo>();
-            var noteProperties = new List<System.Reflection.PropertyInfo>();
+            var noteProperties = new List<System.Reflection.PropertyInfo>(); // Same as ChartProperties but with EventTime added.
 
             if (firstRecord == null)
             {
@@ -59,9 +60,9 @@ namespace BluetoothDeviceController.Beacons
             foreach (var name in SensorPropertyNames)
             {
                 noteProperties.Add(typeof(SensorDataRecord).GetProperty(name));
-                chartProperties.Add(typeof(SensorDataRecord).GetProperty(name));
+                ChartProperties.Add(typeof(SensorDataRecord).GetProperty(name));
             }
-            Sensor_DataChart.SetDataProperties(chartProperties, EventTimeProperty, SensorPropertyNames);
+            Sensor_DataChart.SetDataProperties(ChartProperties, EventTimeProperty, SensorPropertyNames);
             Sensor_DataChart.SetTitle("Sensor Data Chart");
             Sensor_DataChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
             {
@@ -73,7 +74,7 @@ namespace BluetoothDeviceController.Beacons
                 chartDefaultMaxY0 = 25,
                 chartDefaultMinY1 = 990, // common pressure mbar
                 chartDefaultMaxY1 = 1050, 
-                chartDefaultMinY2 = 0, // Y2 is Humidity per the name and chartProperties listings
+                chartDefaultMinY2 = 0, // Y2 is Humidity per the name and ChartProperties listings
                 chartDefaultMaxY2 = 100,
             };
 
@@ -91,6 +92,7 @@ namespace BluetoothDeviceController.Beacons
 
         private async void Di_UpdatedRuuviAdvertisement(SensorDataRecord record)
         {
+            if (record == null) return; 
             var now = DateTime.Now;
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => 
             {
@@ -133,11 +135,25 @@ namespace BluetoothDeviceController.Beacons
         {
             // Copy the contents over...
             var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Temperature,Pressure,Humidity,Notes\n");
+            sb.Append("EventDate,EventTime");
+            foreach (var name in SensorPropertyNames)
+            {
+                sb.Append(",");
+                sb.Append(name);
+            }
+            sb.Append(",Notes\n");
             foreach (var row in SensorDataRecordData)
             {
                 var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Temperature},{row.Pressure},{row.Humidity},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+                sb.Append($"{row.EventTime.ToShortDateString()},{time24}");
+                foreach (var property in ChartProperties)
+                {
+                    var value = (double)property.GetValue(row);
+                    sb.Append(",");
+                    sb.Append(value);
+                }
+                sb.Append($,"{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+                //,{row.Temperature},{row.Pressure},{row.Humidity},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
             }
             var str = sb.ToString();
             var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };

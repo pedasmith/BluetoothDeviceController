@@ -14,12 +14,12 @@ namespace BluetoothDeviceController.Beacons
 
 
         /// <summary>
-        /// This used to be gross and also trigger events. It doesn't any more
+        /// This used to be gross and also trigger events. It doesn't any more. Returns either the name or an Eddystone or Ruvvi name.
         /// </summary>
         /// <param name="deviceWrapper"></param>
         /// <param name="ble"></param>
         /// <param name="name"></param>
-        /// <returns></returns>
+        /// <returns>updated name</returns>
         private static string CustomizeWrapperFromAdvertisement(BleAdvertisementWrapper bleWrapper, string name)
         {
             // Lets's see if it's an Eddystone beacon...
@@ -31,6 +31,12 @@ namespace BluetoothDeviceController.Beacons
             if (govee != null && govee.IsValid)
             {
                 bleWrapper.GoveeDataRecord = govee; // only set if it's valid.
+                bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Govee;
+            }
+            if (Govee.AdvertIsGovee(bleWrapper))
+            {
+                // Set the type to Govee if either this advert is govee OR the original advert is Govee.
+                // Otherwise, doesn't set to Govee for the first advert.
                 bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Govee;
             }
 
@@ -140,6 +146,15 @@ namespace BluetoothDeviceController.Beacons
                 return (name, id, description);
             }
             name = bleAdvert.Advertisement.LocalName;
+            // In the case of a Govee ScanResponse, the LocalName isn't set. But we can still get it from the
+            // OriginalAdvert localname.
+            if (String.IsNullOrEmpty(name))
+            {
+                if (bleAdvertWrapper.BleOriginalAdvert != null)
+                {
+                    name = bleAdvertWrapper.BleOriginalAdvert.Advertisement.LocalName;
+                }
+            }
             id = BluetoothAddress.AsString(bleAdvert.BluetoothAddress);
             if (EmptyOrAllNull(name))
             {

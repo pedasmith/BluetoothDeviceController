@@ -30,7 +30,8 @@ namespace BluetoothProtocols.Beacons
         {
             Govee retval = null;
             BluetoothCompanyIdentifier.CommonManufacturerType parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-            if (wrapper.BleOriginalAdvert != null && wrapper.BleOriginalAdvert.Advertisement.LocalName.StartsWith("Govee_H5074"))
+            bool isGovee = AdvertIsGovee(wrapper); 
+            if (isGovee)
             {
                 //Future work: be more generic here. Right now this is super specific.
                 parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Govee;
@@ -50,6 +51,22 @@ namespace BluetoothProtocols.Beacons
                 }
             }
 
+            return retval;
+        }
+
+        /// <summary>
+        /// Returns true if the local name OR the original name is Govee_H5074
+        /// </summary>
+        /// <param name="wrapper"></param>
+        /// <returns></returns>
+        public static bool AdvertIsGovee(BleAdvertisementWrapper wrapper)
+        {
+            bool retval = false;
+            if (wrapper.BleAdvert.Advertisement.LocalName.StartsWith("Govee_H5074")) retval = true;
+            if (wrapper.BleOriginalAdvert != null)
+            {
+                if (wrapper.BleOriginalAdvert.Advertisement.LocalName.StartsWith("Govee_H5074")) retval = true;
+            }
             return retval;
         }
 

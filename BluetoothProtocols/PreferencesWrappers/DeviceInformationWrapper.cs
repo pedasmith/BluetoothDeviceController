@@ -86,6 +86,7 @@ namespace BluetoothDeviceController
         public event RuuviAdvertisementEvent UpdatedRuuviAdvertisement = null;
         public void Event(SensorDataRecord results)
         {
+            if (results == null) return; // don't invoke for null
             UpdatedRuuviAdvertisement?.Invoke(results);
         }
 
