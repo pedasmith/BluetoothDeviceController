@@ -89,6 +89,7 @@
                                 <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
                             </ComboBox>
                             <Button Content = "Copy" Click="OnCopySensor_Data" />
+                            <Button Content = "Copy for Excel" Click="OnCopyForExcelSensor_Data" />
                         </StackPanel>
                     </StackPanel>
                 </controls:Expander>

@@ -113,7 +113,7 @@ namespace BluetoothProtocols.Beacons
         }
         public override string ToString()
         {
-            return $"Temperaure={Temperature} Humidity={Humidity}% "
+            return $"Temperature={Temperature} Humidity={Humidity}% "
                 + $"Battery={BatteryInPercent}";
         }
 

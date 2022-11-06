@@ -2,6 +2,7 @@
 using BluetoothProtocols;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Xml.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml;
@@ -152,10 +153,41 @@ namespace BluetoothDeviceController.Beacons
                     sb.Append(",");
                     sb.Append(value);
                 }
-                sb.Append($,"{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+                sb.Append($",{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
                 //,{row.Temperature},{row.Pressure},{row.Humidity},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
             }
             var str = sb.ToString();
+            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+            datapackage.SetText(str);
+            Clipboard.SetContent(datapackage);
+        }
+        private void OnCopyForExcelSensor_Data(object sender, RoutedEventArgs e)
+        {
+            // See http://sunriseprogrammer.blogspot.com/2022/09/clipboard-data-for-excel.html for why!
+            // Copy the contents over...
+            var sb = new System.Text.StringBuilder();
+            sb.Append("<html><table><tr><td>EventDate</td><td>EventTime</td>");
+            foreach (var name in SensorPropertyNames)
+            {
+                sb.Append($"<td>{name}</td>");
+            }
+            sb.Append($"<td>Notes</td>");
+            foreach (var row in SensorDataRecordData)
+            {
+                var time24 = row.EventTime.ToString("HH:mm:ss");
+                sb.Append($"<tr><td>{row.EventTime.ToShortDateString()}</td><td>{time24}</td>");
+                foreach (var property in ChartProperties)
+                {
+                    var value = (double)property.GetValue(row);
+                    sb.Append($"<td>{value}</td>");
+                }
+                var note = WebUtility.HtmlEncode(row.Note);
+                sb.Append($"<td>{note}</td></tr>\n"); 
+                //,{row.Temperature},{row.Pressure},{row.Humidity},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+            }
+            sb.Append("</table></html>");
+            var str = sb.ToString();
+
             var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
             datapackage.SetText(str);
             Clipboard.SetContent(datapackage);

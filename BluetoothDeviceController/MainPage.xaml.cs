@@ -281,23 +281,23 @@ namespace BluetoothDeviceController
                     // Transitions are:
                     // all-->one: if the one is govee, display it, otherwise simple beacon page
                     // one-->all: simple beacon page
-                    var newAddr = deviceWrapper.BleAdvert.BleAdvert.BluetoothAddress;
-                    SavedBeaconFilter = (SavedBeaconFilter == newAddr) ? 0 : deviceWrapper.BleAdvert.BleAdvert.BluetoothAddress;
-                    // TODO: maybe display the specialized page?
-                    // Maybe use the actual list that we've got?
+                    // one-->different one
+                    var newAddress = deviceWrapper.BleAdvert.BleAdvert.BluetoothAddress;
+                    SavedBeaconFilter = (newAddress == SavedBeaconFilter) ? 0 : deviceWrapper.BleAdvert.BleAdvert.BluetoothAddress;
 
-                    var bp = ContentFrame.Content as SimpleBeaconPage;
-                    if (SavedBeaconFilter == 0)
+                    var oldSimpleBeaconPage = ContentFrame.Content as SimpleBeaconPage;
+                    if (SavedBeaconFilter == 0) // going to the 'all' style
                     {
                         // End state is to be a SimpleBeaconPage.
-                        if (bp == null) // wasn't a simple beacon page before, so have to transition to one.
+                        if (oldSimpleBeaconPage == null) // wasn't a simple beacon page before, so have to transition to one.
                         {
                             await NavView_NavigateAsync(null, null);
-                            // TODO: Don't specifiy the device wrapper -- if you include the device wrapper
+                            // Don't specifiy the device wrapper -- if you include the device wrapper it
+                            // will do the specialization
                         }
                         else
                         {
-                            await UpdateSimpleBeaconPage();
+                            await UpdateSimpleBeaconPage(); // can just update the existing page.
                         }
                     }
                     else
@@ -308,7 +308,15 @@ namespace BluetoothDeviceController
                         }
                         else
                         {
-                            await UpdateSimpleBeaconPage();
+                            if (oldSimpleBeaconPage == null)
+                            {
+                                await NavView_NavigateAsync(deviceWrapper, null); // happily pick a specialization if appropriate
+                                // Specialization is from the deviceWrapper
+                            }
+                            else
+                            {
+                                await UpdateSimpleBeaconPage(); // Can just update the existing page
+                            }
                         }
                     }
                     return;
