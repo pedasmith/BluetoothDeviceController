@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Beacons;
+using BluetoothDeviceController.Names;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -50,8 +51,7 @@ namespace BluetoothDeviceController
                 string description = "??--??";
                 if (wrapper.di != null)
                 {
-                    description = wrapper.di.Id.Replace("BluetoothLE#BluetoothLEbc:83:85:22:5a:70-", "Address:");
-                    description = description.Replace("Bluetooth#Bluetoothbc:83:85:22:5a:70-", "Address:");
+                    description = GuidGetCommon.NiceId(wrapper.di.Id, "Address:");
                     description = description.Replace(":00000000:{00001101-0000-1000-8000-00805f9b34fb}", "");
                 }
                 else if (wrapper.BleAdvert != null)

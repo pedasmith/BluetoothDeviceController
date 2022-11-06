@@ -46,6 +46,7 @@ Bulbs that are definitely not compatible include the C by GE bulb, the Philips H
 
 ### Sensors known to be compatible
 * [BBC micro:bit](Device_Bbc_MicroBit.md)
+* [Govee H5074](Device_Govee_H5074.md)
 * [Kano Coding Wand](Device_Kano_Wand.md)
 * [Nordic Thingy](Device_Nordic_Thingy.md)
 * [Pyle PHBPBW40](Device_Samico_BloodPressure_BG512.md)

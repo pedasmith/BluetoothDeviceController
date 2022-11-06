@@ -333,6 +333,12 @@
     <Content Include="Assets\DevicePictures\Espruino_PuckJs-350.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\DevicePictures\Govee_H5074-175.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\DevicePictures\Govee_H5074-350.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\DevicePictures\Kano_Wand-175.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -621,6 +627,9 @@
     <Content Include="Assets\ScreenShots\Device_Espruino_Puckjs.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ScreenShots\Device_Govee_H5074.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ScreenShots\Device_Particula_GoDice_Rolled.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -711,6 +720,9 @@
     <Content Include="Assets\HelpFiles\Device_Samico_BloodPressure_BG512.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Assets\HelpFiles\Device_Govee_H5074.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

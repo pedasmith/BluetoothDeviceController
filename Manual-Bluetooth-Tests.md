@@ -27,5 +27,11 @@ Govee Data:: Temp=20.03℃ (68.054℉) Hum=46.08% Bat=100% (junk=0)
 * click on "copy for excel". Run excel, open a blank worksheet, and press ^V to paste. *check* that the data looks OK.
 * click 'Scan' to stop the scan if needed. Then click 'Scan' to start the scan and wait 1 minute. *check* that there's more data and *check* that the old data was not discarded.
 
+## Nordic Thingy
 
-
+* Make sure the device is charged and the on/off switch is set to on (|). You may have to push the rubber cover aside.
+* No need to pair. 
+* Run the app. Click 'Scan' to stop the scan, then click 'settings'. Show BLE Devices with Names, Preferred Display=Specialized Display and make sure that When Editing, automatically read from device is checked. Then press OK
+* Click 'scan' to start the scan.
+* When the "Thingy" shows up *check* that the icon is a graph. Click 'Thingy' and *check* that the specialty display shows up.
+* Click 'Notify' for temperature, pressure, humidity, and Air Quality. *check* that the values for temperature pressure and humidity show up quickly (within 30 seconds). The air quality takes longer and will start off as '0' values.

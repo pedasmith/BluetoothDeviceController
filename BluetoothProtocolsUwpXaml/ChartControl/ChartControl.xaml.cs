@@ -397,8 +397,8 @@ namespace BluetoothDeviceController.Charts
                     if (lineIndex >= 0 && lineIndex <= MAX_LINE_INDEX)
                     {
                         var y = Convert.ToDouble(yProperty.GetValue(record));
-                        YMins[i] = Math.Min(YMins[i], y);
-                        YMaxs[i] = Math.Max(YMaxs[i], y);
+                        YMins[j] = Math.Min(YMins[j], y);
+                        YMaxs[j] = Math.Max(YMaxs[j], y);
                     }
                 }
                 var x = Convert.ToDateTime(TimeProperty.GetValue(record));
@@ -489,11 +489,12 @@ namespace BluetoothDeviceController.Charts
             for (int i = 0; i < list.Count; i++)
             {
                 var record = list[i];
-                foreach (var yProperty in DataProperties)
+                for (int j = 0; j < DataProperties.Count; j ++)
                 {
+                    var yProperty = DataProperties[j];
                     var y = Convert.ToDouble(yProperty.GetValue(record));
-                    YMins[i] = Math.Min(YMins[i], y);
-                    YMaxs[i] = Math.Max(YMaxs[i], y);
+                    YMins[j] = Math.Min(YMins[j], y);
+                    YMaxs[j] = Math.Max(YMaxs[j], y);
                 }
                 var x = Convert.ToDateTime(TimeProperty.GetValue(record));
                 if (i==0)

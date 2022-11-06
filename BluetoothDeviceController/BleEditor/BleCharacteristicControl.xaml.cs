@@ -701,7 +701,7 @@ namespace BluetoothDeviceController.BleEditor
         {
             try
             {
-                var cvc = new CharacteristicEditorControl(NC, writeOption);
+                var cvc = new CharacteristicEditorControl(NC, writeOption, AutomaticallyReadData);
                 await cvc.InitAsync(Service, Characteristic);
                 var dlg = new ContentDialog()
                 {

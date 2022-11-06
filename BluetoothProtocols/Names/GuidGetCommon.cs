@@ -9,6 +9,23 @@ namespace BluetoothDeviceController.Names
     public static class GuidGetCommon
     {
         /// <summary>
+        /// Given a string like BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5c:31:3e:89:ad:5c return 5c:31:3e:89:ad:5c
+        /// which is the Bluetooth address (the stuff before the - is the Windows ID. The GUID 83:85:22... will
+        /// change at some interval, so it cannot be relied on.
+        /// </summary>
+        /// <param name="id">String like BluetoothLE#BluetoothLEbc:83:85:22:5a:70-5c:31:3e:89:ad:5c</param>
+        /// <returns></returns>
+        public static string NiceId(string id, string prefixIfReplaced="") // was DeviceInformation args)
+        {
+            var retval = id;
+            var idx = retval.IndexOf('-');
+            if (retval.StartsWith("BluetoothLE#BluetoothLE") && idx >= 0)
+            {
+                retval = prefixIfReplaced + retval.Substring(idx + 1);
+            }
+            return retval;
+        }
+        /// <summary>
         /// Given two bluetooth GUIDs, return a short version of string B such that it contains
         /// the characters that are different from A such that the differences are "bluetooth-like".
         /// </summary>

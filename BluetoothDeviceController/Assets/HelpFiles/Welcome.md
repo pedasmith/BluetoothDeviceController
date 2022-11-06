@@ -17,6 +17,7 @@ and more devices -- please leave feedback to request specific devices!
 
 ## Data sensors that can be read
 [![BBC micro:bit](../DevicePictures/Bbc_MicroBit-175.png)](Device_Bbc_MicroBit.md)
+[![Govee H5074](../DevicePictures/Govee_H5074-175.png)](Device_Govee_H5074.md)
 [![Kano Wand](../DevicePictures/Kano_Wand-175.png)](Device_Kano_Wand.md)
 [![Nordic Thingy](../DevicePictures/Nordic_Thingy-175.png)](Device_Nordic_Thingy.md)
 [![Pyle PHBPBW40](../DevicePictures/Samico_BloodPressure_BG512-175.png)](Device_Samico_BloodPressure_BG512.md)
@@ -27,7 +28,7 @@ and more devices -- please leave feedback to request specific devices!
 [![TI Original Sensor Tag](../DevicePictures/TI_SensorTag_2541-175.png)](Device_TI_SensorTag_2541.md)
 
 
-## Robots devices
+## Robot devices
 [![BERO](../DevicePictures/RealityRobotics_Bero-175.png)](Device_RealityRobotics_Bero.md)
 [![Elegoo MiniCar](../DevicePictures/Elegoo_MiniCar-175.png)](Device_Elegoo_MiniCar.md)
 [![LittleBot](../DevicePictures/SlantRobotics-LittleBot-175.png)](Device_SlantRobotics_LittleBot.md)

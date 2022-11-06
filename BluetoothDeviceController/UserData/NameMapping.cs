@@ -16,6 +16,7 @@ namespace BluetoothDeviceController.UserData
         /// <summary>
         /// The bluetooth device id. Is, e.g., BluetoothLE#BluetoothLEbc:83:85:22:5a:70-00:a0:50:7c:b3:da 
         /// so that it includes a bunch of cruft in addition to the bluetooth address.
+        /// Use GuidGetCommon.NiceId to strip the cruft off.
         /// </summary>
         public string Id { get; set; }
     }

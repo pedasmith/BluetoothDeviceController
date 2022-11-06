@@ -662,7 +662,7 @@ namespace BluetoothDeviceController
             if (name.StartsWith("BluetoothLE#BluetoothLE"))
             {
                 hasName = false;
-                name = "Address:" + NiceId(name);
+                name = "Address:" + GuidGetCommon.NiceId(name);
             }
             return (name, hasName);
         }
@@ -684,7 +684,7 @@ namespace BluetoothDeviceController
             string id = "??-??";
             if (wrapper.di != null)
             {
-                id = NiceId (wrapper.di.Id);
+                id = GuidGetCommon.NiceId (wrapper.di.Id);
                 var isAll_bluetooth_devices = Preferences.Scope == UserPreferences.SearchScope.Ble_All_ble_devices;
                 bool hasDeviceName;
                 (name, hasDeviceName) = GetDeviceInformationName(wrapper.di);
@@ -1169,20 +1169,10 @@ namespace BluetoothDeviceController
             SearchFeedback?.StopSearchFeedback();
         }
 
-        private static string NiceId (string id) // was DeviceInformation args)
-        {
-            var retval = id;
-            var idx = retval.IndexOf('-');
-            if (retval.StartsWith ("BluetoothLE#BluetoothLE") && idx >=0)
-            {
-                retval = retval.Substring(idx + 1);
-            }
-            return retval;
-        }
 
         private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
-            var id = NiceId(args.Id);
+            // why was this calculated? var id = GuidGetCommon.NiceId(args.Id);
             await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
                 async () => {
                     try
@@ -1197,12 +1187,12 @@ namespace BluetoothDeviceController
         }
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            var id = NiceId(args.Id);
+            var id = GuidGetCommon.NiceId(args.Id);
             Log($"DeviceWatcher: Device {id} Removed");
         }
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            var id = NiceId(args.Id);
+            var id = GuidGetCommon.NiceId(args.Id);
 
             // Play around with getting a strength value!
             object strength = null;

@@ -26,13 +26,15 @@ namespace BluetoothDeviceController.BleEditor
 {
     public sealed partial class CharacteristicEditorControl : UserControl
     {
-        public CharacteristicEditorControl(NameCharacteristic nc, GattWriteOption writeOption)
+        public CharacteristicEditorControl(NameCharacteristic nc, GattWriteOption writeOption, bool automaticallyReadData)
         {
             NC = nc;
             WriteOption = writeOption;
+            AutomaticallyReadData = automaticallyReadData; 
             this.InitializeComponent();
             this.Loaded += CharacteristicEditorControl_Loaded;
         }
+        public bool AutomaticallyReadData { get; internal set; } = true;
         private GattWriteOption WriteOption;
         private string BytesFormat = "BYTES"; // can also be STRING
         private string DisplayFormat;
@@ -144,7 +146,10 @@ namespace BluetoothDeviceController.BleEditor
 
             try
             {
-                if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
+                // NOTE: used to always try to read; this is a mistake because some devices 
+                // say they are readable but aren't. That's why there's an "When editing, automatically read from device" checkbox.
+                // here!here
+                if (AutomaticallyReadData && characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
                 {
                     var buffer = await characteristic.ReadValueAsync();
                     if (buffer.Status == GattCommunicationStatus.Success)
