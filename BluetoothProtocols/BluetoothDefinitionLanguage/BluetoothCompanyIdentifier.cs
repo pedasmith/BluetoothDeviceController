@@ -2607,7 +2607,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             return $"CompanyId={companyId}";
         }
 
-        public enum CommonManufacturerType {  Other, Apple10, Govee, Microsoft, MicrosoftRome, Ruuvi}
+        public enum CommonManufacturerType {  Other, Apple10, Govee, Microsoft, MicrosoftRome, Ruuvi, SwitchBot }
         public static (string result, CommonManufacturerType, UInt16 companyId, object specialty) 
             ParseManufacturerData(BluetoothLEAdvertisementDataSection section, sbyte txPower, CommonManufacturerType parseAs)
         {

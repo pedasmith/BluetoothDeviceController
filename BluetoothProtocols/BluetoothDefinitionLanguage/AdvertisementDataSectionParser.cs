@@ -168,6 +168,27 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                                         // Is a COVID tracking value.
                                         str = "COVID tracking value (hidden):\n"; // See https://covid19-static.cdn-apple.com/applications/covid19/current/static/contact-tracing/pdf/ExposureNotification-BluetoothSpecificationv1.2.pdf?1 for details
                                         break;
+                                    case 0xFD3D: // SwitchBot
+                                        {
+                                            byte modeRaw = dr.ReadByte();
+                                            char deviceType = (char)(modeRaw & 0x7F);
+                                            byte status = dr.ReadByte();
+                                            byte batteryRaw = dr.ReadByte();
+                                            uint batteryPercent = (uint)(batteryRaw & 0x7F);
+                                            byte fracRaw = dr.ReadByte();
+                                            uint temperatureFraction = (uint)(fracRaw & 0x0F);
+                                            byte tempRaw = dr.ReadByte();
+                                            bool tempNegative = (tempRaw & 0x80) == 0x00;
+                                            uint temp = (uint)(tempRaw & 0x7F);
+                                            double tempC = (double)temp + (double)temperatureFraction / 10.0;
+                                            double tempF = (tempC * 9.0 / 5.0) + 32.0;
+                                            if (tempNegative) tempC = -tempC;
+                                            byte humidityRaw = dr.ReadByte();
+                                            bool displayC = (humidityRaw & 0x80) == 0x00;
+                                            uint humidityPercent = (uint)(humidityRaw & 0x7F);
+                                            str = $"SwitchBot deviceType={deviceType} temperature={tempC}℃ {tempF}℉ humidity={humidityPercent}% battery={batteryPercent}% \n";
+                                        }
+                                        break;
                                     default:
                                         {
                                             var servicedatastr = ValueParser.Parse(section.Data, "U16|HEX BYTES|HEX");
