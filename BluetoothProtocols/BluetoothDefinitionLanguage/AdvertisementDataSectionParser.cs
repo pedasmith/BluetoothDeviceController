@@ -169,7 +169,10 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                                         str = "COVID tracking value (hidden):\n"; // See https://covid19-static.cdn-apple.com/applications/covid19/current/static/contact-tracing/pdf/ExposureNotification-BluetoothSpecificationv1.2.pdf?1 for details
                                         break;
                                     default:
-                                        printAsHex = true;
+                                        {
+                                            var servicedatastr = ValueParser.Parse(section.Data, "U16|HEX BYTES|HEX");
+                                            str = $"{hexPrefix}section {dtv.ToString()} data={servicedatastr.AsString}\n";
+                                        }
                                         break;
                                 }
                             }
