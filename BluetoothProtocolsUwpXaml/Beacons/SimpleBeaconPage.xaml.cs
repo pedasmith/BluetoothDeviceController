@@ -98,9 +98,8 @@ namespace BluetoothDeviceController.Beacons
         private async void BleAdvert_UpdatedUniversalBleAdvertisementWrapper(BleAdvertisementWrapper data)
         {
             BluetoothCompanyIdentifier.CommonManufacturerType parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-            if (data.BleOriginalAdvert != null && data.BleOriginalAdvert.Advertisement.LocalName.StartsWith ("Govee_H5074"))
+            if (Govee.AdvertIsGovee(data))
             {
-                //Future work: be more generic here. Right now this is super specific.
                 parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Govee;
             }
             await UpdateUI(data, parseAs, IsPaused);
@@ -201,7 +200,7 @@ namespace BluetoothDeviceController.Beacons
             // via the DataSections item.
 
             // We don't know all of the header information until later
-            if (!completeLocalName.Contains("Govee") && !completeLocalName.Contains("LC")) // just for debugging
+            if (!completeLocalName.Contains("LC")) // just for debugging
             {
                 // TODO: just for some debugging: return;
             }

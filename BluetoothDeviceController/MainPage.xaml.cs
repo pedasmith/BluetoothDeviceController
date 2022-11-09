@@ -789,10 +789,6 @@ namespace BluetoothDeviceController
                 return;
             }
 
-            if (bleAdvert.Advertisement.LocalName.Contains ("Govee"))
-            {
-                ; // Hand hook for debugger.
-            }
             if (bleAdvert.Advertisement.LocalName.StartsWith("LC"))
             {
                 ; // Hand hook for debugger.
@@ -811,12 +807,8 @@ namespace BluetoothDeviceController
             {
                 specialization = Specialization.Get(Specializations, "Beacon"); // This will get the SimpleBeaconPage
                 specialization.ShortDescription = description;
-                var isScanable = bleAdvert.IsScannable;
-                var isScanResponse = bleAdvert.IsScanResponse;
-                if (isScanable && bleAdvert.Advertisement.LocalName.Contains("Govee"))
-                {
-                    ; // handy place to hang a debugger
-                }
+                //var isScanable = bleAdvert.IsScannable;
+                //var isScanResponse = bleAdvert.IsScanResponse;
             }
 
             // Not eddystone or ruuvitag. Let's do the event so it can be seen

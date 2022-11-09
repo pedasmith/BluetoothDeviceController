@@ -128,17 +128,8 @@
     <Compile Include="..\BluetoothDeviceController\BCBasic\MockClasses.cs">
       <Link>FromBluetoothDeviceController\BCBasic\MockClasses.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs">
-      <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\AdvertisementDataSectionParser.cs</Link>
-    </Compile>
     <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothCharacteristic.cs">
       <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothCharacteristic.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs">
-      <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothCompanyIdentifier.cs</Link>
-    </Compile>
-    <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothServiceUuid16Bit.cs">
-      <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothServiceUuid16Bit.cs</Link>
     </Compile>
     <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothUnit.cs">
       <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothUnit.cs</Link>

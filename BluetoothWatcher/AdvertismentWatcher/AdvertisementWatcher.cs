@@ -50,7 +50,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                         break;
 
                     case DataTypeValue.ManufacturerData:
-                        (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, watcherData.TransmitPower);
+                        (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, watcherData.TransmitPower, BluetoothCompanyIdentifier.CommonManufacturerType.Other);
                         if (watcherData.CompanyId == 18498)
                         {
                             ; // Handy hook for debugging.

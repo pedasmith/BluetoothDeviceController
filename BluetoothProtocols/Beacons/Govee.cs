@@ -62,10 +62,10 @@ namespace BluetoothProtocols.Beacons
         public static bool AdvertIsGovee(BleAdvertisementWrapper wrapper)
         {
             bool retval = false;
-            if (wrapper.BleAdvert.Advertisement.LocalName.StartsWith("Govee_H5074")) retval = true;
+            if (wrapper.BleAdvert.Advertisement.LocalName.StartsWith("Govee_H5074_")) retval = true;
             if (wrapper.BleOriginalAdvert != null)
             {
-                if (wrapper.BleOriginalAdvert.Advertisement.LocalName.StartsWith("Govee_H5074")) retval = true;
+                if (wrapper.BleOriginalAdvert.Advertisement.LocalName.StartsWith("Govee_H5074_")) retval = true;
             }
             return retval;
         }

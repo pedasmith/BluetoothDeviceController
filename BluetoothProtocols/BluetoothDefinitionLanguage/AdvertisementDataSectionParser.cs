@@ -187,6 +187,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                                             bool displayC = (humidityRaw & 0x80) == 0x00;
                                             uint humidityPercent = (uint)(humidityRaw & 0x7F);
                                             str = $"SwitchBot deviceType={deviceType} temperature={tempC}℃ {tempF}℉ humidity={humidityPercent}% battery={batteryPercent}% \n";
+                                            manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.SwitchBot;
                                         }
                                         break;
                                     default:

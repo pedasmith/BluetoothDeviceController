@@ -23,7 +23,7 @@ namespace BluetoothDeviceController.Beacons
         public byte MovementCounter { get; set; }
         public UInt16 MovementSequenceCounter { get; set; }
 
-        public static Ruuvi_Tag ZZZFromRuuvi_DataRecord (SensorDataRecord dr)
+        public static Ruuvi_Tag FromRuuvi_DataRecord (SensorDataRecord dr) // Used by Watacher
         {
             if (dr == null) return null;
             var retval = new Ruuvi_Tag()

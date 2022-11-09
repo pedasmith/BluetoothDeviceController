@@ -80,7 +80,7 @@ namespace SearchControllers
         {
             var name = args.Advertisement.LocalName;
             System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {name} seen");
-            if (name.Contains("Wescale") || name.StartsWith("LC") || name.StartsWith("Govee"))
+            if (name.Contains("Wescale") || name.StartsWith("LC"))
             {
                 ; // Handy hook for debugger.
             }
