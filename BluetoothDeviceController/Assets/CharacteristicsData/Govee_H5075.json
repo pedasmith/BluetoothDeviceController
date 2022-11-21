@@ -2,7 +2,7 @@
   "AllDevices": [
     {
       "Name": "Govee_H5074_74C5",
-	  "REM10":"Small battery-powered temperature and humidity sensor"
+	   "REM10":"Small battery-powered temperature and humidity sensor",
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",
@@ -120,7 +120,7 @@
           "UUID": "0000fef5-0000-1000-8000-00805f9b34fb",
           "RegistrationOwner": "Dialog Semiconductor GmbH",
 		  "REM10" : "See https://github.com/s8w1e2ep/BuildingCenter/blob/e874e745b76a65febd26acf6f6e00f3d2f831edb/BuildingCenter/BLEDefines.h",
-		  "REM20: : "Or https://github.com/lilincun/U6/blob/87a5881b8b6600aa61a491ce1c11df5da38f9624/projects/dk_apps/features/ble_suota_client/suota_client.c",
+		  "REM20" : "Or https://github.com/lilincun/U6/blob/87a5881b8b6600aa61a491ce1c11df5da38f9624/projects/dk_apps/features/ble_suota_client/suota_client.c",
 		  "REM50": "https://www.dialog-semiconductor.com/", 
           "Name": "SPOTA_SERVICE",
 		  "Suppress": true,

@@ -720,6 +720,8 @@
     <Content Include="Assets\HelpFiles\Device_Samico_BloodPressure_BG512.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Assets\CharacteristicsData\Govee_H5075.json" />
+    <None Include="Assets\CharacteristicsData\Sphero.json" />
     <None Include="Assets\HelpFiles\Device_Govee_H5074.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
