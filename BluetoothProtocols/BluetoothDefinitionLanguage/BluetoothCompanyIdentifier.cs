@@ -2601,8 +2601,8 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 case 1: /* hex=0x0001 */ return "Nokia Mobile Phones";
                 case 0: /* hex=0x0000 */ return "Ericsson Technology Licensing";
                 #endregion
-                case 65534: return "??";
-                case 65535: return "This value has special meaning depending on the context in which it used.";
+                case 65534: return "Company FFFE??";
+                case 65535: return "Company FFFF (has special meaning depending on the context)";
             }
             return $"CompanyId={companyId}";
         }
@@ -2636,6 +2636,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 }
 
                 var sb = new StringBuilder();
+                sb.Append("    Manufacturer: ");
                 sb.Append(companyName);
                 sb.Append(": ");
                 bool displayAsHex = true ;

@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.BleEditor;
+using BluetoothProtocols.Beacons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,6 +108,41 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                     case DataTypeValue.Flags:
                         str = ParseFlags(section);
                         break;
+                    case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf128BitServiceUuids:
+                    case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf128BitServiceUuids:
+                        {
+                            // Viatom pulse oximeter has these
+                            // Correct output: 6e400001-b5a3-f393-e0a9-e50e24dcca9e
+                            // Actual  output: 6E400001-B5A3-F393-E0A9-E50E24DCCA9E
+                            str = "";
+                            var pre = dtv == DataTypeValue.CompleteListOf128BitServiceUuids ? "Service UUIDs (complete): " : "Service UUIDs (incomplete)";
+                            var dr = DataReader.FromBuffer(section.Data);
+                            dr.ByteOrder = ByteOrder.LittleEndian;
+                            while (dr.UnconsumedBufferLength >= 16)
+                            {
+                                var addr0 = dr.ReadUInt16();
+                                var addr1 = dr.ReadUInt16();
+                                var addr2 = dr.ReadUInt16();
+                                var addr3 = dr.ReadUInt16();
+                                var addr4 = dr.ReadUInt16();
+                                var addr5 = dr.ReadUInt16();
+                                var addr6 = dr.ReadUInt16();
+                                var addr7 = dr.ReadUInt16();
+                                //var service = $"{addr0:X02}:{addr1:X02}:{addr2:X02}:{addr3:X02}:{addr4:X02}:{addr5:X02}:{addr6:X02}:{addr7:X02}";
+                                var service = $"{addr7:X04}{addr6:X04}-{addr5:X04}-{addr4:X04}-{addr3:X04}-{addr2:X04}{addr1:X04}{addr0:X04}";
+                                if (str != "") str += ", ";
+                                str += service;
+                            }
+                            if (str == "")
+                            {
+                                str = pre + "\n";
+                            }
+                            else
+                            {
+                                str = pre + str + "\n";
+                            }
+                        }
+                        break;
                     case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
                     case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
                         {
@@ -156,52 +192,18 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                         str = $"{db}";
                         break;
                     case DataTypeValue.ServiceData:
+                        SwitchBot switchbot = null;
+                        switch (parseAs)
                         {
-                            var dr = DataReader.FromBuffer(section.Data);
-                            dr.ByteOrder = ByteOrder.LittleEndian;
-                            if (dr.UnconsumedBufferLength >= 2)
-                            {
-                                var addr = dr.ReadUInt16();
-                                switch (addr)
-                                {
-                                    case 0xFD6F:
-                                        // Is a COVID tracking value.
-                                        str = "COVID tracking value (hidden):\n"; // See https://covid19-static.cdn-apple.com/applications/covid19/current/static/contact-tracing/pdf/ExposureNotification-BluetoothSpecificationv1.2.pdf?1 for details
-                                        break;
-                                    case 0xFD3D: // SwitchBot
-                                        {
-                                            byte modeRaw = dr.ReadByte();
-                                            char deviceType = (char)(modeRaw & 0x7F);
-                                            byte status = dr.ReadByte();
-                                            byte batteryRaw = dr.ReadByte();
-                                            uint batteryPercent = (uint)(batteryRaw & 0x7F);
-                                            byte fracRaw = dr.ReadByte();
-                                            uint temperatureFraction = (uint)(fracRaw & 0x0F);
-                                            byte tempRaw = dr.ReadByte();
-                                            bool tempNegative = (tempRaw & 0x80) == 0x00;
-                                            uint temp = (uint)(tempRaw & 0x7F);
-                                            double tempC = (double)temp + (double)temperatureFraction / 10.0;
-                                            double tempF = (tempC * 9.0 / 5.0) + 32.0;
-                                            if (tempNegative) tempC = -tempC;
-                                            byte humidityRaw = dr.ReadByte();
-                                            bool displayC = (humidityRaw & 0x80) == 0x00;
-                                            uint humidityPercent = (uint)(humidityRaw & 0x7F);
-                                            str = $"SwitchBot deviceType={deviceType} temperature={tempC}℃ {tempF}℉ humidity={humidityPercent}% battery={batteryPercent}% \n";
-                                            manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.SwitchBot;
-                                        }
-                                        break;
-                                    default:
-                                        {
-                                            var servicedatastr = ValueParser.Parse(section.Data, "U16|HEX BYTES|HEX");
-                                            str = $"{hexPrefix}section {dtv.ToString()} data={servicedatastr.AsString}\n";
-                                        }
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                printAsHex = true;
-                            }
+                            case BluetoothCompanyIdentifier.CommonManufacturerType.SwitchBot:
+                                switchbot = SwitchBot.ParseScanResponseServiceData(section);
+                                str = switchbot.ToString();
+                                break;
+                        }
+                        if (switchbot == null)
+                        {
+                            var servicedatastr = ValueParser.Parse(section.Data, "U16|HEX BYTES|HEX");
+                            str = $"{hexPrefix}section {dtv.ToString()} data={servicedatastr.AsString}\n";
                         }
                         break;
                 }

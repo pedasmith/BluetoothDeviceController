@@ -14,19 +14,24 @@ namespace BluetoothDeviceController.Beacons
 
 
         /// <summary>
-        /// This used to be gross and also trigger events. It doesn't any more. Returns either the name or an Eddystone or Ruvvi name.
+        /// This used to be gross and also trigger events. It doesn't any more. Returns either the retval or an Eddystone or Ruvvi retval.
         /// </summary>
-        /// <param name="deviceWrapper"></param>
-        /// <param name="ble"></param>
-        /// <param name="name"></param>
-        /// <returns>updated name</returns>
+        /// <param retval="deviceWrapper"></param>
+        /// <param retval="ble"></param>
+        /// <param retval="name"></param>
+        /// <returns>updated name of device</returns>
         private static string CustomizeWrapperFromAdvertisement(BleAdvertisementWrapper bleWrapper, string name)
         {
             // Lets's see if it's an Eddystone beacon...
             // https://github.com/google/eddystone
             // https://github.com/google/eddystone/blob/master/protocol-specification.md
 
+            var retval = name;
             var ble = bleWrapper.BleAdvert;
+
+            // 
+            // let's see if the advert is one of the known cases.
+            //
             var govee = Govee.Parse(bleWrapper);
             if (govee != null && govee.IsValid)
             {
@@ -39,7 +44,14 @@ namespace BluetoothDeviceController.Beacons
                 // Otherwise, doesn't set to Govee for the first advert.
                 bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Govee;
             }
-
+            var switchbot = SwitchBot.Parse(bleWrapper);
+            if (switchbot != null && switchbot.IsValid)
+            {
+                bleWrapper.RuuviDataRecord = switchbot; // TODO: change the name over and remove the special caes for Govee.
+                bleWrapper.SwitchBotDataRecord = switchbot; 
+                bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.SwitchBot;
+                retval = $"SwitchBot-{switchbot.TagType}";
+            }
 
             foreach (var section in ble.Advertisement.DataSections)
             {
@@ -79,11 +91,11 @@ namespace BluetoothDeviceController.Beacons
                                 case TypeURL: // 0x10: An Eddystone-URL
                                     // https://github.com/google/eddystone/tree/master/eddystone-url
                                     var result = BluetoothDeviceController.Beacons.Eddystone.ParseEddystoneUrlArgs(section.Data);
-                                    name = result.Success ? result.Url : "Invalid eddystone!";
+                                    retval = result.Success ? result.Url : "Invalid eddystone!";
 
                                     bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Eddystone;
                                     bleWrapper.AdvertisementEddystoneSubtype = BleAdvertisementWrapper.BleAdvertisementEddystoneSubtype.Url;
-                                    bleWrapper.EddystoneUrl = name;
+                                    bleWrapper.EddystoneUrl = retval;
                                     if (result.Success && result.Url.StartsWith("https://ruu.vi/#"))
                                     {
                                         //foundValues.Add(AdvertisementType.RuuviTag);
@@ -91,7 +103,7 @@ namespace BluetoothDeviceController.Beacons
                                         ruuvi.Data.EventTime = DateTime.Now;
                                         if (ruuvi.Success)
                                         {
-                                            name = ruuvi.ToString(); // Make a new user-friendly string
+                                            retval = ruuvi.ToString(); // Make a new user-friendly string
                                         }
                                         bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.RuuviTag;
                                         bleWrapper.RuuviDataRecord = ruuvi.Data;
@@ -99,10 +111,12 @@ namespace BluetoothDeviceController.Beacons
                                         // This function is all about setting up the wrapper, not actually
                                         // triggering events!
                                         //TODO: fixing: deviceWrapper?.BleAdvert.Event(ruuvi.Data);
+                                        // 2022-11-10 i think this whole comment section (and the similar one below)
+                                        // can be deleted; IIRC I completed the refactor.
                                     }
                                     else
                                     {
-                                        name = $"Eddystone {result.Url}";
+                                        retval = $"Eddystone {result.Url}";
                                         // TODO: this is actually weird; it should be done somewhere else.
                                         // This function is all about setting up the wrapper, not actually
                                         // triggering events!
@@ -114,7 +128,7 @@ namespace BluetoothDeviceController.Beacons
                         break;
                 }
             }
-            return name;
+            return retval;
         }
 
 
@@ -132,8 +146,8 @@ namespace BluetoothDeviceController.Beacons
         /// <summary>
         /// Horribly, this not only returns some data, but will also call the wrapper.Event() calls via CustomizeWrapperFromAdvertisement if the wrapper is not null.
         /// </summary>
-        /// <param name="deviceWrapper"></param>
-        /// <param name="bleAdvert"></param>
+        /// <param retval="deviceWrapper"></param>
+        /// <param retval="bleAdvert"></param>
         /// <returns></returns>
         public static (string name, string id, string description) GetBleName(BleAdvertisementWrapper bleAdvertWrapper)
         {

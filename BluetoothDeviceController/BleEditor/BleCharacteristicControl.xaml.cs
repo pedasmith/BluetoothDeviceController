@@ -647,7 +647,15 @@ namespace BluetoothDeviceController.BleEditor
                 Content = cvc,
                 CloseButtonText = "OK"
             };
-            await dlg.ShowAsync();
+            try
+            {
+                await dlg.ShowAsync();
+            }
+            catch (Exception)
+            {
+                // Sigh. Some devices like the LEDDMX take a really long time to pop up, allowing the user to 
+                // click multiple times and therefore trying to show two dialogs at once (which isn't allowed)
+            }
 
             if (cvc.PreferredFormatChanged)
             {
@@ -710,6 +718,7 @@ namespace BluetoothDeviceController.BleEditor
                     CloseButtonText = "Done",
                 };
                 await dlg.ShowAsync();
+                prevBytesWritten = cvc.BytesWritten;
 
                 // Update the value if possible. Some writable values are not readable at all.
                 await DoReadAsync(false); // not a readable item? then just move on with life!
@@ -735,7 +744,7 @@ namespace BluetoothDeviceController.BleEditor
         {
             await DoWriteAsync(GattWriteOption.WriteWithResponse);
         }
-
+        byte[] prevBytesWritten = null;
         private async Task DoIncrementWriteTapped(GattWriteOption WriteOption)
         {
             var oldValue = uiValueShow.Text;
@@ -749,31 +758,41 @@ namespace BluetoothDeviceController.BleEditor
                     if (buffer.Status == GattCommunicationStatus.Success)
                     {
                         var data = buffer.Value.ToArray();
-                        for (int i = data.Length - 1; i >= 0; i--)
-                        {
-                            if (data[i] < 0xFF)
-                            {
-                                data[i]++;
-                                break;
-                            }
-                            else
-                            {
-                                data[i] = 0;
-                                // And carry the one to the next byte.
-                            }
-                        }
-                        var dataBuffer = data.AsBuffer();
-                        var newAsString = ValueParser.ConvertToStringHex(dataBuffer);
-                        uiValueShow.Text = newAsString;
-                        var status = await Characteristic.WriteValueWithResultAsync(dataBuffer, WriteOption);
+                        await DoIncrementWriteData(WriteOption, data);
                     }
                 }
+                else
+                {
+                    await DoIncrementWriteData(WriteOption, prevBytesWritten);
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ; //TODO: show exception to user!
+                uiValueShow.Text = $"Error: {ex.Message}";
             }
         }
+
+        private async Task DoIncrementWriteData(GattWriteOption WriteOption, byte[] data)
+        {
+            for (int i = data.Length - 1; i >= 0; i--)
+            {
+                if (data[i] < 0xFF)
+                {
+                    data[i]++;
+                    break;
+                }
+                else
+                {
+                    data[i] = 0;
+                    // And carry the one to the next byte.
+                }
+            }
+            var dataBuffer = data.AsBuffer();
+            var newAsString = ValueParser.ConvertToStringHex(dataBuffer);
+            uiValueShow.Text = newAsString;
+            var status = await Characteristic.WriteValueWithResultAsync(dataBuffer, WriteOption);
+        }
+
         private async void OnIncrementWriteTapped(object sender, TappedRoutedEventArgs e)
         {
             await DoIncrementWriteTapped(GattWriteOption.WriteWithoutResponse);

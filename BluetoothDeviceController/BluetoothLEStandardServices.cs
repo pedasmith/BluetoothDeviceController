@@ -20,7 +20,7 @@ namespace BluetoothDeviceController
         public static Guid Privacy = Guid.Parse("00002a02-0000-1000-8000-00805f9b34fb");
         public static Guid ReconnectAddress = Guid.Parse("00002a03-0000-1000-8000-00805f9b34fb");
         public static Guid ConnectionParameter = Guid.Parse("00002a04-0000-1000-8000-00805f9b34fb");
-        //public static Guid Name = Guid.Parse("00002a05-0000-1000-8000-00805f9b34fb");
+        //public static Guid Name = Guid.ParseScanResponseServiceData("00002a05-0000-1000-8000-00805f9b34fb");
 
         // https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml
 

@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using BluetoothDeviceController.BleEditor;
+using Windows.Devices.Bluetooth.Advertisement;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -34,6 +35,7 @@ namespace BluetoothDeviceController.BleEditor
             this.InitializeComponent();
             this.Loaded += CharacteristicEditorControl_Loaded;
         }
+        public byte[] BytesWritten = null;
         public bool AutomaticallyReadData { get; internal set; } = true;
         private GattWriteOption WriteOption;
         private string BytesFormat = "BYTES"; // can also be STRING
@@ -219,6 +221,7 @@ namespace BluetoothDeviceController.BleEditor
         {
             var value = (int)(sender as FrameworkElement).Tag;
             var buffer = new byte[] { (byte)value };
+            BytesWritten = buffer;
             await DoWriteAsync(buffer.AsBuffer());
         }
 
@@ -259,12 +262,14 @@ namespace BluetoothDeviceController.BleEditor
                         var maxCount = Math.Min(MAXBYTES, command.Length - i);
                         var subcommand = new ArraySegment<byte>(command, i, maxCount);
                         var data = subcommand.ToArray().AsBuffer();
+                        BytesWritten = subcommand.ToArray();
                         await DoWriteAsync(data);
                     }
                 }
                 else
                 {
                     var data = result.ByteResult.ToArray().AsBuffer();
+                    BytesWritten = result.ByteResult.ToArray();
                     await DoWriteAsync(data);
                 }
             }

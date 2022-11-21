@@ -130,7 +130,7 @@ namespace BluetoothDeviceController
             // RuuviTag and other EddyStone data sensors
             new Specialization (typeof(Beacons.SimpleBeaconPage), new string[] { "Beacon" }, LIGHTNING, "", "Advertisement", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(Beacons.EddystonePage), new string[] { "Eddystone" }, BEACON, "", "Eddystone beacon", Specialization.ParentScrollType.ChildHandlesScrolling),
-            new Specialization (typeof(Beacons.RuuvitagPage), new string[] { "Govee_H5074_", "Ruuvi" }, DATA, "", "Environmental sensor"),
+            new Specialization (typeof(Beacons.RuuvitagPage), new string[] { "Govee_H5074_", "Ruuvi", "SwitchBot-MeterTH" }, DATA, "", "Environmental sensor"),
         };
 
         public BleNames AllBleNames { get; set; }
@@ -306,6 +306,10 @@ namespace BluetoothDeviceController
                         {
                             await NavView_NavigateAsync(deviceWrapper, args.RecommendedNavigationTransitionInfo);
                         }
+                        else if (deviceWrapper?.BleAdvert?.AdvertisementType == BleAdvertisementWrapper.BleAdvertisementType.SwitchBot)
+                        {
+                            await NavView_NavigateAsync(deviceWrapper, args.RecommendedNavigationTransitionInfo);
+                        }
                         else
                         {
                             if (oldSimpleBeaconPage == null)
@@ -461,7 +465,8 @@ namespace BluetoothDeviceController
                     {
                         case BleAdvertisementWrapper.BleAdvertisementType.Govee:
                         case BleAdvertisementWrapper.BleAdvertisementType.RuuviTag:
-                            _pageType = typeof(Beacons.RuuvitagPage);
+                        case BleAdvertisementWrapper.BleAdvertisementType.SwitchBot:
+                            _pageType = typeof(Beacons.RuuvitagPage); // TODO: RuuviTag is now used with 3 data types :-)
                             break;
                         case BleAdvertisementWrapper.BleAdvertisementType.Eddystone:
                             _pageType = typeof(Beacons.EddystonePage);
@@ -900,12 +905,17 @@ namespace BluetoothDeviceController
         private int StartSearchCount = 0; // Started since the last 'clear'
         private UserPreferences.ReadSelection LastSearchReadType;
         private UserPreferences.SearchScope LastSearchScope;
+
+        public void StartSearch(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope)
+        {
+            StartSearchWithTime(readType, scope, ScanTimeType.TimeIsPreference);
+        }
         /// <summary>
         /// Primary function to kick off a search for devices (both automation and UX 'search now' button.
         /// </summary>
         /// <param name="readType">only used for the BLE scope items</param>
         /// <param name="scope">Can be any value: the BLE (has_specialty, named, all), advert (beacon) or COM types.</param>
-        public void StartSearch(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope)
+        private void StartSearchWithTime(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope, ScanTimeType scanTimeType=ScanTimeType.TimeIsPreference)
         {
             // Track whether or no we should clear the screen. We clean the screen and the list
             // when it's a "new" search
@@ -922,6 +932,9 @@ namespace BluetoothDeviceController
             LastSearchScope = scope;
             StartSearchCount++;
 
+            //
+            // Set up the page to see (but don't start the search; that's further down)
+            //
             switch (scope)
             {
                 case UserPreferences.SearchScope.Bluetooth_Beacons:
@@ -964,8 +977,12 @@ namespace BluetoothDeviceController
             {
                 ClearDevices();
             }
+
+            //
+            // Start the search!
+            //
             SearchFeedback.StartSearchFeedback();
-            StartWatchForBluetoothDevices(scope);
+            StartWatchForBluetoothDevices(scope, scanTimeType);
 
             // In some cases, we also want to automatically read the device information.
             // For the 'Everything' value, we read in all data and display it to the user.
@@ -1024,7 +1041,7 @@ namespace BluetoothDeviceController
         }
 
         enum WatcherType { DeviceInformationWatcher, BluetoothLEAdvertisementWatcher }
-        private async void StartWatchForBluetoothDevices(UserPreferences.SearchScope scope)
+        private async void StartWatchForBluetoothDevices(UserPreferences.SearchScope scope, ScanTimeType scanTimeType) // normally "use the user preferences" but sometimes "infinite"
         {
             // Query for extra properties you want returned
             // See https://docs.microsoft.com/en-us/windows/desktop/properties/devices-bumper
@@ -1070,6 +1087,8 @@ namespace BluetoothDeviceController
                         dt.Interval = TimeSpan.FromMilliseconds(Preferences.AdvertisementScanTimeInMilliseconds);
                         Timeout_BluetoothLEAdvertisementWatcher = dt;
                     }
+                    // Always make sure timeout is set (might have been set by automation for long adverts)
+                    Timeout_BluetoothLEAdvertisementWatcher.Interval = TimeSpan.FromMilliseconds(Preferences.AdvertisementScanTimeInMilliseconds);
 
                     // Register event handlers before starting the watcher.
                     // Added, Updated and Removed are required to get all nearby devices
@@ -1092,20 +1111,29 @@ namespace BluetoothDeviceController
                         dt.Interval = TimeSpan.FromMilliseconds(Preferences.AdvertisementScanTimeInMilliseconds);
                         Timeout_BluetoothLEAdvertisementWatcher = dt;
                     }
+                    switch (scanTimeType)
+                    {
+                        case ScanTimeType.TimeIsPreference:
+                            Timeout_BluetoothLEAdvertisementWatcher.Interval = TimeSpan.FromMilliseconds(Preferences.AdvertisementScanTimeInMilliseconds);
+                            break;
+                        case ScanTimeType.TimeIsInfinite:
+                            Timeout_BluetoothLEAdvertisementWatcher.Interval = TimeSpan.MaxValue;
+                            break;
+                    }
                     BTAdvertisementWatcher.Start(); 
                     Timeout_BluetoothLEAdvertisementWatcher.Start();
 
-                    await ListAllAdapters();
+                    await LogAllAdapters();
 
                     break;
             }
             DeviceEnumerationChanged?.Invoke(this, new EventArgs());
         }
 
-        private async Task ListAllAdapters()
+        private async Task LogAllAdapters()
         {
             // List stuff about the radio
-            Log("List all adapters");
+            Log("Log all adapters");
             var defaultAdapter = await BluetoothAdapter.GetDefaultAsync();
 
             var selector = BluetoothAdapter.GetDeviceSelector();
@@ -1161,9 +1189,30 @@ namespace BluetoothDeviceController
             SearchFeedback?.StopSearchFeedback();
         }
 
-
+        /// <summary>
+        /// Called by the MenuDeviceInformationWatcher.Added
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
+            // Play around with getting a strength value!
+            var id = GuidGetCommon.NiceId(args.Id);
+            object strength = null;
+            args.Properties.TryGetValue("System.Devices.Aep.SignalStrength", out strength);
+            if (strength != null && strength is int)
+            {
+                ;
+                var strvalue = (int)strength;
+                Log($"DeviceWatcher: Added: Device {id} added with strength {strength}");
+            }
+            else
+            {
+                Log($"DeviceWatcher: Added: Device {id} added with no strength");
+            }
+
+
+
             // why was this calculated? var id = GuidGetCommon.NiceId(args.Id);
             await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
                 async () => {
@@ -1202,7 +1251,7 @@ namespace BluetoothDeviceController
         }
 
         /// <summary>
-        /// Called from StartSearch. Starts a task to read data from devices; only valid for Name and Everthing (not Address)
+        /// Called from StartSearchWithTime. Starts a task to read data from devices; only valid for Name and Everthing (not Address)
         /// </summary>
         /// <param name="readType">must be name or everthing</param>
         /// <returns></returns>
@@ -1338,7 +1387,7 @@ namespace BluetoothDeviceController
             }
         }
 
-        readonly Guid CommonConfigurationGuid1800 = BluetoothLEStandardServices.Display; //  Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"); // service
+        readonly Guid CommonConfigurationGuid1800 = BluetoothLEStandardServices.Display; //  Guid.ParseScanResponseServiceData("00001800-0000-1000-8000-00805f9b34fb"); // service
         readonly Guid DeviceNameGuid2a00 = BluetoothLEStandardServices.Name;  // new Guid("00002a00-0000-1000-8000-00805f9b34fb"); // characteristic
 
         /// <summary>
@@ -1485,10 +1534,12 @@ namespace BluetoothDeviceController
             Clipboard.SetContent(dp);
         }
 
+        public enum ScanTimeType {  TimeIsPreference, TimeIsInfinite};
+
         private void MenuOnSweepBeaconAdvertisement(object sender, RoutedEventArgs e)
         {
             CancelSearch();
-            StartSearch(UserPreferences.ReadSelection.Name, UserPreferences.SearchScope.Bluetooth_Beacons);
+            StartSearchWithTime(UserPreferences.ReadSelection.Name, UserPreferences.SearchScope.Bluetooth_Beacons, ScanTimeType.TimeIsInfinite);
         }
 
         private void MenuOnSweepBleName(object sender, RoutedEventArgs e)

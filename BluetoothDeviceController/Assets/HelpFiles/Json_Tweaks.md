@@ -1,6 +1,6 @@
 ﻿# JSON tweaks for a better UI
 
-The JSON file that can be deduced from the the captured Bluetooth sisgnals is often not ideal. 
+The JSON file that can be created from the the captured Bluetooth signals is often not ideal. 
 You can tweak the resulting JSON file to make it exactly match your needs.
 
 ## Device name, class name, aliases

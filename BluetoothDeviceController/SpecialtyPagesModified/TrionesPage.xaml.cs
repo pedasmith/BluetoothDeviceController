@@ -129,7 +129,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             uiProgress.IsActive = ncommand == 0;
             ncommand++;
 
-            byte onoff = Byte.Parse((sender as Button).Tag as string);
+            byte onoff = Byte.ParseScanResponseServiceData((sender as Button).Tag as string);
             await Triones.Power((onoff == 0 ? false : true));
         }
         */

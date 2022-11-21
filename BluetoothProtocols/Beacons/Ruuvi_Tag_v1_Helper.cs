@@ -34,7 +34,7 @@ namespace BluetoothDeviceController.Beacons
         }
 
         /// <summary>
-        /// Parse the URL that RuuviTags produce
+        /// ParseScanResponseServiceData the URL that RuuviTags produce
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>

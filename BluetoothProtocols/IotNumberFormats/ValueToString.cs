@@ -121,7 +121,7 @@ namespace BluetoothDeviceController.BleEditor
 
         private string[][] SplitData = null;
         /// <summary>
-        /// Parse after the string is split into units
+        /// ParseScanResponseServiceData after the string is split into units
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>

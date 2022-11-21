@@ -21,7 +21,7 @@ namespace BluetoothDeviceController
         /// <summary>
         /// Which exact type of advertisement is this?
         /// </summary>
-        public enum BleAdvertisementType { None, BluetoothLE, Eddystone, Govee, RuuviTag }
+        public enum BleAdvertisementType { None, BluetoothLE, Eddystone, Govee, RuuviTag, SwitchBot }
         public enum BleAdvertisementEddystoneSubtype {  None, Uid, Url, Tlm, Eid };
         public BleAdvertisementType AdvertisementType { get; set; } = BleAdvertisementType.None;
         public BleAdvertisementEddystoneSubtype AdvertisementEddystoneSubtype { get; set; } = BleAdvertisementEddystoneSubtype.None;
@@ -34,6 +34,7 @@ namespace BluetoothDeviceController
         public string EddystoneUrl { get; set; }
         public Govee GoveeDataRecord { get; set; }
         public SensorDataRecord RuuviDataRecord { get; set; }
+        public SwitchBot SwitchBotDataRecord { get; set; }
 
         public delegate void BluetoothLEAdvertisementEvent(BluetoothLEAdvertisementReceivedEventArgs data);
         public delegate void BluetoothLEAdvertisementWrapperEvent(BleAdvertisementWrapper data);
@@ -112,11 +113,17 @@ namespace BluetoothDeviceController
                             break;
                     }
                     break;
+                    //
+                    // SENSOR: new sensors get added here
+                    //
                 case BleAdvertisementWrapper.BleAdvertisementType.Govee:
                     Event(GoveeDataRecord);
                     break;
                 case BleAdvertisementWrapper.BleAdvertisementType.RuuviTag:
                     Event(RuuviDataRecord);
+                    break;
+                case BleAdvertisementWrapper.BleAdvertisementType.SwitchBot:
+                    Event(SwitchBotDataRecord);
                     break;
             }
         }

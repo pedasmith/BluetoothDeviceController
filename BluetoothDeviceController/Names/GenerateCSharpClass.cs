@@ -776,7 +776,7 @@ namespace BluetoothDeviceController.Names
             {
                 if (service.Suppress) continue; // seems to be needed for Protocentral Sensything for generic service
 
-                serviceGuidList += $"            Guid.Parse(\"{service.UUID}\"),\n";
+                serviceGuidList += $"            Guid.ParseScanResponseServiceData(\"{service.UUID}\"),\n";
                 serviceNameList += $"            \"{service.Name}\",\n";
                 serviceList += $"            null,\n";
 
@@ -784,7 +784,7 @@ namespace BluetoothDeviceController.Names
                 for (var i=0; i<service.Characteristics.Count; i++)
                 {
                     var characteristic = service.Characteristics[i];
-                    characteristicGuidList += $"            Guid.Parse(\"{characteristic.UUID}\"), // #{i} is {characteristic.Name}\n";
+                    characteristicGuidList += $"            Guid.ParseScanResponseServiceData(\"{characteristic.UUID}\"), // #{i} is {characteristic.Name}\n";
                     characteristicNameList += $"            \"{characteristic.Name}\", // #{i} is {characteristic.UUID}\n";
                     characteristicList += $"            null,\n";
 

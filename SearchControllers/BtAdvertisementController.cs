@@ -126,7 +126,7 @@ namespace SearchControllers
                 await Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
                     () => { DeviceDisplay.AddOrUpdateDeviceBle(diwrapper); }
                 );
-                // Will be the MainPage.Xaml.cs method call at about line 770
+                // Will be the MainPage.Xaml.cs method call at about line 782
             }
         }
 

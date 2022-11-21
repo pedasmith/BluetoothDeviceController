@@ -14,7 +14,7 @@ The CLEAR mode parameter can be 0, 1, 2, or 3; 1 will turn off the lights, 2 wil
 
 ## Commands and UIList
 
-Each command (like BEEPS) is described in a single entry in the Commands list. The command entry includes a list of Paramters (like the Tone and Duration) and a Compute value. The Compute value is string with a set of commands; they are just like the commands described in [Interpreting Data](https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/). 
+Each command (like BEEPS) is described in a single entry in the Commands list. The command entry includes a list of Parameters (like the Tone and Duration) and a Compute value. The Compute value is string with a set of commands; they are just like the commands described in [Interpreting Data](https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/). 
 
 The command string is a set of sub-commands separated with spaces. In the BEEPS example, the goal is to make a string like
 

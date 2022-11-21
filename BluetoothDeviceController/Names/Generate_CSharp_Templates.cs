@@ -250,7 +250,7 @@ namespace BluetoothProtocols
         private void Notify[[CHARACTERISTICNAME]]Callback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = ""[[CHARACTERISTICTYPE]]"";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.ParseScanResponseServiceData(args.CharacteristicValue, datameaning);
 [[SET_PROPERTY_VALUES]]
             [[CHARACTERISTICNAME]]Event?.Invoke(parseResult);
 
@@ -279,7 +279,7 @@ namespace BluetoothProtocols
             if (result == null) return null;
 
             var datameaning = ""[[CHARACTERISTICTYPE]]"";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.ParseScanResponseServiceData(result, datameaning);
 [[SET_PROPERTY_VALUES]]
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue(""LightRaw"").AsDouble;

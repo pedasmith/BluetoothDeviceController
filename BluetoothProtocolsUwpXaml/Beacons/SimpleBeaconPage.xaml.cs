@@ -102,6 +102,10 @@ namespace BluetoothDeviceController.Beacons
             {
                 parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Govee;
             }
+            else if (SwitchBot.AdvertIsSwitchBot(data))
+            {
+                parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.SwitchBot;
+            }
             await UpdateUI(data, parseAs, IsPaused);
         }
         private async void BleAdvert_UpdatedBleAdvertisement(Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementReceivedEventArgs data)
@@ -180,7 +184,7 @@ namespace BluetoothDeviceController.Beacons
                     case AdvertisementDataSectionParser.DataTypeValue.ManufacturerData://0xFF==255==-1
                         {
                             //string result;
-                            //(result, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, transmitPower, indent);
+                            //(result, manufacturerType, companyId) = AdvertisementDataSectionParser.ParseScanResponseServiceData(section, transmitPower, indent);
                             object speciality;
                             (result, manufacturerType, companyId, speciality) = BluetoothCompanyIdentifier.ParseManufacturerData(section, transmitPower, parseAs);
 

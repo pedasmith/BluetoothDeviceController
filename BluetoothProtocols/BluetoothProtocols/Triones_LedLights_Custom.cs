@@ -85,7 +85,7 @@ namespace BluetoothProtocols
         // This is the setup for 
         GuidSet[] NotificationGuids = new GuidSet[]
         {
-            //new GuidSet ("Triones", Guid.Parse("0000ffd5-0000-1000-8000-00805f9b34fb"), Guid.Parse("0000ffd9-0000-1000-8000-00805f9b34fb")),
+            //new GuidSet ("Triones", Guid.ParseScanResponseServiceData("0000ffd5-0000-1000-8000-00805f9b34fb"), Guid.ParseScanResponseServiceData("0000ffd9-0000-1000-8000-00805f9b34fb")),
             new GuidSet ("LEDBlue", Guid.Parse("0000ffe0-0000-1000-8000-00805f9b34fb"), Guid.Parse("0000ffe4-0000-1000-8000-00805f9b34fb")),
         };
         GattCharacteristic NotificationCharacteristic = null;
