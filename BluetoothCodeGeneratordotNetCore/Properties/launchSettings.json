@@ -2,8 +2,8 @@
   "profiles": {
     "BluetoothCodeGeneratordotNetCore": {
       "commandName": "Project",
-      "commandLineArgs": " -inputJsonDirectory \"C:\\bin\\My Small Utils\\Shipwreck\\BluetoothDeviceController\\BluetoothDeviceController\\Assets\\CharacteristicsData\" -inputTemplates Templates -output output\r\n",
-      "workingDirectory": "C:\\bin\\My Small Utils\\Shipwreck\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore",
+      "commandLineArgs": " -inputJsonFile \"..\\BluetoothDeviceController\\Assets\\CharacteristicsData\\Nordic_Thingy.json\" -inputTemplates Templates -output output\r\n",
+      "workingDirectory": "C:\\Users\\toomr\\source\\repos\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore",
       "remoteDebugEnabled": true
     }
   }

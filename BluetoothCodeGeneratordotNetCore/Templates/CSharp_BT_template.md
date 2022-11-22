@@ -257,7 +257,7 @@ namespace BluetoothProtocols
 ## HASH+LIST+REVERSE Type=list Source=Services/Characteristics Code="            [[../COUNT]], // Characteristic [[COUNT]]" CodeListSubZero="            // No characteristics for [[Name]]"
 
 
-## SET+PROPERTY+VALUES Type=list Source=Services/Characteristics/Properties ListOutput=parent CodeListZero="            // No properties for this characteristic" CodeListSubZero="            // No properties for this characteristic"
+## SET+PROPERTY+VALUES Type=list Source=Services/Characteristics/ReadProperties ListOutput=parent CodeListZero="            // No properties for this characteristic" CodeListSubZero="            // No properties for this characteristic"
 
 ```
             [[CHDATANAME]] = parseResult.ValueList.GetValue("[[DATANAME]]").[[AS+DOUBLE+OR+STRING]];
@@ -333,7 +333,7 @@ namespace BluetoothProtocols
 
 ```
 
-## METHOD+PROPERTY Type=list If="[[Verbs]] contains :RdInNo:" Type=list ListOutput=parent Source=Services/Characteristics/Properties CodeListSubZero=""
+## METHOD+PROPERTY Type=list If="[[Verbs]] contains :RdInNo:" Type=list ListOutput=parent Source=Services/Characteristics/ReadProperties CodeListSubZero=""
 
 ```
         private [[VARIABLETYPE+DS]] _[[CHDATANAME]] = [[DOUBLE+OR+STRING+DEFAULT]];
@@ -371,7 +371,7 @@ Replace the simple Reads Data comment with this better snippet.
         }
 ```
 
-## WRITE+PARAMS If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteParams CodeListSubZero="" CodeListSeparator=", " Trim=true 
+## WRITE+PARAMS If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteProperties CodeListSubZero="" CodeListSeparator=", " Trim=true 
 ```
 [[VARIABLETYPEPARAM]] [[DATANAME]]
 ```
@@ -410,7 +410,7 @@ The parameter list for writing data to the device.
         }
 ```
 
-## DATAWRITER If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteParams CodeListSubZero="" Trim=false
+## DATAWRITER If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteProperties CodeListSubZero="" Trim=false
 ```
             [[ARGDWCALL]]( [[ARGDWCALLCAST]] [[DATANAME]]);
 ```
@@ -522,185 +522,6 @@ In my **TODO:** list
 // FUNCTION_ENUM_INITS is e.g. "            Left = 0,"
 
 
-# PageXaml
-## PageXaml+BodyTemplate
-```
-<Page
-    x:Class="BluetoothDeviceController.SpecialtyPages.[[CLASSNAME]]Page"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:charts="using:BluetoothDeviceController.Charts"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <Page.Resources>
-        <Style TargetType="Button">
-            <Setter Property="MinWidth" Value="60" />
-            <Setter Property="VerticalAlignment" Value="Bottom" />
-            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
-            <Setter Property="Margin" Value="10,5,0,0" />
-        </Style>
-        <Style TargetType="Slider">
-            <Setter Property="MinWidth" Value="200" />
-            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
-            <Setter Property="Margin" Value="10,5,10,0" />
-        </Style>
-        <Style TargetType="Line">
-            <Setter Property="Margin" Value="0,15,0,0" />
-            <Setter Property="Stroke" Value="ForestGreen" />
-        </Style>
-        <Style x:Key="TitleStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="30" />
-        </Style>
-        <Style x:Key="HeaderStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="20" />
-        </Style>
-        <Style x:Key="HeaderStyleExpander" TargetType="controls:Expander">
-            <Setter Property="MinWidth" Value="550" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-        </Style>
-        <Style x:Key="SubheaderStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16" />
-        </Style>
-        <Style x:Key="AboutStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-        </Style>
-        <Style x:Key="ChacteristicListStyle" TargetType="StackPanel">
-            <Setter Property="Background" Value="WhiteSmoke" />
-            <Setter Property="Margin" Value="18,0,0,0" />
-        </Style>
-        <Style x:Key="HEXStyle" TargetType="TextBox">
-            <Setter Property="MinWidth" Value="90" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="Margin" Value="5,0,0,0" />
-        </Style>
-        <Style x:Key="TableStyle" TargetType="controls:DataGrid">
-            <Setter Property = "Background" Value="BlanchedAlmond" />
-            <Setter Property = "FontSize" Value="12" />
-            <Setter Property = "Height" Value="200" />
-            <Setter Property = "HorizontalAlignment" Value="Center" />
-            <Setter Property = "Width" Value="500" />
-        </Style>
-    </Page.Resources>
-    
-    <StackPanel>
-        <Grid MaxWidth="550" HorizontalAlignment="Left">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <TextBlock Style="{StaticResource TitleStyle}">[[DEVICENAMEUSER]] device</TextBlock>
-                <TextBlock Style="{StaticResource AboutStyle}">
-                    [[DESCRIPTION]]
-                </TextBlock>
-            </StackPanel>
-            <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/[[CLASSNAME]].PNG" />
-        </Grid>
-        <ProgressRing x:Name="uiProgress" />
-        <TextBlock x:Name="uiStatus" />
-[[SERVICE+LIST]]
-        <Button Content="REREAD" Click="OnRereadDevice" />
-    </StackPanel>
-</Page>
-```
-
-## PageXaml+ServiceTemplate
-```
-        <controls:Expander Header="[[SERVICENAMEUSER]]" IsExpanded="[[SERVICEISEXPANDED]]" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-[[CHARACTERISTIC+LIST]]
-            </StackPanel>
-        </controls:Expander>
-```
-
-## PageXaml+CharacteristicTemplate
-```
-                <TextBlock Style="{StaticResource SubheaderStyle}">[[CHARACTERISTICNAMEUSER]]</TextBlock>
-                <StackPanel Orientation="Horizontal">
-[[DATA1+LIST]]
-[[READWRITE+BUTTON+LIST]]
-                </StackPanel>
-[[ENUM+BUTTON+LIST+PANEL]]
-[[FUNCTIONUI+LIST+PANEL]]
-[[TABLE]]
-```
-
-## PageXamlCharacteristicDataTemplate
-```
-                    <TextBox IsReadOnly="[[IS+READ+ONLY]]" x:Name="[[CHARACTERISTICNAME]]_[[DATANAME]]" Text="*" Header="[[DATANAMEUSER]]" Style="{StaticResource HEXStyle}"/>
-```
-
-## PageXamlCharacteristicEnumButtonTemplate
-```
-                    <Button Content="[[ENUM+NAME]]" Tag="[[ENUM+VALUE]]" Click="OnClick[[CHARACTERISTICNAME]]" />
-```
-        
-## PageXamlCharacteristicEnumButtonPanelTemplate
-```
-                <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="[[MAXCOLUMNS]]">
-[[ENUM+BUTTON+LIST]]                </VariableSizedWrapGrid>	
-```
-
-## PageXamlCharacteristicButtonTemplate
-```
-                    <Button Content="[[BUTTONTYPE]]" Click="On[[BUTTONTYPE]][[CHARACTERISTICNAME]]" />
-```
-
-## PageXamlCharacteristicTableTemplate
-```
-                    <controls:Expander Header="[[CHARACTERISTICNAMEUSER]] Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
-                        <StackPanel MinWidth="550">
-                            [[XAMLCHART]]
-                            <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="[[CHARACTERISTICNAME]]Grid" ItemsSource="{Binding [[CHARACTERISTICNAME]]RecordData}" />
-                            <TextBox  x:Name="[[CHARACTERISTICNAME]]_Notebox" KeyDown="On[[CHARACTERISTICNAME]]_NoteKeyDown" />
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                <ComboBox SelectionChanged="OnKeepCount[[CHARACTERISTICNAME]]" Header="Keep how many items?" SelectedIndex="2">
-                                    <ComboBoxItem Tag="10">10</ComboBoxItem>
-                                    <ComboBoxItem Tag="100">100</ComboBoxItem>
-                                    <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
-                                    <ComboBoxItem Tag="10000">10K</ComboBoxItem>
-                                </ComboBox>
-                                <Rectangle Width="5" />
-                                <ComboBox SelectionChanged="OnAlgorithm[[CHARACTERISTICNAME]]" Header="Remove algorithm?" SelectedIndex="0">
-                                    <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
-                                    <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
-                                </ComboBox>
-                                <Button Content = "Copy" Click="OnCopy[[CHARACTERISTICNAME]]" />
-                            </StackPanel>
-                        </StackPanel>
-                    </controls:Expander>
-```
-
-
-## PageXamlFunctionUIListPanelTemplate 
-```
-[[TAB]]<StackPanel>
-[[FUNCTIONUILIST]]
-[[TAB]]</StackPanel>
-```
-
-## PageXamlFunctionComboBoxTemplate 
-```
-[[TAB]]<ComboBox Header="[[LABEL]]" [[COMBOINIT]] MinWidth="140" SelectionChanged="[[COMMAND]]_[[PARAM]]_ComboBoxChanged">
-[[COMBOBOXLIST]]
-[[TAB]]</ComboBox>
-```
-
-
-## PageXamlFunctionButtonTemplate 
-```
-[[TAB]]<Button Content="[[LABEL]]" Click="[[FUNCTIONNAME]]_ButtonClick" />
-```
-## PageXamlFunctionSliderTemplate
-```
-[[TAB]]<Slider Header="[[LABEL]]" Value="[[INIT]]" Minimum="[[MIN]]" Maximum="[[MAX]]" ValueChanged="[[COMMAND]]_[[PARAM]]_SliderChanged" />
-```
 
 # PageCSharp
 ## PageCSharp+BodyTemplate

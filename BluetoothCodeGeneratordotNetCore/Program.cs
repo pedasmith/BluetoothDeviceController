@@ -169,9 +169,16 @@ namespace BluetoothCodeGenerator
                                     }
 
                                     var codeTemplate = child.Code;
-                                    var code = Expander.ExpandMacroAll(codeTemplate, btdata);
-                                    Log($"Length starts as {codeTemplate.Length} and becomes {code.Length}");
-                                    File.WriteAllText(outfilename, code);
+                                    if (codeTemplate == null)
+                                    {
+                                        Log($"Error: was unable to expand the Code template for {fname}");
+                                    }
+                                    else
+                                    {
+                                        var code = Expander.ExpandMacroAll(codeTemplate, btdata);
+                                        Log($"Length starts as {codeTemplate.Length} and becomes {code.Length}");
+                                        File.WriteAllText(outfilename, code);
+                                    }
                                 }
                             }
                         }

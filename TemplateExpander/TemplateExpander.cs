@@ -236,7 +236,7 @@ namespace TemplateExpander
             {
                 if (itemListSubZero == null)
                 {
-                    expand = $"[[ERROR: {source} has no macros and no children; parent={data.Parent.Name} template={template.Name}]]";
+                    expand = $"[[ERROR: {source} has no macros and no children; parent={data.Parent.Name} template={template.Name}]]. Add CodeListSubZero item to fix?";
                 }
                 else
                 {

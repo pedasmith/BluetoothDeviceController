@@ -7,12 +7,17 @@ set JSON=%JSONDIR%\TI_SensorTag_1350.json
 set JSON=%JSONDIR%\Elegoo_Mini_Car.json
 set BIN= ".\bin\Debug\net6.0-windows10.0.19041.0\BluetoothCodeGeneratordotNetCore"
 if not exist output mkdir output
-REM goto :Debug
+
+REM
+REM Normally we want to generate everything. But when we are debugging just something new,
+REM it's nicer to have just the single file handled.
+REM
+goto :Debug
 %BIN% -inputJsonDirectory "%JSONDIR%" -inputTemplates Templates -output output
 goto :EOF
 
-REM Or generate just the one
+REM Or generate just the one, which is a little easier to handle when debugging.
 :Debug
-%BIN% -inputJsonFile "%JSONDIR%"\Elegoo_Mini_Car.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Templates -output output
 
 

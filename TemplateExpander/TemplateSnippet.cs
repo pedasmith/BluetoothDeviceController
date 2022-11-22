@@ -61,6 +61,9 @@ namespace TemplateExpander
         public TypeOfExpansion OptionType { get; internal set; } = TypeOfExpansion.Normal;
         public string OptionSource { get; internal set; } = "";
         public enum TypeOfListOutput { Global, Parent, Child };
+        /// <summary>
+        /// ListOutput=global is default; puts list into global area. Other options are ListOutput=parent and ListOutput=child
+        /// </summary>
         public TypeOfListOutput OptionListOutput { get; internal set; } = TypeOfListOutput.Global;
 
 
