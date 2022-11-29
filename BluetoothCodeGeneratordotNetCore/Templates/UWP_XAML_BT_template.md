@@ -1,4 +1,4 @@
-﻿# PageXaml FileName=[[CLASSNAME]].xaml
+﻿# PageXaml FileName=[[CLASSNAME]]Page.xaml
 ```
 <Page
     x:Class="BluetoothDeviceController.SpecialtyPages.[[CLASSNAME]]Page"
@@ -8,7 +8,6 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:charts="using:BluetoothDeviceController.Charts"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -108,7 +107,7 @@ Feel free to add in this little explainer to the code
 <charts:ChartControl Height="200" Width="500" x:Name="[[CharacteristicName.dotNet]]Chart" />
 ```
 
-## ENUM+BUTTON+LIST Type=list Source=Services/Characteristics/Enums ListOutput=parent
+## ENUM+BUTTON+LIST Type=list Source=Services/Characteristics/Enums ListOutput=parent 
 
 Was PageXamlCharacteristicEnumButtonTemplate
 ```
@@ -152,12 +151,28 @@ We only add in the XAML+TABLE if the characteristic.UI?.tableType is not null or
 ```
 
 ## XAML+CHARACTERISTIC+LIST Type=list Source=Services/Characteristics ListOutput=parent
+
+TODO: the original code would add a </stackpanel><stackpanel> every 5 items. That keeps everything a bit 
+more tidy. However, that's not possible with the new system.
+
+Instead, the code should be updated to be a GridView where the ItemsPanel is set to be an ItemsWrapGrid
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid MaximumRowsOrColumns="3"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+
 ```
                 <TextBlock Style="{StaticResource SubheaderStyle}">[[CharacteristicName]]</TextBlock>
-                <StackPanel Orientation="Horizontal">
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
 [[XAML+DATA1+LIST]]
 [[READWRITE+BUTTON+LIST]]
-                </StackPanel>
+                </GridView>
 [[ENUM+BUTTON+LIST+PANEL]]
 [[FUNCTIONUI+LIST+PANEL]]
 [[XAML+TABLE]]
@@ -165,10 +180,14 @@ We only add in the XAML+TABLE if the characteristic.UI?.tableType is not null or
 
 
 ## SERVICE+LIST Type=list Source=Services
+
+this is not the code section!
+
 ```
+        <!-- SERVICE+LIST for [[ServiceName]] -->
         <controls:Expander Header="[[ServiceName]]" IsExpanded="[[ServiceIsExpanded]]" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-[[XAML+CHARACTERISTIC+LIST]]
+            [[XAML+CHARACTERISTIC+LIST]]
             </StackPanel>
         </controls:Expander>
 ```
