@@ -79,7 +79,7 @@
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
-[[SERVICE+LIST]]
+[[XAML+SERVICE+LIST]]
         <Button Content="REREAD" Click="OnRereadDevice" />
     </StackPanel>
 </Page>
@@ -87,7 +87,7 @@
 
 
 
-## XAML+DATA1+LIST Type=list Source=Services/Characteristics/Properties ListOutput=parent
+## XAML+CHARACTERISTIC+DATA+PROPERTY Type=list Source=Services/Characteristics/Properties ListOutput=parent
 
 Feel free to add in this little explainer to the code
                     <!-- Data=[[DataName]] Characteristic=[[CharacteristicName]] Service=[[ServiceName]] -->
@@ -96,7 +96,7 @@ Feel free to add in this little explainer to the code
                     <TextBox IsReadOnly="[[IS+READ+ONLY]]" x:Name="[[CharacteristicName.dotNet]]_[[DataName.dotNet]]" Text="*" Header="[[DATANAMEUSER]]" Style="{StaticResource HEXStyle}"/>
 ```
 
-## READWRITE+BUTTON+LIST Type=list Source=Services/Characteristics/Buttons ListOutput=parent CodeListSubZero=""
+## XAML+READWRITE+BUTTON+LIST Type=list Source=Services/Characteristics/Buttons ListOutput=parent CodeListSubZero=""
 ```
                     <Button Content="[[ButtonVerb]]" Click="On[[ButtonVerb]][[CharacteristicName.dotNet]]" />
 ```
@@ -107,18 +107,18 @@ Feel free to add in this little explainer to the code
 <charts:ChartControl Height="200" Width="500" x:Name="[[CharacteristicName.dotNet]]Chart" />
 ```
 
-## ENUM+BUTTON+LIST Type=list Source=Services/Characteristics/Enums ListOutput=parent 
+## XAML+ENUM+BUTTON+LIST Type=list Source=Services/Characteristics/Enums ListOutput=parent 
 
 Was PageXamlCharacteristicEnumButtonTemplate
 ```
                     <Button Content="[[ENUM+NAME]]" Tag="[[ENUM+VALUE]]" Click="OnClick[[CharacteristicName.dotNet]]" />
 ```
         
-## ENUM+BUTTON+LIST+PANEL Type=list Source=Services/Characteristics ListOutput=child
+## XAML+ENUM+BUTTON+LIST+PANEL Type=list Source=Services/Characteristics ListOutput=child
 Was PageXamlCharacteristicEnumButtonPanelTemplate
 ```
                 <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="[[MAXCOLUMNS]]">
-[[ENUM+BUTTON+LIST]]                </VariableSizedWrapGrid>	
+[[XAML+ENUM+BUTTON+LIST]]                </VariableSizedWrapGrid>	
 ```
 
 
@@ -170,21 +170,21 @@ Instead, the code should be updated to be a GridView where the ItemsPanel is set
                     <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
-[[XAML+DATA1+LIST]]
-[[READWRITE+BUTTON+LIST]]
+[[XAML+CHARACTERISTIC+DATA+PROPERTY]]
+[[XAML+READWRITE+BUTTON+LIST]]
                 </GridView>
-[[ENUM+BUTTON+LIST+PANEL]]
-[[FUNCTIONUI+LIST+PANEL]]
+[[XAML+ENUM+BUTTON+LIST+PANEL]]
+[[XAML+FUNCTIONUI+LIST+PANEL]]
 [[XAML+TABLE]]
 ```
 
 
-## SERVICE+LIST Type=list Source=Services
+## XAML+SERVICE+LIST Type=list Source=ServicesByPriority
 
-this is not the code section!
+TODO: investigate if this should be ListOutput=parent -- it seems like almost all Type=list should be a ListOutput=parent 
 
 ```
-        <!-- SERVICE+LIST for [[ServiceName]] -->
+        <!-- XAML+SERVICE+LIST for [[ServiceName]] -->
         <controls:Expander Header="[[ServiceName]]" IsExpanded="[[ServiceIsExpanded]]" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
             [[XAML+CHARACTERISTIC+LIST]]
@@ -197,7 +197,7 @@ this is not the code section!
 
 
 
-## FUNCTIONUI+LIST+PANEL
+## XAML+FUNCTIONUI+LIST+PANEL
 
 PageXamlFunctionUIListPanelTemplate 
 The FunctionUIList puts in buttons, radio, slider etc. based on the characteristic "UIList" which is only part

@@ -4,7 +4,7 @@
       "Name": "Multi-Sensor",
       "ClassName": "TI_SensorTag_1352",
       "ClassModifiers": "partial",
-      "Description": "The TI 1352 is the latest 2019 version in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth",
+      "Description": "The TI 1352 is the 2019 version in the TI range of Sensor Tags. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth",
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

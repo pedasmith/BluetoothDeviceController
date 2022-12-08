@@ -442,7 +442,7 @@ namespace TemplateExpander
                             var countAll = 0;
                             expand = ExpandListRecursive(sourceList, 0, child, macros, ref count, ref countAll);
 
-                            if (!string.IsNullOrEmpty(child.OptionIf) && child.OptionListOutput != TemplateSnippet.TypeOfListOutput.Child)
+                            if (!string.IsNullOrEmpty(child.OptionIf) && child.OptionListOutput == TemplateSnippet.TypeOfListOutput.Parent)
                             {
                                 var exp = TemplateExpression.Parse(child.OptionIf);
                                 if (exp.Error != "")

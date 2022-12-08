@@ -369,7 +369,7 @@ namespace BluetoothDeviceController.Names
             replace["[[ARG_LIST]]"] = arglist;
             for (int ii = 0; ii < dataTemplates.Length; ii++)
             {
-                replace[$"[[DATA{ii+1}_LIST]]"] = datalist[ii];
+                replace[$"[[DATA{ii+1}_LIST]]"] = datalist[ii]; // e.g. [[DATA1_LIST]] [[DATA2_LIST]] and more
             }
             replace["[[PROPERTY_LIST]]"] = propertylist;
             string chartCommand = "";

@@ -712,13 +712,13 @@ namespace BluetoothDeviceController.SpecialtyPages
 @"
             private [[VARIABLETYPE_DS]] _[[DATANAME]];
             public [[VARIABLETYPE_DS]] [[DATANAME]] { get { return _[[DATANAME]]; } set { if (value == _[[DATANAME]]) return; _[[DATANAME]] = value; OnPropertyChanged(); } }
-", // DATA1_LIST
-@",[[DATANAME]]", // DATA2_LIST
-@",{row.[[DATANAME]]}", // DATA3_LIST
+", // [[DATA1_LIST]]
+@",[[DATANAME]]", // [[DATA2_LIST]]
+@",{row.[[DATANAME]]}", // [[DATA3_LIST]]
 @"
 typeof([[CHARACTERISTICNAME]]Record).GetProperty(""[[DATANAME]]""),", // DATA4_LIST
 @"
-""[[DATANAME]]"",", // DATA5_LIST
+""[[DATANAME]]"",", // [[DATA5_LIST]]
 };
 
 

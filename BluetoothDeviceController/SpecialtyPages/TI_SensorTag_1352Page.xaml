@@ -11,8 +11,15 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Page.Resources>
         <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="60" />
             <Setter Property="VerticalAlignment" Value="Bottom" />
-            <Setter Property="Margin" Value="10,0,0,0" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,0,0" />
+        </Style>
+        <Style TargetType="Slider">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,10,0" />
         </Style>
         <Style TargetType="Line">
             <Setter Property="Margin" Value="0,15,0,0" />
@@ -63,568 +70,669 @@
             <StackPanel Grid.Column="0">
                 <TextBlock Style="{StaticResource TitleStyle}">Multi-Sensor device</TextBlock>
                 <TextBlock Style="{StaticResource AboutStyle}">
-                    The TI 1352 is the latest 2019 version in the TI range of Sensor. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth
+                    The TI 1352 is the 2019 version in the TI range of Sensor Tags. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth
                 </TextBlock>
             </StackPanel>
             <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/TI_SensorTag_1352.PNG" />
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
-
-        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+        <!-- XAML+SERVICE+LIST for Temperature -->
+        <controls:Expander Header="Temperature" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadDevice_Name" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Appearance</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Appearance_Appearance" Text="*" Header="Appearance" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadAppearance" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Connection Parameter</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_ConnectionParameter" Text="*" Header="ConnectionParameter" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadConnection_Parameter" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Central Address Resolution</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Central_Address_Resolution_AddressResolutionSupported" Text="*" Header="AddressResolutionSupported" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadCentral_Address_Resolution" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Resolvable Private Address Only</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Resolvable_Private_Address_Only_ResolvablePrivateAddressFlag" Text="*" Header="ResolvablePrivateAddressFlag" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadResolvable_Private_Address_Only" />
-
-                </StackPanel>
-
-
-            </StackPanel>
-        </controls:Expander>
-
-        <controls:Expander Header="Generic Service" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-            </StackPanel>
-        </controls:Expander>
-
-        <controls:Expander Header="Device Info" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">System ID</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="System_ID_SystemId" Text="*" Header="SystemId" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadSystem_ID" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Model Number</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Model_Number_ModelNumber" Text="*" Header="ModelNumber" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadModel_Number" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Serial Number</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Serial_Number_SerialNumber" Text="*" Header="SerialNumber" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadSerial_Number" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Firmware Revision</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Firmware_Revision_FirmwareRevision" Text="*" Header="FirmwareRevision" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadFirmware_Revision" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Hardware Revision</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Hardware_Revision_HardwareRevision" Text="*" Header="HardwareRevision" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadHardware_Revision" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Software Revision</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Software_Revision_SoftwareRevision" Text="*" Header="SoftwareRevision" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadSoftware_Revision" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Manufacturer Name</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Manufacturer_Name_ManufacturerName" Text="*" Header="ManufacturerName" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadManufacturer_Name" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Regulatory List</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Regulatory_List_BodyType" Text="*" Header="BodyType" Style="{StaticResource HEXStyle}"/>
-
-                    <TextBox IsReadOnly="True" x:Name="Regulatory_List_BodyStructure" Text="*" Header="BodyStructure" Style="{StaticResource HEXStyle}"/>
-
-                    <TextBox IsReadOnly="True" x:Name="Regulatory_List_Data" Text="*" Header="Data" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadRegulatory_List" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">PnP ID</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="PnP_ID_PnPID" Text="*" Header="PnPID" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadPnP_ID" />
-
-                </StackPanel>
-
-
-            </StackPanel>
-        </controls:Expander>
-
-        <controls:Expander Header="Imaging" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Img Identify</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="False" x:Name="Img_Identify_Img_Identify" Text="*" Header="Img Identify" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Write" Click="OnWriteImg_Identify" />
-
-                    <Button Content="Notify" Click="OnNotifyImg_Identify" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Img Block</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="False" x:Name="Img_Block_Img_Block" Text="*" Header="Img Block" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Write" Click="OnWriteImg_Block" />
-
-                    <Button Content="Notify" Click="OnNotifyImg_Block" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">OAD Extended Control</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="False" x:Name="OAD_Extended_Control_OAD_Extended_Control" Text="*" Header="OAD Extended Control" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Write" Click="OnWriteOAD_Extended_Control" />
-
-                    <Button Content="Notify" Click="OnNotifyOAD_Extended_Control" />
-
-                </StackPanel>
-
-
-            </StackPanel>
-        </controls:Expander>
-
-        <controls:Expander Header="Temperature" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Temperature Data</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Temperature Data</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Temperature_Data_Temperature" Text="*" Header="Temperature" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Read" Click="OnReadTemperature_Data" />
-
                     <Button Content="Notify" Click="OnNotifyTemperature_Data" />
 
-                </StackPanel>
+                </GridView>
 
-                <controls:Expander Header="Temperature Data Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
-                    <StackPanel MinWidth="550">
-                        <charts:ChartControl Height="200" Width="500" x:Name="Temperature_DataChart" />
-                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="Temperature_DataGrid" ItemsSource="{Binding Temperature_DataRecordData}" />
-                        <TextBox  x:Name="Temperature_Data_Notebox" KeyDown="OnTemperature_Data_NoteKeyDown" />
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                            <ComboBox SelectionChanged="OnKeepCountTemperature_Data" Header="Keep how many items?" SelectedIndex="2">
-                                <ComboBoxItem Tag="10">10</ComboBoxItem>
-                                <ComboBoxItem Tag="100">100</ComboBoxItem>
-                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
-                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
-                            </ComboBox>
-                            <Rectangle Width="5" />
-                            <ComboBox SelectionChanged="OnAlgorithmTemperature_Data" Header="Remove algorithm?" SelectedIndex="0">
-                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
-                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
-                            </ComboBox>
-                            <Button Content = "Copy" Click="OnCopyTemperature_Data" />
+
+
+                    <controls:Expander Header="Temperature Data Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                        <StackPanel MinWidth="550">
+                            <charts:ChartControl Height="200" Width="500" x:Name="Temperature_DataChart" />
+
+                            <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="Temperature_DataGrid" ItemsSource="{Binding Temperature_DataRecordData}" />
+                            <TextBox  x:Name="Temperature_Data_Notebox" KeyDown="OnTemperature_Data_NoteKeyDown" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <ComboBox SelectionChanged="OnKeepCountTemperature_Data" Header="Keep how many items?" SelectedIndex="2">
+                                    <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                    <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                    <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                    <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                                </ComboBox>
+                                <Rectangle Width="5" />
+                                <ComboBox SelectionChanged="OnAlgorithmTemperature_Data" Header="Remove algorithm?" SelectedIndex="0">
+                                    <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                    <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                                </ComboBox>
+                                <Button Content = "Copy" Click="OnCopyTemperature_Data" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </controls:Expander>
-
+                    </controls:Expander>
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Temperature Conf.</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Temperature_Conf_Enable" Text="*" Header="Enable" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteTemperature_Conf" />
-
                     <Button Content="Read" Click="OnReadTemperature_Conf" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Temperature Period</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Temperature_Period_Period" Text="*" Header="Period" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteTemperature_Period" />
-
                     <Button Content="Read" Click="OnReadTemperature_Period" />
 
-                </StackPanel>
+                </GridView>
+
+
+
 
 
             </StackPanel>
         </controls:Expander>
-
-        <controls:Expander Header="Humidity" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+        <!-- XAML+SERVICE+LIST for Humidity -->
+        <controls:Expander Header="Humidity" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Humidity Data</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Humidity Data</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Humidity_Data_Humidty" Text="*" Header="Humidty" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Read" Click="OnReadHumidity_Data" />
-
                     <Button Content="Notify" Click="OnNotifyHumidity_Data" />
 
-                </StackPanel>
+                </GridView>
 
-                <controls:Expander Header="Humidity Data Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
-                    <StackPanel MinWidth="550">
-                        <charts:ChartControl Height="200" Width="500" x:Name="Humidity_DataChart" />
-                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="Humidity_DataGrid" ItemsSource="{Binding Humidity_DataRecordData}" />
-                        <TextBox  x:Name="Humidity_Data_Notebox" KeyDown="OnHumidity_Data_NoteKeyDown" />
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                            <ComboBox SelectionChanged="OnKeepCountHumidity_Data" Header="Keep how many items?" SelectedIndex="2">
-                                <ComboBoxItem Tag="10">10</ComboBoxItem>
-                                <ComboBoxItem Tag="100">100</ComboBoxItem>
-                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
-                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
-                            </ComboBox>
-                            <Rectangle Width="5" />
-                            <ComboBox SelectionChanged="OnAlgorithmHumidity_Data" Header="Remove algorithm?" SelectedIndex="0">
-                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
-                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
-                            </ComboBox>
-                            <Button Content = "Copy" Click="OnCopyHumidity_Data" />
+
+
+                    <controls:Expander Header="Humidity Data Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                        <StackPanel MinWidth="550">
+                            <charts:ChartControl Height="200" Width="500" x:Name="Humidity_DataChart" />
+
+                            <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="Humidity_DataGrid" ItemsSource="{Binding Humidity_DataRecordData}" />
+                            <TextBox  x:Name="Humidity_Data_Notebox" KeyDown="OnHumidity_Data_NoteKeyDown" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <ComboBox SelectionChanged="OnKeepCountHumidity_Data" Header="Keep how many items?" SelectedIndex="2">
+                                    <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                    <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                    <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                    <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                                </ComboBox>
+                                <Rectangle Width="5" />
+                                <ComboBox SelectionChanged="OnAlgorithmHumidity_Data" Header="Remove algorithm?" SelectedIndex="0">
+                                    <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                    <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                                </ComboBox>
+                                <Button Content = "Copy" Click="OnCopyHumidity_Data" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </controls:Expander>
-
+                    </controls:Expander>
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Humidity Conf.</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Humidity_Conf_Enable" Text="*" Header="Enable" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteHumidity_Conf" />
-
                     <Button Content="Read" Click="OnReadHumidity_Conf" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Humidity Period</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Humidity_Period_Period" Text="*" Header="Period" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteHumidity_Period" />
-
                     <Button Content="Read" Click="OnReadHumidity_Period" />
 
-                </StackPanel>
+                </GridView>
 
 
-            </StackPanel>
-        </controls:Expander>
 
-        <controls:Expander Header="Optical Service" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Light Data</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Light_Data_Lux" Text="*" Header="Lux" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadLight_Data" />
-
-                    <Button Content="Notify" Click="OnNotifyLight_Data" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Light Conf.</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="False" x:Name="Light_Conf_Enable" Text="*" Header="Enable" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Write" Click="OnWriteLight_Conf" />
-
-                    <Button Content="Read" Click="OnReadLight_Conf" />
-
-                </StackPanel>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Light Period</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="False" x:Name="Light_Period_Light_Period" Text="*" Header="Light Period" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Write" Click="OnWriteLight_Period" />
-
-                    <Button Content="Read" Click="OnReadLight_Period" />
-
-                </StackPanel>
 
 
             </StackPanel>
         </controls:Expander>
-
+        <!-- XAML+SERVICE+LIST for LED -->
         <controls:Expander Header="LED" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Red</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Red</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Red_Red" Text="*" Header="Red" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteRed" />
-
                     <Button Content="Read" Click="OnReadRed" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Green</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Green_Green" Text="*" Header="Green" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteGreen" />
-
                     <Button Content="Read" Click="OnReadGreen" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Blue</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Blue_Blue" Text="*" Header="Blue" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteBlue" />
-
                     <Button Content="Read" Click="OnReadBlue" />
 
-                </StackPanel>
+                </GridView>
+
+
+
 
 
             </StackPanel>
         </controls:Expander>
-
+        <!-- XAML+SERVICE+LIST for Button -->
         <controls:Expander Header="Button" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Button 0</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Button 0</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Button_0_Button0" Text="*" Header="Button0" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Read" Click="OnReadButton_0" />
-
                     <Button Content="Notify" Click="OnNotifyButton_0" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Button 1</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Button_1_Button1" Text="*" Header="Button1" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Read" Click="OnReadButton_1" />
-
                     <Button Content="Notify" Click="OnNotifyButton_1" />
 
-                </StackPanel>
+                </GridView>
 
 
-            </StackPanel>
-        </controls:Expander>
 
-        <controls:Expander Header="Battery" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Battery Data</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="Battery_Data_BatteryLevel" Text="*" Header="BatteryLevel" Style="{StaticResource HEXStyle}"/>
-
-
-                    <Button Content="Read" Click="OnReadBattery_Data" />
-
-                    <Button Content="Notify" Click="OnNotifyBattery_Data" />
-
-                </StackPanel>
 
 
             </StackPanel>
         </controls:Expander>
-
+        <!-- XAML+SERVICE+LIST for Accelerometer -->
         <controls:Expander Header="Accelerometer" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Accel Enable</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Accel Enable</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Accel_Enable_Enable" Text="*" Header="Enable" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteAccel_Enable" />
-
                     <Button Content="Read" Click="OnReadAccel_Enable" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Accel Range</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Accel_Range_Accel_Range" Text="*" Header="Accel Range" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Read" Click="OnReadAccel_Range" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">X</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="X_AccelX" Text="*" Header="AccelX" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Notify" Click="OnNotifyX" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Y</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Y_AccelY" Text="*" Header="AccelY" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Notify" Click="OnNotifyY" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Z</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Z_AccelZ" Text="*" Header="AccelZ" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Notify" Click="OnNotifyZ" />
 
-                </StackPanel>
+                </GridView>
+
+
+
+
+
+            </StackPanel>
+        </controls:Expander>
+        <!-- XAML+SERVICE+LIST for Optical Service -->
+        <controls:Expander Header="Optical Service" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Light Data</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Light_Data_Lux" Text="*" Header="Lux" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadLight_Data" />
+                    <Button Content="Notify" Click="OnNotifyLight_Data" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Light Conf.</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="False" x:Name="Light_Conf_Enable" Text="*" Header="Enable" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Write" Click="OnWriteLight_Conf" />
+                    <Button Content="Read" Click="OnReadLight_Conf" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Light Period</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="False" x:Name="Light_Period_Light_Period" Text="*" Header="Light Period" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Write" Click="OnWriteLight_Period" />
+                    <Button Content="Read" Click="OnReadLight_Period" />
+
+                </GridView>
+
+
+
+
+
+            </StackPanel>
+        </controls:Expander>
+        <!-- XAML+SERVICE+LIST for Battery -->
+        <controls:Expander Header="Battery" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Battery Data</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Battery_Data_BatteryLevel" Text="*" Header="BatteryLevel" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadBattery_Data" />
+                    <Button Content="Notify" Click="OnNotifyBattery_Data" />
+
+                </GridView>
+
+
+
+
+
+            </StackPanel>
+        </controls:Expander>
+        <!-- XAML+SERVICE+LIST for Common Configuration -->
+        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadDevice_Name" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Appearance</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Appearance_Appearance" Text="*" Header="Appearance" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadAppearance" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Connection Parameter</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_ConnectionParameter" Text="*" Header="ConnectionParameter" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadConnection_Parameter" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Central Address Resolution</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Central_Address_Resolution_AddressResolutionSupported" Text="*" Header="AddressResolutionSupported" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadCentral_Address_Resolution" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Resolvable Private Address Only</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Resolvable_Private_Address_Only_ResolvablePrivateAddressFlag" Text="*" Header="ResolvablePrivateAddressFlag" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadResolvable_Private_Address_Only" />
+
+                </GridView>
+
+
+
+
+
+            </StackPanel>
+        </controls:Expander>
+        <!-- XAML+SERVICE+LIST for Device Info -->
+        <controls:Expander Header="Device Info" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+                            <TextBlock Style="{StaticResource SubheaderStyle}">System ID</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="System_ID_SystemId" Text="*" Header="SystemId" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadSystem_ID" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Model Number</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Model_Number_ModelNumber" Text="*" Header="ModelNumber" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadModel_Number" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Serial Number</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Serial_Number_SerialNumber" Text="*" Header="SerialNumber" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadSerial_Number" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Firmware Revision</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Firmware_Revision_FirmwareRevision" Text="*" Header="FirmwareRevision" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadFirmware_Revision" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Hardware Revision</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Hardware_Revision_HardwareRevision" Text="*" Header="HardwareRevision" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadHardware_Revision" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Software Revision</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Software_Revision_SoftwareRevision" Text="*" Header="SoftwareRevision" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadSoftware_Revision" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Manufacturer Name</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Manufacturer_Name_ManufacturerName" Text="*" Header="ManufacturerName" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadManufacturer_Name" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Regulatory List</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Regulatory_List_BodyType" Text="*" Header="BodyType" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Regulatory_List_BodyStructure" Text="*" Header="BodyStructure" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Regulatory_List_Data" Text="*" Header="Data" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadRegulatory_List" />
+
+                </GridView>
+
+
+
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">PnP ID</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="PnP_ID_PnPID" Text="*" Header="PnPID" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadPnP_ID" />
+
+                </GridView>
+
+
+
 
 
             </StackPanel>

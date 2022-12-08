@@ -1,23 +1,26 @@
 ﻿# TODO list
 
+- [ ] Make the XAML CS files work
 - [x] Read in list of MD files from  directory
 - [x] Parse into TemplateSnippet
-- [ ] Read in JSON
-- [ ] Write out template w/CLASSNAME
+- [x] Read in JSON
+- [x] Write out template w/CLASSNAME
 
 # Syntx for the template file
 
-A typical template will look like this:
+A typical template will always have a format  like this:
 
 ```
 # NAME OPTION=VALUE OPTION=VALUE
 
-Some comments about what the template does
+Some comments about what the template does.
+There must **always** be a blank line before the template code! Otherwise it doesn't get picked up correctly.
+
 !!```
 Template code
 !!```
 
-Maybe more comments
+Maybe more comments. The NAme and the Options are important in the processing; the NAME will be the template name and the vawrious options say how to apply the template. For example, a file template needs to be at the top level and have a FileName=_value_ where the _value_ can include any of the macro values.
 
 ## SUBNAME
 This template is only used by the upper template
@@ -87,7 +90,7 @@ Value|Meaning
 Source.Length|length of the replaced text
 
 
-#### Numberic Opcodes
+#### Numeric Opcodes
 
 Opcode|Meaning
 ----|----
@@ -107,12 +110,14 @@ contains|The left string contains the right string. Compare is case-insensitive
 Says where to place the result of expanding a Type=list expansion
 
 
-### Trim=true|false (says whether to trim the CR off of the template)
+### Trim=true|false (d=false) says whether to trim the CR off of the template
+
+Sometimes the template expansion should include the CR at the and of the code block, and sometimes not. Use the Trim option to set the way you need it. The default is **false**, so it's often only applied when you need a Trim=true. 
 
 ### Type=list Source=SOURCE
 
 The code will be created from a list of input data. For the Bluetooth devices, this can be 
-the Services or Services.Characteristics or the Links values.
+the Services or Services/Characteristics or the Links values or several other speciality values.
 
 Macros created when expanding the list element:
 

@@ -27,6 +27,12 @@ namespace TemplateExpander
         public bool Eval(TemplateSnippet macros)
         {
             bool retval = false;
+
+            if (Left == "[[AutoNotify]]")
+            {
+                ; // Handy place to hang a debugger.
+            }
+
             var left = Expander.ExpandMacroAll(Left, macros);
             var right = Expander.ExpandMacroAll(Right, macros);
             if (BuiltInValues.ContainsKey(left)) left = BuiltInValues[left];

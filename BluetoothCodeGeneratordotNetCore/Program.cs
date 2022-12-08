@@ -177,7 +177,7 @@ namespace BluetoothCodeGenerator
                                     {
                                         var code = Expander.ExpandMacroAll(codeTemplate, btdata);
                                         Log($"Length starts as {codeTemplate.Length} and becomes {code.Length}");
-                                        File.WriteAllText(outfilename, code);
+                                        File.WriteAllText(outfilename, code, Encoding.UTF8);
                                     }
                                 }
                             }

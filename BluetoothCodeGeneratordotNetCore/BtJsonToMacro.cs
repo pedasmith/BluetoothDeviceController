@@ -169,271 +169,325 @@ namespace BluetoothCodeGenerator
             return $"double";
         }
 
-        public static TemplateSnippet Convert(NameDevice bt)
+        private static TemplateSnippet ServiceToTemplateSnippet(NameService btService)
         {
-            TemplateSnippet retval = new TemplateSnippet(bt.Name);
-            retval.Macros.Add("DeviceName", bt.Name);
-            retval.Macros.Add("CLASSNAME", bt.ClassName ?? bt.Name?.DotNetSafe());
-            retval.Macros.Add("DESCRIPTION", bt.Description);
-            retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::hh:mm"));
-            retval.Macros.Add("CLASSMODIFIERS", bt.ClassModifiers);
+            var service = new TemplateSnippet(btService.Name);
+            service.Macros.Add("Name", btService.Name); // [[SERVICENAMEUSER]
+            service.Macros.Add("Name.dotNet", btService.Name.DotNetSafe()); // [[SERVICENAME]]
+            service.Macros.Add("ServiceName", btService.Name); // Preferred name to "Name"
+            service.Macros.Add("ServiceIsExpanded", (btService.Priority >= 10) ? "true" : "false");
+            service.Macros.Add("UUID", btService.UUID);
 
-            //Services
-            var services = new TemplateSnippet("Services");
-            retval.AddChild("Services", services);
+            var chs = new TemplateSnippet("Characteristics");
+            service.AddChild("Characteristics", chs);
 
-            var servicesByPriority = bt.Services.OrderByDescending(bt => bt.Priority).ToList();
-            var servicesOriginalOrder = bt.Services.ToList();
-            foreach (var btService in servicesByPriority)
+            foreach (var btCharacteristic in btService.Characteristics)
             {
-                if (btService.Suppress) continue;
+                if (btCharacteristic.Suppress) continue;
 
-                var service = new TemplateSnippet(btService.Name);
-                service.Macros.Add("Name", btService.Name); // [[SERVICENAMEUSER]
-                service.Macros.Add("Name.dotNet", btService.Name.DotNetSafe()); // [[SERVICENAME]]
-                service.Macros.Add("ServiceName", btService.Name); // Preferred name to "Name"
-                service.Macros.Add("ServiceIsExpanded", (btService.Priority >= 10) ? "true" : "false");
-                service.Macros.Add("UUID", btService.UUID);
-                services.AddChildViaMacro(service); // have to wait until the UUID macro is added
+                var ch = new TemplateSnippet(btCharacteristic.Name);
+                ch.Macros.Add("UUID", btCharacteristic.UUID);
+                ch.Macros.Add("Name", btCharacteristic.Name);
+                ch.Macros.Add("CharacteristicName", btCharacteristic.Name);
+                ch.Macros.Add("CharacteristicName.dotNet", btCharacteristic.Name.DotNetSafe());
+                ch.Macros.Add("Name.dotNet", btCharacteristic.Name.DotNetSafe());
 
-                var chs = new TemplateSnippet("Characteristics");
-                service.AddChild("Characteristics", chs);
+                ch.Macros.Add("Type", btCharacteristic.Type);
+                ch.Macros.Add("CHARACTERISTICTYPE", btCharacteristic.Type);
+                ch.Macros.Add("Verbs", btCharacteristic.Verbs);
+                ch.Macros.Add("TableType", btCharacteristic.UI?.tableType ?? "");
+                ch.Macros.Add("AutoNotify", btCharacteristic.AutoNotify ? "true" : "false");
+                ch.Macros.Add("UICHARTCOMMAND", btCharacteristic.UI?.chartCommand ?? "");
 
-                foreach (var btCharacteristic in btService.Characteristics)
+                var UI_AsCSharp = btCharacteristic.UI?.AsCSharpString() ?? "";
+                ch.Macros.Add("UISPECS", UI_AsCSharp);
+                if (UI_AsCSharp.Contains ("[[CHARACTERISTICNAME]]"))
                 {
-                    if (btCharacteristic.Suppress) continue;
+                    // Just a little bit of weirdness here :-)
+                    ch.Macros.Add("CHARACTERISTICNAME", btCharacteristic.Name.DotNetSafe());
+                }
+                ch.Macros.Add("READCONVERT", btCharacteristic.ReadConvert ?? "");
+                ch.Macros.Add("NOTIFYCONVERT", btCharacteristic.NotifyConvert ?? "");
+                ch.Macros.Add("NOTIFYCONFIGURE", btCharacteristic.NotifyConfigure ?? "");
 
-                    var ch = new TemplateSnippet(btCharacteristic.Name);
-                    ch.Macros.Add("UUID", btCharacteristic.UUID);
-                    ch.Macros.Add("Name", btCharacteristic.Name);
-                    ch.Macros.Add("CharacteristicName", btCharacteristic.Name);
-                    ch.Macros.Add("CharacteristicName.dotNet", btCharacteristic.Name.DotNetSafe());
-                    ch.Macros.Add("Name.dotNet", btCharacteristic.Name.DotNetSafe());
+                var isReadOnly = true;
 
-                    ch.Macros.Add("Type", btCharacteristic.Type);
-                    ch.Macros.Add("CHARACTERISTICTYPE", btCharacteristic.Type);
-                    ch.Macros.Add("Verbs", btCharacteristic.Verbs);
-                    ch.Macros.Add("TableType", btCharacteristic.UI?.tableType ?? "");
+                // For devices with both Write and WriteWithoutResponse, I prefer
+                // using plain WriteWithoutResponse because it's faster.
+                // Only set the macro for writable ones.
+                if (btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse)
+                {
+                    ch.Macros.Add("WRITEMODE", btCharacteristic.IsWriteWithoutResponse
+                        ? "GattWriteOption.WriteWithoutResponse"
+                        : "GattWriteOption.WriteWithResponse");
+                    isReadOnly = false;
+                }
 
-                    var isReadOnly = true;
+                chs.AddChildViaMacro(ch); // uses the UUID to add correctly
+                ch.Macros.Add("IS+READ+ONLY", isReadOnly ? "True" : "False");
 
-                    // For devices with both Write and WriteWithoutResponse, I prefer
-                    // using plain WriteWithoutResponse because it's faster.
-                    // Only set the macro for writable ones.
-                    if (btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse)
+                //
+                // All of the verbs (read/write/notify) for a characteristic. They are called buttons because this
+                // is used for generating the XAML buttons + textbox for each characteristic.
+                // Source=Source=Services/Characteristics/Buttons
+                //
+                var buttons = new TemplateSnippet("Buttons");
+                ch.AddChild("Buttons", buttons); // always add, even if it's got nothing in it.
+                var buttonList = new List<string>();
+                if (btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse)
+                {
+                    buttonList.Add("Write");
+                }
+                if (btCharacteristic.IsRead)
+                {
+                    buttonList.Add("Read");
+                }
+                if (btCharacteristic.IsNotify)
+                {
+                    buttonList.Add("Notify");
+                }
+                foreach (var button in buttonList)
+                {
+                    var buttonpr = new TemplateSnippet(button);
+                    buttons.AddChild(button, buttonpr);
+                    buttonpr.AddMacro("ButtonVerb", button); // Read Write Notify
+                }
+
+                //
+                // All of the Enums for a characteristic.Used by the Skoobot for the different 
+                // robot command (Left, Stop, Right, etc.)
+                // 
+                var enums = new TemplateSnippet("Enums");
+                ch.AddChild("Enums", buttons); // always add, even if it's got nothing in it.
+                foreach (var (enumcommandname, enumlist) in btCharacteristic.EnumValues)
+                {
+                    foreach (var (enumname, enumvalue) in enumlist)
                     {
-                        ch.Macros.Add("WRITEMODE", btCharacteristic.IsWriteWithoutResponse
-                            ? "GattWriteOption.WriteWithoutResponse"
-                            : "GattWriteOption.WriteWithResponse");
-                        isReadOnly = false;
+                        enums.Macros.Add("ENUM_NAME", enumname);
+                        enums.Macros.Add("ENUM_VALUE", enumvalue.ToString());
+                    }
+                }
+
+                //
+                // All of the properties (args) for a characteristic. 
+                // Source=Services/Characteristics/Properties or /ReadProperties or /WriteProperties
+
+                var allprs = new TemplateSnippet("Properties"); // Properties aka args 
+                ch.AddChild("Properties", allprs); // always add, even if it's got nothing in it.
+
+                var readprs = new TemplateSnippet("ReadProperties"); // Properties aka args -- e.g., ColorR, ColorG, ColorB
+                ch.AddChild("ReadProperties", readprs); // always add, even if it's got nothing in it.
+                bool hasRead = btCharacteristic.IsRead || btCharacteristic.IsNotify || btCharacteristic.IsIndicate;
+
+                var writeprs = new TemplateSnippet("WriteProperties"); // Properties aka args 
+                ch.AddChild("WriteProperties", writeprs); // always add, even if it's got nothing in it.
+                bool hasWrite = btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse;
+
+
+                var split = ValueParserSplit.ParseLine(btCharacteristic.Type);
+
+                // Properties are per-data which is finer grained than just per-characteristic.
+                for (int i = 0; i < split.Count; i++)
+                {
+                    var item = split[i];
+                    var dataname = item.NamePrimary;
+                    if (dataname == "") dataname = $"param{i}";
+                    if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
+
+
+                    // CHDATANAME is either char_data (to make it more unique) or just plain characteristicname.
+                    // If a charateristic has just a single data item, that one item doesn't need a seperate name here.
+                    // so characteristic "temparature" with a single data value "temperature" will get a chdataname
+                    // of "temperature". If there were two data value (temp and humidity) they would get unique names
+                    // (temperature_temp and temperature_humidity)
+                    var name = btCharacteristic.Name;
+                    var displayFormat = "System.Globalization.NumberStyles.None";
+                    switch (item.DisplayFormatPrimary)
+                    {
+                        case "DEC":
+                            displayFormat = "System.Globalization.NumberStyles.None";
+                            break;
+                        case "HEX":
+                            displayFormat = "System.Globalization.NumberStyles.AllowHexSpecifier";
+                            break;
+                        default:
+                            displayFormat = "System.Globalization.NumberStyles.AllowHexSpecifier";
+                            break;
                     }
 
-                    chs.AddChildViaMacro(ch); // uses the UUID to add correctly
-                    ch.Macros.Add("IS+READ+ONLY", isReadOnly ? "True" : "False");
-
-                    //
-                    // All of the verbs (read/write/notify) for a characteristic. They are called buttons because this
-                    // is used for generating the XAML buttons + textbox for each characteristic.
-                    // Source=Source=Services/Characteristics/Buttons
-                    //
-                    var buttons = new TemplateSnippet("Buttons");
-                    ch.AddChild("Buttons", buttons); // always add, even if it's got nothing in it.
-                    var buttonList = new List<string>();
-                    if (btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse)
+                    if (hasRead)
                     {
-                        buttonList.Add("Write");
+                        var datareadpr = new TemplateSnippet(dataname);
+                        readprs.AddChild(dataname, datareadpr);
+
+                        datareadpr.AddMacro("NAME", name);
+                        datareadpr.AddMacro("CHDATANAME", split.Count == 1
+                            ? btCharacteristic.Name.DotNetSafe()
+                            : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
+                        datareadpr.AddMacro("DATANAME", dataname.DotNetSafe());
+                        datareadpr.AddMacro("DataName", dataname);
+                        datareadpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
+                        datareadpr.AddMacro("IS+READ+ONLY", isReadOnly ? "True" : "False");
+                        datareadpr.AddMacro("DATANAMEUSER", dataname.Replace("_", " "));
+                        datareadpr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
+                        datareadpr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
+                        datareadpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
+                        datareadpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
+                        datareadpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
+                        datareadpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
+                        datareadpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
+                        datareadpr.AddMacro("DEC+OR+HEX", displayFormat);
                     }
-                    if (btCharacteristic.IsRead)
+                    if (hasWrite)
                     {
-                        buttonList.Add("Read");
-                    }
-                    if (btCharacteristic.IsNotify)
-                    {
-                        buttonList.Add("Notify");
-                    }
-                    foreach (var button in buttonList)
-                    {
-                        var buttonpr = new TemplateSnippet(button);
-                        buttons.AddChild(button, buttonpr);
-                        buttonpr.AddMacro("ButtonVerb", button); // Read Write Notify
-                    }
-
-                    //
-                    // All of the Enums for a characteristic.Used by the Skoobot for the different 
-                    // robot command (Left, Stop, Right, etc.)
-                    // 
-                    var enums = new TemplateSnippet("Enums");
-                    ch.AddChild("Enums", buttons); // always add, even if it's got nothing in it.
-                    foreach (var (enumcommandname, enumlist) in btCharacteristic.EnumValues)
-                    {
-                        foreach (var (enumname, enumvalue) in enumlist)
-                        {
-                            enums.Macros.Add("ENUM_NAME", enumname);
-                            enums.Macros.Add("ENUM_VALUE", enumvalue.ToString());
-                        }
-                    }
-
-                    //
-                    // All of the properties (args) for a characteristic. 
-                    // Source=Source=Services/Characteristics/Properties or /ReadProperties or /WriteProperties
-
-                    var allprs = new TemplateSnippet("Properties"); // Properties aka args 
-                    ch.AddChild("Properties", allprs); // always add, even if it's got nothing in it.
-
-                    var readprs = new TemplateSnippet("ReadProperties"); // Properties aka args -- e.g., ColorR, ColorG, ColorB
-                    ch.AddChild("ReadProperties", readprs); // always add, even if it's got nothing in it.
-                    bool hasRead = btCharacteristic.IsRead || btCharacteristic.IsNotify || btCharacteristic.IsIndicate;
-
-                    var writeprs = new TemplateSnippet("WriteProperties"); // Properties aka args 
-                    ch.AddChild("WriteProperties", writeprs); // always add, even if it's got nothing in it.
-                    bool hasWrite = btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse;
-
-
-                    var split = ValueParserSplit.ParseLine(btCharacteristic.Type);
-
-                    // Properties are per-data which is finer grained than just per-characteristic.
-                    for (int i = 0; i < split.Count; i++)
-                    {
-                        var item = split[i];
-                        var dataname = item.NamePrimary;
-                        if (dataname == "") dataname = $"param{i}";
-                        if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
-
+                        var datawritepr = new TemplateSnippet(dataname);
+                        writeprs.AddChild(dataname, datawritepr);
 
                         // CHDATANAME is either char_data (to make it more unique) or just plain characteristicname.
                         // If a charateristic has just a single data item, that one item doesn't need a seperate name here.
                         // so characteristic "temparature" with a single data value "temperature" will get a chdataname
                         // of "temperature". If there were two data value (temp and humidity) they would get unique names
                         // (temperature_temp and temperature_humidity)
-                        var name = btCharacteristic.Name;
-
-                        if (hasRead)
-                        {
-                            var datareadpr = new TemplateSnippet(dataname);
-                            readprs.AddChild(dataname, datareadpr);
-
-                            datareadpr.AddMacro("NAME", name);
-                            datareadpr.AddMacro("CHDATANAME", split.Count == 1
-                                ? btCharacteristic.Name.DotNetSafe()
-                                : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
-                            datareadpr.AddMacro("DATANAME", dataname.DotNetSafe());
-                            datareadpr.AddMacro("DataName", dataname);
-                            datareadpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
-                            datareadpr.AddMacro("IS+READ+ONLY", isReadOnly ? "True" : "False");
-                            datareadpr.AddMacro("DATANAMEUSER", dataname.Replace("_", " "));
-                            datareadpr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
-                            datareadpr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
-                            datareadpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
-                            datareadpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
-                            datareadpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
-                            datareadpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
-                            datareadpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
-                        }
-                        if (hasWrite)
-                        {
-                            var datawritepr = new TemplateSnippet(dataname);
-                            writeprs.AddChild(dataname, datawritepr);
-
-                            // CHDATANAME is either char_data (to make it more unique) or just plain characteristicname.
-                            // If a charateristic has just a single data item, that one item doesn't need a seperate name here.
-                            // so characteristic "temparature" with a single data value "temperature" will get a chdataname
-                            // of "temperature". If there were two data value (temp and humidity) they would get unique names
-                            // (temperature_temp and temperature_humidity)
-                            datawritepr.AddMacro("NAME", name);
-                            datawritepr.AddMacro("CHDATANAME", split.Count == 1
-                                ? btCharacteristic.Name.DotNetSafe()
-                                : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
-                            datawritepr.AddMacro("DATANAME", dataname.DotNetSafe());
-                            datawritepr.AddMacro("DATANAMEUSER", dataname.Replace("_", " "));
-                            datawritepr.AddMacro("DataName", dataname);
-                            datawritepr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
-                            datawritepr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
-                            datawritepr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
-                            datawritepr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
-                            datawritepr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
-                            datawritepr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
-                            datawritepr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
-                            datawritepr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
-                        }
-
-                        if (true) // always do this
-                        {
-                            var dataallpr = new TemplateSnippet(dataname);
-                            allprs.AddChild(dataname, dataallpr);
-
-                            dataallpr.AddMacro("NAME", name);
-                            dataallpr.AddMacro("CHDATANAME", split.Count == 1
-                                ? btCharacteristic.Name.DotNetSafe()
-                                : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
-                            dataallpr.AddMacro("DATANAME", dataname.DotNetSafe());
-                            dataallpr.AddMacro("DataName", dataname);
-                            dataallpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
-                            dataallpr.AddMacro("IS+READ+ONLY", isReadOnly ? "True" : "False");
-                            dataallpr.AddMacro("DATANAMEUSER", dataname.Replace("_", " "));
-                            dataallpr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
-                            dataallpr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
-                            dataallpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
-                            dataallpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
-                            dataallpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
-                            dataallpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
-                            dataallpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
-                        }
+                        datawritepr.AddMacro("NAME", name);
+                        datawritepr.AddMacro("CHDATANAME", split.Count == 1
+                            ? btCharacteristic.Name.DotNetSafe()
+                            : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
+                        datawritepr.AddMacro("DATANAME", dataname.DotNetSafe());
+                        datawritepr.AddMacro("DATANAMEUSER", dataname.Replace("_", " "));
+                        datawritepr.AddMacro("DataName", dataname);
+                        datawritepr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
+                        datawritepr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
+                        datawritepr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
+                        datawritepr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
+                        datawritepr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
+                        datawritepr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
+                        datawritepr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
+                        datawritepr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
+                        datawritepr.AddMacro("DEC+OR+HEX", displayFormat);
                     }
-                    readprs = null;
 
-                    // Commands
-                    var cmds = new TemplateSnippet("Commands");
-                    ch.AddChild("Commands", cmds); // always add, even if it's got nothing in it.
-                    foreach (var (dataname, command) in btCharacteristic.Commands)
+                    if (true) // always do this
                     {
-                        var pr = new TemplateSnippet(dataname);
-                        cmds.AddChild(dataname, pr);
+                        var dataallpr = new TemplateSnippet(dataname);
+                        allprs.AddChild(dataname, dataallpr);
 
-                        pr.AddMacro("FUNCTIONNAME", dataname);
-                        pr.AddMacro("Name.dotNet", dataname.DotNetSafe());
-                        pr.AddMacro("Label", command.Label);
-                        pr.AddMacro("Alt", command.Alt); // e.g., "Obstacle Avoidance Mode"
-                        pr.AddMacro("Compute", command.Compute); // e.g., "${OA[?]}"
+                        dataallpr.AddMacro("NAME", name);
+                        dataallpr.AddMacro("CHDATANAME", split.Count == 1
+                            ? btCharacteristic.Name.DotNetSafe()
+                            : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
+                        dataallpr.AddMacro("DATANAME", dataname.DotNetSafe());
+                        dataallpr.AddMacro("DataName", dataname);
+                        dataallpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
+                        dataallpr.AddMacro("IS+READ+ONLY", isReadOnly ? "True" : "False");
+                        dataallpr.AddMacro("DATANAMEUSER", dataname.Replace("_", " "));
+                        dataallpr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
+                        dataallpr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
+                        dataallpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
+                        dataallpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
+                        dataallpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
+                        dataallpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
+                        dataallpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
 
-                        var prms = new TemplateSnippet("Parameters");
-                        pr.AddChild("Parameters", prms);
-                        foreach (var (pname, param) in command.Parameters)
+                        dataallpr.AddMacro("DEC+OR+HEX", displayFormat);
+
+                        // Bad hack: the first item for write is also added to the characteristic
+                        // This is needed for the write which should sweep up the different text boxes, but doesn't.
+                        if (i == 0)
                         {
-                            var paramts = new TemplateSnippet(pname);
-                            prms.AddChild(pname, paramts);
-                            var name = param.Name;
-                            if (string.IsNullOrWhiteSpace(name)) name = pname;
-
-                            paramts.AddMacro("Name", name);
-                            paramts.AddMacro("Name.dotNet", name.DotNetSafe());
-                            paramts.AddMacro("FUNCTIONPARAMINIT", param.Init.ToString());
-
-                            var variableType = "";
-                            var issigned = param.Min < 0;
-                            var sbytestr = issigned ? "s" : "";
-                            var sintstr = issigned ? "" : "u";
-                            if (param.ValueNames.Count > 0) variableType = "Command_[[FUNCTIONNAME]]_[[Name.dotNet]]";
-                            else if (param.Max <= 255) variableType = $"{sbytestr}byte";
-                            else if (param.Max <= 65535) variableType = $"{sintstr}short";
-                            else variableType = $"{sintstr}int";
-                            paramts.AddMacro("VARIABLETYPE", variableType);
-
-
-                            // All of the "Enums" a.k.a. ValueNames
-                            var vns = new TemplateSnippet("ValueNames");
-                            paramts.AddChild("ValueNames", vns);
-                            foreach (var (vname, vvalue) in param.ValueNames)
-                            {
-                                //TODO:: this was the old way and can be deleted (it was removed before it was even used!)
-                                //var enumvalue = new TemplateSnippet(vname);
-                                //vns.AddChild(vname, enumvalue);
-                                //enumvalue.AddMacro("EnumName", vname);
-                                //enumvalue.AddMacro("EnumValue", vvalue.ToString());
-                                vns.AddMacro(vname.DotNetSafe(), vvalue.ToString()); // should be simple, not the complexity of the first attempt.
-                            }
+                            ch.AddMacro("DataName.First.dotNetSafe", btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
+                            ch.AddMacro("DEC+OR+HEX", displayFormat);
                         }
                     }
                 }
+                readprs = null;
+
+                // Commands
+                var cmds = new TemplateSnippet("Commands");
+                ch.AddChild("Commands", cmds); // always add, even if it's got nothing in it.
+                foreach (var (dataname, command) in btCharacteristic.Commands)
+                {
+                    var pr = new TemplateSnippet(dataname);
+                    cmds.AddChild(dataname, pr);
+
+                    pr.AddMacro("FUNCTIONNAME", dataname);
+                    pr.AddMacro("Name.dotNet", dataname.DotNetSafe());
+                    pr.AddMacro("Label", command.Label);
+                    pr.AddMacro("Alt", command.Alt); // e.g., "Obstacle Avoidance Mode"
+                    pr.AddMacro("Compute", command.Compute); // e.g., "${OA[?]}"
+
+                    var prms = new TemplateSnippet("Parameters");
+                    pr.AddChild("Parameters", prms);
+                    foreach (var (pname, param) in command.Parameters)
+                    {
+                        var paramts = new TemplateSnippet(pname);
+                        prms.AddChild(pname, paramts);
+                        var name = param.Name;
+                        if (string.IsNullOrWhiteSpace(name)) name = pname;
+
+                        paramts.AddMacro("Name", name);
+                        paramts.AddMacro("Name.dotNet", name.DotNetSafe());
+                        paramts.AddMacro("FUNCTIONPARAMINIT", param.Init.ToString());
+
+                        var variableType = "";
+                        var issigned = param.Min < 0;
+                        var sbytestr = issigned ? "s" : "";
+                        var sintstr = issigned ? "" : "u";
+                        if (param.ValueNames.Count > 0) variableType = "Command_[[FUNCTIONNAME]]_[[Name.dotNet]]";
+                        else if (param.Max <= 255) variableType = $"{sbytestr}byte";
+                        else if (param.Max <= 65535) variableType = $"{sintstr}short";
+                        else variableType = $"{sintstr}int";
+                        paramts.AddMacro("VARIABLETYPE", variableType);
+
+
+                        // All of the "Enums" a.k.a. ValueNames
+                        var vns = new TemplateSnippet("ValueNames");
+                        paramts.AddChild("ValueNames", vns);
+                        foreach (var (vname, vvalue) in param.ValueNames)
+                        {
+                            //TODO:: this was the old way and can be deleted (it was removed before it was even used!)
+                            //var enumvalue = new TemplateSnippet(vname);
+                            //vns.AddChild(vname, enumvalue);
+                            //enumvalue.AddMacro("EnumName", vname);
+                            //enumvalue.AddMacro("EnumValue", vvalue.ToString());
+                            vns.AddMacro(vname.DotNetSafe(), vvalue.ToString()); // should be simple, not the complexity of the first attempt.
+                        }
+                    }
+                }
+            }
+            return service;
+        }
+
+        public static TemplateSnippet Convert(NameDevice bt)
+        {
+            TemplateSnippet retval = new TemplateSnippet(bt.Name);
+            retval.Macros.Add("DeviceName", bt.Name);
+            retval.Macros.Add("DeviceName.dotNet", bt.Name.DotNetSafe());
+            retval.Macros.Add("CLASSNAME", bt.ClassName ?? bt.Name?.DotNetSafe());
+            retval.Macros.Add("DESCRIPTION", bt.Description);
+            retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::hh:mm"));
+            retval.Macros.Add("CLASSMODIFIERS", bt.ClassModifiers);
+
+            //Services
+            var servicesByPriority = new TemplateSnippet("Services");
+            retval.AddChild("Services", servicesByPriority);
+            retval.AddChild("ServicesByPriority", servicesByPriority);
+
+            var servicesByOriginalOrder = new TemplateSnippet("ServicesByOriginalOrder");
+            retval.AddChild("ServicesByOriginalOrder", servicesByOriginalOrder);
+
+            var serviceListByOriginalOrder = bt.Services.ToList();
+            var serviceListByPriority = bt.Services.OrderByDescending(bt => bt.Priority).ToList();
+            foreach (var btService in serviceListByPriority)
+            {
+                if (btService.Suppress) continue;
+                var service = ServiceToTemplateSnippet(btService);
+                servicesByPriority.AddChildViaMacro(service); // have to wait until the UUID macro is added
+            }
+            foreach (var btService in serviceListByOriginalOrder)
+            {
+                if (btService.Suppress) continue;
+                var service = ServiceToTemplateSnippet(btService);
+                servicesByOriginalOrder.AddChildViaMacro(service); // have to wait until the UUID macro is added
             }
 
             // The LINKS
