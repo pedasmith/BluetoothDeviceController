@@ -155,7 +155,7 @@ Was PageCSharp+CharacteristicNotify+DataTemplates
                 if ([[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsDouble || [[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsString || [[DATANAME]].IsArray)
                 {
                     record.[[DATANAME]] = ([[VARIABLETYPE+DS]])[[DATANAME]].[[AS+DOUBLE+OR+STRING]];
-                    [[CharacteristicName.dotNet]]_[[DATANAME]].Text = record.[[DATANAME]].ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    [[CharacteristicName.dotNet]]_[[DATANAME]].Text = record.[[DATANAME]].[[DataToString.dotNet]];
                 }
 ```
 
@@ -169,7 +169,7 @@ PageCSharp+CharacteristicRead+DataTemplates
                 if ([[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsDouble || [[DATANAME]].CurrentType == BCBasic.BCValue.ValueType.IsString || [[DATANAME]].IsArray)
                 {
                     record.[[DATANAME]] = ([[VARIABLETYPE+DS]])[[DATANAME]].[[AS+DOUBLE+OR+STRING]];
-                    [[CharacteristicName.dotNet]]_[[DATANAME]].Text = record.[[DATANAME]].ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    [[CharacteristicName.dotNet]]_[[DATANAME]].Text = record.[[DATANAME]].[[DataToString.dotNet]];
                 }
 ```
 

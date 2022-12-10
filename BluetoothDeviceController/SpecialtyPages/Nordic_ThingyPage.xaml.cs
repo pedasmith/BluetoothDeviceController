@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Utilities;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -14,13 +15,14 @@ using Windows.Devices.Enumeration;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using static BluetoothProtocols.Nordic_Thingy;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace BluetoothDeviceController.SpecialtyPages
 {
     /// <summary>
-    /// Specialty page for the [[NAME]] device
+    /// Specialty page for the Thingy device
     /// </summary>
     public sealed partial class Nordic_ThingyPage : Page, HasId, ISetHandleStatus
     {
@@ -36,14 +38,15 @@ namespace BluetoothDeviceController.SpecialtyPages
         Nordic_Thingy bleDevice = new Nordic_Thingy();
         protected async override void OnNavigatedTo(NavigationEventArgs args)
         {
-            SetStatusActive(true);
+            SetStatusActive (true);
             var di = args.Parameter as DeviceInformationWrapper;
             var ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
-            SetStatusActive(false);
+            SetStatusActive (false);
 
             bleDevice.ble = ble;
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
-            DoReadDevice_Name();
+            await DoReadDevice_Name();
+
         }
 
         public string GetId()
@@ -73,7 +76,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             uiStatus.Text = status;
             ParentStatusHandler?.SetStatusText(status);
         }
-        private void SetStatusActive(bool isActive)
+        private void SetStatusActive (bool isActive)
         {
             uiProgress.IsActive = isActive;
             ParentStatusHandler?.SetStatusActive(isActive);
@@ -85,13 +88,12 @@ namespace BluetoothDeviceController.SpecialtyPages
             var nowstr = $"{now.Hour:D2}:{now.Minute:D2}:{now.Second:D2}.{now.Millisecond:D03}";
             await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => {
                 SetStatus(nowstr + ": " + status.AsStatusString);
-                SetStatusActive(false);
+                SetStatusActive (false);
             });
         }
 
+
         // Functions for Common Configuration
-
-
         public class Device_NameRecord : INotifyPropertyChanged
         {
             public Device_NameRecord()
@@ -114,95 +116,95 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Device_NameRecord> Device_NameRecordData { get; } = new DataCollection<Device_NameRecord>();
-        private void OnDevice_Name_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Device_NameRecord> Device_NameRecordData { get; } = new DataCollection<Device_NameRecord>();
+    private void OnDevice_Name_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Device_NameRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Device_NameRecordData.Count == 0)
-                {
-                    Device_NameRecordData.AddRecord(new Device_NameRecord());
-                }
-                Device_NameRecordData[Device_NameRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Device_NameRecordData.AddRecord(new Device_NameRecord());
             }
+            Device_NameRecordData[Device_NameRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountDevice_Name(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountDevice_Name(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Device_NameRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmDevice_Name(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Device_NameRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyDevice_Name(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Device_Name,Notes\n");
+        foreach (var row in Device_NameRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Device_NameRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Device_Name},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmDevice_Name(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Device_NameRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyDevice_Name(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Device_Name,Notes\n");
-            foreach (var row in Device_NameRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Device_Name},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
-
-        public void DoReadDevice_Name()
-        {
-            OnReadDevice_Name(null, null);
-        }
 
         private async void OnReadDevice_Name(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadDevice_Name();
+        }
+
+        private async Task DoReadDevice_Name()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadDevice_Name();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Device_Name");
+                    SetStatus ($"Error: unable to read Device_Name");
                     return;
                 }
-
+                
                 var record = new Device_NameRecord();
-
                 var Device_Name = valueList.GetValue("Device_Name");
-                if (Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsString || Device_Name.IsArray)
                 {
                     record.Device_Name = (string)Device_Name.AsString;
-                    Device_Name_Device_Name.Text = record.Device_Name.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Device_Name_Device_Name.Text = record.Device_Name.ToString();
                 }
-
 
                 Device_NameRecordData.Add(record);
 
             }
             catch (Exception ex)
             {
-                SetStatus($"Error: exception: {ex.Message}");
+                SetStatus ($"Error: exception: {ex.Message}");
             }
         }
+
 
         public class AppearanceRecord : INotifyPropertyChanged
         {
@@ -226,90 +228,95 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<AppearanceRecord> AppearanceRecordData { get; } = new DataCollection<AppearanceRecord>();
-        private void OnAppearance_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<AppearanceRecord> AppearanceRecordData { get; } = new DataCollection<AppearanceRecord>();
+    private void OnAppearance_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (AppearanceRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (AppearanceRecordData.Count == 0)
-                {
-                    AppearanceRecordData.AddRecord(new AppearanceRecord());
-                }
-                AppearanceRecordData[AppearanceRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                AppearanceRecordData.AddRecord(new AppearanceRecord());
             }
+            AppearanceRecordData[AppearanceRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountAppearance(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountAppearance(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        AppearanceRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmAppearance(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        AppearanceRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyAppearance(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Appearance,Notes\n");
+        foreach (var row in AppearanceRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            AppearanceRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Appearance},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmAppearance(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            AppearanceRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyAppearance(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Appearance,Notes\n");
-            foreach (var row in AppearanceRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Appearance},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadAppearance(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadAppearance();
+        }
+
+        private async Task DoReadAppearance()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadAppearance();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Appearance");
+                    SetStatus ($"Error: unable to read Appearance");
                     return;
                 }
-
+                
                 var record = new AppearanceRecord();
-
                 var Appearance = valueList.GetValue("Appearance");
-                if (Appearance.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Appearance.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Appearance.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Appearance.CurrentType == BCBasic.BCValue.ValueType.IsString || Appearance.IsArray)
                 {
                     record.Appearance = (double)Appearance.AsDouble;
-                    Appearance_Appearance.Text = record.Appearance.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Appearance_Appearance.Text = record.Appearance.ToString();
                 }
-
 
                 AppearanceRecordData.Add(record);
 
             }
             catch (Exception ex)
             {
-                SetStatus($"Error: exception: {ex.Message}");
+                SetStatus ($"Error: exception: {ex.Message}");
             }
         }
+
 
         public class Connection_ParameterRecord : INotifyPropertyChanged
         {
@@ -333,90 +340,95 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Connection_ParameterRecord> Connection_ParameterRecordData { get; } = new DataCollection<Connection_ParameterRecord>();
-        private void OnConnection_Parameter_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Connection_ParameterRecord> Connection_ParameterRecordData { get; } = new DataCollection<Connection_ParameterRecord>();
+    private void OnConnection_Parameter_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Connection_ParameterRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Connection_ParameterRecordData.Count == 0)
-                {
-                    Connection_ParameterRecordData.AddRecord(new Connection_ParameterRecord());
-                }
-                Connection_ParameterRecordData[Connection_ParameterRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Connection_ParameterRecordData.AddRecord(new Connection_ParameterRecord());
             }
+            Connection_ParameterRecordData[Connection_ParameterRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountConnection_Parameter(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountConnection_Parameter(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Connection_ParameterRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmConnection_Parameter(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Connection_ParameterRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyConnection_Parameter(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,ConnectionParameter,Notes\n");
+        foreach (var row in Connection_ParameterRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Connection_ParameterRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.ConnectionParameter},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmConnection_Parameter(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Connection_ParameterRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyConnection_Parameter(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,ConnectionParameter,Notes\n");
-            foreach (var row in Connection_ParameterRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.ConnectionParameter},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadConnection_Parameter(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadConnection_Parameter();
+        }
+
+        private async Task DoReadConnection_Parameter()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadConnection_Parameter();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Connection_Parameter");
+                    SetStatus ($"Error: unable to read Connection_Parameter");
                     return;
                 }
-
+                
                 var record = new Connection_ParameterRecord();
-
                 var ConnectionParameter = valueList.GetValue("ConnectionParameter");
-                if (ConnectionParameter.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ConnectionParameter.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (ConnectionParameter.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ConnectionParameter.CurrentType == BCBasic.BCValue.ValueType.IsString || ConnectionParameter.IsArray)
                 {
                     record.ConnectionParameter = (string)ConnectionParameter.AsString;
-                    Connection_Parameter_ConnectionParameter.Text = record.ConnectionParameter.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Connection_Parameter_ConnectionParameter.Text = record.ConnectionParameter.ToString();
                 }
-
 
                 Connection_ParameterRecordData.Add(record);
 
             }
             catch (Exception ex)
             {
-                SetStatus($"Error: exception: {ex.Message}");
+                SetStatus ($"Error: exception: {ex.Message}");
             }
         }
+
 
         public class Central_Address_ResolutionRecord : INotifyPropertyChanged
         {
@@ -440,83 +452,204 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Central_Address_ResolutionRecord> Central_Address_ResolutionRecordData { get; } = new DataCollection<Central_Address_ResolutionRecord>();
-        private void OnCentral_Address_Resolution_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Central_Address_ResolutionRecord> Central_Address_ResolutionRecordData { get; } = new DataCollection<Central_Address_ResolutionRecord>();
+    private void OnCentral_Address_Resolution_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Central_Address_ResolutionRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Central_Address_ResolutionRecordData.Count == 0)
-                {
-                    Central_Address_ResolutionRecordData.AddRecord(new Central_Address_ResolutionRecord());
-                }
-                Central_Address_ResolutionRecordData[Central_Address_ResolutionRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Central_Address_ResolutionRecordData.AddRecord(new Central_Address_ResolutionRecord());
             }
+            Central_Address_ResolutionRecordData[Central_Address_ResolutionRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountCentral_Address_Resolution(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountCentral_Address_Resolution(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Central_Address_ResolutionRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmCentral_Address_Resolution(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Central_Address_ResolutionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyCentral_Address_Resolution(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,AddressResolutionSupported,Notes\n");
+        foreach (var row in Central_Address_ResolutionRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Central_Address_ResolutionRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.AddressResolutionSupported},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmCentral_Address_Resolution(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Central_Address_ResolutionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyCentral_Address_Resolution(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,AddressResolutionSupported,Notes\n");
-            foreach (var row in Central_Address_ResolutionRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.AddressResolutionSupported},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadCentral_Address_Resolution(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadCentral_Address_Resolution();
+        }
+
+        private async Task DoReadCentral_Address_Resolution()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadCentral_Address_Resolution();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Central_Address_Resolution");
+                    SetStatus ($"Error: unable to read Central_Address_Resolution");
                     return;
                 }
-
+                
                 var record = new Central_Address_ResolutionRecord();
-
                 var AddressResolutionSupported = valueList.GetValue("AddressResolutionSupported");
-                if (AddressResolutionSupported.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AddressResolutionSupported.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (AddressResolutionSupported.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AddressResolutionSupported.CurrentType == BCBasic.BCValue.ValueType.IsString || AddressResolutionSupported.IsArray)
                 {
                     record.AddressResolutionSupported = (double)AddressResolutionSupported.AsDouble;
-                    Central_Address_Resolution_AddressResolutionSupported.Text = record.AddressResolutionSupported.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Central_Address_Resolution_AddressResolutionSupported.Text = record.AddressResolutionSupported.ToString("N0");
                 }
 
-
                 Central_Address_ResolutionRecordData.Add(record);
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus ($"Error: exception: {ex.Message}");
+            }
+        }
+
+
+
+        // Functions for Generic Service
+        public class Service_ChangesRecord : INotifyPropertyChanged
+        {
+            public Service_ChangesRecord()
+            {
+                this.EventTime = DateTime.Now;
+            }
+            // For the INPC INotifyPropertyChanged values
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            private DateTime _EventTime;
+            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
+
+            private double _StartRange;
+            public double StartRange { get { return _StartRange; } set { if (value == _StartRange) return; _StartRange = value; OnPropertyChanged(); } }
+            private double _EndRange;
+            public double EndRange { get { return _EndRange; } set { if (value == _EndRange) return; _EndRange = value; OnPropertyChanged(); } }
+
+            private String _Note;
+            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+        }
+
+    public DataCollection<Service_ChangesRecord> Service_ChangesRecordData { get; } = new DataCollection<Service_ChangesRecord>();
+    private void OnService_Changes_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Service_ChangesRecordData.Count == 0)
+            {
+                Service_ChangesRecordData.AddRecord(new Service_ChangesRecord());
+            }
+            Service_ChangesRecordData[Service_ChangesRecordData.Count - 1].Note = text;
+            e.Handled = true;
+        }
+    }
+
+    // Functions called from the expander
+    private void OnKeepCountService_Changes(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Service_ChangesRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmService_Changes(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Service_ChangesRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyService_Changes(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,StartRange,EndRange,Notes\n");
+        foreach (var row in Service_ChangesRecordData)
+        {
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.StartRange},{row.EndRange},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
+
+        GattClientCharacteristicConfigurationDescriptorValue[] NotifyService_ChangesSettings = {
+            GattClientCharacteristicConfigurationDescriptorValue.Notify,
+
+            GattClientCharacteristicConfigurationDescriptorValue.None,
+        };
+        int Service_ChangesNotifyIndex = 0;
+        bool Service_ChangesNotifySetup = false;
+        private async void OnNotifyService_Changes(object sender, RoutedEventArgs e)
+        {
+            await DoNotifyService_Changes();
+        }
+
+        private async Task DoNotifyService_Changes()
+        {
+            SetStatusActive (true);
+            ncommand++;
+            try
+            {
+                // Only set up the event callback once.
+                if (!Service_ChangesNotifySetup)
+                {
+                    Service_ChangesNotifySetup = true;
+                    bleDevice.Service_ChangesEvent += BleDevice_Service_ChangesEvent;
+                }
+                var notifyType = NotifyService_ChangesSettings[Service_ChangesNotifyIndex];
+                Service_ChangesNotifyIndex = (Service_ChangesNotifyIndex + 1) % NotifyService_ChangesSettings.Length;
+                var result = await bleDevice.NotifyService_ChangesAsync(notifyType);
+                
+
 
             }
             catch (Exception ex)
@@ -525,14 +658,40 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
+        private async void BleDevice_Service_ChangesEvent(BleEditor.ValueParserResult data)
+        {
+            if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
+            {
+                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                var valueList = data.ValueList;
+                
+                var record = new Service_ChangesRecord();
+                var StartRange = valueList.GetValue("StartRange");
+                if (StartRange.CurrentType == BCBasic.BCValue.ValueType.IsDouble || StartRange.CurrentType == BCBasic.BCValue.ValueType.IsString || StartRange.IsArray)
+                {
+                    record.StartRange = (double)StartRange.AsDouble;
+                    Service_Changes_StartRange.Text = record.StartRange.ToString("N0");
+                }
+                var EndRange = valueList.GetValue("EndRange");
+                if (EndRange.CurrentType == BCBasic.BCValue.ValueType.IsDouble || EndRange.CurrentType == BCBasic.BCValue.ValueType.IsString || EndRange.IsArray)
+                {
+                    record.EndRange = (double)EndRange.AsDouble;
+                    Service_Changes_EndRange.Text = record.EndRange.ToString("N0");
+                }
 
-        // Functions for Generic Service
+                var addResult = Service_ChangesRecordData.AddRecord(record);
+
+                
+                // Original update was to make this CHART+COMMAND
+                });
+            }
+        }
+
 
 
 
         // Functions for Battery
-
-
         public class BatteryLevelRecord : INotifyPropertyChanged
         {
             public BatteryLevelRecord()
@@ -555,90 +714,58 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<BatteryLevelRecord> BatteryLevelRecordData { get; } = new DataCollection<BatteryLevelRecord>();
-        private void OnBatteryLevel_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<BatteryLevelRecord> BatteryLevelRecordData { get; } = new DataCollection<BatteryLevelRecord>();
+    private void OnBatteryLevel_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (BatteryLevelRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (BatteryLevelRecordData.Count == 0)
-                {
-                    BatteryLevelRecordData.AddRecord(new BatteryLevelRecord());
-                }
-                BatteryLevelRecordData[BatteryLevelRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                BatteryLevelRecordData.AddRecord(new BatteryLevelRecord());
             }
+            BatteryLevelRecordData[BatteryLevelRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountBatteryLevel(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountBatteryLevel(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        BatteryLevelRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmBatteryLevel(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        BatteryLevelRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyBatteryLevel(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,BatteryLevel,Notes\n");
+        foreach (var row in BatteryLevelRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            BatteryLevelRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.BatteryLevel},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmBatteryLevel(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            BatteryLevelRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyBatteryLevel(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,BatteryLevel,Notes\n");
-            foreach (var row in BatteryLevelRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.BatteryLevel},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
-
-        private async void OnReadBatteryLevel(object sender, RoutedEventArgs e)
-        {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
-            ncommand++;
-            try
-            {
-                var valueList = await bleDevice.ReadBatteryLevel();
-                if (valueList == null)
-                {
-                    SetStatus($"Error: unable to read BatteryLevel");
-                    return;
-                }
-
-                var record = new BatteryLevelRecord();
-
-                var BatteryLevel = valueList.GetValue("BatteryLevel");
-                if (BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.BatteryLevel = (double)BatteryLevel.AsDouble;
-                    BatteryLevel_BatteryLevel.Text = record.BatteryLevel.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-
-                BatteryLevelRecordData.Add(record);
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyBatteryLevelSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -649,7 +776,12 @@ namespace BluetoothDeviceController.SpecialtyPages
         bool BatteryLevelNotifySetup = false;
         private async void OnNotifyBatteryLevel(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyBatteryLevel();
+        }
+
+        private async Task DoNotifyBatteryLevel()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -662,7 +794,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 var notifyType = NotifyBatteryLevelSettings[BatteryLevelNotifyIndex];
                 BatteryLevelNotifyIndex = (BatteryLevelNotifyIndex + 1) % NotifyBatteryLevelSettings.Length;
                 var result = await bleDevice.NotifyBatteryLevelAsync(notifyType);
-
+                
 
 
             }
@@ -678,59 +810,62 @@ namespace BluetoothDeviceController.SpecialtyPages
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new BatteryLevelRecord();
+                var BatteryLevel = valueList.GetValue("BatteryLevel");
+                if (BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsString || BatteryLevel.IsArray)
+                {
+                    record.BatteryLevel = (double)BatteryLevel.AsDouble;
+                    BatteryLevel_BatteryLevel.Text = record.BatteryLevel.ToString("N0");
+                }
 
-                    var record = new BatteryLevelRecord();
+                var addResult = BatteryLevelRecordData.AddRecord(record);
 
-                    var BatteryLevel = valueList.GetValue("BatteryLevel");
-                    if (BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.BatteryLevel = (double)BatteryLevel.AsDouble;
-                        BatteryLevel_BatteryLevel.Text = record.BatteryLevel.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = BatteryLevelRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
 
-        // Functions for Configuration
-
-
-        private async void OnWriteConfiguration_Device_Name(object sender, RoutedEventArgs e)
+        private async void OnReadBatteryLevel(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoReadBatteryLevel();
+        }
+
+        private async Task DoReadBatteryLevel()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
-                // Note: This template isn't smart enough to piece together
-                // multi-field characteristics. It can support simple characterisitics
-                // where there's only one data item.
-                string parseError = null;
-
-                String Name;
-                var parsedName = Utilities.Parsers.TryParseString(Configuration_Device_Name_Name.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out Name);
-                if (!parsedName)
+                var valueList = await bleDevice.ReadBatteryLevel();
+                if (valueList == null)
                 {
-                    parseError = "Name";
+                    SetStatus ($"Error: unable to read BatteryLevel");
+                    return;
+                }
+                
+                var record = new BatteryLevelRecord();
+                var BatteryLevel = valueList.GetValue("BatteryLevel");
+                if (BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsString || BatteryLevel.IsArray)
+                {
+                    record.BatteryLevel = (double)BatteryLevel.AsDouble;
+                    BatteryLevel_BatteryLevel.Text = record.BatteryLevel.ToString("N0");
                 }
 
-                if (parseError == null)
-                {
-                    await bleDevice.WriteConfiguration_Device_Name(Name);
-                }
-                else
-                { //NOTE: pop up a dialog?
-                    SetStatus($"Error: could not parse {parseError}");
-                }
+                BatteryLevelRecordData.Add(record);
+
             }
             catch (Exception ex)
             {
-                SetStatus($"Error: exception: {ex.Message}");
+                SetStatus ($"Error: exception: {ex.Message}");
             }
         }
 
+
+
+        // Functions for Configuration
         public class Configuration_Device_NameRecord : INotifyPropertyChanged
         {
             public Configuration_Device_NameRecord()
@@ -753,94 +888,112 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Configuration_Device_NameRecord> Configuration_Device_NameRecordData { get; } = new DataCollection<Configuration_Device_NameRecord>();
-        private void OnConfiguration_Device_Name_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Configuration_Device_NameRecord> Configuration_Device_NameRecordData { get; } = new DataCollection<Configuration_Device_NameRecord>();
+    private void OnConfiguration_Device_Name_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Configuration_Device_NameRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Configuration_Device_NameRecordData.Count == 0)
-                {
-                    Configuration_Device_NameRecordData.AddRecord(new Configuration_Device_NameRecord());
-                }
-                Configuration_Device_NameRecordData[Configuration_Device_NameRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Configuration_Device_NameRecordData.AddRecord(new Configuration_Device_NameRecord());
             }
+            Configuration_Device_NameRecordData[Configuration_Device_NameRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountConfiguration_Device_Name(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountConfiguration_Device_Name(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Configuration_Device_NameRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmConfiguration_Device_Name(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Configuration_Device_NameRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyConfiguration_Device_Name(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Name,Notes\n");
+        foreach (var row in Configuration_Device_NameRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Configuration_Device_NameRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Name},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmConfiguration_Device_Name(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Configuration_Device_NameRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyConfiguration_Device_Name(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Name,Notes\n");
-            foreach (var row in Configuration_Device_NameRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Name},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadConfiguration_Device_Name(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadConfiguration_Device_Name();
+        }
+
+        private async Task DoReadConfiguration_Device_Name()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadConfiguration_Device_Name();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Configuration_Device_Name");
+                    SetStatus ($"Error: unable to read Configuration_Device_Name");
                     return;
                 }
-
+                
                 var record = new Configuration_Device_NameRecord();
-
                 var Name = valueList.GetValue("Name");
-                if (Name.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Name.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Name.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Name.CurrentType == BCBasic.BCValue.ValueType.IsString || Name.IsArray)
                 {
                     record.Name = (string)Name.AsString;
-                    Configuration_Device_Name_Name.Text = record.Name.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Configuration_Device_Name_Name.Text = record.Name.ToString();
                 }
-
 
                 Configuration_Device_NameRecordData.Add(record);
 
             }
             catch (Exception ex)
             {
-                SetStatus($"Error: exception: {ex.Message}");
+                SetStatus ($"Error: exception: {ex.Message}");
             }
         }
 
-        private async void OnWriteAdvertising_Parameter(object sender, RoutedEventArgs e)
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickConfiguration_Device_Name(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            var text = (sender as Button).Tag as String;
+            await DoWriteConfiguration_Device_Name (text, System.Globalization.NumberStyles.Integer);
+        }
+
+        private async void OnWriteConfiguration_Device_Name(object sender, RoutedEventArgs e)
+        {
+            var text = Configuration_Device_Name_Name.Text;
+            await DoWriteConfiguration_Device_Name (text, System.Globalization.NumberStyles.AllowHexSpecifier);
+        }
+
+        private async Task DoWriteConfiguration_Device_Name(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -849,23 +1002,18 @@ namespace BluetoothDeviceController.SpecialtyPages
                 // where there's only one data item.
                 string parseError = null;
 
-                UInt16 Interval;
-                var parsedInterval = Utilities.Parsers.TryParseUInt16(Advertising_Parameter_Interval.Text, System.Globalization.NumberStyles.None, null, out Interval);
-                if (!parsedInterval)
+                String Name;
+                // History: used to go into Configuration_Device_Name_Name.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedName = Utilities.Parsers.TryParseString(text, dec_or_hex, null, out Name);
+                if (!parsedName)
                 {
-                    parseError = "Interval";
-                }
-
-                Byte Timeout;
-                var parsedTimeout = Utilities.Parsers.TryParseByte(Advertising_Parameter_Timeout.Text, System.Globalization.NumberStyles.None, null, out Timeout);
-                if (!parsedTimeout)
-                {
-                    parseError = "Timeout";
+                    parseError = "Name";
                 }
 
                 if (parseError == null)
                 {
-                    await bleDevice.WriteAdvertising_Parameter(Interval, Timeout);
+                    await bleDevice.WriteConfiguration_Device_Name(Name);
                 }
                 else
                 { //NOTE: pop up a dialog?
@@ -895,7 +1043,6 @@ namespace BluetoothDeviceController.SpecialtyPages
 
             private double _Interval;
             public double Interval { get { return _Interval; } set { if (value == _Interval) return; _Interval = value; OnPropertyChanged(); } }
-
             private double _Timeout;
             public double Timeout { get { return _Timeout; } set { if (value == _Timeout) return; _Timeout = value; OnPropertyChanged(); } }
 
@@ -903,101 +1050,118 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Advertising_ParameterRecord> Advertising_ParameterRecordData { get; } = new DataCollection<Advertising_ParameterRecord>();
-        private void OnAdvertising_Parameter_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Advertising_ParameterRecord> Advertising_ParameterRecordData { get; } = new DataCollection<Advertising_ParameterRecord>();
+    private void OnAdvertising_Parameter_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Advertising_ParameterRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Advertising_ParameterRecordData.Count == 0)
-                {
-                    Advertising_ParameterRecordData.AddRecord(new Advertising_ParameterRecord());
-                }
-                Advertising_ParameterRecordData[Advertising_ParameterRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Advertising_ParameterRecordData.AddRecord(new Advertising_ParameterRecord());
             }
+            Advertising_ParameterRecordData[Advertising_ParameterRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountAdvertising_Parameter(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountAdvertising_Parameter(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Advertising_ParameterRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmAdvertising_Parameter(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Advertising_ParameterRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyAdvertising_Parameter(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Interval,Timeout,Notes\n");
+        foreach (var row in Advertising_ParameterRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Advertising_ParameterRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Interval},{row.Timeout},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmAdvertising_Parameter(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Advertising_ParameterRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyAdvertising_Parameter(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Interval,Timeout,Notes\n");
-            foreach (var row in Advertising_ParameterRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Interval},{row.Timeout},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadAdvertising_Parameter(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadAdvertising_Parameter();
+        }
+
+        private async Task DoReadAdvertising_Parameter()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadAdvertising_Parameter();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Advertising_Parameter");
+                    SetStatus ($"Error: unable to read Advertising_Parameter");
                     return;
                 }
-
+                
                 var record = new Advertising_ParameterRecord();
-
                 var Interval = valueList.GetValue("Interval");
-                if (Interval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Interval.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Interval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Interval.CurrentType == BCBasic.BCValue.ValueType.IsString || Interval.IsArray)
                 {
                     record.Interval = (double)Interval.AsDouble;
-                    Advertising_Parameter_Interval.Text = record.Interval.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Advertising_Parameter_Interval.Text = record.Interval.ToString("N0");
                 }
-
                 var Timeout = valueList.GetValue("Timeout");
-                if (Timeout.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Timeout.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Timeout.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Timeout.CurrentType == BCBasic.BCValue.ValueType.IsString || Timeout.IsArray)
                 {
                     record.Timeout = (double)Timeout.AsDouble;
-                    Advertising_Parameter_Timeout.Text = record.Timeout.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Advertising_Parameter_Timeout.Text = record.Timeout.ToString("N0");
                 }
-
 
                 Advertising_ParameterRecordData.Add(record);
 
             }
             catch (Exception ex)
             {
-                SetStatus($"Error: exception: {ex.Message}");
+                SetStatus ($"Error: exception: {ex.Message}");
             }
         }
 
-        private async void OnWriteConnection_parameters(object sender, RoutedEventArgs e)
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickAdvertising_Parameter(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            var text = (sender as Button).Tag as String;
+            await DoWriteAdvertising_Parameter (text, System.Globalization.NumberStyles.Integer);
+        }
+
+        private async void OnWriteAdvertising_Parameter(object sender, RoutedEventArgs e)
+        {
+            var text = Advertising_Parameter_Interval.Text;
+            await DoWriteAdvertising_Parameter (text, System.Globalization.NumberStyles.None);
+        }
+
+        private async Task DoWriteAdvertising_Parameter(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -1006,37 +1170,26 @@ namespace BluetoothDeviceController.SpecialtyPages
                 // where there's only one data item.
                 string parseError = null;
 
-                UInt16 MinInterval;
-                var parsedMinInterval = Utilities.Parsers.TryParseUInt16(Connection_parameters_MinInterval.Text, System.Globalization.NumberStyles.None, null, out MinInterval);
-                if (!parsedMinInterval)
+                UInt16 Interval;
+                // History: used to go into Advertising_Parameter_Interval.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedInterval = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out Interval);
+                if (!parsedInterval)
                 {
-                    parseError = "MinInterval";
+                    parseError = "Interval";
                 }
-
-                UInt16 MaxInterval;
-                var parsedMaxInterval = Utilities.Parsers.TryParseUInt16(Connection_parameters_MaxInterval.Text, System.Globalization.NumberStyles.None, null, out MaxInterval);
-                if (!parsedMaxInterval)
+                Byte Timeout;
+                // History: used to go into Advertising_Parameter_Timeout.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedTimeout = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out Timeout);
+                if (!parsedTimeout)
                 {
-                    parseError = "MaxInterval";
-                }
-
-                UInt16 Latency;
-                var parsedLatency = Utilities.Parsers.TryParseUInt16(Connection_parameters_Latency.Text, System.Globalization.NumberStyles.None, null, out Latency);
-                if (!parsedLatency)
-                {
-                    parseError = "Latency";
-                }
-
-                UInt16 SupervisionTimeout;
-                var parsedSupervisionTimeout = Utilities.Parsers.TryParseUInt16(Connection_parameters_SupervisionTimeout.Text, System.Globalization.NumberStyles.None, null, out SupervisionTimeout);
-                if (!parsedSupervisionTimeout)
-                {
-                    parseError = "SupervisionTimeout";
+                    parseError = "Timeout";
                 }
 
                 if (parseError == null)
                 {
-                    await bleDevice.WriteConnection_parameters(MinInterval, MaxInterval, Latency, SupervisionTimeout);
+                    await bleDevice.WriteAdvertising_Parameter(Interval, Timeout);
                 }
                 else
                 { //NOTE: pop up a dialog?
@@ -1066,13 +1219,10 @@ namespace BluetoothDeviceController.SpecialtyPages
 
             private double _MinInterval;
             public double MinInterval { get { return _MinInterval; } set { if (value == _MinInterval) return; _MinInterval = value; OnPropertyChanged(); } }
-
             private double _MaxInterval;
             public double MaxInterval { get { return _MaxInterval; } set { if (value == _MaxInterval) return; _MaxInterval = value; OnPropertyChanged(); } }
-
             private double _Latency;
             public double Latency { get { return _Latency; } set { if (value == _Latency) return; _Latency = value; OnPropertyChanged(); } }
-
             private double _SupervisionTimeout;
             public double SupervisionTimeout { get { return _SupervisionTimeout; } set { if (value == _SupervisionTimeout) return; _SupervisionTimeout = value; OnPropertyChanged(); } }
 
@@ -1080,115 +1230,130 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Connection_parametersRecord> Connection_parametersRecordData { get; } = new DataCollection<Connection_parametersRecord>();
-        private void OnConnection_parameters_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Connection_parametersRecord> Connection_parametersRecordData { get; } = new DataCollection<Connection_parametersRecord>();
+    private void OnConnection_parameters_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Connection_parametersRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Connection_parametersRecordData.Count == 0)
-                {
-                    Connection_parametersRecordData.AddRecord(new Connection_parametersRecord());
-                }
-                Connection_parametersRecordData[Connection_parametersRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Connection_parametersRecordData.AddRecord(new Connection_parametersRecord());
             }
+            Connection_parametersRecordData[Connection_parametersRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountConnection_parameters(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountConnection_parameters(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Connection_parametersRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmConnection_parameters(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Connection_parametersRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyConnection_parameters(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,MinInterval,MaxInterval,Latency,SupervisionTimeout,Notes\n");
+        foreach (var row in Connection_parametersRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Connection_parametersRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.MinInterval},{row.MaxInterval},{row.Latency},{row.SupervisionTimeout},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmConnection_parameters(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Connection_parametersRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyConnection_parameters(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,MinInterval,MaxInterval,Latency,SupervisionTimeout,Notes\n");
-            foreach (var row in Connection_parametersRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.MinInterval},{row.MaxInterval},{row.Latency},{row.SupervisionTimeout},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadConnection_parameters(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadConnection_parameters();
+        }
+
+        private async Task DoReadConnection_parameters()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadConnection_parameters();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Connection_parameters");
+                    SetStatus ($"Error: unable to read Connection_parameters");
                     return;
                 }
-
+                
                 var record = new Connection_parametersRecord();
-
                 var MinInterval = valueList.GetValue("MinInterval");
-                if (MinInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MinInterval.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (MinInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MinInterval.CurrentType == BCBasic.BCValue.ValueType.IsString || MinInterval.IsArray)
                 {
                     record.MinInterval = (double)MinInterval.AsDouble;
-                    Connection_parameters_MinInterval.Text = record.MinInterval.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Connection_parameters_MinInterval.Text = record.MinInterval.ToString("N0");
                 }
-
                 var MaxInterval = valueList.GetValue("MaxInterval");
-                if (MaxInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MaxInterval.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (MaxInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MaxInterval.CurrentType == BCBasic.BCValue.ValueType.IsString || MaxInterval.IsArray)
                 {
                     record.MaxInterval = (double)MaxInterval.AsDouble;
-                    Connection_parameters_MaxInterval.Text = record.MaxInterval.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Connection_parameters_MaxInterval.Text = record.MaxInterval.ToString("N0");
                 }
-
                 var Latency = valueList.GetValue("Latency");
-                if (Latency.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Latency.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Latency.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Latency.CurrentType == BCBasic.BCValue.ValueType.IsString || Latency.IsArray)
                 {
                     record.Latency = (double)Latency.AsDouble;
-                    Connection_parameters_Latency.Text = record.Latency.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Connection_parameters_Latency.Text = record.Latency.ToString("N0");
                 }
-
                 var SupervisionTimeout = valueList.GetValue("SupervisionTimeout");
-                if (SupervisionTimeout.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SupervisionTimeout.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (SupervisionTimeout.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SupervisionTimeout.CurrentType == BCBasic.BCValue.ValueType.IsString || SupervisionTimeout.IsArray)
                 {
                     record.SupervisionTimeout = (double)SupervisionTimeout.AsDouble;
-                    Connection_parameters_SupervisionTimeout.Text = record.SupervisionTimeout.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Connection_parameters_SupervisionTimeout.Text = record.SupervisionTimeout.ToString("N0");
                 }
-
 
                 Connection_parametersRecordData.Add(record);
 
             }
             catch (Exception ex)
             {
-                SetStatus($"Error: exception: {ex.Message}");
+                SetStatus ($"Error: exception: {ex.Message}");
             }
         }
 
-        private async void OnWriteEddystone_URL(object sender, RoutedEventArgs e)
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickConnection_parameters(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            var text = (sender as Button).Tag as String;
+            await DoWriteConnection_parameters (text, System.Globalization.NumberStyles.Integer);
+        }
+
+        private async void OnWriteConnection_parameters(object sender, RoutedEventArgs e)
+        {
+            var text = Connection_parameters_MinInterval.Text;
+            await DoWriteConnection_parameters (text, System.Globalization.NumberStyles.None);
+        }
+
+        private async Task DoWriteConnection_parameters(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -1197,16 +1362,42 @@ namespace BluetoothDeviceController.SpecialtyPages
                 // where there's only one data item.
                 string parseError = null;
 
-                String Eddystone;
-                var parsedEddystone = Utilities.Parsers.TryParseString(Eddystone_URL_Eddystone.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out Eddystone);
-                if (!parsedEddystone)
+                UInt16 MinInterval;
+                // History: used to go into Connection_parameters_MinInterval.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedMinInterval = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out MinInterval);
+                if (!parsedMinInterval)
                 {
-                    parseError = "Eddystone";
+                    parseError = "MinInterval";
+                }
+                UInt16 MaxInterval;
+                // History: used to go into Connection_parameters_MaxInterval.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedMaxInterval = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out MaxInterval);
+                if (!parsedMaxInterval)
+                {
+                    parseError = "MaxInterval";
+                }
+                UInt16 Latency;
+                // History: used to go into Connection_parameters_Latency.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedLatency = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out Latency);
+                if (!parsedLatency)
+                {
+                    parseError = "Latency";
+                }
+                UInt16 SupervisionTimeout;
+                // History: used to go into Connection_parameters_SupervisionTimeout.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedSupervisionTimeout = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out SupervisionTimeout);
+                if (!parsedSupervisionTimeout)
+                {
+                    parseError = "SupervisionTimeout";
                 }
 
                 if (parseError == null)
                 {
-                    await bleDevice.WriteEddystone_URL(Eddystone);
+                    await bleDevice.WriteConnection_parameters(MinInterval, MaxInterval, Latency, SupervisionTimeout);
                 }
                 else
                 { //NOTE: pop up a dialog?
@@ -1241,94 +1432,112 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Eddystone_URLRecord> Eddystone_URLRecordData { get; } = new DataCollection<Eddystone_URLRecord>();
-        private void OnEddystone_URL_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Eddystone_URLRecord> Eddystone_URLRecordData { get; } = new DataCollection<Eddystone_URLRecord>();
+    private void OnEddystone_URL_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Eddystone_URLRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Eddystone_URLRecordData.Count == 0)
-                {
-                    Eddystone_URLRecordData.AddRecord(new Eddystone_URLRecord());
-                }
-                Eddystone_URLRecordData[Eddystone_URLRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Eddystone_URLRecordData.AddRecord(new Eddystone_URLRecord());
             }
+            Eddystone_URLRecordData[Eddystone_URLRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountEddystone_URL(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountEddystone_URL(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Eddystone_URLRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmEddystone_URL(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Eddystone_URLRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyEddystone_URL(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Eddystone,Notes\n");
+        foreach (var row in Eddystone_URLRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Eddystone_URLRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Eddystone},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmEddystone_URL(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Eddystone_URLRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyEddystone_URL(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Eddystone,Notes\n");
-            foreach (var row in Eddystone_URLRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Eddystone},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadEddystone_URL(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadEddystone_URL();
+        }
+
+        private async Task DoReadEddystone_URL()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadEddystone_URL();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Eddystone_URL");
+                    SetStatus ($"Error: unable to read Eddystone_URL");
                     return;
                 }
-
+                
                 var record = new Eddystone_URLRecord();
-
                 var Eddystone = valueList.GetValue("Eddystone");
-                if (Eddystone.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Eddystone.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Eddystone.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Eddystone.CurrentType == BCBasic.BCValue.ValueType.IsString || Eddystone.IsArray)
                 {
                     record.Eddystone = (string)Eddystone.AsString;
-                    Eddystone_URL_Eddystone.Text = record.Eddystone.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Eddystone_URL_Eddystone.Text = record.Eddystone.ToString();
                 }
-
 
                 Eddystone_URLRecordData.Add(record);
 
             }
             catch (Exception ex)
             {
-                SetStatus($"Error: exception: {ex.Message}");
+                SetStatus ($"Error: exception: {ex.Message}");
             }
         }
 
-        private async void OnWriteCloud_Token(object sender, RoutedEventArgs e)
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickEddystone_URL(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            var text = (sender as Button).Tag as String;
+            await DoWriteEddystone_URL (text, System.Globalization.NumberStyles.Integer);
+        }
+
+        private async void OnWriteEddystone_URL(object sender, RoutedEventArgs e)
+        {
+            var text = Eddystone_URL_Eddystone.Text;
+            await DoWriteEddystone_URL (text, System.Globalization.NumberStyles.AllowHexSpecifier);
+        }
+
+        private async Task DoWriteEddystone_URL(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -1337,16 +1546,18 @@ namespace BluetoothDeviceController.SpecialtyPages
                 // where there's only one data item.
                 string parseError = null;
 
-                Bytes CloudToken;
-                var parsedCloudToken = Utilities.Parsers.TryParseBytes(Cloud_Token_CloudToken.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out CloudToken);
-                if (!parsedCloudToken)
+                String Eddystone;
+                // History: used to go into Eddystone_URL_Eddystone.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedEddystone = Utilities.Parsers.TryParseString(text, dec_or_hex, null, out Eddystone);
+                if (!parsedEddystone)
                 {
-                    parseError = "CloudToken";
+                    parseError = "Eddystone";
                 }
 
                 if (parseError == null)
                 {
-                    await bleDevice.WriteCloud_Token(CloudToken);
+                    await bleDevice.WriteEddystone_URL(Eddystone);
                 }
                 else
                 { //NOTE: pop up a dialog?
@@ -1381,84 +1592,137 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Cloud_TokenRecord> Cloud_TokenRecordData { get; } = new DataCollection<Cloud_TokenRecord>();
-        private void OnCloud_Token_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Cloud_TokenRecord> Cloud_TokenRecordData { get; } = new DataCollection<Cloud_TokenRecord>();
+    private void OnCloud_Token_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Cloud_TokenRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Cloud_TokenRecordData.Count == 0)
-                {
-                    Cloud_TokenRecordData.AddRecord(new Cloud_TokenRecord());
-                }
-                Cloud_TokenRecordData[Cloud_TokenRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Cloud_TokenRecordData.AddRecord(new Cloud_TokenRecord());
             }
+            Cloud_TokenRecordData[Cloud_TokenRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountCloud_Token(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountCloud_Token(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Cloud_TokenRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmCloud_Token(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Cloud_TokenRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyCloud_Token(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,CloudToken,Notes\n");
+        foreach (var row in Cloud_TokenRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Cloud_TokenRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.CloudToken},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmCloud_Token(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Cloud_TokenRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyCloud_Token(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,CloudToken,Notes\n");
-            foreach (var row in Cloud_TokenRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.CloudToken},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadCloud_Token(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadCloud_Token();
+        }
+
+        private async Task DoReadCloud_Token()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadCloud_Token();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Cloud_Token");
+                    SetStatus ($"Error: unable to read Cloud_Token");
                     return;
                 }
-
+                
                 var record = new Cloud_TokenRecord();
-
                 var CloudToken = valueList.GetValue("CloudToken");
-                if (CloudToken.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CloudToken.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (CloudToken.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CloudToken.CurrentType == BCBasic.BCValue.ValueType.IsString || CloudToken.IsArray)
                 {
                     record.CloudToken = (string)CloudToken.AsString;
-                    Cloud_Token_CloudToken.Text = record.CloudToken.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Cloud_Token_CloudToken.Text = record.CloudToken.ToString();
                 }
-
 
                 Cloud_TokenRecordData.Add(record);
 
+            }
+            catch (Exception ex)
+            {
+                SetStatus ($"Error: exception: {ex.Message}");
+            }
+        }
+
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickCloud_Token(object sender, RoutedEventArgs e)
+        {
+            var text = (sender as Button).Tag as String;
+            await DoWriteCloud_Token (text, System.Globalization.NumberStyles.Integer);
+        }
+
+        private async void OnWriteCloud_Token(object sender, RoutedEventArgs e)
+        {
+            var text = Cloud_Token_CloudToken.Text;
+            await DoWriteCloud_Token (text, System.Globalization.NumberStyles.AllowHexSpecifier);
+        }
+
+        private async Task DoWriteCloud_Token(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
+            ncommand++;
+            try
+            {
+                // Note: This template isn't smart enough to piece together
+                // multi-field characteristics. It can support simple characterisitics
+                // where there's only one data item.
+                string parseError = null;
+
+                Bytes CloudToken;
+                // History: used to go into Cloud_Token_CloudToken.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedCloudToken = Utilities.Parsers.TryParseBytes(text, dec_or_hex, null, out CloudToken);
+                if (!parsedCloudToken)
+                {
+                    parseError = "CloudToken";
+                }
+
+                if (parseError == null)
+                {
+                    await bleDevice.WriteCloud_Token(CloudToken);
+                }
+                else
+                { //NOTE: pop up a dialog?
+                    SetStatus($"Error: could not parse {parseError}");
+                }
             }
             catch (Exception ex)
             {
@@ -1483,10 +1747,8 @@ namespace BluetoothDeviceController.SpecialtyPages
 
             private double _Major;
             public double Major { get { return _Major; } set { if (value == _Major) return; _Major = value; OnPropertyChanged(); } }
-
             private double _Minor;
             public double Minor { get { return _Minor; } set { if (value == _Minor) return; _Minor = value; OnPropertyChanged(); } }
-
             private double _Patch;
             public double Patch { get { return _Patch; } set { if (value == _Patch) return; _Patch = value; OnPropertyChanged(); } }
 
@@ -1494,108 +1756,244 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Firmware_VersionRecord> Firmware_VersionRecordData { get; } = new DataCollection<Firmware_VersionRecord>();
-        private void OnFirmware_Version_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Firmware_VersionRecord> Firmware_VersionRecordData { get; } = new DataCollection<Firmware_VersionRecord>();
+    private void OnFirmware_Version_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Firmware_VersionRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Firmware_VersionRecordData.Count == 0)
-                {
-                    Firmware_VersionRecordData.AddRecord(new Firmware_VersionRecord());
-                }
-                Firmware_VersionRecordData[Firmware_VersionRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Firmware_VersionRecordData.AddRecord(new Firmware_VersionRecord());
             }
+            Firmware_VersionRecordData[Firmware_VersionRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountFirmware_Version(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountFirmware_Version(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Firmware_VersionRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmFirmware_Version(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Firmware_VersionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyFirmware_Version(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Major,Minor,Patch,Notes\n");
+        foreach (var row in Firmware_VersionRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Firmware_VersionRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Major},{row.Minor},{row.Patch},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmFirmware_Version(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Firmware_VersionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyFirmware_Version(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Major,Minor,Patch,Notes\n");
-            foreach (var row in Firmware_VersionRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Major},{row.Minor},{row.Patch},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadFirmware_Version(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadFirmware_Version();
+        }
+
+        private async Task DoReadFirmware_Version()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadFirmware_Version();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Firmware_Version");
+                    SetStatus ($"Error: unable to read Firmware_Version");
                     return;
                 }
-
+                
                 var record = new Firmware_VersionRecord();
-
                 var Major = valueList.GetValue("Major");
-                if (Major.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Major.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Major.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Major.CurrentType == BCBasic.BCValue.ValueType.IsString || Major.IsArray)
                 {
                     record.Major = (double)Major.AsDouble;
-                    Firmware_Version_Major.Text = record.Major.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Firmware_Version_Major.Text = record.Major.ToString("N0");
                 }
-
                 var Minor = valueList.GetValue("Minor");
-                if (Minor.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Minor.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Minor.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Minor.CurrentType == BCBasic.BCValue.ValueType.IsString || Minor.IsArray)
                 {
                     record.Minor = (double)Minor.AsDouble;
-                    Firmware_Version_Minor.Text = record.Minor.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Firmware_Version_Minor.Text = record.Minor.ToString("N0");
                 }
-
                 var Patch = valueList.GetValue("Patch");
-                if (Patch.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Patch.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (Patch.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Patch.CurrentType == BCBasic.BCValue.ValueType.IsString || Patch.IsArray)
                 {
                     record.Patch = (double)Patch.AsDouble;
-                    Firmware_Version_Patch.Text = record.Patch.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Firmware_Version_Patch.Text = record.Patch.ToString("N0");
                 }
-
 
                 Firmware_VersionRecordData.Add(record);
 
             }
             catch (Exception ex)
             {
-                SetStatus($"Error: exception: {ex.Message}");
+                SetStatus ($"Error: exception: {ex.Message}");
             }
+        }
+
+
+        public class MTU_RequestRecord : INotifyPropertyChanged
+        {
+            public MTU_RequestRecord()
+            {
+                this.EventTime = DateTime.Now;
+            }
+            // For the INPC INotifyPropertyChanged values
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            private DateTime _EventTime;
+            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
+
+            private double _param0;
+            public double param0 { get { return _param0; } set { if (value == _param0) return; _param0 = value; OnPropertyChanged(); } }
+            private double _param1;
+            public double param1 { get { return _param1; } set { if (value == _param1) return; _param1 = value; OnPropertyChanged(); } }
+
+            private String _Note;
+            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+        }
+
+    public DataCollection<MTU_RequestRecord> MTU_RequestRecordData { get; } = new DataCollection<MTU_RequestRecord>();
+    private void OnMTU_Request_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (MTU_RequestRecordData.Count == 0)
+            {
+                MTU_RequestRecordData.AddRecord(new MTU_RequestRecord());
+            }
+            MTU_RequestRecordData[MTU_RequestRecordData.Count - 1].Note = text;
+            e.Handled = true;
+        }
+    }
+
+    // Functions called from the expander
+    private void OnKeepCountMTU_Request(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        MTU_RequestRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmMTU_Request(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        MTU_RequestRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyMTU_Request(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,param0,param1,Notes\n");
+        foreach (var row in MTU_RequestRecordData)
+        {
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
+
+
+        private async void OnReadMTU_Request(object sender, RoutedEventArgs e)
+        {
+            await DoReadMTU_Request();
+        }
+
+        private async Task DoReadMTU_Request()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
+            ncommand++;
+            try
+            {
+                var valueList = await bleDevice.ReadMTU_Request();
+                if (valueList == null)
+                {
+                    SetStatus ($"Error: unable to read MTU_Request");
+                    return;
+                }
+                
+                var record = new MTU_RequestRecord();
+                var param0 = valueList.GetValue("param0");
+                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
+                {
+                    record.param0 = (double)param0.AsDouble;
+                    MTU_Request_param0.Text = record.param0.ToString();
+                }
+                var param1 = valueList.GetValue("param1");
+                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString || param1.IsArray)
+                {
+                    record.param1 = (double)param1.AsDouble;
+                    MTU_Request_param1.Text = record.param1.ToString();
+                }
+
+                MTU_RequestRecordData.Add(record);
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus ($"Error: exception: {ex.Message}");
+            }
+        }
+
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickMTU_Request(object sender, RoutedEventArgs e)
+        {
+            var text = (sender as Button).Tag as String;
+            await DoWriteMTU_Request (text, System.Globalization.NumberStyles.Integer);
         }
 
         private async void OnWriteMTU_Request(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            var text = MTU_Request_param0.Text;
+            await DoWriteMTU_Request (text, System.Globalization.NumberStyles.AllowHexSpecifier);
+        }
+
+        private async Task DoWriteMTU_Request(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -1605,14 +2003,17 @@ namespace BluetoothDeviceController.SpecialtyPages
                 string parseError = null;
 
                 Byte param0;
-                var parsedparam0 = Utilities.Parsers.TryParseByte(MTU_Request_param0.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param0);
+                // History: used to go into MTU_Request_param0.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam0 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param0);
                 if (!parsedparam0)
                 {
                     parseError = "param0";
                 }
-
                 UInt16 param1;
-                var parsedparam1 = Utilities.Parsers.TryParseUInt16(MTU_Request_param1.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param1);
+                // History: used to go into MTU_Request_param1.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam1 = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out param1);
                 if (!parsedparam1)
                 {
                     parseError = "param1";
@@ -1633,9 +2034,9 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-        public class MTU_RequestRecord : INotifyPropertyChanged
+        public class NFC_TagRecord : INotifyPropertyChanged
         {
-            public MTU_RequestRecord()
+            public NFC_TagRecord()
             {
                 this.EventTime = DateTime.Now;
             }
@@ -1648,112 +2049,71 @@ namespace BluetoothDeviceController.SpecialtyPages
             private DateTime _EventTime;
             public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
 
-            private double _param0;
-            public double param0 { get { return _param0; } set { if (value == _param0) return; _param0 = value; OnPropertyChanged(); } }
-
-            private double _param1;
-            public double param1 { get { return _param1; } set { if (value == _param1) return; _param1 = value; OnPropertyChanged(); } }
+            private string _NFCTag;
+            public string NFCTag { get { return _NFCTag; } set { if (value == _NFCTag) return; _NFCTag = value; OnPropertyChanged(); } }
 
             private String _Note;
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<MTU_RequestRecord> MTU_RequestRecordData { get; } = new DataCollection<MTU_RequestRecord>();
-        private void OnMTU_Request_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<NFC_TagRecord> NFC_TagRecordData { get; } = new DataCollection<NFC_TagRecord>();
+    private void OnNFC_Tag_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (NFC_TagRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (MTU_RequestRecordData.Count == 0)
-                {
-                    MTU_RequestRecordData.AddRecord(new MTU_RequestRecord());
-                }
-                MTU_RequestRecordData[MTU_RequestRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                NFC_TagRecordData.AddRecord(new NFC_TagRecord());
             }
+            NFC_TagRecordData[NFC_TagRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountMTU_Request(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountNFC_Tag(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        NFC_TagRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmNFC_Tag(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        NFC_TagRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyNFC_Tag(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,NFCTag,Notes\n");
+        foreach (var row in NFC_TagRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            MTU_RequestRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.NFCTag},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmMTU_Request(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            MTU_RequestRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyMTU_Request(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,param0,param1,Notes\n");
-            foreach (var row in MTU_RequestRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
-
-        private async void OnReadMTU_Request(object sender, RoutedEventArgs e)
-        {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
-            ncommand++;
-            try
-            {
-                var valueList = await bleDevice.ReadMTU_Request();
-                if (valueList == null)
-                {
-                    SetStatus($"Error: unable to read MTU_Request");
-                    return;
-                }
-
-                var record = new MTU_RequestRecord();
-
-                var param0 = valueList.GetValue("param0");
-                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.param0 = (double)param0.AsDouble;
-                    MTU_Request_param0.Text = record.param0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var param1 = valueList.GetValue("param1");
-                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.param1 = (double)param1.AsDouble;
-                    MTU_Request_param1.Text = record.param1.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
 
-                MTU_RequestRecordData.Add(record);
 
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
 
 
         // Functions for Environment
-
-
         public class Temperature_cRecord : INotifyPropertyChanged
         {
             public Temperature_cRecord()
@@ -1776,58 +2136,59 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Temperature_cRecord> Temperature_cRecordData { get; } = new DataCollection<Temperature_cRecord>();
-        private void OnTemperature_c_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Temperature_cRecord> Temperature_cRecordData { get; } = new DataCollection<Temperature_cRecord>();
+    private void OnTemperature_c_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Temperature_cRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Temperature_cRecordData.Count == 0)
-                {
-                    Temperature_cRecordData.AddRecord(new Temperature_cRecord());
-                }
-                Temperature_cRecordData[Temperature_cRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Temperature_cRecordData.AddRecord(new Temperature_cRecord());
             }
+            Temperature_cRecordData[Temperature_cRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountTemperature_c(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Temperature_cRecordData.MaxLength = value;
+    // Functions called from the expander
+    private void OnKeepCountTemperature_c(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Temperature_cRecordData.MaxLength = value;
 
-            Temperature_cChart.RedrawYTime<Temperature_cRecord>(Temperature_cRecordData);
-        }
+        Temperature_cChart.RedrawYTime<Temperature_cRecord>(Temperature_cRecordData);
 
-        private void OnAlgorithmTemperature_c(object sender, SelectionChangedEventArgs e)
+    }
+
+    private void OnAlgorithmTemperature_c(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Temperature_cRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyTemperature_c(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Temperature,Notes\n");
+        foreach (var row in Temperature_cRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Temperature_cRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Temperature},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-        private void OnCopyTemperature_c(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Temperature,Notes\n");
-            foreach (var row in Temperature_cRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Temperature},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyTemperature_cSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -1838,7 +2199,12 @@ namespace BluetoothDeviceController.SpecialtyPages
         bool Temperature_cNotifySetup = false;
         private async void OnNotifyTemperature_c(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyTemperature_c();
+        }
+
+        private async Task DoNotifyTemperature_c()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -1851,28 +2217,27 @@ namespace BluetoothDeviceController.SpecialtyPages
                 var notifyType = NotifyTemperature_cSettings[Temperature_cNotifyIndex];
                 Temperature_cNotifyIndex = (Temperature_cNotifyIndex + 1) % NotifyTemperature_cSettings.Length;
                 var result = await bleDevice.NotifyTemperature_cAsync(notifyType);
-
-
+                
 
                 var EventTimeProperty = typeof(Temperature_cRecord).GetProperty("EventTime");
                 var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
                 {
-typeof(Temperature_cRecord).GetProperty("Temperature"),
+                    typeof(Temperature_cRecord).GetProperty("Temperature"),
+
                 };
                 var names = new List<string>()
-                {
-"Temperature",
+                {"Temperature",
                 };
                 Temperature_cChart.SetDataProperties(properties, EventTimeProperty, names);
                 Temperature_cChart.SetTitle("Temperature (c) Chart");
                 Temperature_cChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
-                {
-                    tableType = "standard",
-                    chartType = "standard",
-                    chartCommand = "AddYTime<Environment_ConfigurationRecord>(addResult, Environment_ConfigurationRecordData)",
-                    chartDefaultMaxY = 100,
-                    chartDefaultMinY = 0,
-                }
+{
+tableType="standard",
+chartType="standard",
+chartCommand="AddYTime<Temperature_cRecord>(addResult, Temperature_cRecordData)",
+chartDefaultMaxY=100,
+chartDefaultMinY=0,
+}
 ;
 
             }
@@ -1888,22 +2253,27 @@ typeof(Temperature_cRecord).GetProperty("Temperature"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new Temperature_cRecord();
+                var Temperature = valueList.GetValue("Temperature");
+                if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
+                {
+                    record.Temperature = (double)Temperature.AsDouble;
+                    Temperature_c_Temperature.Text = record.Temperature.ToString("F3");
+                }
 
-                    var record = new Temperature_cRecord();
+                var addResult = Temperature_cRecordData.AddRecord(record);
 
-                    var Temperature = valueList.GetValue("Temperature");
-                    if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Temperature = (double)Temperature.AsDouble;
-                        Temperature_c_Temperature.Text = record.Temperature.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
+                Temperature_cChart.AddYTime<Temperature_cRecord>(addResult, Temperature_cRecordData);
 
-                    var addResult = Temperature_cRecordData.AddRecord(record);
-                    Temperature_cChart.AddYTime<Temperature_cRecord>(addResult, Temperature_cRecordData);
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class Pressure_hpaRecord : INotifyPropertyChanged
         {
             public Pressure_hpaRecord()
@@ -1926,58 +2296,59 @@ typeof(Temperature_cRecord).GetProperty("Temperature"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Pressure_hpaRecord> Pressure_hpaRecordData { get; } = new DataCollection<Pressure_hpaRecord>();
-        private void OnPressure_hpa_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Pressure_hpaRecord> Pressure_hpaRecordData { get; } = new DataCollection<Pressure_hpaRecord>();
+    private void OnPressure_hpa_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Pressure_hpaRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Pressure_hpaRecordData.Count == 0)
-                {
-                    Pressure_hpaRecordData.AddRecord(new Pressure_hpaRecord());
-                }
-                Pressure_hpaRecordData[Pressure_hpaRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Pressure_hpaRecordData.AddRecord(new Pressure_hpaRecord());
             }
+            Pressure_hpaRecordData[Pressure_hpaRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountPressure_hpa(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Pressure_hpaRecordData.MaxLength = value;
+    // Functions called from the expander
+    private void OnKeepCountPressure_hpa(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Pressure_hpaRecordData.MaxLength = value;
 
-            Pressure_hpaChart.RedrawYTime<Pressure_hpaRecord>(Pressure_hpaRecordData);
-        }
+        Pressure_hpaChart.RedrawYTime<Pressure_hpaRecord>(Pressure_hpaRecordData);
 
-        private void OnAlgorithmPressure_hpa(object sender, SelectionChangedEventArgs e)
+    }
+
+    private void OnAlgorithmPressure_hpa(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Pressure_hpaRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyPressure_hpa(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Pressure,Notes\n");
+        foreach (var row in Pressure_hpaRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Pressure_hpaRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Pressure},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-        private void OnCopyPressure_hpa(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Pressure,Notes\n");
-            foreach (var row in Pressure_hpaRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Pressure},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyPressure_hpaSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -1988,7 +2359,12 @@ typeof(Temperature_cRecord).GetProperty("Temperature"),
         bool Pressure_hpaNotifySetup = false;
         private async void OnNotifyPressure_hpa(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyPressure_hpa();
+        }
+
+        private async Task DoNotifyPressure_hpa()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -2001,28 +2377,27 @@ typeof(Temperature_cRecord).GetProperty("Temperature"),
                 var notifyType = NotifyPressure_hpaSettings[Pressure_hpaNotifyIndex];
                 Pressure_hpaNotifyIndex = (Pressure_hpaNotifyIndex + 1) % NotifyPressure_hpaSettings.Length;
                 var result = await bleDevice.NotifyPressure_hpaAsync(notifyType);
-
-
+                
 
                 var EventTimeProperty = typeof(Pressure_hpaRecord).GetProperty("EventTime");
                 var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
                 {
-typeof(Pressure_hpaRecord).GetProperty("Pressure"),
+                    typeof(Pressure_hpaRecord).GetProperty("Pressure"),
+
                 };
                 var names = new List<string>()
-                {
-"Pressure",
+                {"Pressure",
                 };
                 Pressure_hpaChart.SetDataProperties(properties, EventTimeProperty, names);
                 Pressure_hpaChart.SetTitle("Pressure (hpa) Chart");
                 Pressure_hpaChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
-                {
-                    tableType = "standard",
-                    chartType = "standard",
-                    chartCommand = "AddYTime<Environment_ConfigurationRecord>(addResult, Environment_ConfigurationRecordData)",
-                    chartDefaultMaxY = 1043,
-                    chartDefaultMinY = 983,
-                }
+{
+tableType="standard",
+chartType="standard",
+chartCommand="AddYTime<Pressure_hpaRecord>(addResult, Pressure_hpaRecordData)",
+chartDefaultMaxY=1043,
+chartDefaultMinY=983,
+}
 ;
 
             }
@@ -2038,22 +2413,27 @@ typeof(Pressure_hpaRecord).GetProperty("Pressure"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new Pressure_hpaRecord();
+                var Pressure = valueList.GetValue("Pressure");
+                if (Pressure.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Pressure.CurrentType == BCBasic.BCValue.ValueType.IsString || Pressure.IsArray)
+                {
+                    record.Pressure = (double)Pressure.AsDouble;
+                    Pressure_hpa_Pressure.Text = record.Pressure.ToString("F3");
+                }
 
-                    var record = new Pressure_hpaRecord();
+                var addResult = Pressure_hpaRecordData.AddRecord(record);
 
-                    var Pressure = valueList.GetValue("Pressure");
-                    if (Pressure.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Pressure.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Pressure = (double)Pressure.AsDouble;
-                        Pressure_hpa_Pressure.Text = record.Pressure.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
+                Pressure_hpaChart.AddYTime<Pressure_hpaRecord>(addResult, Pressure_hpaRecordData);
 
-                    var addResult = Pressure_hpaRecordData.AddRecord(record);
-                    Pressure_hpaChart.AddYTime<Pressure_hpaRecord>(addResult, Pressure_hpaRecordData);
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class HumidityRecord : INotifyPropertyChanged
         {
             public HumidityRecord()
@@ -2076,58 +2456,59 @@ typeof(Pressure_hpaRecord).GetProperty("Pressure"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<HumidityRecord> HumidityRecordData { get; } = new DataCollection<HumidityRecord>();
-        private void OnHumidity_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<HumidityRecord> HumidityRecordData { get; } = new DataCollection<HumidityRecord>();
+    private void OnHumidity_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (HumidityRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (HumidityRecordData.Count == 0)
-                {
-                    HumidityRecordData.AddRecord(new HumidityRecord());
-                }
-                HumidityRecordData[HumidityRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                HumidityRecordData.AddRecord(new HumidityRecord());
             }
+            HumidityRecordData[HumidityRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountHumidity(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            HumidityRecordData.MaxLength = value;
+    // Functions called from the expander
+    private void OnKeepCountHumidity(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        HumidityRecordData.MaxLength = value;
 
-            HumidityChart.RedrawYTime<HumidityRecord>(HumidityRecordData);
-        }
+        HumidityChart.RedrawYTime<HumidityRecord>(HumidityRecordData);
 
-        private void OnAlgorithmHumidity(object sender, SelectionChangedEventArgs e)
+    }
+
+    private void OnAlgorithmHumidity(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        HumidityRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyHumidity(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Humidity,Notes\n");
+        foreach (var row in HumidityRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            HumidityRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Humidity},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-        private void OnCopyHumidity(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Humidity,Notes\n");
-            foreach (var row in HumidityRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Humidity},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyHumiditySettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -2138,7 +2519,12 @@ typeof(Pressure_hpaRecord).GetProperty("Pressure"),
         bool HumidityNotifySetup = false;
         private async void OnNotifyHumidity(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyHumidity();
+        }
+
+        private async Task DoNotifyHumidity()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -2151,28 +2537,27 @@ typeof(Pressure_hpaRecord).GetProperty("Pressure"),
                 var notifyType = NotifyHumiditySettings[HumidityNotifyIndex];
                 HumidityNotifyIndex = (HumidityNotifyIndex + 1) % NotifyHumiditySettings.Length;
                 var result = await bleDevice.NotifyHumidityAsync(notifyType);
-
-
+                
 
                 var EventTimeProperty = typeof(HumidityRecord).GetProperty("EventTime");
                 var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
                 {
-typeof(HumidityRecord).GetProperty("Humidity"),
+                    typeof(HumidityRecord).GetProperty("Humidity"),
+
                 };
                 var names = new List<string>()
-                {
-"Humidity",
+                {"Humidity",
                 };
                 HumidityChart.SetDataProperties(properties, EventTimeProperty, names);
                 HumidityChart.SetTitle("Humidity (%) Chart");
                 HumidityChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
-                {
-                    tableType = "standard",
-                    chartType = "standard",
-                    chartCommand = "AddYTime<Environment_ConfigurationRecord>(addResult, Environment_ConfigurationRecordData)",
-                    chartDefaultMaxY = 100,
-                    chartDefaultMinY = 0,
-                }
+{
+tableType="standard",
+chartType="standard",
+chartCommand="AddYTime<HumidityRecord>(addResult, HumidityRecordData)",
+chartDefaultMaxY=100,
+chartDefaultMinY=0,
+}
 ;
 
             }
@@ -2188,22 +2573,27 @@ typeof(HumidityRecord).GetProperty("Humidity"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new HumidityRecord();
+                var Humidity = valueList.GetValue("Humidity");
+                if (Humidity.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Humidity.CurrentType == BCBasic.BCValue.ValueType.IsString || Humidity.IsArray)
+                {
+                    record.Humidity = (double)Humidity.AsDouble;
+                    Humidity_Humidity.Text = record.Humidity.ToString("N0");
+                }
 
-                    var record = new HumidityRecord();
+                var addResult = HumidityRecordData.AddRecord(record);
 
-                    var Humidity = valueList.GetValue("Humidity");
-                    if (Humidity.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Humidity.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Humidity = (double)Humidity.AsDouble;
-                        Humidity_Humidity.Text = record.Humidity.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
+                HumidityChart.AddYTime<HumidityRecord>(addResult, HumidityRecordData);
 
-                    var addResult = HumidityRecordData.AddRecord(record);
-                    HumidityChart.AddYTime<HumidityRecord>(addResult, HumidityRecordData);
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class Air_Quality_eCOS_TVOCRecord : INotifyPropertyChanged
         {
             public Air_Quality_eCOS_TVOCRecord()
@@ -2221,7 +2611,6 @@ typeof(HumidityRecord).GetProperty("Humidity"),
 
             private double _eCOS;
             public double eCOS { get { return _eCOS; } set { if (value == _eCOS) return; _eCOS = value; OnPropertyChanged(); } }
-
             private double _TVOC;
             public double TVOC { get { return _TVOC; } set { if (value == _TVOC) return; _TVOC = value; OnPropertyChanged(); } }
 
@@ -2229,58 +2618,59 @@ typeof(HumidityRecord).GetProperty("Humidity"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Air_Quality_eCOS_TVOCRecord> Air_Quality_eCOS_TVOCRecordData { get; } = new DataCollection<Air_Quality_eCOS_TVOCRecord>();
-        private void OnAir_Quality_eCOS_TVOC_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Air_Quality_eCOS_TVOCRecord> Air_Quality_eCOS_TVOCRecordData { get; } = new DataCollection<Air_Quality_eCOS_TVOCRecord>();
+    private void OnAir_Quality_eCOS_TVOC_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Air_Quality_eCOS_TVOCRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Air_Quality_eCOS_TVOCRecordData.Count == 0)
-                {
-                    Air_Quality_eCOS_TVOCRecordData.AddRecord(new Air_Quality_eCOS_TVOCRecord());
-                }
-                Air_Quality_eCOS_TVOCRecordData[Air_Quality_eCOS_TVOCRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Air_Quality_eCOS_TVOCRecordData.AddRecord(new Air_Quality_eCOS_TVOCRecord());
             }
+            Air_Quality_eCOS_TVOCRecordData[Air_Quality_eCOS_TVOCRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountAir_Quality_eCOS_TVOC(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Air_Quality_eCOS_TVOCRecordData.MaxLength = value;
+    // Functions called from the expander
+    private void OnKeepCountAir_Quality_eCOS_TVOC(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Air_Quality_eCOS_TVOCRecordData.MaxLength = value;
 
-            Air_Quality_eCOS_TVOCChart.RedrawYTime<Air_Quality_eCOS_TVOCRecord>(Air_Quality_eCOS_TVOCRecordData);
-        }
+        Air_Quality_eCOS_TVOCChart.RedrawYTime<Air_Quality_eCOS_TVOCRecord>(Air_Quality_eCOS_TVOCRecordData);
 
-        private void OnAlgorithmAir_Quality_eCOS_TVOC(object sender, SelectionChangedEventArgs e)
+    }
+
+    private void OnAlgorithmAir_Quality_eCOS_TVOC(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Air_Quality_eCOS_TVOCRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyAir_Quality_eCOS_TVOC(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,eCOS,TVOC,Notes\n");
+        foreach (var row in Air_Quality_eCOS_TVOCRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Air_Quality_eCOS_TVOCRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.eCOS},{row.TVOC},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-        private void OnCopyAir_Quality_eCOS_TVOC(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,eCOS,TVOC,Notes\n");
-            foreach (var row in Air_Quality_eCOS_TVOCRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.eCOS},{row.TVOC},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyAir_Quality_eCOS_TVOCSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -2291,7 +2681,12 @@ typeof(HumidityRecord).GetProperty("Humidity"),
         bool Air_Quality_eCOS_TVOCNotifySetup = false;
         private async void OnNotifyAir_Quality_eCOS_TVOC(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyAir_Quality_eCOS_TVOC();
+        }
+
+        private async Task DoNotifyAir_Quality_eCOS_TVOC()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -2304,28 +2699,26 @@ typeof(HumidityRecord).GetProperty("Humidity"),
                 var notifyType = NotifyAir_Quality_eCOS_TVOCSettings[Air_Quality_eCOS_TVOCNotifyIndex];
                 Air_Quality_eCOS_TVOCNotifyIndex = (Air_Quality_eCOS_TVOCNotifyIndex + 1) % NotifyAir_Quality_eCOS_TVOCSettings.Length;
                 var result = await bleDevice.NotifyAir_Quality_eCOS_TVOCAsync(notifyType);
-
-
+                
 
                 var EventTimeProperty = typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("EventTime");
                 var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
                 {
-typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("eCOS"),
-typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("TVOC"),
+                    typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("eCOS"),
+                    typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("TVOC"),
+
                 };
                 var names = new List<string>()
-                {
-"eCOS",
-"TVOC",
+                {"eCOS","TVOC",
                 };
                 Air_Quality_eCOS_TVOCChart.SetDataProperties(properties, EventTimeProperty, names);
                 Air_Quality_eCOS_TVOCChart.SetTitle("Air Quality eCOS TVOC Chart");
                 Air_Quality_eCOS_TVOCChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
-                {
-                    tableType = "standard",
-                    chartType = "standard",
-                    chartCommand = "AddYTime<Environment_ConfigurationRecord>(addResult, Environment_ConfigurationRecordData)",
-                    chartLineDefaults ={
+{
+tableType="standard",
+chartType="standard",
+chartCommand="AddYTime<Air_Quality_eCOS_TVOCRecord>(addResult, Air_Quality_eCOS_TVOCRecordData)",
+        chartLineDefaults={
                         { "eCOS", new ChartLineDefaults() {
                             stroke="DarkGreen",
                             }
@@ -2335,7 +2728,7 @@ typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("TVOC"),
                             }
                         },
                     },
-                }
+}
 ;
 
             }
@@ -2351,29 +2744,33 @@ typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("TVOC"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new Air_Quality_eCOS_TVOCRecord();
+                var eCOS = valueList.GetValue("eCOS");
+                if (eCOS.CurrentType == BCBasic.BCValue.ValueType.IsDouble || eCOS.CurrentType == BCBasic.BCValue.ValueType.IsString || eCOS.IsArray)
+                {
+                    record.eCOS = (double)eCOS.AsDouble;
+                    Air_Quality_eCOS_TVOC_eCOS.Text = record.eCOS.ToString("N0");
+                }
+                var TVOC = valueList.GetValue("TVOC");
+                if (TVOC.CurrentType == BCBasic.BCValue.ValueType.IsDouble || TVOC.CurrentType == BCBasic.BCValue.ValueType.IsString || TVOC.IsArray)
+                {
+                    record.TVOC = (double)TVOC.AsDouble;
+                    Air_Quality_eCOS_TVOC_TVOC.Text = record.TVOC.ToString("N0");
+                }
 
-                    var record = new Air_Quality_eCOS_TVOCRecord();
+                var addResult = Air_Quality_eCOS_TVOCRecordData.AddRecord(record);
 
-                    var eCOS = valueList.GetValue("eCOS");
-                    if (eCOS.CurrentType == BCBasic.BCValue.ValueType.IsDouble || eCOS.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.eCOS = (double)eCOS.AsDouble;
-                        Air_Quality_eCOS_TVOC_eCOS.Text = record.eCOS.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
+                Air_Quality_eCOS_TVOCChart.AddYTime<Air_Quality_eCOS_TVOCRecord>(addResult, Air_Quality_eCOS_TVOCRecordData);
 
-                    var TVOC = valueList.GetValue("TVOC");
-                    if (TVOC.CurrentType == BCBasic.BCValue.ValueType.IsDouble || TVOC.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.TVOC = (double)TVOC.AsDouble;
-                        Air_Quality_eCOS_TVOC_TVOC.Text = record.TVOC.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = Air_Quality_eCOS_TVOCRecordData.AddRecord(record);
-                    Air_Quality_eCOS_TVOCChart.AddYTime<Air_Quality_eCOS_TVOCRecord>(addResult, Air_Quality_eCOS_TVOCRecordData);
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class Color_RGB_ClearRecord : INotifyPropertyChanged
         {
             public Color_RGB_ClearRecord()
@@ -2391,13 +2788,10 @@ typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("TVOC"),
 
             private double _Red;
             public double Red { get { return _Red; } set { if (value == _Red) return; _Red = value; OnPropertyChanged(); } }
-
             private double _Green;
             public double Green { get { return _Green; } set { if (value == _Green) return; _Green = value; OnPropertyChanged(); } }
-
             private double _Blue;
             public double Blue { get { return _Blue; } set { if (value == _Blue) return; _Blue = value; OnPropertyChanged(); } }
-
             private double _Clear;
             public double Clear { get { return _Clear; } set { if (value == _Clear) return; _Clear = value; OnPropertyChanged(); } }
 
@@ -2405,58 +2799,59 @@ typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("TVOC"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Color_RGB_ClearRecord> Color_RGB_ClearRecordData { get; } = new DataCollection<Color_RGB_ClearRecord>();
-        private void OnColor_RGB_Clear_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Color_RGB_ClearRecord> Color_RGB_ClearRecordData { get; } = new DataCollection<Color_RGB_ClearRecord>();
+    private void OnColor_RGB_Clear_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Color_RGB_ClearRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Color_RGB_ClearRecordData.Count == 0)
-                {
-                    Color_RGB_ClearRecordData.AddRecord(new Color_RGB_ClearRecord());
-                }
-                Color_RGB_ClearRecordData[Color_RGB_ClearRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Color_RGB_ClearRecordData.AddRecord(new Color_RGB_ClearRecord());
             }
+            Color_RGB_ClearRecordData[Color_RGB_ClearRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountColor_RGB_Clear(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Color_RGB_ClearRecordData.MaxLength = value;
+    // Functions called from the expander
+    private void OnKeepCountColor_RGB_Clear(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Color_RGB_ClearRecordData.MaxLength = value;
 
-            Color_RGB_ClearChart.RedrawYTime<Color_RGB_ClearRecord>(Color_RGB_ClearRecordData);
-        }
+        Color_RGB_ClearChart.RedrawYTime<Color_RGB_ClearRecord>(Color_RGB_ClearRecordData);
 
-        private void OnAlgorithmColor_RGB_Clear(object sender, SelectionChangedEventArgs e)
+    }
+
+    private void OnAlgorithmColor_RGB_Clear(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Color_RGB_ClearRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyColor_RGB_Clear(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Red,Green,Blue,Clear,Notes\n");
+        foreach (var row in Color_RGB_ClearRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Color_RGB_ClearRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Red},{row.Green},{row.Blue},{row.Clear},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-        private void OnCopyColor_RGB_Clear(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Red,Green,Blue,Clear,Notes\n");
-            foreach (var row in Color_RGB_ClearRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Red},{row.Green},{row.Blue},{row.Clear},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyColor_RGB_ClearSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -2467,7 +2862,12 @@ typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("TVOC"),
         bool Color_RGB_ClearNotifySetup = false;
         private async void OnNotifyColor_RGB_Clear(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyColor_RGB_Clear();
+        }
+
+        private async Task DoNotifyColor_RGB_Clear()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -2480,34 +2880,30 @@ typeof(Air_Quality_eCOS_TVOCRecord).GetProperty("TVOC"),
                 var notifyType = NotifyColor_RGB_ClearSettings[Color_RGB_ClearNotifyIndex];
                 Color_RGB_ClearNotifyIndex = (Color_RGB_ClearNotifyIndex + 1) % NotifyColor_RGB_ClearSettings.Length;
                 var result = await bleDevice.NotifyColor_RGB_ClearAsync(notifyType);
-
-
+                
 
                 var EventTimeProperty = typeof(Color_RGB_ClearRecord).GetProperty("EventTime");
                 var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
                 {
-typeof(Color_RGB_ClearRecord).GetProperty("Red"),
-typeof(Color_RGB_ClearRecord).GetProperty("Green"),
-typeof(Color_RGB_ClearRecord).GetProperty("Blue"),
-typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
+                    typeof(Color_RGB_ClearRecord).GetProperty("Red"),
+                    typeof(Color_RGB_ClearRecord).GetProperty("Green"),
+                    typeof(Color_RGB_ClearRecord).GetProperty("Blue"),
+                    typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
+
                 };
                 var names = new List<string>()
-                {
-"Red",
-"Green",
-"Blue",
-"Clear",
+                {"Red","Green","Blue","Clear",
                 };
                 Color_RGB_ClearChart.SetDataProperties(properties, EventTimeProperty, names);
                 Color_RGB_ClearChart.SetTitle("Color RGB+Clear Chart");
                 Color_RGB_ClearChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
-                {
-                    tableType = "standard",
-                    chartType = "standard",
-                    chartCommand = "AddYTime<Environment_ConfigurationRecord>(addResult, Environment_ConfigurationRecordData)",
-                    chartDefaultMaxY = 10000,
-                    chartMinY = 0,
-                    chartLineDefaults ={
+{
+tableType="standard",
+chartType="standard",
+chartCommand="AddYTime<Color_RGB_ClearRecord>(addResult, Color_RGB_ClearRecordData)",
+chartDefaultMaxY=10000,
+chartMinY=0,
+        chartLineDefaults={
                         { "Red", new ChartLineDefaults() {
                             stroke="DarkRed",
                             }
@@ -2525,7 +2921,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                             }
                         },
                     },
-                }
+}
 ;
 
             }
@@ -2541,46 +2937,229 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new Color_RGB_ClearRecord();
+                var Red = valueList.GetValue("Red");
+                if (Red.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Red.CurrentType == BCBasic.BCValue.ValueType.IsString || Red.IsArray)
+                {
+                    record.Red = (double)Red.AsDouble;
+                    Color_RGB_Clear_Red.Text = record.Red.ToString("N0");
+                }
+                var Green = valueList.GetValue("Green");
+                if (Green.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Green.CurrentType == BCBasic.BCValue.ValueType.IsString || Green.IsArray)
+                {
+                    record.Green = (double)Green.AsDouble;
+                    Color_RGB_Clear_Green.Text = record.Green.ToString("N0");
+                }
+                var Blue = valueList.GetValue("Blue");
+                if (Blue.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Blue.CurrentType == BCBasic.BCValue.ValueType.IsString || Blue.IsArray)
+                {
+                    record.Blue = (double)Blue.AsDouble;
+                    Color_RGB_Clear_Blue.Text = record.Blue.ToString("N0");
+                }
+                var Clear = valueList.GetValue("Clear");
+                if (Clear.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Clear.CurrentType == BCBasic.BCValue.ValueType.IsString || Clear.IsArray)
+                {
+                    record.Clear = (double)Clear.AsDouble;
+                    Color_RGB_Clear_Clear.Text = record.Clear.ToString("N0");
+                }
 
-                    var record = new Color_RGB_ClearRecord();
+                var addResult = Color_RGB_ClearRecordData.AddRecord(record);
 
-                    var Red = valueList.GetValue("Red");
-                    if (Red.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Red.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Red = (double)Red.AsDouble;
-                        Color_RGB_Clear_Red.Text = record.Red.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
+                Color_RGB_ClearChart.AddYTime<Color_RGB_ClearRecord>(addResult, Color_RGB_ClearRecordData);
 
-                    var Green = valueList.GetValue("Green");
-                    if (Green.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Green.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Green = (double)Green.AsDouble;
-                        Color_RGB_Clear_Green.Text = record.Green.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var Blue = valueList.GetValue("Blue");
-                    if (Blue.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Blue.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Blue = (double)Blue.AsDouble;
-                        Color_RGB_Clear_Blue.Text = record.Blue.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var Clear = valueList.GetValue("Clear");
-                    if (Clear.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Clear.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Clear = (double)Clear.AsDouble;
-                        Color_RGB_Clear_Clear.Text = record.Clear.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = Color_RGB_ClearRecordData.AddRecord(record);
-                    Color_RGB_ClearChart.AddYTime<Color_RGB_ClearRecord>(addResult, Color_RGB_ClearRecordData);
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
+        public class Environment_ConfigurationRecord : INotifyPropertyChanged
+        {
+            public Environment_ConfigurationRecord()
+            {
+                this.EventTime = DateTime.Now;
+            }
+            // For the INPC INotifyPropertyChanged values
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            private DateTime _EventTime;
+            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
+
+            private double _TempInterval;
+            public double TempInterval { get { return _TempInterval; } set { if (value == _TempInterval) return; _TempInterval = value; OnPropertyChanged(); } }
+            private double _PressureInterval;
+            public double PressureInterval { get { return _PressureInterval; } set { if (value == _PressureInterval) return; _PressureInterval = value; OnPropertyChanged(); } }
+            private double _HumidityInterval;
+            public double HumidityInterval { get { return _HumidityInterval; } set { if (value == _HumidityInterval) return; _HumidityInterval = value; OnPropertyChanged(); } }
+            private double _ColorInterval;
+            public double ColorInterval { get { return _ColorInterval; } set { if (value == _ColorInterval) return; _ColorInterval = value; OnPropertyChanged(); } }
+            private double _GasMode;
+            public double GasMode { get { return _GasMode; } set { if (value == _GasMode) return; _GasMode = value; OnPropertyChanged(); } }
+            private double _RedCalibration;
+            public double RedCalibration { get { return _RedCalibration; } set { if (value == _RedCalibration) return; _RedCalibration = value; OnPropertyChanged(); } }
+            private double _GreenCalibration;
+            public double GreenCalibration { get { return _GreenCalibration; } set { if (value == _GreenCalibration) return; _GreenCalibration = value; OnPropertyChanged(); } }
+            private double _BlueCalibration;
+            public double BlueCalibration { get { return _BlueCalibration; } set { if (value == _BlueCalibration) return; _BlueCalibration = value; OnPropertyChanged(); } }
+
+            private String _Note;
+            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+        }
+
+    public DataCollection<Environment_ConfigurationRecord> Environment_ConfigurationRecordData { get; } = new DataCollection<Environment_ConfigurationRecord>();
+    private void OnEnvironment_Configuration_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Environment_ConfigurationRecordData.Count == 0)
+            {
+                Environment_ConfigurationRecordData.AddRecord(new Environment_ConfigurationRecord());
+            }
+            Environment_ConfigurationRecordData[Environment_ConfigurationRecordData.Count - 1].Note = text;
+            e.Handled = true;
+        }
+    }
+
+    // Functions called from the expander
+    private void OnKeepCountEnvironment_Configuration(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Environment_ConfigurationRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmEnvironment_Configuration(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Environment_ConfigurationRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyEnvironment_Configuration(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,TempInterval,PressureInterval,HumidityInterval,ColorInterval,GasMode,RedCalibration,GreenCalibration,BlueCalibration,Notes\n");
+        foreach (var row in Environment_ConfigurationRecordData)
+        {
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.TempInterval},{row.PressureInterval},{row.HumidityInterval},{row.ColorInterval},{row.GasMode},{row.RedCalibration},{row.GreenCalibration},{row.BlueCalibration},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
+
+
+        private async void OnReadEnvironment_Configuration(object sender, RoutedEventArgs e)
+        {
+            await DoReadEnvironment_Configuration();
+        }
+
+        private async Task DoReadEnvironment_Configuration()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
+            ncommand++;
+            try
+            {
+                var valueList = await bleDevice.ReadEnvironment_Configuration();
+                if (valueList == null)
+                {
+                    SetStatus ($"Error: unable to read Environment_Configuration");
+                    return;
+                }
+                
+                var record = new Environment_ConfigurationRecord();
+                var TempInterval = valueList.GetValue("TempInterval");
+                if (TempInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || TempInterval.CurrentType == BCBasic.BCValue.ValueType.IsString || TempInterval.IsArray)
+                {
+                    record.TempInterval = (double)TempInterval.AsDouble;
+                    Environment_Configuration_TempInterval.Text = record.TempInterval.ToString("N0");
+                }
+                var PressureInterval = valueList.GetValue("PressureInterval");
+                if (PressureInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || PressureInterval.CurrentType == BCBasic.BCValue.ValueType.IsString || PressureInterval.IsArray)
+                {
+                    record.PressureInterval = (double)PressureInterval.AsDouble;
+                    Environment_Configuration_PressureInterval.Text = record.PressureInterval.ToString("N0");
+                }
+                var HumidityInterval = valueList.GetValue("HumidityInterval");
+                if (HumidityInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || HumidityInterval.CurrentType == BCBasic.BCValue.ValueType.IsString || HumidityInterval.IsArray)
+                {
+                    record.HumidityInterval = (double)HumidityInterval.AsDouble;
+                    Environment_Configuration_HumidityInterval.Text = record.HumidityInterval.ToString("N0");
+                }
+                var ColorInterval = valueList.GetValue("ColorInterval");
+                if (ColorInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ColorInterval.CurrentType == BCBasic.BCValue.ValueType.IsString || ColorInterval.IsArray)
+                {
+                    record.ColorInterval = (double)ColorInterval.AsDouble;
+                    Environment_Configuration_ColorInterval.Text = record.ColorInterval.ToString("N0");
+                }
+                var GasMode = valueList.GetValue("GasMode");
+                if (GasMode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GasMode.CurrentType == BCBasic.BCValue.ValueType.IsString || GasMode.IsArray)
+                {
+                    record.GasMode = (double)GasMode.AsDouble;
+                    Environment_Configuration_GasMode.Text = record.GasMode.ToString("N0");
+                }
+                var RedCalibration = valueList.GetValue("RedCalibration");
+                if (RedCalibration.CurrentType == BCBasic.BCValue.ValueType.IsDouble || RedCalibration.CurrentType == BCBasic.BCValue.ValueType.IsString || RedCalibration.IsArray)
+                {
+                    record.RedCalibration = (double)RedCalibration.AsDouble;
+                    Environment_Configuration_RedCalibration.Text = record.RedCalibration.ToString("N0");
+                }
+                var GreenCalibration = valueList.GetValue("GreenCalibration");
+                if (GreenCalibration.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GreenCalibration.CurrentType == BCBasic.BCValue.ValueType.IsString || GreenCalibration.IsArray)
+                {
+                    record.GreenCalibration = (double)GreenCalibration.AsDouble;
+                    Environment_Configuration_GreenCalibration.Text = record.GreenCalibration.ToString("N0");
+                }
+                var BlueCalibration = valueList.GetValue("BlueCalibration");
+                if (BlueCalibration.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BlueCalibration.CurrentType == BCBasic.BCValue.ValueType.IsString || BlueCalibration.IsArray)
+                {
+                    record.BlueCalibration = (double)BlueCalibration.AsDouble;
+                    Environment_Configuration_BlueCalibration.Text = record.BlueCalibration.ToString("N0");
+                }
+
+                Environment_ConfigurationRecordData.Add(record);
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus ($"Error: exception: {ex.Message}");
+            }
+        }
+
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickEnvironment_Configuration(object sender, RoutedEventArgs e)
+        {
+            var text = (sender as Button).Tag as String;
+            await DoWriteEnvironment_Configuration (text, System.Globalization.NumberStyles.Integer);
+        }
+
         private async void OnWriteEnvironment_Configuration(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            var text = Environment_Configuration_TempInterval.Text;
+            await DoWriteEnvironment_Configuration (text, System.Globalization.NumberStyles.None);
+        }
+
+        private async Task DoWriteEnvironment_Configuration(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -2590,56 +3169,65 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 string parseError = null;
 
                 UInt16 TempInterval;
-                var parsedTempInterval = Utilities.Parsers.TryParseUInt16(Environment_Configuration_TempInterval.Text, System.Globalization.NumberStyles.None, null, out TempInterval);
+                // History: used to go into Environment_Configuration_TempInterval.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedTempInterval = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out TempInterval);
                 if (!parsedTempInterval)
                 {
                     parseError = "TempInterval";
                 }
-
                 UInt16 PressureInterval;
-                var parsedPressureInterval = Utilities.Parsers.TryParseUInt16(Environment_Configuration_PressureInterval.Text, System.Globalization.NumberStyles.None, null, out PressureInterval);
+                // History: used to go into Environment_Configuration_PressureInterval.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedPressureInterval = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out PressureInterval);
                 if (!parsedPressureInterval)
                 {
                     parseError = "PressureInterval";
                 }
-
                 UInt16 HumidityInterval;
-                var parsedHumidityInterval = Utilities.Parsers.TryParseUInt16(Environment_Configuration_HumidityInterval.Text, System.Globalization.NumberStyles.None, null, out HumidityInterval);
+                // History: used to go into Environment_Configuration_HumidityInterval.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedHumidityInterval = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out HumidityInterval);
                 if (!parsedHumidityInterval)
                 {
                     parseError = "HumidityInterval";
                 }
-
                 UInt16 ColorInterval;
-                var parsedColorInterval = Utilities.Parsers.TryParseUInt16(Environment_Configuration_ColorInterval.Text, System.Globalization.NumberStyles.None, null, out ColorInterval);
+                // History: used to go into Environment_Configuration_ColorInterval.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedColorInterval = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out ColorInterval);
                 if (!parsedColorInterval)
                 {
                     parseError = "ColorInterval";
                 }
-
                 Byte GasMode;
-                var parsedGasMode = Utilities.Parsers.TryParseByte(Environment_Configuration_GasMode.Text, System.Globalization.NumberStyles.None, null, out GasMode);
+                // History: used to go into Environment_Configuration_GasMode.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedGasMode = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out GasMode);
                 if (!parsedGasMode)
                 {
                     parseError = "GasMode";
                 }
-
                 Byte RedCalibration;
-                var parsedRedCalibration = Utilities.Parsers.TryParseByte(Environment_Configuration_RedCalibration.Text, System.Globalization.NumberStyles.None, null, out RedCalibration);
+                // History: used to go into Environment_Configuration_RedCalibration.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedRedCalibration = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out RedCalibration);
                 if (!parsedRedCalibration)
                 {
                     parseError = "RedCalibration";
                 }
-
                 Byte GreenCalibration;
-                var parsedGreenCalibration = Utilities.Parsers.TryParseByte(Environment_Configuration_GreenCalibration.Text, System.Globalization.NumberStyles.None, null, out GreenCalibration);
+                // History: used to go into Environment_Configuration_GreenCalibration.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedGreenCalibration = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out GreenCalibration);
                 if (!parsedGreenCalibration)
                 {
                     parseError = "GreenCalibration";
                 }
-
                 Byte BlueCalibration;
-                var parsedBlueCalibration = Utilities.Parsers.TryParseByte(Environment_Configuration_BlueCalibration.Text, System.Globalization.NumberStyles.None, null, out BlueCalibration);
+                // History: used to go into Environment_Configuration_BlueCalibration.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedBlueCalibration = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out BlueCalibration);
                 if (!parsedBlueCalibration)
                 {
                     parseError = "BlueCalibration";
@@ -2660,241 +3248,8 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             }
         }
 
-        public class Environment_ConfigurationRecord : INotifyPropertyChanged
-        {
-            public Environment_ConfigurationRecord()
-            {
-                this.EventTime = DateTime.Now;
-            }
-            // For the INPC INotifyPropertyChanged values
-            public event PropertyChangedEventHandler PropertyChanged;
-            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-            private DateTime _EventTime;
-            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
-
-            private double _TempInterval;
-            public double TempInterval { get { return _TempInterval; } set { if (value == _TempInterval) return; _TempInterval = value; OnPropertyChanged(); } }
-
-            private double _PressureInterval;
-            public double PressureInterval { get { return _PressureInterval; } set { if (value == _PressureInterval) return; _PressureInterval = value; OnPropertyChanged(); } }
-
-            private double _HumidityInterval;
-            public double HumidityInterval { get { return _HumidityInterval; } set { if (value == _HumidityInterval) return; _HumidityInterval = value; OnPropertyChanged(); } }
-
-            private double _ColorInterval;
-            public double ColorInterval { get { return _ColorInterval; } set { if (value == _ColorInterval) return; _ColorInterval = value; OnPropertyChanged(); } }
-
-            private double _GasMode;
-            public double GasMode { get { return _GasMode; } set { if (value == _GasMode) return; _GasMode = value; OnPropertyChanged(); } }
-
-            private double _RedCalibration;
-            public double RedCalibration { get { return _RedCalibration; } set { if (value == _RedCalibration) return; _RedCalibration = value; OnPropertyChanged(); } }
-
-            private double _GreenCalibration;
-            public double GreenCalibration { get { return _GreenCalibration; } set { if (value == _GreenCalibration) return; _GreenCalibration = value; OnPropertyChanged(); } }
-
-            private double _BlueCalibration;
-            public double BlueCalibration { get { return _BlueCalibration; } set { if (value == _BlueCalibration) return; _BlueCalibration = value; OnPropertyChanged(); } }
-
-            private String _Note;
-            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
-        }
-
-        public DataCollection<Environment_ConfigurationRecord> Environment_ConfigurationRecordData { get; } = new DataCollection<Environment_ConfigurationRecord>();
-        private void OnEnvironment_Configuration_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Environment_ConfigurationRecordData.Count == 0)
-                {
-                    Environment_ConfigurationRecordData.AddRecord(new Environment_ConfigurationRecord());
-                }
-                Environment_ConfigurationRecordData[Environment_ConfigurationRecordData.Count - 1].Note = text;
-                e.Handled = true;
-            }
-        }
-
-        // Functions called from the expander
-        private void OnKeepCountEnvironment_Configuration(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Environment_ConfigurationRecordData.MaxLength = value;
-
-
-        }
-
-        private void OnAlgorithmEnvironment_Configuration(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Environment_ConfigurationRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyEnvironment_Configuration(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,TempInterval,PressureInterval,HumidityInterval,ColorInterval,GasMode,RedCalibration,GreenCalibration,BlueCalibration,Notes\n");
-            foreach (var row in Environment_ConfigurationRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.TempInterval},{row.PressureInterval},{row.HumidityInterval},{row.ColorInterval},{row.GasMode},{row.RedCalibration},{row.GreenCalibration},{row.BlueCalibration},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
-
-        private async void OnReadEnvironment_Configuration(object sender, RoutedEventArgs e)
-        {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
-            ncommand++;
-            try
-            {
-                var valueList = await bleDevice.ReadEnvironment_Configuration();
-                if (valueList == null)
-                {
-                    SetStatus($"Error: unable to read Environment_Configuration");
-                    return;
-                }
-
-                var record = new Environment_ConfigurationRecord();
-
-                var TempInterval = valueList.GetValue("TempInterval");
-                if (TempInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || TempInterval.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.TempInterval = (double)TempInterval.AsDouble;
-                    Environment_Configuration_TempInterval.Text = record.TempInterval.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var PressureInterval = valueList.GetValue("PressureInterval");
-                if (PressureInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || PressureInterval.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.PressureInterval = (double)PressureInterval.AsDouble;
-                    Environment_Configuration_PressureInterval.Text = record.PressureInterval.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var HumidityInterval = valueList.GetValue("HumidityInterval");
-                if (HumidityInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || HumidityInterval.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.HumidityInterval = (double)HumidityInterval.AsDouble;
-                    Environment_Configuration_HumidityInterval.Text = record.HumidityInterval.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var ColorInterval = valueList.GetValue("ColorInterval");
-                if (ColorInterval.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ColorInterval.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.ColorInterval = (double)ColorInterval.AsDouble;
-                    Environment_Configuration_ColorInterval.Text = record.ColorInterval.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var GasMode = valueList.GetValue("GasMode");
-                if (GasMode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GasMode.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.GasMode = (double)GasMode.AsDouble;
-                    Environment_Configuration_GasMode.Text = record.GasMode.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var RedCalibration = valueList.GetValue("RedCalibration");
-                if (RedCalibration.CurrentType == BCBasic.BCValue.ValueType.IsDouble || RedCalibration.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.RedCalibration = (double)RedCalibration.AsDouble;
-                    Environment_Configuration_RedCalibration.Text = record.RedCalibration.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var GreenCalibration = valueList.GetValue("GreenCalibration");
-                if (GreenCalibration.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GreenCalibration.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.GreenCalibration = (double)GreenCalibration.AsDouble;
-                    Environment_Configuration_GreenCalibration.Text = record.GreenCalibration.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var BlueCalibration = valueList.GetValue("BlueCalibration");
-                if (BlueCalibration.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BlueCalibration.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.BlueCalibration = (double)BlueCalibration.AsDouble;
-                    Environment_Configuration_BlueCalibration.Text = record.BlueCalibration.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-
-                Environment_ConfigurationRecordData.Add(record);
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
-
 
         // Functions for UI
-
-
-        private async void OnWriteLED_Characteristics(object sender, RoutedEventArgs e)
-        {
-            SetStatusActive(true);
-            ncommand++;
-            try
-            {
-                // Note: This template isn't smart enough to piece together
-                // multi-field characteristics. It can support simple characterisitics
-                // where there's only one data item.
-                string parseError = null;
-
-                Byte param0;
-                var parsedparam0 = Utilities.Parsers.TryParseByte(LED_Characteristics_param0.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param0);
-                if (!parsedparam0)
-                {
-                    parseError = "param0";
-                }
-
-                Byte param1;
-                var parsedparam1 = Utilities.Parsers.TryParseByte(LED_Characteristics_param1.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param1);
-                if (!parsedparam1)
-                {
-                    parseError = "param1";
-                }
-
-                Byte param2;
-                var parsedparam2 = Utilities.Parsers.TryParseByte(LED_Characteristics_param2.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param2);
-                if (!parsedparam2)
-                {
-                    parseError = "param2";
-                }
-
-                Byte param3;
-                var parsedparam3 = Utilities.Parsers.TryParseByte(LED_Characteristics_param3.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param3);
-                if (!parsedparam3)
-                {
-                    parseError = "param3";
-                }
-
-                if (parseError == null)
-                {
-                    await bleDevice.WriteLED_Characteristics(param0, param1, param2, param3);
-                }
-                else
-                { //NOTE: pop up a dialog?
-                    SetStatus($"Error: could not parse {parseError}");
-                }
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
-
         public class LED_CharacteristicsRecord : INotifyPropertyChanged
         {
             public LED_CharacteristicsRecord()
@@ -2912,13 +3267,10 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
 
             private double _param0;
             public double param0 { get { return _param0; } set { if (value == _param0) return; _param0 = value; OnPropertyChanged(); } }
-
             private double _param1;
             public double param1 { get { return _param1; } set { if (value == _param1) return; _param1 = value; OnPropertyChanged(); } }
-
             private double _param2;
             public double param2 { get { return _param2; } set { if (value == _param2) return; _param2 = value; OnPropertyChanged(); } }
-
             private double _param3;
             public double param3 { get { return _param3; } set { if (value == _param3) return; _param3 = value; OnPropertyChanged(); } }
 
@@ -2926,105 +3278,179 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<LED_CharacteristicsRecord> LED_CharacteristicsRecordData { get; } = new DataCollection<LED_CharacteristicsRecord>();
-        private void OnLED_Characteristics_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<LED_CharacteristicsRecord> LED_CharacteristicsRecordData { get; } = new DataCollection<LED_CharacteristicsRecord>();
+    private void OnLED_Characteristics_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (LED_CharacteristicsRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (LED_CharacteristicsRecordData.Count == 0)
-                {
-                    LED_CharacteristicsRecordData.AddRecord(new LED_CharacteristicsRecord());
-                }
-                LED_CharacteristicsRecordData[LED_CharacteristicsRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                LED_CharacteristicsRecordData.AddRecord(new LED_CharacteristicsRecord());
             }
+            LED_CharacteristicsRecordData[LED_CharacteristicsRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountLED_Characteristics(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountLED_Characteristics(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        LED_CharacteristicsRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmLED_Characteristics(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        LED_CharacteristicsRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyLED_Characteristics(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,param0,param1,param2,param3,Notes\n");
+        foreach (var row in LED_CharacteristicsRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            LED_CharacteristicsRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{row.param2},{row.param3},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmLED_Characteristics(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            LED_CharacteristicsRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyLED_Characteristics(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,param0,param1,param2,param3,Notes\n");
-            foreach (var row in LED_CharacteristicsRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{row.param2},{row.param3},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadLED_Characteristics(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadLED_Characteristics();
+        }
+
+        private async Task DoReadLED_Characteristics()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadLED_Characteristics();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read LED_Characteristics");
+                    SetStatus ($"Error: unable to read LED_Characteristics");
                     return;
                 }
-
+                
                 var record = new LED_CharacteristicsRecord();
-
                 var param0 = valueList.GetValue("param0");
-                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
                 {
                     record.param0 = (double)param0.AsDouble;
-                    LED_Characteristics_param0.Text = record.param0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    LED_Characteristics_param0.Text = record.param0.ToString();
                 }
-
                 var param1 = valueList.GetValue("param1");
-                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString || param1.IsArray)
                 {
                     record.param1 = (double)param1.AsDouble;
-                    LED_Characteristics_param1.Text = record.param1.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    LED_Characteristics_param1.Text = record.param1.ToString();
                 }
-
                 var param2 = valueList.GetValue("param2");
-                if (param2.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param2.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (param2.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param2.CurrentType == BCBasic.BCValue.ValueType.IsString || param2.IsArray)
                 {
                     record.param2 = (double)param2.AsDouble;
-                    LED_Characteristics_param2.Text = record.param2.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    LED_Characteristics_param2.Text = record.param2.ToString();
                 }
-
                 var param3 = valueList.GetValue("param3");
-                if (param3.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param3.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (param3.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param3.CurrentType == BCBasic.BCValue.ValueType.IsString || param3.IsArray)
                 {
                     record.param3 = (double)param3.AsDouble;
-                    LED_Characteristics_param3.Text = record.param3.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    LED_Characteristics_param3.Text = record.param3.ToString();
                 }
-
 
                 LED_CharacteristicsRecordData.Add(record);
 
+            }
+            catch (Exception ex)
+            {
+                SetStatus ($"Error: exception: {ex.Message}");
+            }
+        }
+
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickLED_Characteristics(object sender, RoutedEventArgs e)
+        {
+            var text = (sender as Button).Tag as String;
+            await DoWriteLED_Characteristics (text, System.Globalization.NumberStyles.Integer);
+        }
+
+        private async void OnWriteLED_Characteristics(object sender, RoutedEventArgs e)
+        {
+            var text = LED_Characteristics_param0.Text;
+            await DoWriteLED_Characteristics (text, System.Globalization.NumberStyles.AllowHexSpecifier);
+        }
+
+        private async Task DoWriteLED_Characteristics(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
+            ncommand++;
+            try
+            {
+                // Note: This template isn't smart enough to piece together
+                // multi-field characteristics. It can support simple characterisitics
+                // where there's only one data item.
+                string parseError = null;
+
+                Byte param0;
+                // History: used to go into LED_Characteristics_param0.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam0 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param0);
+                if (!parsedparam0)
+                {
+                    parseError = "param0";
+                }
+                Byte param1;
+                // History: used to go into LED_Characteristics_param1.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam1 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param1);
+                if (!parsedparam1)
+                {
+                    parseError = "param1";
+                }
+                Byte param2;
+                // History: used to go into LED_Characteristics_param2.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam2 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param2);
+                if (!parsedparam2)
+                {
+                    parseError = "param2";
+                }
+                Byte param3;
+                // History: used to go into LED_Characteristics_param3.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam3 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param3);
+                if (!parsedparam3)
+                {
+                    parseError = "param3";
+                }
+
+                if (parseError == null)
+                {
+                    await bleDevice.WriteLED_Characteristics(param0, param1, param2, param3);
+                }
+                else
+                { //NOTE: pop up a dialog?
+                    SetStatus($"Error: could not parse {parseError}");
+                }
             }
             catch (Exception ex)
             {
@@ -3054,58 +3480,58 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<ButtonRecord> ButtonRecordData { get; } = new DataCollection<ButtonRecord>();
-        private void OnButton_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<ButtonRecord> ButtonRecordData { get; } = new DataCollection<ButtonRecord>();
+    private void OnButton_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (ButtonRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (ButtonRecordData.Count == 0)
-                {
-                    ButtonRecordData.AddRecord(new ButtonRecord());
-                }
-                ButtonRecordData[ButtonRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                ButtonRecordData.AddRecord(new ButtonRecord());
             }
+            ButtonRecordData[ButtonRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountButton(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountButton(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        ButtonRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmButton(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        ButtonRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyButton(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Press,Notes\n");
+        foreach (var row in ButtonRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            ButtonRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Press},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmButton(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            ButtonRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyButton(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Press,Notes\n");
-            foreach (var row in ButtonRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Press},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyButtonSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -3116,7 +3542,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool ButtonNotifySetup = false;
         private async void OnNotifyButton(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyButton();
+        }
+
+        private async Task DoNotifyButton()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -3129,7 +3560,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyButtonSettings[ButtonNotifyIndex];
                 ButtonNotifyIndex = (ButtonNotifyIndex + 1) % NotifyButtonSettings.Length;
                 var result = await bleDevice.NotifyButtonAsync(notifyType);
-
+                
 
 
             }
@@ -3145,25 +3576,178 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new ButtonRecord();
+                var Press = valueList.GetValue("Press");
+                if (Press.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Press.CurrentType == BCBasic.BCValue.ValueType.IsString || Press.IsArray)
+                {
+                    record.Press = (double)Press.AsDouble;
+                    Button_Press.Text = record.Press.ToString("N0");
+                }
 
-                    var record = new ButtonRecord();
+                var addResult = ButtonRecordData.AddRecord(record);
 
-                    var Press = valueList.GetValue("Press");
-                    if (Press.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Press.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Press = (double)Press.AsDouble;
-                        Button_Press.Text = record.Press.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = ButtonRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
+        public class External_pinRecord : INotifyPropertyChanged
+        {
+            public External_pinRecord()
+            {
+                this.EventTime = DateTime.Now;
+            }
+            // For the INPC INotifyPropertyChanged values
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            private DateTime _EventTime;
+            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
+
+            private double _param0;
+            public double param0 { get { return _param0; } set { if (value == _param0) return; _param0 = value; OnPropertyChanged(); } }
+            private double _param1;
+            public double param1 { get { return _param1; } set { if (value == _param1) return; _param1 = value; OnPropertyChanged(); } }
+            private double _param2;
+            public double param2 { get { return _param2; } set { if (value == _param2) return; _param2 = value; OnPropertyChanged(); } }
+            private double _param3;
+            public double param3 { get { return _param3; } set { if (value == _param3) return; _param3 = value; OnPropertyChanged(); } }
+
+            private String _Note;
+            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+        }
+
+    public DataCollection<External_pinRecord> External_pinRecordData { get; } = new DataCollection<External_pinRecord>();
+    private void OnExternal_pin_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (External_pinRecordData.Count == 0)
+            {
+                External_pinRecordData.AddRecord(new External_pinRecord());
+            }
+            External_pinRecordData[External_pinRecordData.Count - 1].Note = text;
+            e.Handled = true;
+        }
+    }
+
+    // Functions called from the expander
+    private void OnKeepCountExternal_pin(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        External_pinRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmExternal_pin(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        External_pinRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyExternal_pin(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,param0,param1,param2,param3,Notes\n");
+        foreach (var row in External_pinRecordData)
+        {
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{row.param2},{row.param3},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
+
+
+        private async void OnReadExternal_pin(object sender, RoutedEventArgs e)
+        {
+            await DoReadExternal_pin();
+        }
+
+        private async Task DoReadExternal_pin()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
+            ncommand++;
+            try
+            {
+                var valueList = await bleDevice.ReadExternal_pin();
+                if (valueList == null)
+                {
+                    SetStatus ($"Error: unable to read External_pin");
+                    return;
+                }
+                
+                var record = new External_pinRecord();
+                var param0 = valueList.GetValue("param0");
+                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
+                {
+                    record.param0 = (double)param0.AsDouble;
+                    External_pin_param0.Text = record.param0.ToString();
+                }
+                var param1 = valueList.GetValue("param1");
+                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString || param1.IsArray)
+                {
+                    record.param1 = (double)param1.AsDouble;
+                    External_pin_param1.Text = record.param1.ToString();
+                }
+                var param2 = valueList.GetValue("param2");
+                if (param2.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param2.CurrentType == BCBasic.BCValue.ValueType.IsString || param2.IsArray)
+                {
+                    record.param2 = (double)param2.AsDouble;
+                    External_pin_param2.Text = record.param2.ToString();
+                }
+                var param3 = valueList.GetValue("param3");
+                if (param3.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param3.CurrentType == BCBasic.BCValue.ValueType.IsString || param3.IsArray)
+                {
+                    record.param3 = (double)param3.AsDouble;
+                    External_pin_param3.Text = record.param3.ToString();
+                }
+
+                External_pinRecordData.Add(record);
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus ($"Error: exception: {ex.Message}");
+            }
+        }
+
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickExternal_pin(object sender, RoutedEventArgs e)
+        {
+            var text = (sender as Button).Tag as String;
+            await DoWriteExternal_pin (text, System.Globalization.NumberStyles.Integer);
+        }
+
         private async void OnWriteExternal_pin(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            var text = External_pin_param0.Text;
+            await DoWriteExternal_pin (text, System.Globalization.NumberStyles.AllowHexSpecifier);
+        }
+
+        private async Task DoWriteExternal_pin(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -3173,28 +3757,33 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 string parseError = null;
 
                 Byte param0;
-                var parsedparam0 = Utilities.Parsers.TryParseByte(External_pin_param0.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param0);
+                // History: used to go into External_pin_param0.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam0 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param0);
                 if (!parsedparam0)
                 {
                     parseError = "param0";
                 }
-
                 Byte param1;
-                var parsedparam1 = Utilities.Parsers.TryParseByte(External_pin_param1.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param1);
+                // History: used to go into External_pin_param1.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam1 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param1);
                 if (!parsedparam1)
                 {
                     parseError = "param1";
                 }
-
                 Byte param2;
-                var parsedparam2 = Utilities.Parsers.TryParseByte(External_pin_param2.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param2);
+                // History: used to go into External_pin_param2.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam2 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param2);
                 if (!parsedparam2)
                 {
                     parseError = "param2";
                 }
-
                 Byte param3;
-                var parsedparam3 = Utilities.Parsers.TryParseByte(External_pin_param3.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param3);
+                // History: used to go into External_pin_param3.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam3 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param3);
                 if (!parsedparam3)
                 {
                     parseError = "param3";
@@ -3215,208 +3804,8 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             }
         }
 
-        public class External_pinRecord : INotifyPropertyChanged
-        {
-            public External_pinRecord()
-            {
-                this.EventTime = DateTime.Now;
-            }
-            // For the INPC INotifyPropertyChanged values
-            public event PropertyChangedEventHandler PropertyChanged;
-            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-            private DateTime _EventTime;
-            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
-
-            private double _param0;
-            public double param0 { get { return _param0; } set { if (value == _param0) return; _param0 = value; OnPropertyChanged(); } }
-
-            private double _param1;
-            public double param1 { get { return _param1; } set { if (value == _param1) return; _param1 = value; OnPropertyChanged(); } }
-
-            private double _param2;
-            public double param2 { get { return _param2; } set { if (value == _param2) return; _param2 = value; OnPropertyChanged(); } }
-
-            private double _param3;
-            public double param3 { get { return _param3; } set { if (value == _param3) return; _param3 = value; OnPropertyChanged(); } }
-
-            private String _Note;
-            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
-        }
-
-        public DataCollection<External_pinRecord> External_pinRecordData { get; } = new DataCollection<External_pinRecord>();
-        private void OnExternal_pin_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (External_pinRecordData.Count == 0)
-                {
-                    External_pinRecordData.AddRecord(new External_pinRecord());
-                }
-                External_pinRecordData[External_pinRecordData.Count - 1].Note = text;
-                e.Handled = true;
-            }
-        }
-
-        // Functions called from the expander
-        private void OnKeepCountExternal_pin(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            External_pinRecordData.MaxLength = value;
-
-
-        }
-
-        private void OnAlgorithmExternal_pin(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            External_pinRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyExternal_pin(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,param0,param1,param2,param3,Notes\n");
-            foreach (var row in External_pinRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{row.param2},{row.param3},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
-
-        private async void OnReadExternal_pin(object sender, RoutedEventArgs e)
-        {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
-            ncommand++;
-            try
-            {
-                var valueList = await bleDevice.ReadExternal_pin();
-                if (valueList == null)
-                {
-                    SetStatus($"Error: unable to read External_pin");
-                    return;
-                }
-
-                var record = new External_pinRecord();
-
-                var param0 = valueList.GetValue("param0");
-                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.param0 = (double)param0.AsDouble;
-                    External_pin_param0.Text = record.param0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var param1 = valueList.GetValue("param1");
-                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.param1 = (double)param1.AsDouble;
-                    External_pin_param1.Text = record.param1.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var param2 = valueList.GetValue("param2");
-                if (param2.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param2.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.param2 = (double)param2.AsDouble;
-                    External_pin_param2.Text = record.param2.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var param3 = valueList.GetValue("param3");
-                if (param3.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param3.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.param3 = (double)param3.AsDouble;
-                    External_pin_param3.Text = record.param3.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-
-                External_pinRecordData.Add(record);
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
-
 
         // Functions for Motion
-
-
-        private async void OnWriteMotion_Configuration(object sender, RoutedEventArgs e)
-        {
-            SetStatusActive(true);
-            ncommand++;
-            try
-            {
-                // Note: This template isn't smart enough to piece together
-                // multi-field characteristics. It can support simple characterisitics
-                // where there's only one data item.
-                string parseError = null;
-
-                UInt16 param0;
-                var parsedparam0 = Utilities.Parsers.TryParseUInt16(Motion_Configuration_param0.Text, System.Globalization.NumberStyles.None, null, out param0);
-                if (!parsedparam0)
-                {
-                    parseError = "param0";
-                }
-
-                UInt16 param1;
-                var parsedparam1 = Utilities.Parsers.TryParseUInt16(Motion_Configuration_param1.Text, System.Globalization.NumberStyles.None, null, out param1);
-                if (!parsedparam1)
-                {
-                    parseError = "param1";
-                }
-
-                UInt16 param2;
-                var parsedparam2 = Utilities.Parsers.TryParseUInt16(Motion_Configuration_param2.Text, System.Globalization.NumberStyles.None, null, out param2);
-                if (!parsedparam2)
-                {
-                    parseError = "param2";
-                }
-
-                UInt16 param3;
-                var parsedparam3 = Utilities.Parsers.TryParseUInt16(Motion_Configuration_param3.Text, System.Globalization.NumberStyles.None, null, out param3);
-                if (!parsedparam3)
-                {
-                    parseError = "param3";
-                }
-
-                Byte param4;
-                var parsedparam4 = Utilities.Parsers.TryParseByte(Motion_Configuration_param4.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out param4);
-                if (!parsedparam4)
-                {
-                    parseError = "param4";
-                }
-
-                if (parseError == null)
-                {
-                    await bleDevice.WriteMotion_Configuration(param0, param1, param2, param3, param4);
-                }
-                else
-                { //NOTE: pop up a dialog?
-                    SetStatus($"Error: could not parse {parseError}");
-                }
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
-
         public class Motion_ConfigurationRecord : INotifyPropertyChanged
         {
             public Motion_ConfigurationRecord()
@@ -3434,16 +3823,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
 
             private double _param0;
             public double param0 { get { return _param0; } set { if (value == _param0) return; _param0 = value; OnPropertyChanged(); } }
-
             private double _param1;
             public double param1 { get { return _param1; } set { if (value == _param1) return; _param1 = value; OnPropertyChanged(); } }
-
             private double _param2;
             public double param2 { get { return _param2; } set { if (value == _param2) return; _param2 = value; OnPropertyChanged(); } }
-
             private double _param3;
             public double param3 { get { return _param3; } set { if (value == _param3) return; _param3 = value; OnPropertyChanged(); } }
-
             private double _param4;
             public double param4 { get { return _param4; } set { if (value == _param4) return; _param4 = value; OnPropertyChanged(); } }
 
@@ -3451,112 +3836,193 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Motion_ConfigurationRecord> Motion_ConfigurationRecordData { get; } = new DataCollection<Motion_ConfigurationRecord>();
-        private void OnMotion_Configuration_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Motion_ConfigurationRecord> Motion_ConfigurationRecordData { get; } = new DataCollection<Motion_ConfigurationRecord>();
+    private void OnMotion_Configuration_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Motion_ConfigurationRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Motion_ConfigurationRecordData.Count == 0)
-                {
-                    Motion_ConfigurationRecordData.AddRecord(new Motion_ConfigurationRecord());
-                }
-                Motion_ConfigurationRecordData[Motion_ConfigurationRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Motion_ConfigurationRecordData.AddRecord(new Motion_ConfigurationRecord());
             }
+            Motion_ConfigurationRecordData[Motion_ConfigurationRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountMotion_Configuration(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountMotion_Configuration(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Motion_ConfigurationRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmMotion_Configuration(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Motion_ConfigurationRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyMotion_Configuration(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,param0,param1,param2,param3,param4,Notes\n");
+        foreach (var row in Motion_ConfigurationRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Motion_ConfigurationRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{row.param2},{row.param3},{row.param4},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmMotion_Configuration(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Motion_ConfigurationRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyMotion_Configuration(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,param0,param1,param2,param3,param4,Notes\n");
-            foreach (var row in Motion_ConfigurationRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{row.param2},{row.param3},{row.param4},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadMotion_Configuration(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            await DoReadMotion_Configuration();
+        }
+
+        private async Task DoReadMotion_Configuration()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
                 var valueList = await bleDevice.ReadMotion_Configuration();
                 if (valueList == null)
                 {
-                    SetStatus($"Error: unable to read Motion_Configuration");
+                    SetStatus ($"Error: unable to read Motion_Configuration");
                     return;
                 }
-
+                
                 var record = new Motion_ConfigurationRecord();
-
                 var param0 = valueList.GetValue("param0");
-                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
                 {
                     record.param0 = (double)param0.AsDouble;
-                    Motion_Configuration_param0.Text = record.param0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Motion_Configuration_param0.Text = record.param0.ToString("N0");
                 }
-
                 var param1 = valueList.GetValue("param1");
-                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString || param1.IsArray)
                 {
                     record.param1 = (double)param1.AsDouble;
-                    Motion_Configuration_param1.Text = record.param1.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Motion_Configuration_param1.Text = record.param1.ToString("N0");
                 }
-
                 var param2 = valueList.GetValue("param2");
-                if (param2.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param2.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (param2.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param2.CurrentType == BCBasic.BCValue.ValueType.IsString || param2.IsArray)
                 {
                     record.param2 = (double)param2.AsDouble;
-                    Motion_Configuration_param2.Text = record.param2.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Motion_Configuration_param2.Text = record.param2.ToString("N0");
                 }
-
                 var param3 = valueList.GetValue("param3");
-                if (param3.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param3.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (param3.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param3.CurrentType == BCBasic.BCValue.ValueType.IsString || param3.IsArray)
                 {
                     record.param3 = (double)param3.AsDouble;
-                    Motion_Configuration_param3.Text = record.param3.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Motion_Configuration_param3.Text = record.param3.ToString("N0");
                 }
-
                 var param4 = valueList.GetValue("param4");
-                if (param4.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param4.CurrentType == BCBasic.BCValue.ValueType.IsString)
+                if (param4.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param4.CurrentType == BCBasic.BCValue.ValueType.IsString || param4.IsArray)
                 {
                     record.param4 = (double)param4.AsDouble;
-                    Motion_Configuration_param4.Text = record.param4.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Motion_Configuration_param4.Text = record.param4.ToString();
                 }
-
 
                 Motion_ConfigurationRecordData.Add(record);
 
+            }
+            catch (Exception ex)
+            {
+                SetStatus ($"Error: exception: {ex.Message}");
+            }
+        }
+
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickMotion_Configuration(object sender, RoutedEventArgs e)
+        {
+            var text = (sender as Button).Tag as String;
+            await DoWriteMotion_Configuration (text, System.Globalization.NumberStyles.Integer);
+        }
+
+        private async void OnWriteMotion_Configuration(object sender, RoutedEventArgs e)
+        {
+            var text = Motion_Configuration_param0.Text;
+            await DoWriteMotion_Configuration (text, System.Globalization.NumberStyles.None);
+        }
+
+        private async Task DoWriteMotion_Configuration(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
+            ncommand++;
+            try
+            {
+                // Note: This template isn't smart enough to piece together
+                // multi-field characteristics. It can support simple characterisitics
+                // where there's only one data item.
+                string parseError = null;
+
+                UInt16 param0;
+                // History: used to go into Motion_Configuration_param0.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam0 = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out param0);
+                if (!parsedparam0)
+                {
+                    parseError = "param0";
+                }
+                UInt16 param1;
+                // History: used to go into Motion_Configuration_param1.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam1 = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out param1);
+                if (!parsedparam1)
+                {
+                    parseError = "param1";
+                }
+                UInt16 param2;
+                // History: used to go into Motion_Configuration_param2.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam2 = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out param2);
+                if (!parsedparam2)
+                {
+                    parseError = "param2";
+                }
+                UInt16 param3;
+                // History: used to go into Motion_Configuration_param3.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam3 = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out param3);
+                if (!parsedparam3)
+                {
+                    parseError = "param3";
+                }
+                Byte param4;
+                // History: used to go into Motion_Configuration_param4.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedparam4 = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out param4);
+                if (!parsedparam4)
+                {
+                    parseError = "param4";
+                }
+
+                if (parseError == null)
+                {
+                    await bleDevice.WriteMotion_Configuration(param0, param1, param2, param3, param4);
+                }
+                else
+                { //NOTE: pop up a dialog?
+                    SetStatus($"Error: could not parse {parseError}");
+                }
             }
             catch (Exception ex)
             {
@@ -3581,7 +4047,6 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
 
             private double _param0;
             public double param0 { get { return _param0; } set { if (value == _param0) return; _param0 = value; OnPropertyChanged(); } }
-
             private double _param1;
             public double param1 { get { return _param1; } set { if (value == _param1) return; _param1 = value; OnPropertyChanged(); } }
 
@@ -3589,58 +4054,58 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<TapsRecord> TapsRecordData { get; } = new DataCollection<TapsRecord>();
-        private void OnTaps_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<TapsRecord> TapsRecordData { get; } = new DataCollection<TapsRecord>();
+    private void OnTaps_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (TapsRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (TapsRecordData.Count == 0)
-                {
-                    TapsRecordData.AddRecord(new TapsRecord());
-                }
-                TapsRecordData[TapsRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                TapsRecordData.AddRecord(new TapsRecord());
             }
+            TapsRecordData[TapsRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountTaps(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountTaps(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        TapsRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmTaps(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        TapsRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyTaps(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,param0,param1,Notes\n");
+        foreach (var row in TapsRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            TapsRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmTaps(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            TapsRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyTaps(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,param0,param1,Notes\n");
-            foreach (var row in TapsRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyTapsSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -3651,7 +4116,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool TapsNotifySetup = false;
         private async void OnNotifyTaps(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyTaps();
+        }
+
+        private async Task DoNotifyTaps()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -3664,7 +4134,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyTapsSettings[TapsNotifyIndex];
                 TapsNotifyIndex = (TapsNotifyIndex + 1) % NotifyTapsSettings.Length;
                 var result = await bleDevice.NotifyTapsAsync(notifyType);
-
+                
 
 
             }
@@ -3680,29 +4150,32 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new TapsRecord();
+                var param0 = valueList.GetValue("param0");
+                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
+                {
+                    record.param0 = (double)param0.AsDouble;
+                    Taps_param0.Text = record.param0.ToString();
+                }
+                var param1 = valueList.GetValue("param1");
+                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString || param1.IsArray)
+                {
+                    record.param1 = (double)param1.AsDouble;
+                    Taps_param1.Text = record.param1.ToString("N0");
+                }
 
-                    var record = new TapsRecord();
+                var addResult = TapsRecordData.AddRecord(record);
 
-                    var param0 = valueList.GetValue("param0");
-                    if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param0 = (double)param0.AsDouble;
-                        Taps_param0.Text = record.param0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var param1 = valueList.GetValue("param1");
-                    if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param1 = (double)param1.AsDouble;
-                        Taps_param1.Text = record.param1.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = TapsRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class OrientationRecord : INotifyPropertyChanged
         {
             public OrientationRecord()
@@ -3725,58 +4198,58 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<OrientationRecord> OrientationRecordData { get; } = new DataCollection<OrientationRecord>();
-        private void OnOrientation_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<OrientationRecord> OrientationRecordData { get; } = new DataCollection<OrientationRecord>();
+    private void OnOrientation_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (OrientationRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (OrientationRecordData.Count == 0)
-                {
-                    OrientationRecordData.AddRecord(new OrientationRecord());
-                }
-                OrientationRecordData[OrientationRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                OrientationRecordData.AddRecord(new OrientationRecord());
             }
+            OrientationRecordData[OrientationRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountOrientation(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountOrientation(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        OrientationRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmOrientation(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        OrientationRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyOrientation(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,param0,Notes\n");
+        foreach (var row in OrientationRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            OrientationRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmOrientation(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            OrientationRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyOrientation(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,param0,Notes\n");
-            foreach (var row in OrientationRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyOrientationSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -3787,7 +4260,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool OrientationNotifySetup = false;
         private async void OnNotifyOrientation(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyOrientation();
+        }
+
+        private async Task DoNotifyOrientation()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -3800,7 +4278,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyOrientationSettings[OrientationNotifyIndex];
                 OrientationNotifyIndex = (OrientationNotifyIndex + 1) % NotifyOrientationSettings.Length;
                 var result = await bleDevice.NotifyOrientationAsync(notifyType);
-
+                
 
 
             }
@@ -3816,22 +4294,26 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new OrientationRecord();
+                var param0 = valueList.GetValue("param0");
+                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
+                {
+                    record.param0 = (double)param0.AsDouble;
+                    Orientation_param0.Text = record.param0.ToString("N0");
+                }
 
-                    var record = new OrientationRecord();
+                var addResult = OrientationRecordData.AddRecord(record);
 
-                    var param0 = valueList.GetValue("param0");
-                    if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param0 = (double)param0.AsDouble;
-                        Orientation_param0.Text = record.param0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = OrientationRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class QuaternionsRecord : INotifyPropertyChanged
         {
             public QuaternionsRecord()
@@ -3849,13 +4331,10 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
 
             private double _W;
             public double W { get { return _W; } set { if (value == _W) return; _W = value; OnPropertyChanged(); } }
-
             private double _X;
             public double X { get { return _X; } set { if (value == _X) return; _X = value; OnPropertyChanged(); } }
-
             private double _Y;
             public double Y { get { return _Y; } set { if (value == _Y) return; _Y = value; OnPropertyChanged(); } }
-
             private double _Z;
             public double Z { get { return _Z; } set { if (value == _Z) return; _Z = value; OnPropertyChanged(); } }
 
@@ -3863,58 +4342,58 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<QuaternionsRecord> QuaternionsRecordData { get; } = new DataCollection<QuaternionsRecord>();
-        private void OnQuaternions_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<QuaternionsRecord> QuaternionsRecordData { get; } = new DataCollection<QuaternionsRecord>();
+    private void OnQuaternions_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (QuaternionsRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (QuaternionsRecordData.Count == 0)
-                {
-                    QuaternionsRecordData.AddRecord(new QuaternionsRecord());
-                }
-                QuaternionsRecordData[QuaternionsRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                QuaternionsRecordData.AddRecord(new QuaternionsRecord());
             }
+            QuaternionsRecordData[QuaternionsRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountQuaternions(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountQuaternions(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        QuaternionsRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmQuaternions(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        QuaternionsRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyQuaternions(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,W,X,Y,Z,Notes\n");
+        foreach (var row in QuaternionsRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            QuaternionsRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.W},{row.X},{row.Y},{row.Z},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmQuaternions(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            QuaternionsRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyQuaternions(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,W,X,Y,Z,Notes\n");
-            foreach (var row in QuaternionsRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.W},{row.X},{row.Y},{row.Z},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyQuaternionsSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -3925,7 +4404,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool QuaternionsNotifySetup = false;
         private async void OnNotifyQuaternions(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyQuaternions();
+        }
+
+        private async Task DoNotifyQuaternions()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -3938,7 +4422,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyQuaternionsSettings[QuaternionsNotifyIndex];
                 QuaternionsNotifyIndex = (QuaternionsNotifyIndex + 1) % NotifyQuaternionsSettings.Length;
                 var result = await bleDevice.NotifyQuaternionsAsync(notifyType);
-
+                
 
 
             }
@@ -3954,43 +4438,44 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new QuaternionsRecord();
+                var W = valueList.GetValue("W");
+                if (W.CurrentType == BCBasic.BCValue.ValueType.IsDouble || W.CurrentType == BCBasic.BCValue.ValueType.IsString || W.IsArray)
+                {
+                    record.W = (double)W.AsDouble;
+                    Quaternions_W.Text = record.W.ToString("N0");
+                }
+                var X = valueList.GetValue("X");
+                if (X.CurrentType == BCBasic.BCValue.ValueType.IsDouble || X.CurrentType == BCBasic.BCValue.ValueType.IsString || X.IsArray)
+                {
+                    record.X = (double)X.AsDouble;
+                    Quaternions_X.Text = record.X.ToString("N0");
+                }
+                var Y = valueList.GetValue("Y");
+                if (Y.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Y.CurrentType == BCBasic.BCValue.ValueType.IsString || Y.IsArray)
+                {
+                    record.Y = (double)Y.AsDouble;
+                    Quaternions_Y.Text = record.Y.ToString("N0");
+                }
+                var Z = valueList.GetValue("Z");
+                if (Z.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Z.CurrentType == BCBasic.BCValue.ValueType.IsString || Z.IsArray)
+                {
+                    record.Z = (double)Z.AsDouble;
+                    Quaternions_Z.Text = record.Z.ToString("N0");
+                }
 
-                    var record = new QuaternionsRecord();
+                var addResult = QuaternionsRecordData.AddRecord(record);
 
-                    var W = valueList.GetValue("W");
-                    if (W.CurrentType == BCBasic.BCValue.ValueType.IsDouble || W.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.W = (double)W.AsDouble;
-                        Quaternions_W.Text = record.W.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var X = valueList.GetValue("X");
-                    if (X.CurrentType == BCBasic.BCValue.ValueType.IsDouble || X.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.X = (double)X.AsDouble;
-                        Quaternions_X.Text = record.X.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var Y = valueList.GetValue("Y");
-                    if (Y.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Y.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Y = (double)Y.AsDouble;
-                        Quaternions_Y.Text = record.Y.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var Z = valueList.GetValue("Z");
-                    if (Z.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Z.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Z = (double)Z.AsDouble;
-                        Quaternions_Z.Text = record.Z.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = QuaternionsRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class Step_CounterRecord : INotifyPropertyChanged
         {
             public Step_CounterRecord()
@@ -4008,7 +4493,6 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
 
             private double _Steps;
             public double Steps { get { return _Steps; } set { if (value == _Steps) return; _Steps = value; OnPropertyChanged(); } }
-
             private double _Time;
             public double Time { get { return _Time; } set { if (value == _Time) return; _Time = value; OnPropertyChanged(); } }
 
@@ -4016,58 +4500,58 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Step_CounterRecord> Step_CounterRecordData { get; } = new DataCollection<Step_CounterRecord>();
-        private void OnStep_Counter_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Step_CounterRecord> Step_CounterRecordData { get; } = new DataCollection<Step_CounterRecord>();
+    private void OnStep_Counter_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Step_CounterRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Step_CounterRecordData.Count == 0)
-                {
-                    Step_CounterRecordData.AddRecord(new Step_CounterRecord());
-                }
-                Step_CounterRecordData[Step_CounterRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Step_CounterRecordData.AddRecord(new Step_CounterRecord());
             }
+            Step_CounterRecordData[Step_CounterRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountStep_Counter(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountStep_Counter(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Step_CounterRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmStep_Counter(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Step_CounterRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyStep_Counter(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Steps,Time,Notes\n");
+        foreach (var row in Step_CounterRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Step_CounterRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Steps},{row.Time},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmStep_Counter(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Step_CounterRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyStep_Counter(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Steps,Time,Notes\n");
-            foreach (var row in Step_CounterRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Steps},{row.Time},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyStep_CounterSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -4078,7 +4562,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool Step_CounterNotifySetup = false;
         private async void OnNotifyStep_Counter(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyStep_Counter();
+        }
+
+        private async Task DoNotifyStep_Counter()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -4091,7 +4580,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyStep_CounterSettings[Step_CounterNotifyIndex];
                 Step_CounterNotifyIndex = (Step_CounterNotifyIndex + 1) % NotifyStep_CounterSettings.Length;
                 var result = await bleDevice.NotifyStep_CounterAsync(notifyType);
-
+                
 
 
             }
@@ -4107,29 +4596,32 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new Step_CounterRecord();
+                var Steps = valueList.GetValue("Steps");
+                if (Steps.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Steps.CurrentType == BCBasic.BCValue.ValueType.IsString || Steps.IsArray)
+                {
+                    record.Steps = (double)Steps.AsDouble;
+                    Step_Counter_Steps.Text = record.Steps.ToString("N0");
+                }
+                var Time = valueList.GetValue("Time");
+                if (Time.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Time.CurrentType == BCBasic.BCValue.ValueType.IsString || Time.IsArray)
+                {
+                    record.Time = (double)Time.AsDouble;
+                    Step_Counter_Time.Text = record.Time.ToString("N0");
+                }
 
-                    var record = new Step_CounterRecord();
+                var addResult = Step_CounterRecordData.AddRecord(record);
 
-                    var Steps = valueList.GetValue("Steps");
-                    if (Steps.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Steps.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Steps = (double)Steps.AsDouble;
-                        Step_Counter_Steps.Text = record.Steps.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var Time = valueList.GetValue("Time");
-                    if (Time.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Time.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Time = (double)Time.AsDouble;
-                        Step_Counter_Time.Text = record.Time.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = Step_CounterRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class Raw_MotionRecord : INotifyPropertyChanged
         {
             public Raw_MotionRecord()
@@ -4147,28 +4639,20 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
 
             private double _AccelX;
             public double AccelX { get { return _AccelX; } set { if (value == _AccelX) return; _AccelX = value; OnPropertyChanged(); } }
-
             private double _AccelY;
             public double AccelY { get { return _AccelY; } set { if (value == _AccelY) return; _AccelY = value; OnPropertyChanged(); } }
-
             private double _AccelZ;
             public double AccelZ { get { return _AccelZ; } set { if (value == _AccelZ) return; _AccelZ = value; OnPropertyChanged(); } }
-
             private double _GyroX;
             public double GyroX { get { return _GyroX; } set { if (value == _GyroX) return; _GyroX = value; OnPropertyChanged(); } }
-
             private double _GyroY;
             public double GyroY { get { return _GyroY; } set { if (value == _GyroY) return; _GyroY = value; OnPropertyChanged(); } }
-
             private double _GyroZ;
             public double GyroZ { get { return _GyroZ; } set { if (value == _GyroZ) return; _GyroZ = value; OnPropertyChanged(); } }
-
             private double _CompassX;
             public double CompassX { get { return _CompassX; } set { if (value == _CompassX) return; _CompassX = value; OnPropertyChanged(); } }
-
             private double _CompassY;
             public double CompassY { get { return _CompassY; } set { if (value == _CompassY) return; _CompassY = value; OnPropertyChanged(); } }
-
             private double _CompassZ;
             public double CompassZ { get { return _CompassZ; } set { if (value == _CompassZ) return; _CompassZ = value; OnPropertyChanged(); } }
 
@@ -4176,58 +4660,58 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Raw_MotionRecord> Raw_MotionRecordData { get; } = new DataCollection<Raw_MotionRecord>();
-        private void OnRaw_Motion_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Raw_MotionRecord> Raw_MotionRecordData { get; } = new DataCollection<Raw_MotionRecord>();
+    private void OnRaw_Motion_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Raw_MotionRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Raw_MotionRecordData.Count == 0)
-                {
-                    Raw_MotionRecordData.AddRecord(new Raw_MotionRecord());
-                }
-                Raw_MotionRecordData[Raw_MotionRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Raw_MotionRecordData.AddRecord(new Raw_MotionRecord());
             }
+            Raw_MotionRecordData[Raw_MotionRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountRaw_Motion(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountRaw_Motion(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Raw_MotionRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmRaw_Motion(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Raw_MotionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyRaw_Motion(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,AccelX,AccelY,AccelZ,GyroX,GyroY,GyroZ,CompassX,CompassY,CompassZ,Notes\n");
+        foreach (var row in Raw_MotionRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Raw_MotionRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.AccelX},{row.AccelY},{row.AccelZ},{row.GyroX},{row.GyroY},{row.GyroZ},{row.CompassX},{row.CompassY},{row.CompassZ},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmRaw_Motion(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Raw_MotionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyRaw_Motion(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,AccelX,AccelY,AccelZ,GyroX,GyroY,GyroZ,CompassX,CompassY,CompassZ,Notes\n");
-            foreach (var row in Raw_MotionRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.AccelX},{row.AccelY},{row.AccelZ},{row.GyroX},{row.GyroY},{row.GyroZ},{row.CompassX},{row.CompassY},{row.CompassZ},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyRaw_MotionSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -4238,7 +4722,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool Raw_MotionNotifySetup = false;
         private async void OnNotifyRaw_Motion(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyRaw_Motion();
+        }
+
+        private async Task DoNotifyRaw_Motion()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -4251,7 +4740,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyRaw_MotionSettings[Raw_MotionNotifyIndex];
                 Raw_MotionNotifyIndex = (Raw_MotionNotifyIndex + 1) % NotifyRaw_MotionSettings.Length;
                 var result = await bleDevice.NotifyRaw_MotionAsync(notifyType);
-
+                
 
 
             }
@@ -4267,78 +4756,74 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new Raw_MotionRecord();
+                var AccelX = valueList.GetValue("AccelX");
+                if (AccelX.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AccelX.CurrentType == BCBasic.BCValue.ValueType.IsString || AccelX.IsArray)
+                {
+                    record.AccelX = (double)AccelX.AsDouble;
+                    Raw_Motion_AccelX.Text = record.AccelX.ToString("N0");
+                }
+                var AccelY = valueList.GetValue("AccelY");
+                if (AccelY.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AccelY.CurrentType == BCBasic.BCValue.ValueType.IsString || AccelY.IsArray)
+                {
+                    record.AccelY = (double)AccelY.AsDouble;
+                    Raw_Motion_AccelY.Text = record.AccelY.ToString("N0");
+                }
+                var AccelZ = valueList.GetValue("AccelZ");
+                if (AccelZ.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AccelZ.CurrentType == BCBasic.BCValue.ValueType.IsString || AccelZ.IsArray)
+                {
+                    record.AccelZ = (double)AccelZ.AsDouble;
+                    Raw_Motion_AccelZ.Text = record.AccelZ.ToString("N0");
+                }
+                var GyroX = valueList.GetValue("GyroX");
+                if (GyroX.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GyroX.CurrentType == BCBasic.BCValue.ValueType.IsString || GyroX.IsArray)
+                {
+                    record.GyroX = (double)GyroX.AsDouble;
+                    Raw_Motion_GyroX.Text = record.GyroX.ToString("N0");
+                }
+                var GyroY = valueList.GetValue("GyroY");
+                if (GyroY.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GyroY.CurrentType == BCBasic.BCValue.ValueType.IsString || GyroY.IsArray)
+                {
+                    record.GyroY = (double)GyroY.AsDouble;
+                    Raw_Motion_GyroY.Text = record.GyroY.ToString("N0");
+                }
+                var GyroZ = valueList.GetValue("GyroZ");
+                if (GyroZ.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GyroZ.CurrentType == BCBasic.BCValue.ValueType.IsString || GyroZ.IsArray)
+                {
+                    record.GyroZ = (double)GyroZ.AsDouble;
+                    Raw_Motion_GyroZ.Text = record.GyroZ.ToString("N0");
+                }
+                var CompassX = valueList.GetValue("CompassX");
+                if (CompassX.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CompassX.CurrentType == BCBasic.BCValue.ValueType.IsString || CompassX.IsArray)
+                {
+                    record.CompassX = (double)CompassX.AsDouble;
+                    Raw_Motion_CompassX.Text = record.CompassX.ToString("N0");
+                }
+                var CompassY = valueList.GetValue("CompassY");
+                if (CompassY.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CompassY.CurrentType == BCBasic.BCValue.ValueType.IsString || CompassY.IsArray)
+                {
+                    record.CompassY = (double)CompassY.AsDouble;
+                    Raw_Motion_CompassY.Text = record.CompassY.ToString("N0");
+                }
+                var CompassZ = valueList.GetValue("CompassZ");
+                if (CompassZ.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CompassZ.CurrentType == BCBasic.BCValue.ValueType.IsString || CompassZ.IsArray)
+                {
+                    record.CompassZ = (double)CompassZ.AsDouble;
+                    Raw_Motion_CompassZ.Text = record.CompassZ.ToString("N0");
+                }
 
-                    var record = new Raw_MotionRecord();
+                var addResult = Raw_MotionRecordData.AddRecord(record);
 
-                    var AccelX = valueList.GetValue("AccelX");
-                    if (AccelX.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AccelX.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.AccelX = (double)AccelX.AsDouble;
-                        Raw_Motion_AccelX.Text = record.AccelX.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var AccelY = valueList.GetValue("AccelY");
-                    if (AccelY.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AccelY.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.AccelY = (double)AccelY.AsDouble;
-                        Raw_Motion_AccelY.Text = record.AccelY.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var AccelZ = valueList.GetValue("AccelZ");
-                    if (AccelZ.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AccelZ.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.AccelZ = (double)AccelZ.AsDouble;
-                        Raw_Motion_AccelZ.Text = record.AccelZ.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var GyroX = valueList.GetValue("GyroX");
-                    if (GyroX.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GyroX.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.GyroX = (double)GyroX.AsDouble;
-                        Raw_Motion_GyroX.Text = record.GyroX.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var GyroY = valueList.GetValue("GyroY");
-                    if (GyroY.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GyroY.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.GyroY = (double)GyroY.AsDouble;
-                        Raw_Motion_GyroY.Text = record.GyroY.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var GyroZ = valueList.GetValue("GyroZ");
-                    if (GyroZ.CurrentType == BCBasic.BCValue.ValueType.IsDouble || GyroZ.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.GyroZ = (double)GyroZ.AsDouble;
-                        Raw_Motion_GyroZ.Text = record.GyroZ.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var CompassX = valueList.GetValue("CompassX");
-                    if (CompassX.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CompassX.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.CompassX = (double)CompassX.AsDouble;
-                        Raw_Motion_CompassX.Text = record.CompassX.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var CompassY = valueList.GetValue("CompassY");
-                    if (CompassY.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CompassY.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.CompassY = (double)CompassY.AsDouble;
-                        Raw_Motion_CompassY.Text = record.CompassY.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var CompassZ = valueList.GetValue("CompassZ");
-                    if (CompassZ.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CompassZ.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.CompassZ = (double)CompassZ.AsDouble;
-                        Raw_Motion_CompassZ.Text = record.CompassZ.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = Raw_MotionRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class EulerRecord : INotifyPropertyChanged
         {
             public EulerRecord()
@@ -4356,10 +4841,8 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
 
             private double _Roll;
             public double Roll { get { return _Roll; } set { if (value == _Roll) return; _Roll = value; OnPropertyChanged(); } }
-
             private double _Pitch;
             public double Pitch { get { return _Pitch; } set { if (value == _Pitch) return; _Pitch = value; OnPropertyChanged(); } }
-
             private double _Yaw;
             public double Yaw { get { return _Yaw; } set { if (value == _Yaw) return; _Yaw = value; OnPropertyChanged(); } }
 
@@ -4367,58 +4850,58 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<EulerRecord> EulerRecordData { get; } = new DataCollection<EulerRecord>();
-        private void OnEuler_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<EulerRecord> EulerRecordData { get; } = new DataCollection<EulerRecord>();
+    private void OnEuler_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (EulerRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (EulerRecordData.Count == 0)
-                {
-                    EulerRecordData.AddRecord(new EulerRecord());
-                }
-                EulerRecordData[EulerRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                EulerRecordData.AddRecord(new EulerRecord());
             }
+            EulerRecordData[EulerRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountEuler(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountEuler(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        EulerRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmEuler(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        EulerRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyEuler(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Roll,Pitch,Yaw,Notes\n");
+        foreach (var row in EulerRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            EulerRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Roll},{row.Pitch},{row.Yaw},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmEuler(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            EulerRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyEuler(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Roll,Pitch,Yaw,Notes\n");
-            foreach (var row in EulerRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Roll},{row.Pitch},{row.Yaw},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyEulerSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -4429,7 +4912,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool EulerNotifySetup = false;
         private async void OnNotifyEuler(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyEuler();
+        }
+
+        private async Task DoNotifyEuler()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -4442,7 +4930,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyEulerSettings[EulerNotifyIndex];
                 EulerNotifyIndex = (EulerNotifyIndex + 1) % NotifyEulerSettings.Length;
                 var result = await bleDevice.NotifyEulerAsync(notifyType);
-
+                
 
 
             }
@@ -4458,36 +4946,38 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new EulerRecord();
+                var Roll = valueList.GetValue("Roll");
+                if (Roll.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Roll.CurrentType == BCBasic.BCValue.ValueType.IsString || Roll.IsArray)
+                {
+                    record.Roll = (double)Roll.AsDouble;
+                    Euler_Roll.Text = record.Roll.ToString("N0");
+                }
+                var Pitch = valueList.GetValue("Pitch");
+                if (Pitch.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Pitch.CurrentType == BCBasic.BCValue.ValueType.IsString || Pitch.IsArray)
+                {
+                    record.Pitch = (double)Pitch.AsDouble;
+                    Euler_Pitch.Text = record.Pitch.ToString("N0");
+                }
+                var Yaw = valueList.GetValue("Yaw");
+                if (Yaw.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Yaw.CurrentType == BCBasic.BCValue.ValueType.IsString || Yaw.IsArray)
+                {
+                    record.Yaw = (double)Yaw.AsDouble;
+                    Euler_Yaw.Text = record.Yaw.ToString("N0");
+                }
 
-                    var record = new EulerRecord();
+                var addResult = EulerRecordData.AddRecord(record);
 
-                    var Roll = valueList.GetValue("Roll");
-                    if (Roll.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Roll.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Roll = (double)Roll.AsDouble;
-                        Euler_Roll.Text = record.Roll.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var Pitch = valueList.GetValue("Pitch");
-                    if (Pitch.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Pitch.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Pitch = (double)Pitch.AsDouble;
-                        Euler_Pitch.Text = record.Pitch.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var Yaw = valueList.GetValue("Yaw");
-                    if (Yaw.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Yaw.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Yaw = (double)Yaw.AsDouble;
-                        Euler_Yaw.Text = record.Yaw.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = EulerRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class RotationMatrixRecord : INotifyPropertyChanged
         {
             public RotationMatrixRecord()
@@ -4505,28 +4995,20 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
 
             private double _param0;
             public double param0 { get { return _param0; } set { if (value == _param0) return; _param0 = value; OnPropertyChanged(); } }
-
             private double _param1;
             public double param1 { get { return _param1; } set { if (value == _param1) return; _param1 = value; OnPropertyChanged(); } }
-
             private double _param2;
             public double param2 { get { return _param2; } set { if (value == _param2) return; _param2 = value; OnPropertyChanged(); } }
-
             private double _param3;
             public double param3 { get { return _param3; } set { if (value == _param3) return; _param3 = value; OnPropertyChanged(); } }
-
             private double _param4;
             public double param4 { get { return _param4; } set { if (value == _param4) return; _param4 = value; OnPropertyChanged(); } }
-
             private double _param5;
             public double param5 { get { return _param5; } set { if (value == _param5) return; _param5 = value; OnPropertyChanged(); } }
-
             private double _param6;
             public double param6 { get { return _param6; } set { if (value == _param6) return; _param6 = value; OnPropertyChanged(); } }
-
             private double _param7;
             public double param7 { get { return _param7; } set { if (value == _param7) return; _param7 = value; OnPropertyChanged(); } }
-
             private double _param8;
             public double param8 { get { return _param8; } set { if (value == _param8) return; _param8 = value; OnPropertyChanged(); } }
 
@@ -4534,58 +5016,58 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<RotationMatrixRecord> RotationMatrixRecordData { get; } = new DataCollection<RotationMatrixRecord>();
-        private void OnRotationMatrix_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<RotationMatrixRecord> RotationMatrixRecordData { get; } = new DataCollection<RotationMatrixRecord>();
+    private void OnRotationMatrix_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (RotationMatrixRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (RotationMatrixRecordData.Count == 0)
-                {
-                    RotationMatrixRecordData.AddRecord(new RotationMatrixRecord());
-                }
-                RotationMatrixRecordData[RotationMatrixRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                RotationMatrixRecordData.AddRecord(new RotationMatrixRecord());
             }
+            RotationMatrixRecordData[RotationMatrixRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountRotationMatrix(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountRotationMatrix(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        RotationMatrixRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmRotationMatrix(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        RotationMatrixRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyRotationMatrix(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,param0,param1,param2,param3,param4,param5,param6,param7,param8,Notes\n");
+        foreach (var row in RotationMatrixRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            RotationMatrixRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{row.param2},{row.param3},{row.param4},{row.param5},{row.param6},{row.param7},{row.param8},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmRotationMatrix(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            RotationMatrixRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyRotationMatrix(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,param0,param1,param2,param3,param4,param5,param6,param7,param8,Notes\n");
-            foreach (var row in RotationMatrixRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{row.param1},{row.param2},{row.param3},{row.param4},{row.param5},{row.param6},{row.param7},{row.param8},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyRotationMatrixSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -4596,7 +5078,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool RotationMatrixNotifySetup = false;
         private async void OnNotifyRotationMatrix(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyRotationMatrix();
+        }
+
+        private async Task DoNotifyRotationMatrix()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -4609,7 +5096,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyRotationMatrixSettings[RotationMatrixNotifyIndex];
                 RotationMatrixNotifyIndex = (RotationMatrixNotifyIndex + 1) % NotifyRotationMatrixSettings.Length;
                 var result = await bleDevice.NotifyRotationMatrixAsync(notifyType);
-
+                
 
 
             }
@@ -4625,78 +5112,74 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new RotationMatrixRecord();
+                var param0 = valueList.GetValue("param0");
+                if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
+                {
+                    record.param0 = (double)param0.AsDouble;
+                    RotationMatrix_param0.Text = record.param0.ToString();
+                }
+                var param1 = valueList.GetValue("param1");
+                if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString || param1.IsArray)
+                {
+                    record.param1 = (double)param1.AsDouble;
+                    RotationMatrix_param1.Text = record.param1.ToString();
+                }
+                var param2 = valueList.GetValue("param2");
+                if (param2.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param2.CurrentType == BCBasic.BCValue.ValueType.IsString || param2.IsArray)
+                {
+                    record.param2 = (double)param2.AsDouble;
+                    RotationMatrix_param2.Text = record.param2.ToString();
+                }
+                var param3 = valueList.GetValue("param3");
+                if (param3.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param3.CurrentType == BCBasic.BCValue.ValueType.IsString || param3.IsArray)
+                {
+                    record.param3 = (double)param3.AsDouble;
+                    RotationMatrix_param3.Text = record.param3.ToString();
+                }
+                var param4 = valueList.GetValue("param4");
+                if (param4.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param4.CurrentType == BCBasic.BCValue.ValueType.IsString || param4.IsArray)
+                {
+                    record.param4 = (double)param4.AsDouble;
+                    RotationMatrix_param4.Text = record.param4.ToString();
+                }
+                var param5 = valueList.GetValue("param5");
+                if (param5.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param5.CurrentType == BCBasic.BCValue.ValueType.IsString || param5.IsArray)
+                {
+                    record.param5 = (double)param5.AsDouble;
+                    RotationMatrix_param5.Text = record.param5.ToString();
+                }
+                var param6 = valueList.GetValue("param6");
+                if (param6.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param6.CurrentType == BCBasic.BCValue.ValueType.IsString || param6.IsArray)
+                {
+                    record.param6 = (double)param6.AsDouble;
+                    RotationMatrix_param6.Text = record.param6.ToString();
+                }
+                var param7 = valueList.GetValue("param7");
+                if (param7.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param7.CurrentType == BCBasic.BCValue.ValueType.IsString || param7.IsArray)
+                {
+                    record.param7 = (double)param7.AsDouble;
+                    RotationMatrix_param7.Text = record.param7.ToString();
+                }
+                var param8 = valueList.GetValue("param8");
+                if (param8.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param8.CurrentType == BCBasic.BCValue.ValueType.IsString || param8.IsArray)
+                {
+                    record.param8 = (double)param8.AsDouble;
+                    RotationMatrix_param8.Text = record.param8.ToString();
+                }
 
-                    var record = new RotationMatrixRecord();
+                var addResult = RotationMatrixRecordData.AddRecord(record);
 
-                    var param0 = valueList.GetValue("param0");
-                    if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param0 = (double)param0.AsDouble;
-                        RotationMatrix_param0.Text = record.param0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var param1 = valueList.GetValue("param1");
-                    if (param1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param1.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param1 = (double)param1.AsDouble;
-                        RotationMatrix_param1.Text = record.param1.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var param2 = valueList.GetValue("param2");
-                    if (param2.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param2.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param2 = (double)param2.AsDouble;
-                        RotationMatrix_param2.Text = record.param2.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var param3 = valueList.GetValue("param3");
-                    if (param3.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param3.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param3 = (double)param3.AsDouble;
-                        RotationMatrix_param3.Text = record.param3.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var param4 = valueList.GetValue("param4");
-                    if (param4.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param4.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param4 = (double)param4.AsDouble;
-                        RotationMatrix_param4.Text = record.param4.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var param5 = valueList.GetValue("param5");
-                    if (param5.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param5.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param5 = (double)param5.AsDouble;
-                        RotationMatrix_param5.Text = record.param5.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var param6 = valueList.GetValue("param6");
-                    if (param6.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param6.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param6 = (double)param6.AsDouble;
-                        RotationMatrix_param6.Text = record.param6.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var param7 = valueList.GetValue("param7");
-                    if (param7.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param7.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param7 = (double)param7.AsDouble;
-                        RotationMatrix_param7.Text = record.param7.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var param8 = valueList.GetValue("param8");
-                    if (param8.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param8.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.param8 = (double)param8.AsDouble;
-                        RotationMatrix_param8.Text = record.param8.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = RotationMatrixRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class Compass_HeadingRecord : INotifyPropertyChanged
         {
             public Compass_HeadingRecord()
@@ -4719,58 +5202,58 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Compass_HeadingRecord> Compass_HeadingRecordData { get; } = new DataCollection<Compass_HeadingRecord>();
-        private void OnCompass_Heading_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Compass_HeadingRecord> Compass_HeadingRecordData { get; } = new DataCollection<Compass_HeadingRecord>();
+    private void OnCompass_Heading_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Compass_HeadingRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Compass_HeadingRecordData.Count == 0)
-                {
-                    Compass_HeadingRecordData.AddRecord(new Compass_HeadingRecord());
-                }
-                Compass_HeadingRecordData[Compass_HeadingRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Compass_HeadingRecordData.AddRecord(new Compass_HeadingRecord());
             }
+            Compass_HeadingRecordData[Compass_HeadingRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountCompass_Heading(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountCompass_Heading(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Compass_HeadingRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmCompass_Heading(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Compass_HeadingRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyCompass_Heading(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Heading,Notes\n");
+        foreach (var row in Compass_HeadingRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Compass_HeadingRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Heading},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmCompass_Heading(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Compass_HeadingRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyCompass_Heading(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,Heading,Notes\n");
-            foreach (var row in Compass_HeadingRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Heading},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyCompass_HeadingSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -4781,7 +5264,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool Compass_HeadingNotifySetup = false;
         private async void OnNotifyCompass_Heading(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyCompass_Heading();
+        }
+
+        private async Task DoNotifyCompass_Heading()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -4794,7 +5282,7 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyCompass_HeadingSettings[Compass_HeadingNotifyIndex];
                 Compass_HeadingNotifyIndex = (Compass_HeadingNotifyIndex + 1) % NotifyCompass_HeadingSettings.Length;
                 var result = await bleDevice.NotifyCompass_HeadingAsync(notifyType);
-
+                
 
 
             }
@@ -4810,22 +5298,26 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new Compass_HeadingRecord();
+                var Heading = valueList.GetValue("Heading");
+                if (Heading.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Heading.CurrentType == BCBasic.BCValue.ValueType.IsString || Heading.IsArray)
+                {
+                    record.Heading = (double)Heading.AsDouble;
+                    Compass_Heading_Heading.Text = record.Heading.ToString("N0");
+                }
 
-                    var record = new Compass_HeadingRecord();
+                var addResult = Compass_HeadingRecordData.AddRecord(record);
 
-                    var Heading = valueList.GetValue("Heading");
-                    if (Heading.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Heading.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Heading = (double)Heading.AsDouble;
-                        Compass_Heading_Heading.Text = record.Heading.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = Compass_HeadingRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class GravityRecord : INotifyPropertyChanged
         {
             public GravityRecord()
@@ -4843,10 +5335,8 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
 
             private double _X;
             public double X { get { return _X; } set { if (value == _X) return; _X = value; OnPropertyChanged(); } }
-
             private double _Y;
             public double Y { get { return _Y; } set { if (value == _Y) return; _Y = value; OnPropertyChanged(); } }
-
             private double _Z;
             public double Z { get { return _Z; } set { if (value == _Z) return; _Z = value; OnPropertyChanged(); } }
 
@@ -4854,58 +5344,59 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<GravityRecord> GravityRecordData { get; } = new DataCollection<GravityRecord>();
-        private void OnGravity_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<GravityRecord> GravityRecordData { get; } = new DataCollection<GravityRecord>();
+    private void OnGravity_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (GravityRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (GravityRecordData.Count == 0)
-                {
-                    GravityRecordData.AddRecord(new GravityRecord());
-                }
-                GravityRecordData[GravityRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                GravityRecordData.AddRecord(new GravityRecord());
             }
+            GravityRecordData[GravityRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountGravity(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            GravityRecordData.MaxLength = value;
+    // Functions called from the expander
+    private void OnKeepCountGravity(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        GravityRecordData.MaxLength = value;
 
-            GravityChart.RedrawYTime<GravityRecord>(GravityRecordData);
-        }
+        GravityChart.RedrawYTime<GravityRecord>(GravityRecordData);
 
-        private void OnAlgorithmGravity(object sender, SelectionChangedEventArgs e)
+    }
+
+    private void OnAlgorithmGravity(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        GravityRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyGravity(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,X,Y,Z,Notes\n");
+        foreach (var row in GravityRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            GravityRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.X},{row.Y},{row.Z},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-        private void OnCopyGravity(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,X,Y,Z,Notes\n");
-            foreach (var row in GravityRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.X},{row.Y},{row.Z},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyGravitySettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -4916,7 +5407,12 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
         bool GravityNotifySetup = false;
         private async void OnNotifyGravity(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyGravity();
+        }
+
+        private async Task DoNotifyGravity()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -4929,32 +5425,29 @@ typeof(Color_RGB_ClearRecord).GetProperty("Clear"),
                 var notifyType = NotifyGravitySettings[GravityNotifyIndex];
                 GravityNotifyIndex = (GravityNotifyIndex + 1) % NotifyGravitySettings.Length;
                 var result = await bleDevice.NotifyGravityAsync(notifyType);
-
-
+                
 
                 var EventTimeProperty = typeof(GravityRecord).GetProperty("EventTime");
                 var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
                 {
-typeof(GravityRecord).GetProperty("X"),
-typeof(GravityRecord).GetProperty("Y"),
-typeof(GravityRecord).GetProperty("Z"),
+                    typeof(GravityRecord).GetProperty("X"),
+                    typeof(GravityRecord).GetProperty("Y"),
+                    typeof(GravityRecord).GetProperty("Z"),
+
                 };
                 var names = new List<string>()
-                {
-"X",
-"Y",
-"Z",
+                {"X","Y","Z",
                 };
                 GravityChart.SetDataProperties(properties, EventTimeProperty, names);
                 GravityChart.SetTitle("Gravity Chart");
                 GravityChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
-                {
-                    tableType = "standard",
-                    chartType = "standard",
-                    chartCommand = "AddYTime<GravityRecord>(addResult, GravityRecordData)",
-                    chartDefaultMaxY = 20,
-                    chartDefaultMinY = -20,
-                    chartLineDefaults ={
+{
+tableType="standard",
+chartType="standard",
+chartCommand="AddYTime<GravityRecord>(addResult, GravityRecordData)",
+chartDefaultMaxY=20,
+chartDefaultMinY=-20,
+        chartLineDefaults={
                         { "X", new ChartLineDefaults() {
                             stroke="DarkRed",
                             }
@@ -4968,7 +5461,7 @@ typeof(GravityRecord).GetProperty("Z"),
                             }
                         },
                     },
-                }
+}
 ;
 
             }
@@ -4984,43 +5477,177 @@ typeof(GravityRecord).GetProperty("Z"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new GravityRecord();
+                var X = valueList.GetValue("X");
+                if (X.CurrentType == BCBasic.BCValue.ValueType.IsDouble || X.CurrentType == BCBasic.BCValue.ValueType.IsString || X.IsArray)
+                {
+                    record.X = (double)X.AsDouble;
+                    Gravity_X.Text = record.X.ToString("F3");
+                }
+                var Y = valueList.GetValue("Y");
+                if (Y.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Y.CurrentType == BCBasic.BCValue.ValueType.IsString || Y.IsArray)
+                {
+                    record.Y = (double)Y.AsDouble;
+                    Gravity_Y.Text = record.Y.ToString();
+                }
+                var Z = valueList.GetValue("Z");
+                if (Z.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Z.CurrentType == BCBasic.BCValue.ValueType.IsString || Z.IsArray)
+                {
+                    record.Z = (double)Z.AsDouble;
+                    Gravity_Z.Text = record.Z.ToString();
+                }
 
-                    var record = new GravityRecord();
+                var addResult = GravityRecordData.AddRecord(record);
 
-                    var X = valueList.GetValue("X");
-                    if (X.CurrentType == BCBasic.BCValue.ValueType.IsDouble || X.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.X = (double)X.AsDouble;
-                        Gravity_X.Text = record.X.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
+                GravityChart.AddYTime<GravityRecord>(addResult, GravityRecordData);
 
-                    var Y = valueList.GetValue("Y");
-                    if (Y.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Y.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Y = (double)Y.AsDouble;
-                        Gravity_Y.Text = record.Y.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var Z = valueList.GetValue("Z");
-                    if (Z.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Z.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.Z = (double)Z.AsDouble;
-                        Gravity_Z.Text = record.Z.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = GravityRecordData.AddRecord(record);
-                    GravityChart.AddYTime<GravityRecord>(addResult, GravityRecordData);
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
 
-        // Functions for Audio
 
+
+
+        // Functions for Audio
+        public class Audio_ConfigurationRecord : INotifyPropertyChanged
+        {
+            public Audio_ConfigurationRecord()
+            {
+                this.EventTime = DateTime.Now;
+            }
+            // For the INPC INotifyPropertyChanged values
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            private DateTime _EventTime;
+            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
+
+            private double _SpeakerMode;
+            public double SpeakerMode { get { return _SpeakerMode; } set { if (value == _SpeakerMode) return; _SpeakerMode = value; OnPropertyChanged(); } }
+            private double _MicrophoneMode;
+            public double MicrophoneMode { get { return _MicrophoneMode; } set { if (value == _MicrophoneMode) return; _MicrophoneMode = value; OnPropertyChanged(); } }
+
+            private String _Note;
+            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+        }
+
+    public DataCollection<Audio_ConfigurationRecord> Audio_ConfigurationRecordData { get; } = new DataCollection<Audio_ConfigurationRecord>();
+    private void OnAudio_Configuration_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Audio_ConfigurationRecordData.Count == 0)
+            {
+                Audio_ConfigurationRecordData.AddRecord(new Audio_ConfigurationRecord());
+            }
+            Audio_ConfigurationRecordData[Audio_ConfigurationRecordData.Count - 1].Note = text;
+            e.Handled = true;
+        }
+    }
+
+    // Functions called from the expander
+    private void OnKeepCountAudio_Configuration(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Audio_ConfigurationRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmAudio_Configuration(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Audio_ConfigurationRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyAudio_Configuration(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,SpeakerMode,MicrophoneMode,Notes\n");
+        foreach (var row in Audio_ConfigurationRecordData)
+        {
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.SpeakerMode},{row.MicrophoneMode},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
+
+
+        private async void OnReadAudio_Configuration(object sender, RoutedEventArgs e)
+        {
+            await DoReadAudio_Configuration();
+        }
+
+        private async Task DoReadAudio_Configuration()
+        {
+            SetStatusActive (true); // the false happens in the bluetooth status handler.
+            ncommand++;
+            try
+            {
+                var valueList = await bleDevice.ReadAudio_Configuration();
+                if (valueList == null)
+                {
+                    SetStatus ($"Error: unable to read Audio_Configuration");
+                    return;
+                }
+                
+                var record = new Audio_ConfigurationRecord();
+                var SpeakerMode = valueList.GetValue("SpeakerMode");
+                if (SpeakerMode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SpeakerMode.CurrentType == BCBasic.BCValue.ValueType.IsString || SpeakerMode.IsArray)
+                {
+                    record.SpeakerMode = (double)SpeakerMode.AsDouble;
+                    Audio_Configuration_SpeakerMode.Text = record.SpeakerMode.ToString("N0");
+                }
+                var MicrophoneMode = valueList.GetValue("MicrophoneMode");
+                if (MicrophoneMode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MicrophoneMode.CurrentType == BCBasic.BCValue.ValueType.IsString || MicrophoneMode.IsArray)
+                {
+                    record.MicrophoneMode = (double)MicrophoneMode.AsDouble;
+                    Audio_Configuration_MicrophoneMode.Text = record.MicrophoneMode.ToString("N0");
+                }
+
+                Audio_ConfigurationRecordData.Add(record);
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus ($"Error: exception: {ex.Message}");
+            }
+        }
+
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickAudio_Configuration(object sender, RoutedEventArgs e)
+        {
+            var text = (sender as Button).Tag as String;
+            await DoWriteAudio_Configuration (text, System.Globalization.NumberStyles.Integer);
+        }
 
         private async void OnWriteAudio_Configuration(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            var text = Audio_Configuration_SpeakerMode.Text;
+            await DoWriteAudio_Configuration (text, System.Globalization.NumberStyles.AllowHexSpecifier);
+        }
+
+        private async Task DoWriteAudio_Configuration(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -5030,14 +5657,17 @@ typeof(GravityRecord).GetProperty("Z"),
                 string parseError = null;
 
                 Byte SpeakerMode;
-                var parsedSpeakerMode = Utilities.Parsers.TryParseByte(Audio_Configuration_SpeakerMode.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out SpeakerMode);
+                // History: used to go into Audio_Configuration_SpeakerMode.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedSpeakerMode = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out SpeakerMode);
                 if (!parsedSpeakerMode)
                 {
                     parseError = "SpeakerMode";
                 }
-
                 Byte MicrophoneMode;
-                var parsedMicrophoneMode = Utilities.Parsers.TryParseByte(Audio_Configuration_MicrophoneMode.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out MicrophoneMode);
+                // History: used to go into Audio_Configuration_MicrophoneMode.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedMicrophoneMode = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out MicrophoneMode);
                 if (!parsedMicrophoneMode)
                 {
                     parseError = "MicrophoneMode";
@@ -5058,9 +5688,9 @@ typeof(GravityRecord).GetProperty("Z"),
             }
         }
 
-        public class Audio_ConfigurationRecord : INotifyPropertyChanged
+        public class Speaker_DataRecord : INotifyPropertyChanged
         {
-            public Audio_ConfigurationRecord()
+            public Speaker_DataRecord()
             {
                 this.EventTime = DateTime.Now;
             }
@@ -5073,111 +5703,85 @@ typeof(GravityRecord).GetProperty("Z"),
             private DateTime _EventTime;
             public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
 
-            private double _SpeakerMode;
-            public double SpeakerMode { get { return _SpeakerMode; } set { if (value == _SpeakerMode) return; _SpeakerMode = value; OnPropertyChanged(); } }
-
-            private double _MicrophoneMode;
-            public double MicrophoneMode { get { return _MicrophoneMode; } set { if (value == _MicrophoneMode) return; _MicrophoneMode = value; OnPropertyChanged(); } }
+            private string _Data;
+            public string Data { get { return _Data; } set { if (value == _Data) return; _Data = value; OnPropertyChanged(); } }
 
             private String _Note;
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Audio_ConfigurationRecord> Audio_ConfigurationRecordData { get; } = new DataCollection<Audio_ConfigurationRecord>();
-        private void OnAudio_Configuration_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Speaker_DataRecord> Speaker_DataRecordData { get; } = new DataCollection<Speaker_DataRecord>();
+    private void OnSpeaker_Data_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Speaker_DataRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Audio_ConfigurationRecordData.Count == 0)
-                {
-                    Audio_ConfigurationRecordData.AddRecord(new Audio_ConfigurationRecord());
-                }
-                Audio_ConfigurationRecordData[Audio_ConfigurationRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Speaker_DataRecordData.AddRecord(new Speaker_DataRecord());
             }
+            Speaker_DataRecordData[Speaker_DataRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountAudio_Configuration(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountSpeaker_Data(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Speaker_DataRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmSpeaker_Data(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Speaker_DataRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopySpeaker_Data(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,Data,Notes\n");
+        foreach (var row in Speaker_DataRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Audio_ConfigurationRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Data},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
-        private void OnAlgorithmAudio_Configuration(object sender, SelectionChangedEventArgs e)
+
+
+        // CS+CHARACTERISTIC+WRITE+METHOD
+        // OK to include this method even if there are no defined buttons
+        private async void OnClickSpeaker_Data(object sender, RoutedEventArgs e)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Audio_ConfigurationRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyAudio_Configuration(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,SpeakerMode,MicrophoneMode,Notes\n");
-            foreach (var row in Audio_ConfigurationRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.SpeakerMode},{row.MicrophoneMode},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
-
-        private async void OnReadAudio_Configuration(object sender, RoutedEventArgs e)
-        {
-            SetStatusActive(true); // the false happens in the bluetooth status handler.
-            ncommand++;
-            try
-            {
-                var valueList = await bleDevice.ReadAudio_Configuration();
-                if (valueList == null)
-                {
-                    SetStatus($"Error: unable to read Audio_Configuration");
-                    return;
-                }
-
-                var record = new Audio_ConfigurationRecord();
-
-                var SpeakerMode = valueList.GetValue("SpeakerMode");
-                if (SpeakerMode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SpeakerMode.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.SpeakerMode = (double)SpeakerMode.AsDouble;
-                    Audio_Configuration_SpeakerMode.Text = record.SpeakerMode.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-                var MicrophoneMode = valueList.GetValue("MicrophoneMode");
-                if (MicrophoneMode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MicrophoneMode.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                {
-                    record.MicrophoneMode = (double)MicrophoneMode.AsDouble;
-                    Audio_Configuration_MicrophoneMode.Text = record.MicrophoneMode.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                }
-
-
-                Audio_ConfigurationRecordData.Add(record);
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
+            var text = (sender as Button).Tag as String;
+            await DoWriteSpeaker_Data (text, System.Globalization.NumberStyles.Integer);
         }
 
         private async void OnWriteSpeaker_Data(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            var text = Speaker_Data_Data.Text;
+            await DoWriteSpeaker_Data (text, System.Globalization.NumberStyles.AllowHexSpecifier);
+        }
+
+        private async Task DoWriteSpeaker_Data(string text, System.Globalization.NumberStyles dec_or_hex)
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -5187,7 +5791,9 @@ typeof(GravityRecord).GetProperty("Z"),
                 string parseError = null;
 
                 Bytes Data;
-                var parsedData = Utilities.Parsers.TryParseBytes(Speaker_Data_Data.Text, System.Globalization.NumberStyles.AllowHexSpecifier, null, out Data);
+                // History: used to go into Speaker_Data_Data.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedData = Utilities.Parsers.TryParseBytes(text, dec_or_hex, null, out Data);
                 if (!parsedData)
                 {
                     parseError = "Data";
@@ -5230,58 +5836,58 @@ typeof(GravityRecord).GetProperty("Z"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Speaker_StatusRecord> Speaker_StatusRecordData { get; } = new DataCollection<Speaker_StatusRecord>();
-        private void OnSpeaker_Status_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Speaker_StatusRecord> Speaker_StatusRecordData { get; } = new DataCollection<Speaker_StatusRecord>();
+    private void OnSpeaker_Status_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Speaker_StatusRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Speaker_StatusRecordData.Count == 0)
-                {
-                    Speaker_StatusRecordData.AddRecord(new Speaker_StatusRecord());
-                }
-                Speaker_StatusRecordData[Speaker_StatusRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Speaker_StatusRecordData.AddRecord(new Speaker_StatusRecord());
             }
+            Speaker_StatusRecordData[Speaker_StatusRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountSpeaker_Status(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountSpeaker_Status(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Speaker_StatusRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmSpeaker_Status(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Speaker_StatusRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopySpeaker_Status(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,SpeakerStatus,Notes\n");
+        foreach (var row in Speaker_StatusRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Speaker_StatusRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.SpeakerStatus},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmSpeaker_Status(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Speaker_StatusRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopySpeaker_Status(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,SpeakerStatus,Notes\n");
-            foreach (var row in Speaker_StatusRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.SpeakerStatus},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifySpeaker_StatusSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -5292,7 +5898,12 @@ typeof(GravityRecord).GetProperty("Z"),
         bool Speaker_StatusNotifySetup = false;
         private async void OnNotifySpeaker_Status(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifySpeaker_Status();
+        }
+
+        private async Task DoNotifySpeaker_Status()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -5305,7 +5916,7 @@ typeof(GravityRecord).GetProperty("Z"),
                 var notifyType = NotifySpeaker_StatusSettings[Speaker_StatusNotifyIndex];
                 Speaker_StatusNotifyIndex = (Speaker_StatusNotifyIndex + 1) % NotifySpeaker_StatusSettings.Length;
                 var result = await bleDevice.NotifySpeaker_StatusAsync(notifyType);
-
+                
 
 
             }
@@ -5321,22 +5932,26 @@ typeof(GravityRecord).GetProperty("Z"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new Speaker_StatusRecord();
+                var SpeakerStatus = valueList.GetValue("SpeakerStatus");
+                if (SpeakerStatus.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SpeakerStatus.CurrentType == BCBasic.BCValue.ValueType.IsString || SpeakerStatus.IsArray)
+                {
+                    record.SpeakerStatus = (double)SpeakerStatus.AsDouble;
+                    Speaker_Status_SpeakerStatus.Text = record.SpeakerStatus.ToString("N0");
+                }
 
-                    var record = new Speaker_StatusRecord();
+                var addResult = Speaker_StatusRecordData.AddRecord(record);
 
-                    var SpeakerStatus = valueList.GetValue("SpeakerStatus");
-                    if (SpeakerStatus.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SpeakerStatus.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.SpeakerStatus = (double)SpeakerStatus.AsDouble;
-                        Speaker_Status_SpeakerStatus.Text = record.SpeakerStatus.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = Speaker_StatusRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
         public class Microphone_DataRecord : INotifyPropertyChanged
         {
             public Microphone_DataRecord()
@@ -5359,58 +5974,58 @@ typeof(GravityRecord).GetProperty("Z"),
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-        public DataCollection<Microphone_DataRecord> Microphone_DataRecordData { get; } = new DataCollection<Microphone_DataRecord>();
-        private void OnMicrophone_Data_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Microphone_DataRecord> Microphone_DataRecordData { get; } = new DataCollection<Microphone_DataRecord>();
+    private void OnMicrophone_Data_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
+            var text = (sender as TextBox).Text.Trim();
+            (sender as TextBox).Text = "";
+            // Add the text to the notes section
+            if (Microphone_DataRecordData.Count == 0)
             {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (Microphone_DataRecordData.Count == 0)
-                {
-                    Microphone_DataRecordData.AddRecord(new Microphone_DataRecord());
-                }
-                Microphone_DataRecordData[Microphone_DataRecordData.Count - 1].Note = text;
-                e.Handled = true;
+                Microphone_DataRecordData.AddRecord(new Microphone_DataRecord());
             }
+            Microphone_DataRecordData[Microphone_DataRecordData.Count - 1].Note = text;
+            e.Handled = true;
         }
+    }
 
-        // Functions called from the expander
-        private void OnKeepCountMicrophone_Data(object sender, SelectionChangedEventArgs e)
+    // Functions called from the expander
+    private void OnKeepCountMicrophone_Data(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Microphone_DataRecordData.MaxLength = value;
+
+        
+    }
+
+    private void OnAlgorithmMicrophone_Data(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1) return;
+        int value;
+        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+        if (!ok) return;
+        Microphone_DataRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+    }
+    private void OnCopyMicrophone_Data(object sender, RoutedEventArgs e)
+    {
+        // Copy the contents over...
+        var sb = new System.Text.StringBuilder();
+        sb.Append("EventDate,EventTime,MicrophoneStatus,Notes\n");
+        foreach (var row in Microphone_DataRecordData)
         {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Microphone_DataRecordData.MaxLength = value;
-
-
+            var time24 = row.EventTime.ToString("HH:mm:ss.f");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.MicrophoneStatus},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
-
-        private void OnAlgorithmMicrophone_Data(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            Microphone_DataRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyMicrophone_Data(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,MicrophoneStatus,Notes\n");
-            foreach (var row in Microphone_DataRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.MicrophoneStatus},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+        var str = sb.ToString();
+        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
+        datapackage.SetText(str);
+        Clipboard.SetContent(datapackage);
+    }
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyMicrophone_DataSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -5421,7 +6036,12 @@ typeof(GravityRecord).GetProperty("Z"),
         bool Microphone_DataNotifySetup = false;
         private async void OnNotifyMicrophone_Data(object sender, RoutedEventArgs e)
         {
-            SetStatusActive(true);
+            await DoNotifyMicrophone_Data();
+        }
+
+        private async Task DoNotifyMicrophone_Data()
+        {
+            SetStatusActive (true);
             ncommand++;
             try
             {
@@ -5434,7 +6054,7 @@ typeof(GravityRecord).GetProperty("Z"),
                 var notifyType = NotifyMicrophone_DataSettings[Microphone_DataNotifyIndex];
                 Microphone_DataNotifyIndex = (Microphone_DataNotifyIndex + 1) % NotifyMicrophone_DataSettings.Length;
                 var result = await bleDevice.NotifyMicrophone_DataAsync(notifyType);
-
+                
 
 
             }
@@ -5450,28 +6070,33 @@ typeof(GravityRecord).GetProperty("Z"),
             {
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
+                var valueList = data.ValueList;
+                
+                var record = new Microphone_DataRecord();
+                var MicrophoneStatus = valueList.GetValue("MicrophoneStatus");
+                if (MicrophoneStatus.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MicrophoneStatus.CurrentType == BCBasic.BCValue.ValueType.IsString || MicrophoneStatus.IsArray)
+                {
+                    record.MicrophoneStatus = (string)MicrophoneStatus.AsString;
+                    Microphone_Data_MicrophoneStatus.Text = record.MicrophoneStatus.ToString();
+                }
 
-                    var record = new Microphone_DataRecord();
+                var addResult = Microphone_DataRecordData.AddRecord(record);
 
-                    var MicrophoneStatus = valueList.GetValue("MicrophoneStatus");
-                    if (MicrophoneStatus.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MicrophoneStatus.CurrentType == BCBasic.BCValue.ValueType.IsString)
-                    {
-                        record.MicrophoneStatus = (string)MicrophoneStatus.AsString;
-                        Microphone_Data_MicrophoneStatus.Text = record.MicrophoneStatus.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = Microphone_DataRecordData.AddRecord(record);
-
+                
+                // Original update was to make this CHART+COMMAND
                 });
             }
         }
+
+
+
+
 
         private async void OnRereadDevice(object sender, RoutedEventArgs e)
         {
             SetStatus("Reading device");
             SetStatusActive(true);
-            await bleDevice.EnsureCharacteristicAsync(true);
+            await bleDevice.EnsureCharacteristicAsync(CharacteristicsEnum.All_enum, true);
             SetStatusActive(false);
         }
     }

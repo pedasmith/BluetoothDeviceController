@@ -175,6 +175,7 @@ namespace BluetoothCodeGenerator
             service.Macros.Add("Name", btService.Name); // [[SERVICENAMEUSER]
             service.Macros.Add("Name.dotNet", btService.Name.DotNetSafe()); // [[SERVICENAME]]
             service.Macros.Add("ServiceName", btService.Name); // Preferred name to "Name"
+            service.Macros.Add("SERVICENAME", btService.Name.DotNetSafe()); // BAD: [[SERVICENAME]] in TI 1350 and 2541 for NOTIFYCONFIGURE
             service.Macros.Add("ServiceIsExpanded", (btService.Priority >= 10) ? "true" : "false");
             service.Macros.Add("UUID", btService.UUID);
 
@@ -287,6 +288,7 @@ namespace BluetoothCodeGenerator
                 var split = ValueParserSplit.ParseLine(btCharacteristic.Type);
 
                 // Properties are per-data which is finer grained than just per-characteristic.
+                var isFirstProperty = true;
                 for (int i = 0; i < split.Count; i++)
                 {
                     var item = split[i];
@@ -302,16 +304,26 @@ namespace BluetoothCodeGenerator
                     // (temperature_temp and temperature_humidity)
                     var name = btCharacteristic.Name;
                     var displayFormat = "System.Globalization.NumberStyles.None";
+                    // DataToString.dotNet
+                    var dotNetDisplayFormat = "ToString()";
+                    var isDouble = ByteFormatToCSharpAsDouble(item.ByteFormatPrimary) == "AsDouble";
                     switch (item.DisplayFormatPrimary)
                     {
                         case "DEC":
                             displayFormat = "System.Globalization.NumberStyles.None";
+                            if (isDouble) dotNetDisplayFormat = "ToString(\"N0\")";
                             break;
                         case "HEX":
                             displayFormat = "System.Globalization.NumberStyles.AllowHexSpecifier";
+                            if (isDouble) dotNetDisplayFormat = "ToString(\"N0\")";
+                            break;
+                        case "FIXED":
+                            displayFormat = "System.Globalization.NumberStyles.AllowHexSpecifier";
+                            if (isDouble) dotNetDisplayFormat = "ToString(\"F3\")";
                             break;
                         default:
                             displayFormat = "System.Globalization.NumberStyles.AllowHexSpecifier";
+                            if (isDouble) dotNetDisplayFormat = "ToString()";
                             break;
                     }
 
@@ -337,6 +349,7 @@ namespace BluetoothCodeGenerator
                         datareadpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                         datareadpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
                         datareadpr.AddMacro("DEC+OR+HEX", displayFormat);
+                        datareadpr.AddMacro("DataToString.dotNet", dotNetDisplayFormat);
                     }
                     if (hasWrite)
                     {
@@ -364,6 +377,7 @@ namespace BluetoothCodeGenerator
                         datawritepr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                         datawritepr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
                         datawritepr.AddMacro("DEC+OR+HEX", displayFormat);
+                        datawritepr.AddMacro("DataToString.dotNet", dotNetDisplayFormat);
                     }
 
                     if (true) // always do this
@@ -389,15 +403,19 @@ namespace BluetoothCodeGenerator
                         dataallpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
 
                         dataallpr.AddMacro("DEC+OR+HEX", displayFormat);
+                        dataallpr.AddMacro("DataToString.dotNet", dotNetDisplayFormat);
 
                         // Bad hack: the first item for write is also added to the characteristic
                         // This is needed for the write which should sweep up the different text boxes, but doesn't.
-                        if (i == 0)
+                        // Can't just be based on i==0 because the first property might be e.g. OOPT and be suppressed.
+                        if (isFirstProperty)
                         {
                             ch.AddMacro("DataName.First.dotNetSafe", btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
                             ch.AddMacro("DEC+OR+HEX", displayFormat);
                         }
                     }
+                    isFirstProperty = false;
+
                 }
                 readprs = null;
 

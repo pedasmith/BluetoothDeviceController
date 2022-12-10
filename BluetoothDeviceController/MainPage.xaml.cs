@@ -130,7 +130,8 @@ namespace BluetoothDeviceController
             // RuuviTag and other EddyStone data sensors
             new Specialization (typeof(Beacons.SimpleBeaconPage), new string[] { "Beacon" }, LIGHTNING, "", "Advertisement", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(Beacons.EddystonePage), new string[] { "Eddystone" }, BEACON, "", "Eddystone beacon", Specialization.ParentScrollType.ChildHandlesScrolling),
-            new Specialization (typeof(Beacons.RuuvitagPage), new string[] { "Govee_H5074_", "Ruuvi", "SwitchBot-MeterTH" }, DATA, "", "Environmental sensor"),
+            new Specialization (typeof(Beacons.RuuvitagPage), new string[] { "Ruuvi", "SwitchBot-MeterTH" }, DATA, "", "Environmental sensor"), 
+            // Ruuvitag page also handles the Govee H5074 but since the Govee is really just advert based, it should not be on this list.
         };
 
         public BleNames AllBleNames { get; set; }

@@ -36,7 +36,7 @@ and a Notes column (adding notes to the data turns out to be super useful)
 
 ## To make a chart
 
-The simplest chart is like the table: dd in the UI : { } JSON element and add add a **"chartType": "standard"** and also 
+The simplest chart is like the table: dd in the UI : { } JSON element and add add a **"chartType": "ytime"** and also 
 a **"chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"**. You will need both commands;
 without the first the chart won't be made, and without the second the chart won't be added to. The resulting chart UI 
 in the XAML and code-behind will be a time-oriented chart with one line per data value in the Type data.

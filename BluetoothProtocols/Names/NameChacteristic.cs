@@ -156,7 +156,7 @@ namespace BluetoothDeviceController.Names
             var sb = new StringBuilder();
             sb.Append("{\n");
             if (!string.IsNullOrEmpty(tableType)) sb.Append($"tableType=\"{tableType}\",\n");
-            if (!string.IsNullOrEmpty(chartType)) sb.Append($"chartType=\"{tableType}\",\n");
+            if (!string.IsNullOrEmpty(chartType)) sb.Append($"chartType=\"{chartType}\",\n");
             if (!string.IsNullOrEmpty(chartCommand)) sb.Append($"chartCommand=\"{chartCommand}\",\n");
 
             if (chartDefaultMaxY.HasValue) sb.Append($"chartDefaultMaxY={chartDefaultMaxY.Value},\n");

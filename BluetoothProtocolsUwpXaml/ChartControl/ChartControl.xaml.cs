@@ -63,6 +63,7 @@ namespace BluetoothDeviceController.Charts
             switch (UISpec?.chartYAxisCombined ?? UISpecifications.YMinMaxCombined.Combined)
             {
                 case UISpecifications.YMinMaxCombined.Combined:
+                    if (YMins.Count == 0) return DEFAULT_YMIN;
                     return YMins.Min();
                 case UISpecifications.YMinMaxCombined.Separate:
                     return YMins[index];
@@ -74,6 +75,7 @@ namespace BluetoothDeviceController.Charts
             switch (UISpec?.chartYAxisCombined ?? UISpecifications.YMinMaxCombined.Combined)
             {
                 case UISpecifications.YMinMaxCombined.Combined:
+                    if (YMins.Count == 0) return DEFAULT_YMAX;
                     return YMaxs.Max();
                 case UISpecifications.YMinMaxCombined.Separate:
                     return YMaxs[index];
