@@ -193,7 +193,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsString || Device_Name.IsArray)
                 {
                     record.Device_Name = (string)Device_Name.AsString;
-                    Device_Name_Device_Name.Text = record.Device_Name.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Device_Name_Device_Name.Text = record.Device_Name.ToString();
                 }
 
                 Device_NameRecordData.Add(record);
@@ -305,7 +305,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (Appearance.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Appearance.CurrentType == BCBasic.BCValue.ValueType.IsString || Appearance.IsArray)
                 {
                     record.Appearance = (double)Appearance.AsDouble;
-                    Appearance_Appearance.Text = record.Appearance.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Appearance_Appearance.Text = record.Appearance.ToString();
                 }
 
                 AppearanceRecordData.Add(record);
@@ -417,7 +417,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (ConnectionParameter.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ConnectionParameter.CurrentType == BCBasic.BCValue.ValueType.IsString || ConnectionParameter.IsArray)
                 {
                     record.ConnectionParameter = (string)ConnectionParameter.AsString;
-                    Connection_Parameter_ConnectionParameter.Text = record.ConnectionParameter.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Connection_Parameter_ConnectionParameter.Text = record.ConnectionParameter.ToString();
                 }
 
                 Connection_ParameterRecordData.Add(record);
@@ -529,7 +529,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (AddressResolutionSupported.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AddressResolutionSupported.CurrentType == BCBasic.BCValue.ValueType.IsString || AddressResolutionSupported.IsArray)
                 {
                     record.AddressResolutionSupported = (double)AddressResolutionSupported.AsDouble;
-                    Central_Address_Resolution_AddressResolutionSupported.Text = record.AddressResolutionSupported.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Central_Address_Resolution_AddressResolutionSupported.Text = record.AddressResolutionSupported.ToString("N0");
                 }
 
                 Central_Address_ResolutionRecordData.Add(record);
@@ -641,7 +641,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (ResolvablePrivateAddressFlag.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ResolvablePrivateAddressFlag.CurrentType == BCBasic.BCValue.ValueType.IsString || ResolvablePrivateAddressFlag.IsArray)
                 {
                     record.ResolvablePrivateAddressFlag = (double)ResolvablePrivateAddressFlag.AsDouble;
-                    Resolvable_Private_Address_Only_ResolvablePrivateAddressFlag.Text = record.ResolvablePrivateAddressFlag.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Resolvable_Private_Address_Only_ResolvablePrivateAddressFlag.Text = record.ResolvablePrivateAddressFlag.ToString("N0");
                 }
 
                 Resolvable_Private_Address_OnlyRecordData.Add(record);
@@ -755,7 +755,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (SystemId.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SystemId.CurrentType == BCBasic.BCValue.ValueType.IsString || SystemId.IsArray)
                 {
                     record.SystemId = (string)SystemId.AsString;
-                    System_ID_SystemId.Text = record.SystemId.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    System_ID_SystemId.Text = record.SystemId.ToString();
                 }
 
                 System_IDRecordData.Add(record);
@@ -867,7 +867,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (ModelNumber.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ModelNumber.CurrentType == BCBasic.BCValue.ValueType.IsString || ModelNumber.IsArray)
                 {
                     record.ModelNumber = (string)ModelNumber.AsString;
-                    Model_Number_ModelNumber.Text = record.ModelNumber.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Model_Number_ModelNumber.Text = record.ModelNumber.ToString();
                 }
 
                 Model_NumberRecordData.Add(record);
@@ -979,7 +979,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (SerialNumber.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SerialNumber.CurrentType == BCBasic.BCValue.ValueType.IsString || SerialNumber.IsArray)
                 {
                     record.SerialNumber = (string)SerialNumber.AsString;
-                    Serial_Number_SerialNumber.Text = record.SerialNumber.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Serial_Number_SerialNumber.Text = record.SerialNumber.ToString();
                 }
 
                 Serial_NumberRecordData.Add(record);
@@ -1091,7 +1091,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (FirmwareRevision.CurrentType == BCBasic.BCValue.ValueType.IsDouble || FirmwareRevision.CurrentType == BCBasic.BCValue.ValueType.IsString || FirmwareRevision.IsArray)
                 {
                     record.FirmwareRevision = (string)FirmwareRevision.AsString;
-                    Firmware_Revision_FirmwareRevision.Text = record.FirmwareRevision.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Firmware_Revision_FirmwareRevision.Text = record.FirmwareRevision.ToString();
                 }
 
                 Firmware_RevisionRecordData.Add(record);
@@ -1203,7 +1203,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (HardwareRevision.CurrentType == BCBasic.BCValue.ValueType.IsDouble || HardwareRevision.CurrentType == BCBasic.BCValue.ValueType.IsString || HardwareRevision.IsArray)
                 {
                     record.HardwareRevision = (string)HardwareRevision.AsString;
-                    Hardware_Revision_HardwareRevision.Text = record.HardwareRevision.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Hardware_Revision_HardwareRevision.Text = record.HardwareRevision.ToString();
                 }
 
                 Hardware_RevisionRecordData.Add(record);
@@ -1315,7 +1315,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (SoftwareRevision.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SoftwareRevision.CurrentType == BCBasic.BCValue.ValueType.IsString || SoftwareRevision.IsArray)
                 {
                     record.SoftwareRevision = (string)SoftwareRevision.AsString;
-                    Software_Revision_SoftwareRevision.Text = record.SoftwareRevision.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Software_Revision_SoftwareRevision.Text = record.SoftwareRevision.ToString();
                 }
 
                 Software_RevisionRecordData.Add(record);
@@ -1427,7 +1427,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (ManufacturerName.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ManufacturerName.CurrentType == BCBasic.BCValue.ValueType.IsString || ManufacturerName.IsArray)
                 {
                     record.ManufacturerName = (string)ManufacturerName.AsString;
-                    Manufacturer_Name_ManufacturerName.Text = record.ManufacturerName.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Manufacturer_Name_ManufacturerName.Text = record.ManufacturerName.ToString();
                 }
 
                 Manufacturer_NameRecordData.Add(record);
@@ -1543,19 +1543,19 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (BodyType.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BodyType.CurrentType == BCBasic.BCValue.ValueType.IsString || BodyType.IsArray)
                 {
                     record.BodyType = (double)BodyType.AsDouble;
-                    Regulatory_List_BodyType.Text = record.BodyType.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Regulatory_List_BodyType.Text = record.BodyType.ToString("N0");
                 }
                 var BodyStructure = valueList.GetValue("BodyStructure");
                 if (BodyStructure.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BodyStructure.CurrentType == BCBasic.BCValue.ValueType.IsString || BodyStructure.IsArray)
                 {
                     record.BodyStructure = (double)BodyStructure.AsDouble;
-                    Regulatory_List_BodyStructure.Text = record.BodyStructure.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Regulatory_List_BodyStructure.Text = record.BodyStructure.ToString("N0");
                 }
                 var Data = valueList.GetValue("Data");
                 if (Data.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Data.CurrentType == BCBasic.BCValue.ValueType.IsString || Data.IsArray)
                 {
                     record.Data = (string)Data.AsString;
-                    Regulatory_List_Data.Text = record.Data.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Regulatory_List_Data.Text = record.Data.ToString();
                 }
 
                 Regulatory_ListRecordData.Add(record);
@@ -1667,7 +1667,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (PnPID.CurrentType == BCBasic.BCValue.ValueType.IsDouble || PnPID.CurrentType == BCBasic.BCValue.ValueType.IsString || PnPID.IsArray)
                 {
                     record.PnPID = (string)PnPID.AsString;
-                    PnP_ID_PnPID.Text = record.PnPID.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    PnP_ID_PnPID.Text = record.PnPID.ToString();
                 }
 
                 PnP_IDRecordData.Add(record);
@@ -1801,7 +1801,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 Temperature_DataChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
 {
 tableType="standard",
-chartType="standard",
+chartType="ytime",
 chartCommand="AddYTime<Temperature_DataRecord>(addResult, Temperature_DataRecordData)",
 chartDefaultMaxY=25,
 chartDefaultMinY=20,
@@ -1828,7 +1828,7 @@ chartDefaultMinY=20,
                 if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
                 {
                     record.Temperature = (double)Temperature.AsDouble;
-                    Temperature_Data_Temperature.Text = record.Temperature.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Temperature_Data_Temperature.Text = record.Temperature.ToString("F3");
                 }
 
                 var addResult = Temperature_DataRecordData.AddRecord(record);
@@ -1863,7 +1863,7 @@ chartDefaultMinY=20,
                 if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
                 {
                     record.Temperature = (double)Temperature.AsDouble;
-                    Temperature_Data_Temperature.Text = record.Temperature.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Temperature_Data_Temperature.Text = record.Temperature.ToString("F3");
                 }
 
                 Temperature_DataRecordData.Add(record);
@@ -1975,7 +1975,7 @@ chartDefaultMinY=20,
                 if (Enable.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Enable.CurrentType == BCBasic.BCValue.ValueType.IsString || Enable.IsArray)
                 {
                     record.Enable = (double)Enable.AsDouble;
-                    Temperature_Conf_Enable.Text = record.Enable.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Temperature_Conf_Enable.Text = record.Enable.ToString("N0");
                 }
 
                 Temperature_ConfRecordData.Add(record);
@@ -2135,7 +2135,7 @@ chartDefaultMinY=20,
                 if (Period.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Period.CurrentType == BCBasic.BCValue.ValueType.IsString || Period.IsArray)
                 {
                     record.Period = (double)Period.AsDouble;
-                    Temperature_Period_Period.Text = record.Period.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Temperature_Period_Period.Text = record.Period.ToString("N0");
                 }
 
                 Temperature_PeriodRecordData.Add(record);
@@ -2317,7 +2317,7 @@ chartDefaultMinY=20,
                 Humidity_DataChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
 {
 tableType="standard",
-chartType="standard",
+chartType="ytime",
 chartCommand="AddYTime<Humidity_DataRecord>(addResult, Humidity_DataRecordData)",
 chartDefaultMaxY=100,
 chartDefaultMinY=0,
@@ -2344,7 +2344,7 @@ chartDefaultMinY=0,
                 if (Humidty.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Humidty.CurrentType == BCBasic.BCValue.ValueType.IsString || Humidty.IsArray)
                 {
                     record.Humidty = (double)Humidty.AsDouble;
-                    Humidity_Data_Humidty.Text = record.Humidty.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Humidity_Data_Humidty.Text = record.Humidty.ToString("F3");
                 }
 
                 var addResult = Humidity_DataRecordData.AddRecord(record);
@@ -2379,7 +2379,7 @@ chartDefaultMinY=0,
                 if (Humidty.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Humidty.CurrentType == BCBasic.BCValue.ValueType.IsString || Humidty.IsArray)
                 {
                     record.Humidty = (double)Humidty.AsDouble;
-                    Humidity_Data_Humidty.Text = record.Humidty.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Humidity_Data_Humidty.Text = record.Humidty.ToString("F3");
                 }
 
                 Humidity_DataRecordData.Add(record);
@@ -2491,7 +2491,7 @@ chartDefaultMinY=0,
                 if (Enable.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Enable.CurrentType == BCBasic.BCValue.ValueType.IsString || Enable.IsArray)
                 {
                     record.Enable = (double)Enable.AsDouble;
-                    Humidity_Conf_Enable.Text = record.Enable.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Humidity_Conf_Enable.Text = record.Enable.ToString("N0");
                 }
 
                 Humidity_ConfRecordData.Add(record);
@@ -2651,7 +2651,7 @@ chartDefaultMinY=0,
                 if (Period.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Period.CurrentType == BCBasic.BCValue.ValueType.IsString || Period.IsArray)
                 {
                     record.Period = (double)Period.AsDouble;
-                    Humidity_Period_Period.Text = record.Period.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Humidity_Period_Period.Text = record.Period.ToString("N0");
                 }
 
                 Humidity_PeriodRecordData.Add(record);
@@ -2839,7 +2839,7 @@ chartDefaultMinY=0,
                 if (Lux.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Lux.CurrentType == BCBasic.BCValue.ValueType.IsString || Lux.IsArray)
                 {
                     record.Lux = (double)Lux.AsDouble;
-                    Light_Data_Lux.Text = record.Lux.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Light_Data_Lux.Text = record.Lux.ToString("F3");
                 }
 
                 var addResult = Light_DataRecordData.AddRecord(record);
@@ -2873,7 +2873,7 @@ chartDefaultMinY=0,
                 if (Lux.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Lux.CurrentType == BCBasic.BCValue.ValueType.IsString || Lux.IsArray)
                 {
                     record.Lux = (double)Lux.AsDouble;
-                    Light_Data_Lux.Text = record.Lux.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Light_Data_Lux.Text = record.Lux.ToString("F3");
                 }
 
                 Light_DataRecordData.Add(record);
@@ -2985,7 +2985,7 @@ chartDefaultMinY=0,
                 if (Enable.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Enable.CurrentType == BCBasic.BCValue.ValueType.IsString || Enable.IsArray)
                 {
                     record.Enable = (string)Enable.AsString;
-                    Light_Conf_Enable.Text = record.Enable.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Light_Conf_Enable.Text = record.Enable.ToString();
                 }
 
                 Light_ConfRecordData.Add(record);
@@ -3145,7 +3145,7 @@ chartDefaultMinY=0,
                 if (Light_Period.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Light_Period.CurrentType == BCBasic.BCValue.ValueType.IsString || Light_Period.IsArray)
                 {
                     record.Light_Period = (string)Light_Period.AsString;
-                    Light_Period_Light_Period.Text = record.Light_Period.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Light_Period_Light_Period.Text = record.Light_Period.ToString();
                 }
 
                 Light_PeriodRecordData.Add(record);
@@ -3307,7 +3307,7 @@ chartDefaultMinY=0,
                 if (Red.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Red.CurrentType == BCBasic.BCValue.ValueType.IsString || Red.IsArray)
                 {
                     record.Red = (double)Red.AsDouble;
-                    Red_Red.Text = record.Red.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Red_Red.Text = record.Red.ToString("N0");
                 }
 
                 RedRecordData.Add(record);
@@ -3467,7 +3467,7 @@ chartDefaultMinY=0,
                 if (Green.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Green.CurrentType == BCBasic.BCValue.ValueType.IsString || Green.IsArray)
                 {
                     record.Green = (double)Green.AsDouble;
-                    Green_Green.Text = record.Green.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Green_Green.Text = record.Green.ToString("N0");
                 }
 
                 GreenRecordData.Add(record);
@@ -3627,7 +3627,7 @@ chartDefaultMinY=0,
                 if (Blue.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Blue.CurrentType == BCBasic.BCValue.ValueType.IsString || Blue.IsArray)
                 {
                     record.Blue = (double)Blue.AsDouble;
-                    Blue_Blue.Text = record.Blue.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Blue_Blue.Text = record.Blue.ToString("N0");
                 }
 
                 BlueRecordData.Add(record);
@@ -3815,7 +3815,7 @@ chartDefaultMinY=0,
                 if (Button0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Button0.CurrentType == BCBasic.BCValue.ValueType.IsString || Button0.IsArray)
                 {
                     record.Button0 = (double)Button0.AsDouble;
-                    Button_0_Button0.Text = record.Button0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Button_0_Button0.Text = record.Button0.ToString("N0");
                 }
 
                 var addResult = Button_0RecordData.AddRecord(record);
@@ -3849,7 +3849,7 @@ chartDefaultMinY=0,
                 if (Button0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Button0.CurrentType == BCBasic.BCValue.ValueType.IsString || Button0.IsArray)
                 {
                     record.Button0 = (double)Button0.AsDouble;
-                    Button_0_Button0.Text = record.Button0.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Button_0_Button0.Text = record.Button0.ToString("N0");
                 }
 
                 Button_0RecordData.Add(record);
@@ -3987,7 +3987,7 @@ chartDefaultMinY=0,
                 if (Button1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Button1.CurrentType == BCBasic.BCValue.ValueType.IsString || Button1.IsArray)
                 {
                     record.Button1 = (double)Button1.AsDouble;
-                    Button_1_Button1.Text = record.Button1.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Button_1_Button1.Text = record.Button1.ToString("N0");
                 }
 
                 var addResult = Button_1RecordData.AddRecord(record);
@@ -4021,7 +4021,7 @@ chartDefaultMinY=0,
                 if (Button1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Button1.CurrentType == BCBasic.BCValue.ValueType.IsString || Button1.IsArray)
                 {
                     record.Button1 = (double)Button1.AsDouble;
-                    Button_1_Button1.Text = record.Button1.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Button_1_Button1.Text = record.Button1.ToString("N0");
                 }
 
                 Button_1RecordData.Add(record);
@@ -4161,7 +4161,7 @@ chartDefaultMinY=0,
                 if (BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsString || BatteryLevel.IsArray)
                 {
                     record.BatteryLevel = (double)BatteryLevel.AsDouble;
-                    Battery_Data_BatteryLevel.Text = record.BatteryLevel.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Battery_Data_BatteryLevel.Text = record.BatteryLevel.ToString("N0");
                 }
 
                 var addResult = Battery_DataRecordData.AddRecord(record);
@@ -4195,7 +4195,7 @@ chartDefaultMinY=0,
                 if (BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsString || BatteryLevel.IsArray)
                 {
                     record.BatteryLevel = (double)BatteryLevel.AsDouble;
-                    Battery_Data_BatteryLevel.Text = record.BatteryLevel.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Battery_Data_BatteryLevel.Text = record.BatteryLevel.ToString("N0");
                 }
 
                 Battery_DataRecordData.Add(record);
@@ -4309,7 +4309,7 @@ chartDefaultMinY=0,
                 if (Enable.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Enable.CurrentType == BCBasic.BCValue.ValueType.IsString || Enable.IsArray)
                 {
                     record.Enable = (string)Enable.AsString;
-                    Accel_Enable_Enable.Text = record.Enable.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Accel_Enable_Enable.Text = record.Enable.ToString();
                 }
 
                 Accel_EnableRecordData.Add(record);
@@ -4469,7 +4469,7 @@ chartDefaultMinY=0,
                 if (Accel_Range.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Accel_Range.CurrentType == BCBasic.BCValue.ValueType.IsString || Accel_Range.IsArray)
                 {
                     record.Accel_Range = (double)Accel_Range.AsDouble;
-                    Accel_Range_Accel_Range.Text = record.Accel_Range.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Accel_Range_Accel_Range.Text = record.Accel_Range.ToString("N0");
                 }
 
                 Accel_RangeRecordData.Add(record);
@@ -4607,7 +4607,7 @@ chartDefaultMinY=0,
                 if (AccelX.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AccelX.CurrentType == BCBasic.BCValue.ValueType.IsString || AccelX.IsArray)
                 {
                     record.AccelX = (double)AccelX.AsDouble;
-                    X_AccelX.Text = record.AccelX.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    X_AccelX.Text = record.AccelX.ToString("F3");
                 }
 
                 var addResult = XRecordData.AddRecord(record);
@@ -4745,7 +4745,7 @@ chartDefaultMinY=0,
                 if (AccelY.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AccelY.CurrentType == BCBasic.BCValue.ValueType.IsString || AccelY.IsArray)
                 {
                     record.AccelY = (double)AccelY.AsDouble;
-                    Y_AccelY.Text = record.AccelY.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Y_AccelY.Text = record.AccelY.ToString("F3");
                 }
 
                 var addResult = YRecordData.AddRecord(record);
@@ -4883,7 +4883,7 @@ chartDefaultMinY=0,
                 if (AccelZ.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AccelZ.CurrentType == BCBasic.BCValue.ValueType.IsString || AccelZ.IsArray)
                 {
                     record.AccelZ = (double)AccelZ.AsDouble;
-                    Z_AccelZ.Text = record.AccelZ.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    Z_AccelZ.Text = record.AccelZ.ToString("F3");
                 }
 
                 var addResult = ZRecordData.AddRecord(record);
