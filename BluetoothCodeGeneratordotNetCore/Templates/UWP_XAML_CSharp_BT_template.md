@@ -1,5 +1,5 @@
 ﻿
-# PageCSharp FileName=[[CLASSNAME]]Page.xaml.cs
+# PageCSharp FileName=[[CLASSNAME]]Page.xaml.cs DirName=SpecialtyPages
 ```
 using BluetoothDeviceController.Charts;
 using BluetoothDeviceController.Names;

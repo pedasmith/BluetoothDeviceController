@@ -2,8 +2,10 @@
   "AllDevices": [
     {
       "Name": "SensorBug10B5D0",
-      "ClassName":  "BleHome_SensorBug",
+      "ClassName": "BleHome_SensorBug",
       "ClassModifiers": "",
+      "CompletionStatus": "Unusable",
+      "CompletionStatusExplanation": "2022-12-10: In progresss; items are not yet finished.",
       "Description": "",
       "Services": [
         {
@@ -198,7 +200,7 @@
               "UUID": "00002a07-0000-1000-8000-00805f9b34fb",
               "Name": "Transmit Power",
               "Type": "I8|DEC|Power|db",
-              "REM_db":  "db allowed values are -100 to 20", 
+              "REM_db": "db allowed values are -100 to 20",
               "IsRead": true,
               "ExampleData": [
                 "Value:  00"

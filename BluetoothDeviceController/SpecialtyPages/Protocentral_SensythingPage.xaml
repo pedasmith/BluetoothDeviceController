@@ -11,8 +11,15 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Page.Resources>
         <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="60" />
             <Setter Property="VerticalAlignment" Value="Bottom" />
-            <Setter Property="Margin" Value="10,0,0,0" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,0,0" />
+        </Style>
+        <Style TargetType="Slider">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,10,0" />
         </Style>
         <Style TargetType="Line">
             <Setter Property="Margin" Value="0,15,0,0" />
@@ -70,140 +77,156 @@
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
-
+        <!-- XAML+SERVICE+LIST for Common Configuration -->
         <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Read" Click="OnReadDevice_Name" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Appearance</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Appearance_Appearance" Text="*" Header="Appearance" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Read" Click="OnReadAppearance" />
 
-                </StackPanel>
+                </GridView>
+
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Central Address Resolution</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Central_Address_Resolution_AddressResolutionSupported" Text="*" Header="AddressResolutionSupported" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Read" Click="OnReadCentral_Address_Resolution" />
 
-                </StackPanel>
+                </GridView>
+
+
+
 
 
             </StackPanel>
         </controls:Expander>
-
+        <!-- XAML+SERVICE+LIST for Battery -->
         <controls:Expander Header="Battery" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">BatteryLevel</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">BatteryLevel</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="BatteryLevel_BatteryLevel" Text="*" Header="BatteryLevel" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteBatteryLevel" />
-
                     <Button Content="Read" Click="OnReadBatteryLevel" />
-
                     <Button Content="Notify" Click="OnNotifyBatteryLevel" />
 
-                </StackPanel>
+                </GridView>
+
+
+
 
 
             </StackPanel>
         </controls:Expander>
-
+        <!-- XAML+SERVICE+LIST for Primary -->
         <controls:Expander Header="Primary" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Analog</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Analog</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Analog_A1" Text="*" Header="A1" Style="{StaticResource HEXStyle}"/>
-
                     <TextBox IsReadOnly="True" x:Name="Analog_A2" Text="*" Header="A2" Style="{StaticResource HEXStyle}"/>
-
                     <TextBox IsReadOnly="True" x:Name="Analog_A3" Text="*" Header="A3" Style="{StaticResource HEXStyle}"/>
-
                     <TextBox IsReadOnly="True" x:Name="Analog_A4" Text="*" Header="A4" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Notify" Click="OnNotifyAnalog" />
 
-                </StackPanel>
+                </GridView>
 
-                <controls:Expander Header="Analog Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
-                    <StackPanel MinWidth="550">
-                        <charts:ChartControl Height="200" Width="500" x:Name="AnalogChart" />
-                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="AnalogGrid" ItemsSource="{Binding AnalogRecordData}" />
-                        <TextBox  x:Name="Analog_Notebox" KeyDown="OnAnalog_NoteKeyDown" />
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                            <ComboBox SelectionChanged="OnKeepCountAnalog" Header="Keep how many items?" SelectedIndex="2">
-                                <ComboBoxItem Tag="10">10</ComboBoxItem>
-                                <ComboBoxItem Tag="100">100</ComboBoxItem>
-                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
-                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
-                            </ComboBox>
-                            <Rectangle Width="5" />
-                            <ComboBox SelectionChanged="OnAlgorithmAnalog" Header="Remove algorithm?" SelectedIndex="0">
-                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
-                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
-                            </ComboBox>
-                            <Button Content = "Copy" Click="OnCopyAnalog" />
+
+
+                    <controls:Expander Header="Analog Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                        <StackPanel MinWidth="550">
+                            <charts:ChartControl Height="200" Width="500" x:Name="AnalogChart" />
+
+                            <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="AnalogGrid" ItemsSource="{Binding AnalogRecordData}" />
+                            <TextBox  x:Name="Analog_Notebox" KeyDown="OnAnalog_NoteKeyDown" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <ComboBox SelectionChanged="OnKeepCountAnalog" Header="Keep how many items?" SelectedIndex="2">
+                                    <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                    <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                    <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                    <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                                </ComboBox>
+                                <Rectangle Width="5" />
+                                <ComboBox SelectionChanged="OnAlgorithmAnalog" Header="Remove algorithm?" SelectedIndex="0">
+                                    <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                    <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                                </ComboBox>
+                                <Button Content = "Copy" Click="OnCopyAnalog" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </controls:Expander>
+                    </controls:Expander>
 
 
             </StackPanel>
         </controls:Expander>
-
+        <!-- XAML+SERVICE+LIST for QWIIC -->
         <controls:Expander Header="QWIIC" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">QWIIC</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">QWIIC</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="QWIIC_Sensor" Text="*" Header="Sensor" Style="{StaticResource HEXStyle}"/>
-
                     <TextBox IsReadOnly="False" x:Name="QWIIC_Channel1" Text="*" Header="Channel1" Style="{StaticResource HEXStyle}"/>
-
                     <TextBox IsReadOnly="False" x:Name="QWIIC_Channel2" Text="*" Header="Channel2" Style="{StaticResource HEXStyle}"/>
-
                     <TextBox IsReadOnly="False" x:Name="QWIIC_Channel3" Text="*" Header="Channel3" Style="{StaticResource HEXStyle}"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-
                     <TextBox IsReadOnly="False" x:Name="QWIIC_Channel4" Text="*" Header="Channel4" Style="{StaticResource HEXStyle}"/>
-
                     <TextBox IsReadOnly="False" x:Name="QWIIC_Channel5" Text="*" Header="Channel5" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteQWIIC" />
-
                     <Button Content="Read" Click="OnReadQWIIC" />
-
                     <Button Content="Notify" Click="OnNotifyQWIIC" />
 
-                </StackPanel>
+                </GridView>
+
+
+
 
 
             </StackPanel>

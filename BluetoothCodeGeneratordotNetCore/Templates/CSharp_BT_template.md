@@ -1,4 +1,4 @@
-﻿# Protocol FileName=[[CLASSNAME]].cs
+﻿# Protocol FileName=[[CLASSNAME]].cs DirName=BluetoothProtocols
 
 ```
 //From template: Protocol_Body v2022-07-02 9:54

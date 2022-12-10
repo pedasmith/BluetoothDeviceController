@@ -37,6 +37,7 @@ namespace BluetoothDeviceController.Names
         public string Name { get; set; }
         public enum CompletionStatusEnum {  Usable, Unusable};
         public CompletionStatusEnum CompletionStatus { get; set; } = CompletionStatusEnum.Usable;
+        public string CompletionStatusExplanation { get; set; } = "";
         /// <summary>
         /// Should be [maker]_[device]. Be consistant with other devices. This is used directly to make C# class names, so it must be a valid C# class name.
         /// </summary>

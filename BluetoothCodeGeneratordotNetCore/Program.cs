@@ -31,7 +31,7 @@ namespace BluetoothCodeGenerator
             Log(text, Verbose.Verbose);
         }
 
-        private static void ReadJsonFile(string filename, List<TemplateSnippet> outputList)
+        private static void ReadJsonFile(string filename,string logfname, List<TemplateSnippet> outputList)
         {
             if (filename != "")
             {
@@ -44,28 +44,42 @@ namespace BluetoothCodeGenerator
                     var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllBleDevices>(contents);
                     if (newlist.AllDevices.Count == 0)
                     {
-                        Log($"Error: {NAME}: JSON file has no devices for file {filename}");
+                        Log($"Error: {NAME}: JSON file has no devices for file {logfname}");
+                        return;
                     }
+                    var ndevicesOk = 0;
+                    var ndevicesNotOk = 0;
+                    var ndevices = 0;
                     foreach (var nameDevice in newlist.AllDevices)
                     {
+                        ndevices++;
                         if (filename.Contains ("Gems"))
                         {
                             ; // handy place to put a debugger.
                         }
                         if (nameDevice.CompletionStatus == NameDevice.CompletionStatusEnum.Unusable)
                         {
-                            Log($"Note: {nameDevice.Name} is marked as Unusable");
+                            Log($"Note: {logfname}\tUNUSABLE");
+                            ndevicesNotOk++;
                             continue;
                         }
                         outputList.Add(BtJsonToMacro.Convert(nameDevice));
+                        ndevicesOk++;
                     }
-                    //InitSingleBleFile(AllDevices, file, DefaultDevice);
-                    //InitSingleBleFile(AllRawDevices, file, null); // read in a device without adding in default services
+                    if (ndevices != (ndevicesNotOk + ndevicesOk))
+                    {
+                        Log($"Error: {NAME}: incorrect error count in file {logfname} ");
+                    }
+                    else if (ndevicesOk > 0)
+                    {
+                        Log($"Verbose: read in file {logfname}");
+                    }
+                    // otherwise there were errors and they have already been displayed
 
                 }
                 catch (Exception e)
                 {
-                    Log($"Error: {NAME}: unable to read JSON file from {filename}; reason {e.Message}");
+                    Log($"Error: {NAME}: unable to read JSON file from {logfname}; reason {e.Message}");
                     return;
                 }
             }
@@ -114,7 +128,7 @@ namespace BluetoothCodeGenerator
                         List<TemplateSnippet> jsonData = new List<TemplateSnippet>();
                         if (args.InputJsonFile != "")
                         {
-                            ReadJsonFile(args.InputJsonFile, jsonData);
+                            ReadJsonFile(args.InputJsonFile, args.InputJsonFile, jsonData);
                         }
                         if (args.InputJsonDirectory != "")
                         {
@@ -125,8 +139,10 @@ namespace BluetoothCodeGenerator
                                 {
                                     if (file.EndsWith(".json"))
                                     {
-                                        Log($"Verbose: read in file {file}");
-                                        ReadJsonFile(file, jsonData);
+                                        var logfname = file;
+                                        var idx = logfname.IndexOf("..");
+                                        if (idx > 0) logfname = logfname.Substring(idx); 
+                                        ReadJsonFile(file, logfname, jsonData);
                                     }
                                 }
                             }
@@ -149,7 +165,7 @@ namespace BluetoothCodeGenerator
                             {
                                 // For each BT info, make the needed macros.
                                 // This is just stubbed out for now.
-                                Log($"Verbose: jsonData length {jsonData.Count}");
+                                // Log($"Verbose: jsonData length {jsonData.Count}");
                                 foreach (var btdata in jsonData)
                                 {
                                     if (string.IsNullOrEmpty (btdata.Name)
@@ -161,8 +177,10 @@ namespace BluetoothCodeGenerator
                                     Expander.ExpandChildTemplatesIntoMacros(child, btdata);
 
                                     var fname = Expander.ExpandMacroAll(child.OptionFileName, btdata);
-                                    var outfilename = args.OutputDirectory + "\\" + fname;
-                                    Log($"Writing file {fname} as {outfilename}");
+                                    var dirname = string.IsNullOrEmpty(child.OptionDirName) ? "" : "\\" + child.OptionDirName;
+                                    var outfilename = args.OutputDirectory + dirname + "\\" + fname;
+                                    Directory.CreateDirectory(args.OutputDirectory + dirname);
+                                    //Log($"Writing file {fname} as {outfilename}");
                                     if (fname == ".cs")
                                     {
                                         ; // handy place to hang a debugger.
@@ -176,7 +194,7 @@ namespace BluetoothCodeGenerator
                                     else
                                     {
                                         var code = Expander.ExpandMacroAll(codeTemplate, btdata);
-                                        Log($"Length starts as {codeTemplate.Length} and becomes {code.Length}");
+                                        Log($"Writing file {fname} as {outfilename}; length {codeTemplate.Length}==>{code.Length}");
                                         File.WriteAllText(outfilename, code, Encoding.UTF8);
                                     }
                                 }

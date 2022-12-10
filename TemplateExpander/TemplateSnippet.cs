@@ -53,6 +53,7 @@ namespace TemplateExpander
             }
         }
         public string OptionFileName { get; internal set; } = "";
+        public string OptionDirName { get; internal set; } = "";
         public string OptionIf { get; internal set; }
         public bool OptionTrim { get; internal set; } = false;
         public bool OptionTrimWrap { get; internal set; } = false;
@@ -248,6 +249,9 @@ namespace TemplateExpander
                             break;
                         case "CodeWrap":
                             retval.CodeWrap = opts[1];
+                            break;
+                        case "DirName":
+                            retval.OptionDirName = opts[1];
                             break;
                         case "FileName":
                             retval.OptionFileName = opts[1];

@@ -2,7 +2,8 @@
   "AllDevices": [
     {
       "Name": "PC-60F_SN109400",
-	  "CompletionStatus": "Unusable",
+      "CompletionStatus": "Unusable",
+      "CompletionStatusExplanation": "2022-12-10: protocol is understood; device sends advertisement packets which can be decoded",
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

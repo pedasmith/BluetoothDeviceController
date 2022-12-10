@@ -231,7 +231,7 @@
             {
               "UUID": "00002a07-0000-1000-8000-00805f9b34fb",
               "Name": "Transmit Power",
-              "Type": "I8|DEC|Transmit Power|db"
+              "Type": "I8|DEC|TransmitPower|db"
             },
             {
               "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
@@ -256,7 +256,7 @@
             {
               "UUID": "00002a5b-0000-1000-8000-00805f9b34fb",
               "Name": "Cycling Service Measurement",
-              "Type": "U8|HEX|Flags_1wheel_2crank U32|DEC|WheelRevolutions U16^1024_/|FIXED|WheelLastTime|s U32|DEC|CrankRevolutions U16^1024_/|FIXED|CrankLastTime|s "
+              "Type": "U8|HEX|Flags_1wheel_2crank U32|DEC|WheelRevolutions U16^1024_/|FIXED|WheelLastTime|s U32|DEC|CrankRevolutions U16^1024_/|FIXED|CrankLastTime|s"
             },
             {
               "UUID": "00002a5c-0000-1000-8000-00805f9b34fb",

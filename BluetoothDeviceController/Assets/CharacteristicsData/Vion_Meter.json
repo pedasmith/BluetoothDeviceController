@@ -3,8 +3,10 @@
     {
       "Name": "Vion Meter",
       "ClassName": "Vion_Meter",
+      "CompletionStatus": "Unusable",
+      "CompletionStatusExplanation": "2022-12-10: meter has been dropped by the creators; BT is inexplicable",
       "Links": [
-        "https://www.kickstarter.com/projects/1441579202/the-worlds-simplest-bluetooth-multimeter" 
+        "https://www.kickstarter.com/projects/1441579202/the-worlds-simplest-bluetooth-multimeter"
 
       ],
       "Services": [
@@ -63,12 +65,12 @@
         {
           "UUID": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
           "Name": "Meter Data",
-          "Priority":  10,
+          "Priority": 10,
           "Characteristics": [
             {
               "UUID": "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
               "Name": "Data Configuration",
-              "REM":  "TODO: what's the right values for configuration?",
+              "REM": "TODO: what's the right values for configuration?",
               "Type": "BYTES|HEX|Data_Configuration",
               "IsWrite": true,
               "IsWriteWithoutResponse": true

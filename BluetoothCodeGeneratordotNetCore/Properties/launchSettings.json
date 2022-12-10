@@ -2,7 +2,7 @@
   "profiles": {
     "BluetoothCodeGeneratordotNetCore": {
       "commandName": "Project",
-      "commandLineArgs": " -inputJsonFile \"..\\BluetoothDeviceController\\Assets\\CharacteristicsData\\Pyle_PHBPBW40_Samico_BG512_Blood_Pressure.json\" -inputTemplates Templates -output output\r\n",
+      "commandLineArgs": " -inputJsonFile \"..\\BluetoothDeviceController\\Assets\\CharacteristicsData\\DefaultBluetooth.json\" -inputTemplates Templates -output output\r\n",
       "workingDirectory": "C:\\Users\\toomr\\source\\repos\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore",
       "remoteDebugEnabled": true
     }

@@ -98,7 +98,6 @@ namespace BluetoothDeviceController.Beacons
                                     bleWrapper.EddystoneUrl = retval;
                                     if (result.Success && result.Url.StartsWith("https://ruu.vi/#"))
                                     {
-                                        //foundValues.Add(AdvertisementType.RuuviTag);
                                         var ruuvi = BluetoothDeviceController.Beacons.Ruuvi_Tag_v1_Helper.ParseRuuviTag(result.Url);
                                         ruuvi.Data.EventTime = DateTime.Now;
                                         if (ruuvi.Success)
@@ -107,20 +106,10 @@ namespace BluetoothDeviceController.Beacons
                                         }
                                         bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.RuuviTag;
                                         bleWrapper.RuuviDataRecord = ruuvi.Data;
-                                        // TODO: this is actually weird; it should be done somewhere else.
-                                        // This function is all about setting up the wrapper, not actually
-                                        // triggering events!
-                                        //TODO: fixing: deviceWrapper?.BleAdvert.Event(ruuvi.Data);
-                                        // 2022-11-10 i think this whole comment section (and the similar one below)
-                                        // can be deleted; IIRC I completed the refactor.
                                     }
                                     else
                                     {
                                         retval = $"Eddystone {result.Url}";
-                                        // TODO: this is actually weird; it should be done somewhere else.
-                                        // This function is all about setting up the wrapper, not actually
-                                        // triggering events!
-                                        //TODO: fixing: deviceWrapper?.BleAdvert.Event(result.Url);
                                     }
                                     break;
                             }
@@ -144,11 +133,8 @@ namespace BluetoothDeviceController.Beacons
         }
 
         /// <summary>
-        /// Horribly, this not only returns some data, but will also call the wrapper.Event() calls via CustomizeWrapperFromAdvertisement if the wrapper is not null.
+        /// This no longer horribly returns some data while also calling the wrapper.Event() calls via CustomizeWrapperFromAdvertisement if the wrapper is not null.
         /// </summary>
-        /// <param retval="deviceWrapper"></param>
-        /// <param retval="bleAdvert"></param>
-        /// <returns></returns>
         public static (string name, string id, string description) GetBleName(BleAdvertisementWrapper bleAdvertWrapper)
         {
             BluetoothLEAdvertisementReceivedEventArgs bleAdvert = bleAdvertWrapper.BleAdvert;
@@ -175,7 +161,7 @@ namespace BluetoothDeviceController.Beacons
                 // BAD: There's a device where the LocalName is 13 NUL chars!
                 name = id;
             }
-            name = CustomizeWrapperFromAdvertisement(bleAdvertWrapper, name);
+            name = CustomizeWrapperFromAdvertisement(bleAdvertWrapper, name); // Used to also trigger an event, but doesn't any more.
             description = AsDescription (bleAdvert);
             return (name, id, description);
         }

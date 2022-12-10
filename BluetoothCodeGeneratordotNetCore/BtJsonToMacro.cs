@@ -67,7 +67,7 @@ namespace BluetoothCodeGenerator
             {
                 return "double";
             }
-            Error($"ByteFormatToCSharp: unknown format {format}");
+            Error($"ByteFormatToCSharp: unknown format={format} expected e.g. F32 or BYTES or STRING");
             return $"OtherType{format}";
         }
 
