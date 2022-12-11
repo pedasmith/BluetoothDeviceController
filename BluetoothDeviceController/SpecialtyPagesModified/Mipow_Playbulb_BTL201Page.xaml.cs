@@ -141,7 +141,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             SetStatus("Reading device");
             SetStatusActive(true);
-            await bleDevice.EnsureCharacteristicAsync(true);
+            await bleDevice.EnsureCharacteristicAsync(MIPOW_Playbulb_BTL201.CharacteristicsEnum.All_enum, true);
             SetStatusActive(false);
         }
 

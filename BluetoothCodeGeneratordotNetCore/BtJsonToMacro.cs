@@ -264,8 +264,10 @@ namespace BluetoothCodeGenerator
                 {
                     foreach (var (enumname, enumvalue) in enumlist)
                     {
-                        enums.Macros.Add("ENUM_NAME", enumname);
-                        enums.Macros.Add("ENUM_VALUE", enumvalue.ToString());
+                        var singleEnum = new TemplateSnippet(enumname);
+                        enums.AddChild(enumname, singleEnum);
+                        singleEnum.Macros.Add("ENUM_NAME", enumname);
+                        singleEnum.Macros.Add("ENUM_VALUE", enumvalue.ToString());
                     }
                 }
 

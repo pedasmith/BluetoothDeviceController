@@ -80,7 +80,7 @@
 
         {
           "UUID": "0000ffd5-0000-1000-8000-00805f9b34fb",
-          "Name": "Light Control",
+          "Name": "Light Control B",
           "REM": "This is a dup of the 0000ffe5-0000-1000-8000-00805f9b34fb",
           "REM_2": "Some bulbs use one, some use the other",
           "Priority":  10,
@@ -102,7 +102,7 @@
             },
             {
               "UUID": "0000ffd9-0000-1000-8000-00805f9b34fb",
-              "Name": "Triones Command",
+              "Name": "Triones Command B",
               "Type": "BYTES|HEX",
               "IsWriteWithoutResponse": true,
               "SampleCommands": [

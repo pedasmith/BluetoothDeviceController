@@ -1,12 +1,5 @@
 ﻿using BluetoothDeviceController.Names;
-using Microsoft.Toolkit.Parsers.Markdown;
-using Microsoft.Toolkit.Parsers.Markdown.Blocks;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using TemplateExpander;
 
 // See https://docs.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-enhance
@@ -31,8 +24,9 @@ namespace BluetoothCodeGenerator
             Log(text, Verbose.Verbose);
         }
 
-        private static void ReadJsonFile(string filename,string logfname, List<TemplateSnippet> outputList)
+        private static int ReadJsonFile(string filename,string logfname, List<TemplateSnippet> outputList)
         {
+            int nerror = 0; // error is a fatal error
             if (filename != "")
             {
                 try
@@ -45,7 +39,8 @@ namespace BluetoothCodeGenerator
                     if (newlist.AllDevices.Count == 0)
                     {
                         Log($"Error: {NAME}: JSON file has no devices for file {logfname}");
-                        return;
+                        nerror++;
+                        return nerror;
                     }
                     var ndevicesOk = 0;
                     var ndevicesNotOk = 0;
@@ -61,7 +56,7 @@ namespace BluetoothCodeGenerator
                         {
                             Log($"Note: {logfname}\tUNUSABLE");
                             ndevicesNotOk++;
-                            continue;
+                            continue; // unusable is not an error; lots of devices are unusable.
                         }
                         outputList.Add(BtJsonToMacro.Convert(nameDevice));
                         ndevicesOk++;
@@ -69,6 +64,7 @@ namespace BluetoothCodeGenerator
                     if (ndevices != (ndevicesNotOk + ndevicesOk))
                     {
                         Log($"Error: {NAME}: incorrect error count in file {logfname} ");
+                        nerror++;
                     }
                     else if (ndevicesOk > 0)
                     {
@@ -80,9 +76,11 @@ namespace BluetoothCodeGenerator
                 catch (Exception e)
                 {
                     Log($"Error: {NAME}: unable to read JSON file from {logfname}; reason {e.Message}");
-                    return;
+                    nerror++;
+                    return nerror;
                 }
             }
+            return nerror;
         }
 
         static void Main(string[] rawargs)
@@ -90,6 +88,7 @@ namespace BluetoothCodeGenerator
             var args = ProgramArgs.ParseFromArgs(rawargs);
             TemplateSnippet.Verbosity = (TemplateSnippet.Verbose)Verbosity;//Must keep in sync.
             TemplateSnippet.NAME = NAME;
+            int nerror = 0;
 
             switch (args.Command)
             {
@@ -100,6 +99,7 @@ namespace BluetoothCodeGenerator
                     Log("-inputBtFile <file> to select a single BT JSON file");
                     break;
                 case ProgramArgs.CommandType.Error:
+                    nerror++;
                     Log($"Error: {NAME}: {args.ErrorMessage}");
                     break;
                 case ProgramArgs.CommandType.Run:
@@ -112,23 +112,24 @@ namespace BluetoothCodeGenerator
                         catch (Exception)
                         {
                             Log($"Error: {NAME}: unable to get files from {args.InputTemplateDirectory}");
-                            return;
+                            nerror++;
+                            break;
                         }
 
                         TemplateSnippet allSnippets = new TemplateSnippet("allSnippets");
 
-                        int nerror = TemplateSnippet.ReadAllFiles(files, allSnippets);
+                        nerror = TemplateSnippet.ReadAllFiles(files, allSnippets);
                         if (nerror > 0)
                         {
                             Log($"ERROR: {NAME}: total parse errors={nerror}");
-                            return;
+                            break;
                         }
 
                         // Read in the JSON file
                         List<TemplateSnippet> jsonData = new List<TemplateSnippet>();
                         if (args.InputJsonFile != "")
                         {
-                            ReadJsonFile(args.InputJsonFile, args.InputJsonFile, jsonData);
+                            nerror += ReadJsonFile(args.InputJsonFile, args.InputJsonFile, jsonData);
                         }
                         if (args.InputJsonDirectory != "")
                         {
@@ -142,14 +143,15 @@ namespace BluetoothCodeGenerator
                                         var logfname = file;
                                         var idx = logfname.IndexOf("..");
                                         if (idx > 0) logfname = logfname.Substring(idx); 
-                                        ReadJsonFile(file, logfname, jsonData);
+                                        nerror += ReadJsonFile(file, logfname, jsonData);
                                     }
                                 }
                             }
                             catch (Exception)
                             {
                                 Log($"Error: {NAME}: unable to get files from {args.InputJsonDirectory}");
-                                return;
+                                nerror++;
+                                break;
                             }
                         }
 
@@ -190,6 +192,7 @@ namespace BluetoothCodeGenerator
                                     if (codeTemplate == null)
                                     {
                                         Log($"Error: was unable to expand the Code template for {fname}");
+                                        nerror++;
                                     }
                                     else
                                     {
@@ -203,6 +206,10 @@ namespace BluetoothCodeGenerator
                     }
                     break;
             } // end switch on the command type (run, error, help, etc.)
+            if (nerror > 0)
+            {
+                Log($"ERROR: total error count is {nerror} (should be zero)");
+            }
         }
     }
 }
