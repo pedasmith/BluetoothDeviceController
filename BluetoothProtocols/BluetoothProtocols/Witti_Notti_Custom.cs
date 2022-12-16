@@ -58,7 +58,7 @@ namespace BluetoothProtocols
             if (Data6.HasValue) dw.WriteByte(Data6.Value);
 
             var command = dw.DetachBuffer().ToArray();
-            await WriteCommandAsync(16, "Command", command, GattWriteOption.WriteWithoutResponse);
+            await WriteCommandAsync(CharacteristicsEnum.Command_LED_Control_enum, "Command", command, GattWriteOption.WriteWithoutResponse);
         }
 
 

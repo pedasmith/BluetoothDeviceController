@@ -1,4 +1,4 @@
-﻿# PageXaml FileName=[[CLASSNAME]]Page.xamln DirName=SpecialtyPages
+﻿# PageXaml FileName=[[CLASSNAME]]Page.xaml DirName=SpecialtyPages
 ```
 <Page
     x:Class="BluetoothDeviceController.SpecialtyPages.[[CLASSNAME]]Page"
