@@ -70,7 +70,7 @@ Right now, the following list has been verified as controllable with this progra
 * [Elegoo MiniCar](Device_Elegoo_MiniCar.md)
 * [Reality Robotics BERO](Device_RealityRobotics_Bero.md)
 * [Slant Robotics LittleBot](Device_SlantRobotics_LittleBot.md)
-* [William Weiler Engineering Skoobot](WilliamWeilerEngineering_Skoobot.md)
+* [William Weiler Engineering Skoobot](Device_WilliamWeilerEngineering_Skoobot.md)
 
 ## Programmable Devices
 There are a wide variety of Espruino and other programmable Bluetooth devices. This program will

@@ -1,10 +1,31 @@
 ﻿# TODO list
 
-- [ ] Make the XAML CS files work
+- [] Robots!
+- [x] Make the XAML CS files work
 - [x] Read in list of MD files from  directory
 - [x] Parse into TemplateSnippet
 - [x] Read in JSON
 - [x] Write out template w/CLASSNAME
+
+# What this is
+
+The Bluetooth Code Generator converts JSON descriptions of Bluetooth devices into working code. The code is divided into low-level protocol code to directly connect to a device, and XAML (and the XAML.CS) files to form crude interfaces to manipulate the devices.
+
+The Bluetooth CCode Generator is used in conjunction with the Bluetooth Device Controller program.
+
+Problems solved include:
+
+1. Bluetooth requires a lot of common "boilerplate" code; the Bluetooth Code Generator creates those for you
+2. Some Bluetooth LE devices have complex characteristics; the JSON descriptions include a mini-language for describing those characteristics. (Note that some devices are more complex than the mini-language can describe)
+3. A preliminary version of the JSON can be generated automatically by the Bluetooth Device Controller program.
+4. The UX code can generate useful data tables and graphs for numeric data. 
+5. The UX code can generate some level of "fancy" code for controlling devices
+
+Problems not solved:
+1. Some Bluetooth devices are COM-port based. These are handled by a seperate system of **SerialData** files
+2. Some Bluetooth devices are BLE version of COM-port based devices; these are handled with a series of "macro" values are difficult to properly describe and require an expert to create
+3. Some Bluetooth devices use advertisements for their data. This requires C# code directly in the Blueooth Device Controller; there's no JSON description of the advertisement format.
+4. You can modify the resulting files. However, once modified, the code cannot be usefully regenerated.
 
 # Syntx for the template file
 

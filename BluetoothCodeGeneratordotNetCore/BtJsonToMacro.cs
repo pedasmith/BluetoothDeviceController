@@ -258,18 +258,75 @@ namespace BluetoothCodeGenerator
                 // All of the Enums for a characteristic.Used by the Skoobot for the different 
                 // robot command (Left, Stop, Right, etc.)
                 // 
-                var enums = new TemplateSnippet("Enums");
-                ch.AddChild("Enums", buttons); // always add, even if it's got nothing in it.
+                var buttonSource = "None"; // or might be ButtonUI
+                var commandEnums = new TemplateSnippet("Enums");
+                ch.AddChild("Enums", commandEnums); // always add, even if it's got nothing in it.
+                if (btCharacteristic.EnumValues.Count > 0)
+                {
+                    buttonSource = "Enums";
+                }
                 foreach (var (enumcommandname, enumlist) in btCharacteristic.EnumValues)
                 {
+                    // NOTE: technically this is wrong; there could be any number of Enum values
                     foreach (var (enumname, enumvalue) in enumlist)
                     {
                         var singleEnum = new TemplateSnippet(enumname);
-                        enums.AddChild(enumname, singleEnum);
-                        singleEnum.Macros.Add("ENUM_NAME", enumname);
-                        singleEnum.Macros.Add("ENUM_VALUE", enumvalue.ToString());
+                        commandEnums.AddChild(enumname, singleEnum);
+                        singleEnum.Macros.Add("EnumCommandName", enumcommandname); // Maybe instead have a hierarchy?
+                        singleEnum.Macros.Add("EnumName", enumname);
+                        singleEnum.Macros.Add("EnumValue", enumvalue.ToString());
                     }
                 }
+
+                //
+                // All of the UI elements. Used by the Skoobot for the different
+                // robot commands (Left, Stop, Right, etc.)
+                //
+
+                var uiCustom = new TemplateSnippet("ButtonUI");
+                ch.AddChild("ButtonUI", uiCustom);
+                var ui = btCharacteristic.UI;
+                ch.AddMacro("buttonType", ui?.buttonType ?? "");
+                ch.AddMacro("buttonMaxColumns", (ui?.buttonUI?.MaxColumns ?? 5).ToString());
+                if (ui != null)
+                {
+                    if (ui.buttonUI != null && ui.buttonUI.Buttons.Count > 0) // if buttonUI is null, we make mediocre buttons.
+                    {
+                        buttonSource = "ButtonUI";
+
+                        // Get the enum translations from the ../Enums macros
+                        var enumSource = ui.buttonUI.DefaultEnum;
+                        var enumList = commandEnums;
+
+                        int index = 0;
+                        foreach (var button in ui.buttonUI.Buttons)
+                        {
+                            var enumname = button.Label; //  "?enumname?button?";
+                            if (string.IsNullOrEmpty(enumname)) enumname = $"button{index}";
+                            var singleEnum = new TemplateSnippet(enumname);
+                            uiCustom.AddChild(enumname, singleEnum);
+
+                            // Find the enum value
+                            var enumValue = "";
+                            foreach (var (name, macros) in enumList.Children) // n**2 FTW!
+                            {
+                                if (macros.Macros["EnumCommandName"] == enumSource
+                                    && macros.Macros["EnumName"] == button.Enum)
+                                {
+                                    enumValue = macros.Macros["EnumValue"];
+                                }
+                            }
+
+                            singleEnum.Macros.Add("ButtonEnum", button.Enum);
+                            singleEnum.Macros.Add("ButtonEnumValue", enumValue);
+                            singleEnum.Macros.Add("ButtonLabel", button.Label);
+                            singleEnum.Macros.Add("ButtonType", button.Type.ToString()); // "Blank" or "Button"
+                            index++;
+                        }
+                    }
+                }
+                ch.AddMacro("ButtonSource", buttonSource); // None Enums or ButtonUI
+
 
                 //
                 // All of the properties (args) for a characteristic. 

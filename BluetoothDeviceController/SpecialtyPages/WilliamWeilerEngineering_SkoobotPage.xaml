@@ -16,6 +16,11 @@
             <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
             <Setter Property="Margin" Value="10,5,0,0" />
         </Style>
+        <Style TargetType="Slider">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,10,0" />
+        </Style>
         <Style TargetType="Line">
             <Setter Property="Margin" Value="0,15,0,0" />
             <Setter Property="Stroke" Value="ForestGreen" />
@@ -65,28 +70,29 @@
             <StackPanel Grid.Column="0">
                 <TextBlock Style="{StaticResource TitleStyle}">Skoobot device</TextBlock>
                 <TextBlock Style="{StaticResource AboutStyle}">
-
+                    
                 </TextBlock>
             </StackPanel>
             <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/WilliamWeilerEngineering_Skoobot.PNG" />
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
-
+        <!-- XAML+SERVICE+LIST for Robot -->
         <controls:Expander Header="Robot" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Command</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Command</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Command_Command" Text="*" Header="Command" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteCommand" />
-
                     <Button Content="Read" Click="OnReadCommand" />
 
-                </StackPanel>
+                </GridView>
                 <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
                     <Button Content="🔊" Tag="23" Click="OnClickCommand" />
                     <Button Content="⇑" Tag="18" Click="OnClickCommand" />
@@ -100,70 +106,80 @@
                     <Button Content="🚗" Tag="64" Click="OnClickCommand" />
                     <Button Content="" Tag="34" Click="OnClickCommand" />
                     <Button Content="" Tag="33" Click="OnClickCommand" />
-                </VariableSizedWrapGrid>
+
+                </VariableSizedWrapGrid>    
+
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Distance</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Distance_Distance" Text="*" Header="Distance" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Read" Click="OnReadDistance" />
-
                     <Button Content="Notify" Click="OnNotifyDistance" />
 
-                </StackPanel>
+                </GridView>
 
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">AmbientLight</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="AmbientLight_AmbientLight" Text="*" Header="AmbientLight" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Read" Click="OnReadAmbientLight" />
-
                     <Button Content="Notify" Click="OnNotifyAmbientLight" />
 
-                </StackPanel>
+                </GridView>
 
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Microphone</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Microphone_Audio" Text="*" Header="Audio" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteMicrophone" />
-
                     <Button Content="Read" Click="OnReadMicrophone" />
-
                     <Button Content="Notify" Click="OnNotifyMicrophone" />
 
-                </StackPanel>
+                </GridView>
+
 
 
 
             </StackPanel>
         </controls:Expander>
-
+        <!-- XAML+SERVICE+LIST for Common Configuration -->
         <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
 
-
                     <Button Content="Write" Click="OnWriteDevice_Name" />
-
                     <Button Content="Read" Click="OnReadDevice_Name" />
 
-                </StackPanel>
+                </GridView>
+
 
 
 

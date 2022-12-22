@@ -29,12 +29,14 @@ namespace BluetoothCodeGenerator
             int nerror = 0; // error is a fatal error
             if (filename != "")
             {
+                var step = "start";
                 try
                 {
                     // Read in the Default device. 
                     //DefaultDevice = await InitBleDefault(dname);
 
                     var contents = File.ReadAllText(filename);
+                    step = "deserialize";
                     var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllBleDevices>(contents);
                     if (newlist.AllDevices.Count == 0)
                     {
@@ -42,6 +44,7 @@ namespace BluetoothCodeGenerator
                         nerror++;
                         return nerror;
                     }
+                    step = "generate";
                     var ndevicesOk = 0;
                     var ndevicesNotOk = 0;
                     var ndevices = 0;
@@ -58,7 +61,10 @@ namespace BluetoothCodeGenerator
                             ndevicesNotOk++;
                             continue; // unusable is not an error; lots of devices are unusable.
                         }
+                        step = "convert";
                         outputList.Add(BtJsonToMacro.Convert(nameDevice));
+                        step = "convert-complete";
+
                         ndevicesOk++;
                     }
                     if (ndevices != (ndevicesNotOk + ndevicesOk))
@@ -75,7 +81,7 @@ namespace BluetoothCodeGenerator
                 }
                 catch (Exception e)
                 {
-                    Log($"Error: {NAME}: unable to read JSON file from {logfname}; reason {e.Message}");
+                    Log($"Error: {NAME}: unable to read JSON file from {logfname}; reason {e.Message} at {step}");
                     nerror++;
                     return nerror;
                 }

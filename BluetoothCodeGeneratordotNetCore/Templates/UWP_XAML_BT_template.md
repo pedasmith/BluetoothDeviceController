@@ -97,6 +97,7 @@ Feel free to add in this little explainer to the code
 ```
 
 ## XAML+READWRITE+BUTTON+LIST Type=list Source=Services/Characteristics/Buttons ListOutput=parent CodeListSubZero=""
+
 ```
                     <Button Content="[[ButtonVerb]]" Click="On[[ButtonVerb]][[CharacteristicName.dotNet]]" />
 ```
@@ -107,18 +108,49 @@ Feel free to add in this little explainer to the code
 <charts:ChartControl Height="200" Width="500" x:Name="[[CharacteristicName.dotNet]]Chart" />
 ```
 
-## XAML+ENUM+BUTTON+LIST Type=list Source=Services/Characteristics/Enums ListOutput=parent 
+## XAML+ENUM+SIMPLE+BUTTON+LIST If="[[ButtonSource]] == Enums" Type=list Source=Services/Characteristics/Enums ListOutput=parent 
 
-Was PageXamlCharacteristicEnumButtonTemplate
+Was PageXamlCharacteristicEnumButtonTemplate. 
+Creates simple buttons from a list of Enums; this makes for pretty seriously ugly buttons.
+The preferred approach is to make a buttonUI item with a Buttons list (see the William Weiler Skoobot)
+
 ```
-                    <Button Content="[[ENUM+NAME]]" Tag="[[ENUM+VALUE]]" Click="OnClick[[CharacteristicName.dotNet]]" />
+                    <Button Content="[[EnumName]]" Tag="[[EnumValue]]" Click="OnClick[[CharacteristicName.dotNet]]" />
+```
+
+
+## XAML+UI+BUTTON+LIST+CONTENT+BUTTON If="[[ButtonType]] contains Button" Type=list Source=Services/Characteristics/ButtonUI ListOutput=child  Trim=true
+
+```
+                    <Button Content="[[ButtonLabel]]" Tag="[[ButtonEnumValue]]" Click="OnClick[[CharacteristicName.dotNet]]" />
 ```
         
-## XAML+ENUM+BUTTON+LIST+PANEL Type=list Source=Services/Characteristics ListOutput=child
-Was PageXamlCharacteristicEnumButtonPanelTemplate
+## XAML+UI+BUTTON+LIST+CONTENT+RECTANGLE If="[[ButtonType]] contains Blank" Type=list Source=Services/Characteristics/ButtonUI ListOutput=child Trim=true
+
 ```
-                <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="[[MAXCOLUMNS]]">
-[[XAML+ENUM+BUTTON+LIST]]                </VariableSizedWrapGrid>	
+                    <Rectangle />
+```
+        
+
+## XAML+UI+BUTTON+LIST If="[[ButtonSource]] contains ButtonUI" Type=list Source=Services/Characteristics/ButtonUI ListOutput=parent 
+
+TODO: this is the new list I'm working on here!here
+It is like the XAML+ENUM+SIMPLE+BUTTON+LIST but creates much nicer buttons
+
+```
+[[XAML+UI+BUTTON+LIST+CONTENT+BUTTON]][[XAML+UI+BUTTON+LIST+CONTENT+RECTANGLE]]
+```
+
+
+        
+## XAML+ENUM+BUTTON+LIST+PANEL If="[[ButtonSource]] !contains None" Type=list Source=Services/Characteristics ListOutput=child
+Was PageXamlCharacteristicEnumButtonPanelTemplate
+
+
+```
+                <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="[[buttonMaxColumns]]">
+[[XAML+UI+BUTTON+LIST]][[XAML+ENUM+SIMPLE+BUTTON+LIST]]
+                </VariableSizedWrapGrid>	
 ```
 
 
