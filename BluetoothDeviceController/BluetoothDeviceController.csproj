@@ -681,7 +681,7 @@
     <Content Include="Assets\CharacteristicsData\Gems_ActivityTracker.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\CharacteristicsData\Elegoo_Mini_Car.json">
+    <Content Include="Assets\CharacteristicsData\Elegoo_MiniCar.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\CharacteristicsData\Pyle_PHBPBW40_Samico_BG512_Blood_Pressure.json">
