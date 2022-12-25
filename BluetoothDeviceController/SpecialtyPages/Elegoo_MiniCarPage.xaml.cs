@@ -481,7 +481,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             SetStatus("Reading device");
             SetStatusActive(true);
-            await bleDevice.EnsureCharacteristicAsync(true);
+            await bleDevice.EnsureCharacteristicAsync(Elegoo_MiniCar.CharacteristicsEnum.All_enum, true);
             SetStatusActive(false);
         }
     }

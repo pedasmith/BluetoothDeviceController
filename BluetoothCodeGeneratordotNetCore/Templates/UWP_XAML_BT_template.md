@@ -153,6 +153,52 @@ Was PageXamlCharacteristicEnumButtonPanelTemplate
                 </VariableSizedWrapGrid>	
 ```
 
+## XAML+UILIST+LIST+CONTENT+BLANK If="[[UIType]] contains Blank" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
+
+```
+                    <Rectangle />
+```
+
+## XAML+UILIST+LIST+CONTENT+BUTTON If="[[UIType]] contains ButtonFor" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
+
+```
+                    <Button Content="[[Label]]" Click="[[FunctionName]]_ButtonClick" />
+```
+
+## XAML+UILIST+LIST+CONTENT+ROWSTART If="[[UIType]] contains RowStart" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
+
+```
+                    <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="[[N]]">
+```
+
+## XAML+UILIST+LIST+CONTENT+ROWEND If="[[UIType]] contains RowEnd" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
+
+```
+                    </VariableSizedWrapGrid>
+```
+
+## XAML+UILIST+LIST+CONTENT+SLIDER If="[[UIType]] contains SliderFor" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
+
+```
+                    <Slider Header="[[Slider_Label]]" Value="[[Slider_Init]]" Minimum="[[Slider_Min]]" Maximum="[[Slider_Max]]" ValueChanged="[[FunctionName]]_SliderChanged" />
+```
+
+## XAML+UILIST+LIST If="[[UIListType]] !contains None" Type=list Source=Services/Characteristics/UIList ListOutput=parent 
+
+```
+[[XAML+UILIST+LIST+CONTENT+BLANK]][[XAML+UILIST+LIST+CONTENT+BUTTON]][[XAML+UILIST+LIST+CONTENT+ROWSTART]][[XAML+UILIST+LIST+CONTENT+ROWEND]][[XAML+UILIST+LIST+CONTENT+SLIDER]]
+```
+
+## XAML+UILIST+PANEL If="[[UIListType]] !contains None" Type=list Source=Services/Characteristics ListOutput=child
+Was PageXamlCharacteristicEnumButtonPanelTemplate
+
+
+```
+                <StackPanel>
+[[XAML+UILIST+LIST]]
+                </StackPanel>	
+```
+
 
 ## XAML+TABLE If="[[TableType]] contains standard" Type=list Source=Services/Characteristics ListOutput=child 
 
@@ -207,6 +253,7 @@ Instead, the code should be updated to be a GridView where the ItemsPanel is set
                 </GridView>
 [[XAML+ENUM+BUTTON+LIST+PANEL]]
 [[XAML+FUNCTIONUI+LIST+PANEL]]
+[[XAML+UILIST+PANEL]]
 [[XAML+TABLE]]
 ```
 
