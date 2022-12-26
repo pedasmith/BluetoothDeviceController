@@ -153,16 +153,52 @@ Was PageXamlCharacteristicEnumButtonPanelTemplate
                 </VariableSizedWrapGrid>	
 ```
 
+
+
 ## XAML+UILIST+LIST+CONTENT+BLANK If="[[UIType]] contains Blank" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
 
 ```
                     <Rectangle />
 ```
 
+## XAML+UILIST+LIST+CONTENT+COMBOBOX+LIST If="[[UIType]] contains ComboBoxFor" Type=list Source=Services/Characteristics/UIList/RadioFor ListOutput=parent
+
+The ComboBoxFor and RadioFor share the same child list called "RadioFor"
+
+NOTE: Cannot set the Trim=true because it cuts the list short? That makes no sense. For Elegoo MiniCar.
+
+```
+                            <ComboBoxItem Content="[[RadioName]]" Tag="[[RadioValue]]" />
+```
+
+## XAML+UILIST+LIST+CONTENT+COMBOBOX+CONTROL If="[[UIType]] contains ComboBoxFor" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
+
+```
+                    <ComboBox Header="[[Sub_Label]]" SelectedIndex="0" MinWidth="140" SelectionChanged="[[FunctionName]]_ComboBoxChanged">
+[[XAML+UILIST+LIST+CONTENT+COMBOBOX+LIST]]
+                    </ComboBox>
+```
+
 ## XAML+UILIST+LIST+CONTENT+BUTTON If="[[UIType]] contains ButtonFor" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
 
 ```
                     <Button Content="[[Label]]" Click="[[FunctionName]]_ButtonClick" />
+```
+
+## XAML+UILIST+LIST+CONTENT+RADIO+LIST If="[[UIType]] contains RadioFor" Type=list Source=Services/Characteristics/UIList/RadioFor ListOutput=parent
+
+NOTE: Cannot set the Trim=true because it cuts the list short? That makes no sense. For Elegoo MiniCar.
+
+```
+                            <RadioButton Content="[[RadioName]]" IsChecked="[[RadioChecked]]" Tag="[[RadioValue]]" Checked="[[FunctionName]]_RadioCheck"  />
+```
+
+## XAML+UILIST+LIST+CONTENT+RADIO+PANEL If="[[UIType]] contains RadioFor" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
+
+```
+                    <StackPanel>
+[[XAML+UILIST+LIST+CONTENT+RADIO+LIST]]
+                    </StackPanel>
 ```
 
 ## XAML+UILIST+LIST+CONTENT+ROWSTART If="[[UIType]] contains RowStart" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
@@ -180,13 +216,13 @@ Was PageXamlCharacteristicEnumButtonPanelTemplate
 ## XAML+UILIST+LIST+CONTENT+SLIDER If="[[UIType]] contains SliderFor" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
 
 ```
-                    <Slider Header="[[Slider_Label]]" Value="[[Slider_Init]]" Minimum="[[Slider_Min]]" Maximum="[[Slider_Max]]" ValueChanged="[[FunctionName]]_SliderChanged" />
+                    <Slider Header="[[Sub_Label]]" Value="[[Slider_Init]]" Minimum="[[Slider_Min]]" Maximum="[[Slider_Max]]" ValueChanged="[[FunctionName]]_SliderChanged" />
 ```
 
 ## XAML+UILIST+LIST If="[[UIListType]] !contains None" Type=list Source=Services/Characteristics/UIList ListOutput=parent 
 
 ```
-[[XAML+UILIST+LIST+CONTENT+BLANK]][[XAML+UILIST+LIST+CONTENT+BUTTON]][[XAML+UILIST+LIST+CONTENT+ROWSTART]][[XAML+UILIST+LIST+CONTENT+ROWEND]][[XAML+UILIST+LIST+CONTENT+SLIDER]]
+[[XAML+UILIST+LIST+CONTENT+BLANK]][[XAML+UILIST+LIST+CONTENT+COMBOBOX+CONTROL]][[XAML+UILIST+LIST+CONTENT+BUTTON]][[XAML+UILIST+LIST+CONTENT+RADIO+PANEL]][[XAML+UILIST+LIST+CONTENT+ROWSTART]][[XAML+UILIST+LIST+CONTENT+ROWEND]][[XAML+UILIST+LIST+CONTENT+SLIDER]]
 ```
 
 ## XAML+UILIST+PANEL If="[[UIListType]] !contains None" Type=list Source=Services/Characteristics ListOutput=child

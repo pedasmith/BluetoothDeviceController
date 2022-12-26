@@ -597,6 +597,26 @@ namespace BluetoothCodeGenerator
                     singleUI.AddMacro("Slider_Max", cmdsub.Max.ToString());
                     singleUI.AddMacro("Slider_Init", cmdsub.Init.ToString());
                     singleUI.AddMacro("Slider_Label", cmdsub.Label);
+                    singleUI.AddMacro("Sub_Label", cmdsub.Label);
+                }
+
+                // Add in the RadioFor list. Always make the list, even if it's empty.
+                TemplateSnippet radioForList = new TemplateSnippet("RadioFor");
+                singleUI.AddChild("RadioFor", radioForList);
+                if (simpleUI.UIType == "RadioFor" || simpleUI.UIType == "ComboBoxFor")
+                {
+                    // Grab the items from the ValueNames
+                    var vnames = cmdsub.ValueNames;
+                    int n = 0;
+                    foreach (var vname in vnames )
+                    {
+                        var value = new TemplateSnippet(vname.Key);
+                        radioForList.AddChild(vname.Key, value);
+                        value.AddMacro("RadioName", vname.Key);
+                        value.AddMacro("RadioValue", vname.Value.ToString());
+                        value.AddMacro("RadioChecked", n == 0 ? "True" : "False");
+                        n++;
+                    }
                 }
 
 

@@ -77,82 +77,93 @@
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
-
+        <!-- XAML+SERVICE+LIST for Car -->
         <controls:Expander Header="Car" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Result</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Result</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Result_Result" Text="*" Header="Result" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Notify" Click="OnNotifyResult" />
 
-                </StackPanel>
+                </GridView>
 
 
 
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Command</TextBlock>
-                <StackPanel Orientation="Horizontal">
-
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Command_Command" Text="*" Header="Command" Style="{StaticResource HEXStyle}"/>
-
 
                     <Button Content="Write" Click="OnWriteCommand" />
 
-                </StackPanel>
+                </GridView>
+
 
                 <StackPanel>
+                    <Slider Header="Beep Tone" Value="100" Minimum="1" Maximum="255" ValueChanged="Beep2_Tone_SliderChanged" />
                     <Button Content="Obstacle" Click="ObstacleAvoidance_ButtonClick" />
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <StackPanel>
+                    <StackPanel>
                             <RadioButton Content="Left" IsChecked="True" Tag="0" Checked="LineTrack_Sensor_RadioCheck"  />
-                            <RadioButton Content="Right" IsChecked="False" Tag="1" Checked="LineTrack_Sensor_RadioCheck" />
-                        </StackPanel>
-                        <Button Content="Line Track Mode" Click="LineTrack_ButtonClick" />
+                            <RadioButton Content="Right" IsChecked="False" Tag="1" Checked="LineTrack_Sensor_RadioCheck"  />
+
+                    </StackPanel>
+                    <Button Content="Line Track" Click="LineTrack_ButtonClick" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
-                        <Slider Header="Speed" Value="255" Minimum="0" Maximum="255" ValueChanged="Sport_Speed_SliderChanged" />
-                        <Button Content="⇑" Click="Sport_Forward_ButtonClick" />
-                        <Rectangle />
-                        <Button Content="⇐" Click="Sport_Left_ButtonClick" />
-                        <Button Content="🛑" Click="Sport_Stop_ButtonClick" />
-                        <Button Content="⇒" Click="Sport_Right_ButtonClick" />
-                        <Rectangle />
-                        <Button Content="⇓" Click="Sport_Backward_ButtonClick" />
+                    <Slider Header="Speed" Value="255" Minimum="0" Maximum="255" ValueChanged="Sport_Speed_SliderChanged" />
+                    <Button Content="⇑" Click="Sport_Forward_ButtonClick" />
+                    <Rectangle />
+                    <Button Content="⇐" Click="Sport_Left_ButtonClick" />
+                    <Button Content="🛑" Click="Sport_Stop_ButtonClick" />
+                    <Button Content="⇒" Click="Sport_Right_ButtonClick" />
+                    <Rectangle />
+                    <Button Content="⇓" Click="Sport_Backward_ButtonClick" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <Slider Header="Beep Tone" Value="100" Minimum="1" Maximum="255" ValueChanged="Beep2_Tone_SliderChanged" />
-                        <Slider Header="Duration in milliseconds" Value="250" Minimum="0" Maximum="65535" ValueChanged="Beep2_Duration_SliderChanged" />
-                        <Button Content="Beep" Click="Beep2_ButtonClick" />
+                    <Slider Header="Beep Tone" Value="100" Minimum="1" Maximum="255" ValueChanged="Beep2_Tone_SliderChanged" />
+                    <Slider Header="Duration in milliseconds" Value="250" Minimum="0" Maximum="65535" ValueChanged="Beep2_Duration_SliderChanged" />
+                    <Button Content="Beep" Click="Beep2_ButtonClick" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <Slider Header="Red" Value="100" Minimum="1" Maximum="255" ValueChanged="RGB_R_SliderChanged" />
-                        <Slider Header="Green" Value="100" Minimum="1" Maximum="255" ValueChanged="RGB_G_SliderChanged" />
-                        <Slider Header="Blue" Value="100" Minimum="1" Maximum="255" ValueChanged="RGB_B_SliderChanged" />
+                    <Slider Header="Red" Value="100" Minimum="1" Maximum="255" ValueChanged="RGB_R_SliderChanged" />
+                    <Slider Header="Green" Value="100" Minimum="1" Maximum="255" ValueChanged="RGB_G_SliderChanged" />
+                    <Slider Header="Blue" Value="100" Minimum="1" Maximum="255" ValueChanged="RGB_B_SliderChanged" />
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <Slider Header="Duration" Value="100" Minimum="0" Maximum="255" ValueChanged="RGB_Duration_SliderChanged" />
-                        <ComboBox Header="Lights" SelectedIndex="0"  MinWidth="140" SelectionChanged="RGB_Lights_ComboBoxChanged">
-                            <ComboBoxItem Content="Both" Tag="0"  />
-                            <ComboBoxItem Content="Left" Tag="1"  />
-                            <ComboBoxItem Content="Right" Tag="2"  />
-                        </ComboBox>
-                        <ComboBox Header="Flashing" SelectedIndex="0"  MinWidth="140" SelectionChanged="RGB_Mode_ComboBoxChanged">
-                            <ComboBoxItem Content="Solid" Tag="0"  />
-                            <ComboBoxItem Content="Flashing" Tag="1"  />
-                        </ComboBox>
+                    <Slider Header="Duration" Value="100" Minimum="0" Maximum="255" ValueChanged="RGB_Duration_SliderChanged" />
+                    <ComboBox Header="Lights" SelectedIndex="0" MinWidth="140" SelectionChanged="RGB_Lights_ComboBoxChanged">
+                            <ComboBoxItem Content="Both" Tag="0" />
+                            <ComboBoxItem Content="Left" Tag="1" />
+                            <ComboBoxItem Content="Right" Tag="2" />
+
+                    </ComboBox>
+                    <ComboBox Header="Flashing" SelectedIndex="0" MinWidth="140" SelectionChanged="RGB_Mode_ComboBoxChanged">
+                            <ComboBoxItem Content="Solid" Tag="0" />
+                            <ComboBoxItem Content="Flashing" Tag="1" />
+
+                    </ComboBox>
                     </VariableSizedWrapGrid>
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
-                        <Button Content="Clear" Click="Clear_All_ButtonClick" />
-                        <Button Content="Lights" Click="Clear_Lights_Off_ButtonClick" />
-                        <Button Content="Stop" Click="Clear_Stop_ButtonClick" />
-                        <Button Content="Mute" Click="Clear_Mute_ButtonClick" />
+                    <Button Content="Clear" Click="Clear_All_ButtonClick" />
+                    <Button Content="Lights" Click="Clear_Lights_Off_ButtonClick" />
+                    <Button Content="Stop" Click="Clear_Stop_ButtonClick" />
+                    <Button Content="Mute" Click="Clear_Mute_ButtonClick" />
                     </VariableSizedWrapGrid>
 
-                </StackPanel>
+                </StackPanel>   
+
 
 
             </StackPanel>
