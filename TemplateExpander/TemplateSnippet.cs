@@ -55,6 +55,7 @@ namespace TemplateExpander
         public string OptionFileName { get; internal set; } = "";
         public string OptionDirName { get; internal set; } = "";
         public string OptionIf { get; internal set; }
+        public string OptionElse { get; internal set; } = null; // null means not set; blank ("") means replace with nothing
         public bool OptionTrim { get; internal set; } = false;
         public bool OptionTrimWrap { get; internal set; } = false;
         public bool OptionTrimListSubZero { get; internal set; } = false;
@@ -252,6 +253,9 @@ namespace TemplateExpander
                             break;
                         case "DirName":
                             retval.OptionDirName = opts[1];
+                            break;
+                        case "Else":
+                            retval.OptionElse = opts[1];
                             break;
                         case "FileName":
                             retval.OptionFileName = opts[1];

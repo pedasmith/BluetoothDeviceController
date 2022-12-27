@@ -31,10 +31,6 @@
               "REM": "REM: UIType, Target, Set[], Label",
               "UIList": [
                 {
-                  "UIType": "SliderFor",
-                  "Target": "Beep2 Tone"
-                },
-                {
                   "UIType": "ButtonFor",
                   "Target": "ObstacleAvoidance"
                 },

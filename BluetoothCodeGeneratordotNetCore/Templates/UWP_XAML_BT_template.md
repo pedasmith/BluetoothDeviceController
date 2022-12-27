@@ -160,6 +160,12 @@ Was PageXamlCharacteristicEnumButtonPanelTemplate
 ```
                     <Rectangle />
 ```
+## XAML+UILIST+LIST+CONTENT+BUTTON If="[[UIType]] contains ButtonFor" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
+
+```
+                    <Button Content="[[Label]]" Click="[[FunctionName]]_ButtonClick" />
+```
+
 
 ## XAML+UILIST+LIST+CONTENT+COMBOBOX+LIST If="[[UIType]] contains ComboBoxFor" Type=list Source=Services/Characteristics/UIList/RadioFor ListOutput=parent
 
@@ -179,11 +185,7 @@ NOTE: Cannot set the Trim=true because it cuts the list short? That makes no sen
                     </ComboBox>
 ```
 
-## XAML+UILIST+LIST+CONTENT+BUTTON If="[[UIType]] contains ButtonFor" Type=list Source=Services/Characteristics/UIList ListOutput=child  Trim=true
 
-```
-                    <Button Content="[[Label]]" Click="[[FunctionName]]_ButtonClick" />
-```
 
 ## XAML+UILIST+LIST+CONTENT+RADIO+LIST If="[[UIType]] contains RadioFor" Type=list Source=Services/Characteristics/UIList/RadioFor ListOutput=parent
 

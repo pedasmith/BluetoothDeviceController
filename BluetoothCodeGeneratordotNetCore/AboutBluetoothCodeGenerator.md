@@ -27,7 +27,7 @@ Problems not solved:
 3. Some Bluetooth devices use advertisements for their data. This requires C# code directly in the Blueooth Device Controller; there's no JSON description of the advertisement format.
 4. You can modify the resulting files. However, once modified, the code cannot be usefully regenerated.
 
-# Syntx for the template file
+# Syntax for the template file
 
 A typical template will always have a format  like this:
 
@@ -125,6 +125,7 @@ Opcode|Meaning
 !=|Not-equals
 contains|The left string contains the right string. Compare is case-insensitive
 !contains|The left string does not contain the right string. Compare is case-insensitive
+length\>|Length of left-hand macro is greater-than right hand value
 
 ### ListOutput=parent or child or global (default)
 

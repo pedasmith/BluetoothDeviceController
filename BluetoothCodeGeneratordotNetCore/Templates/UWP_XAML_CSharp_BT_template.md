@@ -48,7 +48,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
             bleDevice.ble = ble;
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
-[[DOREADDEVICE_NAME]]
+[[DOREADDEVICE+NAME]]
 [[DOAUTONOTIFY]]
         }
 
@@ -108,7 +108,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 }
 ```
 
-## DOREADDEVICE_NAME
+## DOREADDEVICE+NAME If="[[HasReadDeviceName]] == true" Else="            await Task.Delay(0); // No Device_Name to read, but still need to have an async operation."
 
 ```
             await DoReadDevice_Name();
@@ -412,6 +412,102 @@ PageCSharp+CharacteristicWriteTemplate
 ```
 
 
+## CS+XAML+UILIST+LIST+CONTENT+VALUECHANGE+COMPUTETARGET If="[[ComputeTarget]] length> 0" Type=list Source=ServicesByOriginalOrder/Characteristics/UIList ListOutput=child
+```
+            // computedTarget might be different from the computed value
+            var commandWrite = bleDevice.[[CharacteristicName.dotNet]]_[[ComputeTarget]]_Init();
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.Write[[CharacteristicName.dotNet]](commandString);
+```
+
+## ASYNC If="[[CS+XAML+UILIST+LIST+CONTENT+VALUECHANGE+COMPUTETARGET]] length> 10" Type=list Source=ServicesByOriginalOrder/Characteristics/UIList ListOutput=child Trim=true
+```
+async
+```
+
+
+## CS+XAML+UILIST+LIST+CONTENT+BUTTON+SETLIST If="[[Set0]] length> 5" Type=list Source=ServicesByOriginalOrder/Characteristics/UIList ListOutput=child Trim=true
+
+The original concept of the "Set" field was that it would be a list of strings, where each string was a space-seperated
+list of what to set. But that is actually overkill; nothing in the Elegoo ever used more than one. So the Set list
+(technically an array) is flattened and just shows up as the Set0_Paremeter Set0_Value etc.
+
+```
+            commandWrite.Parameters["[[Set0_Parameter]]"].CurrValue = [[Set0_Value]]; // same as commandWrite.Parameters["[[Set0_Parameter]]"].ValueNames["[[Set0_ValueName]]"];
+```
+
+## CS+XAML+UILIST+LIST+CONTENT+BUTTON If="[[UIType]] contains ButtonFor" Type=list Source=ServicesByOriginalOrder/Characteristics/UIList ListOutput=child
+
+
+PageCSharp+Characteristic+ButtonClick
+
+
+```
+        private async void [[FunctionName]]_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var commandWrite = bleDevice.[[CharacteristicName.dotNet]]_[[Target0]]_Init();
+[[CS+XAML+UILIST+LIST+CONTENT+BUTTON+SETLIST]]
+            var commandString = commandWrite.DoCompute();
+            await bleDevice.Write[[CharacteristicName.dotNet]](commandString);
+        }
+
+```
+
+## CS+XAML+UILIST+LIST+CONTENT+COMBOBOX+LIST If="[[UIType]] contains ComboBoxFor" Type=list Source=ServicesByOriginalOrder/Characteristics/UIList ListOutput=child 
+
+PageCSharp+Characteristic+ComboChange
+
+
+```
+        private [[ASYNC]] void [[FunctionName]]_ComboBoxChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var commandSet = bleDevice.[[CharacteristicName.dotNet]]_[[Target0]]_Init();
+            if (e.AddedItems.Count == 1
+                && (double.TryParse((sender as FrameworkElement).Tag as string, out var value)))
+            {
+                commandSet.SetCurrDouble("[[Target1]]", value);
+            }
+[[CS+XAML+UILIST+LIST+CONTENT+VALUECHANGE+COMPUTETARGET]]
+        }
+```
+
+
+## CS+XAML+UILIST+LIST+CONTENT+RADIO+LIST If="[[UIType]] contains RadioFor" Type=list Source=ServicesByOriginalOrder/Characteristics/UIList ListOutput=child
+
+PageCSharp+Characteristic+RadioChange
+
+
+```
+        private [[ASYNC]] void [[FunctionName]]_RadioCheck(object sender, RoutedEventArgs e)
+        {
+            var commandSet = bleDevice.[[CharacteristicName.dotNet]]_[[Target0]]_Init();
+            if (double.TryParse((sender as FrameworkElement).Tag as string, out var value))
+            {
+                commandSet.SetCurrDouble("[[Target1]]", value);
+            }
+[[CS+XAML+UILIST+LIST+CONTENT+VALUECHANGE+COMPUTETARGET]]
+        }
+```
+
+## CS+XAML+UILIST+LIST+CONTENT+SLIDER If="[[UIType]] contains SliderFor" Type=list Source=ServicesByOriginalOrder/Characteristics/UIList ListOutput=child  
+
+PageCSharp+Characteristic+SliderChange
+
+```
+        private [[ASYNC]] void [[FunctionName]]_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            var commandSet = bleDevice.[[CharacteristicName.dotNet]]_[[Target0]]_Init();
+            commandSet.SetCurrDouble("[[Target1]]", e.NewValue);
+[[CS+XAML+UILIST+LIST+CONTENT+VALUECHANGE+COMPUTETARGET]]
+        }
+```
+
+## CS+XAML+UILIST If="[[UIListType]] !contains None" Type=list Source=ServicesByOriginalOrder/Characteristics/UIList ListOutput=parent CodeListSubZero=""
+
+```
+[[CS+XAML+UILIST+LIST+CONTENT+BUTTON]][[CS+XAML+UILIST+LIST+CONTENT+COMBOBOX+LIST]][[CS+XAML+UILIST+LIST+CONTENT+RADIO+LIST]][[CS+XAML+UILIST+LIST+CONTENT+SLIDER]]
+```
+
 ## CS+CHARACTERISTIC+LIST Type=list Source=ServicesByOriginalOrder/Characteristics ListOutput=parent
 
 PageCSharp+CharacteristicRecordTemplate
@@ -494,6 +590,8 @@ PageCSharp+CharacteristicRecordTemplate
 [[CS+CHARACTERISTIC+NOTIFY+METHOD]]
 [[CS+CHARACTERISTIC+READ+METHOD]]
 [[CS+CHARACTERISTIC+WRITE+METHOD]]
+[[CS+XAML+UILIST]]
+
 ```
 
 ## CS+SERVICE+LIST Type=list Source=ServicesByOriginalOrder
@@ -551,30 +649,7 @@ LIST!!!
                 }
 ```
 
-## PageCSharp+Characteristic+ButtonClick
-```
-        private async void [[FUNCTIONNAME]]_ButtonClick(object sender, RoutedEventArgs e)
-        {
-            var commandWrite = bleDevice.[[CharacteristicName.dotNet]]_[[COMMAND]]_Init();
-[[SETLIST]]
-            var commandString = commandWrite.DoCompute();
-            await bleDevice.Write[[CharacteristicName.dotNet]](commandString);
-        }
-```
 
-## PageCSharp+Characteristic+ComboChange
-```
-        private [[ASYNC]]void [[COMMAND]]_[[PARAM]]_ComboBoxChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var commandSet = bleDevice.[[CharacteristicName.dotNet]]_[[COMMAND]]_Init();
-            if (e.AddedItems.Count == 1
-                && (double.TryParse((sender as FrameworkElement).Tag as string, out var value)))
-            {
-                commandSet.SetCurrDouble("[[PARAM]]", value);
-            }
-[[VALUECHANGE+COMPUTETARGET]]
-        }
-```
 
 ## PageCSharp+Characteristic+SetValue 
 
@@ -582,28 +657,7 @@ LIST!!!
             commandWrite.Parameters["[[PARAMETER]]"].CurrValue = [[VALUE]]; // same as commandWrite.Parameters["[[PARAMETER]]"].ValueNames["[[VALUENAME]]"];
 ```
 
-## PageCSharp+Characteristic+RadioChange
-```
-        private void [[COMMAND]]_[[PARAM]]_RadioCheck(object sender, RoutedEventArgs e)
-        {
-            var commandSet = bleDevice.[[CharacteristicName.dotNet]]_[[COMMAND]]_Init();
-            if (double.TryParse((sender as FrameworkElement).Tag as string, out var value))
-            {
-                commandSet.SetCurrDouble("[[PARAM]]", value);
-            }
-[[VALUECHANGE+COMPUTETARGET]]
-        }
-```
 
-## PageCSharp+Characteristic+SliderChange
-```
-        private [[ASYNC]]void [[COMMAND]]_[[PARAM]]_SliderChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
-        {
-            var commandSet = bleDevice.[[CharacteristicName.dotNet]]_[[COMMAND]]_Init();
-            commandSet.SetCurrDouble("[[PARAM]]", e.NewValue);
-[[VALUECHANGE+COMPUTETARGET]]
-        }
-```
 
 ## PageCSharp+Characteristic+ValueChangeComputeTarget
 ```

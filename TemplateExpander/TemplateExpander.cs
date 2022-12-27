@@ -486,7 +486,11 @@ namespace TemplateExpander
                 if (matchesIf)
                 {
                     macros.AddMacro(kv.Key, expand);
-                
+                }
+                else if (child.OptionElse != null)
+                {
+                    var elseExpand = ExpandMacroAll(child.OptionElse, macros);
+                    macros.AddMacro(kv.Key, elseExpand);
                 }
             }
         }

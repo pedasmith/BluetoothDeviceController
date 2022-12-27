@@ -565,7 +565,13 @@ namespace BluetoothCodeGenerator
                 var singleUI = new TemplateSnippet(name);
                 uiList.AddChild(name, singleUI);
                 singleUI.AddMacro("UIType", simpleUI.UIType); // ButtonFor RadioFor SliderFor RowStart RowEnd
+
+                var targetSplit = simpleUI.Target != null ? simpleUI.Target.Split(" ") : new string[] { "" };
+                var target0 = targetSplit[0];
+                var target1 = targetSplit.Length > 1 ? targetSplit[1] : "";
                 singleUI.AddMacro("Target", simpleUI.Target);
+                singleUI.AddMacro("Target0", target0);
+                singleUI.AddMacro("Target1", target1);
                 singleUI.AddMacro("ComputeTarget", simpleUI.ComputeTarget);
 
                 var label = simpleUI.Label;
@@ -584,7 +590,20 @@ namespace BluetoothCodeGenerator
                 }
                 singleUI.AddMacro("FunctionName", functionName?.DotNetSafe() ?? "");
                 singleUI.AddMacro("N", simpleUI.GetN().ToString());
-                singleUI.AddMacro("Set0", simpleUI.Set.FirstOrDefault() ?? "");
+
+                var set0 = simpleUI.Set.FirstOrDefault() ?? "";
+                singleUI.AddMacro("Set0", set0);
+                var setlist = set0.Split(new char[] { ' ' });
+                if (setlist.Length >= 3)
+                {
+                    var setcmd = btCharacteristic.Commands[setlist[0]];
+                    var param = setcmd.Parameters[setlist[1]];
+                    var value = param.ValueNames[setlist[2]];
+                    singleUI.AddMacro("Set0_Parameter", setlist[1]);
+                    singleUI.AddMacro("Set0_ValueName", setlist[2]);
+                    singleUI.AddMacro("Set0_Value", value.ToString());
+                }
+
 
                 // Add in duration values for sliders. They are all prepended with e.g. "Duration_" or "Tone_"
                 if (cmdsub != null)
@@ -680,6 +699,8 @@ namespace BluetoothCodeGenerator
             retval.Macros.Add("DESCRIPTION", bt.Description);
             retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::hh:mm"));
             retval.Macros.Add("CLASSMODIFIERS", bt.ClassModifiers);
+
+            retval.Macros.Add("HasReadDeviceName", bt.HasReadDevice_Name() ? "true" : "false");
 
             //Services
             var servicesByPriority = new TemplateSnippet("Services");
