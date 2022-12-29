@@ -35,6 +35,13 @@ namespace BluetoothDeviceController.Names
         /// Name of the device. This will be used to match actual devices and should not include e.g., the MAC address of the device
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// User-visible name of the device. Often not set, but for some devices (like the Lionel trains) where
+        /// the BT name is LC-0-1-0494-B69B but the user knows it as a Lionel Train.
+        /// </summary>
+        public string UserName { get; set; }
+        public string GetUserName() { return String.IsNullOrEmpty(UserName) ? Name : UserName; }
+
         public enum CompletionStatusEnum {  Usable, Unusable};
         public CompletionStatusEnum CompletionStatus { get; set; } = CompletionStatusEnum.Usable;
         public string CompletionStatusExplanation { get; set; } = "";
@@ -50,11 +57,22 @@ namespace BluetoothDeviceController.Names
         /// <summary>
         /// User-supplied description of the device
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
+        /// <summary>
+        /// Documentation only string for how to use the device. Will be placed in the # Using section of the help file.
+        /// </summary>
+        public string UsingTheDevice { get; set; } = "";
         /// <summary>
         /// The default PIN for the device. Many devices don't require PIN values.
         /// </summary>
-        public string DefaultPin { get; set; }
+        /// 
+        public string DefaultPin { get; set; } = "";
+        /// <summary>
+        /// Used in conjuction with the MD template files. The MD file will have a "SupressFile=":SuppressXAML:".
+        /// If that SuppressFile contains the SuppressFile here, then the file will be suppressed.
+        /// Note that a single JSON device file can list a bunch of different templates that get suppressed.
+        /// </summary>
+        public string SuppressFile { get; set; } = "";
         /// <summary>
         /// List of aliases for the device; used by the Triones bulb.
         /// </summary>

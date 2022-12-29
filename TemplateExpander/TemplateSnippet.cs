@@ -62,6 +62,11 @@ namespace TemplateExpander
         public enum TypeOfExpansion {  Normal, List};
         public TypeOfExpansion OptionType { get; internal set; } = TypeOfExpansion.Normal;
         public string OptionSource { get; internal set; } = "";
+        /// <summary>
+        /// Used by BT JSON when, e.g., the protocol files are fine but the XAML has been customized
+        /// Corresponds to the JSON "SuppressFile":":SuppressXAML:". Only used on the top-level # value.
+        /// </summary>
+        public string OptionSuppressFile { get; internal set; } = "";
         public enum TypeOfListOutput { Global, Parent, Child };
         /// <summary>
         /// ListOutput=global is default; puts list into global area. Other options are ListOutput=parent and ListOutput=child
@@ -282,6 +287,9 @@ namespace TemplateExpander
                             break;
                         case "Source":
                             retval.OptionSource = opts[1];
+                            break;
+                        case "SuppressFile":
+                            retval.OptionSuppressFile = opts[1];
                             break;
                         case "Trim":
                             switch (opts[1])

@@ -45,6 +45,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Templates\MD_BT_DeviceController_Helpfile_template.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Import Project="..\TemplateExpander\TemplateExpander.projitems" Label="Shared" />
 
   <Import Project="..\BluetoothProtocols\BluetoothProtocols.projitems" Label="Shared" />

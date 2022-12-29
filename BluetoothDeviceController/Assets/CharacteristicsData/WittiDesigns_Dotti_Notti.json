@@ -3,6 +3,7 @@
     {
       "Name": "Dotti",
       "ClassName": "Witti_Dotti",
+      "SuppressFile": ":SuppressXAML:",
       "ClassModifiers": "partial",
       "Links": [
         "https://www.wittidesign.com/products/dotti-one",
@@ -232,6 +233,7 @@
       "Name": "Notti",
       "ClassName": "Witti_Notti",
       "ClassModifiers": "partial",
+      "SuppressFile": ":SuppressXAML:",
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

@@ -2,14 +2,15 @@
   "AllDevices": [
     {
       "Name": "GoDice",
-	  "ClassName": "Particula_GoDice",
-	  "ClassModifiers": "partial",
-	  "Description": "Bluetooth-enable dice (like for playing games). The colors can be set and the position and state of the dice can be detected.",
-	  "Links" :[
-	      "https://getgocube.com/products/godice-full-pack/",
-		  "https://www.kickstarter.com/projects/1928372437/godice-your-favorite-dice-games-reimagined",
-		  "https://github.com/ParticulaCode/GoDiceJavaScriptAPI"
-	  ],
+      "ClassName": "Particula_GoDice",
+      "ClassModifiers": "partial",
+      "Description": "Bluetooth-enable dice (like for playing games). The colors can be set and the position and state of the dice can be detected.",
+      "SuppressFile": ":SuppressXAML:",
+      "Links": [
+        "https://getgocube.com/products/godice-full-pack/",
+        "https://www.kickstarter.com/projects/1928372437/godice-your-favorite-dice-games-reimagined",
+        "https://github.com/ParticulaCode/GoDiceJavaScriptAPI"
+      ],
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",
@@ -63,13 +64,13 @@
           "UUID": "00001801-0000-1000-8000-00805f9b34fb",
           "RegistrationOwner": "Bluetooth Standard",
           "Name": "Generic Service",
-          "Suppress": true,
+          "Suppress": true
         },
         {
           "UUID": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
           "Name": "DiceTransmit",
           "Priority": 5,
-          "Description":  "Sends commands to the dice and gets events back",
+          "Description": "Sends commands to the dice and gets events back",
           "Characteristics": [
             {
               "UUID": "6e400002-b5a3-f393-e0a9-e50e24dcca9e",

@@ -12,12 +12,12 @@ REM
 REM Normally we want to generate everything. But when we are debugging just something new,
 REM it's nicer to have just the single file handled.
 REM
-goto :Debug
+REM goto :Debug
 %BIN% -inputJsonDirectory "%JSONDIR%" -inputTemplates Templates -output output
 goto :EOF
 
 REM Or generate just the one, which is a little easier to handle when debugging.
 :Debug
-%BIN% -inputJsonFile "%JSONDIR%"\Elegoo_MiniCar.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\Lionel_LionChief.json -inputTemplates Templates -output output
 
 

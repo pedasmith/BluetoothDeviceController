@@ -693,13 +693,18 @@ namespace BluetoothCodeGenerator
         public static TemplateSnippet Convert(NameDevice bt)
         {
             TemplateSnippet retval = new TemplateSnippet(bt.Name);
+            retval.OptionSuppressFile = bt.SuppressFile;
+
             retval.Macros.Add("DeviceName", bt.Name);
             retval.Macros.Add("DeviceName.dotNet", bt.Name.DotNetSafe());
             retval.Macros.Add("CLASSNAME", bt.ClassName ?? bt.Name?.DotNetSafe());
+            retval.Macros.Add("UserName", bt.GetUserName());
+            retval.Macros.Add("Description", bt.Description);
+            retval.Macros.Add("UsingTheDevice", bt.UsingTheDevice);
+            retval.Macros.Add("DefaultPin", bt.DefaultPin);
             retval.Macros.Add("DESCRIPTION", bt.Description);
             retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::hh:mm"));
             retval.Macros.Add("CLASSMODIFIERS", bt.ClassModifiers);
-
             retval.Macros.Add("HasReadDeviceName", bt.HasReadDevice_Name() ? "true" : "false");
 
             //Services

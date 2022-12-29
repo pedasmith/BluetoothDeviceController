@@ -6,12 +6,13 @@
       "ClassName": "CraftyRobot_Smartibot",
       "ClassModifiers": "partial",
       "Description": "Robot with a carboard shell. The interior robot is a typical Espruino JavaScript-based bot. Communications are via a TX and RX characteristic.",
+      "SuppressFile": ":SuppressXAML:",
       "Links": [
         "https://thecraftyrobot.net/collections/smartibot",
         "http://www.espruino.com/Smartibot",
         "https://www.kickstarter.com/projects/460355237/smartibot-the-worlds-first-ai-enabled-cardboard-ro",
         "https://www.espruino.com/modules/Smartibot.js",
-		"https://www.reddit.com/r/Smartibot/"
+        "https://www.reddit.com/r/Smartibot/"
       ],
       "Services": [
         {

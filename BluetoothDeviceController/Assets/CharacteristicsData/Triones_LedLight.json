@@ -2,13 +2,14 @@
   "AllDevices": [
     {
       "Name": "Triones",
-      "ClassName":  "Triones_LedLight",
+      "ClassName": "Triones_LedLight",
       "Aliases": [ "LEDBlue" ],
+      "SuppressFile": ":SuppressXAML:",
       "REM_About": "Multiple LED bulbs use similar protocols",
       "Links": [
         "https://github.com/madhead/saberlight/blob/master/protocols/Triones/protocol.md",
         "https://github.com/hunsly/Ledblee-Triones-control",
-        "https://github.com/Betree/magicblue/wiki/Characteristics-list",
+        "https://github.com/Betree/magicblue/wiki/Characteristics-list"
       ],
 
       "Services": [
@@ -68,7 +69,7 @@
             {
               "UUID": "0000ffe4-0000-1000-8000-00805f9b34fb",
               "Name": "Status Reply",
-              "Type": "U8|HEX|Opcode U8|HEX|Constant U8|HEX|Power U8|HEX|Mode U8|HEX|Unknown U8|HEX|Speed U8|HEX|R U8|HEX|G U8|HEX|B U8|HEX|W U8|HEX|Unknown2 U8|HEX|Final",
+              "Type": "U8|HEX|Opcode U8|HEX|Constant U8|HEX|Power U8|HEX|Mode U8|HEX|Unknown U8|HEX|Speed U8|HEX|R U8|HEX|G U8|HEX|B U8|HEX|W U8|HEX|Unknown2 U8|HEX|Final"
             },
             {
               "UUID": "0000ffe5-0000-1000-8000-00805f9b34fb",
@@ -83,7 +84,7 @@
           "Name": "Light Control B",
           "REM": "This is a dup of the 0000ffe5-0000-1000-8000-00805f9b34fb",
           "REM_2": "Some bulbs use one, some use the other",
-          "Priority":  10,
+          "Priority": 10,
           "Characteristics": [
             {
               "UUID": "0000ffd6-0000-1000-8000-00805f9b34fb",
@@ -115,7 +116,7 @@
         {
           "UUID": "0000ffe5-0000-1000-8000-00805f9b34fb",
           "Name": "Light Control",
-          "Priorioty":  10,
+          "Priorioty": 10,
           "Characteristics": [
             {
               "UUID": "0000ffe6-0000-1000-8000-00805f9b34fb",

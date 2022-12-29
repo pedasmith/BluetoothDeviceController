@@ -1,4 +1,4 @@
-﻿# PageXaml FileName=[[CLASSNAME]]Page.xaml DirName=SpecialtyPages
+﻿# PageXaml FileName=[[CLASSNAME]]Page.xaml DirName=SpecialtyPages SuppressFile=:SuppressXAML:
 ```
 <Page
     x:Class="BluetoothDeviceController.SpecialtyPages.[[CLASSNAME]]Page"

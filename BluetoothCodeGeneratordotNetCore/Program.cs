@@ -181,6 +181,20 @@ namespace BluetoothCodeGenerator
                                     {
                                         continue; // skip it. Can legit be this way (e.g., default is like this)
                                     }
+                                    bool shouldSupress = false;
+                                    if (!string.IsNullOrEmpty (child.OptionSuppressFile)
+                                        && !string.IsNullOrEmpty(btdata.OptionSuppressFile))
+                                    {
+                                        if (child.OptionSuppressFile.Contains (btdata.OptionSuppressFile))
+                                        {
+                                            shouldSupress = true;
+                                        }
+                                    }
+                                    if (shouldSupress)
+                                    {
+                                        Log($"NOTE: Supressing {child.Name} for {btdata.Name} [{child.OptionSuppressFile}.Contains {btdata.OptionSuppressFile}]");
+                                        continue;
+                                    }
                                     //var btdata = jsonData; // Switch to closer to the real thing! CreateMockBt.Create();
                                     Expander.ExpandChildTemplatesIntoMacros(child, btdata);
 

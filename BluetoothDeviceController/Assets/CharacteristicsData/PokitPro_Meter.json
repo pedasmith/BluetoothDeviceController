@@ -1,10 +1,11 @@
 ﻿{
   "AllDevices": [
     {
-      "Name":"PokitPro",
+      "Name": "PokitPro",
       "ClassName": "PokitProMeter",
       "ClassModifiers": "partial",
       "Description": "Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display.",
+      "SuppressFile": ":SuppressXAML:",
 
       "Links": [
         "https://help.pokitmeter.com/hc/en-us/community/posts/360023523213-Bluetooth-API-Documentation",
@@ -22,13 +23,13 @@
               "UUID": "00002803-0000-1000-8000-00805f9b34fb",
               "Name": "Server_Supported_Features",
               "Type": "U8|HEX|FeatureBitmap0",
-	      		  "REM_Byte0":"bit 0=enhanced ATT bearer",
+              "REM_Byte0": "bit 0=enhanced ATT bearer",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
                 "Value:  01"
               ]
-            },		  
+            },
             {
               "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
               "Name": "Service Changes",
@@ -39,7 +40,7 @@
               "UUID": "00002b29-0000-1000-8000-00805f9b34fb",
               "Name": "Client_Supported_Features",
               "Type": "U8|HEX|FeatureBitmap0",
-			        "REM_Byte0":"bit 0=robust caching 1=enhanced ATT bearer 2=multiple value",
+              "REM_Byte0": "bit 0=robust caching 1=enhanced ATT bearer 2=multiple value",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -49,9 +50,9 @@
             {
               "UUID": "00002b2a-0000-1000-8000-00805f9b34fb",
               "Name": "Database Hash",
-      			  "REM10":"https://community.silabs.com/s/question/0D51M00007xeOAUSA2/what-are-the-strange-characteristics-2b2a-and-2b29-in-the-generic-attribute-service?language=en_US",
+              "REM10": "https://community.silabs.com/s/question/0D51M00007xeOAUSA2/what-are-the-strange-characteristics-2b2a-and-2b29-in-the-generic-attribute-service?language=en_US",
               "Type": "U32|HEX|Hash0 U32|HEX|Hash1 U32|HEX|Hash2 U32|HEX|Hash3",
-      			  "REM20":"Technically this is a uint128",
+              "REM20": "Technically this is a uint128",
               "IsRead": true,
               "ExampleData": [
                 "Value:  F3 45 EF 2A E8 B9 88 1C 06 C8 44 6F 36 F8 13 00"
@@ -171,7 +172,7 @@
               "UUID": "3dba36e1-6120-4706-8dfd-ed9c16e569b6",
               "Name": "Status_Status",
               "Type": "U8|HEX|DeviceStatus F32|FIXED|BatteryLevel",
-		      	  "REM10 DeviceStatus" : "0=Idle 1=MM Vdc 2=MM Vac 3=MM AmpDC 4=MM AmpAC 5=MM ohm 6=MM Diode 7=MM Cont 8=MM Temp 9=DSO 10=Logger",
+              "REM10 DeviceStatus": "0=Idle 1=MM Vdc 2=MM Vac 3=MM AmpDC 4=MM AmpAC 5=MM ohm 6=MM Diode 7=MM Cont 8=MM Temp 9=DSO 10=Logger",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -225,7 +226,7 @@
         {
           "UUID": "e7481d2f-5781-442e-bb9a-fd4e3441dadc",
           "Name": "Multimeter",
-          "Priority":  40,
+          "Priority": 40,
           "Characteristics": [
             {
               "UUID": "53dc9a7a-bc19-4280-b76b-002d0e23b078",
@@ -233,9 +234,9 @@
               "Type": "U8|HEX|Mode U8|HEX|Range U32|HEX|Interval|ms",
               "IsWrite": true,
               "REM05": "mode 0=idle, 1=voltDC, 2=voltAC 3=ampDC,4=ampAC 5=ohm 6=diode 7=continuity 8=temp",
-	      		  "REM10": "05 FF 00 04 00 00 ",
+              "REM10": "05 FF 00 04 00 00 ",
               "REM20": "09 00 01 00 00 00 00",
-              "REM30":  "range v 0=...300mv 1=300mv..2V 2=2..6V 3=6v..12v"
+              "REM30": "range v 0=...300mv 1=300mv..2V 2=2..6V 3=6v..12v"
             },
             {
               "UUID": "047d3559-8bee-423a-b229-4417fa603b90",

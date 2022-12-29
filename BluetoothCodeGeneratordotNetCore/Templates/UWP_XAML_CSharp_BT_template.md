@@ -1,5 +1,6 @@
-﻿
-# PageCSharp FileName=[[CLASSNAME]]Page.xaml.cs DirName=SpecialtyPages
+﻿# PageCSharp FileName=[[CLASSNAME]]Page.xaml.cs DirName=SpecialtyPages SuppressFile=:SuppressXAML:
+
+
 ```
 using BluetoothDeviceController.Charts;
 using BluetoothDeviceController.Names;

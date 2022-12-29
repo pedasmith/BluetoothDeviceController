@@ -1,9 +1,15 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "LC-0-1-0494-B69B",
+      "Name": "LC-",
+      "UserName": "Lionel LionChief",
       "REM10_Name": "LC010494",
+      "REM12_Name": "LC-0-1-0494-B69B",
       "ClassName": "Lionel_LionChief",
+      "DefaultPin": "none",
+      "Description": "LionChief is the name of the Lionel company's Bluetooth train control system. New Lionel trains are all fitted with this system, sometime alongside other non-Bluetooth control systems. Given the number of Lionel trains, this has not been tested with all trains, and may not be compatible with all Lionel LionChief trains.",
+      "UsingTheDevice": "The device uses Bluetooth LE without pairing.",
+      "SuppressFile": ":SuppressXAML:",
       "Links": [
         "http://www.lionel.com/bluetooth/",
         "https://github.com/Property404/lionchief-controller",
@@ -189,7 +195,7 @@
             {
               "UUID": "08590f7e-db05-467e-8757-72f6faeb14d3",
               "Name": "LionelData",
-              "REM10":  "Never seems to be triggered.",
+              "REM10": "Never seems to be triggered.",
               "Description": "TrainData",
               "Type": "BYTES|HEX|TrainData",
               "IsNotify": true

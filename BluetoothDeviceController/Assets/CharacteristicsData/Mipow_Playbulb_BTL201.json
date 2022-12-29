@@ -2,7 +2,8 @@
   "AllDevices": [
     {
       "Name": "PLAYBULB smart bulb",
-      "ClassName":  "MIPOW_Playbulb_BTL201",
+      "ClassName": "MIPOW_Playbulb_BTL201",
+      "SuppressFile": ":SuppressXAML:",
       "Links": [
         "http://mipow.com/",
         "https://pdominique.wordpress.com/2015/01/02/hacking-playbulb-candles/",
@@ -145,7 +146,7 @@
               "Type": "U8|HEX|W U8|HEX|R U8|HEX|G U8|HEX|B U8|HEX|Effect U8|HEX|Junk U8|HEX|Delay1 U8|HEX|Delay2",
               "IsRead": true,
               "IsWriteWithoutResponse": true,
-              "REM_EFFECT":  "0=blink 1=pulse 2=rainbow hard 3=rainbow smooth 4=candle ff=no demo (just on)",
+              "REM_EFFECT": "0=blink 1=pulse 2=rainbow hard 3=rainbow smooth 4=candle ff=no demo (just on)",
               "ExampleData": [
                 "Value:  FF 00 00 00 FF 00 0A 00"
               ]

@@ -2,8 +2,9 @@
   "AllDevices": [
     {
       "Name": "beLight",
-      "ClassName":  "TI_beLight_2540",
+      "ClassName": "TI_beLight_2540",
       "REM_About": "TI beLight high-intensity developer kit",
+      "SuppressFile": ":SuppressXAML:",
       "Links": [
         "http://www.ti.com/tool/tidc-bluetooth-low-energy-light",
         "http://www.ti.com/lit/ug/swru392a/swru392a.pdf"
