@@ -91,11 +91,15 @@ namespace BluetoothDeviceController
             new Specialization (typeof(SpecialtyPages.Kano_WandPage), new string[] { "Kano-Wand" }, WAND, "Kano Wand", "Kano coding kit Harry Potter Wand"),
             new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { "Puck" }, UART, "Espruino (puck)", "Puck.js: a UART-based Espruino device", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPagesCustom.UartPage), new string[] { Nordic_Uart.SpecializationName }, UART, "BLE UART COM port", "Nordic UART comm port", Specialization.ParentScrollType.ChildHandlesScrolling),
+
+            // Various robots
             new Specialization (typeof(SpecialtyPagesCustom.CraftyRobot_SmartibotPage), new string[] { "Smartibot" }, ROBOT, "Smartibot", "Smartibot espruino-based robot", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(SpecialtyPages.Elegoo_MiniCarPage), new string[] { "ELEGOO BT16" }, CAR, "Elegoo Mini-Car", "Elegoo small robot car"),
+            new Specialization (typeof(SpecialtyPages.WilliamWeilerEngineering_SkoobotPage), new string[] { "Skoobot" }, ROBOT, "Skoobot", "Skoobot tiny robot"),
+
+            // Toys
             new Specialization (typeof(SpecialtyPages.Lionel_LionChiefPage), new string[] { "LC" }, TRAIN, "LionChief Train", "Lionel Train Controller"),
             new Specialization (typeof(SpecialtyPages.Particula_GoDicePage), new string[] { "GoDice" }, DICE, "Particula GoDice", "GoDice 6-sided game dice"),
-            new Specialization (typeof(SpecialtyPages.WilliamWeilerEngineering_SkoobotPage), new string[] { "Skoobot" }, ROBOT, "Skoobot", "Skoobot tiny robot"),
 
             // Lights
             new Specialization (typeof(SpecialtyPages.TI_beLight_2540Page), new string[] { "beLight" }, LIGHT, "TI Light", "TI CC2540 Bluetooth kit"),

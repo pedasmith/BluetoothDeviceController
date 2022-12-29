@@ -83,6 +83,7 @@ devices that are programmable in JavaScript.
 Other devices that can be controled with this program include
 
 * [Particula GoDice](Device_Particula_GoDice.md)
+* [Lionel LionChief](Device_Lionel_LionChief.md)
 
 ## Protocol details
 

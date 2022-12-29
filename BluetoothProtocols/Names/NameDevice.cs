@@ -58,6 +58,20 @@ namespace BluetoothDeviceController.Names
         /// User-supplied description of the device
         /// </summary>
         public string Description { get; set; } = "";
+
+        /// <summary>
+        /// Two or three words to describe the device; used in the mainpain.xaml.cs list of devices
+        /// </summary>
+        public string ShortDescription { get; set; } = "";
+        /// <summary>
+        /// Single word; must be one of the const strings at about line 70 in mainpage.xaml.cs
+        /// </summary>
+        public string DeviceType { get; set; } = ""; // ALARM BEACON CAR DATA DICE HEALTH LIGHT LIGHTNING ROBOT TRAIN UART WAND WATER
+
+        /// <summary>
+        /// Device maker; used in the mainpain.xaml.cs list of devices
+        /// </summary>
+        public string Maker { get; set; } = "";
         /// <summary>
         /// Documentation only string for how to use the device. Will be placed in the # Using section of the help file.
         /// </summary>

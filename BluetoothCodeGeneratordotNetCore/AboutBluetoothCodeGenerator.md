@@ -1,4 +1,4 @@
-﻿# TODO list
+# TODO list
 
 - [] Robots!
 - [x] Make the XAML CS files work
@@ -11,7 +11,7 @@
 
 The Bluetooth Code Generator converts JSON descriptions of Bluetooth devices into working code. The code is divided into low-level protocol code to directly connect to a device, and XAML (and the XAML.CS) files to form crude interfaces to manipulate the devices.
 
-The Bluetooth CCode Generator is used in conjunction with the Bluetooth Device Controller program.
+The Bluetooth Code Generator is used in conjunction with the Bluetooth Device Controller program.
 
 Problems solved include:
 
@@ -41,7 +41,7 @@ There must **always** be a blank line before the template code! Otherwise it doe
 Template code
 !!```
 
-Maybe more comments. The NAme and the Options are important in the processing; the NAME will be the template name and the vawrious options say how to apply the template. For example, a file template needs to be at the top level and have a FileName=_value_ where the _value_ can include any of the macro values.
+Maybe more comments. The Name and the Options are important in the processing; the NAME will be the template name and the vawrious options say how to apply the template. For example, a file template needs to be at the top level and have a FileName=_value_ where the _value_ can include any of the macro values.
 
 ## SUBNAME
 This template is only used by the upper template

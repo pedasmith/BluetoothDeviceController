@@ -2,7 +2,7 @@
 
 ![H5074](../DevicePictures/Govee_H5074-175.png)
 
-The Govee H5074 is a now obsolete (?) small square environmental sensor that transmits data using the Bluetooth advertisement data. The sensor reports temperature, relative humidity values.
+The Govee H5074 thermostat + humidity sensor is a small, coin-cell battery (CR2477) powered smart sensor. It sends data over advertisements and does not need to be connected.
 
 The Govee website no longer mentions the H5074
 

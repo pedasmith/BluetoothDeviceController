@@ -1,8 +1,20 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "Govee_H5074_74C5",
-      "REM10": "Small battery-powered temperature and humidity sensor using adverts and not the BLE",
+      "Name": "Govee_H5074",
+      "UserName": "Govee H5074",
+      "Maker": "Govee",
+      "Description": "The Govee H5074 thermostat + humidity sensor is a small, coin-cell battery (CR2477) powered smart sensor. It sends data over advertisements and does not need to be connected.",
+      "ShortDescription": "Sensor",
+      "DeviceType": "DATA",
+      "UsingTheDevice": "The device uses Bluetooth LE advertisements",
+      "Links": [
+        "https://github.com/neilsheps/GoveeTemperatureAndHumidity",
+        "https://github.com/Thrilleratplay/GoveeWatcher",
+        "https://wimsworld.wordpress.com/2020/07/11/govee-h5075-and-h5074-bluetooth-low-energy-and-mrtg/",
+        "https://github.com/wcbonner/GoveeBTTempLogger",
+        "https://github.com/alamers/openhab-addons/blob/b03e730699d703f669080343156a66d003ddd08d/bundles/org.openhab.binding.bluetooth.govee/src/main/java/org/openhab/binding/bluetooth/govee/internal/GoveeHygrometerHandler.java"
+      ],
       "SuppressFile": ":SuppressXAML:",
       "Services": [
         {

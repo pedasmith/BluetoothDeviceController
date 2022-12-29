@@ -19,5 +19,6 @@ goto :EOF
 REM Or generate just the one, which is a little easier to handle when debugging.
 :Debug
 %BIN% -inputJsonFile "%JSONDIR%"\Lionel_LionChief.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\Govee_H5075.json -inputTemplates Templates -output output
 
 

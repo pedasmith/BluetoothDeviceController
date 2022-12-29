@@ -42,6 +42,7 @@ and more devices -- please leave feedback to request specific devices!
 ## Toys and games
 
 [![GoDice](../DevicePictures/Particula_GoDice-175.png)](Device_Particula_GoDice.md)
+[![Lionel LionChief](../DevicePictures/Lionel_LionChief-175.png)](Device_Lionel_LionChief.md)
 
 ## More help
 [Help](Help.md)

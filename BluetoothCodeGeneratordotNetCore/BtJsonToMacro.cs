@@ -701,6 +701,9 @@ namespace BluetoothCodeGenerator
             retval.Macros.Add("UserName", bt.GetUserName());
             retval.Macros.Add("Description", bt.Description);
             retval.Macros.Add("UsingTheDevice", bt.UsingTheDevice);
+            retval.Macros.Add("Maker", bt.Maker);
+            retval.Macros.Add("DeviceType", bt.DeviceType);
+            retval.Macros.Add("ShortDescription", bt.ShortDescription);
             retval.Macros.Add("DefaultPin", bt.DefaultPin);
             retval.Macros.Add("DESCRIPTION", bt.Description);
             retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::hh:mm"));

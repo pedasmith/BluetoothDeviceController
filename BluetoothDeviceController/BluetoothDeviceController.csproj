@@ -348,6 +348,12 @@
     <Content Include="Assets\DevicePictures\Kano_Wand.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\DevicePictures\Lionel_LionChief-175.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\DevicePictures\Lionel_LionChief-350.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\DevicePictures\MagicLight-175.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -630,6 +636,9 @@
     <Content Include="Assets\ScreenShots\Device_Govee_H5074.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ScreenShots\Device_Lionel_LionChief.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ScreenShots\Device_Particula_GoDice_Rolled.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -725,6 +734,9 @@
     <None Include="Assets\HelpFiles\Device_Govee_H5074.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Assets\HelpFiles\Device_Lionel_LionChief.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
