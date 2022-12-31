@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.UI.Xaml.Controls"
-    xmlns:UI="using:Microsoft.Advertising.WinRT.UI"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -87,11 +86,12 @@
                               HorizontalAlignment="Left" VerticalAlignment="Top"
                               Width="300" Height="250" Visibility="Collapsed"/>
                 -->
+                <!-- ADVERT: Removed 2022-12-30 for version 1.10
                 <UI:AdControl x:Name="uiAdVertical" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" ApplicationId="9pp2jw8c2nrt" AdUnitId="1100053145"
                               AdRefreshed="OnAdRefreshed" ErrorOccurred="OnAdErrorOccurred"
                               HorizontalAlignment="Left" VerticalAlignment="Top"
                               Width="160" Height="600"  />
-
+                --> 
                 <!-- moved to the Automation menu
                 <Button Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="📰" Click="OnGenerateCode" ToolTipService.ToolTip="Generate code from Bluetooth" />
                 -->

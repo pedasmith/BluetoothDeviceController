@@ -2,7 +2,7 @@
 using BluetoothDeviceController.BluetoothProtocolsCustom;
 using BluetoothDeviceController.Names;
 using BluetoothDeviceController.UserData;
-using Microsoft.Advertising.WinRT.UI;
+// ADVERT: removed 2022-12-30: using Microsoft.Advertising.WinRT.UI;
 using SearchControllers;
 using System;
 using System.Collections.Generic;
@@ -16,8 +16,8 @@ using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
-using Windows.Foundation.Metadata;
-using Windows.Storage.Streams;
+//using Windows.Foundation.Metadata;
+//using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -198,8 +198,8 @@ namespace BluetoothDeviceController
         {
             if (!ALLOW_AD)
             {
-                uiAdVertical.Suspend(); // don't display the ad at all.
-                uiAdVertical.Visibility = Visibility.Collapsed;
+                // ADVERT: uiAdVertical.Suspend(); // don't display the ad at all.
+                // ADVERT: uiAdVertical.Visibility = Visibility.Collapsed;
             }
 
             ContentFrame.Navigated += ContentFrame_Navigated;
@@ -1496,7 +1496,8 @@ namespace BluetoothDeviceController
         {
         }
 
-
+#if NEVER_EVER_DEFINED
+// ADVERT: removed 2022-12-30
         private void OnAdRefreshed(object sender, RoutedEventArgs e)
         {
             var ad = sender as AdControl;
@@ -1510,8 +1511,8 @@ namespace BluetoothDeviceController
             Log($"NOTE: AdControl Error {ad.Name} Message:{e.ErrorMessage} ErrorCode:{e.ErrorCode}");
             ;
         }
-
-        #region MENU
+#endif
+#region MENU
         private async void OnRequestFeedback(object sender, TappedRoutedEventArgs e)
         {
             var launcher = Microsoft.Services.Store.Engagement.StoreServicesFeedbackLauncher.GetDefault();
