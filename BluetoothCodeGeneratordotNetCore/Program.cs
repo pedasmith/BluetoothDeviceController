@@ -185,14 +185,14 @@ namespace BluetoothCodeGenerator
                                     if (!string.IsNullOrEmpty (child.OptionSuppressFile)
                                         && !string.IsNullOrEmpty(btdata.OptionSuppressFile))
                                     {
-                                        if (child.OptionSuppressFile.Contains (btdata.OptionSuppressFile))
+                                        if (btdata.OptionSuppressFile.Contains (child.OptionSuppressFile))
                                         {
                                             shouldSupress = true;
                                         }
                                     }
                                     if (shouldSupress)
                                     {
-                                        Log($"NOTE: Supressing {child.Name} for {btdata.Name} [{child.OptionSuppressFile}.Contains {btdata.OptionSuppressFile}]");
+                                        Log($"NOTE: Supressing {child.Name} for {btdata.Name} [{btdata.OptionSuppressFile}.Contains {child.OptionSuppressFile}]");
                                         continue;
                                     }
                                     //var btdata = jsonData; // Switch to closer to the real thing! CreateMockBt.Create();

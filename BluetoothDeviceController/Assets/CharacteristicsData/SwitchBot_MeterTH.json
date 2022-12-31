@@ -1,0 +1,17 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "SwitchBot-MeterTH",
+      "UserName": "SwitchBot MeterTH",
+      "Maker": "SwitchBot",
+      "Description": "The SwitchBot MeterTH is a thermostat + hygrometer (humidity) sensor is a small, AAA battery powered smart sensor. It sends data over advertisements and does not need to be connected.",
+      "ShortDescription": "Sensor",
+      "DeviceType": "DATA",
+      "UsingTheDevice": "The device uses Bluetooth LE advertisements",
+      "Links": [
+        "https://us.switch-bot.com/products/switchbot-meter"
+      ],
+      "SuppressFile": ":SuppressXAML:SuppressCSharpProtocol:",
+    }
+  ]
+}

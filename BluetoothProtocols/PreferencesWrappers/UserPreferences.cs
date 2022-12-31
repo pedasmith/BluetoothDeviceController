@@ -25,12 +25,12 @@
         public ReadSelection DeviceReadSelection { get; set; } = UserPreferences.ReadSelection.Name;
         public bool AutomaticallyReadData { get; set; } = true;
         /// <summary>
-        /// When the user asks to scan for advertisements (beacons), the underlying WinRT API will scan forever. That's
+        /// When the user asks to scan for BLE or advertisements (beacons), the underlying WinRT API will scan forever. That's
         /// not what most users will want. Instead scan for a limited amount of time. As of 2022-04-16, this isn't settable
-        /// by the user.
+        /// by the user. Is also the timer for BLE because of course it is.
         /// </summary>
         public int AdvertisementScanTimeInMilliseconds { get; set; } = 120_000; // 30 seconds is a good amount of time
-        // Was 5 seconds, but that felt too quick.
+        // Was 5 seconds, but that felt too quick. 120_000 is 2 minutes.
 
         public bool BeaconFullDetails { get; set; } = false;
         // BeaconTrackAll was used with the old UX to track all adverts or not. But now the advert page is done differently: all adverts are tracked and stored

@@ -141,13 +141,15 @@ namespace BluetoothDeviceController
         public BleNames AllBleNames { get; set; }
         public UserPreferences Preferences { get; } = new UserPreferences();
         public UserSerialPortPreferences SerialPortPreferences { get; } = new UserSerialPortPreferences();
-        public string CurrJsonSearch { get; internal set; }
+        public string CurrFinalJsonSearch { get; internal set; }
+        public string CurrInProgressJsonSearch { get; internal set; }
+
         IDoSearchFeedback SearchFeedback { get; set; }  = null;
 
  
         public string ZZZZGetCurrentSearchResults()
         {
-            return CurrJsonSearch;
+            return CurrFinalJsonSearch;
         }
         public MainPage()
         {
@@ -823,7 +825,7 @@ namespace BluetoothDeviceController
 
             // Not eddystone or ruuvitag. Let's do the event so it can be seen
             // by the SimpleBeaconPage. 
-            SimpleBeaconPage.TheSimpleBeaconPage.IsPaused = SearchFeedback.GetIsPaused(); // Transfer the search feedback UX value to the SimpleBeaconPage.
+            SimpleBeaconPage.TheSimpleBeaconPage.IsPaused = SearchFeedback.GetIsPaused(); // Transfer the search feedback UX jsonSearchText to the SimpleBeaconPage.
             // Yes, this is pretty awkward.
             deviceWrapper.BleAdvert.Event(deviceWrapper.BleAdvert); // TODO: why is this called again?
 
@@ -919,7 +921,7 @@ namespace BluetoothDeviceController
         /// Primary function to kick off a search for devices (both automation and UX 'search now' button.
         /// </summary>
         /// <param name="readType">only used for the BLE scope items</param>
-        /// <param name="scope">Can be any value: the BLE (has_specialty, named, all), advert (beacon) or COM types.</param>
+        /// <param name="scope">Can be any jsonSearchText: the BLE (has_specialty, named, all), advert (beacon) or COM types.</param>
         private void StartSearchWithTime(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope, ScanTimeType scanTimeType=ScanTimeType.TimeIsPreference)
         {
             // Track whether or no we should clear the screen. We clean the screen and the list
@@ -990,8 +992,8 @@ namespace BluetoothDeviceController
             StartWatchForBluetoothDevices(scope, scanTimeType);
 
             // In some cases, we also want to automatically read the device information.
-            // For the 'Everything' value, we read in all data and display it to the user.
-            // For the 'Name' value, we just read in name stuff and update the menu.
+            // For the 'Everything' jsonSearchText, we read in all data and display it to the user.
+            // For the 'Name' jsonSearchText, we just read in name stuff and update the menu.
             Task searchTask = null;
             switch (scope)
             {
@@ -1201,7 +1203,7 @@ namespace BluetoothDeviceController
         /// <param name="args"></param>
         private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
-            // Play around with getting a strength value!
+            // Play around with getting a strength jsonSearchText!
             var id = GuidGetCommon.NiceId(args.Id);
             object strength = null;
             args.Properties.TryGetValue("System.Devices.Aep.SignalStrength", out strength);
@@ -1240,7 +1242,7 @@ namespace BluetoothDeviceController
         {
             var id = GuidGetCommon.NiceId(args.Id);
 
-            // Play around with getting a strength value!
+            // Play around with getting a strength jsonSearchText!
             object strength = null;
             args.Properties.TryGetValue("System.Devices.Aep.SignalStrength", out strength);
             if (strength != null && strength is int)
@@ -1280,7 +1282,7 @@ namespace BluetoothDeviceController
             // Now go for realsie
             DeviceReadCts = new CancellationTokenSource();
             // Special code for automation: will do a complete sweep of all BT devices and fill in 
-            // the global CurrJsonSearch string variable of the devices.
+            // the global CurrFinalJsonSearch string variable of the devices.
             switch (readType)
             {
                 case UserPreferences.ReadSelection.Name:
@@ -1300,9 +1302,8 @@ namespace BluetoothDeviceController
         /// <returns></returns>
         private async Task ReadEverythingAsync(CancellationToken ct)
         {
-            CurrJsonSearch = "";
 
-            var deviceJson = "";
+            CurrInProgressJsonSearch = "";
             await Task.Delay(1000); // pause 1000 ms = 1 s to get some BT
             //int startidx = FindListStart() + 1;
             //int endidx = FindListEnd() - 1;
@@ -1337,11 +1338,11 @@ namespace BluetoothDeviceController
                     var json = editor?.JsonAsSingle;
                     if (!String.IsNullOrEmpty(json))
                     {
-                        if (deviceJson != "")
+                        if (CurrInProgressJsonSearch != "")
                         {
-                            deviceJson += ",\n";
+                            CurrInProgressJsonSearch += ",\n";
                         }
-                        deviceJson += json;
+                        CurrInProgressJsonSearch += json;
                     }
                 }
 
@@ -1350,11 +1351,12 @@ namespace BluetoothDeviceController
             }
 
             // Even on cancel show the text that we have.
-            if (!String.IsNullOrEmpty(deviceJson))
+            CurrFinalJsonSearch = "";
+            if (!String.IsNullOrEmpty(CurrInProgressJsonSearch))
             {
                 // Write it out!
-                CurrJsonSearch = deviceJson;
-                await DisplayTextFromSearchAsync(deviceJson);
+                CurrFinalJsonSearch = CurrInProgressJsonSearch;
+                await DisplayTextFromSearchAsync(CurrInProgressJsonSearch);
             }
         }
 
@@ -1376,11 +1378,18 @@ namespace BluetoothDeviceController
                 Content = scroll,
                 Title = "Raw Bluetooth devices",
                 PrimaryButtonText = "OK",
+                SecondaryButtonText = "Copy as JSON",
             };
             try
             {
                 await (App.Current as App).WaitForAppLockAsync("JsonSearch");
-                await cdb.ShowAsync();
+                var result = await cdb.ShowAsync();
+                switch (result)
+                {
+                    case ContentDialogResult.Secondary:
+                        CopyJsonToClipboardCorrectly(CurrFinalJsonSearch);
+                        break;
+                }
             }
             catch (Exception ex)
             {
@@ -1524,19 +1533,28 @@ namespace BluetoothDeviceController
 #endif
         private void OnMenuAutomationSearchCopyJson(object sender, RoutedEventArgs e)
         {
-            var value = CurrJsonSearch;
-            if (String.IsNullOrEmpty(value)) return;
-            var dp = new DataPackage();
+            var value = CurrInProgressJsonSearch;
+            CopyJsonToClipboardCorrectly(value); // Always copy, even if the result is blank.
+        }
+
+        /// <summary>
+        /// E.G. CopyJsonToClipboardCorrectly(CurrFinalJsonSearch)
+        /// </summary>
+        /// <param name="jsonSearchText"></param>
+        private void CopyJsonToClipboardCorrectly(string jsonSearchText)
+        {
             // Convert the list of individual items into a proper list.
-            value = @"{
+            jsonSearchText = @"{
   ""AllDevices"": [
-" + value + @"
+" + jsonSearchText + @"
   ]
 }";
 
-            dp.SetText(value);
+            var dp = new DataPackage();
+            dp.SetText(jsonSearchText);
             dp.Properties.Title = "JSON Bluetooth data";
             Clipboard.SetContent(dp);
+
         }
 
         public enum ScanTimeType {  TimeIsPreference, TimeIsInfinite};
@@ -1637,8 +1655,10 @@ namespace BluetoothDeviceController
 
         private void OnMenuHelpHelp(object sender, RoutedEventArgs e)
         {
-            var tag = (sender as FrameworkElement).Tag as string;
-            NavView_Navigate(tag, "Help.md", null);
+            var list = ((sender as FrameworkElement).Tag as string).Split('|');
+            var tag = list[0];
+            var page = list[1];
+            NavView_Navigate(tag, page, null);
         }
 
         private void OnMenuHelpFeedback(object sender, RoutedEventArgs e)

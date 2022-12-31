@@ -19,13 +19,15 @@
         
         <!-- TOP MENU -->
         <MenuBar>
-            <MenuBarItem Title="Automation">
+            <MenuBarItem Title="Developer">
                 <MenuFlyoutItem Text="Beacon/Advertisement Long-running sweep" Click="MenuOnSweepBeaconAdvertisement" />
                 <MenuFlyoutItem Text="Full BLE sweep" Click="MenuOnSweepBleFull" />
-                <MenuFlyoutItem Text="✀ Copy sweep results as JSON" Click="OnMenuAutomationSearchCopyJson"  />
+                <MenuFlyoutItem Text="✀ Copy BLE sweep results as JSON" Click="OnMenuAutomationSearchCopyJson"  />
                 
+                <!-- Use the BluetoothCodeGeneratordotNetCore program now, not this code.
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="📰 Generate code from Bluetooth" Click="MenuOnGenerateCode" ToolTipService.ToolTip="Generate code from Bluetooth" />
+                -->
 
                 <MenuFlyoutSeparator />
                 <ToggleMenuFlyoutItem x:Name="uiMenuKeepScreenOn" Text="Keep screen on" IsChecked="False" Click="MenuOnToggleScreenOn" />
@@ -38,7 +40,11 @@
                 <ToggleMenuFlyoutItem x:Name="uiMenuFilterSimpleBeaconPageAscending" Text="Sort AZ" IsChecked="True" Click="OnClientFilterSimpleBeaconPageAscending" />
             </MenuBarItem>
             <MenuBarItem Title="Help">
-                <MenuFlyoutItem Text="💁 Help" Tag="Help" Click="OnMenuHelpHelp" />
+                <MenuFlyoutItem Text="💁 Help" Tag="Help|Help.md" Click="OnMenuHelpHelp" />
+                <MenuFlyoutItem Text="Menus" Tag="Help|Help_Menu_MenuBar.md" Click="OnMenuHelpHelp" />
+                <MenuFlyoutItem Text="Sensor Data" Tag="Help|Sensor_Data_Reading.md" Click="OnMenuHelpHelp" />
+                <MenuFlyoutItem Text="Advanced JSON" Tag="Help|JSON_About.md" Click="OnMenuHelpHelp" />
+                <MenuFlyoutItem Text="Version History" Tag="Help|Help_Versions.md" Click="OnMenuHelpHelp" />
                 <MenuFlyoutItem Text="About" Click="OnMenuHelpAbout" />
                 <MenuFlyoutItem Text=" Leave Feedback" FontFamily="Segoe UI,Segoe MDL2 Assets" Tag="Feedback" Click="OnMenuHelpFeedback" />
             </MenuBarItem>
@@ -122,7 +128,7 @@
         </NavigationView>
         
         <!-- SEARCH + SEARCH FEEDBACK + COPY Search Results -->
-        <Grid Grid.Row="2" >
+        <Grid Grid.Row="2" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />

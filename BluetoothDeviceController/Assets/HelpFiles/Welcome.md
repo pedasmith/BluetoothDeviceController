@@ -23,6 +23,7 @@ and more devices -- please leave feedback to request specific devices!
 [![Pyle PHBPBW40](../DevicePictures/Samico_BloodPressure_BG512-175.png)](Device_Samico_BloodPressure_BG512.md)
 [![RuuviTag](../DevicePictures/Ruuvi_RuuviTag-175.png)](Device_Ruuvi_RuuviTag.md)
 [![Sensything](../DevicePictures/Protocentral_Sensything-175.png)](Device_Protocentral_Sensything.md)
+[![SwitchBot MeterTH](../DevicePictures/SwitchBot_MeterTH-175.png)](Device_SwitchBot_MeterTH.md)
 [![TI 1352 Sensor Tag](../DevicePictures/TI_SensorTag_1352-175.png)](Device_TI_SensorTag_1352.md)
 [![TI Sensor Tag 1350](../DevicePictures/TI_SensorTag_1350-175.png)](Device_TI_SensorTag_1350.md)
 [![TI Original Sensor Tag](../DevicePictures/TI_SensorTag_2541-175.png)](Device_TI_SensorTag_2541.md)

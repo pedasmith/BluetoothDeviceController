@@ -80,7 +80,8 @@ namespace BluetoothDeviceController.Beacons
 
         private void BleAdvert_UpdatedBleAdvertisementWrapper(BleAdvertisementWrapper data)
         {
-            throw new NotImplementedException(); //TODO: should not throw! Is this ever called?
+            //Gets called sometimes? Why? 2022-12-30
+            //throw new NotImplementedException(); //TODO: should not throw! Is this ever called?
             // Got called with a RuuviTag
         }
 

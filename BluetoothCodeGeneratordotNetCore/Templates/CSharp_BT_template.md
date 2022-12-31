@@ -1,4 +1,4 @@
-﻿# Protocol FileName=[[CLASSNAME]].cs DirName=BluetoothProtocols
+﻿# Protocol FileName=[[CLASSNAME]].cs DirName=BluetoothProtocols SuppressFile=:SuppressCSharpProtocol:
 
 ```
 //From template: Protocol_Body v2022-07-02 9:54

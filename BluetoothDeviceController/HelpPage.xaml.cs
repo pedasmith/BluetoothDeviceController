@@ -93,7 +93,7 @@ namespace BluetoothDeviceController
         }
 
         PageHistory History = new PageHistory();
-        private async Task<bool> GotoAsync (string filename)
+        private async Task<bool> GotoAsync (string filename, Dictionary<string,string> ReplaceText = null)
         {
             if (filename.StartsWith ("http://") || filename.StartsWith("https://"))
             {
@@ -117,6 +117,13 @@ namespace BluetoothDeviceController
                 string fname = @"Assets\HelpFiles\" + filename;
                 var f = await InstallationFolder.GetFileAsync(fname);
                 var fcontents = File.ReadAllText(f.Path);
+                if (ReplaceText != null)
+                {
+                    foreach (var (name, value) in ReplaceText) 
+                    {
+                        fcontents= fcontents.Replace(name, value);
+                    }
+                }
                 uiHelpText.Text = fcontents;
                 SetNavigatedTo(filename);
                 return true;
@@ -127,7 +134,11 @@ namespace BluetoothDeviceController
             const string ErrorName = "Error.md";
             if (filename != ErrorName)
             {
-                await GotoAsync(ErrorName);
+                var replace = new Dictionary<string, string>()
+                {
+                    { "[[FILENAME]]", filename },
+                };
+                await GotoAsync(ErrorName, replace);
             }
             return false; // If I'm showing the error, return false.
         }
