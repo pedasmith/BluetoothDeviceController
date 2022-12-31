@@ -27,7 +27,10 @@
             <TextBlock Style="{StaticResource TitleStyle}" Text="Help for Bluetooth Device Controller" />
         </StackPanel>
         <ScrollViewer Grid.Row="1">
-            <toolkit:MarkdownTextBlock x:Name="uiHelpText" FontFamily="Segoe UI,Segoe MDL2 Assets" />
+            <toolkit:MarkdownTextBlock x:Name="uiHelpText" 
+                FontFamily="Segoe UI,Segoe MDL2 Assets"
+                ImageStretch="None"
+                />
         </ScrollViewer>
     </Grid>
 </Page>
