@@ -135,7 +135,7 @@ namespace BluetoothDeviceController
             new Specialization (typeof(Beacons.SimpleBeaconPage), new string[] { "Beacon" }, LIGHTNING, "", "Advertisement", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(Beacons.EddystonePage), new string[] { "Eddystone" }, BEACON, "", "Eddystone beacon", Specialization.ParentScrollType.ChildHandlesScrolling),
             new Specialization (typeof(Beacons.RuuvitagPage), new string[] { "Ruuvi", "SwitchBot-MeterTH" }, DATA, "", "Environmental sensor"), 
-            // Ruuvitag page also handles the Govee H5074 but since the Govee is really just advert based, it should not be on this list.
+            // Ruuvitag page also handles the Govee H5074 and H5075 but since the Govee is really just advert based, it should not be on this list.
         };
 
         public BleNames AllBleNames { get; set; }
@@ -736,12 +736,17 @@ namespace BluetoothDeviceController
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
             MenuItemCache.Add(menu); // must add to cache before we do any awaits.
-
+            var now = DateTime.Now.ToString("HH:mm:ss.f");
+            Log($"{id}: Cache: Added at {DateTime.Now.ToString("HH:mm:ss.f")}: Device added to cache");
 
             var specialization = Specialization.Get(Specializations, name);
             if (specialization == null)
             {
+                // NOTE: this is a real problem. The IsNordicUartAsync takes quite a while to run;
+                // I can see that long after the program is "done" with scanning it's still 
+                // attempting to see if things are a Nordic style UART.
                 var isUart = await wrapper.IsNordicUartAsync();
+                Log($"{id}: IsNordicUart: at {DateTime.Now.ToString("HH:mm:ss.f")}: isUart={isUart}");
                 if (isUart)
                 {
                     specialization = Specialization.Get(Specializations, Nordic_Uart.SpecializationName);
@@ -758,9 +763,11 @@ namespace BluetoothDeviceController
             }
 
             var icon = GetIconForName(name);
+            Log($"{id}: Icon: At {DateTime.Now.ToString("HH:mm:ss.f")}: Device has icon {icon}");
             var dmec = new DeviceMenuEntryControl(wrapper, name, specialization, icon);
             dmec.SettingsClick += OnDeviceSettingsClick;
             menu.Content = dmec;
+            Log($"{id}: MenuItems: Added at {DateTime.Now.ToString("HH:mm:ss.f")}: Device added to menu items");
             uiNavigation.MenuItems.Insert(idx, menu);
             SearchFeedback.FoundDevice(FoundDeviceInfo.IsNew);
         }
@@ -1207,15 +1214,14 @@ namespace BluetoothDeviceController
             var id = GuidGetCommon.NiceId(args.Id);
             object strength = null;
             args.Properties.TryGetValue("System.Devices.Aep.SignalStrength", out strength);
+            var now = DateTime.Now.ToString("HH:mm:ss.f");
             if (strength != null && strength is int)
             {
-                ;
-                var strvalue = (int)strength;
-                Log($"DeviceWatcher: Added: Device {id} added with strength {strength}");
+                Log($"DeviceWatcher: Added at {now}: Device {id} added with strength {strength}");
             }
             else
             {
-                Log($"DeviceWatcher: Added: Device {id} added with no strength");
+                Log($"DeviceWatcher: Added at {now}: Device {id} added with no strength");
             }
 
 
@@ -1513,11 +1519,13 @@ namespace BluetoothDeviceController
         }
 #endif
 #region MENU
+#if NEVER_EVER_DEFINED
         private async void OnRequestFeedback(object sender, TappedRoutedEventArgs e)
         {
             var launcher = Microsoft.Services.Store.Engagement.StoreServicesFeedbackLauncher.GetDefault();
             await launcher.LaunchAsync();
         }
+#endif
 
 #if NEVER_EVER_DEFINED
         private async void OnGenerateCode(object sender, RoutedEventArgs e)
@@ -1661,11 +1669,12 @@ namespace BluetoothDeviceController
             var page = list[1];
             NavView_Navigate(tag, page, null);
         }
-
+#if NEVER_EVER_DEFINED
         private void OnMenuHelpFeedback(object sender, RoutedEventArgs e)
         {
             OnRequestFeedback(null, null);
         }
+#endif
 
         /// <summary>
         /// From the search feedback "Filtered Out" text. Goal is to show the user which devices were filtered out and why.

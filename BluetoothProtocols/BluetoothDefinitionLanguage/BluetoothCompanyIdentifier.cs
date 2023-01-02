@@ -2719,8 +2719,9 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                     case 0xEC88: // Govee device advertisement scan response is for manufacturer 0xEC88
                         if (parseAs == CommonManufacturerType.Govee)
                         {
-
-                            var data = Govee.Parse(section);
+                            // It's better to parse with knowledge of the type
+                            // But soemtimes you have to go with what you have.
+                            var data = Govee.Parse(Govee.SensorType.Other, section);
                             if (!data.IsValid)
                             {
                                 sb.Append(data.EncodeMessage); // will be some kind of error message.

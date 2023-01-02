@@ -32,17 +32,21 @@ namespace BluetoothDeviceController.Beacons
             // 
             // let's see if the advert is one of the known cases.
             //
-            var govee = Govee.Parse(bleWrapper);
-            if (govee != null && govee.IsValid)
+            var goveeType = Govee.AdvertIsGovee(bleWrapper);
+            if (goveeType != Govee.SensorType.NotGovee)
             {
-                bleWrapper.GoveeDataRecord = govee; // only set if it's valid.
-                bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Govee;
-            }
-            if (Govee.AdvertIsGovee(bleWrapper))
-            {
-                // Set the type to Govee if either this advert is govee OR the original advert is Govee.
-                // Otherwise, doesn't set to Govee for the first advert.
-                bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Govee;
+                var govee = Govee.Parse(goveeType, bleWrapper);
+                if (govee != null && govee.IsValid)
+                {
+                    bleWrapper.GoveeDataRecord = govee; // only set if it's valid.
+                    bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Govee;
+                }
+                else
+                {
+                    // Set the type to Govee if either this advert is govee OR the original advert is Govee.
+                    // Otherwise, doesn't set to Govee for the first advert.
+                    bleWrapper.AdvertisementType = BleAdvertisementWrapper.BleAdvertisementType.Govee;
+                }
             }
             var switchbot = SwitchBot.Parse(bleWrapper);
             if (switchbot != null && switchbot.IsValid)

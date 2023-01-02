@@ -45,7 +45,9 @@
                 <MenuFlyoutItem Text="Advanced JSON" Tag="Help|JSON_About.md" Click="OnMenuHelpHelp" />
                 <MenuFlyoutItem Text="Version History" Tag="Help|Help_Versions.md" Click="OnMenuHelpHelp" />
                 <MenuFlyoutItem Text="About" Click="OnMenuHelpAbout" />
+                <!-- Removing 2022-12-31 so that this builds in ARM6
                 <MenuFlyoutItem Text=" Leave Feedback" FontFamily="Segoe UI,Segoe MDL2 Assets" Tag="Feedback" Click="OnMenuHelpFeedback" />
+                -->
             </MenuBarItem>
         </MenuBar>
         
@@ -64,7 +66,7 @@
                 -->
 
             </NavigationView.MenuItems>
-            <!-- NOTE: can remove at any time.
+            <!-- NOTE: can remove at any time; code is dead and functionality moved to menu
             <NavigationView.PaneFooter>
                 <NavigationViewItem FontFamily="Segoe UI,Segoe MDL2 Assets" Content=" Leave Feedback" Tag="Feedback" x:Name="uiMenuFeedback" Tapped="OnRequestFeedback" />
             </NavigationView.PaneFooter>
@@ -108,7 +110,8 @@
                     <local:PageDock Grid.Row="0" Height="104" x:Name="uiDock" Visibility="Collapsed" />
                     <ScrollViewer Grid.Row="1" x:Name="uiPageScroller">
                         <Frame x:Name="ContentFrame" Padding="12,0,12,24" IsTabStop="True"
-                            NavigationFailed="ContentFrame_NavigationFailed"/>
+                            NavigationFailed="ContentFrame_NavigationFailed"
+                               VerticalAlignment="Stretch"/>
                     </ScrollViewer>
                     <Button x:Name="uiMinimizeButton" Content="🗕" ToolTipService.ToolTip="Minimize"
                             Grid.Row="1" 

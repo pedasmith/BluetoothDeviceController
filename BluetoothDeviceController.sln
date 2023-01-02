@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BluetoothCodeGeneratordotNe
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SearchControllers", "SearchControllers\SearchControllers.shproj", "{96D6EA94-D8FB-45A0-94E2-7173D5D300BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindBitPattern", "FindBitPattern\FindBitPattern.csproj", "{3D43813A-308B-44F4-8B19-378627DB54BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,26 @@ Global
 		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|x64.Build.0 = Release|Any CPU
 		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|x86.ActiveCfg = Release|Any CPU
 		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Release|x86.Build.0 = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|ARM.Build.0 = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|x64.Build.0 = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Debug|x86.Build.0 = Debug|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|ARM.ActiveCfg = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|ARM.Build.0 = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|ARM64.Build.0 = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|x64.ActiveCfg = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|x64.Build.0 = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|x86.ActiveCfg = Release|Any CPU
+		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

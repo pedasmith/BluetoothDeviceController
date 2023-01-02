@@ -23,7 +23,7 @@ namespace BluetoothProtocols.Beacons
         public string EncodeMessage { get; set; }
 
         /// <summary>
-        /// Returns true if the local name OR the original name is Govee_H5074
+        /// Returns true if the advert matches a SwitchBot advert.
         /// </summary>
         /// <param name="wrapper"></param>
         /// <returns></returns>

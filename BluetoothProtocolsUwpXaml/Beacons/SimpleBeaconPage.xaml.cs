@@ -100,7 +100,7 @@ namespace BluetoothDeviceController.Beacons
         private async void BleAdvert_UpdatedUniversalBleAdvertisementWrapper(BleAdvertisementWrapper data)
         {
             BluetoothCompanyIdentifier.CommonManufacturerType parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-            if (Govee.AdvertIsGovee(data))
+            if (Govee.AdvertIsGovee(data) != Govee.SensorType.NotGovee)
             {
                 parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Govee;
             }

@@ -1,8 +1,5 @@
 ﻿using BluetoothDeviceController;
-using BluetoothDeviceController.Beacons;
-using BluetoothDeviceController.BluetoothDefinitionLanguage;
 using System;
-using System.Collections.Generic;
 using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
@@ -14,64 +11,67 @@ namespace BluetoothProtocols.Beacons
     {
 
         public bool IsValid { get; set; } = true;
-        public UInt16 CompanyId { get; set; } // will by 0xEC88 for the Govee HS5074
-        public enum SensorType { Other, HS5074 };
+        public UInt16 CompanyId { get; set; } // will by 0xEC88 for the Govee H5074 H5075
+        public enum SensorType { Other, H5074, H5075, NotGovee };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
         public double BatteryInPercent { get; set; }
         public string EncodeMessage { get; set; }
 
+
+
+        /// <summary>
+        /// Returns true if the local name OR the original name matches Govee_H5074_ or GVH5075_
+        /// </summary>
+        /// <param name="wrapper"></param>
+        /// <returns></returns>
+        public static SensorType AdvertIsGovee(BleAdvertisementWrapper wrapper)
+        {
+            var retval = NameToSensorType(wrapper.BleAdvert.Advertisement.LocalName);
+            if (retval == SensorType.NotGovee && wrapper.BleOriginalAdvert != null)
+            {
+                retval = NameToSensorType(wrapper.BleOriginalAdvert.Advertisement.LocalName);
+            }
+            return retval;
+        }
+
+        private static SensorType NameToSensorType(string name)
+        {
+            SensorType retval = SensorType.NotGovee;
+            if (name != null)
+            {
+                if (name.StartsWith("Govee_H5074_")) retval = SensorType.H5074;
+                if (name.StartsWith("GVH5075_")) retval = SensorType.H5075;
+            }
+            return retval;
+        }
         /// <summary>
         /// Parses a BleAdvertisementWrapper and returns a Govee data record. Return might be null or might be Invalid.
         /// </summary>
         /// <param name="wrapper"></param>
         /// <returns></returns>
-        public static Govee Parse (BleAdvertisementWrapper wrapper)
+        public static Govee Parse(SensorType sensorType, BleAdvertisementWrapper wrapper)
         {
+            if (sensorType == SensorType.NotGovee) return null;
+
             Govee retval = null;
-            BluetoothCompanyIdentifier.CommonManufacturerType parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-            bool isGovee = AdvertIsGovee(wrapper); 
-            if (isGovee)
+            var ble = wrapper.BleAdvert;
+            foreach (var section in ble.Advertisement.DataSections)
             {
-                //Future work: be more generic here. Right now this is super specific.
-                parseAs = BluetoothCompanyIdentifier.CommonManufacturerType.Govee;
-            }
-            if (parseAs == BluetoothCompanyIdentifier.CommonManufacturerType.Govee)
-            {
-                var ble = wrapper.BleAdvert;
-                foreach (var section in ble.Advertisement.DataSections)
+                DataTypeValue dtv = ConvertDataTypeValue(section.DataType); // get the enum value
+                switch (dtv)
                 {
-                    DataTypeValue dtv = ConvertDataTypeValue(section.DataType); // get the enum value
-                    switch (dtv)
-                    {
-                        case DataTypeValue.ManufacturerData:
-                            retval = Parse(section);
-                            break;
-                    }
+                    case DataTypeValue.ManufacturerData:
+                        retval = Parse(sensorType, section);
+                        break;
                 }
             }
 
             return retval;
         }
-
-        /// <summary>
-        /// Returns true if the local name OR the original name is Govee_H5074
-        /// </summary>
-        /// <param name="wrapper"></param>
-        /// <returns></returns>
-        public static bool AdvertIsGovee(BleAdvertisementWrapper wrapper)
+        public static Govee Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section)
         {
-            bool retval = false;
-            if (wrapper.BleAdvert.Advertisement.LocalName.StartsWith("Govee_H5074_")) retval = true;
-            if (wrapper.BleOriginalAdvert != null)
-            {
-                if (wrapper.BleOriginalAdvert.Advertisement.LocalName.StartsWith("Govee_H5074_")) retval = true;
-            }
-            return retval;
-        }
-
-        public static Govee Parse(BluetoothLEAdvertisementDataSection section)
-        {
+            if (sensorType == SensorType.NotGovee) return null;
             var retval = new Govee();
 
             try
@@ -80,11 +80,6 @@ namespace BluetoothProtocols.Beacons
                 dr.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
                 retval.CompanyId = dr.ReadUInt16(); // Will be 0xEC88 but that's explicitly not enforced here
 
-                // original code (not sure why I'm keeping it around; it's pretty weird)
-                //var padding = dr.ReadByte();
-                //var encode = dr.ReadUInt32();
-                //var temp = ((double)(encode / 1000)) / 10.0; // result is degrees c
-                //var hum = ((double)(encode % 1000)) / 10.0; // now it's percent
                 if (dr.UnconsumedBufferLength > 16 || retval.CompanyId != 0xEC88)
                 {
                     var pre = dr.ReadInt16();
@@ -95,14 +90,41 @@ namespace BluetoothProtocols.Beacons
                 }
                 else
                 {
-                    var junk = dr.ReadByte();
-                    retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
-                    retval.Temperature = dr.ReadInt16() / 100.0;
-                    retval.Humidity = dr.ReadInt16() / 100.0;
-                    retval.BatteryInPercent = dr.ReadByte();
-                    retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk}) ";
-                }
+                    if (sensorType == SensorType.Other)
+                    {
+                        switch (dr.UnconsumedBufferLength)
+                        {
+                            case 9: sensorType = SensorType.H5075; break;
+                            case 10: sensorType = SensorType.H5074;break;
+                        }
+                    }
 
+                    switch (sensorType)
+                    {
+                        case SensorType.H5074:
+                            var junk = dr.ReadByte();
+                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                            retval.Temperature = dr.ReadInt16() / 100.0;
+                            retval.Humidity = dr.ReadInt16() / 100.0;
+                            retval.BatteryInPercent = dr.ReadByte();
+                            retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk}) ";
+                            break;
+                        case SensorType.H5075:
+                            var junk2 = dr.ReadByte();
+                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                            // Yes, this encoding is horrible for no good reason.
+                            var b1 = dr.ReadByte();
+                            var b2 = dr.ReadByte();
+                            var b3 = dr.ReadByte();
+                            var isneg = (b1 & 0x80) != 0;
+                            var value = ((b1 & 0x7F) << 16) + (b2 << 8) + b3;
+                            retval.Temperature = ((double)(value / 1000)) / 10.0;
+                            retval.Humidity = ((double)(value % 1000)) / 10.0;
+                            retval.BatteryInPercent = dr.ReadByte();
+                            retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk2}) ";
+                            break;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -116,6 +138,5 @@ namespace BluetoothProtocols.Beacons
             return $"Temperature={Temperature} Humidity={Humidity}% "
                 + $"Battery={BatteryInPercent}";
         }
-
     }
 }
