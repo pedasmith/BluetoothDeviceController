@@ -433,6 +433,7 @@ namespace BluetoothDeviceController
 
         private void SetParentScrolltype(Specialization.ParentScrollType scrollType)
         {
+            Log($"DBG: TODO: SetParentScrollType: {scrollType}");
             switch (scrollType)
             {
                 case Specialization.ParentScrollType.ParentShouldScroll:
@@ -473,7 +474,7 @@ namespace BluetoothDeviceController
                         case BleAdvertisementWrapper.BleAdvertisementType.Govee:
                         case BleAdvertisementWrapper.BleAdvertisementType.RuuviTag:
                         case BleAdvertisementWrapper.BleAdvertisementType.SwitchBot:
-                            _pageType = typeof(Beacons.RuuvitagPage); // TODO: RuuviTag is now used with 3 data types :-)
+                            _pageType = typeof(Beacons.RuuvitagPage); // NOTE: RuuviTag is now used with 3 data types -- are they handled? :-)
                             break;
                         case BleAdvertisementWrapper.BleAdvertisementType.Eddystone:
                             _pageType = typeof(Beacons.EddystonePage);
@@ -955,10 +956,11 @@ namespace BluetoothDeviceController
                     // Navigate to a beacons page
                     var _pageType = typeof(Beacons.SimpleBeaconPage);
                     var currPageType = ContentFrame.Content.GetType();
-                    if (_pageType != currPageType)
+                    if (currPageType == typeof(Beacons.RuuvitagPage))
                     {
-                        //TODO: actually, keep the old page shouldClear = true;
+                        _pageType = currPageType; // keep it the same.
                     }
+
                     DeviceInformationWrapper navigateTo = null;
                     if (shouldClear)
                     {
@@ -969,14 +971,18 @@ namespace BluetoothDeviceController
                         };
                     }
 
-                    SetParentScrolltype(Specialization.ParentScrollType.ChildHandlesScrolling); // SimpleBeachPage knows how to scroll itself.
-
                     // Show the Filter menu for the beacon page if we should
                     var pageIsBeacon = _pageType == typeof(Beacons.SimpleBeaconPage);
+                    var pageIsRuuvitag = _pageType == typeof(Beacons.RuuvitagPage);
+                    var pageIsAnyBeacon = pageIsBeacon || pageIsRuuvitag;
                     uiFilterSimpleBeaconPage.Visibility = pageIsBeacon ? Visibility.Visible : Visibility.Collapsed;
-                    SearchFeedback.SetPauseVisibility(pageIsBeacon);
-                    SearchFeedback.SetSearchFeedbackType(pageIsBeacon ? SearchFeedbackType.Advertisement : SearchFeedbackType.Normal)
-                        ;
+                    SearchFeedback.SetPauseVisibility(pageIsAnyBeacon);
+                    SearchFeedback.SetSearchFeedbackType(pageIsAnyBeacon ? SearchFeedbackType.Advertisement : SearchFeedbackType.Normal);
+                    // Some beacon pages handle scrolling (like the SimpleBeaconPage),but others like the RuuvitagPage do not.
+                    if (pageIsBeacon)
+                    {
+                        SetParentScrolltype(Specialization.ParentScrollType.ChildHandlesScrolling); // SimpleBeaconPage knows how to scroll itself.
+                    }
                     if (navigateTo != null)
                     {
                         ContentFrame.Navigate(_pageType, navigateTo);

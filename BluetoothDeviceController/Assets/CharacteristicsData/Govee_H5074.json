@@ -1,0 +1,309 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Govee_H5074",
+      "ClassName": "Govee_H5074",
+      "UserName": "Govee H5074",
+      "Maker": "Govee",
+      "Description": "The Govee H5074 thermostat + humidity sensor is a small, coin-cell battery (CR2477) powered smart sensor. It sends data over advertisements and does not need to be connected.",
+      "ShortDescription": "Sensor",
+      "DeviceType": "DATA",
+      "UsingTheDevice": "The device uses Bluetooth LE advertisements",
+      "Links": [
+        "https://us.govee.com/",
+        "https://www.amazon.com/Govee-Thermometer-Hygrometer-Bluetooth-Temperature/dp/B07R586J37",
+        "https://github.com/neilsheps/GoveeTemperatureAndHumidity",
+        "https://github.com/Thrilleratplay/GoveeWatcher",
+        "https://wimsworld.wordpress.com/2020/07/11/govee-h5075-and-h5074-bluetooth-low-energy-and-mrtg/",
+        "https://github.com/wcbonner/GoveeBTTempLogger",
+        "https://github.com/alamers/openhab-addons/blob/b03e730699d703f669080343156a66d003ddd08d/bundles/org.openhab.binding.bluetooth.govee/src/main/java/org/openhab/binding/bluetooth/govee/internal/GoveeHygrometerHandler.java",
+        "https://sunriseprogrammer.blogspot.com/2023/01/your-bluetooth-is-bad-january-2023.html"
+      ],
+      "SuppressFile": ":SuppressXAML:SuppressCSharpProtocol:",
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Name: Govee_H5074_74C5",
+                "Govee_H5074_74C5"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsRead": true,
+              "IsIndicate": true,
+              "Verbs": ":Read:Indicate:RdInNo:InNo:",
+              "ExampleData": [
+                "Value:  01 00 FF FF",
+                "1 65535"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manufacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  49 6E 74 65 6C 6C 69 5F 52 6F 63 6B 73",
+                "Intelli_Rocks"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  49 52",
+                "IR"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  31 2E 30 30 2E 30 31",
+                "1.00.01"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  31 2E 30 31 2E 30 30",
+                "1.01.00"
+              ]
+            },
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  C5 74 D0 54 17 E0",
+                "C5 74 D0 54 17 E0"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  01 D2 00 80 05 00 01",
+                "01 D2 00 80 05 00 01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fef5-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Dialog Semiconductor GmbH",
+          "Name": "Unknown3",
+          "Characteristics": [
+            {
+              "UUID": "8082caa8-41a6-4021-91c6-56f9b954cc34",
+              "Name": "Unknown0",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "724249f0-5ec3-4b5f-8804-42345af08651",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "6c53db25-47a1-45fe-a022-7c92fb334fd4",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "9d84b9a3-000c-49d8-9183-855b673fda31",
+              "Name": "Unknown3",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "457871e8-d516-4ca1-9116-57d0b17b9cb2",
+              "Name": "Unknown4",
+              "Type": "BYTES|HEX|Unknown4",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":Read:Write:WriteWithoutResponse:RdInNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "5f78df94-798c-46f5-990a-b3eb6a065c88",
+              "Name": "Unknown5",
+              "Type": "BYTES|HEX|Unknown5",
+              "IsRead": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "64b4e8b5-0de5-401b-a21d-acc8db3b913a",
+              "Name": "Unknown6",
+              "Type": "BYTES|HEX|Unknown6",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  0D"
+              ]
+            },
+            {
+              "UUID": "42c3dfdd-77be-4d9c-8454-8f875267fb3b",
+              "Name": "Unknown7",
+              "Type": "BYTES|HEX|Unknown7",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  F4 00"
+              ]
+            },
+            {
+              "UUID": "b7de1eea-823d-43bb-a3af-c4903dfce23c",
+              "Name": "Unknown8",
+              "Type": "BYTES|HEX|Unknown8",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  F7 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "494e5445-4c4c-495f-524f-434b535f4857",
+          "Name": "Unknown4",
+          "Characteristics": [
+            {
+              "UUID": "494e5445-4c4c-495f-524f-434b535f2012",
+              "Name": "humi_cmd",
+              "Description": "humi_cmd",
+              "Type": "BYTES|HEX|humi_cmd",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Write:Notify:RdInNo:InNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "494e5445-4c4c-495f-524f-434b535f2013",
+              "Name": "humi_data",
+              "Description": "humi_data",
+              "Type": "BYTES|HEX|humi_data",
+              "IsRead": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "494e5445-4c4c-495f-524f-434b535f2011",
+              "Name": "protocol",
+              "Description": "protocol",
+              "Type": "BYTES|HEX|protocol",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Write:Notify:RdInNo:InNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "494e5445-4c4c-495f-524f-434b535f2014",
+              "Name": "heart_beat",
+              "Description": "heart_beat",
+              "Type": "BYTES|HEX|heart_beat",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Write:Notify:RdInNo:InNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-e0:17:54:d0:74:c5\nCanPair:True IsPaired:False"
+    }
+  ]
+}

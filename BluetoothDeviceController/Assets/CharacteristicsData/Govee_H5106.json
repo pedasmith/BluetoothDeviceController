@@ -1,17 +1,16 @@
-﻿{
+{
   "AllDevices": [
     {
-      "Name": "GVH5075",
-      "ClassName": "Govee_H5075",
-      "UserName": "Govee H5075",
+      "Name": "GVH5106",
+      "ClassName": "Govee_H5106",
+      "UserName": "Govee H5106",
       "Maker": "Govee",
-      "Description": "The Govee H5075 thermostat + humidity sensor is a small, AAA battery powered smart sensor. It sends data over advertisements and does not need to be connected.",
+      "Description": "The Govee H5106 smart air quality monitor is a small, USB-powered smart sensor. It sends data over advertisements and does not need to be connected.",
       "ShortDescription": "Sensor",
       "DeviceType": "DATA",
       "UsingTheDevice": "The device uses Bluetooth LE advertisements",
       "Links": [
         "https://us.govee.com/",
-        "https://www.amazon.com/Govee-Temperature-Humidity-Notification-Monitor/dp/B07Y36FWTT",
         "https://github.com/neilsheps/GoveeTemperatureAndHumidity",
         "https://github.com/Thrilleratplay/GoveeWatcher",
         "https://wimsworld.wordpress.com/2020/07/11/govee-h5075-and-h5074-bluetooth-low-energy-and-mrtg/",
@@ -31,11 +30,11 @@
               "Name": "Device Name",
               "Type": "STRING|ASCII|Device_Name",
               "IsRead": true,
-              "IsNotify": true,
-              "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
               "ExampleData": [
-                "Name: GVH5075_6188\\0\\0\\0\\0\\0\\0",
-                "GVH5075_6188\\0\\0\\0\\0\\0\\0"
+                "Name: GVH5106_3272",
+                "GVH5106_3272"
               ]
             },
             {
@@ -43,7 +42,8 @@
               "Name": "Appearance",
               "Type": "U16|Speciality^Appearance|Appearance",
               "IsRead": true,
-              "Verbs": ":Read:RdInNo:",
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
               "ExampleData": [
                 "Appearance:  00 00",
                 "Unknown"
@@ -56,8 +56,19 @@
               "IsRead": true,
               "Verbs": ":Read:RdInNo:",
               "ExampleData": [
-                "Value:  14 00 28 00 00 00 E8 03",
-                "25 46 0 10000"
+                "Value:  08 00 0A 00 00 00 90 01",
+                "10 11 0 4000"
+              ]
+            },
+            {
+              "UUID": "00002ac9-0000-1000-8000-00805f9b34fb",
+              "Name": "Resolvable Private Address Only",
+              "Type": "U8|HEX|ResolvablePrivateAddressFlag",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value: ",
+                "U8|HEX|ResolvablePrivateAddressFlag"
               ]
             }
           ]
@@ -71,94 +82,108 @@
               "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
               "Name": "Service Changes",
               "Type": "U16|DEC|StartRange U16|DEC|EndRange",
-              "IsIndicate": true,
-              "Verbs": ":Indicate:RdInNo:InNo:"
-            }
-          ]
-        },
-        {
-          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
-          "RegistrationOwner": "Bluetooth Standard",
-          "Name": "Device Info",
-          "Characteristics": [
-            {
-              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
-              "Name": "PnP ID",
-              "Type": "STRING|ASCII",
               "IsRead": true,
-              "Verbs": ":Read:RdInNo:",
+              "IsIndicate": true,
+              "Verbs": ":Read:Indicate:RdInNo:InNo:",
               "ExampleData": [
-                "Value:  02 8A 24 66 82 01 00",
-                "02 8A 24 66 82 01 00"
+                "Value:  01 00 FF FF",
+                "1 65535"
               ]
             }
           ]
         },
         {
           "UUID": "494e5445-4c4c-495f-524f-434b535f4857",
-          "Name": "Unknown3",
+          "Name": "Unknown2",
           "Characteristics": [
             {
               "UUID": "494e5445-4c4c-495f-524f-434b535f2011",
-              "Name": "Govee SPP: protocol",
-              "Description": "Govee SPP: protocol",
-              "Type": "BYTES|HEX|Govee SPP: protocol",
+              "Name": "for gatt Read",
+              "Description": "for gatt Read",
+              "Type": "BYTES|HEX|for gatt Read",
               "IsRead": true,
               "IsWrite": true,
               "IsNotify": true,
               "Verbs": ":Read:Write:Notify:RdInNo:InNo:WrWw:",
               "ExampleData": [
-                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+                "Value: "
               ]
             },
             {
               "UUID": "494e5445-4c4c-495f-524f-434b535f2012",
-              "Name": "Govee SPP: cmd",
-              "Description": "Govee SPP: cmd",
-              "Type": "BYTES|HEX|Govee SPP: cmd",
+              "Name": "for gatt Read",
+              "Description": "for gatt Read",
+              "Type": "BYTES|HEX|for gatt Read",
               "IsRead": true,
               "IsWrite": true,
               "IsNotify": true,
               "Verbs": ":Read:Write:Notify:RdInNo:InNo:WrWw:",
               "ExampleData": [
-                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+                "Value: "
               ]
             },
             {
               "UUID": "494e5445-4c4c-495f-524f-434b535f2013",
-              "Name": "Govee SPP: transmit",
-              "Description": "Govee SPP: transmit",
-              "Type": "BYTES|HEX|Govee SPP: transmit",
+              "Name": "for gatt Read",
+              "Description": "for gatt Read",
+              "Type": "BYTES|HEX|for gatt Read",
               "IsRead": true,
               "IsNotify": true,
               "Verbs": ":Read:Notify:RdInNo:InNo:",
               "ExampleData": [
-                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+                "Value: "
               ]
             }
           ]
         },
         {
-          "UUID": "00010203-0405-0607-0809-0a0b0c0d1912",
-          "Name": "Unknown4",
+          "UUID": "02f00000-0000-0000-0000-00000000fe00",
+          "Name": "Unknown3",
           "Characteristics": [
             {
-              "UUID": "00010203-0405-0607-0809-0a0b0c0d2b12",
-              "Name": "OTA",
-              "Description": "OTA",
-              "Type": "BYTES|HEX|OTA",
+              "UUID": "02f00000-0000-0000-0000-00000000ff03",
+              "Name": "Unknown0",
+              "Type": "BYTES|HEX|Unknown0",
               "IsRead": true,
-              "IsWriteWithoutResponse": true,
-              "IsNotify": true,
-              "Verbs": ":Read:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:",
+              "Verbs": ":Read:RdInNo:",
               "ExampleData": [
-                "Value:  00"
+                "Value: "
               ]
+            },
+            {
+              "UUID": "02f00000-0000-0000-0000-00000000ff02",
+              "Name": "OTA Response",
+              "Description": "OTA Response",
+              "Type": "BYTES|HEX|OTA Response",
+              "IsRead": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "Value:  6E 74 66 5F 65 6E 61 62 6C 65"
+              ]
+            },
+            {
+              "UUID": "02f00000-0000-0000-0000-00000000ff00",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "02f00000-0000-0000-0000-00000000ff01",
+              "Name": "Unknown3",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":Write:WriteWithoutResponse:WrWw:"
             }
           ]
         }
       ],
-      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-a4:c1:38:b2:61:88\nCanPair:True IsPaired:False"
+      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-c8:32:37:35:32:72\nCanPair:True IsPaired:False"
     }
   ]
 }

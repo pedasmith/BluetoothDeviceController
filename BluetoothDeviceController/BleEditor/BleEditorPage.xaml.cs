@@ -178,10 +178,11 @@ namespace BluetoothDeviceController.BleEditor
             var jsonFormat = Newtonsoft.Json.Formatting.Indented;
             var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings()
             {
-                DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore,
+                DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.IgnoreAndPopulate,
                 NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
                 ContractResolver = IgnoreEmptyEnumerableResolver.Instance,
-            };
+            }; 
+
 
             var wireAllDevices = new NameAllBleDevices();
             WireDevice = new NameDevice();

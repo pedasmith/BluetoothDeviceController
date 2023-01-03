@@ -12,7 +12,7 @@ namespace BluetoothProtocols.Beacons
 
         public bool IsValid { get; set; } = true;
         public UInt16 CompanyId { get; set; } // will by 0xEC88 for the Govee H5074 H5075
-        public enum SensorType { Other, H5074, H5075, NotGovee };
+        public enum SensorType { Other, H5074, H5075, H5106, NotGovee };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
         public double BatteryInPercent { get; set; }
@@ -42,6 +42,7 @@ namespace BluetoothProtocols.Beacons
             {
                 if (name.StartsWith("Govee_H5074_")) retval = SensorType.H5074;
                 if (name.StartsWith("GVH5075_")) retval = SensorType.H5075;
+                if (name.StartsWith("GVH5106_")) retval = SensorType.H5106;
             }
             return retval;
         }
@@ -79,8 +80,9 @@ namespace BluetoothProtocols.Beacons
                 var dr = DataReader.FromBuffer(section.Data);
                 dr.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
                 retval.CompanyId = dr.ReadUInt16(); // Will be 0xEC88 but that's explicitly not enforced here
-
-                if (dr.UnconsumedBufferLength > 16 || retval.CompanyId != 0xEC88)
+                var expectedCompanyId = 0xEC88;
+                if (sensorType == SensorType.H5106) expectedCompanyId = 0x01; // Nokia??
+                if (dr.UnconsumedBufferLength > 16 || retval.CompanyId != expectedCompanyId)
                 {
                     var pre = dr.ReadInt16();
                     var (strName, nameOk) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength - 4);
@@ -95,7 +97,24 @@ namespace BluetoothProtocols.Beacons
                         switch (dr.UnconsumedBufferLength)
                         {
                             case 9: sensorType = SensorType.H5075; break;
-                            case 10: sensorType = SensorType.H5074;break;
+                            case 10:
+                                {
+                                    var drtype = DataReader.FromBuffer(section.Data);
+                                    drtype.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
+                                    var typecompany = dr.ReadInt16();
+                                    var b0 = dr.ReadByte();
+                                    var b1 = dr.ReadByte();
+                                    if (b0 == 0x01 && b1 == 0x01)
+                                    {
+                                        sensorType = SensorType.H5106;
+                                    }
+                                    else
+                                    {
+                                        // Check to make sure that b0==0?
+                                        sensorType = SensorType.H5074; break; // or H5106 :-(
+                                    }
+                                }
+                                break;
                         }
                     }
 
@@ -123,6 +142,16 @@ namespace BluetoothProtocols.Beacons
                             retval.BatteryInPercent = dr.ReadByte();
                             retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk2}) ";
                             break;
+                        case SensorType.H5106:
+                            var junk3 = dr.ReadInt16();
+                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.PM25;
+                            dr.ByteOrder = ByteOrder.BigEndian; // Surprise! It's big endian!
+                            var value3 = dr.ReadUInt32();
+                            retval.Temperature = ((double)(value3 / 1_000_000)) / 10.0;
+                            retval.Humidity = ((double)((value3 / 1_000) % 1000)) / 10.0;
+                            retval.PM25 = (double)(value3 % 1_000);
+                            retval.BatteryInPercent = 100.0; // it's line powered.
+                            break;
                     }
                 }
             }
@@ -135,7 +164,7 @@ namespace BluetoothProtocols.Beacons
         }
         public override string ToString()
         {
-            return $"Temperature={Temperature} Humidity={Humidity}% "
+            return $"Temperature={Temperature} Humidity={Humidity}% PM2.5={PM25} "
                 + $"Battery={BatteryInPercent}";
         }
     }

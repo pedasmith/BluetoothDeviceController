@@ -2738,7 +2738,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                         }
                         break;
                     default:
-                        System.Diagnostics.Debug.WriteLine($"NOTE: saw company {companyId:X4}={companyName}");
+                        System.Diagnostics.Debug.WriteLine($"NOTE: Manufacturer data: saw company {companyId:X4}={companyName}");
                         break ;
                 }
                 if (displayAsHex)

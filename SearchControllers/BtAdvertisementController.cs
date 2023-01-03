@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController;
+using BluetoothDeviceController.Beacons;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
@@ -79,6 +80,10 @@ namespace SearchControllers
         private async void Watcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
             var name = args.Advertisement.LocalName;
+            if (string.IsNullOrEmpty (name))
+            {
+                name = BluetoothAddress.AsString(args.BluetoothAddress);
+            }
             System.Diagnostics.Debug.WriteLine($"DeviceBleWatcher: Device {name} seen");
             if (name.Contains("Wescale") || name.StartsWith("LC"))
             {

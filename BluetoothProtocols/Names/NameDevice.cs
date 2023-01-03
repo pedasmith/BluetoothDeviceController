@@ -39,11 +39,14 @@ namespace BluetoothDeviceController.Names
         /// User-visible name of the device. Often not set, but for some devices (like the Lionel trains) where
         /// the BT name is LC-0-1-0494-B69B but the user knows it as a Lionel Train.
         /// </summary>
-        public string UserName { get; set; }
+        [DefaultValue("")]
+        public string UserName { get; set; } = "";
         public string GetUserName() { return String.IsNullOrEmpty(UserName) ? Name : UserName; }
 
         public enum CompletionStatusEnum {  Usable, Unusable};
         public CompletionStatusEnum CompletionStatus { get; set; } = CompletionStatusEnum.Usable;
+        [DefaultValue("")]
+
         public string CompletionStatusExplanation { get; set; } = "";
         /// <summary>
         /// Should be [maker]_[device]. Be consistant with other devices. This is used directly to make C# class names, so it must be a valid C# class name.
@@ -57,35 +60,42 @@ namespace BluetoothDeviceController.Names
         /// <summary>
         /// User-supplied description of the device
         /// </summary>
+        [DefaultValue("")]
         public string Description { get; set; } = "";
 
         /// <summary>
         /// Two or three words to describe the device; used in the mainpain.xaml.cs list of devices
         /// </summary>
+        [DefaultValue("")]
         public string ShortDescription { get; set; } = "";
         /// <summary>
         /// Single word; must be one of the const strings at about line 70 in mainpage.xaml.cs
         /// </summary>
+        [DefaultValue("")]
         public string DeviceType { get; set; } = ""; // ALARM BEACON CAR DATA DICE HEALTH LIGHT LIGHTNING ROBOT TRAIN UART WAND WATER
 
         /// <summary>
         /// Device maker; used in the mainpain.xaml.cs list of devices
         /// </summary>
+        [DefaultValue("")]
         public string Maker { get; set; } = "";
         /// <summary>
         /// Documentation only string for how to use the device. Will be placed in the # Using section of the help file.
         /// </summary>
+        [DefaultValue("")]
         public string UsingTheDevice { get; set; } = "";
         /// <summary>
         /// The default PIN for the device. Many devices don't require PIN values.
         /// </summary>
         /// 
+        [DefaultValue("")]
         public string DefaultPin { get; set; } = "";
         /// <summary>
         /// Used in conjuction with the MD template files. The MD file will have a "SupressFile=":SuppressXAML:".
         /// If that SuppressFile contains the SuppressFile here, then the file will be suppressed.
         /// Note that a single JSON device file can list a bunch of different templates that get suppressed.
         /// </summary>
+        [DefaultValue("")]
         public string SuppressFile { get; set; } = "";
         /// <summary>
         /// List of aliases for the device; used by the Triones bulb.

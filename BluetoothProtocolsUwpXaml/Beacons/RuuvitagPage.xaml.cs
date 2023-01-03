@@ -45,17 +45,20 @@ namespace BluetoothDeviceController.Beacons
             var EventTimeProperty = typeof(SensorDataRecord).GetProperty("EventTime");
             var noteProperties = new List<System.Reflection.PropertyInfo>(); // Same as ChartProperties but with EventTime added.
 
+            // SensorDataRecord: Update
             if (firstRecord == null)
             {
                 SensorPropertyNames.Add("Temperature");
                 SensorPropertyNames.Add("Pressure");
                 SensorPropertyNames.Add("Humidity");
+                SensorPropertyNames.Add("PM25");
             }
             else
             {
                 if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature)) SensorPropertyNames.Add("Temperature");
                 if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Pressure)) SensorPropertyNames.Add("Pressure");
                 if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity)) SensorPropertyNames.Add("Humidity");
+                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.PM25)) SensorPropertyNames.Add("PM25");
             }
             noteProperties.Add(EventTimeProperty);
             foreach (var name in SensorPropertyNames)
@@ -78,11 +81,41 @@ namespace BluetoothDeviceController.Beacons
                 chartDefaultMinY2 = 0, // Y2 is Humidity per the name and ChartProperties listings
                 chartDefaultMaxY2 = 100,
             };
+            if (firstRecord != null)
+            {
+                int index = 0;
+                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature))
+                {
+                    Sensor_DataChart.UISpec.SetChartDefaultMinY(index, 15); // Common indoor temperature, C
+                    Sensor_DataChart.UISpec.SetChartDefaultMaxY(index, 25);
+                    index++;
+                }
+                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Pressure))
+                {
+                    Sensor_DataChart.UISpec.SetChartDefaultMinY(index, 990); // common pressure mbar
+                    Sensor_DataChart.UISpec.SetChartDefaultMaxY(index, 1050);
+                    index++;
+                }
+                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity))
+                {
+                    Sensor_DataChart.UISpec.SetChartDefaultMinY(index, 0);
+                    Sensor_DataChart.UISpec.SetChartDefaultMaxY(index, 100);
+                    index++;
+                }
+                if (firstRecord.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.PM25))
+                {
+                    Sensor_DataChart.UISpec.SetChartDefaultMinY(index, 0); // not sure what the best default here is.
+                    Sensor_DataChart.UISpec.SetChartDefaultMaxY(index, 50);
+                    index++;
+                }
 
+            }
             // Update the UX as needed
+            // SensorDataRecord: Update
             if (!SensorPropertyNames.Contains("Temperature")) Sensor_Data_Temperature.Visibility = Visibility.Collapsed;
-            if (!SensorPropertyNames.Contains("Pressure")) Sensor_Data_Pressure.Visibility = Visibility.Collapsed;
             if (!SensorPropertyNames.Contains("Humidity")) Sensor_Data_Humidity.Visibility = Visibility.Collapsed;
+            if (!SensorPropertyNames.Contains("Pressure")) Sensor_Data_Pressure.Visibility = Visibility.Collapsed;
+            if (!SensorPropertyNames.Contains("PM25")) Sensor_Data_PM25.Visibility = Visibility.Collapsed;
 
             // Have to add the EventTime so that the summary box is correct.
             SensorDataRecordData.TProperties = noteProperties.ToArray();
@@ -104,9 +137,11 @@ namespace BluetoothDeviceController.Beacons
                 index++;
                 uiResults.Text += $"{index}: {now} {record}\n";
 
+                // SensorDataRecord: Update
                 Sensor_Data_Temperature.Text = record.Temperature.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                 Sensor_Data_Humidity.Text = record.Humidity.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                 Sensor_Data_Pressure.Text = record.Pressure.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                Sensor_Data_PM25.Text = record.PM25.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
 
                 var addResult = SensorDataRecordData.AddRecord(record);
                 Sensor_DataChart.AddYTime<SensorDataRecord>(addResult, SensorDataRecordData);
@@ -121,9 +156,11 @@ namespace BluetoothDeviceController.Beacons
                 // Add to the text box!
                 uiResults.Text += record.ToString() + "\n";
 
+                // SensorDataRecord: Update
                 Sensor_Data_Temperature.Text = record.Temperature.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                 Sensor_Data_Humidity.Text = record.Humidity.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                 Sensor_Data_Pressure.Text = record.Pressure.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                Sensor_Data_PM25.Text = record.PM25.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
 
                 var addResult = SensorDataRecordData.AddRecord(record);
                 Sensor_DataChart.AddYTime<SensorDataRecord>(addResult, SensorDataRecordData);

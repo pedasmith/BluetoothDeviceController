@@ -113,6 +113,31 @@ namespace BluetoothDeviceController.Names
             return chartDefaultMaxY;
         }
 
+        public double? SetChartDefaultMinY(int lineIndex, double value)
+        {
+            switch (lineIndex)
+            {
+                case 0: chartDefaultMinY0 = value; break;
+                case 1: chartDefaultMinY1 = value; break;
+                case 2: chartDefaultMinY2 = value; break;
+                case 3: chartDefaultMinY3 = value; break;
+                case 4: chartDefaultMinY4 = value; break;
+            }
+            return chartDefaultMaxY;
+        }
+        public double? SetChartDefaultMaxY(int lineIndex, double value)
+        {
+            switch (lineIndex)
+            {
+                case 0: chartDefaultMaxY0 = value; break;
+                case 1: chartDefaultMaxY1 = value; break;
+                case 2: chartDefaultMaxY2 = value; break;
+                case 3: chartDefaultMaxY3 = value; break;
+                case 4: chartDefaultMaxY4 = value; break;
+            }
+            return chartDefaultMaxY;
+        }
+
         public Dictionary<string, ChartLineDefaults> chartLineDefaults = new Dictionary<string, ChartLineDefaults>()
         {
         };

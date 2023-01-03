@@ -68,6 +68,7 @@
                     <TextBox IsReadOnly="True" x:Name="Sensor_Data_Temperature" Text="*" Header="Temperature" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="True" x:Name="Sensor_Data_Pressure" Text="*" Header="Pressure" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="True" x:Name="Sensor_Data_Humidity" Text="*" Header="Humidity" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_PM25" Text="*" Header="PM2.5" Style="{StaticResource HEXStyle}"/>
                 </StackPanel>
 
                 <controls:Expander Header="Sensor Data tracker" IsExpanded="true" MinWidth="550" HorizontalAlignment="Left">

@@ -10,14 +10,20 @@ namespace BluetoothProtocols
 
     public class SensorDataRecord : INotifyPropertyChanged
     {
+        /* Adding more fields? Here's a quick guide:
+         * 1. When you add a new field, you must also bump the .All value. Do a search in the code
+         *    for .All; as of 2023-01-02, there's exactly one.
+         * 2. Update the RuuvitagPage.xaml.cs with the new value (about line 50, // SensorDataRecord: Update)
+         */
         [Flags]
-        public enum SensorPresent {  None=0x00, Temperature = 0x01, Pressure = 0x02, Humidity = 0x04, All=0x07 };
+        public enum SensorPresent {  None=0x00, Temperature = 0x01, Pressure = 0x02, Humidity = 0x04, PM25 = 0x08, All=0x0F };
         public SensorPresent IsSensorPresent { get; set; } = SensorPresent.All;
         public SensorDataRecord()
         {
             Temperature = double.NaN;
             Pressure = double.NaN;
             Humidity = double.NaN;
+            PM25 = double.NaN;
             EventTime = DateTime.Now;
         }
         public SensorDataRecord(double temperature, double pressure, double humidity)
@@ -25,6 +31,7 @@ namespace BluetoothProtocols
             Temperature = temperature;
             Pressure = pressure;
             Humidity = humidity;
+            PM25 = double.NaN;
             EventTime = DateTime.Now;
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity;
         }
@@ -54,6 +61,11 @@ namespace BluetoothProtocols
         private double _Humidity;
         public double Humidity { get { return _Humidity; } set { if (value == _Humidity) return; _Humidity = value; OnPropertyChanged(); } }
 
+        /// <summary>
+        /// PM2.5 in ug/m3 µg/㎥
+        /// </summary>
+        private double _PM25;
+        public double PM25 { get { return _PM25; } set { if (value == _PM25) return; _PM25 = value; OnPropertyChanged(); } }
         private String _Note;
         public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
 
@@ -63,6 +75,7 @@ namespace BluetoothProtocols
             if (IsSensorPresent.HasFlag(SensorPresent.Temperature)) retval += " {Temperature}℃";
             if (IsSensorPresent.HasFlag(SensorPresent.Pressure)) retval += " {Pressure}mb";
             if (IsSensorPresent.HasFlag(SensorPresent.Humidity)) retval += " {Humidity}%";
+            if (IsSensorPresent.HasFlag(SensorPresent.PM25)) retval += " {PM25}µg/㎥";
             return retval;
         }
     }
