@@ -2,7 +2,7 @@
   "profiles": {
     "BluetoothCodeGeneratordotNetCore": {
       "commandName": "Project",
-      "commandLineArgs": " -inputJsonFile \"..\\BluetoothDeviceController\\Assets\\CharacteristicsData\\Lionel_LionChief.json\" -inputTemplates Templates -output output\r\n",
+      "commandLineArgs": " -inputJsonFile \"..\\BluetoothDeviceController\\Assets\\CharacteristicsData\\Bluetooth_CurrentTimeService.json\" -inputTemplates Templates -output output\r\n",
       "workingDirectory": "C:\\Users\\toomr\\source\\repos\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore",
       "remoteDebugEnabled": true
     }

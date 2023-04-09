@@ -1,0 +1,79 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "CurrentTimeService",
+      "ClassName": "Bt_CurrentTimeService",
+      "UserName": "Bluetooth Current Time Device",
+      "Maker": "Bluetooth",
+      "Description": "This service defines how a Bluetooth device can expose date and time information",
+      "ShortDescription": "Clock",
+      "DeviceType": "CLOCK",
+      "UsingTheDevice": "---",
+      "Links": [
+        "https://www.bluetooth.com/specifications/specs/current-time-service-1-1/"
+      ],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Description":  "Standard configuration values for LE devices",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "BtCurrentTimeServce",
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "0100",
+                "Clock"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms U16^1.15_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "10 11 0 4000"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "1805",
+          "Name": "CurrentTimeService",
+          "Description":  "Standard time service. The server will send out time information, optionally with additional information about the current time zone and more.",
+          "Characteristics": [
+            {
+              "UUID": "2A2B",
+              "Name": "CurrentTime",
+              "Description": "Current date and time",
+              "Type": "U16|DEC|Year U8|DEC|Month U8|DEC|Day U8|DEC|Hours U8|DEC|Minutes U8|DEC|Seconds U8|DEC|DayOfWeek U8|DEC|Fraction256 U8|HEX|AdjustReason",
+              "IsRead": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "Value: "
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

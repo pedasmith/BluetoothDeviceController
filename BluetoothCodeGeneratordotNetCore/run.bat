@@ -12,14 +12,23 @@ REM
 REM Normally we want to generate everything. But when we are debugging just something new,
 REM it's nicer to have just the single file handled.
 REM
-REM goto :Debug
+if "%~1"=="-debug" goto :debug
+if "%~1"=="-all" goto :All
+goto :Help
+
+goto :Debug
+:All
 %BIN% -inputJsonDirectory "%JSONDIR%" -inputTemplates Templates -output output
 goto :EOF
 
 REM Or generate just the one, which is a little easier to handle when debugging.
 :Debug
-%BIN% -inputJsonFile "%JSONDIR%"\Lionel_LionChief.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\Govee_H5075.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\SwitchBot_MeterTH.json -inputTemplates Templates -output output
+REM %BIN% -inputJsonFile "%JSONDIR%"\Govee_H6005.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\Bluetooth_CurrentTimeService.json -inputTemplates Templates -output output
+goto :EOF
+
+:Help
+@echo run -all to do all conversions
+@echo run -debug to just convert a few active items
 
 

@@ -70,11 +70,16 @@ namespace BluetoothDeviceController
         const string ALARM = "⏰";
         const string BEACON = "⛯"; // MAP SYMBOL FOR LIGHTHOUSE //"🖄";
         const string CAR = "🚗";
-        const string DATA = "📈"; 
-        const string DICE = "🎲"; 
+        const string CLOCK = "🕰";
+        const string DATA = "📈";
+        const string DICE = "🎲";
+        const string GAMEPAD = "🎮";
         const string HEALTH = "🏥"; //"🥼";
+        const string JOYSTICK = "🕹";
+        const string KEYBOARD = "⌨";
         const string LIGHT = "💡";
         const string LIGHTNING = "🖄"; // envelope with lightning
+        const string PLANT = "🪴";
         const string ROBOT = ""; // Part of the Segoe MDL2 Assets FontFamily
         const string TRAIN = "🚂";
         const string UART = "🖀";
@@ -227,7 +232,7 @@ namespace BluetoothDeviceController
             //}
             NavView_Navigate("Help", "welcome.md", null);
 
-            StartSearch(UserPreferences.ReadSelection.Name, Preferences.Scope);
+            StartSearchWithTime(UserPreferences.ReadSelection.Name, Preferences.Scope, ScanTimeType.TimeIsPreference);
 
             // Set the version number in the about box. https://stackoverflow.com/questions/28635208/retrieve-the-current-app-version-from-package
             var version = Windows.ApplicationModel.Package.Current.Id.Version;
@@ -874,8 +879,8 @@ namespace BluetoothDeviceController
         {
             if (di == null) return; // The tag is always a DeviceInformation
             if (di.di == null) return;
-            var (deviceName, hasDeviceName) = GetDeviceInformationName(di.di);
-            var perdevice = new PerDeviceSettings(di.di, deviceName);
+            var (originalDeviceName, hasDeviceName) = GetDeviceInformationName(di.di);
+            var perdevice = new PerDeviceSettings(di.di, originalDeviceName);
 
             var cd = new ContentDialog()
             {
@@ -900,8 +905,11 @@ namespace BluetoothDeviceController
 
             if (result == ContentDialogResult.Primary)
             {
-                // Please update the settings.
-                await UserNameMappings.AddAsync(di.di.Id, perdevice.UserName);
+                // Please update the settings, but only if they have changed.
+                if (perdevice.UserName != originalDeviceName)
+                {
+                    await UserNameMappings.AddAsync(di.di.Id, perdevice.UserName);
+                }
                 // Update the UI????
             }
         }
@@ -915,7 +923,7 @@ namespace BluetoothDeviceController
         public void StartSearchWithUserPreferences()
         {
             // Always do a Name search.
-            StartSearch(UserPreferences.ReadSelection.Name, Preferences.Scope);
+            StartSearchWithTime(UserPreferences.ReadSelection.Name, Preferences.Scope, ScanTimeType.TimeIsPreference);
         }
         private int StartSearchCount = 0; // Started since the last 'clear'
         private UserPreferences.ReadSelection LastSearchReadType;
@@ -929,7 +937,7 @@ namespace BluetoothDeviceController
         /// Primary function to kick off a search for devices (both automation and UX 'search now' button.
         /// </summary>
         /// <param name="readType">only used for the BLE scope items</param>
-        /// <param name="scope">Can be any jsonSearchText: the BLE (has_specialty, named, all), advert (beacon) or COM types.</param>
+        /// <param name="scope">Can be any scope: the BLE (has_specialty, named, all), advert (beacon) or COM types.</param>
         private void StartSearchWithTime(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope, ScanTimeType scanTimeType=ScanTimeType.TimeIsPreference)
         {
             // Track whether or no we should clear the screen. We clean the screen and the list
@@ -1415,6 +1423,7 @@ namespace BluetoothDeviceController
 
         readonly Guid CommonConfigurationGuid1800 = BluetoothLEStandardServices.Display; //  Guid.ParseScanResponseServiceData("00001800-0000-1000-8000-00805f9b34fb"); // service
         readonly Guid DeviceNameGuid2a00 = BluetoothLEStandardServices.Name;  // new Guid("00002a00-0000-1000-8000-00805f9b34fb"); // characteristic
+        BluetoothCacheMode CurrCacheMode = BluetoothCacheMode.Uncached;
 
         /// <summary>
         /// Reads just the name from the list of devices in the MenuItemCache and also all services and characteristics
@@ -1451,19 +1460,22 @@ namespace BluetoothDeviceController
                     // It's only reading Service 1800 (common configuration) Chara 2a00 (device name).
                     // The loops are there because 'technically' there could be multiple services and
                     // characteristics with the same ID. In practice, never.
-                    var services = await ble.GetGattServicesForUuidAsync(CommonConfigurationGuid1800);
+
+                    // TODO: allow this to be set. We often want to use the cache (it's much faster)
+                    // but sometimes the cache is 
+                    var services = await ble.GetGattServicesForUuidAsync(CommonConfigurationGuid1800, CurrCacheMode);
                     if (services.Status != GattCommunicationStatus.Success) continue;
 
                     int nservice = 0;
                     int ncharacteristic = 0;
                     foreach (var service in services.Services)
                     {
-                        var characteristics = await service.GetCharacteristicsForUuidAsync(DeviceNameGuid2a00);
+                        var characteristics = await service.GetCharacteristicsForUuidAsync(DeviceNameGuid2a00, CurrCacheMode);
                         if (characteristics.Status != GattCommunicationStatus.Success) continue;
                         nservice++;
                         foreach (var characteristic in characteristics.Characteristics)
                         {
-                            var read = await characteristic.ReadValueAsync();
+                            var read = await characteristic.ReadValueAsync(CurrCacheMode);
                             if (read.Status != GattCommunicationStatus.Success) continue;
                             ncharacteristic++;
                             var name = BluetoothLEStandardServices.CharacteristicData.ValueAsString(BluetoothLEStandardServices.DisplayType.String, read.Value);
@@ -1583,13 +1595,13 @@ namespace BluetoothDeviceController
         private void MenuOnSweepBleName(object sender, RoutedEventArgs e)
         {
             CancelSearch();
-            StartSearch(UserPreferences.ReadSelection.Name, UserPreferences.SearchScope.Ble_All_ble_devices);
+            StartSearchWithTime(UserPreferences.ReadSelection.Name, UserPreferences.SearchScope.Ble_All_ble_devices, ScanTimeType.TimeIsPreference);
         }
 
         private void MenuOnSweepBleFull(object sender, RoutedEventArgs e)
         {
             CancelSearch();
-            StartSearch(UserPreferences.ReadSelection.Everything, UserPreferences.SearchScope.Ble_All_ble_devices);
+            StartSearchWithTime(UserPreferences.ReadSelection.Everything, UserPreferences.SearchScope.Ble_All_ble_devices, ScanTimeType.TimeIsPreference);
         }
 
         // Stuff needed to keep the screen on

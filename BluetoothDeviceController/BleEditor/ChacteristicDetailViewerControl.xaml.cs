@@ -90,7 +90,25 @@ namespace BluetoothDeviceController.BleEditor
                     var buffer = await characteristic.ReadValueAsync();
                     if (buffer.Status == GattCommunicationStatus.Success)
                     {
-                        var data = ValueParser.ConvertToStringHex(buffer.Value);
+                        bool fallbackToHex = true;
+                        string data = null;
+                        try
+                        {
+                            var parseResult = ValueParser.Parse(buffer.Value, preferredFormat);
+                            if (parseResult.Result == ValueParserResult.ResultValues.Ok)
+                            {
+                                data = parseResult.UserString;
+                                fallbackToHex = false; 
+                            }
+                        }
+                        catch (Exception)
+                        {
+
+                        }
+                        if (string.IsNullOrEmpty(data) || fallbackToHex)
+                        {
+                            data = ValueParser.ConvertToStringHex(buffer.Value);
+                        }
                         AddData("Data", data);
                     }
                     else

@@ -264,7 +264,22 @@ namespace BluetoothDeviceController.Names
         }
 
         public UISpecifications UI { get; set; } = null; // default to null
-        public string UUID { get; set; }
+        private string UuidRaw = "";
+        /// <summary>
+        /// Sets the UUID as a string. Will take in short version (like 1800) but will
+        /// always return full UUID values.
+        /// </summary>
+        public string UUID
+        {
+            get
+            {
+                return UuidRaw.AsFullUuid();
+            }
+            set
+            {
+                UuidRaw = value;
+            }
+        }
         public string Name { get; set; }
         public string Description { get; set; }
         public bool Suppress { get; set; } = false; // when set, the UI doesn't need to see this characteristic.

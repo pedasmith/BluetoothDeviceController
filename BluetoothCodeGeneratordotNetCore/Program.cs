@@ -196,7 +196,12 @@ namespace BluetoothCodeGenerator
                                         continue;
                                     }
                                     //var btdata = jsonData; // Switch to closer to the real thing! CreateMockBt.Create();
-                                    Expander.ExpandChildTemplatesIntoMacros(child, btdata);
+                                    var expandOk = Expander.ExpandChildTemplatesIntoMacros(child, btdata);
+                                    if (!string.IsNullOrEmpty(expandOk))
+                                    {
+                                        Log(expandOk);
+                                        nerror++;
+                                    }
 
                                     var fname = Expander.ExpandMacroAll(child.OptionFileName, btdata);
                                     var dirname = string.IsNullOrEmpty(child.OptionDirName) ? "" : "\\" + child.OptionDirName;

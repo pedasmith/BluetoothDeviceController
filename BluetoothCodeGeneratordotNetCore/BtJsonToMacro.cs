@@ -178,7 +178,9 @@ namespace BluetoothCodeGenerator
             service.Macros.Add("ServiceName", btService.Name); // Preferred name to "Name"
             service.Macros.Add("SERVICENAME", btService.Name.DotNetSafe()); // BAD: [[SERVICENAME]] in TI 1350 and 2541 for NOTIFYCONFIGURE
             service.Macros.Add("ServiceIsExpanded", (btService.Priority >= 10) ? "true" : "false");
+            service.Macros.Add("ServiceDescription", btService.Description);
             service.Macros.Add("UUID", btService.UUID);
+            service.Macros.Add("UuidShort", btService.UUID.AsShortestUuid());
 
             var chs = new TemplateSnippet("Characteristics");
             service.AddChild("Characteristics", chs);
@@ -189,10 +191,12 @@ namespace BluetoothCodeGenerator
 
                 var ch = new TemplateSnippet(btCharacteristic.Name);
                 ch.Macros.Add("UUID", btCharacteristic.UUID);
+                ch.Macros.Add("UuidShort", btCharacteristic.UUID.AsShortestUuid());
                 ch.Macros.Add("Name", btCharacteristic.Name);
                 ch.Macros.Add("CharacteristicName", btCharacteristic.Name);
                 ch.Macros.Add("CharacteristicName.dotNet", btCharacteristic.Name.DotNetSafe());
                 ch.Macros.Add("Name.dotNet", btCharacteristic.Name.DotNetSafe());
+                ch.Macros.Add("CharacteristicDescription", btCharacteristic.Description);
 
                 ch.Macros.Add("Type", btCharacteristic.Type);
                 ch.Macros.Add("CHARACTERISTICTYPE", btCharacteristic.Type);

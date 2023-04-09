@@ -1,11 +1,8 @@
 # TODO list
 
-- [] Robots!
-- [x] Make the XAML CS files work
-- [x] Read in list of MD files from  directory
-- [x] Parse into TemplateSnippet
-- [x] Read in JSON
-- [x] Write out template w/CLASSNAME
+
+- [x] V1 is done and functional! 
+
 
 # What this is
 
@@ -26,6 +23,10 @@ Problems not solved:
 2. Some Bluetooth devices are BLE version of COM-port based devices; these are handled with a series of "macro" values are difficult to properly describe and require an expert to create
 3. Some Bluetooth devices use advertisements for their data. This requires C# code directly in the Blueooth Device Controller; there's no JSON description of the advertisement format.
 4. You can modify the resulting files. However, once modified, the code cannot be usefully regenerated.
+
+# Regenerating code
+
+Use the ```run.bat``` file
 
 # Syntax for the template file
 

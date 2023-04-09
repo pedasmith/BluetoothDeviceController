@@ -1,25 +1,14 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "GVH5075",
-      "ClassName": "Govee_H5075",
-      "UserName": "Govee H5075",
-      "Maker": "Govee",
-      "Description": "The Govee H5075 thermostat + humidity sensor is a small, AAA battery powered smart sensor. It sends data over advertisements and does not need to be connected.",
-      "ShortDescription": "Sensor",
-      "DeviceType": "DATA",
-      "UsingTheDevice": "The device uses Bluetooth LE advertisements",
+      "Name": "ihoment_H6005_CB97",
+      "ClassName": "Govee_H6005",
+      "ClassModifiers":  "partial",
+      "Description":  "The Govee H6055 bulb is a standard lightbulb that accepts Bluetooth commands",
       "Links": [
-        "https://us.govee.com/",
-        "https://www.amazon.com/Govee-Temperature-Humidity-Notification-Monitor/dp/B07Y36FWTT",
-        "https://github.com/neilsheps/GoveeTemperatureAndHumidity",
-        "https://github.com/Thrilleratplay/GoveeWatcher",
-        "https://wimsworld.wordpress.com/2020/07/11/govee-h5075-and-h5074-bluetooth-low-energy-and-mrtg/",
-        "https://github.com/wcbonner/GoveeBTTempLogger",
-        "https://github.com/alamers/openhab-addons/blob/b03e730699d703f669080343156a66d003ddd08d/bundles/org.openhab.binding.bluetooth.govee/src/main/java/org/openhab/binding/bluetooth/govee/internal/GoveeHygrometerHandler.java",
-        "https://sunriseprogrammer.blogspot.com/2023/01/your-bluetooth-is-bad-january-2023.html"
+        "https://us.govee.com/products/govee-smart-bluetooth-rgbww-led-bulbs?_pos=1&_sid=58c8705e1&_ss=r",
+        "https://github.com/chvolkmann/govee_btled/blob/master/govee_btled/bluetooth_led.py"
       ],
-      "SuppressFile": ":SuppressXAML:SuppressCSharpProtocol:",
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",
@@ -34,8 +23,8 @@
               "IsNotify": true,
               "Verbs": ":Read:Notify:RdInNo:InNo:",
               "ExampleData": [
-                "Name: GVH5075_6188\\0\\0\\0\\0\\0\\0",
-                "GVH5075_6188\\0\\0\\0\\0\\0\\0"
+                "Name: ihoment_H6005_CB97",
+                "ihoment_H6005_CB97"
               ]
             },
             {
@@ -95,43 +84,31 @@
           ]
         },
         {
-          "UUID": "494e5445-4c4c-495f-524f-434b535f4857",
-          "Name": "Unknown3",
+          "UUID": "00010203-0405-0607-0809-0a0b0c0d1910",
+          "Name": "TeCommand",
           "Characteristics": [
             {
-              "UUID": "494e5445-4c4c-495f-524f-434b535f2011",
-              "Name": "Govee SPP: protocol",
-              "Description": "Govee SPP: protocol",
-              "Type": "BYTES|HEX|Spp",
-              "IsRead": true,
-              "IsWrite": true,
-              "IsNotify": true,
-              "Verbs": ":Read:Write:Notify:RdInNo:InNo:WrWw:",
-              "ExampleData": [
-                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
-              ]
-            },
-            {
-              "UUID": "494e5445-4c4c-495f-524f-434b535f2012",
-              "Name": "Govee SPP: cmd",
-              "Description": "Govee SPP: cmd",
-              "Type": "BYTES|HEX|SppCmd",
-              "IsRead": true,
-              "IsWrite": true,
-              "IsNotify": true,
-              "Verbs": ":Read:Write:Notify:RdInNo:InNo:WrWw:",
-              "ExampleData": [
-                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
-              ]
-            },
-            {
-              "UUID": "494e5445-4c4c-495f-524f-434b535f2013",
-              "Name": "Govee SPP: transmit",
-              "Description": "Govee SPP: transmit",
-              "Type": "BYTES|HEX|SppTx",
+              "UUID": "00010203-0405-0607-0809-0a0b0c0d2b10",
+              "Name": "Rx",
+              "REMName": "Telink SPP: Module->Phone",
+              "Description": "Telink SPP: Module->Phone",
+              "Type": "BYTES|HEX|Rx",
               "IsRead": true,
               "IsNotify": true,
               "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "00010203-0405-0607-0809-0a0b0c0d2b11",
+              "Name": "Tx",
+              "REMName": "Telink SPP: Phone->Module",
+              "Description": "Telink SPP: Phone->Module",
+              "Type": "BYTES|HEX|Tx",
+              "IsRead": true,
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":Read:WriteWithoutResponse:RdInNo:WrWw:",
               "ExampleData": [
                 "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
               ]
@@ -140,7 +117,7 @@
         },
         {
           "UUID": "00010203-0405-0607-0809-0a0b0c0d1912",
-          "Name": "Unknown4",
+          "Name": "OtaCommand",
           "Characteristics": [
             {
               "UUID": "00010203-0405-0607-0809-0a0b0c0d2b12",
@@ -149,8 +126,7 @@
               "Type": "BYTES|HEX|OTA",
               "IsRead": true,
               "IsWriteWithoutResponse": true,
-              "IsNotify": true,
-              "Verbs": ":Read:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:",
+              "Verbs": ":Read:WriteWithoutResponse:RdInNo:WrWw:",
               "ExampleData": [
                 "Value:  00"
               ]
@@ -158,7 +134,7 @@
           ]
         }
       ],
-      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-a4:c1:38:b2:61:88\nCanPair:True IsPaired:False"
+      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-a4:c1:38:e3:cb:97\nCanPair:True IsPaired:False"
     }
   ]
 }

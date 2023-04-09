@@ -42,7 +42,22 @@ namespace BluetoothDeviceController.Names
                 }
             }
         }
-        public string UUID { get; set; }
+        private string UuidRaw = "";
+        /// <summary>
+        /// Sets the UUID as a string. Will take in short version (like 1800) but will
+        /// always return full UUID values.
+        /// </summary>
+        public string UUID
+        {
+            get
+            {
+                return UuidRaw.AsFullUuid();
+            }
+            set
+            {
+                UuidRaw = value;
+            }
+        }
         public string RegistrationOwner { get; set; } // what company is this service registered to?
         public string Name { get; set; }
         /// <summary>

@@ -173,6 +173,10 @@ namespace BluetoothDeviceController.BleEditor
                 return property;
             }
         }
+        //TODO: make this settable. Right now, we sometimes get old cached data when
+        // we would strongly prefer uncached data. For now, set to be always uncached
+        // because that's my current problem.
+        BluetoothCacheMode CurrCacheMode = BluetoothCacheMode.Uncached;
         private async Task DisplayBluetooth(NameDevice knownDevice, DeviceInformationWrapper di, BluetoothLEDevice ble, bool automaticallyReadData)
         {
             var jsonFormat = Newtonsoft.Json.Formatting.Indented;
@@ -195,8 +199,8 @@ namespace BluetoothDeviceController.BleEditor
             WireDevice.Description = knownDevice.Description;
 
 
-            uiRawData.Text = Newtonsoft.Json.JsonConvert.SerializeObject(WireDevice, jsonFormat);
-            string raw = null;
+            uiRawData.Text = Newtonsoft.Json.JsonConvert.SerializeObject(WireDevice, jsonFormat); //, jsonSettings);
+            string raw = "";
 
             if (ble == null)
             {
@@ -238,10 +242,35 @@ namespace BluetoothDeviceController.BleEditor
                     }
                 }
 #endif
-
-                var result = await ble.GetGattServicesAsync();
-                if (result.Status != GattCommunicationStatus.Success)
+                GattDeviceServicesResult result = null;
+                try
                 {
+                    result = await ble.GetGattServicesAsync(CurrCacheMode);
+                }
+                catch (Exception ex)
+                {
+                    if (CurrCacheMode == BluetoothCacheMode.Uncached)
+                    {
+                        // TODO: BUG: DBG: weird BT issue: trying to get uncached services
+                        // will sometimes result in massive failures.
+                        raw += $"EXCEPTION: while getting uncached Gatt services; will retry. Connection status={ble.ConnectionStatus}: {ex.Message}\n";
+                        var diinfo = ble.DeviceAccessInformation.CurrentStatus;
+                        var requestStatus = await ble.RequestAccessAsync();
+                        raw += $"EXCEPTION (cont): while getting uncached Gatt services; device access info={diinfo} request access status={requestStatus}";
+                        result = await ble.GetGattServicesAsync(BluetoothCacheMode.Cached);
+                    }
+                    else
+                    {
+                        raw += $"EXCEPTION: while getting Gatt services: {ex.Message}";
+                    }
+                }
+                if (result == null)
+                {
+                    raw += $"Major error: while reading Gatt services, unable to read ";
+                }
+                else if (result.Status != GattCommunicationStatus.Success)
+                {
+                    int nservice = result.Services.Count;
                     raw += GetStatusString(result.Status, result.ProtocolError);
                 }
                 else
@@ -265,7 +294,7 @@ namespace BluetoothDeviceController.BleEditor
 
                         try
                         {
-                            var cresult = await service.GetCharacteristicsAsync();
+                            var cresult = await service.GetCharacteristicsAsync(CurrCacheMode);
                             if (cresult.Status != GattCommunicationStatus.Success)
                             {
                                 raw += GetStatusString(cresult.Status, cresult.ProtocolError);

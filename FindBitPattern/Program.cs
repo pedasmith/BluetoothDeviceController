@@ -1,5 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-using static System.Net.Mime.MediaTypeNames;
+﻿using static System.Net.Mime.MediaTypeNames;
 
 byte[] data1 = { 0x01, 0x01, 0x0E, 0x16, 0x8D, 0x59 };
 byte[] data = { 0x01, 0x01, 0x0D, 0xBA, 0xE8, 0x69 };
@@ -8,6 +7,10 @@ FindBitPattern.Test();
 var nfound = FindBitPattern.FindDecimalPattern(data, 233, 250);
 FindBitPattern.ExplorePattern(data, 233, 250);
 Console.WriteLine($"Result: nfound={nfound}");
+
+
+
+
 class FindBitPattern
 {
     public static int ExplorePattern(byte[] data, int patternMin, int patternMax)

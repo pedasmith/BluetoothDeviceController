@@ -9,13 +9,24 @@
     <RootNamespace>BluetoothCodeGenerator</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="originals\**" />
     <Compile Remove="output\**" />
+    <Compile Remove="Utilities\**" />
     <EmbeddedResource Remove="originals\**" />
     <EmbeddedResource Remove="output\**" />
+    <EmbeddedResource Remove="Utilities\**" />
     <None Remove="originals\**" />
     <None Remove="output\**" />
+    <None Remove="Utilities\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,8 +38,6 @@
     <Compile Include="..\..\AdvancedCalculator\BCBasic\BCBasic.Shared\BCValue.cs" Link="BCBasic\BCValue.cs" />
     <Compile Include="..\..\AdvancedCalculator\BCBasic\BCBasic.Shared\BCValueList.cs" Link="BCBasic\BCValueList.cs" />
     <Compile Include="..\BluetoothDeviceController\BCBasic\MockClasses.cs" Link="BCBasic\MockClasses.cs" />
-    <Compile Include="..\BluetoothDeviceController\Utilities\DataReaderReadStringRobust.cs" Link="Utilities\DataReaderReadStringRobust.cs" />
-    <Compile Include="..\BluetoothDeviceController\Utilities\EnumUtilities.cs" Link="Utilities\EnumUtilities.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,5 +63,7 @@
   <Import Project="..\TemplateExpander\TemplateExpander.projitems" Label="Shared" />
 
   <Import Project="..\BluetoothProtocols\BluetoothProtocols.projitems" Label="Shared" />
+
+  <Import Project="..\Utilities\Utilities.projitems" Label="Shared" />
 
 </Project>

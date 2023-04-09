@@ -107,5 +107,42 @@ namespace BluetoothDeviceController.Names
             var partB = B.Substring(startIndex, length);
             return partA == partB;
         }
+        /// <summary>
+        /// Sets the UUID as a string. Will take in short version (like 1800) but will
+        /// always return full UUID values.
+        /// </summary>
+        public static string AsFullUuid(this string uuidRaw)
+        {
+            var retval = uuidRaw;
+            if (retval.Length == 4) // for example, Common Configuration is 1800
+            {
+                // A value like 1800 (Common Configuration) or 2a00 (Device Name)
+                // 00002a00-0000-1000-8000-00805f9b34fb
+                retval = "0000" + retval + "-0000-1000-8000-00805f9b34fb";
+            }
+            return retval;
+        }
+
+        /// <summary>
+        /// Returns the shortest UUID. Will convert long UUID like 00002a00-0000-1000-8000-00805f9b34fb
+        /// into the short version 2a00. Will not shorten non-standard UUIDs
+        /// </summary>
+        /// <param name="uuidRaw"></param>
+        /// <returns></returns>
+        public static string AsShortestUuid(this string uuidRaw)
+        {
+            var retval = uuidRaw.ToLower();
+            if (retval.Length == 36) // for example, Common Configuration is 1800
+            {
+                if (retval.StartsWith ("0000") && 
+                    retval.EndsWith("-0000-1000-8000-00805f9b34fb"))
+                {
+                    retval = retval.Substring(4, 4);
+                }
+                // A value like 1800 (Common Configuration) or 2a00 (Device Name)
+                // 00002a00-0000-1000-8000-00805f9b34fb
+            }
+            return retval;
+        }
     }
 }

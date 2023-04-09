@@ -17,7 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BluetoothCodeGeneratordotNe
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SearchControllers", "SearchControllers\SearchControllers.shproj", "{96D6EA94-D8FB-45A0-94E2-7173D5D300BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindBitPattern", "FindBitPattern\FindBitPattern.csproj", "{3D43813A-308B-44F4-8B19-378627DB54BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FindBitPattern", "FindBitPattern\FindBitPattern.csproj", "{3D43813A-308B-44F4-8B19-378627DB54BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemonstateBluetoothGattServer", "DemonstateBluetoothGattServer\DemonstateBluetoothGattServer.csproj", "{1E823489-7F61-41DF-A84E-E1484865CD96}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Utilities", "Utilities\Utilities.shproj", "{E6B108C1-0E7E-4124-9B33-9B71570DDFAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +89,36 @@ Global
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x86.ActiveCfg = Release|x86
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x86.Build.0 = Release|x86
 		{CBADBEDE-6D24-4E8F-B8AE-6C5864AEB1C4}.Release|x86.Deploy.0 = Release|x86
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Release|ARM.ActiveCfg = Release|Any CPU
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Release|x64.ActiveCfg = Release|Any CPU
+		{190AA0DE-8E65-4A8A-8D69-4EA539C572F2}.Release|x86.ActiveCfg = Release|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Release|ARM.ActiveCfg = Release|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Release|x64.ActiveCfg = Release|Any CPU
+		{FDC6FD5F-DE83-4594-A154-C01B655BF7F1}.Release|x86.ActiveCfg = Release|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Release|ARM.ActiveCfg = Release|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Release|x64.ActiveCfg = Release|Any CPU
+		{A2E9E462-E4BF-4BF6-81EC-7529B830456B}.Release|x86.ActiveCfg = Release|Any CPU
 		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8A1EB9E-1194-424A-8532-37DA12A26DE1}.Debug|ARM.ActiveCfg = Debug|Any CPU
@@ -125,6 +159,36 @@ Global
 		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|x64.Build.0 = Release|Any CPU
 		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|x86.ActiveCfg = Release|Any CPU
 		{3D43813A-308B-44F4-8B19-378627DB54BF}.Release|x86.Build.0 = Release|Any CPU
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|Any CPU.Build.0 = Debug|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|Any CPU.Deploy.0 = Debug|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|ARM.ActiveCfg = Debug|ARM
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|ARM.Build.0 = Debug|ARM
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|ARM.Deploy.0 = Debug|ARM
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|ARM64.Build.0 = Debug|ARM64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|x64.ActiveCfg = Debug|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|x64.Build.0 = Debug|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|x64.Deploy.0 = Debug|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|x86.ActiveCfg = Debug|x86
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|x86.Build.0 = Debug|x86
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Debug|x86.Deploy.0 = Debug|x86
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|Any CPU.ActiveCfg = Release|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|Any CPU.Build.0 = Release|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|Any CPU.Deploy.0 = Release|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|ARM.ActiveCfg = Release|ARM
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|ARM.Build.0 = Release|ARM
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|ARM.Deploy.0 = Release|ARM
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|ARM64.ActiveCfg = Release|ARM64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|ARM64.Build.0 = Release|ARM64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|ARM64.Deploy.0 = Release|ARM64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|x64.ActiveCfg = Release|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|x64.Build.0 = Release|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|x64.Deploy.0 = Release|x64
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|x86.ActiveCfg = Release|x86
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|x86.Build.0 = Release|x86
+		{1E823489-7F61-41DF-A84E-E1484865CD96}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -134,15 +198,20 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		BluetoothProtocols\BluetoothProtocols.projitems*{190aa0de-8e65-4a8a-8d69-4ea539c572f2}*SharedItemsImports = 13
+		Utilities\Utilities.projitems*{1e823489-7f61-41df-a84e-e1484865cd96}*SharedItemsImports = 4
 		SearchControllers\SearchControllers.projitems*{96d6ea94-d8fb-45a0-94e2-7173d5d300be}*SharedItemsImports = 13
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{a2e9e462-e4bf-4bf6-81ec-7529b830456b}*SharedItemsImports = 13
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
 		BluetoothProtocols\BluetoothProtocols.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
+		Utilities\Utilities.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
 		BluetoothProtocols\BluetoothProtocols.projitems*{d8a1eb9e-1194-424a-8532-37da12a26de1}*SharedItemsImports = 5
 		TemplateExpander\TemplateExpander.projitems*{d8a1eb9e-1194-424a-8532-37da12a26de1}*SharedItemsImports = 5
+		Utilities\Utilities.projitems*{d8a1eb9e-1194-424a-8532-37da12a26de1}*SharedItemsImports = 5
+		Utilities\Utilities.projitems*{e6b108c1-0e7e-4124-9b33-9b71570ddfad}*SharedItemsImports = 13
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
 		BluetoothProtocols\BluetoothProtocols.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
 		SearchControllers\SearchControllers.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
+		Utilities\Utilities.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
 		TemplateExpander\TemplateExpander.projitems*{fdc6fd5f-de83-4594-a154-c01b655bf7f1}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
