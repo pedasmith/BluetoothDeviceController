@@ -43,6 +43,10 @@
                 <Run Text="Current Time: " />
                 <Run x:Name="uiCurrentTime" />
             </TextBlock>
+            <TextBlock Style="{StaticResource sTime}">
+                <Run Text="Last time read/notify: " />
+                <Run x:Name="uiLastReadTime" />
+            </TextBlock>
         </StackPanel>
         <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch">
             <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />

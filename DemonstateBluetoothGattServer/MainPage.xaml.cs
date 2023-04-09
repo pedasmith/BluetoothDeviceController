@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
+using Utilities;
 using Windows.Devices.AllJoyn;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
@@ -17,8 +20,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
-
+// See https://learn.microsoft.com/en-us/windows/uwp/devices-sensors/gatt-server for details.
 namespace DemonstateBluetoothGattServer
 {
     /// <summary>
@@ -31,6 +33,8 @@ namespace DemonstateBluetoothGattServer
             this.InitializeComponent();
             this.Loaded += MainPage_Loaded;
         }
+        Thread UpdateTimeThread = null;
+        Task UpdateTimeTask = null;
 
         GattServiceProvider ServiceProvider = null;
 
@@ -54,7 +58,7 @@ namespace DemonstateBluetoothGattServer
         {
             await DoStartServer();
         }
-
+        GattLocalCharacteristic CurrentTimeCharacteristic = null;
         private async Task DoStartServer()
         { 
             var timeServiceUuid = Guid.Parse("00001805-0000-1000-8000-00805f9b34fb");
@@ -78,22 +82,45 @@ namespace DemonstateBluetoothGattServer
                 Log($"Error: GattServiceProvider.CreateAsync failed with {cresult.Error}");
                 return;
             }
-            var currentTimeCharacteristic = cresult.Characteristic;
-            currentTimeCharacteristic.ReadRequested += CurrentTimeCharacteristic_ReadRequested;
-            currentTimeCharacteristic.SubscribedClientsChanged += CurrentTimeCharacteristic_SubscribedClientsChanged;
+            CurrentTimeCharacteristic = cresult.Characteristic;
+            CurrentTimeCharacteristic.ReadRequested += CurrentTimeCharacteristic_ReadRequested;
+            CurrentTimeCharacteristic.SubscribedClientsChanged += CurrentTimeCharacteristic_SubscribedClientsChanged;
 
-
+            //
+            // Now start advertising!
+            //
             var advParameters = new GattServiceProviderAdvertisingParameters
             {
                 IsDiscoverable = true,
                 IsConnectable = true
             };
             ServiceProvider.StartAdvertising(advParameters);
+
+            if (UpdateTimeTask == null)
+            {
+                UpdateTimeTask = Task.Run(UpdateTimeOnThread);
+            }
         }
 
+        private async Task UpdateTimeOnThread()
+        {
+            while (true)
+            {
+                try
+                {
+                    await Task.Delay(1000); // Wait 1 second
+                    await DoUpdateTime(null); // not in response to a read. But will update notify.
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR: UpdateTimeOnThread: e={e.Message}");
+                }
+            }
+        }
+        IReadOnlyList<GattSubscribedClient> ClientList = null;
         private void CurrentTimeCharacteristic_SubscribedClientsChanged(GattLocalCharacteristic sender, object args)
         {
-            ;
+            ClientList = sender.SubscribedClients;
         }
         private static byte ConvertToIsoDayOfWeek(DayOfWeek dow)
         {
@@ -135,15 +162,51 @@ namespace DemonstateBluetoothGattServer
             // Our familiar friend - DataWriter.
 
             var request = await args.GetRequestAsync();
+            await DoUpdateTime(request);
+            deferral.Complete();
+        }
+
+        private async Task DoUpdateTime(GattReadRequest readRequest)
+        {
             var now = DateTime.Now;
             var buffer = CreateCurrentTimeBuffer(now);
-            request.RespondWithValue(buffer);
+            bool updatedBT = false;
+            if (readRequest!= null)
+            {
+                updatedBT = true;
+                try
+                {
+                    readRequest.RespondWithValue(buffer);
+                }
+                catch (Exception)
+                {
+                    ;
+                }
+            }
+            if (ClientList != null && ClientList.Count > 0)
+            {
+                try
+                {
+                    updatedBT = true;
+                    await CurrentTimeCharacteristic.NotifyValueAsync(buffer);
+                }
+                catch (Exception)
+                {
+                    ;
+                }
+            }
 
-            // See https://xkcd.com/1179/ for ISO 8601 with space, not T
-            var time = $"{now.Year}-{now.Month}-{now.Day} {now.Hour:D2}:{now.Minute:D2}:{now.Second:D2}";
-            uiCurrentTime.Text = time;
+            UIThreadHelper.CallOnUIThread(() =>
+            {
+                // See https://xkcd.com/1179/ for ISO 8601 with space, not T
+                var time = $"{now.Year}-{now.Month:D2}-{now.Day:D2} {now.Hour:D2}:{now.Minute:D2}:{now.Second:D2}";
+                uiCurrentTime.Text = time;
+                if (updatedBT)
+                {
+                    uiLastReadTime.Text = time;
+                }
+            });
 
-            deferral.Complete();
         }
 
 
@@ -151,6 +214,7 @@ namespace DemonstateBluetoothGattServer
         private void OnStopServer(object sender, RoutedEventArgs e)
         {
             if (ServiceProvider == null) return;
+            ClientList = null;
             ServiceProvider.StopAdvertising();
             ServiceProvider = null;
         }
