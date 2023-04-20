@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:DemonstateBluetoothGattServer"
+    xmlns:sample="using:SampleServerXaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -12,17 +13,7 @@
             <Setter Property="FontSize" Value="22" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontFamily" Value="Consolas" />
-        </Style>
-        <Style TargetType="TextBlock" x:Name="sInfo">
-            <Setter Property="FontSize" Value="18" />
-            <Setter Property="FontFamily" Value="Consolas" />
-        </Style>
-        <Style TargetType="TextBlock" x:Name="sTime">
-            <Setter Property="FontSize" Value="40" />
-            <Setter Property="FontFamily" Value="Consolas" />
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="Margin" Value="4" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
         </Style>
     </Page.Resources>
 
@@ -32,24 +23,9 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <StackPanel>
-            <TextBlock Style="{StaticResource sTitle}">Current Time Service</TextBlock>
-            <StackPanel Orientation="Horizontal">
-                <Button Content="Start" Click="OnStartServer" />
-                <Button Content="Stop" Click="OnStopServer" />
-                <Button Content="Clear" Click="OnClearScreen" />
-            </StackPanel>
-            <TextBlock Style="{StaticResource sTime}">
-                <Run Text="Current Time: " />
-                <Run x:Name="uiCurrentTime" />
-            </TextBlock>
-            <TextBlock Style="{StaticResource sTime}">
-                <Run Text="Last time read/notify: " />
-                <Run x:Name="uiLastReadTime" />
-            </TextBlock>
-        </StackPanel>
-        <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch">
-            <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
-        </ScrollViewer>
+        <TextBlock Style="{StaticResource sTitle}">Common Bluetooth Services</TextBlock>
+        <VariableSizedWrapGrid Grid.Row="1">
+            <sample:CurrentTimeServer />
+        </VariableSizedWrapGrid>
     </Grid>
 </Page>
