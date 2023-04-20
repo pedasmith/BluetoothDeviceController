@@ -25,6 +25,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Utilities", "Utilities\Util
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SampleServerXaml", "SampleServerXaml\SampleServerXaml.shproj", "{AA5D4B4A-78EE-444E-8F0E-CEB00FDC4716}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SmallProjects", "SmallProjects", "{C4C90D53-D7D6-4FE3-A602-908959FCA9F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
