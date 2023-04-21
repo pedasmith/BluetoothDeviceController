@@ -154,8 +154,8 @@
       <Version>6.2.14</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="..\Utilities\Utilities.projitems" Label="Shared" />
-  <Import Project="..\SmallProjects\SampleServerXaml\SampleServerXaml.projitems" Label="Shared" />
+  <Import Project="..\..\Utilities\Utilities.projitems" Label="Shared" />
+  <Import Project="..\SampleServerXaml\SampleServerXaml.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

@@ -19,11 +19,11 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SearchControllers", "Search
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FindBitPattern", "SmallProjects\FindBitPattern\FindBitPattern.csproj", "{3D43813A-308B-44F4-8B19-378627DB54BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemonstateBluetoothGattServer", "DemonstateBluetoothGattServer\DemonstateBluetoothGattServer.csproj", "{1E823489-7F61-41DF-A84E-E1484865CD96}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemonstateBluetoothGattServer", "SmallProjects\DemonstateBluetoothGattServer\DemonstateBluetoothGattServer.csproj", "{1E823489-7F61-41DF-A84E-E1484865CD96}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Utilities", "Utilities\Utilities.shproj", "{E6B108C1-0E7E-4124-9B33-9B71570DDFAD}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SampleServerXaml", "SampleServerXaml\SampleServerXaml.shproj", "{AA5D4B4A-78EE-444E-8F0E-CEB00FDC4716}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SampleServerXaml", "SmallProjects\SampleServerXaml\SampleServerXaml.shproj", "{AA5D4B4A-78EE-444E-8F0E-CEB00FDC4716}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SmallProjects", "SmallProjects", "{C4C90D53-D7D6-4FE3-A602-908959FCA9F4}"
 EndProject
@@ -185,11 +185,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		BluetoothProtocols\BluetoothProtocols.projitems*{190aa0de-8e65-4a8a-8d69-4ea539c572f2}*SharedItemsImports = 13
-		SampleServerXaml\SampleServerXaml.projitems*{1e823489-7f61-41df-a84e-e1484865cd96}*SharedItemsImports = 4
+		SmallProjects\SampleServerXaml\SampleServerXaml.projitems*{1e823489-7f61-41df-a84e-e1484865cd96}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{1e823489-7f61-41df-a84e-e1484865cd96}*SharedItemsImports = 4
 		SearchControllers\SearchControllers.projitems*{96d6ea94-d8fb-45a0-94e2-7173d5d300be}*SharedItemsImports = 13
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{a2e9e462-e4bf-4bf6-81ec-7529b830456b}*SharedItemsImports = 13
-		SampleServerXaml\SampleServerXaml.projitems*{aa5d4b4a-78ee-444e-8f0e-ceb00fdc4716}*SharedItemsImports = 13
+		SmallProjects\SampleServerXaml\SampleServerXaml.projitems*{aa5d4b4a-78ee-444e-8f0e-ceb00fdc4716}*SharedItemsImports = 13
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
 		BluetoothProtocols\BluetoothProtocols.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
