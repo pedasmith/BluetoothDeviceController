@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BluetoothCodeGeneratordotNe
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SearchControllers", "SearchControllers\SearchControllers.shproj", "{96D6EA94-D8FB-45A0-94E2-7173D5D300BE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FindBitPattern", "FindBitPattern\FindBitPattern.csproj", "{3D43813A-308B-44F4-8B19-378627DB54BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FindBitPattern", "SmallProjects\FindBitPattern\FindBitPattern.csproj", "{3D43813A-308B-44F4-8B19-378627DB54BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemonstateBluetoothGattServer", "DemonstateBluetoothGattServer\DemonstateBluetoothGattServer.csproj", "{1E823489-7F61-41DF-A84E-E1484865CD96}"
 EndProject
