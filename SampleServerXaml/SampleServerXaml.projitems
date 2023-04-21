@@ -9,5 +9,12 @@
     <Import_RootNamespace>SampleServerXaml</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)CurrentTimeServer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CurrentTimeServer.xaml.cs" />
   </ItemGroup>
 </Project>
