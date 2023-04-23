@@ -25,6 +25,7 @@ REM Or generate just the one, which is a little easier to handle when debugging.
 :Debug
 REM %BIN% -inputJsonFile "%JSONDIR%"\Govee_H6005.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\Bluetooth_CurrentTimeService.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\BtUnicodeKeyboard.json -inputTemplates Templates -output output
 goto :EOF
 
 :Help
