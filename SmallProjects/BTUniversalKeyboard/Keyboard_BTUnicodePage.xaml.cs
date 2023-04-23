@@ -16,6 +16,8 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using static BluetoothProtocols.Keyboard_BTUnicode;
+using Windows.UI.Input.Preview.Injection;
+using Windows.Foundation.Diagnostics;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -37,6 +39,8 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         int ncommand = 0;
         Keyboard_BTUnicode bleDevice = new Keyboard_BTUnicode();
+        // CHANGE: all of the input stuff!
+        InputInjector CurrInputInjector = null;
 
         // CHANGE: from an override of OnNavigatedTo to a new method
         // CHANGE: rename OnNavigateTo to DoInitializeAync
@@ -2079,8 +2083,28 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                 var addResult = KeyUtf8RecordData.AddRecord(record);
 
-                
-                // Original update was to make this CHART+COMMAND
+                    //CHANGE: inject input
+                    if (CurrInputInjector == null)
+                    {
+                        CurrInputInjector = InputInjector.TryCreate();
+                    }
+                    if (CurrInputInjector != null)
+                    {
+                        var inputList = new List<InjectedInputKeyboardInfo>();
+                        foreach (var uchar in record.Utf8)
+                        {
+                            var info = new InjectedInputKeyboardInfo()
+                            {
+                                KeyOptions = InjectedInputKeyOptions.Unicode,
+                                ScanCode = uchar,
+                            };
+                            inputList.Add(info);
+                        }
+                        CurrInputInjector.InjectKeyboardInput(inputList);
+                    }
+
+
+                    // Original update was to make this CHART+COMMAND
                 });
             }
         }
