@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Navigation;
 using static BluetoothProtocols.Keyboard_BTUnicode;
 using Windows.UI.Input.Preview.Injection;
 using Windows.Foundation.Diagnostics;
+using System.Threading;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -53,7 +54,16 @@ namespace BluetoothDeviceController.SpecialtyPages
 
             bleDevice.ble = ble;
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
+
+            // CHANGE: no need for reading the name
             await DoReadDevice_Name();
+
+            // CHANGE: get a notify for keypress
+            await DoNotifyKeyPress();
+            await DoNotifyKeyCount();
+            await DoNotifyKeyScanCode();
+            await DoNotifyKeyUtf8();
+            await DoNotifyKeyVirtualCode();
 
         }
 
@@ -1391,8 +1401,15 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                 var addResult = KeyPressRecordData.AddRecord(record);
 
-                
-                // Original update was to make this CHART+COMMAND
+                    // CHANGE: handle key press. Find the actual value.
+                    // Press is 0 for release 1+ for press
+                    if (record.Press >= 1)
+                    {
+                        var utf8 = bleDevice.KeyUtf8;
+                        InjectString(utf8);
+                    }
+
+                    // Original update was to make this CHART+COMMAND
                 });
             }
         }
@@ -2083,29 +2100,42 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                 var addResult = KeyUtf8RecordData.AddRecord(record);
 
-                    //CHANGE: inject input
-                    if (CurrInputInjector == null)
-                    {
-                        CurrInputInjector = InputInjector.TryCreate();
-                    }
-                    if (CurrInputInjector != null)
-                    {
-                        var inputList = new List<InjectedInputKeyboardInfo>();
-                        foreach (var uchar in record.Utf8)
-                        {
-                            var info = new InjectedInputKeyboardInfo()
-                            {
-                                KeyOptions = InjectedInputKeyOptions.Unicode,
-                                ScanCode = uchar,
-                            };
-                            inputList.Add(info);
-                        }
-                        CurrInputInjector.InjectKeyboardInput(inputList);
-                    }
+
 
 
                     // Original update was to make this CHART+COMMAND
                 });
+            }
+        }
+
+        // CHANGE: this new method
+        private void InjectString(string str)
+        {
+            //CHANGE: inject input
+            if (CurrInputInjector == null)
+            {
+                CurrInputInjector = InputInjector.TryCreate();
+            }
+            if (CurrInputInjector != null)
+            {
+                var inputList = new List<InjectedInputKeyboardInfo>();
+                foreach (var uchar in str)
+                {
+                    var info = new InjectedInputKeyboardInfo()
+                    {
+                        KeyOptions = InjectedInputKeyOptions.Unicode,
+                        ScanCode = uchar,
+                    };
+                    inputList.Add(info);
+                }
+                try
+                {
+                    CurrInputInjector.InjectKeyboardInput(inputList);
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR: injection: exception={e.Message}");
+                }
             }
         }
 
