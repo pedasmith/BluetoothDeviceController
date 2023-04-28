@@ -803,6 +803,14 @@ namespace BluetoothDeviceController.BleEditor
             return rawstr;
         }
 
+        public static string UnescapeString (string rawstr)
+        {
+            var retval = rawstr;
+            // Do in reverse order of the EscapeString
+            retval = retval.Replace("\\v", "\v").Replace("\\n", "\n").Replace("\\r", "\r").Replace("\\0", "\0").Replace("\\\\", "\\");
+            return retval;
+        }
+
         public static ValueParserResult ConvertToBuffer (this string value, string type)
         {
             var Retval = new ValueParserResult();

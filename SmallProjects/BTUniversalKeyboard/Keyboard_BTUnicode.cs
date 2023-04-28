@@ -9,7 +9,7 @@ using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
-
+using BluetoothDeviceController.BleEditor;
 
 namespace BluetoothProtocols
 {
@@ -59,6 +59,7 @@ namespace BluetoothProtocols
             Guid.Parse("b7b0a035-852f-4a31-bae4-fcd4510c444d"), // #2 is KeyVirtualCode
             Guid.Parse("b7b0a047-d291-41a3-8c2c-2f4bfa46fef9"), // #3 is KeyScanCode
             Guid.Parse("b7b0a074-e122-4a2d-ae7e-3c596cfcae3b"), // #4 is KeyUtf8
+            Guid.Parse("b7b0a075-e122-4a2d-ae7e-3c596cfcae3b"), // #4 is KeyCommand //TODO: pick correct GUID
             Guid.Parse("00002a00-0000-1000-8000-00805f9b34fb"), // #0 is Device Name
             Guid.Parse("00002a01-0000-1000-8000-00805f9b34fb"), // #1 is Appearance
             Guid.Parse("00002a04-0000-1000-8000-00805f9b34fb"), // #2 is Connection Parameter
@@ -78,6 +79,7 @@ namespace BluetoothProtocols
             "KeyVirtualCode", // #2 is b7b0a035-852f-4a31-bae4-fcd4510c444d
             "KeyScanCode", // #3 is b7b0a047-d291-41a3-8c2c-2f4bfa46fef9
             "KeyUtf8", // #4 is b7b0a074-e122-4a2d-ae7e-3c596cfcae3b
+            "KeyCommand", // #5 is b7b0a074-e122-4a2d-ae7e-3c596cfcae3b //TODO: correct GUID
             "Device Name", // #0 is 00002a00-0000-1000-8000-00805f9b34fb
             "Appearance", // #1 is 00002a01-0000-1000-8000-00805f9b34fb
             "Connection Parameter", // #2 is 00002a04-0000-1000-8000-00805f9b34fb
@@ -143,17 +145,18 @@ namespace BluetoothProtocols
             KeyVirtualCode_BTKeyboard_enum = 2,
             KeyScanCode_BTKeyboard_enum = 3,
             KeyUtf8_BTKeyboard_enum = 4,
-            Device_Name_Common_Configuration_enum = 5,
-            Appearance_Common_Configuration_enum = 6,
-            Connection_Parameter_Common_Configuration_enum = 7,
-            Central_Address_Resolution_Common_Configuration_enum = 8,
+            KeyCommand_BTKeyboard_enum = 5,
+            Device_Name_Common_Configuration_enum = 6,
+            Appearance_Common_Configuration_enum = 7,
+            Connection_Parameter_Common_Configuration_enum = 8,
+            Central_Address_Resolution_Common_Configuration_enum = 9,
             // No characteristics for AdafruitControl2
-            Manufacturer_Name_Device_Info_enum = 9,
-            Software_Revision_Device_Info_enum = 10,
-            Model_Number_Device_Info_enum = 11,
-            Serial_Number_Device_Info_enum = 12,
-            Firmware_Revision_Device_Info_enum = 13,
-            Hardware_Revision_Device_Info_enum = 14,
+            Manufacturer_Name_Device_Info_enum = 10,
+            Software_Revision_Device_Info_enum = 11,
+            Model_Number_Device_Info_enum = 12,
+            Serial_Number_Device_Info_enum = 13,
+            Firmware_Revision_Device_Info_enum = 14,
+            Hardware_Revision_Device_Info_enum = 15,
 
         };
 
@@ -697,6 +700,8 @@ namespace BluetoothProtocols
             internal set { if (_KeyUtf8_set && value == _KeyUtf8) return; _KeyUtf8 = value; _KeyUtf8_set = true; OnPropertyChanged(); }
         }
 
+
+
         /// <summary>
         /// Reads data
         /// </summary>
@@ -767,9 +772,8 @@ namespace BluetoothProtocols
             var datameaning = "STRING|ASCII|Utf8";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
             KeyUtf8 = parseResult.ValueList.GetValue("Utf8").AsString;
-
+            KeyUtf8 = BluetoothDeviceController.BleEditor.ValueParser.UnescapeString(KeyUtf8);
             KeyUtf8Event?.Invoke(parseResult);
-
         }
 
         public void NotifyKeyUtf8RemoveCharacteristicCallback() 
@@ -781,6 +785,95 @@ namespace BluetoothProtocols
         }
 
 
+        private string _KeyCommand = "";
+        private bool _KeyCommand_set = false;
+        public string KeyCommand
+        {
+            get { return _KeyCommand; }
+            internal set { if (_KeyCommand_set && value == _KeyCommand) return; _KeyCommand = value; _KeyCommand_set = true; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<BCBasic.BCValueList> ReadKeyCommand(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.KeyCommand_BTKeyboard_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.KeyCommand_BTKeyboard_enum, "KeyCommand", cacheMode);
+            if (result == null) return null;
+
+            var datameaning = "STRING|ASCII|Command";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            KeyCommand = parseResult.ValueList.GetValue("Command").AsString;
+
+            // Hint: get the data that's been read with e.g. 
+            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
+            return parseResult.ValueList;
+        }
+
+        // Returns a string with the status; starts with OK for good status.
+        /// <summary>
+        /// Event for notifications; KeyCommandEvent += _my function_
+        /// </summary>
+        public event BluetoothDataEvent KeyCommandEvent = null;
+        /// <summary>
+        /// We only want to set the internal callback once, and never need to remove it.
+        /// </summary>
+
+        private bool NotifyKeyCommand_ValueChanged_Set = false;
+
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+
+        public async Task<bool> NotifyKeyCommandAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.KeyCommand_BTKeyboard_enum)) return false;
+            var ch = Characteristics[(int)CharacteristicsEnum.KeyCommand_BTKeyboard_enum];
+            if (ch == null) return false;
+            GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
+            try
+            {
+                result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+                if (!NotifyKeyCommand_ValueChanged_Set)
+                {
+                    // Only set the event callback once
+                    NotifyKeyCommand_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyKeyCommandCallback;
+                }
+
+            }
+            catch (Exception e)
+            {
+                Status.ReportStatus($"NotifyKeyCommand: {e.Message}", result);
+                return false;
+            }
+            Status.ReportStatus($"NotifyKeyCommand: set notification", result);
+
+            return true;
+        }
+
+        private void NotifyKeyCommandCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var datameaning = "STRING|ASCII|Command";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+            KeyCommand = parseResult.ValueList.GetValue("Command").AsString;
+            KeyCommand = BluetoothDeviceController.BleEditor.ValueParser.UnescapeString(KeyCommand);
+            KeyCommandEvent?.Invoke(parseResult);
+        }
+
+        public void NotifyKeyCommandRemoveCharacteristicCallback()
+        {
+            var ch = Characteristics[(int)CharacteristicsEnum.KeyCommand_BTKeyboard_enum];
+            if (ch == null) return;
+            NotifyKeyCommand_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifyKeyCommandCallback;
+        }
 
         private string _Device_Name = "";
         private bool _Device_Name_set = false;

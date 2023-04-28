@@ -134,6 +134,37 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Icons\LargeTile.scale-100.png" />
+    <Content Include="Assets\Icons\LargeTile.scale-125.png" />
+    <Content Include="Assets\Icons\LargeTile.scale-150.png" />
+    <Content Include="Assets\Icons\Original-Image.jpg" />
+    <Content Include="Assets\Icons\SmallTile.scale-100.png" />
+    <Content Include="Assets\Icons\SmallTile.scale-125.png" />
+    <Content Include="Assets\Icons\SmallTile.scale-150.png" />
+    <Content Include="Assets\Icons\SplashScreen.scale-100.png" />
+    <Content Include="Assets\Icons\SplashScreen.scale-125.png" />
+    <Content Include="Assets\Icons\SplashScreen.scale-150.png" />
+    <Content Include="Assets\Icons\Square150x150Logo.scale-100.png" />
+    <Content Include="Assets\Icons\Square150x150Logo.scale-125.png" />
+    <Content Include="Assets\Icons\Square150x150Logo.scale-150.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.altform-lightunplated_targetsize-24.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.altform-lightunplated_targetsize-32.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.altform-unplated_targetsize-16.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.altform-unplated_targetsize-24.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.altform-unplated_targetsize-32.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.scale-100.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.scale-125.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.scale-150.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.targetsize-16.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.targetsize-24.png" />
+    <Content Include="Assets\Icons\Square44x44Logo.targetsize-32.png" />
+    <Content Include="Assets\Icons\StoreLogo.scale-100.png" />
+    <Content Include="Assets\Icons\StoreLogo.scale-125.png" />
+    <Content Include="Assets\Icons\StoreLogo.scale-150.png" />
+    <Content Include="Assets\Icons\Wide310x150Logo.scale-100.png" />
+    <Content Include="Assets\Icons\Wide310x150Logo.scale-125.png" />
+    <Content Include="Assets\Icons\Wide310x150Logo.scale-150.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />

@@ -55,7 +55,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             bleDevice.ble = ble;
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
 
-            // CHANGE: no need for reading the name
+            // CHANGE: no need for reading the name?
             await DoReadDevice_Name();
 
             // CHANGE: get a notify for keypress
@@ -65,6 +65,13 @@ namespace BluetoothDeviceController.SpecialtyPages
             await DoNotifyKeyUtf8();
             await DoNotifyKeyVirtualCode();
 
+        }
+
+        // CHANGE: added Log()
+        private void Log(string str)
+        {
+            Console.WriteLine(str + "(console)");
+            System.Diagnostics.Debug.WriteLine(str + "(debug)");
         }
 
         public string GetId()
@@ -93,6 +100,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             uiStatus.Text = status;
             ParentStatusHandler?.SetStatusText(status);
+            Log(status); //CHANGE: add this log statement for debuggin
         }
         private void SetStatusActive (bool isActive)
         {
@@ -135,63 +143,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<Device_NameRecord> Device_NameRecordData { get; } = new DataCollection<Device_NameRecord>();
-    private void OnDevice_Name_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (Device_NameRecordData.Count == 0)
-            {
-                Device_NameRecordData.AddRecord(new Device_NameRecord());
-            }
-            Device_NameRecordData[Device_NameRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
 
-    // Functions called from the expander
-    private void OnKeepCountDevice_Name(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Device_NameRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmDevice_Name(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Device_NameRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopyDevice_Name(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,Device_Name,Notes\n");
-        foreach (var row in Device_NameRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Device_Name},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
-
-
-        private async void OnReadDevice_Name(object sender, RoutedEventArgs e)
-        {
-            await DoReadDevice_Name();
-        }
 
         private async Task DoReadDevice_Name()
         {
@@ -211,7 +163,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsString || Device_Name.IsArray)
                 {
                     record.Device_Name = (string)Device_Name.AsString;
-                    Device_Name_Device_Name.Text = record.Device_Name.ToString();
                 }
 
                 Device_NameRecordData.Add(record);
@@ -248,63 +199,6 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<AppearanceRecord> AppearanceRecordData { get; } = new DataCollection<AppearanceRecord>();
-    private void OnAppearance_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (AppearanceRecordData.Count == 0)
-            {
-                AppearanceRecordData.AddRecord(new AppearanceRecord());
-            }
-            AppearanceRecordData[AppearanceRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountAppearance(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        AppearanceRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmAppearance(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        AppearanceRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopyAppearance(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,Appearance,Notes\n");
-        foreach (var row in AppearanceRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Appearance},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
-
-
-        private async void OnReadAppearance(object sender, RoutedEventArgs e)
-        {
-            await DoReadAppearance();
-        }
 
         private async Task DoReadAppearance()
         {
@@ -324,7 +218,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (Appearance.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Appearance.CurrentType == BCBasic.BCValue.ValueType.IsString || Appearance.IsArray)
                 {
                     record.Appearance = (double)Appearance.AsDouble;
-                    Appearance_Appearance.Text = record.Appearance.ToString();
                 }
 
                 AppearanceRecordData.Add(record);
@@ -367,63 +260,6 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<Connection_ParameterRecord> Connection_ParameterRecordData { get; } = new DataCollection<Connection_ParameterRecord>();
-    private void OnConnection_Parameter_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (Connection_ParameterRecordData.Count == 0)
-            {
-                Connection_ParameterRecordData.AddRecord(new Connection_ParameterRecord());
-            }
-            Connection_ParameterRecordData[Connection_ParameterRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountConnection_Parameter(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Connection_ParameterRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmConnection_Parameter(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Connection_ParameterRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopyConnection_Parameter(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,Interval_Min,Interval_Max,Latency,Timeout,Notes\n");
-        foreach (var row in Connection_ParameterRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Interval_Min},{row.Interval_Max},{row.Latency},{row.Timeout},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
-
-
-        private async void OnReadConnection_Parameter(object sender, RoutedEventArgs e)
-        {
-            await DoReadConnection_Parameter();
-        }
 
         private async Task DoReadConnection_Parameter()
         {
@@ -443,25 +279,21 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (Interval_Min.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Interval_Min.CurrentType == BCBasic.BCValue.ValueType.IsString || Interval_Min.IsArray)
                 {
                     record.Interval_Min = (double)Interval_Min.AsDouble;
-                    Connection_Parameter_Interval_Min.Text = record.Interval_Min.ToString("N0");
                 }
                 var Interval_Max = valueList.GetValue("Interval_Max");
                 if (Interval_Max.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Interval_Max.CurrentType == BCBasic.BCValue.ValueType.IsString || Interval_Max.IsArray)
                 {
                     record.Interval_Max = (double)Interval_Max.AsDouble;
-                    Connection_Parameter_Interval_Max.Text = record.Interval_Max.ToString("N0");
                 }
                 var Latency = valueList.GetValue("Latency");
                 if (Latency.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Latency.CurrentType == BCBasic.BCValue.ValueType.IsString || Latency.IsArray)
                 {
                     record.Latency = (double)Latency.AsDouble;
-                    Connection_Parameter_Latency.Text = record.Latency.ToString("N0");
                 }
                 var Timeout = valueList.GetValue("Timeout");
                 if (Timeout.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Timeout.CurrentType == BCBasic.BCValue.ValueType.IsString || Timeout.IsArray)
                 {
                     record.Timeout = (double)Timeout.AsDouble;
-                    Connection_Parameter_Timeout.Text = record.Timeout.ToString("N0");
                 }
 
                 Connection_ParameterRecordData.Add(record);
@@ -498,63 +330,6 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<Central_Address_ResolutionRecord> Central_Address_ResolutionRecordData { get; } = new DataCollection<Central_Address_ResolutionRecord>();
-    private void OnCentral_Address_Resolution_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (Central_Address_ResolutionRecordData.Count == 0)
-            {
-                Central_Address_ResolutionRecordData.AddRecord(new Central_Address_ResolutionRecord());
-            }
-            Central_Address_ResolutionRecordData[Central_Address_ResolutionRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountCentral_Address_Resolution(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Central_Address_ResolutionRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmCentral_Address_Resolution(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Central_Address_ResolutionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopyCentral_Address_Resolution(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,AddressResolutionSupported,Notes\n");
-        foreach (var row in Central_Address_ResolutionRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.AddressResolutionSupported},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
-
-
-        private async void OnReadCentral_Address_Resolution(object sender, RoutedEventArgs e)
-        {
-            await DoReadCentral_Address_Resolution();
-        }
 
         private async Task DoReadCentral_Address_Resolution()
         {
@@ -574,7 +349,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (AddressResolutionSupported.CurrentType == BCBasic.BCValue.ValueType.IsDouble || AddressResolutionSupported.CurrentType == BCBasic.BCValue.ValueType.IsString || AddressResolutionSupported.IsArray)
                 {
                     record.AddressResolutionSupported = (double)AddressResolutionSupported.AsDouble;
-                    Central_Address_Resolution_AddressResolutionSupported.Text = record.AddressResolutionSupported.ToString("N0");
                 }
 
                 Central_Address_ResolutionRecordData.Add(record);
@@ -614,63 +388,8 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<Manufacturer_NameRecord> Manufacturer_NameRecordData { get; } = new DataCollection<Manufacturer_NameRecord>();
-    private void OnManufacturer_Name_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (Manufacturer_NameRecordData.Count == 0)
-            {
-                Manufacturer_NameRecordData.AddRecord(new Manufacturer_NameRecord());
-            }
-            Manufacturer_NameRecordData[Manufacturer_NameRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountManufacturer_Name(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Manufacturer_NameRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmManufacturer_Name(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Manufacturer_NameRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopyManufacturer_Name(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,param0,Notes\n");
-        foreach (var row in Manufacturer_NameRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
 
 
-        private async void OnReadManufacturer_Name(object sender, RoutedEventArgs e)
-        {
-            await DoReadManufacturer_Name();
-        }
 
         private async Task DoReadManufacturer_Name()
         {
@@ -690,7 +409,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
                 {
                     record.param0 = (string)param0.AsString;
-                    Manufacturer_Name_param0.Text = record.param0.ToString();
                 }
 
                 Manufacturer_NameRecordData.Add(record);
@@ -727,63 +445,6 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<Software_RevisionRecord> Software_RevisionRecordData { get; } = new DataCollection<Software_RevisionRecord>();
-    private void OnSoftware_Revision_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (Software_RevisionRecordData.Count == 0)
-            {
-                Software_RevisionRecordData.AddRecord(new Software_RevisionRecord());
-            }
-            Software_RevisionRecordData[Software_RevisionRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountSoftware_Revision(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Software_RevisionRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmSoftware_Revision(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Software_RevisionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopySoftware_Revision(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,param0,Notes\n");
-        foreach (var row in Software_RevisionRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
-
-
-        private async void OnReadSoftware_Revision(object sender, RoutedEventArgs e)
-        {
-            await DoReadSoftware_Revision();
-        }
 
         private async Task DoReadSoftware_Revision()
         {
@@ -803,7 +464,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
                 {
                     record.param0 = (string)param0.AsString;
-                    Software_Revision_param0.Text = record.param0.ToString();
                 }
 
                 Software_RevisionRecordData.Add(record);
@@ -840,64 +500,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<Model_NumberRecord> Model_NumberRecordData { get; } = new DataCollection<Model_NumberRecord>();
-    private void OnModel_Number_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (Model_NumberRecordData.Count == 0)
-            {
-                Model_NumberRecordData.AddRecord(new Model_NumberRecord());
-            }
-            Model_NumberRecordData[Model_NumberRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountModel_Number(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Model_NumberRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmModel_Number(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Model_NumberRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopyModel_Number(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,param0,Notes\n");
-        foreach (var row in Model_NumberRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
-
-
-        private async void OnReadModel_Number(object sender, RoutedEventArgs e)
-        {
-            await DoReadModel_Number();
-        }
-
+ 
         private async Task DoReadModel_Number()
         {
             SetStatusActive (true); // the false happens in the bluetooth status handler.
@@ -916,7 +519,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
                 {
                     record.param0 = (string)param0.AsString;
-                    Model_Number_param0.Text = record.param0.ToString();
                 }
 
                 Model_NumberRecordData.Add(record);
@@ -953,64 +555,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<Serial_NumberRecord> Serial_NumberRecordData { get; } = new DataCollection<Serial_NumberRecord>();
-    private void OnSerial_Number_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (Serial_NumberRecordData.Count == 0)
-            {
-                Serial_NumberRecordData.AddRecord(new Serial_NumberRecord());
-            }
-            Serial_NumberRecordData[Serial_NumberRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountSerial_Number(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Serial_NumberRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmSerial_Number(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Serial_NumberRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopySerial_Number(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,param0,Notes\n");
-        foreach (var row in Serial_NumberRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
-
-
-        private async void OnReadSerial_Number(object sender, RoutedEventArgs e)
-        {
-            await DoReadSerial_Number();
-        }
-
+ 
         private async Task DoReadSerial_Number()
         {
             SetStatusActive (true); // the false happens in the bluetooth status handler.
@@ -1029,7 +574,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
                 {
                     record.param0 = (string)param0.AsString;
-                    Serial_Number_param0.Text = record.param0.ToString();
                 }
 
                 Serial_NumberRecordData.Add(record);
@@ -1066,64 +610,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<Firmware_RevisionRecord> Firmware_RevisionRecordData { get; } = new DataCollection<Firmware_RevisionRecord>();
-    private void OnFirmware_Revision_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (Firmware_RevisionRecordData.Count == 0)
-            {
-                Firmware_RevisionRecordData.AddRecord(new Firmware_RevisionRecord());
-            }
-            Firmware_RevisionRecordData[Firmware_RevisionRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountFirmware_Revision(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Firmware_RevisionRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmFirmware_Revision(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Firmware_RevisionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopyFirmware_Revision(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,param0,Notes\n");
-        foreach (var row in Firmware_RevisionRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
-
-
-        private async void OnReadFirmware_Revision(object sender, RoutedEventArgs e)
-        {
-            await DoReadFirmware_Revision();
-        }
-
+    
         private async Task DoReadFirmware_Revision()
         {
             SetStatusActive (true); // the false happens in the bluetooth status handler.
@@ -1142,7 +629,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
                 {
                     record.param0 = (string)param0.AsString;
-                    Firmware_Revision_param0.Text = record.param0.ToString();
                 }
 
                 Firmware_RevisionRecordData.Add(record);
@@ -1179,64 +665,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<Hardware_RevisionRecord> Hardware_RevisionRecordData { get; } = new DataCollection<Hardware_RevisionRecord>();
-    private void OnHardware_Revision_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (Hardware_RevisionRecordData.Count == 0)
-            {
-                Hardware_RevisionRecordData.AddRecord(new Hardware_RevisionRecord());
-            }
-            Hardware_RevisionRecordData[Hardware_RevisionRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountHardware_Revision(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Hardware_RevisionRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmHardware_Revision(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        Hardware_RevisionRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-    private void OnCopyHardware_Revision(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,param0,Notes\n");
-        foreach (var row in Hardware_RevisionRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.param0},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
-
-
-        private async void OnReadHardware_Revision(object sender, RoutedEventArgs e)
-        {
-            await DoReadHardware_Revision();
-        }
-
+    
         private async Task DoReadHardware_Revision()
         {
             SetStatusActive (true); // the false happens in the bluetooth status handler.
@@ -1255,7 +684,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (param0.CurrentType == BCBasic.BCValue.ValueType.IsDouble || param0.CurrentType == BCBasic.BCValue.ValueType.IsString || param0.IsArray)
                 {
                     record.param0 = (string)param0.AsString;
-                    Hardware_Revision_param0.Text = record.param0.ToString();
                 }
 
                 Hardware_RevisionRecordData.Add(record);
@@ -1294,21 +722,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<KeyPressRecord> KeyPressRecordData { get; } = new DataCollection<KeyPressRecord>();
-    private void OnKeyPress_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (KeyPressRecordData.Count == 0)
-            {
-                KeyPressRecordData.AddRecord(new KeyPressRecord());
-            }
-            KeyPressRecordData[KeyPressRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
+
 
     // Functions called from the expander
     private void OnKeepCountKeyPress(object sender, SelectionChangedEventArgs e)
@@ -1330,21 +744,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         if (!ok) return;
         KeyPressRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
     }
-    private void OnCopyKeyPress(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,Press,Notes\n");
-        foreach (var row in KeyPressRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Press},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
+
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyPressSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -1474,21 +874,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<KeyCountRecord> KeyCountRecordData { get; } = new DataCollection<KeyCountRecord>();
-    private void OnKeyCount_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (KeyCountRecordData.Count == 0)
-            {
-                KeyCountRecordData.AddRecord(new KeyCountRecord());
-            }
-            KeyCountRecordData[KeyCountRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
+
 
     // Functions called from the expander
     private void OnKeepCountKeyCount(object sender, SelectionChangedEventArgs e)
@@ -1510,21 +896,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         if (!ok) return;
         KeyCountRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
     }
-    private void OnCopyKeyCount(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,PressCount,Notes\n");
-        foreach (var row in KeyCountRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.PressCount},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
+
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyCountSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -1647,21 +1019,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<KeyVirtualCodeRecord> KeyVirtualCodeRecordData { get; } = new DataCollection<KeyVirtualCodeRecord>();
-    private void OnKeyVirtualCode_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (KeyVirtualCodeRecordData.Count == 0)
-            {
-                KeyVirtualCodeRecordData.AddRecord(new KeyVirtualCodeRecord());
-            }
-            KeyVirtualCodeRecordData[KeyVirtualCodeRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
+
 
     // Functions called from the expander
     private void OnKeepCountKeyVirtualCode(object sender, SelectionChangedEventArgs e)
@@ -1683,21 +1041,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         if (!ok) return;
         KeyVirtualCodeRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
     }
-    private void OnCopyKeyVirtualCode(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,VirtualCode,Notes\n");
-        foreach (var row in KeyVirtualCodeRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.VirtualCode},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
+
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyVirtualCodeSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -1820,21 +1164,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<KeyScanCodeRecord> KeyScanCodeRecordData { get; } = new DataCollection<KeyScanCodeRecord>();
-    private void OnKeyScanCode_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (KeyScanCodeRecordData.Count == 0)
-            {
-                KeyScanCodeRecordData.AddRecord(new KeyScanCodeRecord());
-            }
-            KeyScanCodeRecordData[KeyScanCodeRecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
+
 
     // Functions called from the expander
     private void OnKeepCountKeyScanCode(object sender, SelectionChangedEventArgs e)
@@ -1856,21 +1186,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         if (!ok) return;
         KeyScanCodeRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
     }
-    private void OnCopyKeyScanCode(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,ScanCode,Notes\n");
-        foreach (var row in KeyScanCodeRecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.ScanCode},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
+
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyScanCodeSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -2029,21 +1345,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         if (!ok) return;
         KeyUtf8RecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
     }
-    private void OnCopyKeyUtf8(object sender, RoutedEventArgs e)
-    {
-        // Copy the contents over...
-        var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,Utf8,Notes\n");
-        foreach (var row in KeyUtf8RecordData)
-        {
-            var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Utf8},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-        }
-        var str = sb.ToString();
-        var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-        datapackage.SetText(str);
-        Clipboard.SetContent(datapackage);
-    }
+
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyUtf8Settings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -2108,36 +1410,6 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-        // CHANGE: this new method
-        private void InjectString(string str)
-        {
-            //CHANGE: inject input
-            if (CurrInputInjector == null)
-            {
-                CurrInputInjector = InputInjector.TryCreate();
-            }
-            if (CurrInputInjector != null)
-            {
-                var inputList = new List<InjectedInputKeyboardInfo>();
-                foreach (var uchar in str)
-                {
-                    var info = new InjectedInputKeyboardInfo()
-                    {
-                        KeyOptions = InjectedInputKeyOptions.Unicode,
-                        ScanCode = uchar,
-                    };
-                    inputList.Add(info);
-                }
-                try
-                {
-                    CurrInputInjector.InjectKeyboardInput(inputList);
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine($"ERROR: injection: exception={e.Message}");
-                }
-            }
-        }
 
         private async void OnReadKeyUtf8(object sender, RoutedEventArgs e)
         {
@@ -2174,7 +1446,168 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
+        //
+        // CHANGE: add all this Command stuff
+        //
+        public class KeyCommandRecord : INotifyPropertyChanged
+        {
+            public KeyCommandRecord()
+            {
+                this.EventTime = DateTime.Now;
+            }
+            // For the INPC INotifyPropertyChanged values
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            private DateTime _EventTime;
+            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
 
+            private string _Command;
+            public string Command { get { return _Command; } set { if (value == _Command) return; _Command = value; OnPropertyChanged(); } }
+
+            private String _Note;
+            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+        }
+
+        public DataCollection<KeyCommandRecord> KeyCommandRecordData { get; } = new DataCollection<KeyCommandRecord>();
+        private void OnKeyCommand_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter)
+            {
+                var text = (sender as TextBox).Text.Trim();
+                (sender as TextBox).Text = "";
+                // Add the text to the notes section
+                if (KeyCommandRecordData.Count == 0)
+                {
+                    KeyCommandRecordData.AddRecord(new KeyCommandRecord());
+                }
+                KeyCommandRecordData[KeyCommandRecordData.Count - 1].Note = text;
+                e.Handled = true;
+            }
+        }
+
+        // Functions called from the expander
+        private void OnKeepCountKeyCommand(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1) return;
+            int value;
+            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+            if (!ok) return;
+            KeyCommandRecordData.MaxLength = value;
+
+
+        }
+
+        private void OnAlgorithmKeyCommand(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1) return;
+            int value;
+            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
+            if (!ok) return;
+            KeyCommandRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+        }
+
+
+        GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyCommandSettings = {
+            GattClientCharacteristicConfigurationDescriptorValue.Notify,
+
+            GattClientCharacteristicConfigurationDescriptorValue.None,
+        };
+        int KeyCommandNotifyIndex = 0;
+        bool KeyCommandNotifySetup = false;
+        private async void OnNotifyKeyCommand(object sender, RoutedEventArgs e)
+        {
+            await DoNotifyKeyCommand();
+        }
+
+        private async Task DoNotifyKeyCommand()
+        {
+            SetStatusActive(true);
+            ncommand++;
+            try
+            {
+                // Only set up the event callback once.
+                if (!KeyCommandNotifySetup)
+                {
+                    KeyCommandNotifySetup = true;
+                    bleDevice.KeyCommandEvent += BleDevice_KeyCommandEvent;
+                }
+                var notifyType = NotifyKeyCommandSettings[KeyCommandNotifyIndex];
+                KeyCommandNotifyIndex = (KeyCommandNotifyIndex + 1) % NotifyKeyCommandSettings.Length;
+                var result = await bleDevice.NotifyKeyCommandAsync(notifyType);
+
+
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"Error: exception: {ex.Message}");
+            }
+        }
+
+        private async void BleDevice_KeyCommandEvent(BleEditor.ValueParserResult data)
+        {
+            if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
+            {
+                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    var valueList = data.ValueList;
+
+                    var record = new KeyCommandRecord();
+                    var Command = valueList.GetValue("Command");
+                    if (Command.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Command.CurrentType == BCBasic.BCValue.ValueType.IsString || Command.IsArray)
+                    {
+                        record.Command = (string)Command.AsString;
+                        KeyCommand_Command.Text = record.Command.ToString();
+                    }
+
+                    var addResult = KeyCommandRecordData.AddRecord(record);
+
+
+
+
+                    // Original update was to make this CHART+COMMAND
+                });
+            }
+        }
+
+
+        private async void OnReadKeyCommand(object sender, RoutedEventArgs e)
+        {
+            await DoReadKeyCommand();
+        }
+
+        private async Task DoReadKeyCommand()
+        {
+            SetStatusActive(true); // the false happens in the bluetooth status handler.
+            ncommand++;
+            try
+            {
+                var valueList = await bleDevice.ReadKeyCommand();
+                if (valueList == null)
+                {
+                    SetStatus($"Error: unable to read KeyCommand");
+                    return;
+                }
+
+                var record = new KeyCommandRecord();
+                var Command = valueList.GetValue("Command");
+                if (Command.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Command.CurrentType == BCBasic.BCValue.ValueType.IsString || Command.IsArray)
+                {
+                    record.Command = (string)Command.AsString;
+                    KeyCommand_Command.Text = record.Command.ToString();
+                }
+
+                KeyCommandRecordData.Add(record);
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"Error: exception: {ex.Message}");
+            }
+        }
 
 
 
@@ -2185,5 +1618,73 @@ namespace BluetoothDeviceController.SpecialtyPages
             await bleDevice.EnsureCharacteristicAsync(CharacteristicsEnum.All_enum, true);
             SetStatusActive(false);
         }
+
+
+        // CHANGE: this new method
+        private async void InjectString(string str)
+        {
+            //CHANGE: inject input
+            if (CurrInputInjector == null)
+            {
+                CurrInputInjector = InputInjector.TryCreate();
+            }
+            if (CurrInputInjector != null)
+            {
+                var inputList = new List<InjectedInputKeyboardInfo>();
+                foreach (var uchar in str)
+                {
+                    var ch = uchar;
+                    var chtype = InjectedInputKeyOptions.Unicode;
+                    bool isVKey = false;
+                    switch (ch)
+                    {
+                        case '\n':
+                            ch = (char)0x0d; // VK_ENTER
+                            chtype = InjectedInputKeyOptions.None;
+                            isVKey = true;
+                            break;
+                    }
+                    var info = new InjectedInputKeyboardInfo()
+                    {
+                        KeyOptions = chtype,
+                        ScanCode = isVKey ? (char)0 : ch,
+                        VirtualKey = isVKey ? ch : (char)0,
+                    };
+                    inputList.Add(info);
+                    info = new InjectedInputKeyboardInfo()
+                    {
+                        KeyOptions = chtype | InjectedInputKeyOptions.KeyUp,
+                        ScanCode = isVKey ? (char)0 : ch,
+                        VirtualKey = isVKey ? ch : (char)0,
+                    };
+                    inputList.Add(info);
+                    if (inputList.Count >= 10)
+                    {
+                        try
+                        {
+                            CurrInputInjector.InjectKeyboardInput(inputList);
+                        }
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"ERROR: injection: exception={e.Message}");
+                        }
+                        inputList.Clear();
+                        await Task.Delay(0); // DBG: do I need this?
+                    }
+                }
+                try
+                {
+                    if (inputList.Count > 0)
+                    {
+                        CurrInputInjector.InjectKeyboardInput(inputList);
+                    }
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR: injection: exception={e.Message}");
+                }
+            }
+        }
+
     }
 }

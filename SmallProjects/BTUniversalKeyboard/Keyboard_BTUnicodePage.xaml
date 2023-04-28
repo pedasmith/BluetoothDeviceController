@@ -164,183 +164,19 @@
                 </GridView>
 
 
+                <TextBlock Style="{StaticResource SubheaderStyle}">KeyCommand</TextBlock>
+                <GridView>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="KeyCommand_Command" Text="*" Header="Command" Style="{StaticResource HEXStyle}"/>
 
-
-
-            </StackPanel>
-        </controls:Expander>
-        <!-- XAML+SERVICE+LIST for Common Configuration -->
-        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-                            <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadDevice_Name" />
+                    <Button Content="Read" Click="OnReadKeyCommand" />
+                    <Button Content="Notify" Click="OnNotifyKeyCommand" />
 
                 </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Appearance</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Appearance_Appearance" Text="*" Header="Appearance" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadAppearance" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Connection Parameter</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_Interval_Min" Text="*" Header="Interval Min" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_Interval_Max" Text="*" Header="Interval Max" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_Latency" Text="*" Header="Latency" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Connection_Parameter_Timeout" Text="*" Header="Timeout" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadConnection_Parameter" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Central Address Resolution</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Central_Address_Resolution_AddressResolutionSupported" Text="*" Header="AddressResolutionSupported" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadCentral_Address_Resolution" />
-
-                </GridView>
-
-
-
-
-
-            </StackPanel>
-        </controls:Expander>
-        <!-- XAML+SERVICE+LIST for AdafruitControl2 -->
-        <!-- XAML+SERVICE+LIST for Device Info -->
-        <controls:Expander Header="Device Info" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-                            <TextBlock Style="{StaticResource SubheaderStyle}">Manufacturer Name</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Manufacturer_Name_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadManufacturer_Name" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Software Revision</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Software_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadSoftware_Revision" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Model Number</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Model_Number_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadModel_Number" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Serial Number</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Serial_Number_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadSerial_Number" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Firmware Revision</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Firmware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadFirmware_Revision" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">Hardware Revision</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Hardware_Revision_param0" Text="*" Header="param0" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadHardware_Revision" />
-
-                </GridView>
-
-
-
 
 
             </StackPanel>

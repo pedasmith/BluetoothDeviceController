@@ -111,7 +111,7 @@ namespace BTUniversalKeyboard
         {
         }
 
-        private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
+        private void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
             // Works OK. Log($"Got device: {args.Name}");
             if (args.Name.StartsWith("BTUnicode Keyboard"))
