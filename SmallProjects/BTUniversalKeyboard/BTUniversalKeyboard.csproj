@@ -119,6 +119,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BtUniversalKeyboardCommand.cs" />
     <Compile Include="IHandleStatus.cs" />
     <Compile Include="IHasID.cs" />
     <Compile Include="Keyboard_BTUnicode.cs" />
@@ -138,6 +139,7 @@
     <Content Include="Assets\Icons\LargeTile.scale-125.png" />
     <Content Include="Assets\Icons\LargeTile.scale-150.png" />
     <Content Include="Assets\Icons\Original-Image.jpg" />
+    <Content Include="Assets\Icons\Original-Image.png" />
     <Content Include="Assets\Icons\SmallTile.scale-100.png" />
     <Content Include="Assets\Icons\SmallTile.scale-125.png" />
     <Content Include="Assets\Icons\SmallTile.scale-150.png" />

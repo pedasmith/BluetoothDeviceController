@@ -154,30 +154,30 @@
             "Description": "BT Unicode Keyboard service for the advanced BT keyboard protocol. Contains all of the characteristics for the protocol.",
             "Priority": "8",
             "Characteristics": [
-                {
-                    "UUID": "b7b0a009-b23d-428f-985c-f6f26a80bf1f",
-                    "Name": "KeyPress",
-                    "Description": "0=not pressed 1=pressed 2+=repeat. This is always the last value to be set, so you can watch for this to change and then poll the other values.",
-                    "Type": "I32|HEX|Press",
-                    "IsRead": true,
-                    "IsNotify": true,
-                    "Verbs": ":Read:Notify:RdInNo:InNo:",
-                    "ExampleData": [
-                      "Value:  00 00 00 00"
-                    ]
-                  },
-                  {
-                    "UUID": "b7b0a07e-a995-4eae-9315-856e31bd7334",
-                    "Name": "KeyCount",
-                    "Description": "Total number of key presses (not including repeats)",
-                    "Type": "I32|HEX|PressCount",
-                    "IsRead": true,
-                    "IsNotify": true,
-                    "Verbs": ":Read:Notify:RdInNo:InNo:",
-                    "ExampleData": [
-                      "Value:  03"
-                    ]
-                  },
+              {
+                "UUID": "b7b0a009-b23d-428f-985c-f6f26a80bf1f",
+                "Name": "KeyPress",
+                "Description": "0=not pressed 1=pressed 2+=repeat. This is always the last value to be set, so you can watch for this to change and then poll the other values.",
+                "Type": "I32|HEX|Press",
+                "IsRead": true,
+                "IsNotify": true,
+                "Verbs": ":Read:Notify:RdInNo:InNo:",
+                "ExampleData": [
+                  "Value:  00 00 00 00"
+                ]
+              },
+              {
+                "UUID": "b7b0a07e-a995-4eae-9315-856e31bd7334",
+                "Name": "KeyCount",
+                "Description": "Total number of key presses (not including repeats)",
+                "Type": "I32|HEX|PressCount",
+                "IsRead": true,
+                "IsNotify": true,
+                "Verbs": ":Read:Notify:RdInNo:InNo:",
+                "ExampleData": [
+                  "Value:  03"
+                ]
+              },
               {
                 "UUID": "b7b0a035-852f-4a31-bae4-fcd4510c444d",
                 "Name": "KeyVirtualCode",
@@ -214,6 +214,18 @@
                   "Value:  65 73 63"
                 ]
               },
+              {
+                "UUID": "b7b0a075-e122-4a2d-ae7e-3c596cfcae3b",
+                "Name": "KeyCommand",
+                "Description": "Bytes[] of the command",
+                "Type": "BYTES|HEX|Command",
+                "IsRead": true,
+                "IsNotify": true,
+                "Verbs": ":Read:Notify:RdInNo:InNo:",
+                "ExampleData": [
+                  "Value:  02 65 66"
+                ]
+              }
 
             ]
           }

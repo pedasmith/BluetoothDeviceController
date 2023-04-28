@@ -79,7 +79,7 @@ namespace BluetoothProtocols
             "KeyVirtualCode", // #2 is b7b0a035-852f-4a31-bae4-fcd4510c444d
             "KeyScanCode", // #3 is b7b0a047-d291-41a3-8c2c-2f4bfa46fef9
             "KeyUtf8", // #4 is b7b0a074-e122-4a2d-ae7e-3c596cfcae3b
-            "KeyCommand", // #5 is b7b0a074-e122-4a2d-ae7e-3c596cfcae3b //TODO: correct GUID
+            "KeyCommand", // #5 is b7b0a075-e122-4a2d-ae7e-3c596cfcae3b //TODO: correct GUID
             "Device Name", // #0 is 00002a00-0000-1000-8000-00805f9b34fb
             "Appearance", // #1 is 00002a01-0000-1000-8000-00805f9b34fb
             "Connection Parameter", // #2 is 00002a04-0000-1000-8000-00805f9b34fb
@@ -103,6 +103,7 @@ namespace BluetoothProtocols
             null,
             null,
             null,
+            null,
             // No characteristics for AdafruitControl2
             null,
             null,
@@ -113,10 +114,10 @@ namespace BluetoothProtocols
 
         };
         List<HashSet<int>> MapServiceToCharacteristic = new List<HashSet<int>>() {
-            new HashSet<int>(){ 0, 1, 2, 3, 4,  },
-            new HashSet<int>(){ 5, 6, 7, 8,  },
+            new HashSet<int>(){ 0, 1, 2, 3, 4, 5, },
+            new HashSet<int>(){ 6, 7, 8,  9, },
             // No characteristics for AdafruitControl2
-            new HashSet<int>(){ 9, 10, 11, 12, 13, 14,  },
+            new HashSet<int>(){ 10, 11, 12, 13, 14, 15 },
 
         };
         List<int> MapCharacteristicToService = new List<int>() {
@@ -125,17 +126,18 @@ namespace BluetoothProtocols
             0, // Characteristic 2
             0, // Characteristic 3
             0, // Characteristic 4
-            1, // Characteristic 5
+            0, // Characteristic 5
             1, // Characteristic 6
             1, // Characteristic 7
             1, // Characteristic 8
+            1, // Characteristic 9
             // No characteristics for AdafruitControl2
-            3, // Characteristic 9
             3, // Characteristic 10
             3, // Characteristic 11
             3, // Characteristic 12
             3, // Characteristic 13
             3, // Characteristic 14
+            3, // Characteristic 15
             
         };
         public enum CharacteristicsEnum {
@@ -804,7 +806,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(CharacteristicsEnum.KeyCommand_BTKeyboard_enum, "KeyCommand", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "STRING|ASCII|Command";
+            var datameaning = "BYTES|HEX|Command";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
             KeyCommand = parseResult.ValueList.GetValue("Command").AsString;
 
@@ -860,11 +862,12 @@ namespace BluetoothProtocols
 
         private void NotifyKeyCommandCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var datameaning = "STRING|ASCII|Command";
+            var datameaning = "BYTES|HEX|Command";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
             KeyCommand = parseResult.ValueList.GetValue("Command").AsString;
-            KeyCommand = BluetoothDeviceController.BleEditor.ValueParser.UnescapeString(KeyCommand);
+
             KeyCommandEvent?.Invoke(parseResult);
+
         }
 
         public void NotifyKeyCommandRemoveCharacteristicCallback()

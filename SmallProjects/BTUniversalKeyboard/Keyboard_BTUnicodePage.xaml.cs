@@ -19,6 +19,8 @@ using static BluetoothProtocols.Keyboard_BTUnicode;
 using Windows.UI.Input.Preview.Injection;
 using Windows.Foundation.Diagnostics;
 using System.Threading;
+using BTUniversalKeyboard;
+using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -64,6 +66,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             await DoNotifyKeyScanCode();
             await DoNotifyKeyUtf8();
             await DoNotifyKeyVirtualCode();
+            await DoNotifyKeyCommand();
 
         }
 
@@ -805,8 +808,11 @@ namespace BluetoothDeviceController.SpecialtyPages
                     // Press is 0 for release 1+ for press
                     if (record.Press >= 1)
                     {
-                        var utf8 = bleDevice.KeyUtf8;
-                        InjectString(utf8);
+                        // TODO: inject the Command!
+                        //var utf8 = bleDevice.KeyUtf8;
+                        //InjectString(utf8);
+                        InjectList(KeyCommandList);
+
                     }
 
                     // Original update was to make this CHART+COMMAND
@@ -1547,6 +1553,8 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
+        // CHANGE: new list
+        List<Object> KeyCommandList = new List<Object>();
         private async void BleDevice_KeyCommandEvent(BleEditor.ValueParserResult data)
         {
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
@@ -1565,9 +1573,9 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                     var addResult = KeyCommandRecordData.AddRecord(record);
 
-
-
-
+                    // Command.AsArray is the data in about the most memory-intensive format possible.
+                    var array = Command.AsArray.AsByteArray(); // Handy conversion
+                    BtUniversalKeyboardCommand.Parse(array, KeyCommandList);
                     // Original update was to make this CHART+COMMAND
                 });
             }
@@ -1621,6 +1629,49 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
         // CHANGE: this new method
+
+        private async Task InjectKeyboardListIfNeededAsync(List<InjectedInputKeyboardInfo> list, int minCount)
+        {
+            if (list.Count > minCount)
+            {
+                try
+                {
+                    CurrInputInjector.InjectKeyboardInput(list);
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR: injection: exception={e.Message}");
+                }
+                list.Clear();
+                await Task.Delay(0); // DBG: do I need this?
+            }
+        }
+
+        private async void InjectList(List<object> value)
+        {
+            if (CurrInputInjector == null)
+            {
+                CurrInputInjector = InputInjector.TryCreate();
+            }
+            if (CurrInputInjector != null)
+            {
+                var inputKeyboardList = new List<InjectedInputKeyboardInfo>();
+                bool prevWasKeyboard = false;
+                foreach (var item in value)
+                {
+                    if (item is InjectedInputKeyboardInfo iiki)
+                    {
+                        inputKeyboardList.Add(iiki);
+                        await InjectKeyboardListIfNeededAsync(inputKeyboardList, 10);
+                        prevWasKeyboard = true;
+                    }
+                }
+                value.Clear();
+                await InjectKeyboardListIfNeededAsync(inputKeyboardList, 0);
+            }
+        }
+
+
         private async void InjectString(string str)
         {
             //CHANGE: inject input
@@ -1662,7 +1713,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     {
                         try
                         {
-                            CurrInputInjector.InjectKeyboardInput(inputList);
+                            // DBG: not right now! adding Command handling! CurrInputInjector.InjectKeyboardInput(list);
                         }
                         catch (Exception e)
                         {
@@ -1676,7 +1727,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     if (inputList.Count > 0)
                     {
-                        CurrInputInjector.InjectKeyboardInput(inputList);
+                        // DBG: not right now! adding Command handling: CurrInputInjector.InjectKeyboardInput(list);
                     }
                 }
                 catch (Exception e)
