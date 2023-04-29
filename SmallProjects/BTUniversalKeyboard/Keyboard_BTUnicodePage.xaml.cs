@@ -48,17 +48,31 @@ namespace BluetoothDeviceController.SpecialtyPages
         // CHANGE: from an override of OnNavigatedTo to a new method
         // CHANGE: rename OnNavigateTo to DoInitializeAync
         // CHANGE: public, not private
+        DeviceInformationWrapper CurrKeyboardDevice = null;
         public async Task DoInitializeAsync(DeviceInformationWrapper di)
         {
+            CurrKeyboardDevice = di;
+            await DoInitializeAsync();
+        }
+        bool AddedOnBluetoothStatus = false; // CHANGE: only set up event once.
+        private async Task DoInitializeAsync()
+        {
+            if (this.CurrKeyboardDevice == null) return;
             SetStatusActive (true);
-            var ble = await BluetoothLEDevice.FromIdAsync(di.di.Id);
+            var ble = await BluetoothLEDevice.FromIdAsync(CurrKeyboardDevice.di.Id);
             SetStatusActive (false);
 
             bleDevice.ble = ble;
-            bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
+            if (!AddedOnBluetoothStatus)
+            {
+                bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
+                AddedOnBluetoothStatus = true;
+            }
+
 
             // CHANGE: no need for reading the name?
-            await DoReadDevice_Name();
+            var status = await DoReadDevice_Name();
+            if (!status) return;
 
             // CHANGE: get a notify for keypress
             await DoNotifyKeyPress();
@@ -103,7 +117,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             uiStatus.Text = status;
             ParentStatusHandler?.SetStatusText(status);
-            Log(status); //CHANGE: add this log statement for debuggin
+            Log(status); //CHANGE: add this log statement for debugging
         }
         private void SetStatusActive (bool isActive)
         {
@@ -148,8 +162,9 @@ namespace BluetoothDeviceController.SpecialtyPages
     public DataCollection<Device_NameRecord> Device_NameRecordData { get; } = new DataCollection<Device_NameRecord>();
 
 
-        private async Task DoReadDevice_Name()
+        private async Task<bool> DoReadDevice_Name() //CHANGE: return bool
         {
+            bool retval = false; // CHANGE: set up retvall
             SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
@@ -158,7 +173,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (valueList == null)
                 {
                     SetStatus ($"Error: unable to read Device_Name");
-                    return;
+                    return retval; // CHANGE: return retval
                 }
                 
                 var record = new Device_NameRecord();
@@ -166,6 +181,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsString || Device_Name.IsArray)
                 {
                     record.Device_Name = (string)Device_Name.AsString;
+                    retval = true; // CHANGE: set retval. anything else is an error 
                 }
 
                 Device_NameRecordData.Add(record);
@@ -175,6 +191,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             {
                 SetStatus ($"Error: exception: {ex.Message}");
             }
+            return retval; // CHANGE: return retval
         }
 
 
@@ -1621,9 +1638,11 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         private async void OnRereadDevice(object sender, RoutedEventArgs e)
         {
+            // CHANGE: call DoInitializeAsync() instead
             SetStatus("Reading device");
             SetStatusActive(true);
-            await bleDevice.EnsureCharacteristicAsync(CharacteristicsEnum.All_enum, true);
+            //await bleDevice.EnsureCharacteristicAsync(CharacteristicsEnum.All_enum, true);
+            await DoInitializeAsync();
             SetStatusActive(false);
         }
 
@@ -1656,14 +1675,27 @@ namespace BluetoothDeviceController.SpecialtyPages
             if (CurrInputInjector != null)
             {
                 var inputKeyboardList = new List<InjectedInputKeyboardInfo>();
-                bool prevWasKeyboard = false;
+                var inputMouseList = new List<InjectedInputMouseInfo>(); // Is always only 1 item long
                 foreach (var item in value)
                 {
                     if (item is InjectedInputKeyboardInfo iiki)
                     {
                         inputKeyboardList.Add(iiki);
                         await InjectKeyboardListIfNeededAsync(inputKeyboardList, 10);
-                        prevWasKeyboard = true;
+                    }
+                    if (item is InjectedInputMouseInfo iimi)
+                    {
+                        await InjectKeyboardListIfNeededAsync(inputKeyboardList, 0); // Clear it away if needed.
+                        inputMouseList.Add(iimi);
+                        try
+                        {
+                            CurrInputInjector.InjectMouseInput(inputMouseList);
+                        }
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"ERROR: mouse injection: exception={e.Message}");
+                        }
+                        inputMouseList.Clear();
                     }
                 }
                 value.Clear();

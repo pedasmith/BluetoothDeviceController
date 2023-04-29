@@ -58,8 +58,8 @@ namespace BluetoothProtocols
             Guid.Parse("b7b0a07e-a995-4eae-9315-856e31bd7334"), // #1 is KeyCount
             Guid.Parse("b7b0a035-852f-4a31-bae4-fcd4510c444d"), // #2 is KeyVirtualCode
             Guid.Parse("b7b0a047-d291-41a3-8c2c-2f4bfa46fef9"), // #3 is KeyScanCode
-            Guid.Parse("b7b0a074-e122-4a2d-ae7e-3c596cfcae3b"), // #4 is KeyUtf8
-            Guid.Parse("b7b0a075-e122-4a2d-ae7e-3c596cfcae3b"), // #4 is KeyCommand //TODO: pick correct GUID
+            Guid.Parse("b7b0a0c3-7fda-428e-8254-a31a3d48d954"), // #4 is KeyUtf8
+            Guid.Parse("b7b0a0ad-0e99-45db-8426-e62f6a13109e"), // #5 is KeyCommand
             Guid.Parse("00002a00-0000-1000-8000-00805f9b34fb"), // #0 is Device Name
             Guid.Parse("00002a01-0000-1000-8000-00805f9b34fb"), // #1 is Appearance
             Guid.Parse("00002a04-0000-1000-8000-00805f9b34fb"), // #2 is Connection Parameter
@@ -78,8 +78,8 @@ namespace BluetoothProtocols
             "KeyCount", // #1 is b7b0a07e-a995-4eae-9315-856e31bd7334
             "KeyVirtualCode", // #2 is b7b0a035-852f-4a31-bae4-fcd4510c444d
             "KeyScanCode", // #3 is b7b0a047-d291-41a3-8c2c-2f4bfa46fef9
-            "KeyUtf8", // #4 is b7b0a074-e122-4a2d-ae7e-3c596cfcae3b
-            "KeyCommand", // #5 is b7b0a075-e122-4a2d-ae7e-3c596cfcae3b //TODO: correct GUID
+            "KeyUtf8", // #4 is b7b0a0c3-7fda-428e-8254-a31a3d48d954
+            "KeyCommand", // #5 is b7b0a0ad-0e99-45db-8426-e62f6a13109e
             "Device Name", // #0 is 00002a00-0000-1000-8000-00805f9b34fb
             "Appearance", // #1 is 00002a01-0000-1000-8000-00805f9b34fb
             "Connection Parameter", // #2 is 00002a04-0000-1000-8000-00805f9b34fb

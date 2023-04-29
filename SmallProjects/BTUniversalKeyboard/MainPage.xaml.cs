@@ -110,20 +110,21 @@ namespace BTUniversalKeyboard
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
         }
-
+        DeviceInformationWrapper CurrKeyboardDevice = null;
         private void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
             // Works OK. Log($"Got device: {args.Name}");
             if (args.Name.StartsWith("BTUnicode Keyboard"))
             {
-                Log($"Found the keyboard!");
+                Log($"Found the keyboard! Stopping!");
+                MenuDeviceInformationWatcher.Stop();
 
                 // Connect to the device.
-                var wrapper = new DeviceInformationWrapper(args);
+                CurrKeyboardDevice = new DeviceInformationWrapper(args);
                 UIThreadHelper.CallOnUIThread(
                     async () =>
                     {
-                        await uiKeyboard.DoInitializeAsync(wrapper);
+                        await uiKeyboard.DoInitializeAsync(CurrKeyboardDevice);
                     });
                 
 #if NEVER_EVER_DEFINED

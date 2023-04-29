@@ -33,8 +33,11 @@ The BT Unicode keyboard and HID protocol always sets a bunch of data
     b7b0a035-852f-4a31-bae4-fcd4510c444d
     3. ScanCode (int32) is the Unicode consortium style scan code for a key. This is just the row and column for the key
     b7b0a047-d291-41a3-8c2c-2f4bfa46fef9
-    4. Utf8Value is the Unicode UTF8 of the keypress. This allows
-    b7b0a074-e122-4a2d-ae7e-3c596cfcae3b
+    4. Utf8 is the Unicode UTF8 of the keypress. This allows
+    b7b0a0c3-7fda-428e-8254-a31a3d48d954
+    5. Command (bytes) is the full set of things the keypress should do -- potentially including strings and mice clicks
+    b7b0a0ad-0e99-45db-8426-e62f6a13109e
+
 
 
 
@@ -172,10 +175,10 @@ Trigger the LED when 'trigger' goes to ground. Took forever because there's not 
 
 
 
-b7b0a07e-a995-4eae-9315-856e31bd7334
-b7b0a09b-1890-4538-ab0b-0ea2f16846d7
-b7b0a0ad-0e99-45db-8426-e62f6a13109e
-b7b0a0c3-7fda-428e-8254-a31a3d48d954
+
+
+
+
 b7b0a0e4-6b1f-41ab-a3ab-08d2a9155b69
 b7b0a0f1-6a98-45c5-b732-5ef993ce9b81
 b7b0a0f3-35f9-4ef4-a3f2-49d0279642d5

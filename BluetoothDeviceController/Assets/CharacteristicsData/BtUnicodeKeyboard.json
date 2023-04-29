@@ -203,7 +203,7 @@
                 ]
               },
               {
-                "UUID": "b7b0a074-e122-4a2d-ae7e-3c596cfcae3b",
+                "UUID": " b7b0a0c3-7fda-428e-8254-a31a3d48d954",
                 "Name": "KeyUtf8",
                 "Description": "UTF8 output of a keypress. Might be Unicode.",
                 "Type": "STRING|ASCII|Utf8",
@@ -215,7 +215,7 @@
                 ]
               },
               {
-                "UUID": "b7b0a075-e122-4a2d-ae7e-3c596cfcae3b",
+                "UUID": "b7b0a0ad-0e99-45db-8426-e62f6a13109e",
                 "Name": "KeyCommand",
                 "Description": "Bytes[] of the command",
                 "Type": "BYTES|HEX|Command",
