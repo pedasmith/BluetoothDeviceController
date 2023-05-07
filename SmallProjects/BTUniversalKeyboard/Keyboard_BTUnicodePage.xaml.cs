@@ -21,6 +21,7 @@ using Windows.Foundation.Diagnostics;
 using System.Threading;
 using BTUniversalKeyboard;
 using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
+using BTControls;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -49,17 +50,34 @@ namespace BluetoothDeviceController.SpecialtyPages
         // CHANGE: rename OnNavigateTo to DoInitializeAync
         // CHANGE: public, not private
         DeviceInformationWrapper CurrKeyboardDevice = null;
+        BTAnnunciator uiAnnunciator = null;
         public async Task DoInitializeAsync(DeviceInformationWrapper di)
         {
+            uiAnnunciator = BTAnnunciator.Singleton;
             CurrKeyboardDevice = di;
+            var name = CurrKeyboardDevice?.di?.Name ?? "keyboard";
+            uiAnnunciator.DeviceName = name;
             await DoInitializeAsync();
         }
         bool AddedOnBluetoothStatus = false; // CHANGE: only set up event once.
         private async Task DoInitializeAsync()
         {
-            if (this.CurrKeyboardDevice == null) return;
-            SetStatusActive (true);
+
+            uiAnnunciator.Activity(AnnunciatorActivity.ConnectionStarted);
+            if (CurrKeyboardDevice == null || CurrKeyboardDevice.di == null)
+            {
+                //uiAnnunciator.SetStatus(AnnunciatorStatus.NoDeviceFound, "Can't connect; no device");
+                uiAnnunciator.Activity(AnnunciatorActivity.ConnectionStoppedFailed);
+                return;
+            }
+            SetStatusActive(true);
+            //uiAnnunciator.SetStatus(AnnunciatorStatus.Connecting, $"Connecting to {CurrKeyboardDevice.ToString()}");
             var ble = await BluetoothLEDevice.FromIdAsync(CurrKeyboardDevice.di.Id);
+            if (ble == null) // Can it be null?
+            {
+                uiAnnunciator.Activity(AnnunciatorActivity.ConnectionStoppedFailed);
+                return;
+            }
             SetStatusActive (false);
 
             bleDevice.ble = ble;
@@ -72,14 +90,34 @@ namespace BluetoothDeviceController.SpecialtyPages
 
             // CHANGE: no need for reading the name?
             var status = await DoReadDevice_Name();
-            if (!status) return;
+            if (!status)
+            {
+                uiAnnunciator.Activity(AnnunciatorActivity.ConnectionStoppedFailed);
+                return;
+            }
+            else
+            {
+                // Prove we're connected
+                var valueList = await bleDevice.ReadKeyCount();
+                var countvar = valueList.GetValue("PressCount");
+                var count = countvar.AsDouble;
+                if (double.IsNaN(count) || count < 0)
+                {
+                    uiAnnunciator.Activity(AnnunciatorActivity.ConnectionStoppedFailed);
+                }
+                else
+                {
+                    uiAnnunciator.Activity(AnnunciatorActivity.ConnectionSucceeded);
+                }
+                //
+            }
 
-            // CHANGE: get a notify for keypress
-            await DoNotifyKeyPress();
-            await DoNotifyKeyCount();
-            await DoNotifyKeyScanCode();
-            await DoNotifyKeyUtf8();
-            await DoNotifyKeyVirtualCode();
+            // CHANGE: get a notify for KeyCommand. the rest are not needed.
+            //await DoNotifyKeyPress();
+            //await DoNotifyKeyCount();
+            //await DoNotifyKeyScanCode();
+            //await DoNotifyKeyUtf8();
+            //await DoNotifyKeyVirtualCode();
             await DoNotifyKeyCommand();
 
         }
@@ -718,160 +756,6 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
 
-        // Functions for BTKeyboard
-        public class KeyPressRecord : INotifyPropertyChanged
-        {
-            public KeyPressRecord()
-            {
-                this.EventTime = DateTime.Now;
-            }
-            // For the INPC INotifyPropertyChanged values
-            public event PropertyChangedEventHandler PropertyChanged;
-            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-            private DateTime _EventTime;
-            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
-
-            private double _Press;
-            public double Press { get { return _Press; } set { if (value == _Press) return; _Press = value; OnPropertyChanged(); } }
-
-            private String _Note;
-            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
-        }
-
-    public DataCollection<KeyPressRecord> KeyPressRecordData { get; } = new DataCollection<KeyPressRecord>();
-
-
-    // Functions called from the expander
-    private void OnKeepCountKeyPress(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyPressRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmKeyPress(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyPressRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-
-
-        GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyPressSettings = {
-            GattClientCharacteristicConfigurationDescriptorValue.Notify,
-
-            GattClientCharacteristicConfigurationDescriptorValue.None,
-        };
-        int KeyPressNotifyIndex = 0;
-        bool KeyPressNotifySetup = false;
-        private async void OnNotifyKeyPress(object sender, RoutedEventArgs e)
-        {
-            await DoNotifyKeyPress();
-        }
-
-        private async Task DoNotifyKeyPress()
-        {
-            SetStatusActive (true);
-            ncommand++;
-            try
-            {
-                // Only set up the event callback once.
-                if (!KeyPressNotifySetup)
-                {
-                    KeyPressNotifySetup = true;
-                    bleDevice.KeyPressEvent += BleDevice_KeyPressEvent;
-                }
-                var notifyType = NotifyKeyPressSettings[KeyPressNotifyIndex];
-                KeyPressNotifyIndex = (KeyPressNotifyIndex + 1) % NotifyKeyPressSettings.Length;
-                var result = await bleDevice.NotifyKeyPressAsync(notifyType);
-                
-
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
-
-        private async void BleDevice_KeyPressEvent(BleEditor.ValueParserResult data)
-        {
-            if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
-            {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                var valueList = data.ValueList;
-                
-                var record = new KeyPressRecord();
-                var Press = valueList.GetValue("Press");
-                if (Press.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Press.CurrentType == BCBasic.BCValue.ValueType.IsString || Press.IsArray)
-                {
-                    record.Press = (double)Press.AsDouble;
-                    KeyPress_Press.Text = record.Press.ToString("N0");
-                }
-
-                var addResult = KeyPressRecordData.AddRecord(record);
-
-                    // CHANGE: handle key press. Find the actual value.
-                    // Press is 0 for release 1+ for press
-                    if (record.Press >= 1)
-                    {
-                        // TODO: inject the Command!
-                        //var utf8 = bleDevice.KeyUtf8;
-                        //InjectString(utf8);
-                        InjectList(KeyCommandList);
-
-                    }
-
-                    // Original update was to make this CHART+COMMAND
-                });
-            }
-        }
-
-        private async void OnReadKeyPress(object sender, RoutedEventArgs e)
-        {
-            await DoReadKeyPress();
-        }
-
-        private async Task DoReadKeyPress()
-        {
-            SetStatusActive (true); // the false happens in the bluetooth status handler.
-            ncommand++;
-            try
-            {
-                var valueList = await bleDevice.ReadKeyPress();
-                if (valueList == null)
-                {
-                    SetStatus ($"Error: unable to read KeyPress");
-                    return;
-                }
-                
-                var record = new KeyPressRecord();
-                var Press = valueList.GetValue("Press");
-                if (Press.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Press.CurrentType == BCBasic.BCValue.ValueType.IsString || Press.IsArray)
-                {
-                    record.Press = (double)Press.AsDouble;
-                    KeyPress_Press.Text = record.Press.ToString("N0");
-                }
-
-                KeyPressRecordData.Add(record);
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus ($"Error: exception: {ex.Message}");
-            }
-        }
-
 
 
         public class KeyCountRecord : INotifyPropertyChanged
@@ -897,28 +781,6 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
     public DataCollection<KeyCountRecord> KeyCountRecordData { get; } = new DataCollection<KeyCountRecord>();
-
-
-    // Functions called from the expander
-    private void OnKeepCountKeyCount(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyCountRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmKeyCount(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyCountRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
 
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyCountSettings = {
@@ -971,7 +833,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (PressCount.CurrentType == BCBasic.BCValue.ValueType.IsDouble || PressCount.CurrentType == BCBasic.BCValue.ValueType.IsString || PressCount.IsArray)
                 {
                     record.PressCount = (double)PressCount.AsDouble;
-                    KeyCount_PressCount.Text = record.PressCount.ToString("N0");
+                    // CHANGE: KeyCount_PressCount.Text = record.PressCount.ToString("N0");
                 }
 
                 var addResult = KeyCountRecordData.AddRecord(record);
@@ -982,10 +844,6 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-        private async void OnReadKeyCount(object sender, RoutedEventArgs e)
-        {
-            await DoReadKeyCount();
-        }
 
         private async Task DoReadKeyCount()
         {
@@ -1005,7 +863,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (PressCount.CurrentType == BCBasic.BCValue.ValueType.IsDouble || PressCount.CurrentType == BCBasic.BCValue.ValueType.IsString || PressCount.IsArray)
                 {
                     record.PressCount = (double)PressCount.AsDouble;
-                    KeyCount_PressCount.Text = record.PressCount.ToString("N0");
+                    // CHANGAE: KeyCount_PressCount.Text = record.PressCount.ToString("N0");
                 }
 
                 KeyCountRecordData.Add(record);
@@ -1017,457 +875,6 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-
-
-        public class KeyVirtualCodeRecord : INotifyPropertyChanged
-        {
-            public KeyVirtualCodeRecord()
-            {
-                this.EventTime = DateTime.Now;
-            }
-            // For the INPC INotifyPropertyChanged values
-            public event PropertyChangedEventHandler PropertyChanged;
-            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-            private DateTime _EventTime;
-            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
-
-            private double _VirtualCode;
-            public double VirtualCode { get { return _VirtualCode; } set { if (value == _VirtualCode) return; _VirtualCode = value; OnPropertyChanged(); } }
-
-            private String _Note;
-            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
-        }
-
-    public DataCollection<KeyVirtualCodeRecord> KeyVirtualCodeRecordData { get; } = new DataCollection<KeyVirtualCodeRecord>();
-
-
-    // Functions called from the expander
-    private void OnKeepCountKeyVirtualCode(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyVirtualCodeRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmKeyVirtualCode(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyVirtualCodeRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-
-
-        GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyVirtualCodeSettings = {
-            GattClientCharacteristicConfigurationDescriptorValue.Notify,
-
-            GattClientCharacteristicConfigurationDescriptorValue.None,
-        };
-        int KeyVirtualCodeNotifyIndex = 0;
-        bool KeyVirtualCodeNotifySetup = false;
-        private async void OnNotifyKeyVirtualCode(object sender, RoutedEventArgs e)
-        {
-            await DoNotifyKeyVirtualCode();
-        }
-
-        private async Task DoNotifyKeyVirtualCode()
-        {
-            SetStatusActive (true);
-            ncommand++;
-            try
-            {
-                // Only set up the event callback once.
-                if (!KeyVirtualCodeNotifySetup)
-                {
-                    KeyVirtualCodeNotifySetup = true;
-                    bleDevice.KeyVirtualCodeEvent += BleDevice_KeyVirtualCodeEvent;
-                }
-                var notifyType = NotifyKeyVirtualCodeSettings[KeyVirtualCodeNotifyIndex];
-                KeyVirtualCodeNotifyIndex = (KeyVirtualCodeNotifyIndex + 1) % NotifyKeyVirtualCodeSettings.Length;
-                var result = await bleDevice.NotifyKeyVirtualCodeAsync(notifyType);
-                
-
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
-
-        private async void BleDevice_KeyVirtualCodeEvent(BleEditor.ValueParserResult data)
-        {
-            if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
-            {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                var valueList = data.ValueList;
-                
-                var record = new KeyVirtualCodeRecord();
-                var VirtualCode = valueList.GetValue("VirtualCode");
-                if (VirtualCode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || VirtualCode.CurrentType == BCBasic.BCValue.ValueType.IsString || VirtualCode.IsArray)
-                {
-                    record.VirtualCode = (double)VirtualCode.AsDouble;
-                    KeyVirtualCode_VirtualCode.Text = record.VirtualCode.ToString("N0");
-                }
-
-                var addResult = KeyVirtualCodeRecordData.AddRecord(record);
-
-                
-                // Original update was to make this CHART+COMMAND
-                });
-            }
-        }
-
-        private async void OnReadKeyVirtualCode(object sender, RoutedEventArgs e)
-        {
-            await DoReadKeyVirtualCode();
-        }
-
-        private async Task DoReadKeyVirtualCode()
-        {
-            SetStatusActive (true); // the false happens in the bluetooth status handler.
-            ncommand++;
-            try
-            {
-                var valueList = await bleDevice.ReadKeyVirtualCode();
-                if (valueList == null)
-                {
-                    SetStatus ($"Error: unable to read KeyVirtualCode");
-                    return;
-                }
-                
-                var record = new KeyVirtualCodeRecord();
-                var VirtualCode = valueList.GetValue("VirtualCode");
-                if (VirtualCode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || VirtualCode.CurrentType == BCBasic.BCValue.ValueType.IsString || VirtualCode.IsArray)
-                {
-                    record.VirtualCode = (double)VirtualCode.AsDouble;
-                    KeyVirtualCode_VirtualCode.Text = record.VirtualCode.ToString("N0");
-                }
-
-                KeyVirtualCodeRecordData.Add(record);
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus ($"Error: exception: {ex.Message}");
-            }
-        }
-
-
-
-        public class KeyScanCodeRecord : INotifyPropertyChanged
-        {
-            public KeyScanCodeRecord()
-            {
-                this.EventTime = DateTime.Now;
-            }
-            // For the INPC INotifyPropertyChanged values
-            public event PropertyChangedEventHandler PropertyChanged;
-            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-            private DateTime _EventTime;
-            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
-
-            private double _ScanCode;
-            public double ScanCode { get { return _ScanCode; } set { if (value == _ScanCode) return; _ScanCode = value; OnPropertyChanged(); } }
-
-            private String _Note;
-            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
-        }
-
-    public DataCollection<KeyScanCodeRecord> KeyScanCodeRecordData { get; } = new DataCollection<KeyScanCodeRecord>();
-
-
-    // Functions called from the expander
-    private void OnKeepCountKeyScanCode(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyScanCodeRecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmKeyScanCode(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyScanCodeRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-
-
-        GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyScanCodeSettings = {
-            GattClientCharacteristicConfigurationDescriptorValue.Notify,
-
-            GattClientCharacteristicConfigurationDescriptorValue.None,
-        };
-        int KeyScanCodeNotifyIndex = 0;
-        bool KeyScanCodeNotifySetup = false;
-        private async void OnNotifyKeyScanCode(object sender, RoutedEventArgs e)
-        {
-            await DoNotifyKeyScanCode();
-        }
-
-        private async Task DoNotifyKeyScanCode()
-        {
-            SetStatusActive (true);
-            ncommand++;
-            try
-            {
-                // Only set up the event callback once.
-                if (!KeyScanCodeNotifySetup)
-                {
-                    KeyScanCodeNotifySetup = true;
-                    bleDevice.KeyScanCodeEvent += BleDevice_KeyScanCodeEvent;
-                }
-                var notifyType = NotifyKeyScanCodeSettings[KeyScanCodeNotifyIndex];
-                KeyScanCodeNotifyIndex = (KeyScanCodeNotifyIndex + 1) % NotifyKeyScanCodeSettings.Length;
-                var result = await bleDevice.NotifyKeyScanCodeAsync(notifyType);
-                
-
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
-
-        private async void BleDevice_KeyScanCodeEvent(BleEditor.ValueParserResult data)
-        {
-            if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
-            {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                var valueList = data.ValueList;
-                
-                var record = new KeyScanCodeRecord();
-                var ScanCode = valueList.GetValue("ScanCode");
-                if (ScanCode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ScanCode.CurrentType == BCBasic.BCValue.ValueType.IsString || ScanCode.IsArray)
-                {
-                    record.ScanCode = (double)ScanCode.AsDouble;
-                    KeyScanCode_ScanCode.Text = record.ScanCode.ToString("N0");
-                }
-
-                var addResult = KeyScanCodeRecordData.AddRecord(record);
-
-                
-                // Original update was to make this CHART+COMMAND
-                });
-            }
-        }
-
-        private async void OnReadKeyScanCode(object sender, RoutedEventArgs e)
-        {
-            await DoReadKeyScanCode();
-        }
-
-        private async Task DoReadKeyScanCode()
-        {
-            SetStatusActive (true); // the false happens in the bluetooth status handler.
-            ncommand++;
-            try
-            {
-                var valueList = await bleDevice.ReadKeyScanCode();
-                if (valueList == null)
-                {
-                    SetStatus ($"Error: unable to read KeyScanCode");
-                    return;
-                }
-                
-                var record = new KeyScanCodeRecord();
-                var ScanCode = valueList.GetValue("ScanCode");
-                if (ScanCode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || ScanCode.CurrentType == BCBasic.BCValue.ValueType.IsString || ScanCode.IsArray)
-                {
-                    record.ScanCode = (double)ScanCode.AsDouble;
-                    KeyScanCode_ScanCode.Text = record.ScanCode.ToString("N0");
-                }
-
-                KeyScanCodeRecordData.Add(record);
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus ($"Error: exception: {ex.Message}");
-            }
-        }
-
-
-
-        public class KeyUtf8Record : INotifyPropertyChanged
-        {
-            public KeyUtf8Record()
-            {
-                this.EventTime = DateTime.Now;
-            }
-            // For the INPC INotifyPropertyChanged values
-            public event PropertyChangedEventHandler PropertyChanged;
-            protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-            private DateTime _EventTime;
-            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
-
-            private string _Utf8;
-            public string Utf8 { get { return _Utf8; } set { if (value == _Utf8) return; _Utf8 = value; OnPropertyChanged(); } }
-
-            private String _Note;
-            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
-        }
-
-    public DataCollection<KeyUtf8Record> KeyUtf8RecordData { get; } = new DataCollection<KeyUtf8Record>();
-    private void OnKeyUtf8_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Enter)
-        {
-            var text = (sender as TextBox).Text.Trim();
-            (sender as TextBox).Text = "";
-            // Add the text to the notes section
-            if (KeyUtf8RecordData.Count == 0)
-            {
-                KeyUtf8RecordData.AddRecord(new KeyUtf8Record());
-            }
-            KeyUtf8RecordData[KeyUtf8RecordData.Count - 1].Note = text;
-            e.Handled = true;
-        }
-    }
-
-    // Functions called from the expander
-    private void OnKeepCountKeyUtf8(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyUtf8RecordData.MaxLength = value;
-
-        
-    }
-
-    private void OnAlgorithmKeyUtf8(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count != 1) return;
-        int value;
-        var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-        if (!ok) return;
-        KeyUtf8RecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-    }
-
-
-        GattClientCharacteristicConfigurationDescriptorValue[] NotifyKeyUtf8Settings = {
-            GattClientCharacteristicConfigurationDescriptorValue.Notify,
-
-            GattClientCharacteristicConfigurationDescriptorValue.None,
-        };
-        int KeyUtf8NotifyIndex = 0;
-        bool KeyUtf8NotifySetup = false;
-        private async void OnNotifyKeyUtf8(object sender, RoutedEventArgs e)
-        {
-            await DoNotifyKeyUtf8();
-        }
-
-        private async Task DoNotifyKeyUtf8()
-        {
-            SetStatusActive (true);
-            ncommand++;
-            try
-            {
-                // Only set up the event callback once.
-                if (!KeyUtf8NotifySetup)
-                {
-                    KeyUtf8NotifySetup = true;
-                    bleDevice.KeyUtf8Event += BleDevice_KeyUtf8Event;
-                }
-                var notifyType = NotifyKeyUtf8Settings[KeyUtf8NotifyIndex];
-                KeyUtf8NotifyIndex = (KeyUtf8NotifyIndex + 1) % NotifyKeyUtf8Settings.Length;
-                var result = await bleDevice.NotifyKeyUtf8Async(notifyType);
-                
-
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
-
-        private async void BleDevice_KeyUtf8Event(BleEditor.ValueParserResult data)
-        {
-            if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
-            {
-                await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                var valueList = data.ValueList;
-                
-                var record = new KeyUtf8Record();
-                var Utf8 = valueList.GetValue("Utf8");
-                if (Utf8.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Utf8.CurrentType == BCBasic.BCValue.ValueType.IsString || Utf8.IsArray)
-                {
-                    record.Utf8 = (string)Utf8.AsString;
-                    KeyUtf8_Utf8.Text = record.Utf8.ToString();
-                }
-
-                var addResult = KeyUtf8RecordData.AddRecord(record);
-
-
-
-
-                    // Original update was to make this CHART+COMMAND
-                });
-            }
-        }
-
-
-        private async void OnReadKeyUtf8(object sender, RoutedEventArgs e)
-        {
-            await DoReadKeyUtf8();
-        }
-
-        private async Task DoReadKeyUtf8()
-        {
-            SetStatusActive (true); // the false happens in the bluetooth status handler.
-            ncommand++;
-            try
-            {
-                var valueList = await bleDevice.ReadKeyUtf8();
-                if (valueList == null)
-                {
-                    SetStatus ($"Error: unable to read KeyUtf8");
-                    return;
-                }
-                
-                var record = new KeyUtf8Record();
-                var Utf8 = valueList.GetValue("Utf8");
-                if (Utf8.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Utf8.CurrentType == BCBasic.BCValue.ValueType.IsString || Utf8.IsArray)
-                {
-                    record.Utf8 = (string)Utf8.AsString;
-                    KeyUtf8_Utf8.Text = record.Utf8.ToString();
-                }
-
-                KeyUtf8RecordData.Add(record);
-
-            }
-            catch (Exception ex)
-            {
-                SetStatus ($"Error: exception: {ex.Message}");
-            }
-        }
 
         //
         // CHANGE: add all this Command stuff
@@ -1561,12 +968,16 @@ namespace BluetoothDeviceController.SpecialtyPages
                 KeyCommandNotifyIndex = (KeyCommandNotifyIndex + 1) % NotifyKeyCommandSettings.Length;
                 var result = await bleDevice.NotifyKeyCommandAsync(notifyType);
 
-
+                if (!result)
+                {
+                    uiAnnunciator.SetStatus(AnnunciatorStatus.ConnectionLost, "Unable to get notifications");
+                }
 
             }
             catch (Exception ex)
             {
                 SetStatus($"Error: exception: {ex.Message}");
+                uiAnnunciator.SetStatus(AnnunciatorStatus.ConnectionLost, $"Notify failure with {ex.Message}");
             }
         }
 
@@ -1585,7 +996,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     if (Command.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Command.CurrentType == BCBasic.BCValue.ValueType.IsString || Command.IsArray)
                     {
                         record.Command = (string)Command.AsString;
-                        KeyCommand_Command.Text = record.Command.ToString();
+                        // CHANGE: KeyCommand_Command.Text = record.Command.ToString();
                     }
 
                     var addResult = KeyCommandRecordData.AddRecord(record);
@@ -1593,6 +1004,9 @@ namespace BluetoothDeviceController.SpecialtyPages
                     // Command.AsArray is the data in about the most memory-intensive format possible.
                     var array = Command.AsArray.AsByteArray(); // Handy conversion
                     BtUniversalKeyboardCommand.Parse(array, KeyCommandList);
+
+                    // CHANGE: handle key press. Find the actual value.
+                    InjectList(KeyCommandList);
                     // Original update was to make this CHART+COMMAND
                 });
             }
@@ -1622,7 +1036,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 if (Command.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Command.CurrentType == BCBasic.BCValue.ValueType.IsString || Command.IsArray)
                 {
                     record.Command = (string)Command.AsString;
-                    KeyCommand_Command.Text = record.Command.ToString();
+                    // CHANGE: KeyCommand_Command.Text = record.Command.ToString();
                 }
 
                 KeyCommandRecordData.Add(record);
@@ -1642,6 +1056,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             SetStatus("Reading device");
             SetStatusActive(true);
             //await bleDevice.EnsureCharacteristicAsync(CharacteristicsEnum.All_enum, true);
+            bleDevice.NotifyKeyPressRemoveCharacteristicCallback();
             await DoInitializeAsync();
             SetStatusActive(false);
         }
@@ -1668,23 +1083,39 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         private async void InjectList(List<object> value)
         {
+            if (value.Count == 0)
+            {
+                return; // Nothing to inject, so just return.
+            }
             if (CurrInputInjector == null)
             {
                 CurrInputInjector = InputInjector.TryCreate();
             }
             if (CurrInputInjector != null)
             {
+                aniKeyPress.Begin();
                 var inputKeyboardList = new List<InjectedInputKeyboardInfo>();
                 var inputMouseList = new List<InjectedInputMouseInfo>(); // Is always only 1 item long
                 foreach (var item in value)
                 {
+                    uiTimeStamp.Text = DateTime.Now.ToString("HH:mm:ss");
+
                     if (item is InjectedInputKeyboardInfo iiki)
                     {
+                        if ((iiki.KeyOptions & InjectedInputKeyOptions.Unicode) != 0)
+                        {
+                            uiActivity.Text = $"{(char)iiki.ScanCode}"; // UTF8 string is broken into scan code
+                        }
+                        else
+                        {
+                            uiActivity.Text = $"VKEY={iiki.VirtualKey}"; // UTF8 string is broken into scan code
+                        }
                         inputKeyboardList.Add(iiki);
                         await InjectKeyboardListIfNeededAsync(inputKeyboardList, 10);
                     }
                     if (item is InjectedInputMouseInfo iimi)
                     {
+                        uiActivity.Text = $"MOUSE={iimi}";
                         await InjectKeyboardListIfNeededAsync(inputKeyboardList, 0); // Clear it away if needed.
                         inputMouseList.Add(iimi);
                         try
@@ -1703,7 +1134,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-
+#if NEVER_EVER_DEFINED
         private async void InjectString(string str)
         {
             //CHANGE: inject input
@@ -1768,6 +1199,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 }
             }
         }
-
+#endif
     }
 }

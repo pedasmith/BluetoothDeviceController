@@ -409,8 +409,11 @@ namespace BluetoothProtocols
         {
             var ch = Characteristics[(int)CharacteristicsEnum.KeyPress_BTKeyboard_enum];
             if (ch == null) return;
-            NotifyKeyPress_ValueChanged_Set = false;
-            ch.ValueChanged -= NotifyKeyPressCallback;
+            if (NotifyKeyPress_ValueChanged_Set) // CHANGE: check variable and reset.
+            {
+                NotifyKeyPress_ValueChanged_Set = false;
+                ch.ValueChanged -= NotifyKeyPressCallback;
+            }
         }
 
 

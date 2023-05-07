@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController;
+using BTControls;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,6 +36,7 @@ namespace BTUniversalKeyboard
 
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+            uiAnnunciator.Activity(AnnunciatorActivity.Initial);
             await Connect();
         }
 
@@ -92,32 +94,43 @@ namespace BTUniversalKeyboard
             MenuDeviceInformationWatcher.Stopped += DeviceWatcher_Stopped;
 
             // Start the watcher.
+            uiAnnunciator.Activity(AnnunciatorActivity.ScanStarted);
             MenuDeviceInformationWatcher.Start();
         }
 
         private void DeviceWatcher_Stopped(DeviceWatcher sender, object args)
         {
+            uiAnnunciator.Activity(AnnunciatorActivity.ScanStopped);
+            //uiAnnunciator.SetStatus(AnnunciatorStatus.NoDeviceFound, "Scanner: Stopped");
         }
 
         private void DeviceWatcher_EnumerationCompleted(DeviceWatcher sender, object args)
         {
+            uiAnnunciator.Activity(AnnunciatorActivity.ScanComplete);
+            //uiAnnunciator.SetStatus(AnnunciatorStatus.NoDeviceFound, "Scanner: Completed");
         }
 
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {
+            uiAnnunciator.Activity(AnnunciatorActivity.ScanItemRemoved);
         }
 
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
+            uiAnnunciator.Activity(AnnunciatorActivity.ScanItemUpdated);
         }
         DeviceInformationWrapper CurrKeyboardDevice = null;
         private void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
             // Works OK. Log($"Got device: {args.Name}");
+            uiAnnunciator.Activity(AnnunciatorActivity.ScanItemAdded);
             if (args.Name.StartsWith("BTUnicode Keyboard"))
             {
                 Log($"Found the keyboard! Stopping!");
                 MenuDeviceInformationWatcher.Stop();
+                //uiAnnunciator.SetStatus(AnnunciatorStatus.Connecting, "Found Keyboard");
+                uiAnnunciator.Activity(AnnunciatorActivity.ScanItemFound);
+
 
                 // Connect to the device.
                 CurrKeyboardDevice = new DeviceInformationWrapper(args);
@@ -126,39 +139,13 @@ namespace BTUniversalKeyboard
                     {
                         await uiKeyboard.DoInitializeAsync(CurrKeyboardDevice);
                     });
-                
-#if NEVER_EVER_DEFINED
-                var ble = await BluetoothLEDevice.FromIdAsync(args.Id);
-                Keyboard_BTUnicode = new BluetoothProtocols.Keyboard_BTUnicode();
-                Keyboard_BTUnicode.ble = ble;
-                Keyboard_BTUnicode.PropertyChanged += Keyboard_BTUnicode_PropertyChanged;
-                Keyboard_BTUnicode.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
-                //await Keyboard_BTUnicode.EnsureCharacteristicAsync(BluetoothProtocols.Keyboard_BTUnicode.CharacteristicsEnum.All_enum);
-                Keyboard_BTUnicode.KeyPressEvent += Keyboard_BTUnicode_KeyPressEvent;
-                var status = await Keyboard_BTUnicode.NotifyKeyPressAsync();
-                Log($"Notify status: status={status}");
-#endif
             }
         }
 
-        private void Keyboard_BTUnicode_KeyPressEvent(BluetoothDeviceController.BleEditor.ValueParserResult data)
-        {
-            Log($"Keypress: {data.UserString}");
-        }
-
-        private void Status_OnBluetoothStatus(object source, BluetoothProtocols.BluetoothCommunicationStatus status)
-        {
-            Log($"Status: {status.AsStatusString}");
-        }
-
-        private void Keyboard_BTUnicode_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            // What property?
-            Log($"Change: {e.PropertyName}");
-        }
 
         private void Timeout_BluetoothLEAdvertisementWatcher_Tick(object sender, object e)
         {
+            uiAnnunciator.Activity(AnnunciatorActivity.ScanTimerTick);
         }
     }
 

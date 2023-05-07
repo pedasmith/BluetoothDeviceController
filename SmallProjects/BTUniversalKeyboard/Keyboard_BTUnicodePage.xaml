@@ -59,6 +59,17 @@
             <Setter Property = "HorizontalAlignment" Value="Center" />
             <Setter Property = "Width" Value="500" />
         </Style>
+        <!-- CHANGE: added Storyboard animation -->
+        <Storyboard x:Name="aniKeyPress">
+            <DoubleAnimation
+                Storyboard.TargetName="uiActivity" EnableDependentAnimation="True"
+                Storyboard.TargetProperty="FontSize" 
+                From="16" To="50" Duration="0:0:1" />
+            <DoubleAnimation
+                Storyboard.TargetName="uiActivity"
+                Storyboard.TargetProperty="Opacity"
+                From="1.0" To="0.0" Duration="0:0:1"/>
+        </Storyboard>
     </UserControl.Resources>
 
     <StackPanel>
@@ -78,110 +89,14 @@
         
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
-        <!-- XAML+SERVICE+LIST for BTKeyboard -->
-        <controls:Expander Header="BTKeyboard" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-                            <TextBlock Style="{StaticResource SubheaderStyle}">KeyPress</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="KeyPress_Press" Text="*" Header="Press" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadKeyPress" />
-                    <Button Content="Notify" Click="OnNotifyKeyPress" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">KeyCount</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="KeyCount_PressCount" Text="*" Header="PressCount" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadKeyCount" />
-                    <Button Content="Notify" Click="OnNotifyKeyCount" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">KeyVirtualCode</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="KeyVirtualCode_VirtualCode" Text="*" Header="VirtualCode" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadKeyVirtualCode" />
-                    <Button Content="Notify" Click="OnNotifyKeyVirtualCode" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">KeyScanCode</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="KeyScanCode_ScanCode" Text="*" Header="ScanCode" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadKeyScanCode" />
-                    <Button Content="Notify" Click="OnNotifyKeyScanCode" />
-
-                </GridView>
-
-
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">KeyUtf8</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="KeyUtf8_Utf8" Text="*" Header="Utf8" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadKeyUtf8" />
-                    <Button Content="Notify" Click="OnNotifyKeyUtf8" />
-
-                </GridView>
-
-
-                <TextBlock Style="{StaticResource SubheaderStyle}">KeyCommand</TextBlock>
-                <GridView>
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="KeyCommand_Command" Text="*" Header="Command" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadKeyCommand" />
-                    <Button Content="Notify" Click="OnNotifyKeyCommand" />
-
-                </GridView>
-
-
-            </StackPanel>
-        </controls:Expander>
+        <!-- CHANGE: got rid of all of them! XAML+SERVICE+LIST for BTKeyboard -->
 
         <Button Content="REREAD" Click="OnRereadDevice" />
+
+        <!-- CHANGE: added animation -->
+        <TextBlock FontSize="10" x:Name="uiTimeStamp" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+        <Border Height="110" Width="410" BorderBrush="Blue" BorderThickness="0" HorizontalAlignment="Left">
+            <TextBlock FontSize="20" Opacity="0" x:Name="uiActivity" IsTextSelectionEnabled="True" TextWrapping="Wrap"  HorizontalTextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
     </StackPanel>
 </UserControl>
