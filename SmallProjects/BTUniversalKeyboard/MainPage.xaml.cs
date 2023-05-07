@@ -126,7 +126,7 @@ namespace BTUniversalKeyboard
             uiAnnunciator.Activity(AnnunciatorActivity.ScanItemAdded);
             if (args.Name.StartsWith("BTUnicode Keyboard"))
             {
-                Log($"Found the keyboard! Stopping!");
+                Log($"Found the keyboard; stopping the scan");
                 MenuDeviceInformationWatcher.Stop();
                 //uiAnnunciator.SetStatus(AnnunciatorStatus.Connecting, "Found Keyboard");
                 uiAnnunciator.Activity(AnnunciatorActivity.ScanItemFound);

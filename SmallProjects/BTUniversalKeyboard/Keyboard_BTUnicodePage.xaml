@@ -74,17 +74,11 @@
 
     <StackPanel>
         <Grid MaxWidth="550" HorizontalAlignment="Left">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0">
-                <TextBlock Style="{StaticResource TitleStyle}">BTUnicode Keyboard device</TextBlock>
                 <TextBlock Style="{StaticResource AboutStyle}">
                     The BT Unicode Keyboard protocol allows for advanced keyboards to be designed that do not require specialised keyboard mappings to be installed. These do require a specialized app to read in the data.
                 </TextBlock>
             </StackPanel>
-            <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/Keyboard_BTUnicode.PNG" />
         </Grid>
         
         <ProgressRing x:Name="uiProgress" />

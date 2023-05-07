@@ -1108,14 +1108,15 @@ namespace BluetoothDeviceController.SpecialtyPages
                         }
                         else
                         {
-                            uiActivity.Text = $"VKEY={iiki.VirtualKey}"; // UTF8 string is broken into scan code
+                            var vkey = VK_Code.GetCode(iiki.VirtualKey);
+                            uiActivity.Text = $"{vkey.VK_Meaning}";
                         }
                         inputKeyboardList.Add(iiki);
                         await InjectKeyboardListIfNeededAsync(inputKeyboardList, 10);
                     }
                     if (item is InjectedInputMouseInfo iimi)
                     {
-                        uiActivity.Text = $"MOUSE={iimi}";
+                        uiActivity.Text = $"MOUSE={iimi.MouseOptions}"; //TODO: mouse items
                         await InjectKeyboardListIfNeededAsync(inputKeyboardList, 0); // Clear it away if needed.
                         inputMouseList.Add(iimi);
                         try
