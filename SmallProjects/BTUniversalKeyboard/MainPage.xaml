@@ -10,8 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    Width="500"
-    Height="500"
+
     >
     <Page.Resources>
         <Style TargetType="TextBlock" x:Name="sTitle">
@@ -38,7 +37,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid>
+    <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -47,7 +46,7 @@
         </Grid.RowDefinitions>
         <TextBlock Style="{StaticResource sTitle}">Bluetooth Universal Keyboard</TextBlock>
         <pages:Keyboard_BTUnicodePage Grid.Row="1" x:Name="uiKeyboard" />
-        <TextBlock x:Name="uiLog" Grid.Row="2"  IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+        <TextBlock Visibility="Collapsed" x:Name="uiLog" Grid.Row="2"  IsTextSelectionEnabled="True" TextWrapping="Wrap" />
         <btcontrols:BTAnnunciator Grid.Row="3" x:Name="uiAnnunciator"  />
     </Grid>
 </Page>

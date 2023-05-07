@@ -153,7 +153,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         private void SetStatus(string status)
         {
-            uiStatus.Text = status;
+            //CHANGE: no uistatus any more: uiStatus.Text = status;
             ParentStatusHandler?.SetStatusText(status);
             Log(status); //CHANGE: add this log statement for debugging
         }

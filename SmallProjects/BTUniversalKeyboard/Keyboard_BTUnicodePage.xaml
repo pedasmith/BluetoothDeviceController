@@ -82,8 +82,7 @@
         </Grid>
         
         <ProgressRing x:Name="uiProgress" />
-        <TextBlock x:Name="uiStatus" />
-        <!-- CHANGE: got rid of all of them! XAML+SERVICE+LIST for BTKeyboard -->
+        <!-- CHANGE: got rid uiStatus + of all of them! XAML+SERVICE+LIST for BTKeyboard -->
 
         <Button Content="REREAD" Click="OnRereadDevice" />
 
