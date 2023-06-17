@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Utilities", "Utilities\Utilities.shproj", "{E6B108C1-0E7E-4124-9B33-9B71570DDFAD}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Utilities", "..\..\Utilities\Utilities.shproj", "{E6B108C1-0E7E-4124-9B33-9B71570DDFAD}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SampleServerXaml", "SmallProjects\SampleServerXaml\SampleServerXaml.shproj", "{AA5D4B4A-78EE-444E-8F0E-CEB00FDC4716}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SampleServerXaml", "..\SampleServerXaml\SampleServerXaml.shproj", "{AA5D4B4A-78EE-444E-8F0E-CEB00FDC4716}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SmallProjects", "SmallProjects", "{C4C90D53-D7D6-4FE3-A602-908959FCA9F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothCurrentTimeServer", "SmallProjects\BluetoothCurrentTimeServer\BluetoothCurrentTimeServer.csproj", "{CC0BF9AF-CFC1-4561-B76A-0835174D1E34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothCurrentTimeServer", "BluetoothCurrentTimeServer.csproj", "{CC0BF9AF-CFC1-4561-B76A-0835174D1E34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,9 +67,9 @@ Global
 		SolutionGuid = {62DCA7A6-8C59-4330-98B9-0EF91B6BAD39}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		SmallProjects\SampleServerXaml\SampleServerXaml.projitems*{aa5d4b4a-78ee-444e-8f0e-ceb00fdc4716}*SharedItemsImports = 13
-		SmallProjects\SampleServerXaml\SampleServerXaml.projitems*{cc0bf9af-cfc1-4561-b76a-0835174d1e34}*SharedItemsImports = 4
-		Utilities\Utilities.projitems*{cc0bf9af-cfc1-4561-b76a-0835174d1e34}*SharedItemsImports = 4
-		Utilities\Utilities.projitems*{e6b108c1-0e7e-4124-9b33-9b71570ddfad}*SharedItemsImports = 13
+		..\SampleServerXaml\SampleServerXaml.projitems*{aa5d4b4a-78ee-444e-8f0e-ceb00fdc4716}*SharedItemsImports = 13
+		..\SampleServerXaml\SampleServerXaml.projitems*{cc0bf9af-cfc1-4561-b76a-0835174d1e34}*SharedItemsImports = 4
+		..\..\Utilities\Utilities.projitems*{cc0bf9af-cfc1-4561-b76a-0835174d1e34}*SharedItemsImports = 4
+		..\..\Utilities\Utilities.projitems*{e6b108c1-0e7e-4124-9b33-9b71570ddfad}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
