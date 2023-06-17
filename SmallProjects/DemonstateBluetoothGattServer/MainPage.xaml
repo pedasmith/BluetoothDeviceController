@@ -17,7 +17,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid>
+    <Grid HorizontalAlignment="Center">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />

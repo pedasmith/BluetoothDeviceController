@@ -154,6 +154,9 @@
       <Version>6.2.14</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Icons\" />
+  </ItemGroup>
   <Import Project="..\..\Utilities\Utilities.projitems" Label="Shared" />
   <Import Project="..\SampleServerXaml\SampleServerXaml.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

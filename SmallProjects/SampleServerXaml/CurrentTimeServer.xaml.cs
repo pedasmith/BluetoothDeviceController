@@ -32,6 +32,9 @@ namespace SampleServerXaml
 
         private async void CurrentTimeServer_Loaded(object sender, RoutedEventArgs e)
         {
+#if DEBUG
+            uiClear.Visibility = Visibility.Visible;
+#endif
             await DoStartServer();
         }
 
@@ -206,6 +209,7 @@ namespace SampleServerXaml
                 uiCurrentTime.Text = time;
                 if (updatedBT)
                 {
+                    uiAllReadValues.Visibility = Visibility.Visible;
                     uiLastReadTime.Text = time;
                 }
             });

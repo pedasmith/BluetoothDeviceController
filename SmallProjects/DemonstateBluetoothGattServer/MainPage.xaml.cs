@@ -12,6 +12,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage.Streams;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -31,6 +32,25 @@ namespace DemonstateBluetoothGattServer
         public MainPage()
         {
             this.InitializeComponent();
+            var preferredSize = new Size(410, 240);
+            SetPreferredWindowSize(preferredSize);
+        }
+
+        private void SetPreferredWindowSize(Size preferredSize)
+        {
+            var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            if (localSettings.Values["launchedWithPrefSize"] == null)
+            {
+                // first app launch only!!
+                ApplicationView.PreferredLaunchViewSize = preferredSize;
+                ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+                localSettings.Values["launchedWithPrefSize"] = true;
+            }
+            // resetting the auto-resizing -> next launch the system will control the PreferredLaunchViewSize
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Auto;
+            ApplicationView.PreferredLaunchViewSize = preferredSize;
+            //ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(preferredSize);
         }
     }
 }

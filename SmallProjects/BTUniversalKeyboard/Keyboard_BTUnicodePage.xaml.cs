@@ -40,6 +40,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
         private string DeviceName = "Keyboard_BTUnicode";
         private string DeviceNameUser = "BTUnicode Keyboard";
+        public IReconnect Reconnect = null;
 
         int ncommand = 0;
         Keyboard_BTUnicode bleDevice = new Keyboard_BTUnicode();
@@ -952,6 +953,15 @@ namespace BluetoothDeviceController.SpecialtyPages
             await DoNotifyKeyCommand();
         }
 
+        private void UndoKeyCommandEvent()
+        {
+            if (KeyCommandNotifySetup)
+            {
+                KeyCommandNotifySetup = false;
+                bleDevice.KeyCommandEvent -= BleDevice_KeyCommandEvent;
+            }
+        }
+
         private async Task DoNotifyKeyCommand()
         {
             SetStatusActive(true);
@@ -1054,11 +1064,16 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             // CHANGE: call DoInitializeAsync() instead
             SetStatus("Reading device");
+            UndoKeyCommandEvent();
+            await Reconnect?.ReconnectAsync();
+#if NEVER_EVER_DEFINED
+// Original code
             SetStatusActive(true);
             //await bleDevice.EnsureCharacteristicAsync(CharacteristicsEnum.All_enum, true);
             bleDevice.NotifyKeyPressRemoveCharacteristicCallback();
             await DoInitializeAsync();
             SetStatusActive(false);
+#endif
         }
 
 

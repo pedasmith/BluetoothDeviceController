@@ -37,7 +37,17 @@ The final project is 9 CircuitPython files which are about 1,000 lines of Circui
 
 ## IP: Reading the Pins is Step One
 
-Step one (after getting all the parts and software) is to figure out reading in the keypad. 
+Step one (after getting all the parts and software) is to figure out reading in the keypad. All the code for this is in AtariCX85_Feather.py file but the actual keyboard table (to convert the Atari codes into something a bit more standard) are in KeyboardTables.py.
+
+I tried to divide the code into sections: **LED + LOG** is for logging data and lighting the color LED, **Features** is for my features flag (it controls whether the keyboard will do deep sleeps), the **AtariCx85** sections controls the keboard through the 9-pin "Joystick" interface, **Bluetooth LE** is for Bluetooth, **Power and battery** is for power (rather messy), and **Timer** for the timers. 
+
+There's a timer state machine in TimCode.py. You provide it with information about what's happending (e.g., "the user did something" or "a timer went off") and it will tell you what needs to happen ("should blank the screen").
+
+### The AtariCx85 sections
+
+The key pin on the Atari CX85 is the trigger pin. The trigger is normally at about 3 volts and will dip to 0 volts when any key is pressed. The 0 volts will read as "False"
+
+
 
 ## Diversion: getting the time from a Bluetooth Current Time Service
 

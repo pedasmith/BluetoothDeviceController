@@ -23,10 +23,14 @@ using Windows.UI.Xaml.Navigation;
 
 namespace BTUniversalKeyboard
 {
+    public interface IReconnect
+    {
+        Task ReconnectAsync();
+    }
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Page, IReconnect
     {
         public MainPage()
         {
@@ -35,6 +39,12 @@ namespace BTUniversalKeyboard
         }
 
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            uiKeyboard.Reconnect = this;
+            await ReconnectAsync();
+        }
+
+        public async Task ReconnectAsync()
         {
             uiAnnunciator.Activity(AnnunciatorActivity.Initial);
             await Connect();

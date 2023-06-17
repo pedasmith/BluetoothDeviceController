@@ -6,8 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="400"
-    d:DesignWidth="400">
+    d:DesignHeight="210"
+    d:DesignWidth="410">
 
     <UserControl.Resources>
         <Style TargetType="TextBlock" x:Name="sTitle">
@@ -47,7 +47,7 @@
                 <StackPanel Orientation="Horizontal">
                     <Button Content="Start" Click="OnStartServer" />
                     <Button Content="Stop" Click="OnStopServer" />
-                    <Button Content="Clear" Click="OnClearScreen" />
+                    <Button Content="Clear" Click="OnClearScreen" x:Name="uiClear" Visibility="Collapsed" />
                 </StackPanel>
                 <TextBlock Style="{StaticResource sTimeLabel}">
                     <Run Text="Current Time: " />
@@ -55,13 +55,15 @@
                 <TextBlock Style="{StaticResource sTime}">
                     <Run x:Name="uiCurrentTime" Text="(not set)"/>
                 </TextBlock>
-                <TextBlock Style="{StaticResource sTimeLabel}">
-                    <Run Text="Last read time: " />
-                </TextBlock>
-                <TextBlock Style="{StaticResource sTime}">
-                    <Run x:Name="uiLastReadTime" Text="(not set)" />
-                </TextBlock>
-            </StackPanel>
+                <StackPanel x:Name="uiAllReadValues" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource sTimeLabel}">
+                        <Run Text="Last read time: " />
+                    </TextBlock>
+                        <TextBlock Style="{StaticResource sTime}">
+                        <Run x:Name="uiLastReadTime" Text="(not set)" />
+                        </TextBlock>
+                </StackPanel>
+                </StackPanel>
             <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch">
                 <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
             </ScrollViewer>
