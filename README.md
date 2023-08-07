@@ -9,3 +9,16 @@ If you're a hardware developer, you'll find here JSON files that describe many d
 The JSON says which services and characteristics different devices support plus the math needed to convert the raw data into something usable. 
 
 The app also serves as a simple way to explore your Bluetooth devices; it will list devices that are found and what their services and characteristics are. There's code to create the JSON files from on-the-air Bluetooth, and code to convert the JSON files into C# protocol code and C#/XAML UI code. It's not awesome code, but it is auto-generated, which is super useful.
+
+
+# Other projects
+
+## SmallProjects\BluetoothCurrentTimeServer and Adafruit-Clue and Clue-Clock
+
+The BluetoothTimeServer is a tiny C# app ((Store link)[https://apps.microsoft.com/store/detail/simple-bluetooth-current-time-service/9NJQ3TD3K06F]) that acts as a Bluetooth SIG "Current Time Service" source.
+
+The Adafruit Clue-clock is a couple of Python files that 
+- have Python code to read from the Current Time Service
+- act as a clock that can reset itself.
+
+That directory also blog posts, etc, about the project.

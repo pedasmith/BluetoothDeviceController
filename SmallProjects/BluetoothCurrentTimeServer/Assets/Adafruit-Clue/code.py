@@ -60,14 +60,12 @@ else:
     clock.datetime = now
     DisplayBTEnd(display, "OK")
 
+
+# Do a loop to run the clock. This is slightly off
+# because it will likely occasionally skip a second.
 while True:
     DisplayTime(display, clock.datetime)
     time.sleep(1)
 
-# while True:
-#    led.value = True
-#    time.sleep(0.5)
-#    led.value = False
-#    time.sleep(0.5)
 
 
