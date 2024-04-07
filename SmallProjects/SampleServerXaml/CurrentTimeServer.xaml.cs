@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.WebUI;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -35,7 +36,7 @@ namespace SampleServerXaml
 #if DEBUG
             uiClear.Visibility = Visibility.Visible;
 #endif
-            await DoStartServer();
+            await DoStartServer(); // Really start it? Or wait until the units are filled in?
         }
 
         // Thread UpdateTimeThread = null;
@@ -60,33 +61,66 @@ namespace SampleServerXaml
         {
             await DoStartServer();
         }
+
         GattLocalCharacteristic CurrentTimeCharacteristic = null;
+        GattLocalCharacteristic UserUnitPreferencesCharacteristic = null;
+        string TemperatureUnits = "";
+        string TimeUnits = "";
         private async Task DoStartServer()
         {
             var timeServiceUuid = Guid.Parse("00001805-0000-1000-8000-00805f9b34fb");
             var currentTimeUuid = Guid.Parse("00002A2B-0000-1000-8000-00805f9b34fb");
+            var userUnitPreferencesUuid = BtUnits.UserUnitPreferenceGuid; // most likely 0x8020
+
+
+            TemperatureUnits = (uiTemp.SelectedItem as ComboBoxItem).Tag as string;
+            TimeUnits = (uiTime.SelectedItem as ComboBoxItem).Tag as string;
+
+
             GattServiceProviderResult result = await GattServiceProvider.CreateAsync(timeServiceUuid);
             if (result.Error != Windows.Devices.Bluetooth.BluetoothError.Success)
             {
                 Log($"Error: GattServiceProvider.CreateAsync failed with {result.Error}");
                 return;
             }
-
             ServiceProvider = result.ServiceProvider;
-            var p = new GattLocalCharacteristicParameters();
-            p.WriteProtectionLevel = GattProtectionLevel.Plain;
-            p.UserDescription = "Current time (year/month/day/h/m/s and more)";
-            p.ReadProtectionLevel = GattProtectionLevel.Plain;
-            p.CharacteristicProperties = GattCharacteristicProperties.Read | GattCharacteristicProperties.Notify;
-            var cresult = await ServiceProvider.Service.CreateCharacteristicAsync(currentTimeUuid, p);
+
+            //
+            // Make the CurrentTime characteristic
+            //
+            var currentTimeParameters = new GattLocalCharacteristicParameters();
+            currentTimeParameters.WriteProtectionLevel = GattProtectionLevel.Plain;
+            currentTimeParameters.UserDescription = "Current time (year/month/day/h/m/s and more)";
+            currentTimeParameters.ReadProtectionLevel = GattProtectionLevel.Plain;
+            currentTimeParameters.CharacteristicProperties = GattCharacteristicProperties.Read | GattCharacteristicProperties.Notify;
+            var cresult = await ServiceProvider.Service.CreateCharacteristicAsync(currentTimeUuid, currentTimeParameters);
             if (cresult.Error != Windows.Devices.Bluetooth.BluetoothError.Success)
             {
-                Log($"Error: GattServiceProvider.CreateAsync failed with {cresult.Error}");
+                Log($"Error: GattServiceProvider.CreateAsync for time failed with {cresult.Error}");
                 return;
             }
             CurrentTimeCharacteristic = cresult.Characteristic;
             CurrentTimeCharacteristic.ReadRequested += CurrentTimeCharacteristic_ReadRequested;
             CurrentTimeCharacteristic.SubscribedClientsChanged += CurrentTimeCharacteristic_SubscribedClientsChanged;
+
+            //
+            // Make the UserUnitPreferences characteristic
+            //
+            var userUnitPreferencesParameters = new GattLocalCharacteristicParameters();
+            userUnitPreferencesParameters.WriteProtectionLevel = GattProtectionLevel.Plain;
+            userUnitPreferencesParameters.UserDescription = "User display preferences (meter/foot, etc.)";
+            userUnitPreferencesParameters.ReadProtectionLevel = GattProtectionLevel.Plain;
+            userUnitPreferencesParameters.CharacteristicProperties = GattCharacteristicProperties.Read | GattCharacteristicProperties.Notify;
+            cresult = await ServiceProvider.Service.CreateCharacteristicAsync(userUnitPreferencesUuid, userUnitPreferencesParameters);
+            if (cresult.Error != Windows.Devices.Bluetooth.BluetoothError.Success)
+            {
+                Log($"Error: GattServiceProvider.CreateAsync for unit preferences failed with {cresult.Error}");
+                return;
+            }
+            UserUnitPreferencesCharacteristic = cresult.Characteristic;
+            UserUnitPreferencesCharacteristic.ReadRequested += UserUnitPreferencesCharacteristic_ReadRequested;
+            UserUnitPreferencesCharacteristic.SubscribedClientsChanged += UserUnitPreferencesCharacteristic_SubscribedClientsChanged;
+
 
             //
             // Now start advertising!
@@ -103,6 +137,98 @@ namespace SampleServerXaml
                 UpdateTimeTask = Task.Run(UpdateTimeOnThread);
             }
         }
+
+        // Track the open clients for each characteristic. These
+        // will be used by the Notify call.
+
+        IReadOnlyList<GattSubscribedClient> TimeClientList = null;
+        IReadOnlyList<GattSubscribedClient> UserUnitsPreferencesClientList = null;
+
+        //
+        // Everything for the UserUnitPreferencesCharacteristic
+        //
+
+        /// <summary>
+        /// Fill in the BtUnits from the UX. If no BtUnits provided, will make one. Will only 
+        /// update values are that filled in -- if there's no prefernce in the UX, the BtUnits
+        /// that was passed in will be unchanged.
+        /// </summary>
+        /// <param name="retval"></param>
+        /// <returns></returns>
+        private BtUnits FillBtUnits(BtUnits retval = null)
+        {
+            if (retval == null) retval = new BtUnits();
+            //var tempunits = (uiTemp.SelectedItem as ComboBoxItem).Tag as string;
+            System.Console.WriteLine($"DBG: temp units {TemperatureUnits}");
+            switch (TemperatureUnits)
+            {
+                case "celcius": retval.TemperaturePref = BtUnits.Temperature.celsius; break;
+                case "fahrenheit": retval.TemperaturePref = BtUnits.Temperature.fahrenheit; break;
+                default:
+                    System.Console.WriteLine($"ERROR: unknown temp units {TemperatureUnits}");
+                    break;
+            }
+            //var timeunits = (uiTime.SelectedItem as ComboBoxItem).Tag as string;
+            System.Console.WriteLine($"DBG: time units {TimeUnits}");
+            switch (TimeUnits)
+            {
+                case "ampm": retval.TimePref = BtUnits.Time.hour12ampm; break;
+                case "24hr": retval.TimePref = BtUnits.Time.hour24; break;
+                default:
+                    System.Console.WriteLine($"ERROR: unknown time units {TimeUnits}");
+                    break;
+            }
+            return retval;
+        }
+        private void UserUnitPreferencesCharacteristic_SubscribedClientsChanged(GattLocalCharacteristic sender, object args)
+        {
+            UserUnitsPreferencesClientList = sender.SubscribedClients;
+        }
+
+        private async void UserUnitPreferencesCharacteristic_ReadRequested(GattLocalCharacteristic sender, GattReadRequestedEventArgs args)
+        {
+            var deferral = args.GetDeferral();
+
+            // Our familiar friend - DataWriter.
+
+            GattReadRequest request = await args.GetRequestAsync();
+            await DoUpdateUserUnitsPreferences(request);
+            deferral.Complete();
+        }
+
+
+        private async Task DoUpdateUserUnitsPreferences(GattReadRequest readRequest)
+        {
+            var units = FillBtUnits(new BtUnits());
+            var buffer = units.WriteToBuffer();
+            if (readRequest != null)
+            {
+                try
+                {
+                    readRequest.RespondWithValue(buffer);
+                }
+                catch (Exception)
+                {
+                    ;
+                }
+            }
+            if (UserUnitsPreferencesClientList != null && UserUnitsPreferencesClientList.Count > 0)
+            {
+                try
+                {
+                    await UserUnitPreferencesCharacteristic.NotifyValueAsync(buffer);
+                }
+                catch (Exception)
+                {
+                    ;
+                }
+            }
+        }
+
+
+        //
+        // UX methods for updating time
+        //
 
         private async Task UpdateTimeOnThread()
         {
@@ -123,11 +249,12 @@ namespace SampleServerXaml
                 }
             }
         }
-        IReadOnlyList<GattSubscribedClient> ClientList = null;
-        private void CurrentTimeCharacteristic_SubscribedClientsChanged(GattLocalCharacteristic sender, object args)
-        {
-            ClientList = sender.SubscribedClients;
-        }
+
+        //
+        // Everything for the CurrentTimeCharacteristic
+        //
+
+
         private static byte ConvertToIsoDayOfWeek(DayOfWeek dow)
         {
             if ((int)dow > 7) return 0; // error or unknown
@@ -161,13 +288,18 @@ namespace SampleServerXaml
 
             return writer.DetachBuffer();
         }
+        private void CurrentTimeCharacteristic_SubscribedClientsChanged(GattLocalCharacteristic sender, object args)
+        {
+            TimeClientList = sender.SubscribedClients;
+        }
+
         private async void CurrentTimeCharacteristic_ReadRequested(GattLocalCharacteristic sender, GattReadRequestedEventArgs args)
         {
             var deferral = args.GetDeferral();
 
             // Our familiar friend - DataWriter.
 
-            var request = await args.GetRequestAsync();
+            GattReadRequest request = await args.GetRequestAsync();
             await DoUpdateTime(request);
             deferral.Complete();
         }
@@ -176,7 +308,7 @@ namespace SampleServerXaml
         {
             var now = DateTime.Now;
             var buffer = CreateCurrentTimeBuffer(now);
-            bool updatedBT = false;
+            bool updatedBT = false; // Used when updating display to show the last update time
             if (readRequest != null)
             {
                 updatedBT = true;
@@ -189,7 +321,7 @@ namespace SampleServerXaml
                     ;
                 }
             }
-            if (ClientList != null && ClientList.Count > 0)
+            if (TimeClientList != null && TimeClientList.Count > 0)
             {
                 try
                 {
@@ -216,14 +348,25 @@ namespace SampleServerXaml
 
         }
 
-
+        //
+        // UX calls
+        //
 
         private void OnStopServer(object sender, RoutedEventArgs e)
         {
             if (ServiceProvider == null) return;
-            ClientList = null;
+            TimeClientList = null;
+            UserUnitsPreferencesClientList = null;
             ServiceProvider.StopAdvertising();
             ServiceProvider = null;
+        }
+
+        private void OnCheckAdvanced(object sender, RoutedEventArgs e)
+        {
+            var cb = sender as CheckBox;
+            if (cb == null) return; // Can never happen
+            var vis = cb.IsChecked.Value ? Visibility.Visible : Visibility.Collapsed;
+            uiAdvanced.Visibility = vis;
         }
     }
 }

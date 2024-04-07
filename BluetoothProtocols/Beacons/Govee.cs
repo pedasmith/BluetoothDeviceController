@@ -101,7 +101,7 @@ namespace BluetoothProtocols.Beacons
                                 {
                                     var drtype = DataReader.FromBuffer(section.Data);
                                     drtype.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
-                                    var typecompany = dr.ReadInt16();
+                                    var typecompany = dr.ReadInt16(); // TODO: why isn't this reading from drtype?
                                     var b0 = dr.ReadByte();
                                     var b1 = dr.ReadByte();
                                     if (b0 == 0x01 && b1 == 0x01)
@@ -117,7 +117,7 @@ namespace BluetoothProtocols.Beacons
                                 break;
                         }
                     }
-
+                    // At this point, we've read in two bytes from dr.
                     switch (sensorType)
                     {
                         case SensorType.H5074:

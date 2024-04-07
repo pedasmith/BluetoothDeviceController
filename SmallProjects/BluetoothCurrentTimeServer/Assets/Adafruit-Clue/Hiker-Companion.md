@@ -1,12 +1,13 @@
 # The Hiker's Companion
 
-The Hiker's Companion is an Adafuit Clue with hiker-friendly features. If you make one, you should pick a large battery -- the typical 370 mAH battery will only run the device for 6 to 8 hours, which isn't enough for safety. A Hiker Companian really needs to be good enough Note that the device uses about 50 mA of power.
+The Hiker's Companion is an Adafuit Clue with hiker-friendly features. If you make one, you should pick a large battery -- the typical 370 mAH battery will only run the device for 6 to 8 hours, which isn't enough for safety. A Hiker Companian really needs to be good enough. Note that the device uses about 50 mA of power.
 
 The device can use other microcontrollers and displays.
 
 The display can show: 
 1. Large title + 3 lines of 10 chars
 2. Small title + 4 lines of 10 chars
+3. Large value + 7 lines of small text
 
 
 1. Pressure including barometer + height from a starting point
@@ -24,12 +25,12 @@ There's 3 displays
 ### Basic clock
 Shows the time, date, and day of week
 Next --> Hiker data
-Select --> Flashlight / Turn off display
+Select --> Flashlight
 
 ### Hiker data
 Shows the compass, pressure, temp + humidity  
 Next --> Setup
-Select --> Flashlight / turn off display
+Select --> Flashlight
 
 ### Setup (small title)
 Does common setups that the user will generally do once. These are stored in the permanent memory, so they will be saved from one use to the next.
@@ -39,6 +40,7 @@ temp --> C/F
 pressure --> height/PSI/mbar
 alarm --> off / beep twice / continuous beep
 Hiker Settings --> 
+Advanced settings -->
 
 ### Hiker Settings
 The hiker settings are all the settings that a hiker might want to do at the start of a hike. Note that it's a little funny that these "once a hike" settings are done 
@@ -73,7 +75,23 @@ Note that this is guaranteed to find the right value in about 8 steps, so it's p
 
 The user needs to be able to set the Sea Level Pressure (SLP), possibly from the weird SLP format (where "100" means "1100" and "600" means "9600")
 
-With the number setting, the displa
+#### Current version 2023-08-03
+
+With the number setting, the display will look like this:
+
+Title is the number to set (e.g., "1154")
+1. What's being set ("SLP" or "Sea Level Pressure")(light gray)
+2. Next
+3. Clear
+4. Digits which wraps between 1000, 100, 10, 1, .1. The values are settable
+5. +digit
+6. -digit
+
+The left button selects between 2..6, wrapping around. The right button will select the action. 
+
+
+#### Original concept
+With the number setting, the display will look like this:
 
 Title is the number to set (e.g., "1154") displayed as \*1\*154
 1. What's being set ("SLP" or "Sea Level Pressure")(light gray)
@@ -111,6 +129,26 @@ Example: the time is 7:12 and the user wants it to be 9:59
 1. LEFT (+) right right (9:12)
 2. LEFT LEFT (10 minutes) right right right right (9:52)
 3. LEFT LEFT (Minutes -) right right right (9:59)
+
+
+## Picking a new device
+
+When the project was mostly done, my Clue stopped working. Now I need to pick a new controller (sad face). What I want is something with Bluetooth (**BLE**), a RTC, pressure/humidity (**PTH**), altitude (**alt**), compass (**mag**)
+
+Choices are
+
+| device | BT | charging | RTC |PTH|alt|compass|
+|---|---|---|---|---|---|---|
+|[**nrf52840** feather](https://www.adafruit.com/product/4062)|?|BT|no|no|no|no
+|[**nrf52832** feather](https://www.adafruit.com/product/3406)|charge|BT|no|no|no|no
+|[**nrf52840** itsy bitsy](https://www.adafruit.com/product/4481)|?|BT
+
+| Syntax      | Description |
+| ----------- | ----------- |
+| Header      | Title       |
+| Paragraph   | Text        |
+
+
 
 ## Details
 

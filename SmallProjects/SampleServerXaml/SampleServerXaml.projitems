@@ -15,6 +15,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BtUnits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurrentTimeServer.xaml.cs" />
   </ItemGroup>
 </Project>

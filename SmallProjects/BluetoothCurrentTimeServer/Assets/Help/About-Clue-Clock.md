@@ -145,6 +145,17 @@ https://learn.adafruit.com/deep-sleep-with-circuitpython/overview
 2. Try a deep sleep (will need to stop listening to BT :-) )
 3. Try the alarm.sleep_memory?
 
+Doing all of those reduces the power consumption from about 50 mA to about 45 mA -- which is hardly worth it.
+
+Here's the sensors we can control:
+
+* Adafruit [LSM6DS accel/gyro](https://github.com/adafruit/Adafruit_CircuitPython_LSM6DS)
+* Adafruit [LIS3MDL magnetometer](https://github.com/adafruit/Adafruit_CircuitPython_LIS3MDL)
+* Adafruit [APDS9960 proximity and light](https://github.com/adafruit/Adafruit_CircuitPython_APDS9960) has an "enable"
+* Adafruit [BMP280 temp/pressure](https://github.com/adafruit/Adafruit_CircuitPython_BMP280)
+* Adafruit [SHT31D temp/humidity](https://github.com/adafruit/Adafruit_CircuitPython_SHT31D)
+* Adafruit [NeoPixel](https://github.com/adafruit/Adafruit_CircuitPython_NeoPixel)
+* Adafruit [Display Text](https://github.com/adafruit/Adafruit_CircuitPython_Display_Text)
 
 
 ## Links to technical docs
@@ -172,6 +183,16 @@ https://learn.adafruit.com/deep-sleep-with-circuitpython/overview
 3. Double-client reset button
 4. Drag and drop the .UF2 file
 5. You will know it worked because the drive is now **CIRCUITPY**
-6. Download the libraries that are mentioned in the documentation. Open the zip file, Install the 6 mpy files and 6 directories in the list
+6. Download the libraries that are mentioned in the documentation. Open the zip file, Install the 6 mpy files and 6 directories in the [list](https://learn.adafruit.com/adafruit-clue/clue-circuitpython-libraries)
+
+adafruit_bmp280.mpy, adafruit_clue.mpy, adafruit_lis3mdl.mpy, adafruit_sht31d.mpy, adafruit_slideshow.mpy, neopixel.mpy
+
+adafruit_apds9960
+adafruit_bus_device
+adafruit_display_shapes
+adafruit_display_text
+adafruit_lsm6ds
+adafruit_register
+
 7. Also install the **adafruit_ble** library. This is essential for setting the clock
 7. Start mu, the editor

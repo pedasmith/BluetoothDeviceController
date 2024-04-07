@@ -11,7 +11,7 @@
 
     <UserControl.Resources>
         <Style TargetType="TextBlock" x:Name="sTitle">
-            <Setter Property="FontSize" Value="22" />
+            <Setter Property="FontSize" Value="20" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontFamily" Value="Consolas" />
             <Setter Property="HorizontalAlignment" Value="Center" />
@@ -21,7 +21,7 @@
             <Setter Property="FontFamily" Value="Consolas" />
         </Style>
         <Style TargetType="TextBlock" x:Name="sTime">
-            <Setter Property="FontSize" Value="28" />
+            <Setter Property="FontSize" Value="18" />
             <Setter Property="FontFamily" Value="Consolas" />
             <Setter Property="Margin" Value="20,0,0,0" />
         </Style>
@@ -30,7 +30,9 @@
             <Setter Property="FontFamily" Value="Consolas" />
         </Style>
         <Style TargetType="Button">
-            <Setter Property="Margin" Value="4" />
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Margin" Value="2,0,0,0" />
+            <Setter Property="Padding" Value="2" />
         </Style>
     </UserControl.Resources>
 
@@ -43,7 +45,14 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <StackPanel>
-                <TextBlock Style="{StaticResource sTitle}">🕰 Current Time Service</TextBlock>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Style="{StaticResource sTitle}">🕰 Current Time Service</TextBlock>
+                    <CheckBox Grid.Column="1" Content="Advanced" IsChecked="False" Margin="22,0,0,0" Checked="OnCheckAdvanced" Unchecked="OnCheckAdvanced" />
+                </Grid>
                 <StackPanel Orientation="Horizontal">
                     <Button Content="Start" Click="OnStartServer" />
                     <Button Content="Stop" Click="OnStopServer" />
@@ -59,11 +68,23 @@
                     <TextBlock Style="{StaticResource sTimeLabel}">
                         <Run Text="Last read time: " />
                     </TextBlock>
-                        <TextBlock Style="{StaticResource sTime}">
+                    <TextBlock Style="{StaticResource sTime}">
                         <Run x:Name="uiLastReadTime" Text="(not set)" />
-                        </TextBlock>
+                    </TextBlock>
                 </StackPanel>
+                <StackPanel x:Name="uiAdvanced" Orientation="Horizontal" Visibility="Collapsed" >
+                    <ComboBox x:Name="uiTemp" Width="140" Header="Temperature" SelectedIndex="0">
+                        <ComboBoxItem Content="NoPreference" Tag=""/>
+                        <ComboBoxItem Content="Celcius" Tag="celcius" />
+                        <ComboBoxItem Content="Fahrenheit" Tag="fahrenheit" />
+                    </ComboBox>
+                    <ComboBox x:Name="uiTime" Width="140" Header="Time" SelectedIndex="0" Margin="20,0,0,0">
+                        <ComboBoxItem Content="NoPreference" Tag="" />
+                        <ComboBoxItem Content="AM/PM" Tag="ampm"/>
+                        <ComboBoxItem Content="24 Hour" Tag="24hr" />
+                    </ComboBox>
                 </StackPanel>
+            </StackPanel>
             <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch">
                 <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
             </ScrollViewer>
