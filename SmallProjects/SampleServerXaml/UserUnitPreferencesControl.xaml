@@ -53,12 +53,12 @@
                     <TextBlock Grid.Column="0" Style="{StaticResource sTitle}">Unit preferences</TextBlock>
                 </Grid>
                 <StackPanel x:Name="uiAdvanced" Orientation="Horizontal" Visibility="Visible" >
-                    <ComboBox x:Name="uiTemp" Width="140" Header="Temperature" SelectedIndex="1"> <!-- TODO: set back to zero? -->
+                    <ComboBox x:Name="uiTemp" Width="140" Header="Temperature" SelectedIndex="0" SelectionChanged="OnChangePreference">
                         <ComboBoxItem Content="NoPreference" Tag=""/>
                         <ComboBoxItem Content="Celcius" Tag="celcius" />
                         <ComboBoxItem Content="Fahrenheit" Tag="fahrenheit" />
                     </ComboBox>
-                    <ComboBox x:Name="uiTime" Width="140" Header="Time" SelectedIndex="0" Margin="20,0,0,0">
+                    <ComboBox x:Name="uiTime" Width="140" Header="Time" SelectedIndex="0" Margin="20,0,0,0"  SelectionChanged="OnChangePreference">
                         <ComboBoxItem Content="NoPreference" Tag="" />
                         <ComboBoxItem Content="AM/PM" Tag="ampm"/>
                         <ComboBoxItem Content="24 Hour" Tag="24hr" />

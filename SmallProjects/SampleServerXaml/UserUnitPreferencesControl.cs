@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothCurrentTimeServer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -15,9 +16,11 @@ namespace SampleServerXaml
     public interface FillBtUnits
     {
         BtUnits FillBtUnits(BtUnits retval = null);
+        event EventHandler OnPreferredUnitsChanged;
     }
     public sealed partial class UserUnitPreferencesControl : UserControl, FillBtUnits
     {
+        public event EventHandler OnPreferredUnitsChanged;
         public UserUnitPreferencesControl()
         {
             this.InitializeComponent();
@@ -26,8 +29,40 @@ namespace SampleServerXaml
 
         private void UserUnitPreferencesControl_Loaded(object sender, RoutedEventArgs e)
         {
+            // Set the initial values from the App.SavedBtUnits 
+            string savedtemp = "";
+            switch (App.SavedBtUnits.TemperaturePref)
+            {
+                case BtUnits.Temperature.fahrenheit: savedtemp = "fahrenheit"; break;
+                case BtUnits.Temperature.celsius: savedtemp = "celcius"; break;
+                case BtUnits.Temperature.kelvin: savedtemp = "kelvin"; break; // NOTE: not actually functional 2024-04-08
+            }
+            foreach (var child in uiTemp.Items)
+            {
+                var cbi = child as ComboBoxItem;
+                if (cbi == null) continue;
+                if (cbi.Tag as string == savedtemp)
+                {
+                    uiTemp.SelectedItem = cbi;
+                }
+            }
         }
+        // Wrap event invocations inside a protected virtual method
+        // to allow derived classes to override the event invocation behavior
+        private void RaisePreferredUnitsChanged()
+        {
+            // Link: https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/events/how-to-publish-events-that-conform-to-net-framework-guidelines
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var raiseEvent = OnPreferredUnitsChanged;
 
+            // Event will be null if there are no subscribers
+            if (raiseEvent != null)
+            {
+                raiseEvent(this, null);
+            }
+        }
 
         private void Log(string text)
         {
@@ -40,8 +75,11 @@ namespace SampleServerXaml
             uiLog.Text = "";
         }
 
-        string TemperatureUnits = "";
-        string TimeUnits = "";
+        private void OnChangePreference(object sender, SelectionChangedEventArgs args)
+        {
+            RaisePreferredUnitsChanged();
+        }
+
         //
         // Everything for the UserUnitPreferencesCharacteristic
         //
@@ -57,13 +95,17 @@ namespace SampleServerXaml
         {
             if (retval == null) retval = new BtUnits();
             //var tempunits = (uiTemp.SelectedItem as ComboBoxItem).Tag as string;
-            System.Console.WriteLine($"DBG: temp units {TemperatureUnits}");
+            var TemperatureUnits = (uiTemp.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
+            var TimeUnits = (uiTime.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
+
+
+            System.Console.WriteLine($"DBG: savedtemp units {TemperatureUnits}");
             switch (TemperatureUnits)
             {
                 case "celcius": retval.TemperaturePref = BtUnits.Temperature.celsius; break;
                 case "fahrenheit": retval.TemperaturePref = BtUnits.Temperature.fahrenheit; break;
                 default:
-                    System.Console.WriteLine($"ERROR: unknown temp units {TemperatureUnits}");
+                    System.Console.WriteLine($"ERROR: unknown savedtemp units {TemperatureUnits}");
                     break;
             }
             //var timeunits = (uiTime.SelectedItem as ComboBoxItem).Tag as string;

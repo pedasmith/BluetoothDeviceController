@@ -21,6 +21,11 @@ namespace BluetoothCurrentTimeServer
             SetPreferredWindowSize(preferredSize);
         }
 
+        public BtUnits FillBtUnits(BtUnits units = null)
+        {
+            return uiUnits.FillBtUnits(units);
+        }
+
         private void SetPreferredWindowSize(Size preferredSize)
         {
             var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;

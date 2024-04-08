@@ -14,7 +14,22 @@ namespace SampleServerXaml
 {
     public sealed partial class CurrentTimeServer : UserControl
     {
-        public FillBtUnits FillBtUnits = null;
+        FillBtUnits _fillBtUnits = null;
+        public FillBtUnits FillBtUnits
+        {
+            get { return _fillBtUnits; }
+            set
+            {
+                _fillBtUnits = value;
+                _fillBtUnits.OnPreferredUnitsChanged += _fillBtUnits_OnPreferredUnitsChanged;
+            }
+        }
+
+        private async void _fillBtUnits_OnPreferredUnitsChanged(object sender, EventArgs e)
+        {
+            await DoUpdateUserUnitsPreferences(null);
+        }
+
         public CurrentTimeServer()
         {
             this.InitializeComponent();
@@ -54,18 +69,11 @@ namespace SampleServerXaml
 
         GattLocalCharacteristic CurrentTimeCharacteristic = null;
         GattLocalCharacteristic UserUnitPreferencesCharacteristic = null;
-        //string TemperatureUnits = "";
-        //string TimeUnits = "";
         private async Task DoStartServer()
         {
             var timeServiceUuid = Guid.Parse("00001805-0000-1000-8000-00805f9b34fb");
             var currentTimeUuid = Guid.Parse("00002A2B-0000-1000-8000-00805f9b34fb");
-            var userUnitPreferencesUuid = BtUnits.UserUnitPreferenceGuid; // most likely 0x8020
-
-
-            //TemperatureUnits = (uiTemp.SelectedItem as ComboBoxItem).Tag as string;
-            //TimeUnits = (uiTime.SelectedItem as ComboBoxItem).Tag as string;
-
+            var userUnitPreferencesUuid = BtUnits.UserUnitPreferenceGuid; // FYI: most likely 0x8020
 
             GattServiceProviderResult result = await GattServiceProvider.CreateAsync(timeServiceUuid);
             if (result.Error != Windows.Devices.Bluetooth.BluetoothError.Success)
@@ -138,40 +146,6 @@ namespace SampleServerXaml
         // Everything for the UserUnitPreferencesCharacteristic
         //
 
-/// <summary>
-/// Fill in the BtUnits from the UX. If no BtUnits provided, will make one. Will only 
-/// update values are that filled in -- if there's no prefernce in the UX, the BtUnits
-/// that was passed in will be unchanged.
-/// </summary>
-/// <param name="retval"></param>
-/// <returns></returns>
-#if NEVER_EVER_DEFINED
-        private BtUnits zzzFillBtUnits(BtUnits retval = null)
-        {
-            if (retval == null) retval = new BtUnits();
-            //var tempunits = (uiTemp.SelectedItem as ComboBoxItem).Tag as string;
-            System.Console.WriteLine($"DBG: temp units {TemperatureUnits}");
-            switch (TemperatureUnits)
-            {
-                case "celcius": retval.TemperaturePref = BtUnits.Temperature.celsius; break;
-                case "fahrenheit": retval.TemperaturePref = BtUnits.Temperature.fahrenheit; break;
-                default:
-                    System.Console.WriteLine($"ERROR: unknown temp units {TemperatureUnits}");
-                    break;
-            }
-            //var timeunits = (uiTime.SelectedItem as ComboBoxItem).Tag as string;
-            System.Console.WriteLine($"DBG: time units {TimeUnits}");
-            switch (TimeUnits)
-            {
-                case "ampm": retval.TimePref = BtUnits.Time.hour12ampm; break;
-                case "24hr": retval.TimePref = BtUnits.Time.hour24; break;
-                default:
-                    System.Console.WriteLine($"ERROR: unknown time units {TimeUnits}");
-                    break;
-            }
-            return retval;
-        }
-#endif
         private void UserUnitPreferencesCharacteristic_SubscribedClientsChanged(GattLocalCharacteristic sender, object args)
         {
             UserUnitsPreferencesClientList = sender.SubscribedClients;
@@ -180,9 +154,6 @@ namespace SampleServerXaml
         private async void UserUnitPreferencesCharacteristic_ReadRequested(GattLocalCharacteristic sender, GattReadRequestedEventArgs args)
         {
             var deferral = args.GetDeferral();
-
-            // Our familiar friend - DataWriter.
-
             GattReadRequest request = await args.GetRequestAsync();
             await DoUpdateUserUnitsPreferences(request);
             deferral.Complete();
@@ -290,9 +261,6 @@ namespace SampleServerXaml
         private async void CurrentTimeCharacteristic_ReadRequested(GattLocalCharacteristic sender, GattReadRequestedEventArgs args)
         {
             var deferral = args.GetDeferral();
-
-            // Our familiar friend - DataWriter.
-
             GattReadRequest request = await args.GetRequestAsync();
             await DoUpdateTime(request);
             deferral.Complete();
@@ -354,14 +322,5 @@ namespace SampleServerXaml
             ServiceProvider.StopAdvertising();
             ServiceProvider = null;
         }
-#if NEVER_EVER_DEFINED
-        private void zzOnCheckAdvanced(object sender, RoutedEventArgs e)
-        {
-            var cb = sender as CheckBox;
-            if (cb == null) return; // Can never happen
-            var vis = cb.IsChecked.Value ? Visibility.Visible : Visibility.Collapsed;
-            uiAdvanced.Visibility = vis;
-        }
-#endif
     }
 }
