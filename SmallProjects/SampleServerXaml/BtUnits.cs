@@ -6,7 +6,7 @@ using Windows.Storage.Streams;
 
 namespace SampleServerXaml
 {
-    class BtUnits
+    public class BtUnits
     {
         /// <summary>
         /// Picked 8020 for the UserUnitPreferences

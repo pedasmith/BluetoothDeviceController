@@ -14,6 +14,7 @@ namespace SampleServerXaml
 {
     public sealed partial class CurrentTimeServer : UserControl
     {
+        public FillBtUnits FillBtUnits = null;
         public CurrentTimeServer()
         {
             this.InitializeComponent();
@@ -53,8 +54,8 @@ namespace SampleServerXaml
 
         GattLocalCharacteristic CurrentTimeCharacteristic = null;
         GattLocalCharacteristic UserUnitPreferencesCharacteristic = null;
-        string TemperatureUnits = "";
-        string TimeUnits = "";
+        //string TemperatureUnits = "";
+        //string TimeUnits = "";
         private async Task DoStartServer()
         {
             var timeServiceUuid = Guid.Parse("00001805-0000-1000-8000-00805f9b34fb");
@@ -62,8 +63,8 @@ namespace SampleServerXaml
             var userUnitPreferencesUuid = BtUnits.UserUnitPreferenceGuid; // most likely 0x8020
 
 
-            TemperatureUnits = (uiTemp.SelectedItem as ComboBoxItem).Tag as string;
-            TimeUnits = (uiTime.SelectedItem as ComboBoxItem).Tag as string;
+            //TemperatureUnits = (uiTemp.SelectedItem as ComboBoxItem).Tag as string;
+            //TimeUnits = (uiTime.SelectedItem as ComboBoxItem).Tag as string;
 
 
             GattServiceProviderResult result = await GattServiceProvider.CreateAsync(timeServiceUuid);
@@ -137,14 +138,15 @@ namespace SampleServerXaml
         // Everything for the UserUnitPreferencesCharacteristic
         //
 
-        /// <summary>
-        /// Fill in the BtUnits from the UX. If no BtUnits provided, will make one. Will only 
-        /// update values are that filled in -- if there's no prefernce in the UX, the BtUnits
-        /// that was passed in will be unchanged.
-        /// </summary>
-        /// <param name="retval"></param>
-        /// <returns></returns>
-        private BtUnits FillBtUnits(BtUnits retval = null)
+/// <summary>
+/// Fill in the BtUnits from the UX. If no BtUnits provided, will make one. Will only 
+/// update values are that filled in -- if there's no prefernce in the UX, the BtUnits
+/// that was passed in will be unchanged.
+/// </summary>
+/// <param name="retval"></param>
+/// <returns></returns>
+#if NEVER_EVER_DEFINED
+        private BtUnits zzzFillBtUnits(BtUnits retval = null)
         {
             if (retval == null) retval = new BtUnits();
             //var tempunits = (uiTemp.SelectedItem as ComboBoxItem).Tag as string;
@@ -169,6 +171,7 @@ namespace SampleServerXaml
             }
             return retval;
         }
+#endif
         private void UserUnitPreferencesCharacteristic_SubscribedClientsChanged(GattLocalCharacteristic sender, object args)
         {
             UserUnitsPreferencesClientList = sender.SubscribedClients;
@@ -188,7 +191,9 @@ namespace SampleServerXaml
 
         private async Task DoUpdateUserUnitsPreferences(GattReadRequest readRequest)
         {
-            var units = FillBtUnits(new BtUnits());
+            if (FillBtUnits == null) return; // shouldn't actually happen
+
+            var units = FillBtUnits.FillBtUnits(new BtUnits());
             var buffer = units.WriteToBuffer();
             if (readRequest != null)
             {
@@ -349,13 +354,14 @@ namespace SampleServerXaml
             ServiceProvider.StopAdvertising();
             ServiceProvider = null;
         }
-
-        private void OnCheckAdvanced(object sender, RoutedEventArgs e)
+#if NEVER_EVER_DEFINED
+        private void zzOnCheckAdvanced(object sender, RoutedEventArgs e)
         {
             var cb = sender as CheckBox;
             if (cb == null) return; // Can never happen
             var vis = cb.IsChecked.Value ? Visibility.Visible : Visibility.Collapsed;
             uiAdvanced.Visibility = vis;
         }
+#endif
     }
 }

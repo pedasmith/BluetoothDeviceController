@@ -1,6 +1,7 @@
 ﻿using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -43,6 +44,16 @@ namespace BluetoothCurrentTimeServer
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: Load state from previously suspended application
+                    var settings = Windows.Storage.ApplicationData.Current.RoamingSettings;
+
+                    // Save a setting locally on the device
+                    object userUnitSettingsRaw = null;
+                    settings.Values.TryGetValue("UserUnit", out userUnitSettingsRaw);
+                    var userUnitSettings = userUnitSettingsRaw as ApplicationDataCompositeValue;
+                    if (userUnitSettings != null)
+                    {
+                        // 
+                    }
                 }
 
                 // Place the frame in the current Window

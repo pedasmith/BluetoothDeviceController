@@ -13,9 +13,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)UserUnitPreferencesControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BtUnits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurrentTimeServer.xaml.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserUnitPreferencesControl.cs" />
   </ItemGroup>
 </Project>

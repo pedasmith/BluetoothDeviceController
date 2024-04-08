@@ -1,5 +1,7 @@
-﻿using Windows.Foundation;
+﻿using SampleServerXaml;
+using Windows.Foundation;
 using Windows.UI.ViewManagement;
+using Windows.UI.WebUI;
 using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -14,14 +16,15 @@ namespace BluetoothCurrentTimeServer
         public MainPage()
         {
             this.InitializeComponent();
-            var preferredSize = new Size(410, 240);
+            uiCurrentTimeServer.FillBtUnits = uiUnits;
+            var preferredSize = new Size(410, 30+2*210);  // Kind of a guess for size. t+1x = 240 t+2x=450 x=210 t=30
             SetPreferredWindowSize(preferredSize);
         }
 
         private void SetPreferredWindowSize(Size preferredSize)
         {
             var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-            if (true || localSettings.Values["launchedWithPrefSize"] == null)
+            if (true || localSettings.Values["launchedWithPrefSize"] == null) // TODO: shouldn't the true || be removed?
             {
                 // first app launch only!!
                 ApplicationView.PreferredLaunchViewSize = preferredSize;

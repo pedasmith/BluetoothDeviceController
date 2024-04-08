@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="SampleServerXaml.CurrentTimeServer"
+    x:Class="SampleServerXaml.UserUnitPreferencesControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SampleServerXaml"
@@ -50,33 +50,10 @@
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Style="{StaticResource sTitle}">🕰 Current Time Service</TextBlock>
-                    <!--
-                    <CheckBox Grid.Column="1" Content="Advanced" IsChecked="False" Margin="22,0,0,0" Checked="OnCheckAdvanced" Unchecked="OnCheckAdvanced" />
-                    -->
+                    <TextBlock Grid.Column="0" Style="{StaticResource sTitle}">Unit preferences</TextBlock>
                 </Grid>
-                <StackPanel Orientation="Horizontal">
-                    <Button Content="Start" Click="OnStartServer" />
-                    <Button Content="Stop" Click="OnStopServer" />
-                    <Button Content="Clear" Click="OnClearScreen" x:Name="uiClear" Visibility="Collapsed" />
-                </StackPanel>
-                <TextBlock Style="{StaticResource sTimeLabel}">
-                    <Run Text="Current Time: " />
-                </TextBlock>
-                <TextBlock Style="{StaticResource sTime}">
-                    <Run x:Name="uiCurrentTime" Text="(not set)"/>
-                </TextBlock>
-                <StackPanel x:Name="uiAllReadValues" Visibility="Collapsed">
-                    <TextBlock Style="{StaticResource sTimeLabel}">
-                        <Run Text="Last read time: " />
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource sTime}">
-                        <Run x:Name="uiLastReadTime" Text="(not set)" />
-                    </TextBlock>
-                </StackPanel>
-                <!--
-                <StackPanel x:Name="uiAdvanced" Orientation="Horizontal" Visibility="Collapsed" >
-                    <ComboBox x:Name="uiTemp" Width="140" Header="Temperature" SelectedIndex="0">
+                <StackPanel x:Name="uiAdvanced" Orientation="Horizontal" Visibility="Visible" >
+                    <ComboBox x:Name="uiTemp" Width="140" Header="Temperature" SelectedIndex="1"> <!-- TODO: set back to zero? -->
                         <ComboBoxItem Content="NoPreference" Tag=""/>
                         <ComboBoxItem Content="Celcius" Tag="celcius" />
                         <ComboBoxItem Content="Fahrenheit" Tag="fahrenheit" />
@@ -87,7 +64,6 @@
                         <ComboBoxItem Content="24 Hour" Tag="24hr" />
                     </ComboBox>
                 </StackPanel>
-                -->
             </StackPanel>
             <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch">
                 <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />

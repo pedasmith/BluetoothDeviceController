@@ -24,7 +24,8 @@
         </Grid.RowDefinitions>
         <TextBlock Style="{StaticResource sTitle}">Common Bluetooth Services</TextBlock>
         <VariableSizedWrapGrid Grid.Row="1">
-            <sample:CurrentTimeServer />
+            <sample:CurrentTimeServer x:Name="uiCurrentTimeServer" />
+            <sample:UserUnitPreferencesControl x:Name="uiUnits"/>
         </VariableSizedWrapGrid>
     </Grid>
 </Page>

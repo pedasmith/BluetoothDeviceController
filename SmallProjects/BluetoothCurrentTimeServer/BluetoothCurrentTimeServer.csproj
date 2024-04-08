@@ -178,6 +178,8 @@
     <None Include="Assets\Adafruit-Clue\code.py" />
     <None Include="Assets\Adafruit-Clue\HIker-Companion.md" />
     <None Include="Assets\Help\About-Clue-Clock.md" />
+    <None Include="Assets\Help\Version_BTCTS.md" />
+    <None Include="Assets\Help\Work_List.md" />
     <None Include="Package.StoreAssociation.xml" />
     <Content Include="Assets\Screenshots\Screenshot-2023-06-16.png" />
     <Content Include="Properties\Default.rd.xml" />
