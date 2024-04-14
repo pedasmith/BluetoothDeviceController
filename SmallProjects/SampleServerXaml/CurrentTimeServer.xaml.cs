@@ -14,6 +14,8 @@ namespace SampleServerXaml
 {
     public sealed partial class CurrentTimeServer : UserControl
     {
+        private const int MaxTimeInSeconds = 60;
+
         FillBtUnits _fillBtUnits = null;
         public FillBtUnits FillBtUnits
         {
@@ -33,6 +35,7 @@ namespace SampleServerXaml
         public CurrentTimeServer()
         {
             this.InitializeComponent();
+            uiProgressBar.Maximum = MaxTimeInSeconds;
             this.Loaded += CurrentTimeServer_Loaded;
         }
 
@@ -41,7 +44,7 @@ namespace SampleServerXaml
 #if DEBUG
             uiClear.Visibility = Visibility.Visible;
 #endif
-            await DoStartServer(); // Really start it? Or wait until the units are filled in?
+            await DoStartServer(); // Units will auto-start to old values + when updated do the notify thing as needed.
         }
 
         // Thread UpdateTimeThread = null;
@@ -132,9 +135,12 @@ namespace SampleServerXaml
 
             if (UpdateTimeTask == null)
             {
+                StartedTime = DateTime.Now;
                 UpdateTimeTask = Task.Run(UpdateTimeOnThread);
             }
         }
+
+        DateTime StartedTime = DateTime.MinValue;
 
         // Track the open clients for each characteristic. These
         // will be used by the Notify call.
@@ -202,10 +208,22 @@ namespace SampleServerXaml
                 try
                 {
                     await Task.Delay(1000); // Wait 1 second
+                    var now = DateTime.Now;
+                    var delta = now.Subtract(StartedTime).TotalSeconds;
+                    UIThreadHelper.CallOnUIThread(() => { uiProgressBar.Value = delta; });
+
                     if (ServiceProvider != null)
                     {
                         // Don't update if we're not actually providing a service.
                         await DoUpdateTime(null); // not in response to a read. But will update notify.
+                    }
+
+                    if (delta > MaxTimeInSeconds)
+                    {
+                        UpdateTimeTask = null;
+                        UIThreadHelper.CallOnUIThread(() => { uiProgressBar.Value = 0; });
+
+                        break; // break out of infinite loop.
                     }
                 }
                 catch (Exception e)

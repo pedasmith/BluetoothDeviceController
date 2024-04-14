@@ -125,7 +125,7 @@ namespace TemplateExpander
 
 
         public enum Verbose { Verbose, Normal };
-        public static Verbose Verbosity = Verbose.Normal;
+        public static Verbose Verbosity = Verbose.Verbose;
         public static string NAME = "TemplateSnippet";
         private static void Log(string text, Verbose verbose = Verbose.Normal)
         {
@@ -429,12 +429,13 @@ namespace TemplateExpander
                         {
                             if (!string.IsNullOrEmpty(ts.Code))
                             {
-                                Log($"ERROR: {NAME}: already have a code block for {ts.Name}");
+                                Log($"ERROR: {NAME}: already have a code block for {ts.Name}. Reminder: you can't have a blank line at the end of your code block (it's a bug in the parser)");
                                 nerror++;
                             }
                             else
                             {
                                 ts.Code = element.ToString();
+                                ts.Code = block.Text; // Nope, no change.
                             }
                         }
                         else if (block.CodeLanguage != "SAMPLE" && block.CodeLanguage != "TEST")

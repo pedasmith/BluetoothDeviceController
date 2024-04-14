@@ -60,6 +60,7 @@
                     <Button Content="Stop" Click="OnStopServer" />
                     <Button Content="Clear" Click="OnClearScreen" x:Name="uiClear" Visibility="Collapsed" />
                 </StackPanel>
+                <ProgressBar x:Name="uiProgressBar" Minimum="0" Maximum="60" Value="0" />
                 <TextBlock Style="{StaticResource sTimeLabel}">
                     <Run Text="Current Time: " />
                 </TextBlock>
