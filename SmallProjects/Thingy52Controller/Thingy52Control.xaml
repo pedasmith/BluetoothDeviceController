@@ -8,7 +8,14 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
-
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="AppDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -16,12 +23,12 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <TextBlock FontSize="20">Thingy Data</TextBlock>
+        <TextBlock Style="{StaticResource sTitle}">Thingy Data</TextBlock>
         
         <!-- All of the data output -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="120" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -31,20 +38,20 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0">Color</TextBlock>
-            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="uiRGBClear">?</TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDataHeader}">Color</TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="uiRGBClear" Style="{StaticResource sDataData}">?</TextBlock>
 
-            <TextBlock Grid.Row="1" Grid.Column="0">Temperature</TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="uiTemperature">?</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource sDataHeader}">Temperature</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="uiTemperature" Style="{StaticResource sDataData}">?</TextBlock>
 
-            <TextBlock Grid.Row="2" Grid.Column="0">Pressure</TextBlock>
-            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="uiPressure">?</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource sDataHeader}">Pressure</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="uiPressure" Style="{StaticResource sDataData}">?</TextBlock>
 
-            <TextBlock Grid.Row="3" Grid.Column="0">Humidity</TextBlock>
-            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="uiHumidity">?</TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource sDataHeader}">Humidity</TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="uiHumidity" Style="{StaticResource sDataData}">?</TextBlock>
 
-            <TextBlock Grid.Row="4" Grid.Column="0">Air Quality</TextBlock>
-            <TextBlock Grid.Row="4" Grid.Column="1" x:Name="uiAirQuality">?</TextBlock>
+            <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource sDataHeader}">Air Quality</TextBlock>
+            <TextBlock Grid.Row="4" Grid.Column="1" x:Name="uiAirQuality" Style="{StaticResource sDataData}">?</TextBlock>
         </Grid>
         
         <!-- Log and status -->

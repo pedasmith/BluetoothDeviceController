@@ -378,7 +378,7 @@ namespace BluetoothDeviceController.BleEditor
                             {
                                 case "OEB":
                                     resultState = ResultState.NoResult;
-                                    dr.ByteOrder = ByteOrder.LittleEndian;
+                                    dr.ByteOrder = ByteOrder.BigEndian;
                                     break;
                                 case "OEL":
                                     resultState = ResultState.NoResult;

@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Beacons;
+using SampleServerXaml;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,6 +30,7 @@ namespace ThingyController
         {
             this.InitializeComponent();
             this.Loaded += MainPage_Loaded;
+            Test();
         }
         private void Log(string str)
         {
@@ -41,6 +43,13 @@ namespace ThingyController
         {
             watcher.Received += OnAdvertisementReceived;
             watcher.Start();
+        }
+
+        private static int Test()
+        {
+            int nerror = 0;
+            nerror += UnitConvert.TestPressure();
+            return nerror;
         }
 
         private void OnAdvertisementReceived(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)

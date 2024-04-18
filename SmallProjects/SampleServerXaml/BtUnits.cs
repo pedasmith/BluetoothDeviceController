@@ -8,10 +8,27 @@ namespace SampleServerXaml
 {
     public class BtUnits
     {
+        // BT Specifications at https://btprodspecificationrefs.blob.core.windows.net/gatt-specification-supplement/GATT_Specification_Supplement.pdf
+        // Assigned numbers: https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf?v=1713116033721
+
         /// <summary>
         /// Picked 8020 for the UserUnitPreferences
         /// </summary>
         public static Guid UserUnitPreferenceGuid = Guid.Parse("00008020-0000-1000-8000-00805f9b34fb");
+
+        public enum Barometer {  NoPreference = 0,
+            bar = 0x2780, 
+            mmHg = 0x2781,
+            pascal = 0x2724,
+            psi = 0x27A5,
+
+            hpa = 0x8020, // not a standard amount hpa = mb = .001 bar
+
+            atm = 0x8021, // standard atmosphere = 101326 pascal
+            inHg = 0x8022,
+            mb = 0x8023, // same as hpa
+            //inHg = 0x8021, // not a standard amount
+        }
 
         public enum Length { NoPreference=0,
             foot = 0x27A3,

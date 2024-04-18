@@ -236,7 +236,7 @@
               "REM05": "mode 0=idle, 1=voltDC, 2=voltAC 3=ampDC,4=ampAC 5=ohm 6=diode 7=continuity 8=temp",
               "REM10": "05 FF 00 04 00 00 ",
               "REM20": "09 00 01 00 00 00 00",
-              "REM30": "range v 0=...300mv 1=300mv..2V 2=2..6V 3=6v..12v"
+              "REM30": "range v 0=...300mv 1=300mv..2V 2=2..6V 3=6v..12v 4=12 to 30"
             },
             {
               "UUID": "047d3559-8bee-423a-b229-4417fa603b90",
@@ -249,7 +249,7 @@
                 "REM10: Status "
               ]
             }
-          ]
+          ] 
         },
         {
           "UUID": "1569801e-1425-4a7a-b617-a4f4ed719de6",

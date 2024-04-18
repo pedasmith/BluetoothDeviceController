@@ -21,6 +21,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BtUnits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurrentTimeServer.xaml.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UnitConvert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserUnitPreferencesControl.cs" />
   </ItemGroup>
 </Project>

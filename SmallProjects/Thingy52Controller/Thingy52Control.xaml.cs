@@ -1,6 +1,7 @@
 ﻿using BluetoothDeviceController.Beacons;
 using BluetoothDeviceController.Names;
 using BluetoothProtocols;
+using SampleServerXaml;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -79,21 +80,28 @@ namespace Thingy52Controller
         private void BleDevice_Pressure_hpaEvent(BluetoothDeviceController.BleEditor.ValueParserResult data)
         {
             UIThreadHelper.CallOnUIThread(() => {
-                uiPressure.Text = bleDevice.Pressure_hpa.ToString("F3");
+                var hpa = bleDevice.Pressure_hpa;
+                var psi = UnitConvert.ConvertPressure(hpa, BtUnits.Barometer.hpa, BtUnits.Barometer.psi);
+                var inHg = UnitConvert.ConvertPressure(hpa, BtUnits.Barometer.hpa, BtUnits.Barometer.inHg);
+                var str = $"inHg={inHg:F3} hpa={hpa:F3} psi={psi:F2}";
+                uiPressure.Text = str;
             });
         }
 
         private void BleDevice_Temperature_cEvent(BluetoothDeviceController.BleEditor.ValueParserResult data)
         {
             UIThreadHelper.CallOnUIThread(() => {
-                uiTemperature.Text = bleDevice.Temperature_c.ToString("F3");
+                var c = bleDevice.Temperature_c;
+                var f = UnitConvert.ConvertTemperature(c, BtUnits.Temperature.celsius, BtUnits.Temperature.fahrenheit);
+                var str = $"c={c:F2} f={f:F2}";
+                uiTemperature.Text = str;
             });
         }
 
         private void BleDevice_HumidityEvent(BluetoothDeviceController.BleEditor.ValueParserResult data)
         {
             UIThreadHelper.CallOnUIThread(() => {
-                uiHumidity.Text = bleDevice.Humidity.ToString("F3");
+                uiHumidity.Text = bleDevice.Humidity.ToString("F1") + "%";
             });
         }
 
