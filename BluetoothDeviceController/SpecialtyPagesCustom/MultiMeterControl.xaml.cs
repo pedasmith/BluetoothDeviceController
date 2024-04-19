@@ -208,8 +208,27 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
         private void BleDevice_OnMMVoltDC(object sender, PokitProMeter.MMData e)
         {
-            uiMMSetting.Text = "VDC";
-            uiMMValue.Text = e.Value.ToString("F2");
+            var value = MathUtilities.Significant(e.Value);
+
+            double[] limits = { 0.1, 0.001 };
+            double[] limitsDivide = { 1, 0.001 }; // if the value is > 0.1 volts, just output as volts
+            string[] limitstring = { "V DC", "mV DC" };
+            string units = "VDC";
+
+            for (int i = 0; i < limits.Length; i++)
+            {
+                if (value > limits[i])
+                {
+                    value = value / limitsDivide[i];
+                    units = limitstring[i];
+                    break;
+                }
+            }
+
+
+            uiMMSetting.Text = units;
+            uiMMValue.Text = value.ToString("F2");
+
         }
 
         private void BleDevice_OnMMVoltAC(object sender, PokitProMeter.MMData e)
