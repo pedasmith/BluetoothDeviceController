@@ -156,18 +156,23 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         private void BleDevice_OnMMResistance(object sender, PokitProMeter.MMData e)
         {
             BtConnectionState = ConnectionState.GotData;
-            uiMMSetting.Text = "Ω";
             var value = MathUtilities.Significant(e.Value);
-            if (value > 1_000_000)
+
+            double[] limits = { 1_000_000, 1_000 };
+            string[] limitstring = { "MΩ", "KΩ" };
+            string units = "Ω";
+
+            for (int i=0; i<limits.Length; i++)
             {
-                value = value / 1_000_000.0;
-                uiMMSetting.Text = "MΩ";
+                if (value > limits[i])
+                {
+                    value = value / limits[i];
+                    units = limitstring[i];
+                    break;
+                }
             }
-            else if (value > 1_000)
-            {
-                value = value / 1_000.0;
-                uiMMSetting.Text = "KΩ";
-            }
+
+            uiMMSetting.Text = units;
             uiMMValue.Text = value.ToString("F");
         }
 
@@ -179,8 +184,26 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
         private void BleDevice_OnMMCurrentDC(object sender, PokitProMeter.MMData e)
         {
-            uiMMSetting.Text = "⎓ Amp DC";
-            uiMMValue.Text = e.Value.ToString("F2");
+            BtConnectionState = ConnectionState.GotData;
+            var value = MathUtilities.Significant(e.Value);
+
+            double[] limits = { 1, 0.001 };
+            string[] limitstring = { "⎓ Amp DC", "⎓ mA DC" };
+            string units = "⎓ Amp DC";
+
+            for (int i = 0; i < limits.Length; i++)
+            {
+                if (value > limits[i])
+                {
+                    value = value / limits[i];
+                    units = limitstring[i];
+                    break;
+                }
+            }
+
+
+            uiMMSetting.Text = units;
+            uiMMValue.Text = value.ToString("F2");
         }
 
         private void BleDevice_OnMMVoltDC(object sender, PokitProMeter.MMData e)
