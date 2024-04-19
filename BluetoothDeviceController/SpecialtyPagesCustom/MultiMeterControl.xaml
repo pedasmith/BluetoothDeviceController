@@ -8,6 +8,14 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock" x:Key="sNumbers">
+            <Setter Property="FontSize" Value="44" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="TextAlignment" Value="Right" />
+            <Setter Property="FontFamily" Value="Consolas" />
+        </Style>
+    </UserControl.Resources>
 
     <Border Width="600" HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="2" Padding="10">
         <Grid >
@@ -25,7 +33,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Row="0" Grid.ColumnSpan="3"  FontSize="26" FontWeight="Bold">Multi Meter</TextBlock>
-            <TextBlock Grid.Row="1" x:Name="uiMMValue" FontSize="45" FontWeight="Bold" MinWidth="180" HorizontalTextAlignment="Right">555.55</TextBlock>
+            <TextBlock Grid.Row="1" x:Name="uiMMValue" Style="{StaticResource sNumbers}" MinWidth="180" HorizontalTextAlignment="Right">555.55</TextBlock>
             <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" x:Name="uiMMSetting" FontSize="25" FontWeight="Bold">VAC</TextBlock>
             <Line Grid.Row="3" Grid.ColumnSpan="3" StrokeThickness="2" Stroke="Black" X1="0" X2="600" Y1="0" Y2="0" />
             <GridView Grid.Row="4" Grid.ColumnSpan="3">
@@ -34,11 +42,11 @@
                         <ItemsWrapGrid Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </GridView.ItemsPanel>
-                <RadioButton x:Name="uiMMModeVDC"  Content="Volt DC" Tag="1" IsChecked="True" Checked="OnMMModeChecked" />
+                <RadioButton x:Name="uiMMModeVDC"  Content="Volt DC" Tag="1" Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeVAC" Content="Volt AC" Tag="2"  Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeCDC" Content="Current DC" Tag="3"  Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeCAC" Content="Current AC" Tag="4"  Checked="OnMMModeChecked"/>
-                <RadioButton x:Name="uiMMModeRes" Content="Resitance" Tag="5" Checked="OnMMModeChecked" />
+                <RadioButton x:Name="uiMMModeRes" Content="Resitance" Tag="5" IsChecked="True"  Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeDio" Content="Diode" Tag="6" Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeCon" Content="Continuity" Tag="7" Checked="OnMMModeChecked" />
             </GridView>

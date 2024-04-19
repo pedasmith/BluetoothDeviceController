@@ -51,7 +51,6 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         {
             BtConnectionState = ConnectionState.Off; // Assume the new value isn't connected
             bleDevice = value;
-            await ConnectCallbacksAsync();
         }
 
         private void MultiMeterControl_Loaded(object sender, RoutedEventArgs e)
@@ -122,28 +121,6 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             GattClientCharacteristicConfigurationDescriptorValue.None,
         };
-#if NEVER_EER_DEFINED
-        int MM_DataNotifyIndex = 0;
-        private async Task DoNotifyMM_Data()
-        {
-            try
-            {
-                // Only set up the event callback once.
-                if (!MM_DataNotifySetup)
-                {
-                    MM_DataNotifySetup = true;
-                    bleDevice.MM_DataEvent += BleDevice_MM_DataEvent;
-                }
-                var notifyType = NotifyMM_DataSettings[MM_DataNotifyIndex];
-                MM_DataNotifyIndex = (MM_DataNotifyIndex + 1) % NotifyMM_DataSettings.Length;
-                var result = await bleDevice.NotifyMM_DataAsync(notifyType);
-            }
-            catch (Exception ex)
-            {
-                SetStatus($"Error: exception: {ex.Message}");
-            }
-        }
-#endif
         private void BleDevice_MM_DataEvent(BleEditor.ValueParserResult data)
         {
             BtConnectionState = ConnectionState.GotData;
@@ -178,8 +155,20 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
         private void BleDevice_OnMMResistance(object sender, PokitProMeter.MMData e)
         {
+            BtConnectionState = ConnectionState.GotData;
             uiMMSetting.Text = "Ω";
-            uiMMValue.Text = e.Value.ToString("F2");
+            var value = MathUtilities.Significant(e.Value);
+            if (value > 1_000_000)
+            {
+                value = value / 1_000_000.0;
+                uiMMSetting.Text = "MΩ";
+            }
+            else if (value > 1_000)
+            {
+                value = value / 1_000.0;
+                uiMMSetting.Text = "KΩ";
+            }
+            uiMMValue.Text = value.ToString("F");
         }
 
         private void BleDevice_OnMMCurrentAC(object sender, PokitProMeter.MMData e)
@@ -216,8 +205,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             if (bleDevice == null) return;
             if (start)
             {
+                await ConnectCallbacksAsync();
                 BtConnectionState = ConnectionState.Configuring;
                 await bleDevice.WriteMM_Settings((byte)mode, range, interval);
+                //var ok = await bleDevice.NotifyMM_DataAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                BtConnectionState = ConnectionState.Configured;
             }
             else
             {
@@ -266,5 +258,26 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             }
         }
 
+    }
+
+    static class MathUtilities
+    {
+        // https://stackoverflow.com/questions/374316/round-a-double-to-x-significant-figures
+
+        /// <summary>
+        /// Rounds to a certain number of significant figures
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="digits"></param>
+        /// <returns></returns>
+        public static double Significant(this double value, int digits = 3)
+        {
+            if (value == 0)
+                return 0;
+
+            double scale = Math.Pow(10, Math.Floor(Math.Log10(Math.Abs(value))) + 1);
+            var retval = scale * Math.Round(value / scale, digits);
+            return retval;
+        }
     }
 }

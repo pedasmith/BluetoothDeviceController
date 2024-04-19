@@ -117,7 +117,7 @@ namespace BluetoothProtocols
                 }
                 if (canSetValue)
                 {
-                    dest.Value = (dest.RawValue * dest.Range) + dest.RangeMin;
+                    dest.Value = dest.RawValue; // NOPE! Wrong entirely! I thought this only because there was a busted fuse!  (dest.RawValue * dest.Range) + dest.RangeMin;
                 }
                 else
                 {
