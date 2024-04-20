@@ -1,4 +1,6 @@
-﻿using BluetoothProtocols;
+﻿using BluetoothDeviceController.Charts;
+using BluetoothProtocols;
+using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,15 +18,22 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using static BluetoothDeviceController.SpecialtyPages.Bbc_MicroBitPage;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace BluetoothDeviceController.SpecialtyPagesCustom
 {
+    public class MMDataRecord
+    {
+        public DateTime EventTime { get; set; }
+        public double Value { get; set; }
+    }
     public sealed partial class MultiMeterControl : UserControl
     {
         public enum ConnectionState {  Off, Configuring, Configured, GotData, GotDataStale, Deconfiguring, Failed };
         public ConnectionState _BtConnectionState = ConnectionState.Off;
+        private DataCollection<MMDataRecord> MMData = new DataCollection<MMDataRecord>();
         private void UpdateConnectionState()
         {
             uiState.Text = BtConnectionState.ToString();
@@ -51,11 +60,38 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         {
             BtConnectionState = ConnectionState.Off; // Assume the new value isn't connected
             bleDevice = value;
+            await Task.Delay(0); // added this only so that the compiler warning for async are turned off.
         }
 
         private void MultiMeterControl_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateConnectionState();
+
+            // Set up the graph
+            MMData.RemoveAlgorithm = RemoveRecordAlgorithm.RemoveFirst;
+            MMData.MaxLength = 100;
+
+            var EventTimeProperty = typeof(MMDataRecord).GetProperty("EventTime");
+            var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
+                {
+typeof(MMDataRecord).GetProperty("Value"),
+                };
+            var names = new List<string>()
+                {
+"Resistance",
+                };
+            uiChart.SetDataProperties(properties, EventTimeProperty, names);
+            uiChart.SetTitle("Resistance Chart");
+            uiChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
+            {
+                tableType = "standard",
+                chartType = "standard",
+                chartCommand = "AddYTime<MagnetometerCalibrationRecord>(addResult, MMRecordData)", //TODO: ???
+                chartDefaultMaxY = 10_000,
+                chartDefaultMinY = 0,
+            }
+;
+
         }
 
         private void SetStatus(string text)
@@ -130,6 +166,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             }
         }
 
+
+
         string _CurrBackgroundBrushName = "brushBackground";
         string CurrBackgroundBrushName
         {
@@ -179,6 +217,12 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             double[] limits = { 1_000_000, 1_000 };
             string[] limitstring = { "MΩ", "KΩ" };
             string units = "Ω";
+
+            // Add data to the list and update the graph.
+            var data = new MMDataRecord() { EventTime = DateTime.Now, Value = value };
+            var addResult = MMData.AddRecord(data);
+            uiChart.AddYTime<MMDataRecord>(addResult, MMData);
+
 
             for (int i=0; i<limits.Length; i++)
             {
