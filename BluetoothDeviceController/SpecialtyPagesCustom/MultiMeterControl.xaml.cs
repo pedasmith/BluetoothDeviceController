@@ -129,10 +129,24 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 UIThreadHelper.CallOnUIThread(bleDevice.HandleMMMessageCustom);
             }
         }
+
+        string _CurrBackgroundBrushName = "brushBackground";
+        string CurrBackgroundBrushName
+        {
+            get { return _CurrBackgroundBrushName; }
+            set
+            {
+                if (value == _CurrBackgroundBrushName) return;
+                _CurrBackgroundBrushName = value;
+                uiBorder.Background = (Brush)this.Resources[CurrBackgroundBrushName];
+            }
+        }
+
         private void BleDevice_OnMMOther(object sender, PokitProMeter.MMData e)
         {
             uiMMSetting.Text = "??";
             uiMMValue.Text = e.Value.ToString("F2");
+            CurrBackgroundBrushName = "brushBackgroundOK";
         }
 
         private void BleDevice_OnMMTemperature(object sender, PokitProMeter.MMData e)
@@ -143,14 +157,18 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
         private void BleDevice_OnMMContinuity(object sender, PokitProMeter.MMData e)
         {
-            uiMMSetting.Text = "Cont";
-            uiMMValue.Text = e.Value.ToString("F2");
+            var value = e.Status == PokitProMeter.MMStatus.Continuity;
+            uiMMSetting.Text = "Continuity";
+            uiMMValue.Text = value ? "YES" : "no";
+            CurrBackgroundBrushName  = value ? "brushContinuityYes" : "brushContinuityNo";
         }
 
         private void BleDevice_OnMMDiode(object sender, PokitProMeter.MMData e)
         {
+            var value = e.Status == PokitProMeter.MMStatus.DiodeOk;
             uiMMSetting.Text = "Diode";
-            uiMMValue.Text = e.Value.ToString("F2");
+            uiMMValue.Text = e.Status.ToString();
+            CurrBackgroundBrushName = "brushBackgroundOK";
         }
 
         private void BleDevice_OnMMResistance(object sender, PokitProMeter.MMData e)
@@ -174,6 +192,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             uiMMSetting.Text = units;
             uiMMValue.Text = value.ToString("F");
+            CurrBackgroundBrushName = "brushBackgroundOK";
         }
 
         private void BleDevice_OnMMCurrentAC(object sender, PokitProMeter.MMData e)
@@ -204,6 +223,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             uiMMSetting.Text = units;
             uiMMValue.Text = value.ToString("F2");
+            CurrBackgroundBrushName = "brushBackgroundOK";
         }
 
         private void BleDevice_OnMMVoltDC(object sender, PokitProMeter.MMData e)
@@ -228,7 +248,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             uiMMSetting.Text = units;
             uiMMValue.Text = value.ToString("F2");
-
+            CurrBackgroundBrushName = "brushBackgroundOK";
         }
 
         private void BleDevice_OnMMVoltAC(object sender, PokitProMeter.MMData e)
@@ -240,7 +260,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
         private async void OnMMRunClick(object sender, RoutedEventArgs e)
         {
-            var mode = GetCurrentMMMode(PokitProMeter.MMMode.VoltAC);
+            var mode = GetCurrentMMMode(PokitProMeter.MMMode.Idle);
             var start = (sender as ToggleButton).IsChecked.Value;
             byte range = 255; // autorange for all settings
             UInt32 interval = 100; // ms ; TODO: should be settable?
@@ -270,6 +290,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         /// <returns></returns>
         private PokitProMeter.MMMode GetCurrentMMMode(PokitProMeter.MMMode defaultValue)
         {
+            if (uiMMModeIdle.IsChecked.Value) return PokitProMeter.MMMode.Idle;
             if (uiMMModeVDC.IsChecked.Value) return PokitProMeter.MMMode.VoltDC;
             if (uiMMModeVAC.IsChecked.Value) return PokitProMeter.MMMode.VoltAC;
             if (uiMMModeCDC.IsChecked.Value) return PokitProMeter.MMMode.CurrentDC;

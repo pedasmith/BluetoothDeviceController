@@ -9,15 +9,28 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
     <UserControl.Resources>
+        <Style TargetType="TextBlock" x:Key="sHeader">
+            <Setter Property="FontSize" Value="26" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
         <Style TargetType="TextBlock" x:Key="sNumbers">
             <Setter Property="FontSize" Value="44" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="TextAlignment" Value="Right" />
             <Setter Property="FontFamily" Value="Consolas" />
         </Style>
+        <Style TargetType="TextBlock" x:Key="sUnit">
+            <Setter Property="FontSize" Value="26" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="TextAlignment" Value="Right" />
+        </Style>
+        <SolidColorBrush x:Key="brushBorder" Color="Black" />
+        <SolidColorBrush x:Key="brushBackgroundOK" Color="AntiqueWhite" />
+        <SolidColorBrush x:Key="brushContinuityYes" Color="LightGreen" />
+        <SolidColorBrush x:Key="brushContinuityNo" Color="LightCoral" />
     </UserControl.Resources>
 
-    <Border Width="600" HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="2" Padding="10">
+    <Border x:Name="uiBorder" Width="600" HorizontalAlignment="Left" BorderBrush="{StaticResource brushBorder}" BorderThickness="2" Padding="10">
         <Grid >
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
@@ -28,13 +41,15 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="180" />
-                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="auto" MinWidth="180" />
+                <ColumnDefinition Width="120" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.ColumnSpan="3"  FontSize="26" FontWeight="Bold">Multi Meter</TextBlock>
-            <TextBlock Grid.Row="1" x:Name="uiMMValue" Style="{StaticResource sNumbers}" MinWidth="180" HorizontalTextAlignment="Right">555.55</TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" x:Name="uiMMSetting" FontSize="25" FontWeight="Bold">VAC</TextBlock>
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Style="{StaticResource sHeader}"  >Multi Meter</TextBlock>
+            
+            <TextBlock Grid.Row="1" x:Name="uiMMValue" Style="{StaticResource sNumbers}" >000.00</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="uiMMSetting" Style="{StaticResource sUnit}">---</TextBlock>
+
             <Line Grid.Row="3" Grid.ColumnSpan="3" StrokeThickness="2" Stroke="Black" X1="0" X2="600" Y1="0" Y2="0" />
             <GridView Grid.Row="4" Grid.ColumnSpan="3">
                 <GridView.ItemsPanel>
@@ -42,11 +57,12 @@
                         <ItemsWrapGrid Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </GridView.ItemsPanel>
+                <RadioButton x:Name="uiMMModeIdle"  Content="Idle" Tag="0" Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeVDC"  Content="Volt DC" Tag="1" Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeVAC" Content="Volt AC" Tag="2"  Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeCDC" Content="Current DC" Tag="3"  Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeCAC" Content="Current AC" Tag="4"  Checked="OnMMModeChecked"/>
-                <RadioButton x:Name="uiMMModeRes" Content="Resitance" Tag="5" IsChecked="True"  Checked="OnMMModeChecked" />
+                <RadioButton x:Name="uiMMModeRes" Content="Resitance" Tag="5" Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeDio" Content="Diode" Tag="6" Checked="OnMMModeChecked" />
                 <RadioButton x:Name="uiMMModeCon" Content="Continuity" Tag="7" Checked="OnMMModeChecked" />
             </GridView>
