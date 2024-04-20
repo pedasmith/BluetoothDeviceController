@@ -1,4 +1,4 @@
-﻿using BluetoothCurrentTimeServer;
+﻿//using BluetoothCurrentTimeServer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,21 +29,44 @@ namespace SampleServerXaml
 
         private void UserUnitPreferencesControl_Loaded(object sender, RoutedEventArgs e)
         {
+            //TODO: why aren't the time 12/14 preferences also restored?
             // Set the initial values from the App.SavedBtUnits 
-            string savedtemp = "";
-            switch (App.SavedBtUnits.TemperaturePref)
+
+            ComboBox cb;
+            string savedvalue;
+            
+            savedvalue = "";
+            switch (BtUnits.SavedBtUnits.TemperaturePref)
             {
-                case BtUnits.Temperature.fahrenheit: savedtemp = "fahrenheit"; break;
-                case BtUnits.Temperature.celsius: savedtemp = "celcius"; break;
-                case BtUnits.Temperature.kelvin: savedtemp = "kelvin"; break; // NOTE: not actually functional 2024-04-08
+                case BtUnits.Temperature.fahrenheit: savedvalue = "fahrenheit"; break;
+                case BtUnits.Temperature.celsius: savedvalue = "celcius"; break;
+                case BtUnits.Temperature.kelvin: savedvalue = "kelvin"; break; // NOTE: not actually functional 2024-04-08
             }
-            foreach (var child in uiTemp.Items)
+            cb = uiTemp;
+            foreach (var child in cb.Items)
             {
                 var cbi = child as ComboBoxItem;
                 if (cbi == null) continue;
-                if (cbi.Tag as string == savedtemp)
+                if (cbi.Tag as string == savedvalue)
                 {
-                    uiTemp.SelectedItem = cbi;
+                    cb.SelectedItem = cbi;
+                }
+            }
+
+            savedvalue = "";
+            switch (BtUnits.SavedBtUnits.TimePref)
+            {
+                case BtUnits.Time.hour24: savedvalue = "24hr"; break;
+                case BtUnits.Time.hour12ampm: savedvalue = "ampm"; break;
+            }
+            cb = uiTime;
+            foreach (var child in cb.Items)
+            {
+                var cbi = child as ComboBoxItem;
+                if (cbi == null) continue;
+                if (cbi.Tag as string == savedvalue)
+                {
+                    cb.SelectedItem = cbi;
                 }
             }
         }
@@ -99,13 +122,13 @@ namespace SampleServerXaml
             var TimeUnits = (uiTime.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
 
 
-            System.Console.WriteLine($"DBG: savedtemp units {TemperatureUnits}");
+            System.Console.WriteLine($"DBG: savedvalue units {TemperatureUnits}");
             switch (TemperatureUnits)
             {
                 case "celcius": retval.TemperaturePref = BtUnits.Temperature.celsius; break;
                 case "fahrenheit": retval.TemperaturePref = BtUnits.Temperature.fahrenheit; break;
                 default:
-                    System.Console.WriteLine($"ERROR: unknown savedtemp units {TemperatureUnits}");
+                    System.Console.WriteLine($"ERROR: unknown savedvalue units {TemperatureUnits}");
                     break;
             }
             //var timeunits = (uiTime.SelectedItem as ComboBoxItem).Tag as string;

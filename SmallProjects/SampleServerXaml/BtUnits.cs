@@ -8,6 +8,12 @@ namespace SampleServerXaml
 {
     public class BtUnits
     {
+        /// <summary>
+        /// Public static saved units for use by any app that happens to need to save this stuff.
+        /// </summary>
+        static public BtUnits SavedBtUnits = new BtUnits();
+
+
         // BT Specifications at https://btprodspecificationrefs.blob.core.windows.net/gatt-specification-supplement/GATT_Specification_Supplement.pdf
         // Assigned numbers: https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf?v=1713116033721
 

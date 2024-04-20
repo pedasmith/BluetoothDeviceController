@@ -56,8 +56,8 @@ namespace BluetoothCurrentTimeServer
                     var userUnitSettings = userUnitSettingsRaw as ApplicationDataCompositeValue;
                     if (userUnitSettings != null)
                     {
-                        SavedBtUnits.TimePref = (BtUnits.Time)userUnitSettings["Time"];
-                        SavedBtUnits.TemperaturePref = (BtUnits.Temperature)userUnitSettings["Temp"];
+                        BtUnits.SavedBtUnits.TimePref = (BtUnits.Time)userUnitSettings["Time"];
+                        BtUnits.SavedBtUnits.TemperaturePref = (BtUnits.Temperature)userUnitSettings["Temp"];
                     }
                 }
                 catch (Exception)
@@ -93,7 +93,6 @@ namespace BluetoothCurrentTimeServer
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 
-        static public BtUnits SavedBtUnits = new BtUnits();
         const string UserUnitName = "UserUnit";
 
         /// <summary>
@@ -113,7 +112,7 @@ namespace BluetoothCurrentTimeServer
             if (page != null)
             {
                 // User Unit settings
-                var btunit = page.FillBtUnits(SavedBtUnits);
+                var btunit = page.FillBtUnits(BtUnits.SavedBtUnits);
 
                 var settings = Windows.Storage.ApplicationData.Current.RoamingSettings;
                 var composite = new ApplicationDataCompositeValue();
