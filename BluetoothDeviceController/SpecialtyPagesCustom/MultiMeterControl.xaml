@@ -69,6 +69,8 @@
                 <RadioButton x:Name="uiMMModeCon" Content="Continuity" Tag="7" Checked="OnMMModeChecked" />
             </GridView>
             <StackPanel Grid.Row="5" Grid.ColumnSpan="3" Orientation="Horizontal">
+                <Button Content="Idle" x:Name="uiIdle" Click="OnIdle" />
+                <Button Content="Start" x:Name="uiStart" Click="OnStart" />
                 <ToggleButton Content="Run" x:Name="uiMMRunButton"  Click="OnMMRunClick" />
                 <TextBlock x:Name="uiState" Width="200" />
             </StackPanel>

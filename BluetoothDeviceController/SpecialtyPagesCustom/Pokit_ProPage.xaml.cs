@@ -45,7 +45,8 @@ namespace BluetoothDeviceController.SpecialtyPages
 
             bleDevice.ble = ble;
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
-            await DoReadDevice_Name();
+            // CHANGE: remove this. Page should do nothing automatically (it's all in the multimeter):
+            // await DoReadDevice_Name();
 
             //Change
             await uiMultiMeter.SetMeter(bleDevice);
@@ -3028,6 +3029,8 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         private async Task DoWriteDSO_Settings(string text, System.Globalization.NumberStyles dec_or_hex)
         {
+            // here!here -- this code is just plain wrong. It's taking a single text field and dec/hex flag and using
+            // the same text for every field. It instead needs to take an array of text?
             SetStatusActive(true);
             ncommand++;
             try

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Utilities;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -31,14 +32,15 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
     }
     public sealed partial class MultiMeterControl : UserControl
     {
-        public enum ConnectionState {  Off, Configuring, Configured, GotData, GotDataStale, Deconfiguring, Failed };
+        public enum ConnectionState { Off, Configuring, Configured, GotData, GotDataStale, Deconfiguring, Failed };
         public ConnectionState _BtConnectionState = ConnectionState.Off;
         private DataCollection<MMDataRecord> MMData = new DataCollection<MMDataRecord>();
         private void UpdateConnectionState()
         {
             uiState.Text = BtConnectionState.ToString();
         }
-        public ConnectionState BtConnectionState { 
+        public ConnectionState BtConnectionState
+        {
             get { return _BtConnectionState; }
             internal set
             {
@@ -101,9 +103,9 @@ typeof(MMDataRecord).GetProperty("Value"),
 
         private async Task ConnectCallbacksAsync()
         {
-            if (BtConnectionState != ConnectionState.Off && BtConnectionState != ConnectionState.Failed)
+            if (BtConnectionState != ConnectionState.Off && BtConnectionState != ConnectionState.Failed && BtConnectionState != ConnectionState.Configuring)
             {
-                return; 
+                return;
             }
             if (bleDevice == null)
             {
@@ -151,7 +153,7 @@ typeof(MMDataRecord).GetProperty("Value"),
 
 
         // Copied from the Pokit_ProPage.xaml.cs file
-       //TODO: bool MM_DataNotifySetup = false;
+        //TODO: bool MM_DataNotifySetup = false;
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyMM_DataSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
 
@@ -198,7 +200,7 @@ typeof(MMDataRecord).GetProperty("Value"),
             var value = e.Status == PokitProMeter.MMStatus.Continuity;
             uiMMSetting.Text = "Continuity";
             uiMMValue.Text = value ? "YES" : "no";
-            CurrBackgroundBrushName  = value ? "brushContinuityYes" : "brushContinuityNo";
+            CurrBackgroundBrushName = value ? "brushContinuityYes" : "brushContinuityNo";
         }
 
         private void BleDevice_OnMMDiode(object sender, PokitProMeter.MMData e)
@@ -224,7 +226,7 @@ typeof(MMDataRecord).GetProperty("Value"),
             uiChart.AddYTime<MMDataRecord>(addResult, MMData);
 
 
-            for (int i=0; i<limits.Length; i++)
+            for (int i = 0; i < limits.Length; i++)
             {
                 if (value > limits[i])
                 {
@@ -304,6 +306,11 @@ typeof(MMDataRecord).GetProperty("Value"),
 
         private async void OnMMRunClick(object sender, RoutedEventArgs e)
         {
+            // TODO: updating the UX to work much better. This is called from the radio button clickc
+            await Task.Delay(0);
+            return;
+
+
             var mode = GetCurrentMMMode(PokitProMeter.MMMode.Idle);
             var start = (sender as ToggleButton).IsChecked.Value;
             byte range = 255; // autorange for all settings
@@ -314,16 +321,19 @@ typeof(MMDataRecord).GetProperty("Value"),
                 await ConnectCallbacksAsync();
                 BtConnectionState = ConnectionState.Configuring;
                 await bleDevice.WriteMM_Settings((byte)mode, range, interval);
+                //already done in the ConnectCallbacks
                 //var ok = await bleDevice.NotifyMM_DataAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
                 BtConnectionState = ConnectionState.Configured;
             }
             else
             {
+                // All part of the OnIdle button now!
                 BtConnectionState = ConnectionState.Deconfiguring;
                 uiMMSetting.Text = "...";
                 uiMMValue.Text = "...";
                 await bleDevice.WriteMM_Settings((byte)PokitProMeter.MMMode.Idle, range, interval);
                 await RemoveCallbacksAsync();
+                BtConnectionState = ConnectionState.Off;
             }
         }
 
@@ -346,7 +356,7 @@ typeof(MMDataRecord).GetProperty("Value"),
         }
 
         /// <summary>
-        /// Called when the user 
+        /// Called when the user clicks a radio button
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -365,6 +375,39 @@ typeof(MMDataRecord).GetProperty("Value"),
             }
         }
 
+        private async void OnIdle(object sender, RoutedEventArgs e)
+        {
+            // Turn everything off.
+            byte range = 255; // autorange for all settings
+            UInt32 interval = 100; // ms ; TODO: should be settable?
+
+
+            BtConnectionState = ConnectionState.Deconfiguring;
+            uiMMSetting.Text = "...";
+            uiMMValue.Text = "...";
+            await bleDevice.WriteMM_Settings((byte)PokitProMeter.MMMode.Idle, range, interval);
+            await RemoveCallbacksAsync();
+            BtConnectionState = ConnectionState.Off;
+
+        }
+
+        private async void OnStart(object sender, RoutedEventArgs e)
+        {
+            var mode = GetCurrentMMMode(PokitProMeter.MMMode.Idle);
+            byte range = 255; // autorange for all settings
+            UInt32 interval = 100; // ms ; TODO: should be settable?
+            if (bleDevice == null) return;
+
+            BtConnectionState = ConnectionState.Configuring;
+            uiMMSetting.Text = ">>>";
+            uiMMValue.Text = ">>>";
+
+            await ConnectCallbacksAsync();
+            await bleDevice.WriteMM_Settings((byte)mode, range, interval);
+            //already done in the ConnectCallbacks
+            //var ok = await bleDevice.NotifyMM_DataAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+            //BtConnectionState = ConnectionState.Configured;
+        }
     }
 
     static class MathUtilities
