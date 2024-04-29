@@ -257,6 +257,7 @@
       <DependentUpon>TI_SensorTag_1352Page.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPages\TI_SensorTag_2541Page.xaml.cs" />
+    <Compile Include="SpecialtyPages\UxTextValue.cs" />
     <Compile Include="SpecialtyPages\Vion_MeterPage.xaml.cs">
       <DependentUpon>Vion_MeterPage.xaml</DependentUpon>
     </Compile>

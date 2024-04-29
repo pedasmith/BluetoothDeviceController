@@ -427,7 +427,7 @@ namespace BluetoothCodeGenerator
                         if (isDouble) dotNetDisplayFormat = "ToString(\"N0\")";
                         break;
                     case "FIXED":
-                        displayFormat = "System.Globalization.NumberStyles.AllowHexSpecifier";
+                        displayFormat = "System.Globalization.NumberStyles.Number"; //TODO: if this right? shouldn't it be Number?
                         if (isDouble) dotNetDisplayFormat = "ToString(\"F3\")";
                         break;
                     default:

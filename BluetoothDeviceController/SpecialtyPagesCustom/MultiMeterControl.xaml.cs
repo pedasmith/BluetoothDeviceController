@@ -309,7 +309,7 @@ typeof(MMDataRecord).GetProperty("Value"),
             // TODO: updating the UX to work much better. This is called from the radio button clickc
             await Task.Delay(0);
             return;
-
+#if NEVER_EVER_DEFINED
 
             var mode = GetCurrentMMMode(PokitProMeter.MMMode.Idle);
             var start = (sender as ToggleButton).IsChecked.Value;
@@ -335,6 +335,7 @@ typeof(MMDataRecord).GetProperty("Value"),
                 await RemoveCallbacksAsync();
                 BtConnectionState = ConnectionState.Off;
             }
+#endif
         }
 
         /// <summary>

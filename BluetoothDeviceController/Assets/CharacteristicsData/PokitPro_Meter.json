@@ -5,7 +5,7 @@
       "ClassName": "PokitProMeter",
       "ClassModifiers": "partial",
       "Description": "Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display.",
-      "SuppressFile": ":SuppressXAML:",
+      "SuppressFile": ":ZZZDOXAMLFORNOWSuppressXAML:",
 
       "Links": [
         "https://help.pokitmeter.com/hc/en-us/community/posts/360023523213-Bluetooth-API-Documentation",
@@ -39,7 +39,7 @@
             {
               "UUID": "00002b29-0000-1000-8000-00805f9b34fb",
               "Name": "Client_Supported_Features",
-              "Type": "U8|HEX|FeatureBitmap0",
+              "Type": "U8|HEX|FeatureBitmapCSF",
               "REM_Byte0": "bit 0=robust caching 1=enhanced ATT bearer 2=multiple value",
               "IsRead": true,
               "IsWrite": true,
@@ -265,7 +265,7 @@
             {
               "UUID": "98e14f8e-536e-4f24-b4f4-1debfed0a99e",
               "Name": "DSO_Reading",
-              "Type": "BYTES|HEX|DsoDataRaw",
+              "Type": "I16S|DEC|DsoDataRaw",
               "IsNotify": true,
               "REM": "Is a series of int16 which are multiplied by DsoDataScale to get actual data"
             },

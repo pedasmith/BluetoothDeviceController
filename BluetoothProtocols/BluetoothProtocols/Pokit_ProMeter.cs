@@ -1774,7 +1774,7 @@ namespace BluetoothProtocols
 
         private void NotifyDSO_ReadingCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            var datameaning = "BYTES|HEX|DsoDataRaw";
+            var datameaning = "I16S|DEC|DsoDataRaw";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
             DSO_Reading = parseResult.ValueList.GetValue("DsoDataRaw").AsString;
 

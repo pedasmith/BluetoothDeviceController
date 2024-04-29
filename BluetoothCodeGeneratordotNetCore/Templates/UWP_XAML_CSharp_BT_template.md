@@ -352,7 +352,8 @@ This was DATA1+LIST DATA1_LIST
                 [[VARIABLETYPE]] [[DATANAME]];
                 // History: used to go into [[CharacteristicName.dotNet]]_[[DATANAME]].Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsed[[DATANAME]] = Utilities.Parsers.TryParse[[VARIABLETYPE]](text, dec_or_hex, null, out [[DATANAME]]);
+                var parsed[[DATANAME]] = Utilities.Parsers.TryParse[[VARIABLETYPE]](values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out [[DATANAME]]);
+                valueIndex++; // Change #5
                 if (!parsed[[DATANAME]])
                 {
                     parseError = "[[DATANAMEUSER]]";
@@ -365,6 +366,13 @@ This was DATA1+LIST DATA1_LIST
 [[DATANAME]]
 ```
 
+## CS+CHARACTERISTIC+WRITE+ARGS+XAML+LIST+SETUP If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=ServicesByOriginalOrder/Characteristics/WriteProperties CodeListSubZero="" CodeListZero=""
+
+```
+				new UxTextValue([[CharacteristicName.dotNet]]_[[DataName.dotNet]].Text, [[DEC+OR+HEX]]),
+```
+
+
 ## CS+CHARACTERISTIC+WRITE+METHOD If="[[Verbs]] contains :WrWw:" Type=list Source=ServicesByOriginalOrder/Characteristics ListOutput=child CodeListSubZero="" CodeListZero=""
 
 PageCSharp+CharacteristicWriteTemplate
@@ -374,18 +382,32 @@ PageCSharp+CharacteristicWriteTemplate
         // OK to include this method even if there are no defined buttons
         private async void OnClick[[CharacteristicName.dotNet]](object sender, RoutedEventArgs e)
         {
-            var text = (sender as Button).Tag as String;
-            await DoWrite[[CharacteristicName.dotNet]] (text, System.Globalization.NumberStyles.Integer);
+			var values = new List<UxTextValue>()
+            {
+                // e.g., new UxTextValue([[DataName.First.dotNetSafe]].Text, [[DEC+OR+HEX]]),
+[[CS+CHARACTERISTIC+WRITE+ARGS+XAML+LIST+SETUP]]
+            };
+            //var text = (sender as Button).Tag as String;
+            await DoWrite[[CharacteristicName.dotNet]](values);
+
         }
 
         private async void OnWrite[[CharacteristicName.dotNet]](object sender, RoutedEventArgs e)
         {
-            var text = [[DataName.First.dotNetSafe]].Text;
-            await DoWrite[[CharacteristicName.dotNet]] (text, [[DEC+OR+HEX]]);
+            var values = new List<UxTextValue>()
+            {
+                // e.g., new UxTextValue([[DataName.First.dotNetSafe]].Text, [[DEC+OR+HEX]]),
+[[CS+CHARACTERISTIC+WRITE+ARGS+XAML+LIST+SETUP]]
+            };
+            await DoWrite[[CharacteristicName.dotNet]](values);
+			
         }
 
-        private async Task DoWrite[[CharacteristicName.dotNet]](string text, System.Globalization.NumberStyles dec_or_hex)
+        private async Task DoWrite[[CharacteristicName.dotNet]](List<UxTextValue> values)
         {
+            if (values.Count != 7) return; // Change #2; TODO: Correct number here
+            int valueIndex = 0; // Change #3;
+			
             SetStatusActive (true);
             ncommand++;
             try

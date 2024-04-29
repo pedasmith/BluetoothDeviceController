@@ -168,7 +168,7 @@ namespace BluetoothDeviceController.BleEditor
             dr.ByteOrder = ByteOrder.LittleEndian; // default to little endian because it's common for bluetooth/
             return ConvertHelper(dr, decodeCommands);
         }
-        enum ResultState { NoResult, IsString, IsDouble, IsBytes };
+        enum ResultState { NoResult, IsString, IsDouble, IsDoubleArray, IsBytes };
 
         private static string DoubleToString(double dvalue, string displayFormat, string displayFormatSecondary, string fixedFormat="F2", string hexFormat="X6", string decFormat="D")
         {
@@ -222,6 +222,7 @@ namespace BluetoothDeviceController.BleEditor
 
                 var resultState = ResultState.IsDouble; // the most common result
                 double dvalue = double.NaN;
+                List<double> dvalues = null;
                 try
                 {
                     switch (readindicator)
@@ -276,6 +277,32 @@ namespace BluetoothDeviceController.BleEditor
                                                 return ValueParserResult.CreateError(decodeCommands, $"Float displayFormat unrecognized; should be FIXED {displayFormat}");
                                         }
                                         stritem = dvalue.ToString(displayFormat); // e.g. N3 for 3 digits
+                                    }
+                                    break;
+                                case "F32S": // Array of F32
+                                    {
+                                        resultState = ResultState.IsDoubleArray;
+                                        dvalues = new List<double>();
+                                        while (dr.UnconsumedBufferLength >= 2)
+                                        {
+                                            dvalue = dr.ReadSingle();
+                                            dvalues.Add(dvalue);
+                                            switch (displayFormat)
+                                            {
+                                                case "":
+                                                case "FIXED":
+                                                    displayFormat = (displayFormatSecondary == "") ? "N3" : displayFormatSecondary;
+                                                    break;
+                                                case "DEC":
+                                                    displayFormat = (displayFormatSecondary == "") ? "N0" : displayFormatSecondary;
+                                                    break;
+                                                case "HEX":
+                                                    return ValueParserResult.CreateError(decodeCommands, $"Float displayFormat unrecognized; should be FIXED {displayFormat}");
+                                            }
+
+                                            if (stritem != "") stritem += " ";
+                                            stritem += dvalue.ToString(displayFormat); // e.g. N3 for 3 digits
+                                        } // end while loop
                                     }
                                     break;
                                 default:
@@ -368,6 +395,32 @@ namespace BluetoothDeviceController.BleEditor
 
                                     }
                                     break;
+
+                                case "I16S": // Array of I16
+                                    {
+                                        if (displayFormat == "") displayFormat = "HEX";
+                                        string floatFormat = "F2";
+                                        string intFormat = "X6";
+
+                                        resultState = ResultState.IsDoubleArray;
+                                        dvalues = new List<double>();
+                                        while (dr.UnconsumedBufferLength >= 2)
+                                        {
+                                            dvalue = dr.ReadInt16();
+                                            dvalues.Add(dvalue);
+
+                                            var intstr = DoubleToString(dvalue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
+                                            if (intstr == null)
+                                            {
+                                                return ValueParserResult.CreateError(decodeCommands, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
+                                            }
+
+                                            if (stritem != "") stritem += " ";
+                                            stritem += intstr;
+                                        } // end while loop
+                                    }
+                                    break;
+
 
                                 default:
                                     return ValueParserResult.CreateError(decodeCommands, $"Integer command unrecognized; should be I8/16/24/32 not {readcmd}");
@@ -602,20 +655,20 @@ namespace BluetoothDeviceController.BleEditor
                     stritem = $"EXCEPTION reading data {e} index {i} command {command} len {dr.UnconsumedBufferLength}";
                     return ValueParserResult.CreateError(str + stritem, stritem);
                 }
-                BCBasic.BCValue resultValue = null;
                 switch (resultState)
                 {
                     case ResultState.IsBytes:
-                        resultValue = new BCBasic.BCValue(byteArrayItem);
-                        valueList.SetProperty(name, resultValue);
+                        valueList.SetProperty(name, new BCBasic.BCValue(byteArrayItem));
                         break;
                     case ResultState.IsDouble:
-                        resultValue = new BCBasic.BCValue(dvalue);
-                        valueList.SetProperty(name, resultValue);
+                        valueList.SetProperty(name, new BCBasic.BCValue(dvalue));
+                        break;
+                    case ResultState.IsDoubleArray:
+                        var darray = dvalues.ToArray();
+                        valueList.SetProperty(name, new BCBasic.BCValue(darray));
                         break;
                     case ResultState.IsString:
-                        resultValue = new BCBasic.BCValue(stritem);
-                        valueList.SetProperty(name, resultValue);
+                        valueList.SetProperty(name, new BCBasic.BCValue(stritem));
                         break;
                 }
 

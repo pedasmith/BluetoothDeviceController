@@ -16,6 +16,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Controls.Primitives;
+using static System.Net.Mime.MediaTypeNames;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -3012,25 +3013,61 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
         // Functions for DSO_Oscilloscope
+        // Change: remember how many metadata items we have so far
+        int DSO_NMetadataEvents = 0;
+        int Curr_DSO_NMetadataEvents = -10;
+        int DSO_NReadingsLeft = 0;
+        List<double> RawReadings = new List<double>();
+        List<double> Readings = new List<double>();
+        double DsoScale = 1.0;
 
 
+        // CS+CHARACTERISTIC+WRITE+METHOD
         // OK to include this method even if there are no defined buttons
+
         private async void OnClickDSO_Settings(object sender, RoutedEventArgs e)
         {
-            var text = (sender as Button).Tag as String;
-            await DoWriteDSO_Settings(text, System.Globalization.NumberStyles.Integer);
+            var values = new List<UxTextValue>()
+            {
+                // e.g., new UxTextValue(DSO_Settings_DsoTriggerType.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(DSO_Settings_DsoTriggerType.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(DSO_Settings_DsoTriggerLevel.Text, System.Globalization.NumberStyles.Number),
+                new UxTextValue(DSO_Settings_DsoMode.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(DSO_Settings_DsoRange.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(DSO_Settings_DsoSamplingWindow.Text, System.Globalization.NumberStyles.None),
+                new UxTextValue(DSO_Settings_DsoNSamples.Text, System.Globalization.NumberStyles.None),
+
+            };
+            //var text = (sender as Button).Tag as String;
+            await DoWriteDSO_Settings(values);
+
         }
 
         private async void OnWriteDSO_Settings(object sender, RoutedEventArgs e)
         {
-            var text = DSO_Settings_DsoNSamples.Text;
-            await DoWriteDSO_Settings(text, System.Globalization.NumberStyles.None);
-        }
+            var values = new List<UxTextValue>()
+            {
+                // e.g., new UxTextValue(DSO_Settings_DsoTriggerType.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(DSO_Settings_DsoTriggerType.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(DSO_Settings_DsoTriggerLevel.Text, System.Globalization.NumberStyles.Number),
+                new UxTextValue(DSO_Settings_DsoMode.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(DSO_Settings_DsoRange.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(DSO_Settings_DsoSamplingWindow.Text, System.Globalization.NumberStyles.None),
+                new UxTextValue(DSO_Settings_DsoNSamples.Text, System.Globalization.NumberStyles.None),
 
-        private async Task DoWriteDSO_Settings(string text, System.Globalization.NumberStyles dec_or_hex)
+            };
+            await DoWriteDSO_Settings(values);
+
+        }
+        private async Task DoWriteDSO_Settings(List<UxTextValue> values)
         {
-            // here!here -- this code is just plain wrong. It's taking a single text field and dec/hex flag and using
-            // the same text for every field. It instead needs to take an array of text?
+            if (values.Count != 6) return; // Change #2; TODO: Correct number here CHANGE 11: is 6, mpt 7
+            int valueIndex = 0; // Change #3;
+            Curr_DSO_NMetadataEvents = DSO_NMetadataEvents;
+            System.Diagnostics.Debug.WriteLine($"DBG: WriteDSO_Settings: saving={Curr_DSO_NMetadataEvents}");
+            Readings.Clear();
+            RawReadings.Clear();
+
             SetStatusActive(true);
             ncommand++;
             try
@@ -3042,57 +3079,60 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                 Byte DsoTriggerType;
                 // History: used to go into DSO_Settings_DsoTriggerType.Text instead of using the variable
-                // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedDsoTriggerType = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out DsoTriggerType);
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedDsoTriggerType = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out DsoTriggerType);
+                valueIndex++; // Change #5
                 if (!parsedDsoTriggerType)
                 {
                     parseError = "DsoTriggerType";
                 }
-
                 Single DsoTriggerLevel;
                 // History: used to go into DSO_Settings_DsoTriggerLevel.Text instead of using the variable
-                // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedDsoTriggerLevel = Utilities.Parsers.TryParseSingle(text, dec_or_hex, null, out DsoTriggerLevel);
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedDsoTriggerLevel = Utilities.Parsers.TryParseSingle(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out DsoTriggerLevel);
+                valueIndex++; // Change #5
                 if (!parsedDsoTriggerLevel)
                 {
                     parseError = "DsoTriggerLevel";
                 }
-
                 Byte DsoMode;
                 // History: used to go into DSO_Settings_DsoMode.Text instead of using the variable
-                // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedDsoMode = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out DsoMode);
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedDsoMode = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out DsoMode);
+                valueIndex++; // Change #5
                 if (!parsedDsoMode)
                 {
                     parseError = "DsoMode";
                 }
-
                 Byte DsoRange;
                 // History: used to go into DSO_Settings_DsoRange.Text instead of using the variable
-                // History: used to used System.Globalization.NumberStyles.AllowHexSpecifier for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedDsoRange = Utilities.Parsers.TryParseByte(text, dec_or_hex, null, out DsoRange);
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedDsoRange = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out DsoRange);
+                valueIndex++; // Change #5
                 if (!parsedDsoRange)
                 {
                     parseError = "DsoRange";
                 }
-
                 UInt32 DsoSamplingWindow;
                 // History: used to go into DSO_Settings_DsoSamplingWindow.Text instead of using the variable
-                // History: used to used System.Globalization.NumberStyles.None for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedDsoSamplingWindow = Utilities.Parsers.TryParseUInt32(text, dec_or_hex, null, out DsoSamplingWindow);
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedDsoSamplingWindow = Utilities.Parsers.TryParseUInt32(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out DsoSamplingWindow);
+                valueIndex++; // Change #5
                 if (!parsedDsoSamplingWindow)
                 {
                     parseError = "DsoSamplingWindow";
                 }
-
                 UInt16 DsoNSamples;
                 // History: used to go into DSO_Settings_DsoNSamples.Text instead of using the variable
-                // History: used to used System.Globalization.NumberStyles.None for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedDsoNSamples = Utilities.Parsers.TryParseUInt16(text, dec_or_hex, null, out DsoNSamples);
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedDsoNSamples = Utilities.Parsers.TryParseUInt16(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out DsoNSamples);
+                valueIndex++; // Change #5
                 if (!parsedDsoNSamples)
                 {
                     parseError = "DsoNSamples";
                 }
+                DSO_NReadingsLeft = DsoNSamples; // Change: track how many samples we're expecting.
+ 
 
                 if (parseError == null)
                 {
@@ -3132,57 +3172,13 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
         public DataCollection<DSO_ReadingRecord> DSO_ReadingRecordData { get; } = new DataCollection<DSO_ReadingRecord>();
-        private void OnDSO_Reading_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (DSO_ReadingRecordData.Count == 0)
-                {
-                    DSO_ReadingRecordData.AddRecord(new DSO_ReadingRecord());
-                }
-                DSO_ReadingRecordData[DSO_ReadingRecordData.Count - 1].Note = text;
-                e.Handled = true;
-            }
-        }
+
 
         // Functions called from the expander
-        private void OnKeepCountDSO_Reading(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            DSO_ReadingRecordData.MaxLength = value;
 
 
-        }
 
-        private void OnAlgorithmDSO_Reading(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            DSO_ReadingRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyDSO_Reading(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,DsoDataRaw,Notes\n");
-            foreach (var row in DSO_ReadingRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.DsoDataRaw},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
+
 
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyDSO_ReadingSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
@@ -3235,11 +3231,27 @@ namespace BluetoothDeviceController.SpecialtyPages
                     if (DsoDataRaw.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataRaw.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataRaw.IsArray)
                     {
                         record.DsoDataRaw = (string)DsoDataRaw.AsString;
-                        DSO_Reading_DsoDataRaw.Text = record.DsoDataRaw.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                        //DSO_Reading_DsoDataRaw.Text = record.DsoDataRaw.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                     }
 
                     var addResult = DSO_ReadingRecordData.AddRecord(record);
 
+                    // Change: track the data
+                    var array = DsoDataRaw.AsArray;
+                    DSO_NReadingsLeft -= array.MaxIndex;
+                    System.Diagnostics.Debug.WriteLine($"DBG: Got data: DsoScale={DsoScale} curr={Curr_DSO_NMetadataEvents} newest={DSO_NMetadataEvents} expecting newest > curr! Left={DSO_NReadingsLeft} (after subtract)");
+                    for (int i=0; i<array.data.Count; i++)
+                    {
+                        var value = array.data[i].AsDouble;
+                        RawReadings.Add(value);
+                    }
+                    Readings.Clear();
+                    for (int i=0; i<RawReadings.Count; i++)
+                    {
+                        Readings.Add(RawReadings[i]*DsoScale);
+                    }
+                    DSO_Reading_DsoDataRaw.Text = Readings[0].ToString("F3") + " ... ";
+                    ;
                 });
             }
         }
@@ -3284,57 +3296,6 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
         public DataCollection<DSO_MetadataRecord> DSO_MetadataRecordData { get; } = new DataCollection<DSO_MetadataRecord>();
-        private void OnDSO_Metadata_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (DSO_MetadataRecordData.Count == 0)
-                {
-                    DSO_MetadataRecordData.AddRecord(new DSO_MetadataRecord());
-                }
-                DSO_MetadataRecordData[DSO_MetadataRecordData.Count - 1].Note = text;
-                e.Handled = true;
-            }
-        }
-
-        // Functions called from the expander
-        private void OnKeepCountDSO_Metadata(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            DSO_MetadataRecordData.MaxLength = value;
-
-
-        }
-
-        private void OnAlgorithmDSO_Metadata(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            DSO_MetadataRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyDSO_Metadata(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,DsoStatus,DsoDataScale,DsoDataMode,DsoDataRange,DsoDataSamplingWindow,DsoDataNsamples,DsoSamplingRate,Notes\n");
-            foreach (var row in DSO_MetadataRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.DsoStatus},{row.DsoDataScale},{row.DsoDataMode},{row.DsoDataRange},{row.DsoDataSamplingWindow},{row.DsoDataNsamples},{row.DsoSamplingRate},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
 
         private async void OnReadDSO_Metadata(object sender, RoutedEventArgs e)
         {
@@ -3415,6 +3376,8 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
+
+
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyDSO_MetadataSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
 
@@ -3454,8 +3417,14 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         private async void BleDevice_DSO_MetadataEvent(BleEditor.ValueParserResult data)
         {
+
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
+                DsoScale = data.ValueList.GetValue("DsoDataScale").AsDouble; // Change: grab this earlier.
+                DSO_NMetadataEvents++;
+                System.Diagnostics.Debug.WriteLine($"DBG: DSO_MetaDataEvent: got event {DSO_NMetadataEvents} new scale={DsoScale}");
+
+
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
                     var valueList = data.ValueList;
@@ -3513,6 +3482,9 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                     var addResult = DSO_MetadataRecordData.AddRecord(record);
 
+                    // Change:
+                    //DsoScale = DsoDataScale.AsDouble;
+                    System.Diagnostics.Debug.WriteLine($"DBG: DSO_MetaDataEvent: On UX thread: got event {DSO_NMetadataEvents} new scale={DsoScale}");
                 });
             }
         }
@@ -3521,11 +3493,6 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
         // OK to include this method even if there are no defined buttons
-        private async void OnClickDataLogger_Settings(object sender, RoutedEventArgs e)
-        {
-            var text = (sender as Button).Tag as String;
-            await DoWriteDataLogger_Settings(text, System.Globalization.NumberStyles.Integer);
-        }
 
         private async void OnWriteDataLogger_Settings(object sender, RoutedEventArgs e)
         {
@@ -3636,58 +3603,6 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
 
         public DataCollection<DataLogger_ReadingRecord> DataLogger_ReadingRecordData { get; } = new DataCollection<DataLogger_ReadingRecord>();
-        private void OnDataLogger_Reading_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
-                var text = (sender as TextBox).Text.Trim();
-                (sender as TextBox).Text = "";
-                // Add the text to the notes section
-                if (DataLogger_ReadingRecordData.Count == 0)
-                {
-                    DataLogger_ReadingRecordData.AddRecord(new DataLogger_ReadingRecord());
-                }
-                DataLogger_ReadingRecordData[DataLogger_ReadingRecordData.Count - 1].Note = text;
-                e.Handled = true;
-            }
-        }
-
-        // Functions called from the expander
-        private void OnKeepCountDataLogger_Reading(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            DataLogger_ReadingRecordData.MaxLength = value;
-
-
-        }
-
-        private void OnAlgorithmDataLogger_Reading(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1) return;
-            int value;
-            var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
-            if (!ok) return;
-            DataLogger_ReadingRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
-        }
-        private void OnCopyDataLogger_Reading(object sender, RoutedEventArgs e)
-        {
-            // Copy the contents over...
-            var sb = new System.Text.StringBuilder();
-            sb.Append("EventDate,EventTime,DlogData,Notes\n");
-            foreach (var row in DataLogger_ReadingRecordData)
-            {
-                var time24 = row.EventTime.ToString("HH:mm:ss.f");
-                sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.DlogData},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
-            }
-            var str = sb.ToString();
-            var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
-            datapackage.SetText(str);
-            Clipboard.SetContent(datapackage);
-        }
-
         GattClientCharacteristicConfigurationDescriptorValue[] NotifyDataLogger_ReadingSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
 

@@ -1370,7 +1370,7 @@ namespace BluetoothDeviceController
                 // note that this is no longer needed since I just use the MenuItemCache which has an easy count. endidx = FindListEnd() - 1;
             }
 
-            // Even on cancel show the text that we have.
+            // Even on cancel show the Text that we have.
             CurrFinalJsonSearch = "";
             if (!String.IsNullOrEmpty(CurrInProgressJsonSearch))
             {
@@ -1695,7 +1695,7 @@ namespace BluetoothDeviceController
 #endif
 
         /// <summary>
-        /// From the search feedback "Filtered Out" text. Goal is to show the user which devices were filtered out and why.
+        /// From the search feedback "Filtered Out" Text. Goal is to show the user which devices were filtered out and why.
         /// </summary>
         public void ListFilteredOut()
         {

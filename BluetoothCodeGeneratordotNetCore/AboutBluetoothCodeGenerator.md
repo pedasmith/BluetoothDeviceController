@@ -42,7 +42,7 @@ There must **always** be a blank line before the template code! Otherwise it doe
 Template code
 !!```
 
-Maybe more comments. The Name and the Options are important in the processing; the NAME will be the template name and the vawrious options say how to apply the template. For example, a file template needs to be at the top level and have a FileName=_value_ where the _value_ can include any of the macro values.
+Maybe more comments. The Name and the Options are important in the processing; the NAME will be the template name and the various options say how to apply the template. For example, a file template needs to be at the top level and have a FileName=_value_ where the _value_ can include any of the macro values.
 
 ## SUBNAME
 This template is only used by the upper template

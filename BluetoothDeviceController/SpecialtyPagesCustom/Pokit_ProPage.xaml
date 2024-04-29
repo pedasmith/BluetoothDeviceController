@@ -161,19 +161,19 @@
                 <TextBlock Style="{StaticResource SubheaderStyle}">DSO_Settings</TextBlock>
                 <StackPanel Orientation="Horizontal">
 
-                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoTriggerType" Text="*" Header="DsoTriggerType" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoTriggerType" Text="0" Header="DsoTriggerType" Style="{StaticResource HEXStyle}"/>
 
-                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoTriggerLevel" Text="*" Header="DsoTriggerLevel" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoTriggerLevel" Text="8.0" Header="DsoTriggerLevel" Style="{StaticResource HEXStyle}"/>
 
-                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoMode" Text="*" Header="DsoMode" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoMode" Text="1" Header="DsoMode" Style="{StaticResource HEXStyle}"/>
 
-                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoRange" Text="*" Header="DsoRange" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoRange" Text="4" Header="DsoRange" Style="{StaticResource HEXStyle}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
 
-                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoSamplingWindow" Text="*" Header="DsoSamplingWindow" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoSamplingWindow" Text="20" Header="DsoSamplingWindow" Style="{StaticResource HEXStyle}"/>
 
-                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoNSamples" Text="*" Header="DsoNSamples" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="DSO_Settings_DsoNSamples" Text="10" Header="DsoNSamples" Style="{StaticResource HEXStyle}"/>
 
 
                     <Button Content="Write" Click="OnWriteDSO_Settings" />
