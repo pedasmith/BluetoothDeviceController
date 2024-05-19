@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Controls.Primitives;
 using static System.Net.Mime.MediaTypeNames;
+using Newtonsoft.Json.Linq;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -3221,6 +3222,28 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
+                var valueList = data.ValueList;
+                var array = valueList.GetValue("DsoDataRaw").AsArray.data;
+                for (int i = 0; i < array.Count; i++)
+                {
+                    var value = array[i].AsDouble;
+                    RawReadings.Add(value);
+                }
+                DSO_NReadingsLeft -= array.Count;
+                if (DSO_NReadingsLeft <= 0) // wll never actually be zero. And might fail if BT fails?
+                {
+                    Readings.Clear();
+                    for (int i = 0; i < RawReadings.Count; i++)
+                    {
+                        Readings.Add(RawReadings[i] * DsoScale);
+                    }
+                    await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        DSO_Reading_DsoDataRaw.Text = Readings[0].ToString("F3") + " ... ";
+                    });
+                }
+                System.Diagnostics.Debug.WriteLine($"DBG: Early: Got data: DsoScale={DsoScale} count={array.Count} expecting newest > curr! Left={DSO_NReadingsLeft} (after subtract)");
+#if NEVER_EVER_DEFINED
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
                     var valueList = data.ValueList;
@@ -3238,7 +3261,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                     // Change: track the data
                     var array = DsoDataRaw.AsArray;
-                    DSO_NReadingsLeft -= array.MaxIndex;
+                    DSO_NReadingsLeft -= array.data.Count;
                     System.Diagnostics.Debug.WriteLine($"DBG: Got data: DsoScale={DsoScale} curr={Curr_DSO_NMetadataEvents} newest={DSO_NMetadataEvents} expecting newest > curr! Left={DSO_NReadingsLeft} (after subtract)");
                     for (int i=0; i<array.data.Count; i++)
                     {
@@ -3253,6 +3276,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     DSO_Reading_DsoDataRaw.Text = Readings[0].ToString("F3") + " ... ";
                     ;
                 });
+#endif
             }
         }
         public class DSO_MetadataRecord : INotifyPropertyChanged
