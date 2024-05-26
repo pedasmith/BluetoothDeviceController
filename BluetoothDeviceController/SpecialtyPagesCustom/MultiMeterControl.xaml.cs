@@ -15,18 +15,24 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 {
     public class MMDataRecord
     {
+        public MMDataRecord() { }
+        public MMDataRecord(DateTime time, double value)
+        {
+            EventTime = time;
+            Value = value;
+        }
         public DateTime EventTime { get; set; }
         public double Value { get; set; }
     }
     public sealed partial class MultiMeterControl : UserControl
     {
         public enum ConnectionState { Off, Configuring, Configured, GotData, GotDataStale, Deconfiguring, Failed };
-        public ConnectionState _BtConnectionState = ConnectionState.Off;
         private DataCollection<MMDataRecord> MMData = new DataCollection<MMDataRecord>();
         private void UpdateConnectionState()
         {
             uiState.Text = BtConnectionState.ToString();
         }
+        private ConnectionState _BtConnectionState = ConnectionState.Off;
         public ConnectionState BtConnectionState
         {
             get { return _BtConnectionState; }
@@ -115,7 +121,6 @@ typeof(MMDataRecord).GetProperty("Value"),
             BtConnectionState = ConnectionState.Configuring;
             var result = await bleDevice.NotifyMM_DataAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
             BtConnectionState = result ? ConnectionState.Configured : ConnectionState.Failed;
-
         }
         private async Task RemoveCallbacksAsync()
         {
@@ -380,7 +385,7 @@ typeof(MMDataRecord).GetProperty("Value"),
 
         }
 
-        private async void OnStart(object sender, RoutedEventArgs e)
+        private async void OnConnect(object sender, RoutedEventArgs e)
         {
             var mode = GetCurrentMMMode(PokitProMeter.MMMode.Idle);
             byte range = 255; // autorange for all settings

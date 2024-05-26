@@ -108,6 +108,12 @@ namespace BluetoothDeviceController.Charts
             }
             return retval;
         }
+
+        public void ClearAllRecords()
+        {
+            base.Clear();
+            NAdded = 0;
+        }
         private void ResetSizeForNewMaxLength(int newvalue)
         {
             // Must remove old values

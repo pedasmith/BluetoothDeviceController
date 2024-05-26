@@ -208,6 +208,9 @@
     <Compile Include="SpecialtyPagesCustom\MultiMeterControl.xaml.cs">
       <DependentUpon>MultiMeterControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPagesCustom\OscilloscopeControl.xaml.cs">
+      <DependentUpon>OscilloscopeControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SpecialtyPagesCustom\Pokit_ProPage.xaml.cs">
       <DependentUpon>Pokit_ProPage.xaml</DependentUpon>
     </Compile>
@@ -1008,6 +1011,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPagesCustom\MultiMeterControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPagesCustom\OscilloscopeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

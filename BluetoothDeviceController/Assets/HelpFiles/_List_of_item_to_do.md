@@ -1,5 +1,9 @@
 ﻿# List of work items
 
+## Oscilloscope
+
+- Poke constantly (e.g., 10 times or for 5 seconds)
+
 ## The MultiMeter control / Pokit Pro!
 
 Big thing: get the lifetime all sorted out. 

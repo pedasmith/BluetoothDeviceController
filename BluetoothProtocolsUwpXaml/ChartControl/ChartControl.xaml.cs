@@ -97,7 +97,7 @@ namespace BluetoothDeviceController.Charts
         /// When the line cursor is shown, the data is pulled from the DataCollection. This only works because the DataCollection
         /// is also an ISummarizeValues; it can take a ratio (0..1) and return a string summary of the data.
         /// </summary>
-        private List<List<Point>> Data = new List<List<Point>>();
+        private List<List<Point>> UnderlyingData = new List<List<Point>>();
         private List<Polyline> Lines = new List<Polyline>();
         private IList<PropertyInfo> DataProperties = null;
         private PropertyInfo TimeProperty = null;
@@ -182,9 +182,9 @@ namespace BluetoothDeviceController.Charts
                 Lines.Add(polyline);
                 uiCanvas.Children.Add(polyline); // Actually add the polyline!
             }
-            while (Data.Count <= lineIndex)
+            while (UnderlyingData.Count <= lineIndex)
             {
-                Data.Add(new List<Point>());
+                UnderlyingData.Add(new List<Point>());
             }
             EnsureYExists(lineIndex);
         }
@@ -207,9 +207,9 @@ namespace BluetoothDeviceController.Charts
 
         private void RedrawAllLines()
         {
-            for (int i=0; i<Data.Count; i++)
+            for (int i=0; i<UnderlyingData.Count; i++)
             {
-                var data = Data[i];
+                var data = UnderlyingData[i];
                 var line = Lines[i];
                 line.Points.Clear();
                 //System.Diagnostics.Debug.WriteLine($"\n\nDBG: REDRAW ALL LINES: npoints {data.Count}");
@@ -279,14 +279,14 @@ namespace BluetoothDeviceController.Charts
                 case AddResult.AddReplace:
                     {
                         // Note: must call ResetMinMax if the data is really updated.
-                        Data[lineIndex] = new List<Point>(list.Count);
+                        UnderlyingData[lineIndex] = new List<Point>(list.Count);
                         for (int i = 0; i < list.Count; i++)
                         {
                             var record = list[i];
                             var x = Convert.ToDateTime(timeProperty.GetValue(record));
                             var y = Convert.ToDouble(yProperty.GetValue(record));
                             double xtime = (x.Subtract(StartTime)).TotalSeconds;
-                            Data[lineIndex].Add(new Point(xtime, y));
+                            UnderlyingData[lineIndex].Add(new Point(xtime, y));
                         }
                         RedrawAllLines();
                     }
@@ -344,9 +344,9 @@ namespace BluetoothDeviceController.Charts
                     break;
                 case AddResult.AddReplace:
                     // Wipe out the old lines
-                    for (int lineIndex = 0; lineIndex < Data.Count; lineIndex++)
+                    for (int lineIndex = 0; lineIndex < UnderlyingData.Count; lineIndex++)
                     {
-                        Data[lineIndex] = new List<Point>(list.Count);
+                        UnderlyingData[lineIndex] = new List<Point>(list.Count);
                     }
                     // Add the data back in
                     foreach (var record in list)
@@ -431,7 +431,7 @@ namespace BluetoothDeviceController.Charts
             EnsureLineExists(lineIndex);
             var line = Lines[lineIndex];
             double xtime = (x.Subtract (StartTime)).TotalSeconds;
-            Data[lineIndex].Add(new Point(xtime, y));
+            UnderlyingData[lineIndex].Add(new Point(xtime, y));
 
             if (xtime < XMin || xtime > XMax || y < GetYMin(lineIndex) || y > GetYMax(lineIndex) || !MinMaxBeenInit)
             {

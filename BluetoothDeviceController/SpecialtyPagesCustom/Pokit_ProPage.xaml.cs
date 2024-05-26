@@ -1,9 +1,7 @@
 ﻿using BluetoothDeviceController.Charts;
-using BluetoothDeviceController.Names;
 using BluetoothProtocols;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Utilities;
@@ -11,13 +9,9 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Devices.Enumeration;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using Windows.UI.Xaml.Controls.Primitives;
-using static System.Net.Mime.MediaTypeNames;
-using Newtonsoft.Json.Linq;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -52,6 +46,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
             //Change
             await uiMultiMeter.SetMeter(bleDevice);
+            await uiOscilloscope.SetMeter(bleDevice);
         }
 
         public string GetId()
@@ -3062,7 +3057,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         }
         private async Task DoWriteDSO_Settings(List<UxTextValue> values)
         {
-            if (values.Count != 6) return; // Change #2; TODO: Correct number here CHANGE 11: is 6, mpt 7
+            if (values.Count != 6) return; // Change #2; TODO: Correct number here CHANGE 11: is 6, not 7
             int valueIndex = 0; // Change #3;
             Curr_DSO_NMetadataEvents = DSO_NMetadataEvents;
             System.Diagnostics.Debug.WriteLine($"DBG: WriteDSO_Settings: saving={Curr_DSO_NMetadataEvents}");

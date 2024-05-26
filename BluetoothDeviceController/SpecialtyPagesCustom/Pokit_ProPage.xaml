@@ -78,6 +78,7 @@
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
 
+        <specialtypagescustom:OscilloscopeControl x:Name="uiOscilloscope" />
         <specialtypagescustom:MultiMeterControl x:Name="uiMultiMeter" />
 
 
@@ -155,7 +156,7 @@
             </StackPanel>
         </controls:Expander>
 
-        <controls:Expander Header="DSO_Oscilloscope" IsExpanded="False" Style="{StaticResource HeaderStyleExpander}">
+        <controls:Expander Header="DSO_Oscilloscope" IsExpanded="True" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">DSO_Settings</TextBlock>
@@ -228,7 +229,7 @@
             </StackPanel>
         </controls:Expander>
 
-        <controls:Expander Header="Multimeter" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+        <controls:Expander Header="Multimeter" IsExpanded="False" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">MM_Settings</TextBlock>
