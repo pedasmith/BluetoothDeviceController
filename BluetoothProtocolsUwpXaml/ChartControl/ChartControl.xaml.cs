@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Names;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -257,8 +258,34 @@ namespace BluetoothDeviceController.Charts
             }
             for (int i=0; i<DataProperties.Count; i++)
             {
+                // Each data point can have multiple values -- e.g., temp, pressure, humidity.
+                // Add in each value, all at the same time.
                 AddYTime<T>(i, addResult, list, DataProperties[i], TimeProperty);
             }
+        }
+
+        // TODO: adding new method for oscilloscope-type updates. here!here
+        // Hey -- how is this really any different from RedrawLineYTime()???
+        public void ZZZSetLineData<T>(DateTime startTime, int lineIndex, DataCollection<T> list)
+        {
+            if (lineIndex != 0)
+            {
+                throw new Exception ("NIY: Sorry, the oscilloscope stuff only works for single traces");
+            }
+            StartTime = startTime;
+            var yProperty = DataProperties[lineIndex];
+            var timeProperty = TimeProperty;
+
+            UnderlyingData[lineIndex] = new List<Point>(list.Count);
+            for (int i = 0; i < list.Count; i++)
+            {
+                var record = list[i];
+                var x = Convert.ToDateTime(timeProperty.GetValue(record));
+                var y = Convert.ToDouble(yProperty.GetValue(record));
+                double xtime = (x.Subtract(StartTime)).TotalSeconds;
+                UnderlyingData[lineIndex].Add(new Point(xtime, y));
+            }
+            RedrawAllLines();
         }
 
         /// <summary>
@@ -307,6 +334,7 @@ namespace BluetoothDeviceController.Charts
 
         /// <summary>
         /// Uses DataProperties to pull data from the DataCollection<record> list
+        /// BUT requires that the DataProperties be in the weird line index / actual value order like for BBC microBit
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
@@ -322,11 +350,31 @@ namespace BluetoothDeviceController.Charts
             RedrawAllLines();
         }
 
-
+        /// <summary>
+        /// Uses DataProperties to pull data from the DataCollection<record> list
+        /// BUT requires that the DataProperties be in the weird line index / actual value order like for BBC microBit
+        /// TODO: delete, never used
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        public void ZZZRedrawLineYTimeOscilloscope<T>(DataCollection<T> list)
+        {
+            if (DataProperties == null) return;
+            ResetMinMaxLine(list); //TODO: replace with correct item?
+            if (list.Count > 0)
+            {
+                // Act like everything is all different.
+                AddLineYTime<T>(AddResult.AddReplace, list);
+            }
+            RedrawAllLines();
+        }
         /// <summary>
         /// Most common entry point! Uses DataProperties to pull data from the DataCollection<record> list
         /// My new version just for the bbc micro:bit. Let me just say that their 
         /// pin/value mechanism is a little hard to handle!
+        /// 
+        /// When addResult is AddSimple, just the last item is added.
+        /// When addResult is AddReplace, the entire list is replaced.
         /// </summary>
         public void AddLineYTime<T>(AddResult addResult, DataCollection<T> list)
         {
@@ -379,6 +427,12 @@ namespace BluetoothDeviceController.Charts
             }
         }
         const int MAX_LINE_INDEX = 99;
+
+        /// <summary>
+        /// Uses the **Line** format where the data properties is line index / value
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
         private void ResetMinMaxLine<T>(DataCollection<T> list)
         {
             XMin = double.MaxValue;
@@ -398,6 +452,7 @@ namespace BluetoothDeviceController.Charts
                     var lineIndex = Convert.ToDouble(lineIndexProperty.GetValue(record));
                     if (lineIndex >= 0 && lineIndex <= MAX_LINE_INDEX)
                     {
+                        EnsureLineExists((int)lineIndex);
                         var y = Convert.ToDouble(yProperty.GetValue(record));
                         YMins[j] = Math.Min(YMins[j], y);
                         YMaxs[j] = Math.Max(YMaxs[j], y);
@@ -480,6 +535,11 @@ namespace BluetoothDeviceController.Charts
 
         private void ResetMinMax<T>(DataCollection<T> list)
         {
+            for (int i = 0; i < DataProperties.Count; i++)
+            {
+                EnsureLineExists(i);
+            }
+
             XMin = double.MaxValue;
             XMax = double.MinValue;
             for (int i = 0; i < YMins.Count; i++)

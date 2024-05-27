@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Utilities;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.UI.WebUI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using static BluetoothDeviceController.SpecialtyPages.PokitProMeterPage;
@@ -236,15 +237,16 @@ typeof(MMDataRecord).GetProperty("Value"),
                     Utilities.UIThreadHelper.CallOnUIThread(() =>
                     {
                         MMData.ClearAllRecords();
+                        MMData.MaxLength = RawReadings.Count;
+
                         DateTime readingTime = ReadingStart; // increment by 
                         for (int i = 0; i < RawReadings.Count; i++)
                         {
                             var mm = new MMDataRecord(readingTime, RawReadings[i] * DsoScale);
                             var addResult = MMData.AddRecord(mm);
-                            if (i == 1) addResult = AddResult.AddReplace; // TODO: this is super clunky.
-                            uiChart.AddYTime<MMDataRecord>(addResult, MMData);
                             readingTime = readingTime.AddSeconds(ReadingDeltaInSeconds);
                         }
+                        uiChart.RedrawYTime(MMData);
                         Log(MMData[0].Value.ToString("F3") + " ... ");
                     });
                 }
