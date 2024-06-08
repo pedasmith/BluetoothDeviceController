@@ -10,6 +10,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -33,7 +34,7 @@ namespace BluetoothDeviceController.Charts
         void SetDataProperties(IList<PropertyInfo> dataProperties, PropertyInfo timeProperty, IList<string> names);
         void SetTitle(string title);
         void SetUISpec(UISpecifications uISpec);
-        void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, int triggerIndex = -1); // list is really 
+        void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, List<int> triggerIndex);
     }
     public sealed partial class ChartControl : UserControl, IChartControlOscilloscope
     {
@@ -117,7 +118,7 @@ namespace BluetoothDeviceController.Charts
         /// </summary>
         private List<List<Point>> UnderlyingData = new List<List<Point>>();
         private List<Polyline> Lines = new List<Polyline>();
-        private List<Polyline> Markers = new List<Polyline>();
+        private List<List<Polyline>> Markers = new List<List<Polyline>>();
         private IList<PropertyInfo> DataProperties = null;
         private PropertyInfo TimeProperty = null;
         private DateTime StartTime;
@@ -202,8 +203,10 @@ namespace BluetoothDeviceController.Charts
                 uiCanvas.Children.Add(polyline); // Actually add the polyline!
 
                 // New: markers!
-                var marker = new Polyline() { Fill = null, Stroke = new SolidColorBrush(Colors.Red), StrokeThickness = 2.0 };
-                Markers.Add(marker);
+                var mlist = new List<Polyline>();
+                var marker = MakeMarker();
+                mlist.Add(marker);
+                Markers.Add(mlist);
                 uiCanvas.Children.Add(marker);
             }
             while (UnderlyingData.Count <= lineIndex)
@@ -213,7 +216,11 @@ namespace BluetoothDeviceController.Charts
 
             EnsureYExists(lineIndex);
         }
-
+        private Polyline MakeMarker()
+        {
+            var retval = new Polyline() { Fill = null, Stroke = new SolidColorBrush(Colors.Red), StrokeThickness = 2.0 };
+            return retval;
+        }
         private void EnsureYExists(int lineIndex)
         {
             while (YMins.Count <= lineIndex)
@@ -343,7 +350,7 @@ namespace BluetoothDeviceController.Charts
         /// <typeparam name="T"></typeparam>
         /// <param name="lineIndex"></param>
         /// <param name="list"></param>
-        public void RedrawOscilloscopeYTime<T>(int lineIndex, DataCollection<T> list, int markerIndex= -1)
+        public void RedrawOscilloscopeYTime<T>(int lineIndex, DataCollection<T> list, List<int> markerIndexList)
         {
             if (DataProperties == null) return;
             if (DataProperties.Count != 1) return; // NOTE: Always exactly 1 item
@@ -354,19 +361,22 @@ namespace BluetoothDeviceController.Charts
             if (list.Count > 0)
             {
                 double markerXdelta = 0;
+                if (markerIndexList.Count > 0)
                 if (lineIndex == 0)
                 {
-                    var record = list[markerIndex];
+                    var record = list[markerIndexList[0]];
                     var time = Convert.ToDateTime(TimeProperty.GetValue(record));
                     line0markerx = X(time.Subtract(StartTime).TotalSeconds);
                 }
                 else
                 {
-                    var record = list[markerIndex];
+                    var record = list[markerIndexList[0]];
                     var time = Convert.ToDateTime(TimeProperty.GetValue(record));
                     var markerx = X(time.Subtract(StartTime).TotalSeconds);
                     markerXdelta = line0markerx - markerx;
                 }
+
+                Lines[lineIndex].Points.Clear();
 
                 UnderlyingData[lineIndex] = new List<Point>(list.Count);
                 var yProperty = DataProperties[0];
@@ -378,31 +388,50 @@ namespace BluetoothDeviceController.Charts
                 }
 
 
-                if (markerIndex >= 0)
+                if (markerIndexList.Count > 0)
                 {
-                    var markerRecord = list[markerIndex];
-                    var x = Convert.ToDateTime(TimeProperty.GetValue(markerRecord));
-                    var y = Convert.ToDouble(yProperty.GetValue(markerRecord));
-                    double xtime = (x.Subtract(StartTime)).TotalSeconds;
-                    double xpos = X(xtime) + markerXdelta;
-                    double ypos = Y(lineIndex, y);
-                    Markers[lineIndex].Points.Clear();
-                    Markers[lineIndex].Points.Add(new Point(xpos, ypos));
-                    Markers[lineIndex].Points.Add(new Point(xpos - 5, ypos - 5));
+                    // Remove the old markers
+                    var oldlist = Markers[lineIndex];
+                    foreach (var oldmarker in oldlist)
+                    {
+                        uiCanvas.Children.Remove(oldmarker);
+                    }
 
-                    Markers[lineIndex].Points.Add(new Point(xpos, ypos));
-                    Markers[lineIndex].Points.Add(new Point(xpos + 5, ypos - 5));
-
-                    Markers[lineIndex].Points.Add(new Point(xpos, ypos));
-                    Markers[lineIndex].Points.Add(new Point(xpos - 5, ypos + 5));
-
-                    Markers[lineIndex].Points.Add(new Point(xpos, ypos));
-                    Markers[lineIndex].Points.Add(new Point(xpos + 5, ypos + 5));
-
-                    Markers[lineIndex].Points.Add(new Point(xpos, ypos));
+                    // Create new markers
+                    foreach (var markerIndex in markerIndexList)
+                    {
+                        var markerRecord = list[markerIndex];
+                        var x = Convert.ToDateTime(TimeProperty.GetValue(markerRecord));
+                        var y = Convert.ToDouble(yProperty.GetValue(markerRecord));
+                        double xtime = (x.Subtract(StartTime)).TotalSeconds;
+                        double xpos = X(xtime) + markerXdelta;
+                        double ypos = Y(lineIndex, y);
+                        var marker = MakeMarker();
+                        marker.Stroke = Lines[lineIndex].Stroke; // Make it be the same color
+                        Markers[lineIndex].Add(marker);
+                        uiCanvas.Children.Add(marker);
+                        SetupMarker(marker.Points, xpos, ypos);
+                    }
                 }
-                //RedrawAllLines();
             }
+        }
+
+        private void SetupMarker(PointCollection points, double xpos, double ypos)
+        {
+            points.Clear();
+            points.Add(new Point(xpos, ypos));
+            points.Add(new Point(xpos - 5, ypos - 5));
+
+            points.Add(new Point(xpos, ypos));
+            points.Add(new Point(xpos + 5, ypos - 5));
+
+            points.Add(new Point(xpos, ypos));
+            points.Add(new Point(xpos - 5, ypos + 5));
+
+            points.Add(new Point(xpos, ypos));
+            points.Add(new Point(xpos + 5, ypos + 5));
+
+            points.Add(new Point(xpos, ypos));
         }
 
 
@@ -586,7 +615,7 @@ namespace BluetoothDeviceController.Charts
             }
 
             EnsureLineExists(lineIndex);
-            var line = Lines[lineIndex];
+            // Not actually used?  var line = Lines[lineIndex];
             double xtime = (x.Subtract (StartTime)).TotalSeconds;
             UnderlyingData[lineIndex].Add(new Point(xtime, y));
 

@@ -40,13 +40,31 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         {
             return $"{Trigger} Level={Level}";
         }
-        public int FindTriggeredIndex(IList<OscDataRecord> list)
+
+        public List<int> FindTriggeredIndex(IList<OscDataRecord> list)
+        {
+            List<int> retval = new List<int>();
+            var index = 0;
+            do
+            {
+                var next = FindNextTriggeredIndex(index, list);
+                if (next > 0)
+                {
+                    retval.Add(next);
+                }
+                index = next;
+            }
+            while (index > 0);
+            return retval;
+        }
+
+        private int FindNextTriggeredIndex(int startIndex, IList<OscDataRecord> list)
         {
             if (list.Count < 2) return 0;
             if (Trigger == TriggerType.None) return 0;
 
-            double prev = list[0].Value;
-            for (int i=1; i < list.Count; i++)
+            double prev = list[startIndex].Value;
+            for (int i=startIndex+1; i < list.Count; i++)
             {
                 var curr = list[i].Value;
                 if (prev < Level && curr >= Level)
@@ -144,7 +162,7 @@ typeof(OscDataRecord).GetProperty("Value"),
             {
                 tableType = "standard",
                 chartType = "standard",
-                chartCommand = "AddYTime<MagnetometerCalibrationRecord>(addResult, MMRecordData)", //TODO: What should the chart comand be>???
+                chartCommand = "AddYTime<MagnetometerCalibrationRecord>(addResult, MMRecordData)", //TODO: What should the chart command be>???
                 chartDefaultMaxY = 5.0, // TODO: what's the best value here? 10_000,
                 chartDefaultMinY = 0,
             });
@@ -312,15 +330,15 @@ typeof(OscDataRecord).GetProperty("Value"),
                         {
                             var mm = new OscDataRecord(readingTime, RawReadings[i] * DsoScale);
                             var addResult = MMData.AddRecord(mm);
-                            //readingTime = readingTime.AddSeconds(ReadingDeltaInSeconds * 1_000_000.0); // The timestamp isn't actually a real time thanks to .NET limitations
                             readingTime = readingTime.AddTicks(ReadingDeltaInTicks);
                         }
 
-                        var triggerIndex = TriggerSetting.FindTriggeredIndex(MMData);
+                        var triggerIndexList = TriggerSetting.FindTriggeredIndex(MMData);
                         var triggerNominalTime = MMData[0].EventTime;
 
-                        uiChartRaw.RedrawOscilloscopeYTime(currLineIndex, MMData, triggerIndex); // Push the data into the ChartControl
-                        Log($"Got data: {MMData[0].Value:F3} trigger index {triggerIndex}");
+
+                        uiChartRaw.RedrawOscilloscopeYTime(currLineIndex, MMData, triggerIndexList); // Push the data into the ChartControl
+                        Log($"Got data: {MMData[0].Value:F3}");
                         IncrementCurrLineIndex();
                     });
                 }
