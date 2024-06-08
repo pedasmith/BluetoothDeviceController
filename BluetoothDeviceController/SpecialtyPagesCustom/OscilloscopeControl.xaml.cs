@@ -204,7 +204,8 @@ typeof(OscDataRecord).GetProperty("Value"),
         int Curr_DSO_NMetadataEvents = -10;
         int DSO_NReadingsLeft = 0;
         DateTime ReadingStartTime = DateTime.MinValue;
-        Double ReadingDeltaInSeconds = 0.0001;
+        // Double ReadingDeltaInSeconds = 0.0001;
+        long ReadingDeltaInTicks = 100; // Good default; matches the "10 microseconds per sample" set in 2024-06-08
         List<double> RawReadings = new List<double>();
         double DsoScale = 1.0;
 
@@ -304,14 +305,15 @@ typeof(OscDataRecord).GetProperty("Value"),
                         MMData.ClearAllRecords();
                         MMData.MaxLength = RawReadings.Count;
 
-                        MMData.CurrTimeStampType = DataCollection<OscDataRecord>.TimeStampType.FromZeroMSx1Meg;
+                        MMData.CurrTimeStampType = DataCollection<OscDataRecord>.TimeStampType.FromZeroMS;
                         DateTime readingTime = DateTime.MinValue;  // and not at all ReadingStartTime;
                         MMData.TimeStampStart = readingTime; // force these to always be in sync :-)
                         for (int i = 0; i < RawReadings.Count; i++)
                         {
                             var mm = new OscDataRecord(readingTime, RawReadings[i] * DsoScale);
                             var addResult = MMData.AddRecord(mm);
-                            readingTime = readingTime.AddSeconds(ReadingDeltaInSeconds * 1_000_000.0); // The timestamp isn't actually a real time thanks to .NET limitations
+                            //readingTime = readingTime.AddSeconds(ReadingDeltaInSeconds * 1_000_000.0); // The timestamp isn't actually a real time thanks to .NET limitations
+                            readingTime = readingTime.AddTicks(ReadingDeltaInTicks);
                         }
 
                         var triggerIndex = TriggerSetting.FindTriggeredIndex(MMData);
@@ -378,14 +380,15 @@ typeof(OscDataRecord).GetProperty("Value"),
 
 
             ushort nSamples = 500; // not too many for testing!
-            UInt32 timePerSampleInMicroseconds = 10;
+            UInt32 timePerSampleInMicroseconds = 10; // FYI: there are 10 C# ticks per microsecond
             UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
 
             if (bleDevice == null) return;
 
             DSO_NReadingsLeft = nSamples;
             ReadingStartTime = DateTime.Now;
-            ReadingDeltaInSeconds = ((double)timePerSampleInMicroseconds) / (1_000_000.0); // Convert micro-seconds to seconds
+            // ReadingDeltaInSeconds = ((double)timePerSampleInMicroseconds) / (1_000_000.0); // Convert micro-seconds to seconds
+            ReadingDeltaInTicks = timePerSampleInMicroseconds * 10;
             RawReadings.Clear();
 
             await bleDevice.WriteDSO_Settings((byte)triggerType, triggerLevel, (byte)datamode, (byte)range, samplingWindowInMicroseconds, nSamples);

@@ -31,7 +31,7 @@ namespace BluetoothDeviceController.Charts
     /// <typeparam name="T"></typeparam>
     public class DataCollection<T> : ObservableCollection<T>, ISummarizeValue
     {
-        public enum TimeStampType { HMS, FromZeroMSx1Meg };
+        public enum TimeStampType { HMS, FromZeroMS  };
         public TimeStampType CurrTimeStampType { get; set; } = TimeStampType.HMS;
         public DateTime TimeStampStart { get; set; } = DateTime.MinValue; // Only used when CurrTimeStampType is FromZero.
         public RemoveRecordAlgorithm RemoveAlgorithm = RemoveRecordAlgorithm.RemoveRandom;
@@ -68,12 +68,9 @@ namespace BluetoothDeviceController.Charts
                             case TimeStampType.HMS:
                                 str = dt.ToString("HH:mm:ss.f");
                                 break;
-                            case TimeStampType.FromZeroMSx1Meg:
-                                // Oscilloscope has "time readings" that are higher precision than the
-                                // time values in the .NET used by UWP (aka, not .NET 7 and up).
-                                // Each Oscilloscope time reading is multiplied by 1_000_000.0
+                            case TimeStampType.FromZeroMS:
                                 var delta = dt.Subtract(TimeStampStart);
-                                str = (delta.TotalMilliseconds / 1_000_000.0).ToString("F3") + " msec";
+                                str = (delta.TotalMilliseconds).ToString("F3") + " msec";
                                 break;
                         }
                     }
