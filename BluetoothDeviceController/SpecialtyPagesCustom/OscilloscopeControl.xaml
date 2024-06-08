@@ -70,7 +70,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <chart:ChartControl Grid.Row="0" x:Name="uiChart" Height="200" />
+            <chart:ChartControl Grid.Row="0" x:Name="uiChartRaw" Height="200" />
 
             <StackPanel Grid.Row="1" Orientation="Horizontal">
                 <Button Content="Connect" Click="OnConnect" />

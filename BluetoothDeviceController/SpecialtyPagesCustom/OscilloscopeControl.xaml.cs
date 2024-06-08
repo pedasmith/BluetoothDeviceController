@@ -14,15 +14,86 @@ using static BluetoothDeviceController.SpecialtyPages.PokitProMeterPage;
 
 namespace BluetoothDeviceController.SpecialtyPagesCustom
 {
+    public class OscDataRecord
+    {
+        public OscDataRecord() { }
+        public OscDataRecord(DateTime time, double value)
+        {
+            EventTime = time;
+            Value = value;
+        }
+        public DateTime EventTime { get; set; }
+        public double Value { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Value:F2} at {EventTime.Second}.{EventTime.Millisecond}";
+        }
+    }
+
+    public class TriggerSetting
+    {
+        public enum TriggerType {  None, Rising }; // TODO: should falling trigger, too!
+        public TriggerType Trigger = TriggerType.Rising;
+        public double Level { get; set; } = 2.5;
+        public override string ToString()
+        {
+            return $"{Trigger} Level={Level}";
+        }
+        public int FindTriggeredIndex(IList<OscDataRecord> list)
+        {
+            if (list.Count < 2) return 0;
+            if (Trigger == TriggerType.None) return 0;
+
+            double prev = list[0].Value;
+            for (int i=1; i < list.Count; i++)
+            {
+                var curr = list[i].Value;
+                if (prev < Level && curr >= Level)
+                {
+                    return i;
+                }
+                prev = curr;
+            }
+            return 0;
+        }
+
+        public string ZZZAdjustDataTimeFromTriggerIndex(int triggerIndex, DateTime lineStartTime, IList<OscDataRecord> list)
+        {
+            var logstr = "";
+            var triggerTime = list[triggerIndex].EventTime;
+            var delta = triggerTime.Subtract(lineStartTime);
+            logstr = $" Trigger: time={triggerTime} delta(ms)={delta.TotalMilliseconds}";
+            for (int i=0; i < list.Count; i++)
+            {
+                var value = list[i];
+                value.EventTime = value.EventTime.Subtract(delta);
+            }
+            return logstr;
+        }
+    }
     public sealed partial class OscilloscopeControl : UserControl
     {
         public enum ConnectionState { Off, Configuring, Configured, GotData, GotDataStale, Deconfiguring, Failed };
-        private DataCollection<MMDataRecord> MMData = new DataCollection<MMDataRecord>();
+        private DataCollection<OscDataRecord> MMData = new DataCollection<OscDataRecord>();
 
         public enum OscTriggerType {  FreeRunning=0, TriggerRisingEdge=1,TriggerFallingEdge=2, ResendData=3 };
         public enum OscDataMode {  Idle=0, VDCCouple=1, VACCouple=2, CurrentDCCouple=3, CurrentACCouple=4 }
         public enum OscVRangeVMax {  V300mV=0, V02V=1, V06V=2, V12V=3, V30=4, V60=5}
         // TODO: RangeAmpMax, too.
+
+        TriggerSetting TriggerSetting { get; } = new TriggerSetting();
+        IChartControlOscilloscope uiChart;
+
+        private int currLineIndex = 0;
+        private void IncrementCurrLineIndex()
+        {
+            currLineIndex++;
+            if (currLineIndex > 4)
+            {
+                currLineIndex = 0;
+            }
+        }
 
         private void UpdateConnectionState()
         {
@@ -31,6 +102,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         public OscilloscopeControl()
         {
             this.InitializeComponent();
+            uiChart = uiChartRaw;
             this.Loaded += OscilloscopeControl_Loaded;
         }
         PokitProMeter bleDevice = null;
@@ -57,10 +129,10 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             MMData.RemoveAlgorithm = RemoveRecordAlgorithm.RemoveFirst;
             MMData.MaxLength = 8000;
 
-            var EventTimeProperty = typeof(MMDataRecord).GetProperty("EventTime");
+            var EventTimeProperty = typeof(OscDataRecord).GetProperty("EventTime");
             var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
                 {
-typeof(MMDataRecord).GetProperty("Value"),
+typeof(OscDataRecord).GetProperty("Value"),
                 };
             var names = new List<string>()
                 {
@@ -68,14 +140,14 @@ typeof(MMDataRecord).GetProperty("Value"),
                 };
             uiChart.SetDataProperties(properties, EventTimeProperty, names);
             uiChart.SetTitle("Oscilloscope");
-            uiChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
+            uiChart.SetUISpec(new BluetoothDeviceController.Names.UISpecifications()
             {
                 tableType = "standard",
                 chartType = "standard",
                 chartCommand = "AddYTime<MagnetometerCalibrationRecord>(addResult, MMRecordData)", //TODO: What should the chart comand be>???
                 chartDefaultMaxY = 5.0, // TODO: what's the best value here? 10_000,
                 chartDefaultMinY = 0,
-            }
+            });
 ;
         }
         private async Task ConnectCallbacksAsync()
@@ -146,7 +218,6 @@ typeof(MMDataRecord).GetProperty("Value"),
         {
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
-                Log("DBG: GOT MetaData");
                 DsoScale = data.ValueList.GetValue("DsoDataScale").AsDouble; // Change: grab this earlier.
                 DSO_NMetadataEvents++;
                 System.Diagnostics.Debug.WriteLine($"DBG: DSO_MetaDataEvent: got event {DSO_NMetadataEvents} new scale={DsoScale}");
@@ -202,12 +273,6 @@ typeof(MMDataRecord).GetProperty("Value"),
                     DSO_Metadata_DsoDataSamplingWindow.Text = record.DsoDataSamplingWindow.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                     DSO_Metadata_DsoDataNsamples.Text = record.DsoDataNsamples.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                     DSO_Metadata_DsoSamplingRate.Text = record.DsoSamplingRate.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-
-                    //var addResult = DSO_MetadataRecordData.AddRecord(record);
-
-                    // Change:
-                    //DsoScale = DsoDataScale.AsDouble;
-                    System.Diagnostics.Debug.WriteLine($"DBG: DSO_MetaDataEvent: On UX thread: got event {DSO_NMetadataEvents} new scale={DsoScale}");
                 });
             }
         }
@@ -220,7 +285,7 @@ typeof(MMDataRecord).GetProperty("Value"),
         private void BleDevice_DSO_ReadingEvent(BleEditor.ValueParserResult data)
         {
             nread++;
-            Log($"NRead={nread}");
+            // Works lke a champ; no need for logging: Log($"NRead={nread}");
 
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
@@ -232,22 +297,28 @@ typeof(MMDataRecord).GetProperty("Value"),
                     RawReadings.Add(value);
                 }
                 DSO_NReadingsLeft -= array.Count;
-                if (DSO_NReadingsLeft <= 0) // NOTE: huh? why not zero? old comment: wll never actually be zero. And might fail if BT fails?
+                if (DSO_NReadingsLeft <= 0) // NOTE: what happens if the BT fails?
                 {
                     Utilities.UIThreadHelper.CallOnUIThread(() =>
                     {
                         MMData.ClearAllRecords();
                         MMData.MaxLength = RawReadings.Count;
 
-                        DateTime readingTime = ReadingStart; // increment by 
+                        DateTime readingTime = ReadingStart;
+                        readingTime = DateTime.MinValue;
                         for (int i = 0; i < RawReadings.Count; i++)
                         {
-                            var mm = new MMDataRecord(readingTime, RawReadings[i] * DsoScale);
+                            var mm = new OscDataRecord(readingTime, RawReadings[i] * DsoScale);
                             var addResult = MMData.AddRecord(mm);
                             readingTime = readingTime.AddSeconds(ReadingDeltaInSeconds);
                         }
-                        uiChart.RedrawYTime(MMData);
-                        Log(MMData[0].Value.ToString("F3") + " ... ");
+
+                        var triggerIndex = TriggerSetting.FindTriggeredIndex(MMData);
+                        var triggerNominalTime = MMData[0].EventTime;
+
+                        uiChartRaw.RedrawOscilloscopeYTime(currLineIndex, MMData, triggerIndex); // Push the data into the ChartControl
+                        Log($"Got data: {MMData[0].Value:F3} trigger index {triggerIndex}");
+                        IncrementCurrLineIndex();
                     });
                 }
             }
@@ -295,7 +366,7 @@ typeof(MMDataRecord).GetProperty("Value"),
             UIThreadHelper.CallOnUIThread(() =>
             {
                 NRequest++;
-                uiLog.Text = $"Request Data {NRequest}\n";
+                uiLog.Text = $""; //  Request Data {NRequest}\n";
             });
 
             // TODO: get this all hooked up to some UX t control it. And do continuous readings!
