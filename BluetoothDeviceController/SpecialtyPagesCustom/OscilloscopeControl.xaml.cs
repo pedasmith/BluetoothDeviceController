@@ -203,7 +203,7 @@ typeof(OscDataRecord).GetProperty("Value"),
         int DSO_NMetadataEvents = 0;
         int Curr_DSO_NMetadataEvents = -10;
         int DSO_NReadingsLeft = 0;
-        DateTime ReadingStart = DateTime.MinValue;
+        DateTime ReadingStartTime = DateTime.MinValue;
         Double ReadingDeltaInSeconds = 0.0001;
         List<double> RawReadings = new List<double>();
         double DsoScale = 1.0;
@@ -285,7 +285,7 @@ typeof(OscDataRecord).GetProperty("Value"),
         private void BleDevice_DSO_ReadingEvent(BleEditor.ValueParserResult data)
         {
             nread++;
-            // Works lke a champ; no need for logging: Log($"NRead={nread}");
+            // Works like a champ; no need for logging: Log($"NRead={nread}");
 
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
@@ -304,13 +304,14 @@ typeof(OscDataRecord).GetProperty("Value"),
                         MMData.ClearAllRecords();
                         MMData.MaxLength = RawReadings.Count;
 
-                        DateTime readingTime = ReadingStart;
-                        readingTime = DateTime.MinValue;
+                        MMData.CurrTimeStampType = DataCollection<OscDataRecord>.TimeStampType.FromZeroMSx1Meg;
+                        DateTime readingTime = DateTime.MinValue;  // and not at all ReadingStartTime;
+                        MMData.TimeStampStart = readingTime; // force these to always be in sync :-)
                         for (int i = 0; i < RawReadings.Count; i++)
                         {
                             var mm = new OscDataRecord(readingTime, RawReadings[i] * DsoScale);
                             var addResult = MMData.AddRecord(mm);
-                            readingTime = readingTime.AddSeconds(ReadingDeltaInSeconds);
+                            readingTime = readingTime.AddSeconds(ReadingDeltaInSeconds * 1_000_000.0); // The timestamp isn't actually a real time thanks to .NET limitations
                         }
 
                         var triggerIndex = TriggerSetting.FindTriggeredIndex(MMData);
@@ -369,7 +370,7 @@ typeof(OscDataRecord).GetProperty("Value"),
                 uiLog.Text = $""; //  Request Data {NRequest}\n";
             });
 
-            // TODO: get this all hooked up to some UX t control it. And do continuous readings!
+            // TODO: get this all hooked up to some UX to control it. And do continuous readings!
             var triggerType = OscTriggerType.FreeRunning;
             var triggerLevel = 3.0f; // TODO: select
             var datamode = OscDataMode.VDCCouple;
@@ -383,8 +384,8 @@ typeof(OscDataRecord).GetProperty("Value"),
             if (bleDevice == null) return;
 
             DSO_NReadingsLeft = nSamples;
-            ReadingStart = DateTime.Now;
-            ReadingDeltaInSeconds = ((double)samplingWindowInMicroseconds) / (1_000_000.0); // Convert micro-seconds to seconds
+            ReadingStartTime = DateTime.Now;
+            ReadingDeltaInSeconds = ((double)timePerSampleInMicroseconds) / (1_000_000.0); // Convert micro-seconds to seconds
             RawReadings.Clear();
 
             await bleDevice.WriteDSO_Settings((byte)triggerType, triggerLevel, (byte)datamode, (byte)range, samplingWindowInMicroseconds, nSamples);

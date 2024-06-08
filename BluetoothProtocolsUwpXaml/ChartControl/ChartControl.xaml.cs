@@ -563,7 +563,7 @@ namespace BluetoothDeviceController.Charts
             MinMaxBeenInit = true;
         }
 
-        private void SetMarker(int lineIndex, DateTime x, double y)
+        private void ZZZSetMarker(int lineIndex, DateTime x, double y)
         {
             double xtime = (x.Subtract(StartTime)).TotalSeconds;
             var point = new Point(X(xtime), Y(lineIndex, y));
