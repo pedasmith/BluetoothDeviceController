@@ -349,6 +349,7 @@ namespace BluetoothDeviceController.Charts
         }
 
         double line0markerx = 0;
+        double CurrOscilloscopeLineXOffset = 0;
 
         /// <summary>
         /// Primary method used to push data from the OscilloscopeControl into the embedded ChartControl
@@ -366,20 +367,20 @@ namespace BluetoothDeviceController.Charts
 
             if (list.Count > 0)
             {
-                double markerXdelta = 0;
                 if (markerIndexList.Count > 0)
                 if (lineIndex == 0)
                 {
                     var record = list[markerIndexList[0]];
                     var time = Convert.ToDateTime(TimeProperty.GetValue(record));
                     line0markerx = X(time.Subtract(StartTime).TotalSeconds);
+                    CurrOscilloscopeLineXOffset = 0;
                 }
                 else
                 {
                     var record = list[markerIndexList[0]];
                     var time = Convert.ToDateTime(TimeProperty.GetValue(record));
                     var markerx = X(time.Subtract(StartTime).TotalSeconds);
-                    markerXdelta = line0markerx - markerx;
+                    CurrOscilloscopeLineXOffset = line0markerx - markerx;
                 }
 
                 Lines[lineIndex].Points.Clear();
@@ -390,7 +391,7 @@ namespace BluetoothDeviceController.Charts
                 {
                     var x = Convert.ToDateTime(TimeProperty.GetValue(record));
                     var y = Convert.ToDouble(yProperty.GetValue(record));
-                    AddXYPoint(lineIndex, x, y, false, markerXdelta);
+                    AddXYPoint(lineIndex, x, y, false, CurrOscilloscopeLineXOffset);
                 }
 
 
@@ -410,7 +411,7 @@ namespace BluetoothDeviceController.Charts
                         var x = Convert.ToDateTime(TimeProperty.GetValue(markerRecord));
                         var y = Convert.ToDouble(yProperty.GetValue(markerRecord));
                         double xtime = (x.Subtract(StartTime)).TotalSeconds;
-                        double xpos = X(xtime) + markerXdelta;
+                        double xpos = X(xtime) + CurrOscilloscopeLineXOffset;
                         double ypos = Y(lineIndex, y);
                         var marker = MakeMarker();
                         marker.Stroke = Lines[lineIndex].Stroke; // Make it be the same color
@@ -741,7 +742,7 @@ namespace BluetoothDeviceController.Charts
             e.Handled = true;
 
             // What should the value box say?
-            var ratio = position.X / uiCanvas.ActualWidth;
+            var ratio = (position.X - CurrOscilloscopeLineXOffset) / uiCanvas.ActualWidth;
             var summary = Values?.GetSummary(ratio);
             if (String.IsNullOrEmpty(summary))
             {

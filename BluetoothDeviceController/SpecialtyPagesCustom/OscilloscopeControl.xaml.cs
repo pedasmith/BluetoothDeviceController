@@ -37,8 +37,10 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
     public sealed partial class OscilloscopeControl : UserControl
     {
-        public enum ConnectionState { Off, Configuring, Configured, GotData, GotDataStale, Deconfiguring, Failed };
         private DataCollection<OscDataRecord> MMData = new DataCollection<OscDataRecord>();
+
+
+        public enum ConnectionState { Off, Configuring, Configured, GotData, GotDataStale, Deconfiguring, Failed };
 
         public enum OscTriggerType {  FreeRunning=0, TriggerRisingEdge=1,TriggerFallingEdge=2, ResendData=3 };
         public enum OscDataMode {  Idle=0, VDCCouple=1, VACCouple=2, CurrentDCCouple=3, CurrentACCouple=4 }
@@ -48,20 +50,9 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         TriggerSetting TriggerSetting { get; } = new TriggerSetting();
         IChartControlOscilloscope uiChart;
 
-        private int currLineIndex = 0;
-        private void IncrementCurrLineIndex()
-        {
-            currLineIndex++;
-            if (currLineIndex > 4)
-            {
-                currLineIndex = 0;
-            }
-        }
 
-        private void UpdateConnectionState()
-        {
-            uiState.Text = BtConnectionState.ToString();
-        }
+
+
         public OscilloscopeControl()
         {
             this.InitializeComponent();
@@ -70,6 +61,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             this.Loaded += OscilloscopeControl_Loaded;
         }
 
+        #region DEVICE_STATE
         PokitProMeter bleDevice = null;
 
         private ConnectionState _BtConnectionState = ConnectionState.Off;
@@ -84,6 +76,12 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             }
         }
 
+
+        private void UpdateConnectionState()
+        {
+            uiState.Text = BtConnectionState.ToString();
+        }
+ 
         private async void OscilloscopeControl_Loaded(object sender, RoutedEventArgs e)
         {
             await Task.Delay(0); // Just to the compiler doesn't complain
@@ -134,6 +132,27 @@ typeof(OscDataRecord).GetProperty("Value"),
             var result2 = await bleDevice.NotifyDSO_MetadataAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
             BtConnectionState = result1 &&  result2 ? ConnectionState.Configured : ConnectionState.Failed;
         }
+        public async Task SetMeter(PokitProMeter value)
+        {
+            BtConnectionState = ConnectionState.Off; // Assume the new value isn't connected
+            bleDevice = value;
+            await Task.Delay(0); // added this only so that the compiler warning for async are turned off.
+        }
+        private void Log(string str)
+        {
+            UIThreadHelper.CallOnUIThread(() =>
+            {
+                uiLog.Text += str + "\n";
+            });
+        }
+
+        private async void OnConnect(object sender, RoutedEventArgs e)
+        {
+            if (bleDevice == null) return;
+
+            BtConnectionState = ConnectionState.Configuring;
+            await ConnectCallbacksAsync();
+        }
 
         private async void OnDisconnect(object sender, RoutedEventArgs e)
         {
@@ -163,15 +182,53 @@ typeof(OscDataRecord).GetProperty("Value"),
             BtConnectionState = result1 && result2 ? ConnectionState.Off : ConnectionState.Failed;
         }
 
+        #endregion DEVICE_STATE
 
 
-        int DSO_NMetadataEvents = 0;
-        int Curr_DSO_NMetadataEvents = -10;
+
+
+        #region READ_DATA
+        /// <summary>
+        /// The ChartControl is able to display multiple lines of data at once, overlapping them
+        /// as neeed. To make that work, we have a "CurrLineIndex" which is the index of the line
+        /// in the ChartControl we're going to write into.
+        /// 
+        /// The value wraps at a max value MAX_LINES
+        /// </summary>
+        private int CurrLineIndex = 0;
+        private const int MAX_LINES = 5;
+        private void IncrementCurrLineIndex()
+        {
+            CurrLineIndex++;
+            if (CurrLineIndex >= MAX_LINES)
+            {
+                CurrLineIndex = 0;
+            }
+        }
+
+        /// <summary>
+        /// Helpful value when debugging -- says how many "Metadata" events we've gotten. The 
+        /// Oscilloscope will first send a Metadata event before all of the read events
+        /// </summary>
+        int DSO_NMetadataEvents_Trace = 0;
+        int DSO_NReadEvents_Trace = 0;
+
+        /// <summary>
+        /// Number of Read values are left before we're done. We know ahead of time how many
+        /// values to expect (e.g., we ask for exactly 500 samples, so that's what we get)
+        /// </summary>
         int DSO_NReadingsLeft = 0;
-        DateTime ReadingStartTime = DateTime.MinValue;
+
+        //int Curr_DSO_NMetadataEvents = -10;
+        //DateTime ReadingStartTime = DateTime.MinValue;
+
+        /// <summary>
+        /// 
+        /// </summary>
         long ReadingDeltaInTicks = 100; // Good default; matches the "10 microseconds per sample" set in 2024-06-08
         List<double> RawReadings = new List<double>();
         double DsoScale = 1.0;
+
 
         /// <summary>
         /// Called when the DSO Oscilloscope wants to tell the system what the data format is. AFAICT, this is
@@ -184,8 +241,8 @@ typeof(OscDataRecord).GetProperty("Value"),
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
                 DsoScale = data.ValueList.GetValue("DsoDataScale").AsDouble; // Change: grab this earlier.
-                DSO_NMetadataEvents++;
-                System.Diagnostics.Debug.WriteLine($"DBG: DSO_MetaDataEvent: got event {DSO_NMetadataEvents} new scale={DsoScale}");
+                DSO_NMetadataEvents_Trace++;
+                System.Diagnostics.Debug.WriteLine($"DBG: DSO_MetaDataEvent: got event {DSO_NMetadataEvents_Trace} new scale={DsoScale}");
 
                 var record = new DSO_MetadataRecord();
                 var valueList = data.ValueList;
@@ -242,14 +299,13 @@ typeof(OscDataRecord).GetProperty("Value"),
             }
         }
 
-        int nread = 0;
         /// <summary>
         /// Called when data is available from the Oscilloscope (DSO)
         /// </summary>
         /// <param name="data"></param>
         private void BleDevice_DSO_ReadingEvent(BleEditor.ValueParserResult data)
         {
-            nread++;
+            DSO_NReadEvents_Trace++;
             // Works like a champ; no need for logging: Log($"NRead={nread}");
 
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
@@ -262,6 +318,8 @@ typeof(OscDataRecord).GetProperty("Value"),
                     RawReadings.Add(value);
                 }
                 DSO_NReadingsLeft -= array.Count;
+
+
                 if (DSO_NReadingsLeft <= 0) // NOTE: what happens if the BT fails?
                 {
                     Utilities.UIThreadHelper.CallOnUIThread(() =>
@@ -283,13 +341,17 @@ typeof(OscDataRecord).GetProperty("Value"),
                         var triggerNominalTime = MMData[0].EventTime;
 
 
-                        uiChartRaw.RedrawOscilloscopeYTime(currLineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
+                        uiChartRaw.RedrawOscilloscopeYTime(CurrLineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
                         Log($"Got data: {MMData[0].Value:F3}");
                         IncrementCurrLineIndex();
                     });
                 }
             }
         }
+
+        #endregion READ_DATA
+
+
         private List<int> TriggerIndexes;
 
         private void UiChartRaw_OnPointerPosition(object sender, PointerPositionArgs e)
@@ -323,27 +385,6 @@ typeof(OscDataRecord).GetProperty("Value"),
         }
 
 
-        public async Task SetMeter(PokitProMeter value)
-        {
-            BtConnectionState = ConnectionState.Off; // Assume the new value isn't connected
-            bleDevice = value;
-            await Task.Delay(0); // added this only so that the compiler warning for async are turned off.
-        }
-        private void Log(string str)
-        {
-            UIThreadHelper.CallOnUIThread(() =>
-            {
-                uiLog.Text += str + "\n";
-            });
-        }
-
-        private async void OnConnect(object sender, RoutedEventArgs e)
-        {
-            if (bleDevice == null) return;
-
-            BtConnectionState = ConnectionState.Configuring;
-            await ConnectCallbacksAsync();
-        }
 
         /// <summary>
         /// Called when the user clicks the "Data" button. When data actually flows in, that's BleDevice_DSO_ReadingEvent
@@ -375,15 +416,29 @@ typeof(OscDataRecord).GetProperty("Value"),
             var range = OscVRangeVMax.V30;
 
 
-            ushort nSamples = 500; // not too many for testing!
-            UInt32 timePerSampleInMicroseconds = 10; // FYI: there are 10 C# ticks per microsecond
-            UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
-
             if (bleDevice == null) return;
 
+            ushort nSamples = 500; // TODO: allow for settings not too many for testing!
+            UInt32 timePerSampleInMicroseconds = 10; // FYI: there are 10 C# ticks per microsecond
+
+            nSamples = 1000;
+            //timePerSampleInMicroseconds = 125;
+
+            // Examples of nSamples, timePerSample and samplingWindow sizes
+            // NSamples     timePerSamples      samplingWindowSize
+            //  500             10                   5 milliseconds
+            // 2000             10                  20 milliseconds
+            // 8000             10                  80 milliseconds
+            // 2000            500                     1 second
+            // 8000            125                     1 second
+
+            // Also FYI: a 1000 Hz wave is 1000 microseconds per cycke
+            // So a 1000 Hz wave with 8000 samples will have 8 samples per cycle
+
+            // What the DSO needs is the nSamples and the samplingWindowsInMicroseconds.
+            // These aren't really very user-friendly.
+            UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
             DSO_NReadingsLeft = nSamples;
-            ReadingStartTime = DateTime.Now;
-            // ReadingDeltaInSeconds = ((double)timePerSampleInMicroseconds) / (1_000_000.0); // Convert micro-seconds to seconds
             ReadingDeltaInTicks = timePerSampleInMicroseconds * 10;
             RawReadings.Clear();
 
