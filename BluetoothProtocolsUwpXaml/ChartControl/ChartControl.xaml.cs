@@ -79,14 +79,12 @@ namespace BluetoothDeviceController.Charts
         {
             var oldzoom = CurrZoom.Zoom;
             CurrZoom.Zoom = value;
-            // DBG: and update the PerLineXOffset as 
             RedrawAllLines();
         }
         public void SetPan(double value)
         {
             var oldzoom = CurrZoom.XRatioOffset;
             CurrZoom.XRatioOffset = value;
-            // DBG: and update the PerLineXOffset as 
             RedrawAllLines();
         }
 
@@ -169,11 +167,18 @@ namespace BluetoothDeviceController.Charts
         /// is also an ISummarizeValues; it can take a ratio (0..1) and return a string summary of the data.
         /// </summary>
         private List<List<Point>> UnderlyingData = new List<List<Point>>();
-        private List<double> PerLineXOffset = new List<double>() { 0.0 };
+        private List<double> LLPerLineXOffset = new List<double>() { 0.0 };
+        private List<double> PerLineXOffsetInSeconds = new List<double>() { 0.0 };
         private int CurrOscilloscopeLine = 0;
-        private double CurrXLineOffset { 
-            get {  return  PerLineXOffset[CurrOscilloscopeLine]; } 
-            set { PerLineXOffset[CurrOscilloscopeLine] = value; }
+        private double CurrXLineOffsetInPixels
+        {
+            get { return LLPerLineXOffset[CurrOscilloscopeLine]; }
+            set { LLPerLineXOffset[CurrOscilloscopeLine] = value; }
+        }
+        private double CurrXLineOffsetInSeconds
+        {
+            get { return PerLineXOffsetInSeconds[CurrOscilloscopeLine]; }
+            set { PerLineXOffsetInSeconds[CurrOscilloscopeLine] = value; }
         }
 
 
@@ -228,7 +233,8 @@ namespace BluetoothDeviceController.Charts
         /// <returns></returns>
         private double XRatioReverse(double xpos)
         {
-            var ratio = (xpos - CurrXLineOffset) / uiCanvas.ActualWidth;
+            // TODO: need to finish removing the CurrXLineOFfsetInPixels
+            var ratio = (xpos - CurrXLineOffsetInPixels) / uiCanvas.ActualWidth;
             ratio = ratio / CurrZoom.Zoom;
             ratio = ratio + CurrZoom.XRatioOffset;
             return ratio;
@@ -289,9 +295,13 @@ namespace BluetoothDeviceController.Charts
             {
                 UnderlyingData.Add(new List<Point>());
             }
-            while (PerLineXOffset.Count <= lineIndex)
+            while (LLPerLineXOffset.Count <= lineIndex)
             {
-                PerLineXOffset.Add(0.0);
+                LLPerLineXOffset.Add(0.0);
+            }
+            while (PerLineXOffsetInSeconds.Count <= lineIndex)
+            {
+                PerLineXOffsetInSeconds.Add(0.0);
             }
             while (MarkerList.Count <= lineIndex)
             {
@@ -300,7 +310,7 @@ namespace BluetoothDeviceController.Charts
 
             EnsureYExists(lineIndex);
         }
-        private Polyline MakeMarker()
+        private Polyline MakeEmptyMarker()
         {
             var retval = new Polyline() { Fill = null, Stroke = new SolidColorBrush(Colors.Red), StrokeThickness = 2.0 };
             return retval;
@@ -344,7 +354,7 @@ namespace BluetoothDeviceController.Charts
                     // new way here!here for XAdjust
                     var xtime = datapoint.X;
                     var y = datapoint.Y;
-                    var point = new Point(X(xtime) + PerLineXOffset[lineIndex], Y(lineIndex, y));
+                    var point = new Point(X(xtime + PerLineXOffsetInSeconds[lineIndex]), Y(lineIndex, y));
                     LLLines[lineIndex].Points.Add(point);
                 }
             }
@@ -436,8 +446,8 @@ namespace BluetoothDeviceController.Charts
             }
         }
 
-        double line0markerx = 0;
-
+        double line0markerPixelX = 0;
+        double line0markerSeconds = 0;
         /// <summary>
         /// Primary method used to push data from the OscilloscopeControl into the embedded ChartControl
         /// </summary>
@@ -456,19 +466,30 @@ namespace BluetoothDeviceController.Charts
             if (list.Count > 0)
             {
                 if (markerIndexList.Count > 0)
-                if (lineIndex == 0)
                 {
-                    var record = list[markerIndexList[0]];
-                    var time = Convert.ToDateTime(TimeProperty.GetValue(record));
-                    line0markerx = X(time.Subtract(StartTime).TotalSeconds);
-                    CurrXLineOffset = 0;
+                    if (lineIndex == 0)
+                    {
+                        var record = list[markerIndexList[0]];
+                        var time = Convert.ToDateTime(TimeProperty.GetValue(record));
+                        line0markerSeconds = time.Subtract(StartTime).TotalSeconds;
+                        line0markerPixelX = X(line0markerSeconds);
+                        CurrXLineOffsetInPixels = 0;
+                        CurrXLineOffsetInSeconds = 0.0;
+                    }
+                    else
+                    {
+                        var firstMarkerRecord = list[markerIndexList[0]];
+                        var time = Convert.ToDateTime(TimeProperty.GetValue(firstMarkerRecord));
+                        var markerSeconds = time.Subtract(StartTime).TotalSeconds;
+                        var markerPixelX = X(markerSeconds);
+                        CurrXLineOffsetInPixels = line0markerPixelX - markerPixelX;
+                        CurrXLineOffsetInSeconds = line0markerSeconds - markerSeconds;
+                    }
                 }
                 else
                 {
-                    var record = list[markerIndexList[0]];
-                    var time = Convert.ToDateTime(TimeProperty.GetValue(record));
-                    var markerx = X(time.Subtract(StartTime).TotalSeconds);
-                    CurrXLineOffset = line0markerx - markerx;
+                    CurrXLineOffsetInPixels = 0;
+                    CurrXLineOffsetInSeconds = 0.0;
                 }
 
                 LLLines[lineIndex].Points.Clear();
@@ -517,9 +538,9 @@ namespace BluetoothDeviceController.Charts
         {
             foreach (var point in MarkerList[lineIndex])
             {
-                double xpos = X(point.X) + CurrXLineOffset;
+                double xpos = X(point.X + PerLineXOffsetInSeconds[lineIndex]);
                 double ypos = Y(lineIndex, point.Y);
-                var marker = MakeMarker();
+                var marker = MakeEmptyMarker();
                 marker.Stroke = LLLines[lineIndex].Stroke; // Make it be the same color as the line
                 LLMarkers[lineIndex].Add(marker);
                 uiCanvas.Children.Add(marker);
@@ -765,7 +786,7 @@ namespace BluetoothDeviceController.Charts
             else
             {
                 // here!here for xadjust
-                var point = new Point(X(xtime) + PerLineXOffset[lineIndex], Y(lineIndex, y));
+                var point = new Point(X(xtime + PerLineXOffsetInSeconds[lineIndex]), Y(lineIndex, y));
                 LLLines[lineIndex].Points.Add(point);
                 if (MustRedraw)
                 {

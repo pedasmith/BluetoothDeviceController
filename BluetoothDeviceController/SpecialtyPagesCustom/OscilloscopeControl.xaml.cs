@@ -338,10 +338,8 @@ typeof(OscDataRecord).GetProperty("Value"),
                         }
 
                         TriggerIndexes = TriggerSetting.FindTriggeredIndex(MMData);
-                        var triggerNominalTime = MMData[0].EventTime;
-
-
                         uiChartRaw.RedrawOscilloscopeYTime(CurrLineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
+
                         Log($"Got data: {MMData[0].Value:F3}");
                         IncrementCurrLineIndex();
                     });
