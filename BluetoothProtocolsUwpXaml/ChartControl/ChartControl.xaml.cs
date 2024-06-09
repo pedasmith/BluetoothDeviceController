@@ -26,6 +26,7 @@ namespace BluetoothDeviceController.Charts
         void SetDataProperties(IList<PropertyInfo> dataProperties, PropertyInfo timeProperty, IList<string> names);
         void SetTitle(string title);
         void SetUISpec(UISpecifications uISpec);
+        void SetZoom(double value);
         void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, List<int> triggerIndex);
     }
 
@@ -40,21 +41,48 @@ namespace BluetoothDeviceController.Charts
         public double Ratio { get; set; } = 0.0;
     }
 
+    public class ChartZoom
+    {
+        public double Zoom = 1.0;
+        public double XOffset = 0.0;
+    }
+
     public sealed partial class ChartControl : UserControl, IChartControlOscilloscope
     {
-        public event EventHandler<PointerPositionArgs> OnPointerPosition;
         public UISpecifications UISpec = new UISpecifications();
         public IList<string> Names = new List<string>();
+        public ChartZoom CurrZoom { get; } = new ChartZoom();
+
+
+
+        public event EventHandler<PointerPositionArgs> OnPointerPosition;
+
         private bool MinMaxBeenInit { get; set; } = false;
+        /// <summary>
+        /// Data min/max values
+        /// </summary>
         public double XMin { get; set; } = -1000.0;
+        /// <summary>
+        /// Data min/max values
+        /// </summary>
         public double XMax { get; set; } = 1000.0;
+
+        public void SetZoom(double value)
+        {
+            var oldzoom = CurrZoom.Zoom;
+            CurrZoom.Zoom = value;
+
+            // And also redraw as needed.
+            // DBG: and update the PerLineXOffset as 
+            RedrawAllLines();
+        }
 
         public void SetUISpec(UISpecifications uISpec)
         {
             UISpec = uISpec;
         }
 
-        // Min and Max are just a little weird. Sorry about that :-)
+        // Y Min and Max are just a little weird. Sorry about that :-)
         // Some devices the difference lines need a combined min/max. Other devices
         // need seperate min/max. For the first: accelerometers have x,y,z values
         // which are all +-2g (or whatever). For the second, a device with temperature,
@@ -82,7 +110,7 @@ namespace BluetoothDeviceController.Charts
             }
             return Windows.UI.Colors.Aquamarine;
         }
-        public double GetYMin(int index) 
+        public double GetYMin(int index)
         {
             switch (UISpec?.chartYAxisCombined ?? UISpecifications.YMinMaxCombined.Combined)
             {
@@ -94,7 +122,7 @@ namespace BluetoothDeviceController.Charts
             }
             return DEFAULT_YMIN;
         }
-        public double GetYMax(int index) 
+        public double GetYMax(int index)
         {
             switch (UISpec?.chartYAxisCombined ?? UISpecifications.YMinMaxCombined.Combined)
             {
@@ -122,6 +150,15 @@ namespace BluetoothDeviceController.Charts
         /// is also an ISummarizeValues; it can take a ratio (0..1) and return a string summary of the data.
         /// </summary>
         private List<List<Point>> UnderlyingData = new List<List<Point>>();
+        private List<double> PerLineXOffset = new List<double>() { 0.0 };
+        private int CurrOscilloscopeLine = 0;
+        private double CurrOscilloscopeLineXOffset { 
+            get {  return  PerLineXOffset[CurrOscilloscopeLine]; } 
+            set { PerLineXOffset[CurrOscilloscopeLine] = value; }
+        }
+
+
+
         private List<Polyline> Lines = new List<Polyline>();
         private List<List<Polyline>> Markers = new List<List<Polyline>>();
         private IList<PropertyInfo> DataProperties = null;
@@ -156,8 +193,24 @@ namespace BluetoothDeviceController.Charts
 
         private double X(double x)
         {
-            var retval = (XMax == XMin) ? 0 : ((x - XMin) / (XMax - XMin)) * this.ActualWidth;
+            var ratio = (XMax == XMin) ? 0 : ((x - XMin) / (XMax - XMin));
+            // 2024-06-09: var retval = (XMax == XMin) ? 0 : ((x - XMin) / (XMax - XMin)) * this.ActualWidth;
+            ratio = ratio * CurrZoom.Zoom;
+            var retval = ratio * this.ActualWidth;
             return retval;
+        }
+
+        /// <summary>
+        /// Given a physical location (e.g., from a pointer move), return a 0..1 value that's also
+        /// offset by the CurrOscilloscopeLineXOffset
+        /// </summary>
+        /// <param name="xpos"></param>
+        /// <returns></returns>
+        private double XRatioReverse(double xpos)
+        {
+            var ratio = (xpos - CurrOscilloscopeLineXOffset) / uiCanvas.ActualWidth;
+            ratio = ratio / CurrZoom.Zoom;
+            return ratio;
         }
         private double Y(int line, double y)
         {
@@ -219,6 +272,10 @@ namespace BluetoothDeviceController.Charts
             {
                 UnderlyingData.Add(new List<Point>());
             }
+            while (PerLineXOffset.Count <= lineIndex)
+            {
+                PerLineXOffset.Add(0.0);
+            }
 
             EnsureYExists(lineIndex);
         }
@@ -248,16 +305,23 @@ namespace BluetoothDeviceController.Charts
         private void RedrawAllLines()
         {
             nRedrawAllLines++;
-            for (int i=0; i<UnderlyingData.Count; i++)
+            for (int lineIndex=0; lineIndex<UnderlyingData.Count; lineIndex++)
             {
-                var data = UnderlyingData[i];
-                var line = Lines[i];
-                line.Points.Clear();
-                foreach (var point in data)
+                var data = UnderlyingData[lineIndex];
+                Lines[lineIndex].Points.Clear();
+                foreach (var datapoint in data)
                 {
-                    var x = X(point.X);
-                    var y = Y(i, point.Y);
-                    line.Points.Add(new Point(x, y));
+                    // Original code. Replace with the new way so it's exactly identical to
+                    // the code in the Oscilloscope redraw spot.
+                    //var x = X(datapoint.X);
+                    //var y = Y(lineIndex, datapoint.Y);
+                    //line.Points.Add(new Point(x, y));
+
+                    // new way here!here for XAdjust
+                    var xtime = datapoint.X;
+                    var y = datapoint.Y;
+                    var point = new Point(X(xtime) + PerLineXOffset[lineIndex], Y(lineIndex, y));
+                    Lines[lineIndex].Points.Add(point);
                 }
             }
         }
@@ -349,7 +413,6 @@ namespace BluetoothDeviceController.Charts
         }
 
         double line0markerx = 0;
-        double CurrOscilloscopeLineXOffset = 0;
 
         /// <summary>
         /// Primary method used to push data from the OscilloscopeControl into the embedded ChartControl
@@ -364,6 +427,7 @@ namespace BluetoothDeviceController.Charts
             if (lineIndex < 0 || lineIndex > MAX_LINE_INDEX) return; // Bad line index = fail
             Values = list; // Reset the "Values" so we get a summary item
             ResetMinMaxOscilloscope(lineIndex, list); // Reset XMIN XMAX YMIN YMAX StartTime
+            CurrOscilloscopeLine = lineIndex;
 
             if (list.Count > 0)
             {
@@ -391,7 +455,7 @@ namespace BluetoothDeviceController.Charts
                 {
                     var x = Convert.ToDateTime(TimeProperty.GetValue(record));
                     var y = Convert.ToDouble(yProperty.GetValue(record));
-                    AddXYPoint(lineIndex, x, y, false, CurrOscilloscopeLineXOffset);
+                    AddXYPoint(lineIndex, x, y);
                 }
 
 
@@ -614,7 +678,7 @@ namespace BluetoothDeviceController.Charts
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="MustRedraw"></param>
-        private void AddXYPoint (int lineIndex, DateTime x, double y, bool MustRedraw = false, double xadjust = 0.0)
+        private void AddXYPoint (int lineIndex, DateTime x, double y, bool MustRedraw = false)
         {
             if (!MinMaxBeenInit)
             {
@@ -660,7 +724,8 @@ namespace BluetoothDeviceController.Charts
             }
             else
             {
-                var point = new Point(X(xtime) + xadjust, Y(lineIndex, y));
+                // here!here for xadjust
+                var point = new Point(X(xtime) + PerLineXOffset[lineIndex], Y(lineIndex, y));
                 Lines[lineIndex].Points.Add(point);
                 if (MustRedraw)
                 {
@@ -742,7 +807,7 @@ namespace BluetoothDeviceController.Charts
             e.Handled = true;
 
             // What should the value box say?
-            var ratio = (position.X - CurrOscilloscopeLineXOffset) / uiCanvas.ActualWidth;
+            var ratio = XRatioReverse(position.X); // OLD: - CurrOscilloscopeLineXOffset) / uiCanvas.ActualWidth;
             var summary = Values?.GetSummary(ratio);
             if (String.IsNullOrEmpty(summary))
             {

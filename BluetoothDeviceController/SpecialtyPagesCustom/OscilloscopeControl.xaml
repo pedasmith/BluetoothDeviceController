@@ -72,7 +72,8 @@
             <chart:ChartControl Grid.Row="0" x:Name="uiChartRaw" Height="200" />
 
             
-            <controls:TabView Grid.Row="1" Header="Oscilloscope Controls" SelectedIndex="0" MinHeight="100">
+            <controls:TabView Grid.Row="1" Header="Oscilloscope Controls" 
+                              SelectedIndex="1" MinHeight="100">
                 <controls:TabViewItem Header="Control">
                     <Grid MinHeight="100">
                         <Grid.RowDefinitions>
@@ -120,6 +121,18 @@
                         </StackPanel>
                         <TextBlock HorizontalAlignment="Right" x:Name="uiState">????</TextBlock>
                     </Grid>
+                </controls:TabViewItem>
+                <controls:TabViewItem Header="Zoom">
+                    <Grid MinHeight="100">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Content="x1" Tag="1" Checked="OnZoom" />
+                            <RadioButton Content="x2" Tag="2" Checked="OnZoom" />
+                            <RadioButton Content="x5" Tag="5" Checked="OnZoom" />
+                            <RadioButton Content="x10" Tag="10" Checked="OnZoom" />
+                            <RadioButton Content="x20" Tag="20" Checked="OnZoom" />
+                        </StackPanel>
+                    </Grid>
+                    
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Log">
                     <ScrollViewer Height="100" >
