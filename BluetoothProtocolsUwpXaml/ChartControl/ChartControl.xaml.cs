@@ -26,6 +26,7 @@ namespace BluetoothDeviceController.Charts
         void SetDataProperties(IList<PropertyInfo> dataProperties, PropertyInfo timeProperty, IList<string> names);
         void SetTitle(string title);
         void SetUISpec(UISpecifications uISpec);
+        void SetPan(double value);
         void SetZoom(double value);
         void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, List<int> triggerIndex);
     }
@@ -43,8 +44,15 @@ namespace BluetoothDeviceController.Charts
 
     public class ChartZoom
     {
+        /// <summary>
+        /// Zoom is 1 for no zoom, 10 for zoom in 10x. 
+        /// </summary>
         public double Zoom = 1.0;
-        public double XOffset = 0.0;
+        /// <summary>
+        /// Offset in ratio units; ratio is 0 to 1 for all data. e.g., setting 
+        /// xratiooffset to .5 will jump to the middle of the traces.
+        /// </summary>
+        public double XRatioOffset = 0.0;
     }
 
     public sealed partial class ChartControl : UserControl, IChartControlOscilloscope
@@ -71,9 +79,20 @@ namespace BluetoothDeviceController.Charts
         {
             var oldzoom = CurrZoom.Zoom;
             CurrZoom.Zoom = value;
-
-            // And also redraw as needed.
             // DBG: and update the PerLineXOffset as 
+            RedrawAllLines();
+        }
+        public void SetPan(double value)
+        {
+            var oldzoom = CurrZoom.XRatioOffset;
+            CurrZoom.XRatioOffset = value;
+            // DBG: and update the PerLineXOffset as 
+            RedrawAllLines();
+        }
+
+        public void SetXRatioOffset(double value)
+        {
+            CurrZoom.XRatioOffset = value;
             RedrawAllLines();
         }
 
@@ -152,15 +171,15 @@ namespace BluetoothDeviceController.Charts
         private List<List<Point>> UnderlyingData = new List<List<Point>>();
         private List<double> PerLineXOffset = new List<double>() { 0.0 };
         private int CurrOscilloscopeLine = 0;
-        private double CurrOscilloscopeLineXOffset { 
+        private double CurrXLineOffset { 
             get {  return  PerLineXOffset[CurrOscilloscopeLine]; } 
             set { PerLineXOffset[CurrOscilloscopeLine] = value; }
         }
 
 
 
-        private List<Polyline> Lines = new List<Polyline>();
-        private List<List<Polyline>> Markers = new List<List<Polyline>>();
+        private List<Polyline> LLLines = new List<Polyline>();
+        private List<List<Polyline>> LLMarkers = new List<List<Polyline>>();
         private IList<PropertyInfo> DataProperties = null;
         private PropertyInfo TimeProperty = null;
         private DateTime StartTime;
@@ -195,6 +214,7 @@ namespace BluetoothDeviceController.Charts
         {
             var ratio = (XMax == XMin) ? 0 : ((x - XMin) / (XMax - XMin));
             // 2024-06-09: var retval = (XMax == XMin) ? 0 : ((x - XMin) / (XMax - XMin)) * this.ActualWidth;
+            ratio = ratio - CurrZoom.XRatioOffset;
             ratio = ratio * CurrZoom.Zoom;
             var retval = ratio * this.ActualWidth;
             return retval;
@@ -208,8 +228,9 @@ namespace BluetoothDeviceController.Charts
         /// <returns></returns>
         private double XRatioReverse(double xpos)
         {
-            var ratio = (xpos - CurrOscilloscopeLineXOffset) / uiCanvas.ActualWidth;
+            var ratio = (xpos - CurrXLineOffset) / uiCanvas.ActualWidth;
             ratio = ratio / CurrZoom.Zoom;
+            ratio = ratio + CurrZoom.XRatioOffset;
             return ratio;
         }
         private double Y(int line, double y)
@@ -245,28 +266,24 @@ namespace BluetoothDeviceController.Charts
         private void EnsureLineExists (int lineIndex)
         {
             // Create both the set of XAML lines (which are polylines) and the data.
-            while (Lines.Count <= lineIndex)
+            while (LLLines.Count <= lineIndex)
             {
-                var newIndex = Lines.Count; // if 1 line already exists, then this new line will be index [2]
+                var newIndex = LLLines.Count; // if 1 line already exists, then this new line will be index [2]
                 var name = (Names != null && Names.Count > newIndex) ? Names[newIndex] : "";
                 var lineDefault = UISpec.chartLineDefaults.ContainsKey(name) ? UISpec.chartLineDefaults[name] : null;
-                var color = (lineDefault == null) ? GetDefaultLineColor(Lines.Count) : ConvertColor(lineDefault.stroke);
+                var color = (lineDefault == null) ? GetDefaultLineColor(LLLines.Count) : ConvertColor(lineDefault.stroke);
                 var polyline = new Polyline()
                 {
                     Fill = null,
                     Stroke = new SolidColorBrush(color),
                     StrokeThickness = 1.0,
                 };
-                Lines.Add(polyline);
+                LLLines.Add(polyline);
                 uiCanvas.Children.Add(polyline); // Actually add the polyline!
-
-                // New: markers!
-                var mlist = new List<Polyline>();
-                // TODO: remove the specific markers; they will be added as needed
-                //var marker = MakeMarker();
-                //mlist.Add(marker);
-                Markers.Add(mlist);
-                //uiCanvas.Children.Add(marker);
+            }
+            while (LLMarkers.Count <=  lineIndex)
+            {
+                LLMarkers.Add(new List<Polyline>()); // stroke etc. are set elsewhere.
             }
             while (UnderlyingData.Count <= lineIndex)
             {
@@ -275,6 +292,10 @@ namespace BluetoothDeviceController.Charts
             while (PerLineXOffset.Count <= lineIndex)
             {
                 PerLineXOffset.Add(0.0);
+            }
+            while (MarkerList.Count <= lineIndex)
+            {
+                MarkerList.Add(new List<Point>());
             }
 
             EnsureYExists(lineIndex);
@@ -307,8 +328,11 @@ namespace BluetoothDeviceController.Charts
             nRedrawAllLines++;
             for (int lineIndex=0; lineIndex<UnderlyingData.Count; lineIndex++)
             {
+                RemoveLLMarkers(lineIndex);
+                DrawMarkers(lineIndex);
+
                 var data = UnderlyingData[lineIndex];
-                Lines[lineIndex].Points.Clear();
+                LLLines[lineIndex].Points.Clear();
                 foreach (var datapoint in data)
                 {
                     // Original code. Replace with the new way so it's exactly identical to
@@ -321,7 +345,7 @@ namespace BluetoothDeviceController.Charts
                     var xtime = datapoint.X;
                     var y = datapoint.Y;
                     var point = new Point(X(xtime) + PerLineXOffset[lineIndex], Y(lineIndex, y));
-                    Lines[lineIndex].Points.Add(point);
+                    LLLines[lineIndex].Points.Add(point);
                 }
             }
         }
@@ -437,17 +461,17 @@ namespace BluetoothDeviceController.Charts
                     var record = list[markerIndexList[0]];
                     var time = Convert.ToDateTime(TimeProperty.GetValue(record));
                     line0markerx = X(time.Subtract(StartTime).TotalSeconds);
-                    CurrOscilloscopeLineXOffset = 0;
+                    CurrXLineOffset = 0;
                 }
                 else
                 {
                     var record = list[markerIndexList[0]];
                     var time = Convert.ToDateTime(TimeProperty.GetValue(record));
                     var markerx = X(time.Subtract(StartTime).TotalSeconds);
-                    CurrOscilloscopeLineXOffset = line0markerx - markerx;
+                    CurrXLineOffset = line0markerx - markerx;
                 }
 
-                Lines[lineIndex].Points.Clear();
+                LLLines[lineIndex].Points.Clear();
 
                 UnderlyingData[lineIndex] = new List<Point>(list.Count);
                 var yProperty = DataProperties[0];
@@ -461,29 +485,45 @@ namespace BluetoothDeviceController.Charts
 
                 if (markerIndexList.Count > 0)
                 {
-                    // Remove the old markers
-                    var oldlist = Markers[lineIndex];
-                    foreach (var oldmarker in oldlist)
-                    {
-                        uiCanvas.Children.Remove(oldmarker);
-                    }
-
-                    // Create new markers
+                    MarkerList[lineIndex].Clear();
+                    RemoveLLMarkers(lineIndex);
                     foreach (var markerIndex in markerIndexList)
                     {
                         var markerRecord = list[markerIndex];
                         var x = Convert.ToDateTime(TimeProperty.GetValue(markerRecord));
                         var y = Convert.ToDouble(yProperty.GetValue(markerRecord));
                         double xtime = (x.Subtract(StartTime)).TotalSeconds;
-                        double xpos = X(xtime) + CurrOscilloscopeLineXOffset;
-                        double ypos = Y(lineIndex, y);
-                        var marker = MakeMarker();
-                        marker.Stroke = Lines[lineIndex].Stroke; // Make it be the same color
-                        Markers[lineIndex].Add(marker);
-                        uiCanvas.Children.Add(marker);
-                        SetupMarker(marker.Points, xpos, ypos);
+                        var markerPoint = new Point(xtime, y);
+                        MarkerList[lineIndex].Add(markerPoint);
                     }
+                    DrawMarkers(lineIndex);
                 }
+            }
+        }
+        private List<List<Point>> MarkerList = new List<List<Point>>();
+        private void RemoveLLMarkers(int lineIndex)
+        {
+            foreach (var marker in LLMarkers[lineIndex])
+            {
+                uiCanvas.Children.Remove(marker);
+            }
+        }
+
+        /// <summary>
+        /// Draw the makers in the Markerlist
+        /// </summary>
+        /// <param name="lineIndex"></param>
+        private void DrawMarkers(int lineIndex)
+        {
+            foreach (var point in MarkerList[lineIndex])
+            {
+                double xpos = X(point.X) + CurrXLineOffset;
+                double ypos = Y(lineIndex, point.Y);
+                var marker = MakeMarker();
+                marker.Stroke = LLLines[lineIndex].Stroke; // Make it be the same color as the line
+                LLMarkers[lineIndex].Add(marker);
+                uiCanvas.Children.Add(marker);
+                SetupMarker(marker.Points, xpos, ypos);
             }
         }
 
@@ -667,7 +707,7 @@ namespace BluetoothDeviceController.Charts
         {
             double xtime = (x.Subtract(StartTime)).TotalSeconds;
             var point = new Point(X(xtime), Y(lineIndex, y));
-            Lines[lineIndex].Points.Add(point);
+            LLLines[lineIndex].Points.Add(point);
 
         }
 
@@ -726,7 +766,7 @@ namespace BluetoothDeviceController.Charts
             {
                 // here!here for xadjust
                 var point = new Point(X(xtime) + PerLineXOffset[lineIndex], Y(lineIndex, y));
-                Lines[lineIndex].Points.Add(point);
+                LLLines[lineIndex].Points.Add(point);
                 if (MustRedraw)
                 {
                     RedrawAllLines();

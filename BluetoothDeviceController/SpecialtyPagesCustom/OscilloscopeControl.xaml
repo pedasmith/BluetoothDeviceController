@@ -124,12 +124,22 @@
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Zoom">
                     <Grid MinHeight="100">
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton Content="x1" Tag="1" Checked="OnZoom" />
-                            <RadioButton Content="x2" Tag="2" Checked="OnZoom" />
-                            <RadioButton Content="x5" Tag="5" Checked="OnZoom" />
-                            <RadioButton Content="x10" Tag="10" Checked="OnZoom" />
-                            <RadioButton Content="x20" Tag="20" Checked="OnZoom" />
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="x1" Tag="1" Checked="OnZoom" />
+                                <RadioButton Content="x2" Tag="2" Checked="OnZoom" />
+                                <RadioButton Content="x5" Tag="5" Checked="OnZoom" />
+                                <RadioButton Content="x10" Tag="10" Checked="OnZoom" />
+                                <RadioButton Content="x20" Tag="20" Checked="OnZoom" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="Left" Tag="0" Checked="OnPan" />
+                                <RadioButton Content="1" Tag="0.10" Checked="OnPan" />
+                                <RadioButton Content="2" Tag="0.20" Checked="OnPan" />
+                                <RadioButton Content="3" Tag="0.30" Checked="OnPan" />
+                                <RadioButton Content="4" Tag="0.40" Checked="OnPan" />
+                            </StackPanel>
+
                         </StackPanel>
                     </Grid>
                     

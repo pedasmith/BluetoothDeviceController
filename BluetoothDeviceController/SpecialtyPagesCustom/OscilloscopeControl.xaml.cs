@@ -448,13 +448,22 @@ typeof(OscDataRecord).GetProperty("Value"),
 
         private void OnZoom(object sender, RoutedEventArgs e)
         {
-            var tag = (sender as RadioButton)?.Tag as string;
+            var tag = (sender as FrameworkElement)?.Tag as string;
             if (string.IsNullOrEmpty(tag)) return;
-            double zoom = 1.0;
-            var zoomok = double.TryParse(tag, out zoom);
-            if (!zoomok) return;
-            uiChart.SetZoom(zoom); 
+            double value = 1.0;
+            var parseok = double.TryParse(tag, out value);
+            if (!parseok) return;
+            uiChart.SetZoom(value); 
+        }
 
+        private void OnPan(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            if (string.IsNullOrEmpty(tag)) return;
+            double value = 1.0;
+            var parseok = double.TryParse(tag, out value);
+            if (!parseok) return;
+            uiChart.SetPan(value);
         }
     }
 }
