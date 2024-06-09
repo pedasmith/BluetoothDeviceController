@@ -40,6 +40,23 @@ namespace BluetoothDeviceController.Charts
         private int _MaxLength = 10000;// about 1 reading every 10 seconds for an entire day
         public int MaxLength { get { return _MaxLength; } set { if (value == _MaxLength) return; ResetSizeForNewMaxLength(value); _MaxLength = value; } }
 
+        public int GetItemAtOrBeforeIndex(double ratio)
+        {
+            if (this.Count < 0) return -1;
+            int index = (int)Math.Floor(ratio * this.Count);
+            if (index < 0) index = 0;
+            if (index >= this.Count) index = this.Count - 1;
+            return index;
+        }
+        public T GetItemAtOrBefore(double ratio)
+        {
+            int index = (int)Math.Floor(ratio * this.Count);
+            if (index < 0) index = 0;
+            if (index >= this.Count) index = this.Count - 1;
+            var item = this[index];
+            return item;
+        }
+
         /// <summary>
         /// Gets a summary of the data at a 'ratio' (0..1) that corresponds to some point of actual data.
         /// </summary>
@@ -47,9 +64,8 @@ namespace BluetoothDeviceController.Charts
         /// <returns></returns>
         public string GetSummary(double ratio)
         {
-            int index = (int)Math.Floor (ratio * this.Count);
-            if (index < 0) index = 0;
-            if (index >= this.Count) return "";
+            var index = GetItemAtOrBeforeIndex(ratio);
+            if (index < 0) return "";
             var item = this[index];
 
             string retval = "";

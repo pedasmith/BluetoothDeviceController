@@ -68,40 +68,80 @@
                 <RowDefinition Height="*" MinHeight="200" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <chart:ChartControl Grid.Row="0" x:Name="uiChartRaw" Height="200" />
 
-            <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <Button Content="Connect" Click="OnConnect" />
-                <Button Content="Data" Click="OnData" />
-                <Button Content="Disconnect" Click="OnDisconnect" />
-            </StackPanel>
-            <TextBlock Grid.Row="1" HorizontalAlignment="Right" x:Name="uiState">????</TextBlock>
-            <ScrollViewer Height="100" Grid.Row="2">
-                <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
-            </ScrollViewer>
-            <StackPanel Grid.Row="3">
+            
+            <controls:TabView Grid.Row="1" Header="Oscilloscope Controls" SelectedIndex="0" MinHeight="100">
+                <controls:TabViewItem Header="Control">
+                    <Grid MinHeight="100">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" >
+                            <Grid.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="8,0,8,0" />
+                                    <Setter Property="FontFamily" Value="Courier" />
+                                    <Setter Property="MinWidth" Value="75" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Time" />
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Value" />
+                            <TextBlock Grid.Row="0" Grid.Column="3" Text="𝚫 Time" />
+                            <TextBlock Grid.Row="0" Grid.Column="4" Text="𝚫 Freq" />
 
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoStatus" Text="*" Header="DsoStatus" Style="{StaticResource HEXStyle}"/>
-
-                    <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataScale" Text="*" Header="DsoDataScale" Style="{StaticResource HEXStyle}"/>
-
-                    <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataMode" Text="*" Header="DsoDataMode" Style="{StaticResource HEXStyle}"/>
-
-                    <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataRange" Text="*" Header="DsoDataRange" Style="{StaticResource HEXStyle}"/>
-
-                    <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataSamplingWindow" Text="*" Header="DsoDataSamplingWindow" Style="{StaticResource HEXStyle}"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-
-                    <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataNsamples" Text="*" Header="DsoDataNsamples" Style="{StaticResource HEXStyle}"/>
-
-                    <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoSamplingRate" Text="*" Header="DsoSamplingRate" Style="{StaticResource HEXStyle}"/>
-                </StackPanel>
-            </StackPanel>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Cursor" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="uiCursorTime" Text="1.2 ms" />
+                            <TextBlock Grid.Row="1" Grid.Column="2" x:Name="uiCursorValue" Text="3.45 V" />
+                            <TextBlock Grid.Row="1" Grid.Column="3" x:Name="uiCursorDeltaTime" Text="0.8 ms" />
+                            <TextBlock Grid.Row="1" Grid.Column="4" x:Name="uiCursorDeltaFreq" Text="0.5 Hz" />
+                        </Grid>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <Button Content="Connect" Click="OnConnect" />
+                            <Button Content="Data" Click="OnData" />
+                            <Button Content="Disconnect" Click="OnDisconnect" />
+                        </StackPanel>
+                        <TextBlock HorizontalAlignment="Right" x:Name="uiState">????</TextBlock>
+                    </Grid>
+                </controls:TabViewItem>
+                <controls:TabViewItem Header="Log">
+                    <ScrollViewer Height="100" >
+                        <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+                    </ScrollViewer>
+                </controls:TabViewItem>
+                <controls:TabViewItem Header="Advanced">
+                    <StackPanel MinHeight="100" >
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoStatus" Text="*" Header="DsoStatus" Style="{StaticResource HEXStyle}"/>
+                            <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataScale" Text="*" Header="DsoDataScale" Style="{StaticResource HEXStyle}"/>
+                            <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataMode" Text="*" Header="DsoDataMode" Style="{StaticResource HEXStyle}"/>
+                            <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataRange" Text="*" Header="DsoDataRange" Style="{StaticResource HEXStyle}"/>
+                            <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataSamplingWindow" Text="*" Header="DsoDataSamplingWindow" Style="{StaticResource HEXStyle}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataNsamples" Text="*" Header="DsoDataNsamples" Style="{StaticResource HEXStyle}"/>
+                            <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoSamplingRate" Text="*" Header="DsoSamplingRate" Style="{StaticResource HEXStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </controls:TabViewItem>
+            </controls:TabView>
         </Grid>
     </Border>
 </UserControl>

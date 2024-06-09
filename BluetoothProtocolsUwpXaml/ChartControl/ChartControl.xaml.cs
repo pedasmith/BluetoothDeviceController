@@ -1,23 +1,15 @@
 ﻿using BluetoothDeviceController.Names;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI;
-using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -36,8 +28,21 @@ namespace BluetoothDeviceController.Charts
         void SetUISpec(UISpecifications uISpec);
         void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, List<int> triggerIndex);
     }
+
+    public class PointerPositionArgs : EventArgs
+    {
+        public PointerPositionArgs(string message, double value)
+        {
+            Message = message;
+            Ratio = value;
+        }
+        public string Message { get; internal set; } = "";
+        public double Ratio { get; set; } = 0.0;
+    }
+
     public sealed partial class ChartControl : UserControl, IChartControlOscilloscope
     {
+        public event EventHandler<PointerPositionArgs> OnPointerPosition;
         public UISpecifications UISpec = new UISpecifications();
         public IList<string> Names = new List<string>();
         private bool MinMaxBeenInit { get; set; } = false;
@@ -204,10 +209,11 @@ namespace BluetoothDeviceController.Charts
 
                 // New: markers!
                 var mlist = new List<Polyline>();
-                var marker = MakeMarker();
-                mlist.Add(marker);
+                // TODO: remove the specific markers; they will be added as needed
+                //var marker = MakeMarker();
+                //mlist.Add(marker);
                 Markers.Add(mlist);
-                uiCanvas.Children.Add(marker);
+                //uiCanvas.Children.Add(marker);
             }
             while (UnderlyingData.Count <= lineIndex)
             {
@@ -745,6 +751,10 @@ namespace BluetoothDeviceController.Charts
             {
                 uiThinTextValue.Text = summary;
             }
+            // Per https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/events/how-to-publish-events-that-conform-to-net-framework-guidelines, 
+            // avoid a race condition by making a temp variable first.
+            var tmp = OnPointerPosition;
+            if (tmp != null) tmp.Invoke(this, new PointerPositionArgs(summary, ratio));
         }
 
         private void OnPointerExit(object sender, PointerRoutedEventArgs e)

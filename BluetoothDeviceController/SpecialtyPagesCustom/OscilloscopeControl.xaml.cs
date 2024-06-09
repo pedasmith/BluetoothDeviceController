@@ -1,10 +1,13 @@
 ﻿using BluetoothDeviceController.Charts;
 using BluetoothProtocols;
+using Microsoft.Graphics.Canvas.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Security.Isolation;
 using Windows.UI.WebUI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -14,6 +17,7 @@ using static BluetoothDeviceController.SpecialtyPages.PokitProMeterPage;
 
 namespace BluetoothDeviceController.SpecialtyPagesCustom
 {
+
     public class OscDataRecord
     {
         public OscDataRecord() { }
@@ -31,65 +35,6 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         }
     }
 
-    public class TriggerSetting
-    {
-        public enum TriggerType {  None, Rising }; // TODO: should falling trigger, too!
-        public TriggerType Trigger = TriggerType.Rising;
-        public double Level { get; set; } = 2.5;
-        public override string ToString()
-        {
-            return $"{Trigger} Level={Level}";
-        }
-
-        public List<int> FindTriggeredIndex(IList<OscDataRecord> list)
-        {
-            List<int> retval = new List<int>();
-            var index = 0;
-            do
-            {
-                var next = FindNextTriggeredIndex(index, list);
-                if (next > 0)
-                {
-                    retval.Add(next);
-                }
-                index = next;
-            }
-            while (index > 0);
-            return retval;
-        }
-
-        private int FindNextTriggeredIndex(int startIndex, IList<OscDataRecord> list)
-        {
-            if (list.Count < 2) return 0;
-            if (Trigger == TriggerType.None) return 0;
-
-            double prev = list[startIndex].Value;
-            for (int i=startIndex+1; i < list.Count; i++)
-            {
-                var curr = list[i].Value;
-                if (prev < Level && curr >= Level)
-                {
-                    return i;
-                }
-                prev = curr;
-            }
-            return 0;
-        }
-
-        public string ZZZAdjustDataTimeFromTriggerIndex(int triggerIndex, DateTime lineStartTime, IList<OscDataRecord> list)
-        {
-            var logstr = "";
-            var triggerTime = list[triggerIndex].EventTime;
-            var delta = triggerTime.Subtract(lineStartTime);
-            logstr = $" Trigger: time={triggerTime} delta(ms)={delta.TotalMilliseconds}";
-            for (int i=0; i < list.Count; i++)
-            {
-                var value = list[i];
-                value.EventTime = value.EventTime.Subtract(delta);
-            }
-            return logstr;
-        }
-    }
     public sealed partial class OscilloscopeControl : UserControl
     {
         public enum ConnectionState { Off, Configuring, Configured, GotData, GotDataStale, Deconfiguring, Failed };
@@ -121,8 +66,10 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         {
             this.InitializeComponent();
             uiChart = uiChartRaw;
+            uiChartRaw.OnPointerPosition += UiChartRaw_OnPointerPosition;
             this.Loaded += OscilloscopeControl_Loaded;
         }
+
         PokitProMeter bleDevice = null;
 
         private ConnectionState _BtConnectionState = ConnectionState.Off;
@@ -222,7 +169,6 @@ typeof(OscDataRecord).GetProperty("Value"),
         int Curr_DSO_NMetadataEvents = -10;
         int DSO_NReadingsLeft = 0;
         DateTime ReadingStartTime = DateTime.MinValue;
-        // Double ReadingDeltaInSeconds = 0.0001;
         long ReadingDeltaInTicks = 100; // Good default; matches the "10 microseconds per sample" set in 2024-06-08
         List<double> RawReadings = new List<double>();
         double DsoScale = 1.0;
@@ -333,17 +279,49 @@ typeof(OscDataRecord).GetProperty("Value"),
                             readingTime = readingTime.AddTicks(ReadingDeltaInTicks);
                         }
 
-                        var triggerIndexList = TriggerSetting.FindTriggeredIndex(MMData);
+                        TriggerIndexes = TriggerSetting.FindTriggeredIndex(MMData);
                         var triggerNominalTime = MMData[0].EventTime;
 
 
-                        uiChartRaw.RedrawOscilloscopeYTime(currLineIndex, MMData, triggerIndexList); // Push the data into the ChartControl
+                        uiChartRaw.RedrawOscilloscopeYTime(currLineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
                         Log($"Got data: {MMData[0].Value:F3}");
                         IncrementCurrLineIndex();
                     });
                 }
             }
         }
+        private List<int> TriggerIndexes;
+
+        private void UiChartRaw_OnPointerPosition(object sender, PointerPositionArgs e)
+        {
+            if (MMData.Count == 0) return;
+            var index = MMData.GetItemAtOrBeforeIndex(e.Ratio);
+            if (index < 0) return;
+
+            var item = MMData[index] as OscDataRecord;
+            if (item == null) return;
+            uiCursorTime.Text = item.EventTime.Subtract(DateTime.MinValue).TotalMilliseconds.ToString("F3") + " ms";
+            uiCursorValue.Text = item.Value.ToString("F3") + " V DC";
+
+            // What the closest marker before this?
+            int closestMarkerIndex = 0;
+            foreach (var triggerIndex in TriggerIndexes)
+            {
+                if (triggerIndex >= index) break;
+                closestMarkerIndex = triggerIndex;
+            }
+            var marker = MMData[closestMarkerIndex]; // before or at the cursor
+            var delta = item.EventTime.Subtract(marker.EventTime).TotalMilliseconds;
+            uiCursorDeltaTime.Text = delta.ToString("F3") + " ms";
+
+            // Shouldn't this be measured trigger-to-trigger?
+            var freq = Math.Abs (1.0 / (delta / 1000.0));
+            var freqtext = freq.ToString("F2");
+            if (freq > 100) freqtext = freq.ToString("F1");
+            else if (freq > 500) freqtext = freq.ToString("F0");
+            uiCursorDeltaFreq.Text = freqtext;
+        }
+
 
         public async Task SetMeter(PokitProMeter value)
         {

@@ -214,6 +214,7 @@
     <Compile Include="SpecialtyPagesCustom\Pokit_ProPage.xaml.cs">
       <DependentUpon>Pokit_ProPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPagesCustom\TriggerSetting.cs" />
     <Compile Include="SpecialtyPagesCustom\UartPage.xaml.cs">
       <DependentUpon>UartPage.xaml</DependentUpon>
     </Compile>
