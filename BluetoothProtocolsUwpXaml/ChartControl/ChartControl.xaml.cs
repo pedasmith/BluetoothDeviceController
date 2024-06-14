@@ -167,14 +167,14 @@ namespace BluetoothDeviceController.Charts
         /// is also an ISummarizeValues; it can take a ratio (0..1) and return a string summary of the data.
         /// </summary>
         private List<List<Point>> UnderlyingData = new List<List<Point>>();
-        private List<double> LLPerLineXOffset = new List<double>() { 0.0 };
+        //private List<double> LLPerLineXOffset = new List<double>() { 0.0 };
         private List<double> PerLineXOffsetInSeconds = new List<double>() { 0.0 };
         private int CurrOscilloscopeLine = 0;
-        private double CurrXLineOffsetInPixels
-        {
-            get { return LLPerLineXOffset[CurrOscilloscopeLine]; }
-            set { LLPerLineXOffset[CurrOscilloscopeLine] = value; }
-        }
+        //private double CurrXLineOffsetInPixels
+        //{
+        //    get { return LLPerLineXOffset[CurrOscilloscopeLine]; }
+        //    set { LLPerLineXOffset[CurrOscilloscopeLine] = value; }
+        //}
         private double CurrXLineOffsetInSeconds
         {
             get { return PerLineXOffsetInSeconds[CurrOscilloscopeLine]; }
@@ -214,31 +214,43 @@ namespace BluetoothDeviceController.Charts
         {
             uiTitle.Text = title;
         }
-
-        private double X(double x)
+        /// <summary>
+        /// Given an X time in seconds, return the 0..1 value of where it is between
+        /// the XMin and XMax. Handles the case of XMin == XMax by return 0.
+        /// </summary>
+        private double XToRatio(double x)
         {
             var ratio = (XMax == XMin) ? 0 : ((x - XMin) / (XMax - XMin));
+            return ratio;
+        }
+
+        /// <summary>
+        /// Convert an X time in seconds into a pixel position offset by the current zoom and
+        /// pan but not by the per-line offsets.
+        /// </summary>
+        private double X(double x)
+        {
+            var ratio = XToRatio(x);
             // 2024-06-09: var retval = (XMax == XMin) ? 0 : ((x - XMin) / (XMax - XMin)) * this.ActualWidth;
             ratio = ratio - CurrZoom.XRatioOffset;
             ratio = ratio * CurrZoom.Zoom;
-            var retval = ratio * this.ActualWidth;
+            var retval = ratio * uiCanvas.ActualWidth;
             return retval;
         }
 
         /// <summary>
-        /// Given a physical location (e.g., from a pointer move), return a 0..1 value that's also
-        /// offset by the CurrOscilloscopeLineXOffset
+        /// Given a physical location (e.g., from a pointer move), return a 0..1 value that adjusts for
+        /// the current screen zoom and pan but not the-line adjustment. Not quite the reverse of the X
+        /// method because that method takes in an X time and this one returns an X ratio.
         /// </summary>
-        /// <param name="xpos"></param>
-        /// <returns></returns>
         private double XRatioReverse(double xpos)
         {
-            // TODO: need to finish removing the CurrXLineOFfsetInPixels
-            var ratio = (xpos - CurrXLineOffsetInPixels) / uiCanvas.ActualWidth;
-            ratio = ratio / CurrZoom.Zoom;
-            ratio = ratio + CurrZoom.XRatioOffset;
-            return ratio;
+            double reverse = xpos / uiCanvas.ActualWidth;
+            reverse = reverse / CurrZoom.Zoom;
+            reverse = reverse + CurrZoom.XRatioOffset; // reverse is now the 0..1 ratio but is missing the per-line offset.
+            return reverse;
         }
+
         private double Y(int line, double y)
         {
             var ymin = UISpec?.ChartMinY(line, GetYMin(line)) ?? GetYMin(line);
@@ -295,10 +307,10 @@ namespace BluetoothDeviceController.Charts
             {
                 UnderlyingData.Add(new List<Point>());
             }
-            while (LLPerLineXOffset.Count <= lineIndex)
-            {
-                LLPerLineXOffset.Add(0.0);
-            }
+            //while (LLPerLineXOffset.Count <= lineIndex)
+            //{
+            //    LLPerLineXOffset.Add(0.0);
+            //}
             while (PerLineXOffsetInSeconds.Count <= lineIndex)
             {
                 PerLineXOffsetInSeconds.Add(0.0);
@@ -473,7 +485,7 @@ namespace BluetoothDeviceController.Charts
                         var time = Convert.ToDateTime(TimeProperty.GetValue(record));
                         line0markerSeconds = time.Subtract(StartTime).TotalSeconds;
                         line0markerPixelX = X(line0markerSeconds);
-                        CurrXLineOffsetInPixels = 0;
+                        //CurrXLineOffsetInPixels = 0;
                         CurrXLineOffsetInSeconds = 0.0;
                     }
                     else
@@ -482,13 +494,13 @@ namespace BluetoothDeviceController.Charts
                         var time = Convert.ToDateTime(TimeProperty.GetValue(firstMarkerRecord));
                         var markerSeconds = time.Subtract(StartTime).TotalSeconds;
                         var markerPixelX = X(markerSeconds);
-                        CurrXLineOffsetInPixels = line0markerPixelX - markerPixelX;
+                        //CurrXLineOffsetInPixels = line0markerPixelX - markerPixelX;
                         CurrXLineOffsetInSeconds = line0markerSeconds - markerSeconds;
                     }
                 }
                 else
                 {
-                    CurrXLineOffsetInPixels = 0;
+                    //CurrXLineOffsetInPixels = 0;
                     CurrXLineOffsetInSeconds = 0.0;
                 }
 
@@ -868,8 +880,8 @@ namespace BluetoothDeviceController.Charts
             e.Handled = true;
 
             // What should the value box say?
-            var ratio = XRatioReverse(position.X); // OLD: - CurrOscilloscopeLineXOffset) / uiCanvas.ActualWidth;
-            var summary = Values?.GetSummary(ratio);
+            var ratio = XRatioReverse(position.X) - XToRatio(CurrXLineOffsetInSeconds);
+            var summary = Values?.GetSummary(ratio); // ratio is unzoomed, with no offsets. Just 0..1.
             if (String.IsNullOrEmpty(summary))
             {
                 uiThinTextBorder.Visibility = Visibility.Collapsed;
