@@ -1,14 +1,13 @@
 ﻿using BluetoothDeviceController.Charts;
 using BluetoothProtocols;
-using Microsoft.Graphics.Canvas.Geometry;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Utilities;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Security.Isolation;
-using Windows.UI.WebUI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using static BluetoothDeviceController.SpecialtyPages.PokitProMeterPage;
@@ -146,12 +145,23 @@ typeof(OscDataRecord).GetProperty("Value"),
             });
         }
 
+
+        Status_DeviceRecord Curr_Status_DeviceRecord;
+        Status_StatusRecord Curr_Status_StatusRecord;
+        Status_Device_NameRecord Curr_Status_Device_NameRecord;
+
         private async void OnConnect(object sender, RoutedEventArgs e)
         {
             if (bleDevice == null) return;
 
             BtConnectionState = ConnectionState.Configuring;
             await ConnectCallbacksAsync();
+
+            //
+            Curr_Status_DeviceRecord = await DoReadStatus_Device();
+            Curr_Status_StatusRecord = await DoReadStatus_Status();
+            Curr_Status_Device_NameRecord = await DoReadStatus_Device_Name();
+            SetDeviceInfo(Curr_Status_DeviceRecord, Curr_Status_StatusRecord, Curr_Status_Device_NameRecord);
         }
 
         private async void OnDisconnect(object sender, RoutedEventArgs e)
@@ -285,6 +295,11 @@ typeof(OscDataRecord).GetProperty("Value"),
                     record.DsoSamplingRate = (double)DsoSamplingRate.AsDouble;
                 }
 
+                //
+                // TODO: Update with actual data!
+                //
+                DSO_NReadingsLeft = (int)record.DsoDataNsamples;
+                ;
 
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
@@ -318,6 +333,7 @@ typeof(OscDataRecord).GetProperty("Value"),
                     RawReadings.Add(value);
                 }
                 DSO_NReadingsLeft -= array.Count;
+                System.Diagnostics.Debug.WriteLine($"NRead={DSO_NReadEvents_Trace} readings={array.Count} nleft={DSO_NReadingsLeft}");
 
 
                 if (DSO_NReadingsLeft <= 0) // NOTE: what happens if the BT fails?
@@ -419,7 +435,14 @@ typeof(OscDataRecord).GetProperty("Value"),
             ushort nSamples = 500; // TODO: allow for settings not too many for testing!
             UInt32 timePerSampleInMicroseconds = 10; // FYI: there are 10 C# ticks per microsecond
 
-            nSamples = 1000;
+            var maxSamplesPerSecond = Curr_Status_DeviceRecord.MaxSamplingRate * 1000; // value is in KHz. 1000 == 1 MHz sample rate
+            var minMicrosecondsPerSample = (1.0 / maxSamplesPerSecond) * 1_000_000.0;
+            timePerSampleInMicroseconds = (UInt32)minMicrosecondsPerSample;
+
+
+            nSamples = (UInt16)Curr_Status_DeviceRecord.DeviceBufferSize; // Max number of samples
+            nSamples = (ushort)(nSamples - 1000); // TODO: must reduce the amount, otherwise it doesn't work.
+
             //timePerSampleInMicroseconds = 125;
 
             // Examples of nSamples, timePerSample and samplingWindow sizes
@@ -436,12 +459,15 @@ typeof(OscDataRecord).GetProperty("Value"),
             // What the DSO needs is the nSamples and the samplingWindowsInMicroseconds.
             // These aren't really very user-friendly.
             UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
+
             DSO_NReadingsLeft = nSamples;
             ReadingDeltaInTicks = timePerSampleInMicroseconds * 10;
             RawReadings.Clear();
 
             await bleDevice.WriteDSO_Settings((byte)triggerType, triggerLevel, (byte)datamode, (byte)range, samplingWindowInMicroseconds, nSamples);
 
+            // Will call BleDevice_DSO_MetadataEvent to get the meta data
+            // Will call BleDevice_DSO_ReadingEvent multiple times until all data is sent.
         }
 
         private void OnZoom(object sender, RoutedEventArgs e)
@@ -463,5 +489,298 @@ typeof(OscDataRecord).GetProperty("Value"),
             if (!parseok) return;
             uiChart.SetPan(value);
         }
+
+
+        #region DEVICE_STATUS
+
+        private void SetStatus(string str)
+        {
+            Log(str);
+        }
+
+        private void SetDeviceInfo(Status_DeviceRecord dr, Status_StatusRecord sr, Status_Device_NameRecord nr)
+        {
+            // Style note: only values are set here. Things like units which are fixed are already 
+            // present in the XAML.
+            uiName.Text = nr.Device_Name;
+            uiFirmware.Text = $"{dr.FirmwareMajor}.{dr.FirmwareMinor}";
+            uiBandwidth.Text = $"{(dr.MaxSamplingRate / 1000.0):F2}";
+
+            uiBattery.Text = $"{sr.BatteryLevel:F2}";
+            uiMaxVoltage.Text = $"{dr.MaxInputVoltage:F0}";
+            uiMaxCurrent.Text = $"{dr.MaxInputCurrent:F0}";
+            uiMaxResistance.Text = $"{dr.MaxInputResistance:F0}";
+
+            uiMac.Text= $"{dr.MacAddress}";
+        }
+
+        public class Status_DeviceRecord : INotifyPropertyChanged
+        {
+            public Status_DeviceRecord()
+            {
+                this.EventTime = DateTime.Now;
+            }
+            // For the INPC INotifyPropertyChanged values
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            private DateTime _EventTime;
+            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
+
+            private double _FirmwareMajor;
+            public double FirmwareMajor { get { return _FirmwareMajor; } set { if (value == _FirmwareMajor) return; _FirmwareMajor = value; OnPropertyChanged(); } }
+
+            private double _FirmwareMinor;
+            public double FirmwareMinor { get { return _FirmwareMinor; } set { if (value == _FirmwareMinor) return; _FirmwareMinor = value; OnPropertyChanged(); } }
+
+            private double _MaxInputVoltage;
+            public double MaxInputVoltage { get { return _MaxInputVoltage; } set { if (value == _MaxInputVoltage) return; _MaxInputVoltage = value; OnPropertyChanged(); } }
+
+            private double _MaxInputCurrent;
+            public double MaxInputCurrent { get { return _MaxInputCurrent; } set { if (value == _MaxInputCurrent) return; _MaxInputCurrent = value; OnPropertyChanged(); } }
+
+            private double _MaxInputResistance;
+            public double MaxInputResistance { get { return _MaxInputResistance; } set { if (value == _MaxInputResistance) return; _MaxInputResistance = value; OnPropertyChanged(); } }
+
+            private double _MaxSamplingRate;
+            public double MaxSamplingRate { get { return _MaxSamplingRate; } set { if (value == _MaxSamplingRate) return; _MaxSamplingRate = value; OnPropertyChanged(); } }
+
+            private double _DeviceBufferSize;
+            public double DeviceBufferSize { get { return _DeviceBufferSize; } set { if (value == _DeviceBufferSize) return; _DeviceBufferSize = value; OnPropertyChanged(); } }
+
+            private double _Reserved01;
+            public double Reserved01 { get { return _Reserved01; } set { if (value == _Reserved01) return; _Reserved01 = value; OnPropertyChanged(); } }
+
+            private string _MacAddress;
+            public string MacAddress { get { return _MacAddress; } set { if (value == _MacAddress) return; _MacAddress = value; OnPropertyChanged(); } }
+
+            private String _Note;
+            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+        }
+
+        public class Status_StatusRecord : INotifyPropertyChanged
+        {
+            public Status_StatusRecord()
+            {
+                this.EventTime = DateTime.Now;
+            }
+            // For the INPC INotifyPropertyChanged values
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            private DateTime _EventTime;
+            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
+
+            private double _DeviceStatus;
+            public double DeviceStatus { get { return _DeviceStatus; } set { if (value == _DeviceStatus) return; _DeviceStatus = value; OnPropertyChanged(); } }
+
+            private double _BatteryLevel;
+            public double BatteryLevel { get { return _BatteryLevel; } set { if (value == _BatteryLevel) return; _BatteryLevel = value; OnPropertyChanged(); } }
+
+            private String _Note;
+            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+        }
+        public class Status_Device_NameRecord : INotifyPropertyChanged
+        {
+            public Status_Device_NameRecord()
+            {
+                this.EventTime = DateTime.Now;
+            }
+            // For the INPC INotifyPropertyChanged values
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+            private DateTime _EventTime;
+            public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
+
+            private string _Device_Name;
+            public string Device_Name { get { return _Device_Name; } set { if (value == _Device_Name) return; _Device_Name = value; OnPropertyChanged(); } }
+
+            private String _Note;
+            public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+        }
+
+
+
+        private async Task<Status_DeviceRecord> DoReadStatus_Device()
+        {
+            //SetStatusActive(true); // the false happens in the bluetooth status handler.
+            var record = new Status_DeviceRecord();
+            try
+            {
+                var valueList = await bleDevice.ReadStatus_Device();
+                if (valueList == null)
+                {
+                    SetStatus($"Error: unable to read Status_Device");
+                    return record;
+                }
+
+
+                var FirmwareMajor = valueList.GetValue("FirmwareMajor");
+                if (FirmwareMajor.CurrentType == BCBasic.BCValue.ValueType.IsDouble || FirmwareMajor.CurrentType == BCBasic.BCValue.ValueType.IsString || FirmwareMajor.IsArray)
+                {
+                    record.FirmwareMajor = (double)FirmwareMajor.AsDouble;
+                }
+
+                var FirmwareMinor = valueList.GetValue("FirmwareMinor");
+                if (FirmwareMinor.CurrentType == BCBasic.BCValue.ValueType.IsDouble || FirmwareMinor.CurrentType == BCBasic.BCValue.ValueType.IsString || FirmwareMinor.IsArray)
+                {
+                    record.FirmwareMinor = (double)FirmwareMinor.AsDouble;
+                }
+
+                var MaxInputVoltage = valueList.GetValue("MaxInputVoltage");
+                if (MaxInputVoltage.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MaxInputVoltage.CurrentType == BCBasic.BCValue.ValueType.IsString || MaxInputVoltage.IsArray)
+                {
+                    record.MaxInputVoltage = (double)MaxInputVoltage.AsDouble;
+                }
+
+                var MaxInputCurrent = valueList.GetValue("MaxInputCurrent");
+                if (MaxInputCurrent.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MaxInputCurrent.CurrentType == BCBasic.BCValue.ValueType.IsString || MaxInputCurrent.IsArray)
+                {
+                    record.MaxInputCurrent = (double)MaxInputCurrent.AsDouble;
+                }
+
+                var MaxInputResistance = valueList.GetValue("MaxInputResistance");
+                if (MaxInputResistance.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MaxInputResistance.CurrentType == BCBasic.BCValue.ValueType.IsString || MaxInputResistance.IsArray)
+                {
+                    record.MaxInputResistance = (double)MaxInputResistance.AsDouble;
+                }
+
+                var MaxSamplingRate = valueList.GetValue("MaxSamplingRate");
+                if (MaxSamplingRate.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MaxSamplingRate.CurrentType == BCBasic.BCValue.ValueType.IsString || MaxSamplingRate.IsArray)
+                {
+                    record.MaxSamplingRate = (double)MaxSamplingRate.AsDouble;
+                }
+
+                var DeviceBufferSize = valueList.GetValue("DeviceBufferSize");
+                if (DeviceBufferSize.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DeviceBufferSize.CurrentType == BCBasic.BCValue.ValueType.IsString || DeviceBufferSize.IsArray)
+                {
+                    record.DeviceBufferSize = (double)DeviceBufferSize.AsDouble;
+                }
+
+                var Reserved01 = valueList.GetValue("Reserved01");
+                if (Reserved01.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Reserved01.CurrentType == BCBasic.BCValue.ValueType.IsString || Reserved01.IsArray)
+                {
+                    record.Reserved01 = (double)Reserved01.AsDouble;
+                }
+
+                var MacAddress = valueList.GetValue("MacAddress");
+                if (MacAddress.IsArray)
+                {
+                    var data = MacAddress.AsArray;
+                    var mac = "";
+                    foreach (var b in data.AsByteArray())
+                    {
+                        if (mac != "") mac += ":";
+                        mac += b.ToString("X2");
+                    }
+                    record.MacAddress = mac;    
+                }    
+                //if (MacAddress.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MacAddress.CurrentType == BCBasic.BCValue.ValueType.IsString || MacAddress.IsArray)
+                ///{
+                //    record.MacAddress = (string)MacAddress.AsString;
+                //}
+                //Status_Device_FirmwareMajor.Text = record.FirmwareMajor.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Device_FirmwareMinor.Text = record.FirmwareMinor.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Device_MaxInputVoltage.Text = record.MaxInputVoltage.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Device_MaxInputCurrent.Text = record.MaxInputCurrent.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Device_MaxInputResistance.Text = record.MaxInputResistance.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Device_MaxSamplingRate.Text = record.MaxSamplingRate.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Device_DeviceBufferSize.Text = record.DeviceBufferSize.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Device_Reserved01.Text = record.Reserved01.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Device_MacAddress.Text = record.MacAddress.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+
+                // Status_DeviceRecordData.Add(record);
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"Error: exception: {ex.Message}");
+            }
+
+            return record;
+        }
+
+        private async Task<Status_StatusRecord> DoReadStatus_Status()
+        {
+            //SetStatusActive(true); // the false happens in the bluetooth status handler.
+            //ncommand++;
+            var record = new Status_StatusRecord();
+            try
+            {
+                var valueList = await bleDevice.ReadStatus_Status();
+                if (valueList == null)
+                {
+                    SetStatus($"Error: unable to read Status_Status");
+                    return null;
+                }
+
+
+                var DeviceStatus = valueList.GetValue("DeviceStatus");
+                if (DeviceStatus.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DeviceStatus.CurrentType == BCBasic.BCValue.ValueType.IsString || DeviceStatus.IsArray)
+                {
+                    record.DeviceStatus = (double)DeviceStatus.AsDouble;
+                }
+
+                var BatteryLevel = valueList.GetValue("BatteryLevel");
+                if (BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsDouble || BatteryLevel.CurrentType == BCBasic.BCValue.ValueType.IsString || BatteryLevel.IsArray)
+                {
+                    record.BatteryLevel = (double)BatteryLevel.AsDouble;
+                }
+
+                //Status_Status_DeviceStatus.Text = record.DeviceStatus.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Status_BatteryLevel.Text = record.BatteryLevel.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+
+                //Status_StatusRecordData.Add(record);
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"Error: exception: {ex.Message}");
+            }
+            return record;
+        }
+
+
+        private async Task<Status_Device_NameRecord> DoReadStatus_Device_Name()
+        {
+            //SetStatusActive(true); // the false happens in the bluetooth status handler.
+            //ncommand++;
+            var record = new Status_Device_NameRecord();
+            try
+            {
+                var valueList = await bleDevice.ReadStatus_Device_Name();
+                if (valueList == null)
+                {
+                    SetStatus($"Error: unable to read Status_Device_Name");
+                    return null;
+                }
+
+
+                var Device_Name = valueList.GetValue("Device_Name");
+                if (Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Device_Name.CurrentType == BCBasic.BCValue.ValueType.IsString || Device_Name.IsArray)
+                {
+                    record.Device_Name = (string)Device_Name.AsString;
+                }
+
+
+                //Status_Device_Name_Device_Name.Text = record.Device_Name.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                //Status_Device_NameRecordData.Add(record);
+
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"Error: exception: {ex.Message}");
+            }
+            return record;
+        }
+
+        #endregion
     }
 }

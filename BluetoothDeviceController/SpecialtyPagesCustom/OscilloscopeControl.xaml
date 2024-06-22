@@ -73,9 +73,14 @@
 
             
             <controls:TabView Grid.Row="1" Header="Oscilloscope Controls" 
-                              SelectedIndex="1" MinHeight="100">
+                              SelectedIndex="0" MinHeight="100">
+                <controls:TabView.Resources>
+                    <Style TargetType="Panel" x:Key="sControlPanel">
+                        <Setter Property="Height" Value="100" />
+                    </Style>
+                </controls:TabView.Resources>
                 <controls:TabViewItem Header="Control">
-                    <Grid MinHeight="100">
+                    <Grid Style="{StaticResource sControlPanel}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
@@ -123,7 +128,7 @@
                     </Grid>
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Zoom">
-                    <Grid MinHeight="100">
+                    <Grid Style="{StaticResource sControlPanel}">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton Content="x1" Tag="1" Checked="OnZoom" />
@@ -145,20 +150,74 @@
                     
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Log">
-                    <ScrollViewer Height="100" >
+                    <ScrollViewer Style="{StaticResource sControlPanel}">
                         <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
                     </ScrollViewer>
                 </controls:TabViewItem>
+                <controls:TabViewItem Header="Device Info">
+                    <controls:TabViewItem.Resources>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Width" Value="350" />
+                            <Setter Property="Height" Value="200" />
+                        </Style>
+                        <Style TargetType="TextBlock" x:Key="sNameValueCritical">
+                            <Setter Property="FontSize" Value="16" />
+                            <Setter Property="IsTextSelectionEnabled" Value="True" />
+                        </Style>
+                        <Style TargetType="TextBlock" x:Key="sNameValueInfo">
+                            <Setter Property="FontSize" Value="10" />
+                            <Setter Property="IsTextSelectionEnabled" Value="True" />
+                        </Style>
+
+                    </controls:TabViewItem.Resources>
+                    <StackPanel Style="{StaticResource sControlPanel}">
+                        <TextBlock Style="{StaticResource sNameValueCritical}">
+                            <Run FontWeight="Bold" x:Name="uiName"></Run>
+                                
+                            <Run Text="     " />
+                            <Run FontWeight="Bold">Battery: </Run>
+                            <Run x:Name="uiBattery">__</Run>
+                            <Run >V</Run>
+                                
+                            <Run Text="     " />
+                            <Run FontWeight="Bold">Bandwidth: </Run>
+                            <Run x:Name="uiBandwidth">__</Run>
+                            <Run >MHz</Run>
+                                
+                            <Run Text="     " />
+                            <Run FontWeight="Bold">Firmware: </Run>
+                            <Run x:Name="uiFirmware">__</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sNameValueInfo}">
+                            <Run FontWeight="Bold">Electrical values: </Run>
+                            <Run FontWeight="Bold">Max Voltage: </Run>
+                            <Run x:Name="uiMaxVoltage">__</Run>
+                            <Run >V</Run>
+                                
+                            <Run Text="     " />
+                            <Run FontWeight="Bold">Max Current: </Run>
+                            <Run x:Name="uiMaxCurrent">__</Run>
+                            <Run >A</Run>
+                                
+                            <Run Text="     " />
+                            <Run FontWeight="Bold">Max Resistance: </Run>
+                            <Run x:Name="uiMaxResistance">__</Run>
+                            <Run >Ω</Run>
+                                
+                            <Run Text="     " />
+                            <Run FontWeight="Bold">BT MAC: </Run>
+                            <Run x:Name="uiMac">__</Run>
+                        </TextBlock>
+                    </StackPanel>
+                </controls:TabViewItem>
                 <controls:TabViewItem Header="Advanced">
-                    <StackPanel MinHeight="100" >
+                    <StackPanel Style="{StaticResource sControlPanel}">
                         <StackPanel Orientation="Horizontal">
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoStatus" Text="*" Header="DsoStatus" Style="{StaticResource HEXStyle}"/>
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataScale" Text="*" Header="DsoDataScale" Style="{StaticResource HEXStyle}"/>
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataMode" Text="*" Header="DsoDataMode" Style="{StaticResource HEXStyle}"/>
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataRange" Text="*" Header="DsoDataRange" Style="{StaticResource HEXStyle}"/>
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataSamplingWindow" Text="*" Header="DsoDataSamplingWindow" Style="{StaticResource HEXStyle}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataNsamples" Text="*" Header="DsoDataNsamples" Style="{StaticResource HEXStyle}"/>
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoSamplingRate" Text="*" Header="DsoSamplingRate" Style="{StaticResource HEXStyle}"/>
                         </StackPanel>
