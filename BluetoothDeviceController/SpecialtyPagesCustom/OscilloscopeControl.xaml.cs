@@ -329,30 +329,45 @@ typeof(OscDataRecord).GetProperty("Value"),
 
                 if (DSO_NReadingsLeft <= 0) // NOTE: what happens if the BT fails?
                 {
-                    Utilities.UIThreadHelper.CallOnUIThread(() =>
-                    {
-                        MMData.ClearAllRecords();
-                        MMData.MaxLength = RawReadings.Count;
-
-                        MMData.CurrTimeStampType = DataCollection<OscDataRecord>.TimeStampType.FromZeroMS;
-                        DateTime readingTime = DateTime.MinValue;  // and not at all ReadingStartTime;
-                        MMData.TimeStampStart = readingTime; // force these to always be in sync :-)
-                        for (int i = 0; i < RawReadings.Count; i++)
-                        {
-                            var mm = new OscDataRecord(readingTime, RawReadings[i] * DsoScale);
-                            var addResult = MMData.AddRecord(mm);
-                            readingTime = readingTime.AddTicks(ReadingDeltaInTicks);
-                        }
-
-                        TriggerIndexes = TriggerSetting.FindTriggeredIndex(MMData);
-
-                        var lineIndex = uiChart.GetNextOscilloscopeLine();
-                        uiChartRaw.RedrawOscilloscopeYTime(lineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
-
-                        Log($"Got data: {MMData[0].Value:F3}");
-                    });
+                    Utilities.UIThreadHelper.CallOnUIThread(() => { DrawOscilloscopeLine(); });
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Once the RawReadings are read, convert to the MMData, pop in the right time stamps,
+        /// and draw the resulting graph
+        /// </summary>
+        private void DrawOscilloscopeLine()
+        {
+            MMData.ClearAllRecords();
+            MMData.MaxLength = RawReadings.Count;
+
+            MMData.CurrTimeStampType = DataCollection<OscDataRecord>.TimeStampType.FromZeroMS;
+            DateTime readingTime = DateTime.MinValue;  // and not at all ReadingStartTime;
+            MMData.TimeStampStart = readingTime; // force these to always be in sync :-)
+            for (int i = 0; i < RawReadings.Count; i++)
+            {
+                var mm = new OscDataRecord(readingTime, RawReadings[i] * DsoScale);
+                var addResult = MMData.AddRecord(mm);
+                readingTime = readingTime.AddTicks(ReadingDeltaInTicks);
+            }
+
+            //
+            // Calculate the trigger locationss
+            //
+            TriggerIndexes = TriggerSetting.FindTriggeredIndex(MMData);
+
+            //
+            // Draw the line
+            //
+            var lineIndex = uiChart.GetNextOscilloscopeLine();
+            AddToClearList(lineIndex);
+            uiChartRaw.RedrawOscilloscopeYTime(lineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
+
+            Log($"Got data: {MMData[0].Value:F3}");
+
         }
 
         #endregion READ_DATA
@@ -428,22 +443,20 @@ typeof(OscDataRecord).GetProperty("Value"),
             if (bleDevice == null) return;
             if (BtConnectionState != ConnectionState.Configured) return;
 
-            int sparse = 16; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
+            int READING_SPARCITY = 2; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
             // the time window stays the same, so we always gather the same length of time.
 
-            ushort nSamples = 500; // TODO: allow for settings not too many for testing!
-            //UInt32 timePerSampleInMicroseconds = 10; // FYI: there are 10 C# ticks per microsecond
+            ushort nSamples; 
 
-            var maxSamplesPerSecond = Curr_Status_DeviceRecord.MaxSamplingRate * 1000 / sparse; // value is in KHz. 1000 == 1 MHz sample rate
+            var maxSamplesPerSecond = Curr_Status_DeviceRecord.MaxSamplingRate * 1000 / READING_SPARCITY; // value is in KHz. 1000 == 1 MHz sample rate
             var minMicrosecondsPerSample = (1.0 / maxSamplesPerSecond) * 1_000_000.0;
             UInt32 timePerSampleInMicroseconds = (UInt32)minMicrosecondsPerSample;
 
 
-            nSamples = (UInt16)(Curr_Status_DeviceRecord.DeviceBufferSize / sparse); // Max number of samples
+            nSamples = (UInt16)(Curr_Status_DeviceRecord.DeviceBufferSize / READING_SPARCITY); // Max number of samples
             nSamples = Math.Min(nSamples, (ushort)(Curr_Status_DeviceRecord.DeviceBufferSize - 1000)); // TODO: must reduce the amount, otherwise it doesn't work.
 
 
-            //timePerSampleInMicroseconds = 125;
 
             // Examples of nSamples, timePerSample and samplingWindow sizes
             // NSamples     timePerSamples      samplingWindowSize
@@ -456,7 +469,7 @@ typeof(OscDataRecord).GetProperty("Value"),
             // Also FYI: a 1000 Hz wave is 1000 microseconds per cycke
             // So a 1000 Hz wave with 8000 samples will have 8 samples per cycle
 
-            // What the DSO needs is the nSamples and the samplingWindowsInMicroseconds.
+            // What the DSO needs during setup is the nSamples and the samplingWindowsInMicroseconds.
             // These aren't really very user-friendly.
             UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
 
@@ -491,9 +504,22 @@ typeof(OscDataRecord).GetProperty("Value"),
             uiChart.SetPan(value);
         }
 
+
+        private List<int> ClearList = new List<int>();
+        private void AddToClearList(int lineIndex)
+        {
+            ClearList.Remove(lineIndex);
+            ClearList.Add(lineIndex);
+        }
         private void OnClear(object sender, RoutedEventArgs e)
         {
-            uiChart.ClearLine(1);  // TODO: for now, always clear line 1
+            if (ClearList.Count < 1) return;
+
+            var lastClearIndex = ClearList.Count - 1;   
+            var lineIndexToClear = ClearList[lastClearIndex];
+            ClearList.RemoveAt(lastClearIndex);
+
+            uiChart.ClearLine(lineIndexToClear);
         }
 
         #region DEVICE_STATUS
