@@ -154,6 +154,7 @@ namespace BluetoothDeviceController
         bool _IsNordicUart = false;
         bool _IsNordicUartChecked = false;
         public BluetoothProtocolsCustom.Nordic_Uart AsNordicUart { get; internal set; } = null;
+
         public async Task<bool> IsNordicUartAsync()
         {
             if (di == null) return false; // but don't update the IsNordicUartChecked

@@ -3443,66 +3443,64 @@ namespace BluetoothDeviceController.SpecialtyPages
                 DSO_NMetadataEvents++;
                 System.Diagnostics.Debug.WriteLine($"DBG: DSO_MetaDataEvent: got event {DSO_NMetadataEvents} new scale={DsoScale}");
 
+                var valueList = data.ValueList;
+
+                var record = new DSO_MetadataRecord();
+
+                var DsoStatus = valueList.GetValue("DsoStatus");
+                if (DsoStatus.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoStatus.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoStatus.IsArray)
+                {
+                    record.DsoStatus = (double)DsoStatus.AsDouble;
+                }
+
+                var DsoDataScale = valueList.GetValue("DsoDataScale");
+                if (DsoDataScale.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataScale.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataScale.IsArray)
+                {
+                    record.DsoDataScale = (double)DsoDataScale.AsDouble;
+                }
+
+                var DsoDataMode = valueList.GetValue("DsoDataMode");
+                if (DsoDataMode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataMode.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataMode.IsArray)
+                {
+                    record.DsoDataMode = (double)DsoDataMode.AsDouble;
+                }
+
+                var DsoDataRange = valueList.GetValue("DsoDataRange");
+                if (DsoDataRange.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataRange.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataRange.IsArray)
+                {
+                    record.DsoDataRange = (double)DsoDataRange.AsDouble;
+                }
+
+                var DsoDataSamplingWindow = valueList.GetValue("DsoDataSamplingWindow");
+                if (DsoDataSamplingWindow.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataSamplingWindow.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataSamplingWindow.IsArray)
+                {
+                    record.DsoDataSamplingWindow = (double)DsoDataSamplingWindow.AsDouble;
+                }
+
+                var DsoDataNsamples = valueList.GetValue("DsoDataNsamples");
+                if (DsoDataNsamples.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataNsamples.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataNsamples.IsArray)
+                {
+                    record.DsoDataNsamples = (double)DsoDataNsamples.AsDouble;
+                }
+
+                var DsoSamplingRate = valueList.GetValue("DsoSamplingRate");
+                if (DsoSamplingRate.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoSamplingRate.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoSamplingRate.IsArray)
+                {
+                    record.DsoSamplingRate = (double)DsoSamplingRate.AsDouble;
+                }
+
+                var addResult = DSO_MetadataRecordData.AddRecord(record);
+                System.Diagnostics.Debug.WriteLine($"DBG: DSO_MetaDataEvent: On UX thread: got event {DSO_NMetadataEvents} new scale={DsoScale}");
 
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    var valueList = data.ValueList;
-
-                    var record = new DSO_MetadataRecord();
-
-                    var DsoStatus = valueList.GetValue("DsoStatus");
-                    if (DsoStatus.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoStatus.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoStatus.IsArray)
-                    {
-                        record.DsoStatus = (double)DsoStatus.AsDouble;
-                        DSO_Metadata_DsoStatus.Text = record.DsoStatus.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var DsoDataScale = valueList.GetValue("DsoDataScale");
-                    if (DsoDataScale.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataScale.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataScale.IsArray)
-                    {
-                        record.DsoDataScale = (double)DsoDataScale.AsDouble;
-                        DSO_Metadata_DsoDataScale.Text = record.DsoDataScale.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var DsoDataMode = valueList.GetValue("DsoDataMode");
-                    if (DsoDataMode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataMode.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataMode.IsArray)
-                    {
-                        record.DsoDataMode = (double)DsoDataMode.AsDouble;
-                        DSO_Metadata_DsoDataMode.Text = record.DsoDataMode.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var DsoDataRange = valueList.GetValue("DsoDataRange");
-                    if (DsoDataRange.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataRange.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataRange.IsArray)
-                    {
-                        record.DsoDataRange = (double)DsoDataRange.AsDouble;
-                        DSO_Metadata_DsoDataRange.Text = record.DsoDataRange.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var DsoDataSamplingWindow = valueList.GetValue("DsoDataSamplingWindow");
-                    if (DsoDataSamplingWindow.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataSamplingWindow.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataSamplingWindow.IsArray)
-                    {
-                        record.DsoDataSamplingWindow = (double)DsoDataSamplingWindow.AsDouble;
-                        DSO_Metadata_DsoDataSamplingWindow.Text = record.DsoDataSamplingWindow.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var DsoDataNsamples = valueList.GetValue("DsoDataNsamples");
-                    if (DsoDataNsamples.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoDataNsamples.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoDataNsamples.IsArray)
-                    {
-                        record.DsoDataNsamples = (double)DsoDataNsamples.AsDouble;
-                        DSO_Metadata_DsoDataNsamples.Text = record.DsoDataNsamples.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var DsoSamplingRate = valueList.GetValue("DsoSamplingRate");
-                    if (DsoSamplingRate.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DsoSamplingRate.CurrentType == BCBasic.BCValue.ValueType.IsString || DsoSamplingRate.IsArray)
-                    {
-                        record.DsoSamplingRate = (double)DsoSamplingRate.AsDouble;
-                        DSO_Metadata_DsoSamplingRate.Text = record.DsoSamplingRate.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
-                    }
-
-                    var addResult = DSO_MetadataRecordData.AddRecord(record);
-
-                    // Change:
-                    //DsoScale = DsoDataScale.AsDouble;
+                    DSO_Metadata_DsoStatus.Text = record.DsoStatus.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    DSO_Metadata_DsoDataScale.Text = record.DsoDataScale.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    DSO_Metadata_DsoDataMode.Text = record.DsoDataMode.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    DSO_Metadata_DsoDataRange.Text = record.DsoDataRange.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    DSO_Metadata_DsoDataSamplingWindow.Text = record.DsoDataSamplingWindow.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    DSO_Metadata_DsoDataNsamples.Text = record.DsoDataNsamples.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
+                    DSO_Metadata_DsoSamplingRate.Text = record.DsoSamplingRate.ToString(); // "N0"); // either N or F3 based on DEC HEX FIXED. hex needs conversion to int first?
                     System.Diagnostics.Debug.WriteLine($"DBG: DSO_MetaDataEvent: On UX thread: got event {DSO_NMetadataEvents} new scale={DsoScale}");
                 });
             }

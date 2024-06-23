@@ -751,8 +751,10 @@ namespace BluetoothDeviceController
                 // NOTE: this is a real problem. The IsNordicUartAsync takes quite a while to run;
                 // I can see that long after the program is "done" with scanning it's still 
                 // attempting to see if things are a Nordic style UART.
+                NNordicUartCheck++;
                 var isUart = await wrapper.IsNordicUartAsync();
-                Log($"{id}: IsNordicUart: at {DateTime.Now.ToString("HH:mm:ss.f")}: isUart={isUart}");
+                NNordicUartCheck--;
+                Log($"{id}: IsNordicUart: at {DateTime.Now.ToString("HH:mm:ss.f")}: isUart={isUart} n.remaining={NNordicUartCheck}");
                 if (isUart)
                 {
                     specialization = Specialization.Get(Specializations, Nordic_Uart.SpecializationName);
@@ -777,6 +779,7 @@ namespace BluetoothDeviceController
             uiNavigation.MenuItems.Insert(idx, menu);
             SearchFeedback.FoundDevice(FoundDeviceInfo.IsNew);
         }
+        static int NNordicUartCheck = 0;
 
         const string OTHER = "🜹";
 

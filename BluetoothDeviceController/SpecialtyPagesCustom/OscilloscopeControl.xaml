@@ -123,6 +123,7 @@
                             <Button Content="Connect" Click="OnConnect" />
                             <Button Content="Data" Click="OnData" />
                             <Button Content="Disconnect" Click="OnDisconnect" />
+                            <Button Content="Clear" Click="OnClear" />
                         </StackPanel>
                         <TextBlock HorizontalAlignment="Right" x:Name="uiState">????</TextBlock>
                     </Grid>

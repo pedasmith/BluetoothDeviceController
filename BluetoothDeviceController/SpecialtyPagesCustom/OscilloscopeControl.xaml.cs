@@ -129,7 +129,7 @@ typeof(OscDataRecord).GetProperty("Value"),
             BtConnectionState = ConnectionState.Configuring;
             var result1 = await bleDevice.NotifyDSO_ReadingAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
             var result2 = await bleDevice.NotifyDSO_MetadataAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
-            BtConnectionState = result1 &&  result2 ? ConnectionState.Configured : ConnectionState.Failed;
+            BtConnectionState = (result1 &&  result2) ? ConnectionState.Configuring : ConnectionState.Failed;
         }
         public async Task SetMeter(PokitProMeter value)
         {
@@ -162,6 +162,10 @@ typeof(OscDataRecord).GetProperty("Value"),
             Curr_Status_StatusRecord = await DoReadStatus_Status();
             Curr_Status_Device_NameRecord = await DoReadStatus_Device_Name();
             SetDeviceInfo(Curr_Status_DeviceRecord, Curr_Status_StatusRecord, Curr_Status_Device_NameRecord);
+            bool isOK = Curr_Status_DeviceRecord != null
+                && Curr_Status_StatusRecord != null
+                && Curr_Status_Device_NameRecord != null;
+            BtConnectionState = isOK ? ConnectionState.Configured : ConnectionState.Failed;
         }
 
         private async void OnDisconnect(object sender, RoutedEventArgs e)
@@ -371,6 +375,8 @@ typeof(OscDataRecord).GetProperty("Value"),
         private void UiChartRaw_OnPointerPosition(object sender, PointerPositionArgs e)
         {
             if (MMData.Count == 0) return;
+            if (BtConnectionState != ConnectionState.Configured) return;
+
             var index = MMData.GetItemAtOrBeforeIndex(e.Ratio);
             if (index < 0) return;
 
@@ -407,6 +413,7 @@ typeof(OscDataRecord).GetProperty("Value"),
         /// <param name="e"></param>
         private async void OnData(object sender, RoutedEventArgs e)
         {
+            if (BtConnectionState != ConnectionState.Configured) return;
             await DoOneSweep();
         }
 
@@ -431,6 +438,7 @@ typeof(OscDataRecord).GetProperty("Value"),
 
 
             if (bleDevice == null) return;
+            if (BtConnectionState != ConnectionState.Configured) return;
 
             ushort nSamples = 500; // TODO: allow for settings not too many for testing!
             UInt32 timePerSampleInMicroseconds = 10; // FYI: there are 10 C# ticks per microsecond
@@ -490,6 +498,10 @@ typeof(OscDataRecord).GetProperty("Value"),
             uiChart.SetPan(value);
         }
 
+        private void OnClear(object sender, RoutedEventArgs e)
+        {
+
+        }
 
         #region DEVICE_STATUS
 
@@ -782,5 +794,6 @@ typeof(OscDataRecord).GetProperty("Value"),
         }
 
         #endregion
+
     }
 }
