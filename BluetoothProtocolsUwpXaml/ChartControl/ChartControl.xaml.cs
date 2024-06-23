@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Names;
+using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,8 +29,9 @@ namespace BluetoothDeviceController.Charts
         void SetPan(double value);
         void SetZoom(double value);
         void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, List<int> triggerIndex);
+        int GetNextOscilloscopeLine();
         //TODO: int GetNMaxLines();
-        //TODO: void ClearLine(int line);
+        void ClearLine(int lineIndex);
     }
 
     public class PointerPositionArgs : EventArgs
@@ -112,18 +114,6 @@ namespace BluetoothDeviceController.Charts
         private const double DEFAULT_YMAX = 100.0;
 
 
-        public static Windows.UI.Color ConvertColor(string color)
-        {
-            foreach (var item in typeof(Windows.UI.Colors).GetProperties())
-            {
-                if (color == item.Name)
-                {
-                    return (Windows.UI.Color)item.GetValue(null, null);
-                    ;
-                }
-            }
-            return Windows.UI.Colors.Aquamarine;
-        }
         public double GetYMin(int lineIndex)
         {
             switch (UISpec?.chartYAxisCombined ?? UISpecifications.YMinMaxCombined.Combined)
@@ -155,9 +145,9 @@ namespace BluetoothDeviceController.Charts
         class LineData
         {
             /// <summary>
-            /// newIndex is needed to pick the right line color.
+            /// Color is the line color 
             /// </summary>
-            /// <param name="newIndex"></param>
+            /// <param name="color"></param>
             public LineData(Color color)
             {
                 var polyline = new Polyline()
@@ -176,6 +166,7 @@ namespace BluetoothDeviceController.Charts
             public List<Polyline> LLMarkers = new List<Polyline>();
 
             public bool YMinMaxBeenInit = false;
+            public bool IsValid = false;
             public double YMin = DEFAULT_YMIN;
             public double YMax = DEFAULT_YMAX;
 
@@ -205,6 +196,30 @@ namespace BluetoothDeviceController.Charts
         LineData CurrLineData {  get { return AllLineData[CurrOscilloscopeLine]; } }
         bool CurrLineDataExists {  get { return CurrOscilloscopeLine >= 0 && CurrOscilloscopeLine < AllLineData.Count; } }
 
+        private int CurrOscilloscopeLine = -1;
+        const int MAX_OSCILLOSCOPE_LINE = 3;
+        public int GetNextOscilloscopeLine()
+        {
+            // Phase 1: return the first blank line from the existing set of lines
+            for (int lineIndex=0; lineIndex<AllLineData.Count; lineIndex++)
+            {
+                var linedata = AllLineData[lineIndex];
+                if (linedata == null) continue;
+                if (!linedata.IsValid) return lineIndex;
+            }
+
+            // Phase 2: let the array be expanded up to the max
+            if (AllLineData.Count < MAX_OSCILLOSCOPE_LINE)
+            {
+                return AllLineData.Count;// New line will be automatically created.
+            }
+
+            // Phase 3: return an old line. Don't delete the data; we don't know what the
+            // caller will do with this info (not really true: they are about to draw a 
+            // new line, of course!)
+            var retval = (CurrOscilloscopeLine + 1) % MAX_OSCILLOSCOPE_LINE;
+            return retval;
+        }
 
 
         /// <summary>
@@ -219,15 +234,6 @@ namespace BluetoothDeviceController.Charts
         /// When the line cursor is shown, the data is pulled from the DataCollection. This only works because the DataCollection
         /// is also an ISummarizeValues; it can take a ratio (0..1) and return a string summary of the data.
         /// </summary>
-        // // // private List<List<Point>> UnderlyingData = new List<List<Point>>();
-        //private List<double> LLPerLineXOffset = new List<double>() { 0.0 };
-        // private List<double> PerLineXOffsetInSeconds = new List<double>() { 0.0 };
-        private int CurrOscilloscopeLine = 0;
-        //private double CurrXLineOffsetInPixels
-        //{
-        //    get { return LLPerLineXOffset[CurrOscilloscopeLine]; }
-        //    set { LLPerLineXOffset[CurrOscilloscopeLine] = value; }
-        //}
         private double CurrXLineOffsetInSeconds
         {
             get { return CurrLineData.PerLineXOffsetInSeconds; }
@@ -313,6 +319,7 @@ namespace BluetoothDeviceController.Charts
             return retval;
         }
 
+        #region COLOR
         Color[] DefaultLineColors = new Color[]
         {
             Colors.Black,
@@ -328,6 +335,20 @@ namespace BluetoothDeviceController.Charts
             var index = (lineIndex % DefaultLineColors.Length);
             return DefaultLineColors[index];
         }
+
+        public static Windows.UI.Color ConvertColor(string color)
+        {
+            foreach (var item in typeof(Windows.UI.Colors).GetProperties())
+            {
+                if (color == item.Name)
+                {
+                    return (Windows.UI.Color)item.GetValue(null, null);
+                    ;
+                }
+            }
+            return Windows.UI.Colors.Aquamarine;
+        }
+        #endregion
 
 
         private void EnsureLineExists (int lineIndex)
@@ -353,24 +374,6 @@ namespace BluetoothDeviceController.Charts
             return retval;
         }
 
-#if NEVER_EVER_DEFINED
-        private void EnsureYExists(int lineIndex)
-        {
-            while (YMins.Count <= lineIndex)
-            {
-                YMins.Add(DEFAULT_YMIN);
-            }
-            while (YMaxs.Count <= lineIndex)
-            {
-                YMaxs.Add(DEFAULT_YMAX);
-            }
-            while (YMinMaxBeenInit.Count <= lineIndex)
-            {
-                YMinMaxBeenInit.Add(false); // not initialized.
-            }
-        }
-#endif
-
         int nRedrawAllLines = 0;
         private void RedrawAllLines()
         {
@@ -378,6 +381,7 @@ namespace BluetoothDeviceController.Charts
             for (int lineIndex=0; lineIndex<AllLineData.Count; lineIndex++)
             {
                 var linedata = AllLineData[lineIndex];
+                if (!linedata.IsValid) continue; // line might have been cleared
                 RemoveLLMarkers(lineIndex);
                 DrawMarkers(lineIndex);
 
@@ -480,7 +484,16 @@ namespace BluetoothDeviceController.Charts
             }
         }
 
-        double line0markerPixelX = 0;
+        public void ClearLine(int lineIndex)
+        {
+            var linedata = AllLineData[lineIndex];
+            linedata.IsValid = false;
+            linedata.LLLine.Points.Clear();
+            linedata.MarkerList.Clear();
+            RemoveLLMarkers(lineIndex);
+        }
+
+
         double line0markerSeconds = 0;
         /// <summary>
         /// Primary method used to push data from the OscilloscopeControl into the embedded ChartControl
@@ -493,9 +506,13 @@ namespace BluetoothDeviceController.Charts
             if (DataProperties == null) return;
             if (DataProperties.Count != 1) return; // NOTE: Always exactly 1 item
             if (lineIndex < 0 || lineIndex > MAX_LINE_INDEX) return; // Bad line index = fail
+
             EnsureLineExists(lineIndex);
             var linedata = AllLineData[lineIndex];
             Values = list; // Reset the "Values" so we get a summary item
+
+            ClearLine(lineIndex);
+            linedata.IsValid = true;
             ResetMinMaxOscilloscope(lineIndex, list); // Reset XMIN XMAX YMIN YMAX StartTime
             CurrOscilloscopeLine = lineIndex;
 
@@ -508,8 +525,6 @@ namespace BluetoothDeviceController.Charts
                         var record = list[markerIndexList[0]];
                         var time = Convert.ToDateTime(TimeProperty.GetValue(record));
                         line0markerSeconds = time.Subtract(StartTime).TotalSeconds;
-                        line0markerPixelX = X(line0markerSeconds);
-                        //CurrXLineOffsetInPixels = 0;
                         CurrXLineOffsetInSeconds = 0.0;
                     }
                     else
@@ -517,18 +532,14 @@ namespace BluetoothDeviceController.Charts
                         var firstMarkerRecord = list[markerIndexList[0]];
                         var time = Convert.ToDateTime(TimeProperty.GetValue(firstMarkerRecord));
                         var markerSeconds = time.Subtract(StartTime).TotalSeconds;
-                        var markerPixelX = X(markerSeconds);
-                        //CurrXLineOffsetInPixels = line0markerPixelX - markerPixelX;
                         CurrXLineOffsetInSeconds = line0markerSeconds - markerSeconds;
                     }
                 }
                 else
                 {
-                    //CurrXLineOffsetInPixels = 0;
                     CurrXLineOffsetInSeconds = 0.0;
                 }
 
-                linedata.LLLine.Points.Clear();
 
                 linedata.UnderlyingData = new List<Point>(list.Count);
                 var yProperty = DataProperties[0];
@@ -542,8 +553,6 @@ namespace BluetoothDeviceController.Charts
 
                 if (markerIndexList.Count > 0)
                 {
-                    linedata.MarkerList.Clear();
-                    RemoveLLMarkers(lineIndex);
                     foreach (var markerIndex in markerIndexList)
                     {
                         var markerRecord = list[markerIndex];
@@ -781,7 +790,6 @@ namespace BluetoothDeviceController.Charts
 
             EnsureLineExists(lineIndex);
             var linedata = AllLineData[lineIndex];
-            // Not actually used?  var line = Lines[lineIndex];
             double xtime = (x.Subtract (StartTime)).TotalSeconds;
             linedata.UnderlyingData.Add(new Point(xtime, y));
 

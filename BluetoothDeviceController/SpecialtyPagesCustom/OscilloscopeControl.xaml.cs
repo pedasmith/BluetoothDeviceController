@@ -202,23 +202,6 @@ typeof(OscDataRecord).GetProperty("Value"),
 
 
         #region READ_DATA
-        /// <summary>
-        /// The ChartControl is able to display multiple lines of data at once, overlapping them
-        /// as neeed. To make that work, we have a "CurrLineIndex" which is the index of the line
-        /// in the ChartControl we're going to write into.
-        /// 
-        /// The value wraps at a max value MAX_LINES
-        /// </summary>
-        private int CurrLineIndex = 0;
-        private const int MAX_LINES = 5;
-        private void IncrementCurrLineIndex()
-        {
-            CurrLineIndex++;
-            if (CurrLineIndex >= MAX_LINES)
-            {
-                CurrLineIndex = 0;
-            }
-        }
 
         /// <summary>
         /// Helpful value when debugging -- says how many "Metadata" events we've gotten. The 
@@ -358,10 +341,11 @@ typeof(OscDataRecord).GetProperty("Value"),
                         }
 
                         TriggerIndexes = TriggerSetting.FindTriggeredIndex(MMData);
-                        uiChartRaw.RedrawOscilloscopeYTime(CurrLineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
+
+                        var lineIndex = uiChart.GetNextOscilloscopeLine();
+                        uiChartRaw.RedrawOscilloscopeYTime(lineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
 
                         Log($"Got data: {MMData[0].Value:F3}");
-                        IncrementCurrLineIndex();
                     });
                 }
             }
@@ -451,6 +435,8 @@ typeof(OscDataRecord).GetProperty("Value"),
             nSamples = (UInt16)Curr_Status_DeviceRecord.DeviceBufferSize; // Max number of samples
             nSamples = (ushort)(nSamples - 1000); // TODO: must reduce the amount, otherwise it doesn't work.
 
+            nSamples = Math.Min(nSamples, (ushort)4000); // Only grab a few samples right now TODO: while I'm debugging
+
             //timePerSampleInMicroseconds = 125;
 
             // Examples of nSamples, timePerSample and samplingWindow sizes
@@ -500,7 +486,7 @@ typeof(OscDataRecord).GetProperty("Value"),
 
         private void OnClear(object sender, RoutedEventArgs e)
         {
-
+            uiChart.ClearLine(1);  // TODO: for now, always clear line 1
         }
 
         #region DEVICE_STATUS
