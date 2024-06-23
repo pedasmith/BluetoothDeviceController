@@ -214,7 +214,10 @@ typeof(OscDataRecord).GetProperty("Value"),
         /// Number of Read values are left before we're done. We know ahead of time how many
         /// values to expect (e.g., we ask for exactly 500 samples, so that's what we get)
         /// </summary>
-        int DSO_NReadingsLeft = 0;
+        /// 
+        int DSO_NReadingsExpected = 0;
+        int DSO_NReadingsSoFar = 0;
+        int DSO_NReadingsLeft {  get {  return DSO_NReadingsExpected - DSO_NReadingsSoFar; } }
 
         //int Curr_DSO_NMetadataEvents = -10;
         //DateTime ReadingStartTime = DateTime.MinValue;
@@ -283,9 +286,10 @@ typeof(OscDataRecord).GetProperty("Value"),
                 }
 
                 //
-                // TODO: Update with actual data!
+                // TODO: Update with actual data! (isn't this done right here? what's left?)
+                // TODO: 
                 //
-                DSO_NReadingsLeft = (int)record.DsoDataNsamples;
+                DSO_NReadingsExpected = (int)record.DsoDataNsamples;
                 ;
 
                 await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -319,8 +323,8 @@ typeof(OscDataRecord).GetProperty("Value"),
                     var value = array[i].AsDouble;
                     RawReadings.Add(value);
                 }
-                DSO_NReadingsLeft -= array.Count;
-                System.Diagnostics.Debug.WriteLine($"NRead={DSO_NReadEvents_Trace} readings={array.Count} nleft={DSO_NReadingsLeft}");
+                DSO_NReadingsSoFar += array.Count;
+                System.Diagnostics.Debug.WriteLine($"NRead={DSO_NReadEvents_Trace} readings={array.Count} nleft={DSO_NReadingsLeft} so_far={DSO_NReadingsSoFar}");
 
 
                 if (DSO_NReadingsLeft <= 0) // NOTE: what happens if the BT fails?
@@ -424,18 +428,20 @@ typeof(OscDataRecord).GetProperty("Value"),
             if (bleDevice == null) return;
             if (BtConnectionState != ConnectionState.Configured) return;
 
+            int sparse = 16; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
+            // the time window stays the same, so we always gather the same length of time.
+
             ushort nSamples = 500; // TODO: allow for settings not too many for testing!
-            UInt32 timePerSampleInMicroseconds = 10; // FYI: there are 10 C# ticks per microsecond
+            //UInt32 timePerSampleInMicroseconds = 10; // FYI: there are 10 C# ticks per microsecond
 
-            var maxSamplesPerSecond = Curr_Status_DeviceRecord.MaxSamplingRate * 1000; // value is in KHz. 1000 == 1 MHz sample rate
+            var maxSamplesPerSecond = Curr_Status_DeviceRecord.MaxSamplingRate * 1000 / sparse; // value is in KHz. 1000 == 1 MHz sample rate
             var minMicrosecondsPerSample = (1.0 / maxSamplesPerSecond) * 1_000_000.0;
-            timePerSampleInMicroseconds = (UInt32)minMicrosecondsPerSample;
+            UInt32 timePerSampleInMicroseconds = (UInt32)minMicrosecondsPerSample;
 
 
-            nSamples = (UInt16)Curr_Status_DeviceRecord.DeviceBufferSize; // Max number of samples
-            nSamples = (ushort)(nSamples - 1000); // TODO: must reduce the amount, otherwise it doesn't work.
+            nSamples = (UInt16)(Curr_Status_DeviceRecord.DeviceBufferSize / sparse); // Max number of samples
+            nSamples = Math.Min(nSamples, (ushort)(Curr_Status_DeviceRecord.DeviceBufferSize - 1000)); // TODO: must reduce the amount, otherwise it doesn't work.
 
-            nSamples = Math.Min(nSamples, (ushort)4000); // Only grab a few samples right now TODO: while I'm debugging
 
             //timePerSampleInMicroseconds = 125;
 
@@ -454,7 +460,8 @@ typeof(OscDataRecord).GetProperty("Value"),
             // These aren't really very user-friendly.
             UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
 
-            DSO_NReadingsLeft = nSamples;
+            DSO_NReadingsSoFar = 0;
+            DSO_NReadingsExpected = nSamples; // will be updated by the metadata
             ReadingDeltaInTicks = timePerSampleInMicroseconds * 10;
             RawReadings.Clear();
 
