@@ -25,18 +25,25 @@
         </Style>
     </UserControl.Resources>
 
-    <Canvas x:Name="uiCanvas" 
+    <Grid>
+        <Canvas x:Name="uiReticule">
+            <Line X1="50" X2="50" Y1="0" Y2="200" Stroke="LightBlue" StrokeThickness="5"/>
+
+        </Canvas>
+        <Canvas x:Name="uiCanvas" 
             PointerMoved="OnPointerMoved" PointerExited="OnPointerExit" PointerPressed="OnPointerPress"
             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <Rectangle x:Name="uiBackgroundRect" Fill="Bisque" Opacity="0.01" IsHitTestVisible="True" />
-        <TextBlock x:Name="uiTitle" Style="{StaticResource TitleStyle}" Text="Data Chart" Width="500" HorizontalTextAlignment="Center" />
+            <Rectangle x:Name="uiBackgroundRect" Fill="Bisque" Opacity="0.01" IsHitTestVisible="True" />
+            <TextBlock x:Name="uiTitle" Style="{StaticResource TitleStyle}" Text="Data Chart" Width="500" HorizontalTextAlignment="Center" />
 
-        <TextBlock Canvas.Left="100" Canvas.Top="50" x:Name="uiCursor" Text="✛" FontSize="24" Visibility="Collapsed" />
-        <TextBlock Canvas.Left="10" Canvas.Top="75" x:Name="uiStatus" Text="(status)" FontSize="12" Visibility="Collapsed" />
+            <TextBlock Canvas.Left="100" Canvas.Top="50" x:Name="uiCursor" Text="✛" FontSize="24" Visibility="Collapsed" />
+            <TextBlock Canvas.Left="10" Canvas.Top="75" x:Name="uiStatus" Text="(status)" FontSize="12" Visibility="Collapsed" />
 
-        <Line x:Name="uiThin" X1="0" X2="0" Y1="0" Y2="200" Stroke="DarkOrchid" StrokeThickness="1" Visibility="Collapsed" />
-        <Border x:Name="uiThinTextBorder" Style="{StaticResource ValueCursorBorderStyle}" Visibility="Collapsed">
-            <TextBlock x:Name="uiThinTextValue" Text="Values:" FontSize="12" TextWrapping="Wrap"  />
-        </Border>
-    </Canvas>
+            <Line x:Name="uiThin" X1="0" X2="0" Y1="0" Y2="200" Stroke="DarkOrchid" StrokeThickness="1" Visibility="Collapsed" />
+            <Border x:Name="uiThinTextBorder" Style="{StaticResource ValueCursorBorderStyle}" Visibility="Collapsed">
+                <TextBlock x:Name="uiThinTextValue" Text="Values:" FontSize="12" TextWrapping="Wrap"  />
+            </Border>
+        </Canvas>
+
+    </Grid>
 </UserControl>

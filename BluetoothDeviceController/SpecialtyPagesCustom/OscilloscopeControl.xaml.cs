@@ -316,16 +316,18 @@ typeof(OscDataRecord).GetProperty("Value"),
 
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
-                var valueList = data.ValueList;
-                var array = valueList.GetValue("DsoDataRaw").AsArray.data;
-                for (int i = 0; i < array.Count; i++)
+                // lock (this) // TODO: DBG: Attempt #3: try locking this one?
                 {
-                    var value = array[i].AsDouble;
-                    RawReadings.Add(value);
+                    var valueList = data.ValueList;
+                    var array = valueList.GetValue("DsoDataRaw").AsArray.data;
+                    for (int i = 0; i < array.Count; i++)
+                    {
+                        var value = array[i].AsDouble;
+                        RawReadings.Add(value);
+                    }
+                    DSO_NReadingsSoFar += array.Count;
+                    System.Diagnostics.Debug.WriteLine($"NRead={DSO_NReadEvents_Trace} readings={array.Count} nleft={DSO_NReadingsLeft} so_far={DSO_NReadingsSoFar}");
                 }
-                DSO_NReadingsSoFar += array.Count;
-                System.Diagnostics.Debug.WriteLine($"NRead={DSO_NReadEvents_Trace} readings={array.Count} nleft={DSO_NReadingsLeft} so_far={DSO_NReadingsSoFar}");
-
 
                 if (DSO_NReadingsLeft <= 0) // NOTE: what happens if the BT fails?
                 {
@@ -443,7 +445,11 @@ typeof(OscDataRecord).GetProperty("Value"),
             if (bleDevice == null) return;
             if (BtConnectionState != ConnectionState.Configured) return;
 
-            int READING_SPARCITY = 2; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
+            int READING_SPARCITY = 8; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
+
+            // 2024-06-23 3:15: SPARCITY = 8 GOOD
+            // 2024-06-23 3:22: SPARCITY = 4 GOOD for first half, then starts to fail.
+
             // the time window stays the same, so we always gather the same length of time.
 
             ushort nSamples; 

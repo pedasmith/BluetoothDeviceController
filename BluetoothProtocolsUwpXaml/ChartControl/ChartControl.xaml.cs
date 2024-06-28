@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using Windows.Foundation;
 using Windows.UI;
+using Windows.UI.ViewManagement.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -253,9 +254,9 @@ namespace BluetoothDeviceController.Charts
 
         private void ChartControl_Loaded(object sender, RoutedEventArgs e)
         {
-            this.uiStatus.Text = $"H={this.ActualHeight} W={this.ActualWidth}";
-            uiBackgroundRect.Width = this.ActualWidth;
-            uiBackgroundRect.Height = this.ActualHeight;
+            this.uiStatus.Text = $"H={uiCanvas.ActualHeight} W={uiCanvas.ActualWidth}";
+            uiBackgroundRect.Width = uiCanvas.ActualWidth;
+            uiBackgroundRect.Height = uiCanvas.ActualHeight;
         }
 
         public void SetDataProperties(IList<PropertyInfo> dataProperties, PropertyInfo timeProperty, IList<string> names)
@@ -269,6 +270,8 @@ namespace BluetoothDeviceController.Charts
         {
             uiTitle.Text = title;
         }
+
+        #region POSITION
         /// <summary>
         /// Given an X time in seconds, return the 0..1 value of where it is between
         /// the XMin and XMax. Handles the case of XMin == XMax by return 0.
@@ -286,7 +289,7 @@ namespace BluetoothDeviceController.Charts
         private double X(double x)
         {
             var ratio = XToRatio(x);
-            // 2024-06-09: var retval = (XMax == XMin) ? 0 : ((x - XMin) / (XMax - XMin)) * this.ActualWidth;
+            // 2024-06-09: var retval = (XMax == XMin) ? 0 : ((x - XMin) / (XMax - XMin)) * uiCanvas.ActualWidth;
             ratio = ratio - CurrZoom.XRatioOffset;
             ratio = ratio * CurrZoom.Zoom;
             var retval = ratio * uiCanvas.ActualWidth;
@@ -310,14 +313,15 @@ namespace BluetoothDeviceController.Charts
         {
             var ymin = UISpec?.ChartMinY(line, GetYMin(line)) ?? GetYMin(line);
             var ymax = UISpec?.ChartMaxY(line, GetYMax(line)) ?? GetYMax(line);
-            var retval = (ymax==ymin) ? 0 : ((y - ymin) / (ymax - ymin)) * this.ActualHeight;
-            retval = this.ActualHeight - retval;
-            if (retval > this.ActualHeight)
+            var retval = (ymax==ymin) ? 0 : ((y - ymin) / (ymax - ymin)) * uiCanvas.ActualHeight;
+            retval = uiCanvas.ActualHeight - retval;
+            if (retval > uiCanvas.ActualHeight)
             {
                 ;
             }
             return retval;
         }
+        #endregion
 
         #region COLOR
         Color[] DefaultLineColors = new Color[]
@@ -395,6 +399,47 @@ namespace BluetoothDeviceController.Charts
                     linedata.LLLine.Points.Add(point);
                 }
             }
+
+            DrawReticule();
+        }
+
+        private LineData GetFirstLine()
+        {
+            for (int i=0; i<AllLineData.Count; i++)
+            {
+                if (AllLineData[i].IsValid) return AllLineData[i];
+            }
+            return null;
+        }
+        private void DrawReticule() // The background grid
+        {
+            uiReticule.Children.Clear();
+            if (uiReticule.ActualWidth < 10) return; // too narrow or uninitialized.
+            var linedata = GetFirstLine();
+            if (linedata == null) return; // no line means no grid
+            var data = linedata.UnderlyingData;
+            if (data.Count < 2) return; // need two points to make lines
+            var xstart = data[0].X;
+            var xend = data[data.Count-1].X;
+            var xdelta = xend - xstart;
+            if (xdelta < 0.000001) return; // need two different points to make lines
+            var xspace = xdelta / 10; // TODO: nice even spacing, not just kind of random :-)
+
+            var color = Colors.DarkGreen;
+            var brush = new SolidColorBrush(color);
+
+            for (double xtime = xstart; xtime <= xend; xtime+=xspace)
+            {
+                var llx = X(xtime + linedata.PerLineXOffsetInSeconds);
+                Line line = new Line()
+                {
+                    X1 = llx, X2 = llx, Y1 = 0, Y2 = uiReticule.ActualHeight,
+                    Stroke = brush, StrokeThickness = 3,
+                };
+                uiReticule.Children.Add(line);
+            }
+
+
         }
 
 
@@ -565,6 +610,7 @@ namespace BluetoothDeviceController.Charts
                     DrawMarkers(lineIndex);
                 }
             }
+            if (lineIndex == 0) DrawReticule();
         }
         private void RemoveLLMarkers(int lineIndex)
         {
@@ -890,9 +936,9 @@ namespace BluetoothDeviceController.Charts
             var left = X(x) - uiCursor.ActualWidth / 2;
             var top = Y(defaultLineIndex, y) - uiCursor.ActualHeight / 2; 
             if (left < 0) left = 0;
-            if (left > this.ActualWidth) left = this.ActualWidth;
+            if (left > uiCanvas.ActualWidth) left = uiCanvas.ActualWidth;
             if (top < 0) top = 0;
-            if (top > this.ActualHeight) top = this.ActualHeight;
+            if (top > uiCanvas.ActualHeight) top = uiCanvas.ActualHeight;
             Canvas.SetLeft(uiCursor, left);
             Canvas.SetTop(uiCursor, top);
         }

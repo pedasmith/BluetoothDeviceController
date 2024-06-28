@@ -1772,14 +1772,26 @@ namespace BluetoothProtocols
             return true;
         }
 
+        DateTimeOffset PreviousEvent = DateTime.Now; // DBG: TODO: Attempt #2: fails, doesn't seem to have any effect.
         private void NotifyDSO_ReadingCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            var datameaning = "I16S|DEC|DsoDataRaw";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-            DSO_Reading = parseResult.ValueList.GetValue("DsoDataRaw").AsString;
+            // DBG: TODO: Attempt #1: use a lock. Fails; doesn't seem to have any effect
+            //lock (this) // CHANGE: only one at a time!
+            {
+                var delta = args.Timestamp.Subtract(PreviousEvent);
+                if (delta.Ticks < 0)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR: BT: Backwards in time by {delta.Ticks}");
+                    ; // backward in time.
+                }
+                PreviousEvent = args.Timestamp;
 
-            DSO_ReadingEvent?.Invoke(parseResult);
+                var datameaning = "I16S|DEC|DsoDataRaw";
+                var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
+                DSO_Reading = parseResult.ValueList.GetValue("DsoDataRaw").AsString;
 
+                DSO_ReadingEvent?.Invoke(parseResult);
+            }
         }
 
         public void NotifyDSO_ReadingRemoveCharacteristicCallback() 

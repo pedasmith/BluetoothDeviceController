@@ -23,7 +23,7 @@
             <Setter Property="Margin" Value="10,5,10,0" />
         </Style>
         <Style TargetType="Line">
-            <Setter Property="Margin" Value="0,15,0,0" />
+            <Setter Property="Margin" Value="0,0,0,0" />
             <Setter Property="Stroke" Value="ForestGreen" />
         </Style>
         <Style x:Key="TitleStyle" TargetType="TextBlock">
