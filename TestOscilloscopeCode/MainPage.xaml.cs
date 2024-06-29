@@ -28,24 +28,42 @@ namespace TestOscilloscopeCode
         public MainPage()
         {
             this.InitializeComponent();
+
+            //int nerror = 0;
+            //nerror += BluetoothDeviceController.Charts.ChartControl.TestMakeNiceReticuleSpace();
+
             this.Loaded += MainPage_Loaded;
         }
 
 
         private DataCollection<OscDataRecord> MakeSinWave()
         {
-            const double LEN = 2000;
-            const double NWAVE = 4;
-            const double MIN = 0.0;
-            const double MAX = 5.0;
-            const int ReadingDeltaInTicks = 10_000; // 10_000 ticks per millisecond = 1KHz sound
+            const double LEN = 2000; // two seconds of data
 
-            double RANGE = (MAX - MIN);
-            double HRANGE = RANGE / 2.0;
             var MMData = new DataCollection<OscDataRecord>();
             MMData.MaxLength = (int)LEN;
             DateTime readingTime = DateTime.MinValue;  // and not at all ReadingStartTime;
             MMData.TimeStampStart = readingTime; // force these to always be in sync :-)
+            MMData.CurrTimeStampType = DataCollection<OscDataRecord>.TimeStampType.FromZeroMS;
+
+
+            const double NWAVE = 4;
+            const double MIN = 0.0;
+            const double MAX = 5.0;
+            const double FrequencyInHz = 1000.0;
+
+            // How many ticks? Answer: 
+            // there are 500 samples per wave. At 1KHz, there are 500_000 samples/second
+            double samplesPerWave = LEN / NWAVE;
+            double readingDeltaInSeconds = 1.0 / (FrequencyInHz * samplesPerWave);
+            int ReadingDeltaInTicks = (int)(readingDeltaInSeconds * 10_000.0 * 1_000);
+            // 10_000 ticks per millisecond and 1000 milliseconds per second.
+            //const int ReadingDeltaInTicks = 10_000; // 10_000 ticks per millisecond = 1KHz sound
+
+            double RANGE = (MAX - MIN);
+            double HRANGE = RANGE / 2.0;
+
+
 
             double XPerWave = (LEN / NWAVE) / (2.0 * Math.PI);
             for (double x = 0; x<LEN; x++)

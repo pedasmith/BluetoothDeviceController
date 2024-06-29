@@ -409,6 +409,64 @@ namespace BluetoothDeviceController.Charts
             }
             return null;
         }
+
+        // goal is to set xdelta to a nice even number
+        // e.g., if xdelta is 1.2, switch to be just 1; if it's 1.6, bump
+        // it to 2. 
+        // But 
+        private static double MakeNiceReticuleSpace(double xdelta)
+        {
+            var retval = xdelta;
+            var ndigits = Math.Log10(xdelta); // e.g., 3.4 ==> 0.xx, and 34.2==>1.xx 0.034 ==> -2.xx
+            var normdig = Math.Floor(ndigits);
+            var normalized = retval / Math.Pow(10, normdig);  // Now 
+
+            var rounded = Math.Round(normalized); // e.g., 0.000034 is now 3
+            if (rounded == 4) rounded = 5.0;
+            if (rounded == 8 || rounded == 9) rounded = 10; // bump up.
+
+            xdelta = rounded * Math.Pow(10, normdig); // convert back to expected 
+
+            return xdelta;
+        }
+        private static void Log(string text)
+        {
+            System.Diagnostics.Debug.Write(text);
+        }
+        private static int TestMakeNiceReticuleSpaceOne(double xdelta, double expected)
+        {
+            int nerror = 0;
+            double actual = MakeNiceReticuleSpace(xdelta);
+            var diff = Math.Abs(actual - expected);   
+            if (diff > 0.0000000001) // little bit of rounding slop is OK
+            {
+                Log($"ERROR: MakeNiceReticuleSpace ({xdelta}) expected={expected} actual={actual}");
+                nerror++;
+            }
+
+            return nerror;
+        }
+        public static int TestMakeNiceReticuleSpace()
+        {
+            int nerror = 0;
+            nerror += TestMakeNiceReticuleSpaceOne(0.00037, 0.0004);
+
+
+            nerror += TestMakeNiceReticuleSpaceOne(1.2, 1.0);
+            nerror += TestMakeNiceReticuleSpaceOne(0.12, 0.1);
+            nerror += TestMakeNiceReticuleSpaceOne(0.0012, 0.001);
+
+
+            nerror += TestMakeNiceReticuleSpaceOne(3.2, 3.0);
+            nerror += TestMakeNiceReticuleSpaceOne(0.32, 0.3);
+            nerror += TestMakeNiceReticuleSpaceOne(0.0032, 0.003);
+
+            nerror += TestMakeNiceReticuleSpaceOne(4.2, 5.0);
+            nerror += TestMakeNiceReticuleSpaceOne(0.42, 0.5);
+            nerror += TestMakeNiceReticuleSpaceOne(0.0042, 0.005);
+
+            return nerror;
+        }
         private void DrawReticule() // The background grid
         {
             uiReticule.Children.Clear();
@@ -421,7 +479,9 @@ namespace BluetoothDeviceController.Charts
             var xend = data[data.Count-1].X;
             var xdelta = xend - xstart;
             if (xdelta < 0.000001) return; // need two different points to make lines
-            var xspace = xdelta / 10; // TODO: nice even spacing, not just kind of random :-)
+
+            // Now start the calculations proper
+            var xspace = MakeNiceReticuleSpace (xdelta / 10);
 
             var color = Colors.DarkGreen;
             var brush = new SolidColorBrush(color);
