@@ -17,22 +17,6 @@ using static BluetoothDeviceController.SpecialtyPages.PokitProMeterPage;
 namespace BluetoothDeviceController.SpecialtyPagesCustom
 {
 
-    public class OscDataRecord
-    {
-        public OscDataRecord() { }
-        public OscDataRecord(DateTime time, double value)
-        {
-            EventTime = time;
-            Value = value;
-        }
-        public DateTime EventTime { get; set; }
-        public double Value { get; set; }
-
-        public override string ToString()
-        {
-            return $"{Value:F2} at {EventTime.Second}.{EventTime.Millisecond}";
-        }
-    }
 
     public sealed partial class OscilloscopeControl : UserControl
     {
@@ -91,15 +75,10 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             MMData.RemoveAlgorithm = RemoveRecordAlgorithm.RemoveFirst;
             MMData.MaxLength = 8000;
 
-            var EventTimeProperty = typeof(OscDataRecord).GetProperty("EventTime");
-            var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
-                {
-typeof(OscDataRecord).GetProperty("Value"),
-                };
-            var names = new List<string>()
-                {
-"Osc.",
-                };
+            var EventTimeProperty = OscDataRecord.GetTimeProperty();
+            var properties = OscDataRecord.GetValuePropertyList();
+            var names = OscDataRecord.GetNames();
+
             uiChart.SetDataProperties(properties, EventTimeProperty, names);
             uiChart.SetTitle("Oscilloscope");
             uiChart.SetUISpec(new BluetoothDeviceController.Names.UISpecifications()

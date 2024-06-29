@@ -208,6 +208,7 @@
     <Compile Include="SpecialtyPagesCustom\MultiMeterControl.xaml.cs">
       <DependentUpon>MultiMeterControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPagesCustom\OscDataRecord.cs" />
     <Compile Include="SpecialtyPagesCustom\OscilloscopeControl.xaml.cs">
       <DependentUpon>OscilloscopeControl.xaml</DependentUpon>
     </Compile>

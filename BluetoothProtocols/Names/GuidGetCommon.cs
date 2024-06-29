@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+//Location: BluetoothProtocol/Names
 namespace BluetoothDeviceController.Names
 {
     public static class GuidGetCommon

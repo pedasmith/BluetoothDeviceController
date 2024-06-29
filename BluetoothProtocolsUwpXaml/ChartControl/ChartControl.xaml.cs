@@ -1,12 +1,10 @@
 ﻿using BluetoothDeviceController.Names;
-using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Windows.Foundation;
 using Windows.UI;
-using Windows.UI.ViewManagement.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
