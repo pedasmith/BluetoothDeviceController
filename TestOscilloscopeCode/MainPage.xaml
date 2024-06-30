@@ -12,8 +12,9 @@
 
     <Grid>
         <StackPanel>
+            <Rectangle Height="40" />
             <chart:ChartControl x:Name="uiChart" Width="500" Height="200" />
-            <osc:OscilloscopeControl x:Name="uiOsc" Width="500" Height="200" />
+            <osc:OscilloscopeControl x:Name="uiOsc" Width="500" Height="400" />
         </StackPanel>
     </Grid>
 </Page>

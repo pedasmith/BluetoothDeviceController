@@ -9,6 +9,8 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Utilities;
+using System.Reflection;
+using BluetoothDeviceController.Names;
 
 #if !NO_BT
 
@@ -22,7 +24,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 {
 
 
-    public sealed partial class OscilloscopeControl : UserControl
+    public sealed partial class OscilloscopeControl : UserControl, IChartControlOscilloscope
     {
         private DataCollection<OscDataRecord> MMData = new DataCollection<OscDataRecord>();
 
@@ -566,6 +568,49 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             uiMac.Text= $"{dr.MacAddress}";
         }
+
+        #region CHART_OSCILLOSCOPE_PASSTHROUGH
+        public void SetDataProperties(IList<PropertyInfo> dataProperties, PropertyInfo timeProperty, IList<string> names)
+        {
+            uiChart.SetDataProperties(dataProperties, timeProperty, names);
+        }
+
+        public void SetTitle(string title)
+        {
+            uiChart.SetTitle(title);
+        }
+
+        public void SetUISpec(UISpecifications uiSpec)
+        {
+            uiChart.SetUISpec(uiSpec);
+        }
+
+        public void SetPan(double value)
+        {
+            uiChart.SetPan(value);
+        }
+
+        public void SetZoom(double value)
+        {
+            uiChart.SetZoom(value);
+        }
+
+        public void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, List<int> triggerIndex)
+        {
+            uiChart.RedrawOscilloscopeYTime(line, list, triggerIndex);
+        }
+
+        public int GetNextOscilloscopeLine()
+        {
+            return uiChart.GetNextOscilloscopeLine();
+        }
+
+        public void ClearLine(int lineIndex)
+        {
+            uiChart.ClearLine(lineIndex);
+        }
+
+        #endregion // the CHARTCONTROL_OSCILLOSCOPE_PASSTHROUGH
 
         public class Status_DeviceRecord : INotifyPropertyChanged
         {

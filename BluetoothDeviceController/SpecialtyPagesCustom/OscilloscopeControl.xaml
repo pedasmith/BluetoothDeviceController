@@ -151,9 +151,11 @@
                     
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Log">
-                    <ScrollViewer >
-                        <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
-                    </ScrollViewer>
+                    <Grid Style="{StaticResource sControlPanel}">
+                        <ScrollViewer >
+                            <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+                        </ScrollViewer>
+                    </Grid>
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Device Info">
                     <controls:TabViewItem.Resources>

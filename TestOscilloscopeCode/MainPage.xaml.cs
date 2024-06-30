@@ -2,19 +2,8 @@
 using BluetoothDeviceController.SpecialtyPagesCustom;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using Windows.Web.UI;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -84,9 +73,10 @@ namespace TestOscilloscopeCode
             var properties = OscDataRecord.GetValuePropertyList();
             var names = OscDataRecord.GetNames();
 
-            uiChart.SetDataProperties(properties, EventTimeProperty, names);
-            uiChart.SetTitle("Oscilloscope");
-            uiChart.SetUISpec(new BluetoothDeviceController.Names.UISpecifications()
+            var uiChartAsOsc = uiChart as IChartControlOscilloscope;
+
+            uiChartAsOsc.SetDataProperties(properties, EventTimeProperty, names);
+            uiChartAsOsc.SetUISpec(new BluetoothDeviceController.Names.UISpecifications()
             {
                 tableType = "standard",
                 chartType = "standard",
@@ -95,14 +85,24 @@ namespace TestOscilloscopeCode
                 chartDefaultMinY = 0,
             });
 
-            uiChart.SetTitle("Test Chart Control");
-            var uiOsc = uiChart as IChartControlOscilloscope;
+            uiOsc.SetDataProperties(properties, EventTimeProperty, names);
+            uiOsc.SetUISpec(new BluetoothDeviceController.Names.UISpecifications()
+            {
+                tableType = "standard",
+                chartType = "standard",
+                chartCommand = "AddYTime<MagnetometerCalibrationRecord>(addResult, MMRecordData)", //TODO: What should the chart command be>???
+                chartDefaultMaxY = 5.0, // TODO: what's the best value here? 10_000,
+                chartDefaultMinY = 0,
+            });
+
+            uiChartAsOsc.SetTitle("Test Chart Control");
+            uiOsc.SetTitle("Test Chart Control");
 
             var data = MakeSinWave();
             int OFFSET = 80;
             var triggers = new List<int>() { OFFSET, OFFSET+500, OFFSET+1000, OFFSET+1500 };
-            uiOsc.RedrawOscilloscopeYTime(0, data,  triggers); // #250 is the trigger.
-
+            uiChartAsOsc.RedrawOscilloscopeYTime(0, data,  triggers); // #250 is the trigger.
+            uiOsc.RedrawOscilloscopeYTime(0, data, triggers);
         }
     }
 }

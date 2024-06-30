@@ -24,7 +24,7 @@ namespace BluetoothDeviceController.Charts
     {
         void SetDataProperties(IList<PropertyInfo> dataProperties, PropertyInfo timeProperty, IList<string> names);
         void SetTitle(string title);
-        void SetUISpec(UISpecifications uISpec);
+        void SetUISpec(UISpecifications uiSpec);
         void SetPan(double value);
         void SetZoom(double value);
         void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, List<int> triggerIndex);
@@ -96,9 +96,9 @@ namespace BluetoothDeviceController.Charts
             RedrawAllLines();
         }
 
-        public void SetUISpec(UISpecifications uISpec)
+        public void SetUISpec(UISpecifications uiSpec)
         {
-            UISpec = uISpec;
+            UISpec = uiSpec;
         }
 
         // Y Min and Max are just a little weird. Sorry about that :-)
