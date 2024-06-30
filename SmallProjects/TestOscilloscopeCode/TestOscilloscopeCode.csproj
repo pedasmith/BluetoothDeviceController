@@ -115,34 +115,34 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\BluetoothDeviceController\SpecialtyPagesCustom\OscDataRecord.cs">
+    <Compile Include="..\..\BluetoothDeviceController\SpecialtyPagesCustom\OscDataRecord.cs">
       <Link>OscDataRecord.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothDeviceController\SpecialtyPagesCustom\OscilloscopeControl.xaml.cs">
+    <Compile Include="..\..\BluetoothDeviceController\SpecialtyPagesCustom\OscilloscopeControl.xaml.cs">
       <Link>OscilloscopeControl.xaml.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothDeviceController\SpecialtyPagesCustom\TriggerSetting.cs">
+    <Compile Include="..\..\BluetoothDeviceController\SpecialtyPagesCustom\TriggerSetting.cs">
       <Link>TriggerSetting.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothProtocolsUwpXaml\ChartControl\ChartControl.xaml.cs">
+    <Compile Include="..\..\BluetoothProtocolsUwpXaml\ChartControl\ChartControl.xaml.cs">
       <Link>ChartControl.xaml.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothProtocols\Charts\DataCollection.cs">
+    <Compile Include="..\..\BluetoothProtocols\Charts\DataCollection.cs">
       <Link>DataCollection.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothProtocols\IotNumberFormats\ValueCalculate.cs">
+    <Compile Include="..\..\BluetoothProtocols\IotNumberFormats\ValueCalculate.cs">
       <Link>ValueCalculate.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothProtocols\IotNumberFormats\VariableSet.cs">
+    <Compile Include="..\..\BluetoothProtocols\IotNumberFormats\VariableSet.cs">
       <Link>VariableSet.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothProtocols\Names\GuidGetCommon.cs">
+    <Compile Include="..\..\BluetoothProtocols\Names\GuidGetCommon.cs">
       <Link>GuidGetCommon.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothProtocols\Names\NameChacteristic.cs">
+    <Compile Include="..\..\BluetoothProtocols\Names\NameChacteristic.cs">
       <Link>NameChacteristic.cs</Link>
     </Compile>
-    <Compile Include="..\BluetoothProtocols\Names\SerialConfig.cs">
+    <Compile Include="..\..\BluetoothProtocols\Names\SerialConfig.cs">
       <Link>SerialConfig.cs</Link>
     </Compile>
     <Compile Include="App.xaml.cs">
@@ -173,12 +173,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="..\BluetoothDeviceController\SpecialtyPagesCustom\OscilloscopeControl.xaml">
+    <Page Include="..\..\BluetoothDeviceController\SpecialtyPagesCustom\OscilloscopeControl.xaml">
       <Link>OscilloscopeControl.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\BluetoothProtocolsUwpXaml\ChartControl\ChartControl.xaml">
+    <Page Include="..\..\BluetoothProtocolsUwpXaml\ChartControl\ChartControl.xaml">
       <Link>ChartControl.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -202,7 +202,7 @@
       <Version>5.1.0</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="..\Utilities\Utilities.projitems" Label="Shared" />
+  <Import Project="..\..\Utilities\Utilities.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

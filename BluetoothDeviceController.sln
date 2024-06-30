@@ -37,7 +37,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BCBasicShared", "BCBasicSha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothCurrentTimeServer", "SmallProjects\BluetoothCurrentTimeServer\BluetoothCurrentTimeServer.csproj", "{CC0BF9AF-CFC1-4561-B76A-0835174D1E34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestOscilloscopeCode", "TestOscilloscopeCode\TestOscilloscopeCode.csproj", "{0132B2B2-9D02-49E3-B3CA-4DD2218617A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestOscilloscopeCode", "SmallProjects\TestOscilloscopeCode\TestOscilloscopeCode.csproj", "{0132B2B2-9D02-49E3-B3CA-4DD2218617A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
