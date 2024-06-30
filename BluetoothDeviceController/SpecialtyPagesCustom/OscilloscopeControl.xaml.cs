@@ -1,16 +1,20 @@
 ﻿using BluetoothDeviceController.Charts;
-using BluetoothProtocols;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Utilities;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Utilities;
+
+#if !NO_BT
+
+using BluetoothProtocols;
 using static BluetoothDeviceController.SpecialtyPages.PokitProMeterPage;
+#endif
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -45,8 +49,9 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         }
 
         #region DEVICE_STATE
+#if !NO_BT
         PokitProMeter bleDevice = null;
-
+#endif
         private ConnectionState _BtConnectionState = ConnectionState.Off;
         public ConnectionState BtConnectionState
         {
@@ -97,25 +102,37 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             {
                 return;
             }
+
+#if !NO_BT
             if (bleDevice == null)
             {
                 return;
             }
-            bleDevice.DSO_ReadingEvent += BleDevice_DSO_ReadingEvent;
-            bleDevice.DSO_MetadataEvent += BleDevice_DSO_MetadataEvent;
+#endif
 
             // Copied from the Pokit_ProPage.xaml.cs
             BtConnectionState = ConnectionState.Configuring;
+
+#if !NO_BT
+            bleDevice.DSO_ReadingEvent += BleDevice_DSO_ReadingEvent;
+            bleDevice.DSO_MetadataEvent += BleDevice_DSO_MetadataEvent;
             var result1 = await bleDevice.NotifyDSO_ReadingAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
             var result2 = await bleDevice.NotifyDSO_MetadataAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
             BtConnectionState = (result1 &&  result2) ? ConnectionState.Configuring : ConnectionState.Failed;
+#else
+            BtConnectionState = ConnectionState.Configured;
+            await Task.Delay(0);
+#endif
         }
+
+#if !NO_BT
         public async Task SetMeter(PokitProMeter value)
         {
             BtConnectionState = ConnectionState.Off; // Assume the new value isn't connected
             bleDevice = value;
             await Task.Delay(0); // added this only so that the compiler warning for async are turned off.
         }
+#endif
         private void Log(string str)
         {
             UIThreadHelper.CallOnUIThread(() =>
@@ -124,13 +141,15 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             });
         }
 
-
+#if !NO_BT
         Status_DeviceRecord Curr_Status_DeviceRecord;
         Status_StatusRecord Curr_Status_StatusRecord;
         Status_Device_NameRecord Curr_Status_Device_NameRecord;
-
+#endif
         private async void OnConnect(object sender, RoutedEventArgs e)
         {
+#if !NO_BT
+
             if (bleDevice == null) return;
 
             BtConnectionState = ConnectionState.Configuring;
@@ -145,10 +164,14 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 && Curr_Status_StatusRecord != null
                 && Curr_Status_Device_NameRecord != null;
             BtConnectionState = isOK ? ConnectionState.Configured : ConnectionState.Failed;
+#else
+            await Task.Delay(0);
+#endif
         }
 
         private async void OnDisconnect(object sender, RoutedEventArgs e)
         {
+#if !NO_BT
             if (bleDevice == null)
             {
                 return;
@@ -173,6 +196,9 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             var result1 = await bleDevice.NotifyDSO_ReadingAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
             var result2 = await bleDevice.NotifyDSO_MetadataAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
             BtConnectionState = result1 && result2 ? ConnectionState.Off : ConnectionState.Failed;
+#else
+            await Task.Delay(0);
+#endif
         }
 
         #endregion DEVICE_STATE
@@ -180,14 +206,16 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
 
 
-        #region READ_DATA
+#region READ_DATA
 
+#if !NO_BT
         /// <summary>
         /// Helpful value when debugging -- says how many "Metadata" events we've gotten. The 
         /// Oscilloscope will first send a Metadata event before all of the read events
         /// </summary>
         int DSO_NMetadataEvents_Trace = 0;
         int DSO_NReadEvents_Trace = 0;
+#endif
 
         /// <summary>
         /// Number of Read values are left before we're done. We know ahead of time how many
@@ -209,6 +237,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         double DsoScale = 1.0;
 
 
+#if !NO_BT
         /// <summary>
         /// Called when the DSO Oscilloscope wants to tell the system what the data format is. AFAICT, this is
         /// always sent before the data. Pull the data out on this thread; don't wait until stuff is called
@@ -283,6 +312,9 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 });
             }
         }
+#endif
+
+#if !NO_BT
 
         /// <summary>
         /// Called when data is available from the Oscilloscope (DSO)
@@ -314,7 +346,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 }
             }
         }
-
+#endif
 
         /// <summary>
         /// Once the RawReadings are read, convert to the MMData, pop in the right time stamps,
@@ -351,7 +383,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
         }
 
-        #endregion READ_DATA
+#endregion READ_DATA
 
 
         private List<int> TriggerIndexes;
@@ -398,8 +430,13 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         private async void OnData(object sender, RoutedEventArgs e)
         {
             if (BtConnectionState != ConnectionState.Configured) return;
+#if !NO_BT
             await DoOneSweep();
+#else
+            await Task.Delay(0);
+#endif
         }
+#if !NO_BT
 
         int NRequest = 0;
         /// <summary>
@@ -468,7 +505,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             // Will call BleDevice_DSO_MetadataEvent to get the meta data
             // Will call BleDevice_DSO_ReadingEvent multiple times until all data is sent.
         }
-
+#endif
         private void OnZoom(object sender, RoutedEventArgs e)
         {
             var tag = (sender as FrameworkElement)?.Tag as string;
@@ -623,6 +660,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         }
 
 
+#if !NO_BT
 
         private async Task<Status_DeviceRecord> DoReadStatus_Device()
         {
@@ -722,6 +760,9 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             return record;
         }
+#endif
+
+#if !NO_BT
 
         private async Task<Status_StatusRecord> DoReadStatus_Status()
         {
@@ -762,7 +803,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             }
             return record;
         }
-
+#endif
+#if !NO_BT
 
         private async Task<Status_Device_NameRecord> DoReadStatus_Device_Name()
         {
@@ -796,8 +838,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             }
             return record;
         }
-
-        #endregion
+#endif
+#endregion
 
     }
 }

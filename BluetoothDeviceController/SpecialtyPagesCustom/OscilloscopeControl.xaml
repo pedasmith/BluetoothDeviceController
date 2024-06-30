@@ -151,7 +151,7 @@
                     
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Log">
-                    <ScrollViewer Style="{StaticResource sControlPanel}">
+                    <ScrollViewer >
                         <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
                     </ScrollViewer>
                 </controls:TabViewItem>
