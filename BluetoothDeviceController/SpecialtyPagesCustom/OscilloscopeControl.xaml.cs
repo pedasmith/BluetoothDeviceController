@@ -393,7 +393,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         private void UiChartRaw_OnPointerPosition(object sender, PointerPositionArgs e)
         {
             if (MMData.Count == 0) return;
-            if (BtConnectionState != ConnectionState.Configured) return;
+            // BT state doesn't really matter here: if (BtConnectionState != ConnectionState.Configured) return;
 
             var index = MMData.GetItemAtOrBeforeIndex(e.Ratio);
             if (index < 0) return;
@@ -595,8 +595,19 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             uiChart.SetZoom(value);
         }
 
-        public void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, List<int> triggerIndex)
+        public void RedrawOscilloscopeYTime(int line, DataCollection<OscDataRecord> list, List<int> triggerIndex)
         {
+            // The BT code sets up the MMData 
+            MMData.ClearAllRecords();
+            MMData.MaxLength = list.Count;
+            MMData.CurrTimeStampType = DataCollection<OscDataRecord>.TimeStampType.HMS;
+            MMData.TimeStampStart = list.TimeStampStart;
+            foreach (var data in list)
+            {
+                MMData.AddRecord(data);
+            }
+            TriggerIndexes = triggerIndex; // alt: TriggerSetting.FindTriggeredIndex(MMData);
+
             uiChart.RedrawOscilloscopeYTime(line, list, triggerIndex);
         }
 

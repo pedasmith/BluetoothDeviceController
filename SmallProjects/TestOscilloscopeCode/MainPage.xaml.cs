@@ -73,17 +73,6 @@ namespace TestOscilloscopeCode
             var properties = OscDataRecord.GetValuePropertyList();
             var names = OscDataRecord.GetNames();
 
-            var uiChartAsOsc = uiChart as IChartControlOscilloscope;
-
-            uiChartAsOsc.SetDataProperties(properties, EventTimeProperty, names);
-            uiChartAsOsc.SetUISpec(new BluetoothDeviceController.Names.UISpecifications()
-            {
-                tableType = "standard",
-                chartType = "standard",
-                chartCommand = "AddYTime<MagnetometerCalibrationRecord>(addResult, MMRecordData)", //TODO: What should the chart command be>???
-                chartDefaultMaxY = 5.0, // TODO: what's the best value here? 10_000,
-                chartDefaultMinY = 0,
-            });
 
             uiOsc.SetDataProperties(properties, EventTimeProperty, names);
             uiOsc.SetUISpec(new BluetoothDeviceController.Names.UISpecifications()
@@ -95,13 +84,11 @@ namespace TestOscilloscopeCode
                 chartDefaultMinY = 0,
             });
 
-            uiChartAsOsc.SetTitle("Test Chart Control");
             uiOsc.SetTitle("Test Chart Control");
 
             var data = MakeSinWave();
             int OFFSET = 80;
             var triggers = new List<int>() { OFFSET, OFFSET+500, OFFSET+1000, OFFSET+1500 };
-            uiChartAsOsc.RedrawOscilloscopeYTime(0, data,  triggers); // #250 is the trigger.
             uiOsc.RedrawOscilloscopeYTime(0, data, triggers);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Names;
+using BluetoothDeviceController.SpecialtyPagesCustom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace BluetoothDeviceController.Charts
         void SetUISpec(UISpecifications uiSpec);
         void SetPan(double value);
         void SetZoom(double value);
-        void RedrawOscilloscopeYTime<OscDataType>(int line, DataCollection<OscDataType> list, List<int> triggerIndex);
+        void RedrawOscilloscopeYTime(int line, DataCollection<OscDataRecord> list, List<int> triggerIndex);
         int GetNextOscilloscopeLine();
         //TODO: int GetNMaxLines();
         void ClearLine(int lineIndex);
@@ -604,7 +605,7 @@ namespace BluetoothDeviceController.Charts
         /// <typeparam name="T"></typeparam>
         /// <param name="lineIndex"></param>
         /// <param name="list"></param>
-        public void RedrawOscilloscopeYTime<T>(int lineIndex, DataCollection<T> list, List<int> markerIndexList)
+        public void RedrawOscilloscopeYTime(int lineIndex, DataCollection<OscDataRecord> list, List<int> markerIndexList)
         {
             if (DataProperties == null) return;
             if (DataProperties.Count != 1) return; // NOTE: Always exactly 1 item

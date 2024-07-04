@@ -134,6 +134,9 @@
     <Compile Include="..\BluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothUnit.cs">
       <Link>FromBluetoothDeviceController\BluetoothDefinitionLanguage\BluetoothUnit.cs</Link>
     </Compile>
+    <Compile Include="..\BluetoothDeviceController\SpecialtyPagesCustom\OscDataRecord.cs">
+      <Link>FromBluetoothDeviceController\OscDataRecord.cs</Link>
+    </Compile>
     <Compile Include="AdvertismentWatcher\AdvertisementWatcher.cs" />
     <Compile Include="AdvertismentWatcher\WatcherData.cs" />
     <Compile Include="App.xaml.cs">
