@@ -412,7 +412,11 @@ namespace BluetoothDeviceController.Charts
                     var xtime = datapoint.X;
                     var y = datapoint.Y;
                     var point = new Point(X(xtime + linedata.PerLineXOffsetInSeconds), Y(lineIndex, y));
-                    linedata.LLLine.Points.Add(point);
+                    // Only add points that are visible on screen.
+                    if (point.X >= 0 && point.X <= uiCanvas.ActualWidth)
+                    {
+                        linedata.LLLine.Points.Add(point);
+                    }
                 }
             }
 
@@ -774,11 +778,14 @@ namespace BluetoothDeviceController.Charts
             {
                 double xpos = X(point.X + linedata.PerLineXOffsetInSeconds);
                 double ypos = Y(lineIndex, point.Y);
-                var marker = MakeEmptyMarker();
-                marker.Stroke = linedata.LLLine.Stroke; // Make it be the same color as the line
-                linedata.LLMarkers.Add(marker);
-                uiCanvas.Children.Add(marker);
-                SetupMarker(marker.Points, xpos, ypos);
+                if (xpos >= 0 && xpos <= uiCanvas.ActualWidth)
+                {
+                    var marker = MakeEmptyMarker();
+                    marker.Stroke = linedata.LLLine.Stroke; // Make it be the same color as the line
+                    linedata.LLMarkers.Add(marker);
+                    uiCanvas.Children.Add(marker);
+                    SetupMarker(marker.Points, xpos, ypos);
+                }
             }
         }
 
