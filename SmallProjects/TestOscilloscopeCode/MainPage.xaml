@@ -13,7 +13,7 @@
     <Grid>
         <StackPanel>
             <Rectangle Height="40" />
-            <osc:OscilloscopeControl x:Name="uiOsc" Width="500" Height="400" />
+            <osc:OscilloscopeControl x:Name="uiOsc" Width="900" Height="400" />
         </StackPanel>
     </Grid>
 </Page>

@@ -202,6 +202,9 @@
       <Version>5.1.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Pan_Zoom_TODO_list.md" />
+  </ItemGroup>
   <Import Project="..\..\Utilities\Utilities.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -1,4 +1,5 @@
-﻿using BluetoothDeviceController.Charts;
+﻿using BluetoothDeviceController.BleEditor;
+using BluetoothDeviceController.Charts;
 using BluetoothDeviceController.SpecialtyPagesCustom;
 using System;
 using System.Collections.Generic;
@@ -24,40 +25,51 @@ namespace TestOscilloscopeCode
             this.Loaded += MainPage_Loaded;
         }
 
+        private static double CalcSin(double Y_MIN, double Y_MAX, double x, double XPerWave)
+        {
+            double Y_RANGE = (Y_MAX - Y_MIN);
+            double Y_RANGE_HALF = Y_RANGE / 2.0;
 
+            double value = Y_MIN + Y_RANGE_HALF + (Y_RANGE_HALF * Math.Sin(x / XPerWave));
+            return value;
+        }
         private DataCollection<OscDataRecord> MakeSinWave()
         {
-            const double LEN = 2000; // two seconds of data
+            const double N_SAMPLES = 2000; // two seconds of data
 
             var MMData = new DataCollection<OscDataRecord>();
-            MMData.MaxLength = (int)LEN;
+            MMData.MaxLength = (int)N_SAMPLES;
             DateTime readingTime = DateTime.MinValue;  // and not at all ReadingStartTime;
             MMData.TimeStampStart = readingTime; // force these to always be in sync :-)
             MMData.CurrTimeStampType = DataCollection<OscDataRecord>.TimeStampType.FromZeroMS;
 
 
             const double NWAVE = 4;
-            const double MIN = 0.0;
-            const double MAX = 5.0;
+            const double Y_MIN = 0.0;
+            const double Y_MAX = 5.0;
             const double FrequencyInHz = 1000.0;
 
             // How many ticks? Answer: 
             // there are 500 samples per wave. At 1KHz, there are 500_000 samples/second
-            double samplesPerWave = LEN / NWAVE;
+            double samplesPerWave = N_SAMPLES / NWAVE;
             double readingDeltaInSeconds = 1.0 / (FrequencyInHz * samplesPerWave);
             int ReadingDeltaInTicks = (int)(readingDeltaInSeconds * 10_000.0 * 1_000);
             // 10_000 ticks per millisecond and 1000 milliseconds per second.
             //const int ReadingDeltaInTicks = 10_000; // 10_000 ticks per millisecond = 1KHz sound
 
-            double RANGE = (MAX - MIN);
-            double HRANGE = RANGE / 2.0;
+            //double Y_RANGE = (Y_MAX - Y_MIN);
+            //double Y_RANGE_HALF = (Y_MAX - Y_MIN) / 2.0;
 
 
 
-            double XPerWave = (LEN / NWAVE) / (2.0 * Math.PI);
-            for (double x = 0; x<LEN; x++)
+            double XPerWave = (N_SAMPLES / NWAVE) / (2.0 * Math.PI);
+            for (double x = 0; x<N_SAMPLES; x++)
             {
-                double value = MIN + HRANGE + (HRANGE * Math.Sin(x / XPerWave));
+                //double value = Y_MIN + Y_RANGE_HALF + (Y_RANGE_HALF * Math.Sin(x / XPerWave));
+                double mainvalue = CalcSin(Y_MIN, Y_MAX, x, XPerWave);
+                double overlay1 = CalcSin(-0.1, 0.1, x, XPerWave / 10);
+                double overlay2 = CalcSin(-0.1, 0.1, x, XPerWave / 20);
+                double value = mainvalue + overlay1 + overlay2;
 
                 var mm = new OscDataRecord(readingTime, value);
                 var addResult = MMData.AddRecord(mm);

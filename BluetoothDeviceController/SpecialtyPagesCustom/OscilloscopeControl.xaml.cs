@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.UI.Xaml;
@@ -47,6 +46,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             this.InitializeComponent();
             uiChart = uiChartRaw;
             uiChartRaw.OnPointerPosition += UiChartRaw_OnPointerPosition;
+            uiChartRaw.HandlePointerEvents = false; // This control will handle all of the pointer events, thanks.
             this.Loaded += OscilloscopeControl_Loaded;
         }
 
@@ -585,6 +585,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             uiChart.SetUISpec(uiSpec);
         }
 
+        public double GetPan()
+        {
+            return uiChart.GetPan();
+        }
+
         public void SetPan(double value)
         {
             uiChart.SetPan(value);
@@ -594,6 +599,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         {
             uiChart.SetZoom(value);
         }
+
+        public double GetZoom() 
+        {  
+            return uiChart.GetZoom(); 
+        }  
 
         public void RedrawOscilloscopeYTime(int line, DataCollection<OscDataRecord> list, List<int> triggerIndex)
         {
@@ -895,7 +905,77 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             return record;
         }
 #endif
-#endregion
+        #endregion
 
+
+        bool InManipulation = false;
+        private void OnPointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            // Overrides the ChartControl OnPointerMoved
+            if (InManipulation) return;
+            e.Handled = true;
+            var position = e.GetCurrentPoint(uiChartRaw).Position;
+            uiChartRaw.DoPointerMove(position);
+        }
+
+        private void OnPointerExit(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            if (InManipulation) return;
+            e.Handled = true;
+            uiChartRaw.PointerSetCursorVisible(false);
+        }
+
+        private void OnPointerPress(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+
+        }
+
+        private void OnManipulationStarted(object sender, Windows.UI.Xaml.Input.ManipulationStartedRoutedEventArgs e)
+        {
+            startY = e.Position.Y / uiChartRaw.ActualHeight;
+        }
+
+        private void OnManipulationCompleted(object sender, Windows.UI.Xaml.Input.ManipulationCompletedRoutedEventArgs e)
+        {
+            InManipulation = false;
+
+        }
+        double startPan = 0.0;
+        double startY = 0.0;
+        double startZoom = 1.0;
+        double mockStartPan = 0.0;
+        private void OnManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
+        {
+            if (e.Cumulative.Scale != 1.0)
+            {
+                if (!InManipulation)
+                {
+                    InManipulation = true;
+                    uiChartRaw.PointerSetCursorVisible(false); // hide the cursor while zooming
+                    startZoom = uiChart.GetZoom();
+                }
+                double newzoom = startZoom - 1.0 + e.Cumulative.Scale;
+                uiChart.SetZoom(newzoom);
+            }
+            else if (startY > 0.5 && e.Cumulative.Translation.X != 0)
+            {
+                // Start to pan
+                if (!InManipulation)
+                {
+                    InManipulation = true;
+                    uiChartRaw.PointerSetCursorVisible(false); // hide the cursor while zooming
+                    startPan = mockStartPan; 
+                    startPan = 1.0 - uiChart.GetPan();
+                }
+                double pan = (e.Cumulative.Translation.X / uiChartRaw.ActualWidth);
+                // Update based on the current zoom level
+                pan = pan / uiChart.GetZoom();
+                double newpan = pan + startPan;
+                mockStartPan = newpan;
+                uiChart.SetPan(1.0 - newpan);
+                uiState.Text = $"{startPan:F3} curr={pan:F3} new={newpan:F3}"; // pan.ToString("F3");
+            }
+
+        }
     }
 }

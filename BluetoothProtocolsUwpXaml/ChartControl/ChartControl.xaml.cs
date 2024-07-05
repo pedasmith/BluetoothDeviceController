@@ -26,8 +26,10 @@ namespace BluetoothDeviceController.Charts
         void SetDataProperties(IList<PropertyInfo> dataProperties, PropertyInfo timeProperty, IList<string> names);
         void SetTitle(string title);
         void SetUISpec(UISpecifications uiSpec);
+        double GetPan();
         void SetPan(double value);
         void SetZoom(double value);
+        double GetZoom();
         void RedrawOscilloscopeYTime(int line, DataCollection<OscDataRecord> list, List<int> triggerIndex);
         int GetNextOscilloscopeLine();
         //TODO: int GetNMaxLines();
@@ -83,6 +85,15 @@ namespace BluetoothDeviceController.Charts
             var oldzoom = CurrZoom.Zoom;
             CurrZoom.Zoom = value;
             RedrawAllLines();
+        }
+        public double GetZoom()
+        {
+            return CurrZoom.Zoom;
+        }
+
+        public double GetPan()
+        {
+            return CurrZoom.XRatioOffset;
         }
         public void SetPan(double value)
         {
@@ -1002,10 +1013,25 @@ namespace BluetoothDeviceController.Charts
             Canvas.SetTop(uiCursor, top);
         }
 
+        public bool HandlePointerEvents { get; set; } = true;
+
+        public void PointerSetCursorVisible(bool visible)
+        {
+            Visibility v = visible ? Visibility.Visible : Visibility.Collapsed;
+            uiThin.Visibility = v;
+            uiThinTextBorder.Visibility = v;
+        }
 
         private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
         {
+            if (!HandlePointerEvents) return;
             var position = e.GetCurrentPoint(uiCanvas).Position;
+            e.Handled = true;
+            DoPointerMove(position);
+        }
+
+        public void DoPointerMove(Point position)
+        { 
             uiThin.Visibility = Visibility.Visible;
             uiThinTextBorder.Visibility = Visibility.Visible;
             uiThin.X1 = position.X;
@@ -1013,7 +1039,6 @@ namespace BluetoothDeviceController.Charts
             uiThin.Y1 = 0;
             uiThin.Y2 = uiCanvas.ActualHeight;
             Canvas.SetLeft(uiThinTextBorder, position.X);
-            e.Handled = true;
 
             // What should the value box say?
             if (!CurrLineDataExists)
@@ -1039,13 +1064,16 @@ namespace BluetoothDeviceController.Charts
 
         private void OnPointerExit(object sender, PointerRoutedEventArgs e)
         {
-            uiThin.Visibility = Visibility.Collapsed;
-            uiThinTextBorder.Visibility = Visibility.Collapsed;
+            if (!HandlePointerEvents) return;
+            PointerSetCursorVisible(false);
+
+
             e.Handled = true;
         }
 
         private void OnPointerPress(object sender, PointerRoutedEventArgs e)
         {
+            if (!HandlePointerEvents) return;
 
         }
     }
