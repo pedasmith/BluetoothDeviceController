@@ -71,6 +71,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         {
             uiState.Text = BtConnectionState.ToString();
         }
+
+        private void LogMini(string text)
+        {
+            uiState.Text = text;
+        }
  
         private async void OscilloscopeControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -379,13 +384,19 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             //
             var lineIndex = uiChart.GetNextOscilloscopeLine();
             AddToClearList(lineIndex);
-            uiChartRaw.RedrawOscilloscopeYTime(lineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
-
+            uiChart.RedrawOscilloscopeYTime(lineIndex, MMData, TriggerIndexes); // Push the data into the ChartControl
+            UpdateReticuleScale();
             Log($"Got data: {MMData[0].Value:F3}");
 
         }
 
-#endregion READ_DATA
+        private void UpdateReticuleScale()
+        {
+            uiReticuleScalePanel.Visibility = Visibility.Visible;
+            var value = uiChartRaw.GetReticuleSpace();
+            uiReticuleScale.Text = value;
+        }
+        #endregion READ_DATA
 
 
         private List<int> TriggerIndexes;
@@ -619,6 +630,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             TriggerIndexes = triggerIndex; // alt: TriggerSetting.FindTriggeredIndex(MMData);
 
             uiChart.RedrawOscilloscopeYTime(line, list, triggerIndex);
+            UpdateReticuleScale();
         }
 
         public int GetNextOscilloscopeLine()
@@ -956,6 +968,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 }
                 double newzoom = startZoom - 1.0 + e.Cumulative.Scale;
                 uiChart.SetZoom(newzoom);
+                UpdateReticuleScale();
             }
             else if (startY > 0.5 && e.Cumulative.Translation.X != 0)
             {
@@ -973,9 +986,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 double newpan = pan + startPan;
                 mockStartPan = newpan;
                 uiChart.SetPan(1.0 - newpan);
-                uiState.Text = $"{startPan:F3} curr={pan:F3} new={newpan:F3}"; // pan.ToString("F3");
             }
-
         }
     }
 }

@@ -11,6 +11,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
+using Windows.Web.Syndication;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -86,6 +87,11 @@ namespace BluetoothDeviceController.Charts
             CurrZoom.Zoom = value;
             RedrawAllLines();
         }
+
+        /// <summary>
+        /// Number from 1 to infinity. 1.0=no zoom 10=zoom in 10x. OK to be < 1 as long as it's > 0
+        /// </summary>
+        /// <returns></returns>
         public double GetZoom()
         {
             return CurrZoom.Zoom;
@@ -425,7 +431,6 @@ namespace BluetoothDeviceController.Charts
         // goal is to set xdelta to a nice even number
         // e.g., if xdelta is 1.2, switch to be just 1; if it's 1.6, bump
         // it to 2. 
-        // But 
         private static double MakeNiceReticuleSpace(double xdelta)
         {
             var retval = xdelta;
@@ -479,6 +484,42 @@ namespace BluetoothDeviceController.Charts
 
             return nerror;
         }
+
+        public static class Reticule_Settings
+        {
+            public const int N_RETICULE_LINES = 10; // when zoomed all the way
+            public const int N_MINOR_LINES = 10; // 10 lines per division
+
+            public const double STROKE_MAJOR_THICKNESS = 3.0;
+            public static Color MAJOR_COLOR = Colors.DarkGreen;
+            public static Brush MAJOR_BRUSH = new SolidColorBrush(MAJOR_COLOR);
+
+            public const double STROKE_MINOR_THICKNESS = 1.0;
+            public static Color MINOR_COLOR = Colors.DarkBlue;
+            public static Brush MINOR_BRUSH = new SolidColorBrush(MINOR_COLOR);
+
+        }
+
+        public double ReticuleSizeInSeconds { get; internal set; } = 0.0;
+        public string GetReticuleSpace()
+        {
+            string retval = "??";
+            double x = ReticuleSizeInSeconds;
+            string units = "s";
+            if (x < 1)
+            {
+                x = x * 1000.0;
+                units = "ms";
+            }
+
+            if (x < 1)
+            {
+                x = x * 1000.0;
+                units = "µs";
+            }
+            retval = $"{x:F1}{units}";
+            return retval;
+        }
         private void DrawReticule() // The background grid
         {
             uiReticule.Children.Clear();
@@ -492,24 +533,52 @@ namespace BluetoothDeviceController.Charts
             var xdelta = xend - xstart;
             if (xdelta < 0.000001) return; // need two different points to make lines
 
-            // Now start the calculations proper
-            var xspace = MakeNiceReticuleSpace (xdelta / 10);
+            double zoom = GetZoom();
+            if (zoom < 1.0) zoom = 1.0;
 
-            var color = Colors.DarkGreen;
-            var brush = new SolidColorBrush(color);
+            // Now start the calculations proper
+            var xspace = MakeNiceReticuleSpace (xdelta / (Reticule_Settings.N_RETICULE_LINES * zoom));
+            var xspace_minor = xspace / Reticule_Settings.N_MINOR_LINES;
+            ReticuleSizeInSeconds = xspace;
 
             for (double xtime = xstart; xtime <= xend; xtime+=xspace)
             {
                 var llx = X(xtime + linedata.PerLineXOffsetInSeconds);
-                Line line = new Line()
+                if (llx >= 0 && llx <= uiReticule.ActualWidth)
                 {
-                    X1 = llx, X2 = llx, Y1 = 0, Y2 = uiReticule.ActualHeight,
-                    Stroke = brush, StrokeThickness = 3,
-                };
-                uiReticule.Children.Add(line);
+                    Line line = new Line()
+                    {
+                        X1 = llx,
+                        X2 = llx,
+                        Y1 = 0,
+                        Y2 = uiReticule.ActualHeight,
+
+                        Stroke = Reticule_Settings.MAJOR_BRUSH,
+                        StrokeThickness = Reticule_Settings.STROKE_MAJOR_THICKNESS,
+                    };
+                    uiReticule.Children.Add(line);
+                }
+
+                for (int minor = 0; minor < Reticule_Settings.N_MINOR_LINES; minor++)
+                {
+                    double xtimeminor = xtime + (minor * xspace_minor);
+                    var llxminor = X(xtimeminor + linedata.PerLineXOffsetInSeconds);
+                    if (llxminor >= 0 && llxminor <= uiReticule.ActualWidth)
+                    {
+                        Line lineminor = new Line()
+                        {
+                            X1 = llxminor,
+                            X2 = llxminor,
+                            Y1 = 0,
+                            Y2 = uiReticule.ActualHeight,
+
+                            Stroke = Reticule_Settings.MINOR_BRUSH,
+                            StrokeThickness = Reticule_Settings.STROKE_MINOR_THICKNESS,
+                        };
+                        uiReticule.Children.Add(lineminor);
+                    }
+                }
             }
-
-
         }
 
 
@@ -680,7 +749,10 @@ namespace BluetoothDeviceController.Charts
                     DrawMarkers(lineIndex);
                 }
             }
-            if (lineIndex == 0) DrawReticule();
+            if (lineIndex == 0)
+            {
+                DrawReticule();
+            }
         }
         private void RemoveLLMarkers(int lineIndex)
         {

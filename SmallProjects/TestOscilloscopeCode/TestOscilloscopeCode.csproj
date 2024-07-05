@@ -203,7 +203,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Pan_Zoom_TODO_list.md" />
+    <None Include="_Pan_Zoom_TODO_list.md" />
   </ItemGroup>
   <Import Project="..\..\Utilities\Utilities.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

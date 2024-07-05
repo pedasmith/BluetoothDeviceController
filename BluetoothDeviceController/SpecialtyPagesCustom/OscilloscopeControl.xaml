@@ -69,11 +69,24 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <chart:ChartControl Grid.Row="0" x:Name="uiChartRaw" Height="200"
+            
+            <!-- MAIN CHART -->
+            <!-- ========== -->
+            <chart:ChartControl Grid.Row="0" x:Name="uiChartRaw" 
                                 PointerMoved="OnPointerMoved" PointerExited="OnPointerExit" PointerPressed="OnPointerPress"
                                 ManipulationStarted="OnManipulationStarted" ManipulationDelta="OnManipulationDelta" ManipulationCompleted="OnManipulationCompleted"
                                 ManipulationMode="Scale,TranslateX"
                                 />
+            <Border x:Name="uiReticuleScalePanel" Grid.Row="0" MinWidth="80" 
+                    Visibility="Visible"
+                    Background="White"
+                    VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                    >
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="4,0,10,0">Scale:</TextBlock>
+                    <TextBlock x:Name="uiReticuleScale" MinWidth="80" TextAlignment="Right" >0.234 ms</TextBlock>
+                </StackPanel>
+            </Border>
 
             
             <controls:TabView Grid.Row="1" Header="Oscilloscope Controls" 
