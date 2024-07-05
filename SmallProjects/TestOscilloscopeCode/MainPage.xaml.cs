@@ -3,6 +3,7 @@ using BluetoothDeviceController.Charts;
 using BluetoothDeviceController.SpecialtyPagesCustom;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -79,7 +80,7 @@ namespace TestOscilloscopeCode
             return MMData;
         }
 
-        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             var EventTimeProperty = OscDataRecord.GetTimeProperty();
             var properties = OscDataRecord.GetValuePropertyList();
@@ -97,6 +98,8 @@ namespace TestOscilloscopeCode
             });
 
             uiOsc.SetTitle("Test Chart Control");
+
+            await Task.Delay(1); // wait for screen up to get sizes correct.
 
             var data = MakeSinWave();
             int OFFSET = 80;
