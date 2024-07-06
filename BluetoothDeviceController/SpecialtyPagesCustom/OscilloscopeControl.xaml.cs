@@ -601,6 +601,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             return uiChart.GetPan();
         }
 
+        public double GetMaxPan()
+        {
+            return uiChart.GetMaxPan();
+        }
+
         public void SetPan(double value)
         {
             uiChart.SetPan(value);
@@ -927,7 +932,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             if (InManipulation) return;
             e.Handled = true;
             var position = e.GetCurrentPoint(uiChartRaw).Position;
-            uiChartRaw.DoPointerMove(position);
+            var y = position.Y / uiChartRaw.ActualHeight;
+            if (y < CURSOR_DIVIDING_LINE)
+            {
+                uiChartRaw.DoPointerMove(position);
+            }
         }
 
         private void OnPointerExit(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
@@ -952,10 +961,14 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             InManipulation = false;
 
         }
+        static double CURSOR_DIVIDING_LINE = 0.5; // when y > CURSOR_DIVIDING_LINE, we're doing a pan (bottom half); otherwise a cursor move.
+
+        static double MIN_ZOOM = 0.9; // normally 1.0, no zoom, but maybe people want to jiggle it a little
+        static double MAX_ZOOM = 25.0; // Set by looking at a typical curve.
+
         double startPan = 0.0;
         double startY = 0.0;
         double startZoom = 1.0;
-        double mockStartPan = 0.0;
         private void OnManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
         {
             if (e.Cumulative.Scale != 1.0)
@@ -967,25 +980,30 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                     startZoom = uiChart.GetZoom();
                 }
                 double newzoom = startZoom - 1.0 + e.Cumulative.Scale;
+                if (newzoom < MIN_ZOOM) newzoom = MIN_ZOOM;
+                else if (newzoom > MAX_ZOOM) newzoom = MAX_ZOOM;
+
                 uiChart.SetZoom(newzoom);
                 UpdateReticuleScale();
             }
-            else if (startY > 0.5 && e.Cumulative.Translation.X != 0)
+            else if (startY > CURSOR_DIVIDING_LINE && e.Cumulative.Translation.X != 0)
             {
                 // Start to pan
                 if (!InManipulation)
                 {
                     InManipulation = true;
                     uiChartRaw.PointerSetCursorVisible(false); // hide the cursor while zooming
-                    startPan = mockStartPan; 
                     startPan = 1.0 - uiChart.GetPan();
                 }
                 double pan = (e.Cumulative.Translation.X / uiChartRaw.ActualWidth);
                 // Update based on the current zoom level
                 pan = pan / uiChart.GetZoom();
-                double newpan = pan + startPan;
-                mockStartPan = newpan;
-                uiChart.SetPan(1.0 - newpan);
+                double newpan = 1.0 - (pan + startPan);
+                double maxpan = uiChartRaw.GetMaxPan();
+                if (newpan < 0.0) newpan = 0.0;
+                if (newpan > maxpan) newpan = maxpan;
+                uiChart.SetPan(newpan);
+                LogMini($"max={maxpan:F3} new={newpan:F3}");
             }
         }
     }

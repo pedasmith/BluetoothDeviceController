@@ -34,6 +34,8 @@ namespace TestOscilloscopeCode
             double value = Y_MIN + Y_RANGE_HALF + (Y_RANGE_HALF * Math.Sin(x / XPerWave));
             return value;
         }
+
+        Random r = new Random();
         private DataCollection<OscDataRecord> MakeSinWave()
         {
             const double N_SAMPLES = 2000; // two seconds of data
@@ -70,7 +72,8 @@ namespace TestOscilloscopeCode
                 double mainvalue = CalcSin(Y_MIN, Y_MAX, x, XPerWave);
                 double overlay1 = CalcSin(-0.1, 0.1, x, XPerWave / 10);
                 double overlay2 = CalcSin(-0.1, 0.1, x, XPerWave / 20);
-                double value = mainvalue + overlay1 + overlay2;
+                double overlay3 = (r.NextDouble() * 0.1) - (0.1/2.0);
+                double value = mainvalue + overlay1 + overlay2 + overlay3;
 
                 var mm = new OscDataRecord(readingTime, value);
                 var addResult = MMData.AddRecord(mm);

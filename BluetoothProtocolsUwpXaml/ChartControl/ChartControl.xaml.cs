@@ -28,6 +28,7 @@ namespace BluetoothDeviceController.Charts
         void SetTitle(string title);
         void SetUISpec(UISpecifications uiSpec);
         double GetPan();
+        double GetMaxPan();
         void SetPan(double value);
         void SetZoom(double value);
         double GetZoom();
@@ -101,6 +102,15 @@ namespace BluetoothDeviceController.Charts
         {
             return CurrZoom.XRatioOffset;
         }
+
+        public double GetMaxPan()
+        {
+            // How wide the the screen? Answer: in panning unit, "1.0".
+            var screenwidth = 1.0 / CurrZoom.Zoom;
+            var retval = 1.0 - screenwidth;
+            return retval;
+        }
+
         public void SetPan(double value)
         {
             var oldzoom = CurrZoom.XRatioOffset;
@@ -1138,7 +1148,7 @@ namespace BluetoothDeviceController.Charts
             // Per https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/events/how-to-publish-events-that-conform-to-net-framework-guidelines, 
             // avoid a race condition by making a temp variable first.
             var tmp = OnPointerPosition;
-            if (tmp != null) tmp.Invoke(this, new PointerPositionArgs(summary, ratio));
+            tmp?.Invoke(this, new PointerPositionArgs(summary, ratio));
         }
 
         private void OnPointerExit(object sender, PointerRoutedEventArgs e)
@@ -1146,14 +1156,12 @@ namespace BluetoothDeviceController.Charts
             if (!HandlePointerEvents) return;
             PointerSetCursorVisible(false);
 
-
             e.Handled = true;
         }
 
         private void OnPointerPress(object sender, PointerRoutedEventArgs e)
         {
             if (!HandlePointerEvents) return;
-
         }
     }
 }

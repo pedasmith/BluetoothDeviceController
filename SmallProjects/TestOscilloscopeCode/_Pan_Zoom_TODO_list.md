@@ -2,6 +2,17 @@
 
 This is the list of all the work needed to make the pan, zoom, reticule look good.
 
+## In progress right now
+
+### Zoom out works weird
+Zoom way in, and then start to zoom out. It's freaking slow!
+
+## UX in general
+
+
+### Fix up the Zoom panel
+Right now the zoom and pan panel is intended to be used for debugging zoom + pan; it's not actually what should be shown to the user. Take a look at existing oscilloscopes (including software ones) for what it should have.
+
 ## Reticule
 
 ### Color and size
@@ -9,23 +20,12 @@ Reticule color and size should be updated to look classier
 
 ## Panning
 
-### Clipping
-You should not be able to pan beyond the waveform. Note that a little bit of padding is OK
 
 ### Keyboard UX
 Must ensure a keyboard UX. Should be usable both from a laptop keyboard and from just a keypad.
 
-## Zooming + Panning display clip
-The waveform should be clipped to the viewport
 
-### Clipping the waveform
-Zooming in / panning? Should not show lines over the edge!
 
-### Min/Max
-There should be a min and max zoom level.
-
-### Zoom out works weird
-Zoom way in, and then start to zoom out. It's freaking slow!
 
 ### Keyboard UX
 Must ensure a keyboard UX. Should be usable both from a laptop keyboard and from just a keypad.
@@ -33,6 +33,17 @@ Must ensure a keyboard UX. Should be usable both from a laptop keyboard and from
 
 
 ## Status 2024-07-05
+
+### Min/Max Zoom level
+There should be a min and max zoom level.
+
+### Min/Max Panning
+You should not be able to pan beyond the waveform. Note that a little bit of padding is OK
+
+
+### Click on bottom half should not show the cursor
+The cursor shows up and flickers when the user clicks the bottom of the screen. It really shouldn't.
+
 
 
 ### Reticule zoom
@@ -43,6 +54,9 @@ Having just the major lines is silly. There should be minor lines (10 per major 
 
 ### Scale marker
 There's no scale marker, so you can't tell how big a division is
+
+## Zooming + Panning display clip
+The waveform should be clipped to the viewport
 
 
 
