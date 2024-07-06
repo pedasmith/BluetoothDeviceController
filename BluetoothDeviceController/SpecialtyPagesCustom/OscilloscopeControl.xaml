@@ -285,6 +285,8 @@
                         <RadioButton Content="Wave 2" Tag="WV2" Checked="OnPersonalizationItem" />
                         <RadioButton Content="Wave 3" Tag="WV3" Checked="OnPersonalizationItem" />
                         <RadioButton Content="Wave 4" Tag="WV4" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Reticule Major" Tag="RETMAJ" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Reticule Minor" Tag="RETMIN" Checked="OnPersonalizationItem" />
                     </StackPanel>
 
                     <ColorPicker Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" x:Name="uiColorPicker"

@@ -510,11 +510,11 @@ namespace BluetoothDeviceController.Charts
             public const int N_RETICULE_LINES = 10; // when zoomed all the way
             public const int N_MINOR_LINES = 10; // 10 lines per division
 
-            public const double STROKE_MAJOR_THICKNESS = 3.0;
+            public static double STROKE_MAJOR_THICKNESS = 3.0;
             public static Color MAJOR_COLOR = Colors.DarkGreen;
             public static Brush MAJOR_BRUSH = new SolidColorBrush(MAJOR_COLOR);
 
-            public const double STROKE_MINOR_THICKNESS = 1.0;
+            public static double STROKE_MINOR_THICKNESS = 1.0;
             public static Color MINOR_COLOR = Colors.DarkBlue;
             public static Brush MINOR_BRUSH = new SolidColorBrush(MINOR_COLOR);
 
@@ -579,7 +579,7 @@ namespace BluetoothDeviceController.Charts
                     uiReticule.Children.Add(line);
                 }
 
-                for (int minor = 0; minor < Reticule_Settings.N_MINOR_LINES; minor++)
+                for (int minor = 1; minor < Reticule_Settings.N_MINOR_LINES; minor++)
                 {
                     double xtimeminor = xtime + (minor * xspace_minor);
                     var llxminor = X(xtimeminor + linedata.PerLineXOffsetInSeconds);
@@ -1196,8 +1196,24 @@ namespace BluetoothDeviceController.Charts
                 var linedata = AllLineData[i];
                 linedata.LLLine.Stroke = pref.GetBrush(waveEnum);
                 linedata.LLLine.StrokeThickness = pref.GetThickness(waveEnum);
+
+                // Markers and lines look identical.
+                foreach (var marker in linedata.LLMarkers)
+                {
+                    marker.Stroke = pref.GetBrush(waveEnum);
+                    marker.StrokeThickness = pref.GetThickness(waveEnum);
+                }
             }
 
+            // Reticule
+            Reticule_Settings.MAJOR_COLOR = pref.GetColor(UserPersonalization.Item.ReticuleMajor);
+            Reticule_Settings.MAJOR_BRUSH = pref.GetBrush(UserPersonalization.Item.ReticuleMajor);
+            Reticule_Settings.STROKE_MAJOR_THICKNESS = pref.GetThickness(UserPersonalization.Item.ReticuleMajor);
+
+            Reticule_Settings.MINOR_COLOR = pref.GetColor(UserPersonalization.Item.ReticuleMinor);
+            Reticule_Settings.MINOR_BRUSH = pref.GetBrush(UserPersonalization.Item.ReticuleMinor);
+            Reticule_Settings.STROKE_MINOR_THICKNESS = pref.GetThickness(UserPersonalization.Item.ReticuleMinor);
+            DrawReticule();
         }
     }
 }

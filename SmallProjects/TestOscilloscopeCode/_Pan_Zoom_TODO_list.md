@@ -23,8 +23,8 @@ Colors are for:
 - Cursor (Thin, and later thick)
 - waveforms (1..N)
 - Markers
+- reticule major and minor + width + fuzzy? (not fuzzy; it's too hard)
 - text foreground for cursor + reticule scale
-- reticule major and minor + width + fuzzy?
 
 Be sure to save the values!
 

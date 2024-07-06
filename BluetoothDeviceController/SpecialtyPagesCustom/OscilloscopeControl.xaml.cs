@@ -1046,6 +1046,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 case "WV2": CurrPersonalization = UserPersonalization.Item.Wave2; break;
                 case "WV3": CurrPersonalization = UserPersonalization.Item.Wave3; break;
                 case "WV4": CurrPersonalization = UserPersonalization.Item.Wave4; break;
+                case "RETMAJ": CurrPersonalization = UserPersonalization.Item.ReticuleMajor; break;
+                case "RETMIN": CurrPersonalization = UserPersonalization.Item.ReticuleMinor; break;
             }
 
             if (CurrPersonalization != UserPersonalization.Item.None)
@@ -1074,6 +1076,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 case UserPersonalization.Item.Wave2:
                 case UserPersonalization.Item.Wave3:
                 case UserPersonalization.Item.Wave4:
+                case UserPersonalization.Item.ReticuleMajor:
+                case UserPersonalization.Item.ReticuleMinor:
                     uiThickness.Visibility = Visibility.Visible;
                     break;
                 default:
@@ -1106,10 +1110,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 if (visibleTags.Contains(tag)) radio.Visibility= Visibility.Visible;
                 // ignore all of the tags that aren't a WV1 or WV2
             }
-
-
-
         }
+        
         private void OnPersonalizationColorChanged(ColorPicker sender, ColorChangedEventArgs args)
         {
             var pref = UserPersonalization.Current;
