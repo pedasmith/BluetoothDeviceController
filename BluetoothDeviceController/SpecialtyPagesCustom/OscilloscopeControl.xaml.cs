@@ -979,7 +979,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                     uiChartRaw.PointerSetCursorVisible(false); // hide the cursor while zooming
                     startZoom = uiChart.GetZoom();
                 }
-                double newzoom = startZoom - 1.0 + e.Cumulative.Scale;
+                double newzoom = startZoom * e.Cumulative.Scale;
                 if (newzoom < MIN_ZOOM) newzoom = MIN_ZOOM;
                 else if (newzoom > MAX_ZOOM) newzoom = MAX_ZOOM;
 
@@ -1003,7 +1003,6 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 if (newpan < 0.0) newpan = 0.0;
                 if (newpan > maxpan) newpan = maxpan;
                 uiChart.SetPan(newpan);
-                LogMini($"max={maxpan:F3} new={newpan:F3}");
             }
         }
     }
