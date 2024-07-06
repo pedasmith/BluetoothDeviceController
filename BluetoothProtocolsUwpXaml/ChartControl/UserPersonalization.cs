@@ -10,6 +10,10 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
 
     {
         public static UserPersonalization Current { get; set; }
+        public enum Item { None, ChartBackground, ThinCursor, };
+        public Brush GetBrush(Item item) { return AllBrushes[(int)item]; }
+        public double GetThickness(Item item) { return AllThickness[(int)item]; }
+
         public static void Init()
         {
             if (Current != null) return;
@@ -27,14 +31,17 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             AllColors[(int)item] = color;
             AllBrushes[(int)item] = new SolidColorBrush(color);
         }
-        private void SetThickness(Item item, double value)
+        public void SetThickness(Item item, double value)
         {
             AllThickness[(int)item] = value;    
         }
 
+
+
         public UserPersonalization()
         {
-            while (AllThickness.Count < AllThickness.Capacity) {
+            while (AllThickness.Count < AllThickness.Capacity)
+            {
                 AllThickness.Add(1.0);
             }
 
@@ -43,20 +50,16 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
                 AllColors.Add(Colors.Red);
             }
             var b = new SolidColorBrush(Colors.Red);
-            while(AllBrushes.Count < AllBrushes.Capacity)
+            while (AllBrushes.Count < AllBrushes.Capacity)
             {
                 AllBrushes.Add(b);
             }
         }
-
-        public enum Item {  None, ChartBackground, ThinCursor, };
         private static int NEnum {  get {  return Enum.GetValues(typeof(Item)).Length; } }
 
         public List<SolidColorBrush> AllBrushes { get; } = new List<SolidColorBrush>(NEnum);
-        public Brush GetBrush(Item item) {  return AllBrushes[(int)item]; }
         public List<Color> AllColors { get; } = new List<Color>(NEnum);
         public Color GetColor(Item item) { return AllColors[(int)item]; }
         public List<Double> AllThickness { get; } = new List<Double>(NEnum);
-        public double GetThickness(Item item) { return AllThickness[(int)item]; }
     }
 }

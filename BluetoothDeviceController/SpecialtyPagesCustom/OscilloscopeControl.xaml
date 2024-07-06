@@ -230,7 +230,7 @@
                     </StackPanel>
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Personalization">
-                    <StackPanel>
+                    <StackPanel Style="{StaticResource sControlPanel}">
                         <Button Content="Open" Click="OnOpenPersonalization" />
                     </StackPanel>
                 </controls:TabViewItem>
@@ -253,42 +253,52 @@
                     Visibility="Visible"
                     Background="Bisque" HorizontalAlignment="Right" Margin="0,0,0,11"
                     >
-                <StackPanel>
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="ColorSpectrum">
+                            <Setter Property="Width" Value="80" />
+                            <Setter Property="MinWidth" Value="20" />
+                            <Setter Property="MaxWidth" Value="400" />
+                            <Setter Property="Height" Value="20" />
+                            <Setter Property="MinHeight" Value="20" />
+                            <Setter Property="MaxHeight" Value="400" />
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                        
                     <TextBlock Style="{StaticResource HeaderStyle}">Personalization</TextBlock>
-                    <Rectangle Height="5" />
-                    <Grid>
-                        <Grid.Resources>
-                            <Style TargetType="ColorSpectrum">
-                                <Setter Property="Width" Value="80" />
-                                <Setter Property="MinWidth" Value="20" />
-                                <Setter Property="MaxWidth" Value="400" />
-                                <Setter Property="Height" Value="20" />
-                                <Setter Property="MinHeight" Value="20" />
-                                <Setter Property="MaxHeight" Value="400" />
-                            </Style>
-                        </Grid.Resources>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <RadioButton Content="Background" Tag="BKG" Checked="OnPersonalization" />
-                            <RadioButton Content="Cursor" Tag="THN" Checked="OnPersonalization" />
-                        </StackPanel>
 
-                        <ColorPicker Grid.Column="1" x:Name="uiColorPicker"
-                                     ColorChanged="OnPersonalizationColorChanged" 
-                                     VerticalAlignment="Top" 
-                                     IsMoreButtonVisible="False"
-                                     IsAlphaSliderVisible="False"
-                                     IsColorSliderVisible="True"
-                                     IsColorChannelTextInputVisible="False"
-                                     IsColorPreviewVisible="False"
-                                     ColorSpectrumShape="Box"
-                                     IsColorSpectrumVisible="True"
-                                     />
-                    </Grid>
-                </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
+                        <RadioButton Content="Background" Tag="BKG" Checked="OnPersonalization" />
+                        <RadioButton Content="Cursor" Tag="THN" Checked="OnPersonalization" />
+                    </StackPanel>
+
+                    <ColorPicker Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" x:Name="uiColorPicker"
+                                    ColorChanged="OnPersonalizationColorChanged" 
+                                    VerticalAlignment="Top" 
+                                    IsMoreButtonVisible="False"
+                                    IsAlphaSliderVisible="False"
+                                    IsColorSliderVisible="True"
+                                    IsColorChannelTextInputVisible="False"
+                                    IsColorPreviewVisible="False"
+                                    ColorSpectrumShape="Box"
+                                    IsColorSpectrumVisible="True"
+                                    />
+
+                    <Slider x:Name="uiThickness" Grid.Row="2" Grid.Column="1"
+                            Minimum="0.5" Maximum="4" StepFrequency="0.5"
+                            TickFrequency="0.5" SnapsTo="Ticks"
+                            ValueChanged="OnPersonalizationThicknessChanged"
+                            />
+                </Grid>
             </Border>
         </Grid>
     </Border>

@@ -21,7 +21,7 @@ Colors are for:
 - text background for cursor + reticule scale
 
 - waveforms (1..N)
-- Cursor
+- Cursor (Thin, and later thick)
 - text foreground for cursor + reticule scale
 - reticule major and minor + width + fuzzy?
 

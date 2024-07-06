@@ -1111,6 +1111,15 @@ namespace BluetoothDeviceController.Charts
             uiThinTextBorder.Visibility = v;
         }
 
+        public void PointerSetCursorVisibleOnLeft(bool visible)
+        {
+            if (visible)
+            {
+                DoPointerMove(new Point() { X = uiCanvas.ActualWidth * 0.15, Y = uiCanvas.ActualHeight - 20.0 });
+            }
+            PointerSetCursorVisible(visible);
+        }
+
         private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
         {
             if (!HandlePointerEvents) return;
@@ -1169,20 +1178,6 @@ namespace BluetoothDeviceController.Charts
             uiReticule.Background = pref.GetBrush(UserPersonalization.Item.ChartBackground);
             uiThin.Stroke = pref.GetBrush(UserPersonalization.Item.ThinCursor);
             uiThin.StrokeThickness = pref.GetThickness(UserPersonalization.Item.ThinCursor);
-        }
-
-        public void SetBackgroundColor(Brush brush)
-        {
-            uiReticule.Background = brush;
-        }
-
-        public void SetCursorThinColor(Brush brush)
-        {
-            uiThin.Stroke = brush;
-        }
-        public void SetCursorThinWidth(double thickness)
-        {
-            uiThin.StrokeThickness= thickness;
         }
     }
 }

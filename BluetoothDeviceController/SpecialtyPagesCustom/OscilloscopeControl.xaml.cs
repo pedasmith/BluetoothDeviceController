@@ -1026,6 +1026,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             var tag = (sender as FrameworkElement)?.Tag as string;
             if (string.IsNullOrEmpty(tag)) return;
 
+            var oldPersonalization = CurrPersonalization;
+
             switch (tag)
             {
                 default:
@@ -1043,6 +1045,29 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             {
                 var pref = UserPersonalization.Current;
                 uiColorPicker.Color = pref.GetColor(CurrPersonalization);
+                uiThickness.Value = pref.GetThickness(CurrPersonalization);
+            }
+
+            // Get / hide cursor
+            if (CurrPersonalization == UserPersonalization.Item.ThinCursor)
+            {
+                uiChartRaw.PointerSetCursorVisibleOnLeft(true);
+            }
+            else
+            {
+                uiChartRaw.PointerSetCursorVisible(false);
+            }
+
+
+            // Should the thickness setting be shown?
+            switch (CurrPersonalization)
+            {
+                case UserPersonalization.Item.ThinCursor:
+                    uiThickness.Visibility = Visibility.Visible;
+                    break;
+                default:
+                    uiThickness.Visibility = Visibility.Collapsed;
+                    break;
             }
         }
 
@@ -1052,6 +1077,13 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             pref.SetColor(CurrPersonalization, args.NewColor);
             SetPersonalization(pref);
         }
+        private void OnPersonalizationThicknessChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            var pref = UserPersonalization.Current;
+            pref.SetThickness(CurrPersonalization, e.NewValue);
+            SetPersonalization(pref);
+        }
+
         public void SetPersonalization(UserPersonalization pref)
         {
             uiChartRaw.SetPersonalization(pref);
