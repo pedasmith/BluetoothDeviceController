@@ -1,6 +1,7 @@
 ﻿using BluetoothDeviceController.BleEditor;
 using BluetoothDeviceController.Charts;
 using BluetoothDeviceController.SpecialtyPagesCustom;
+using BluetoothProtocolsUwpXaml.ChartControl;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace TestOscilloscopeCode
     {
         public MainPage()
         {
+            UserPersonalization.Init();
             this.InitializeComponent();
 
             //int nerror = 0;

@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ChartControl\ChartControl.xaml.cs">
       <DependentUpon>ChartControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)ChartControl\UserPersonalization.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferencesControl.xaml.cs">
       <DependentUpon>UserSerialPortPreferencesControl.xaml</DependentUpon>
     </Compile>

@@ -18,11 +18,14 @@ Reticule color and size should be updated to look classier. While I'm at it, why
 
 Colors are for:
 - background
+- text background for cursor + reticule scale
+
 - waveforms (1..N)
 - Cursor
-- text background for cursor + reticule scale
-- text foregrond for cursor + reticule scale
-- reticule major and minor + width + 
+- text foreground for cursor + reticule scale
+- reticule major and minor + width + fuzzy?
+
+Be sure to save the values!
 
 ## Panning + Zooming
 

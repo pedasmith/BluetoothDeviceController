@@ -127,6 +127,9 @@
     <Compile Include="..\..\BluetoothProtocolsUwpXaml\ChartControl\ChartControl.xaml.cs">
       <Link>ChartControl.xaml.cs</Link>
     </Compile>
+    <Compile Include="..\..\BluetoothProtocolsUwpXaml\ChartControl\UserPersonalization.cs">
+      <Link>FromBluetooth\UserPersonalization.cs</Link>
+    </Compile>
     <Compile Include="..\..\BluetoothProtocols\Charts\DataCollection.cs">
       <Link>DataCollection.cs</Link>
     </Compile>

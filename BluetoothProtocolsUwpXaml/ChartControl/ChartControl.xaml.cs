@@ -1,5 +1,6 @@
 ﻿using BluetoothDeviceController.Names;
 using BluetoothDeviceController.SpecialtyPagesCustom;
+using BluetoothProtocolsUwpXaml.ChartControl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
-using Windows.Web.Syndication;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -1162,6 +1162,27 @@ namespace BluetoothDeviceController.Charts
         private void OnPointerPress(object sender, PointerRoutedEventArgs e)
         {
             if (!HandlePointerEvents) return;
+        }
+
+        public void SetPersonalization(BluetoothProtocolsUwpXaml.ChartControl.UserPersonalization pref)
+        {
+            uiReticule.Background = pref.GetBrush(UserPersonalization.Item.ChartBackground);
+            uiThin.Stroke = pref.GetBrush(UserPersonalization.Item.ThinCursor);
+            uiThin.StrokeThickness = pref.GetThickness(UserPersonalization.Item.ThinCursor);
+        }
+
+        public void SetBackgroundColor(Brush brush)
+        {
+            uiReticule.Background = brush;
+        }
+
+        public void SetCursorThinColor(Brush brush)
+        {
+            uiThin.Stroke = brush;
+        }
+        public void SetCursorThinWidth(double thickness)
+        {
+            uiThin.StrokeThickness= thickness;
         }
     }
 }

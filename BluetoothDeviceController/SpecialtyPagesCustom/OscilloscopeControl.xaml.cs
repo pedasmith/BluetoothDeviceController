@@ -10,6 +10,8 @@ using Windows.UI.Xaml.Controls;
 using Utilities;
 using System.Reflection;
 using BluetoothDeviceController.Names;
+using Windows.UI.Xaml.Media;
+using BluetoothProtocolsUwpXaml.ChartControl;
 
 #if !NO_BT
 
@@ -1005,5 +1007,64 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 uiChart.SetPan(newpan);
             }
         }
+
+
+        #region PERSONALIZATION
+
+
+        //enum PersonalizationItem {  None, Background, CursorThick, CursorThin }
+        UserPersonalization.Item CurrPersonalization = UserPersonalization.Item.None;
+        /// <summary>
+        /// Radio button for selection a personalization was clicked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnPersonalization(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsLoaded) return;
+
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            if (string.IsNullOrEmpty(tag)) return;
+
+            switch (tag)
+            {
+                default:
+                    CurrPersonalization = UserPersonalization.Item.None;
+                    break;
+                case "BKG":
+                    CurrPersonalization = UserPersonalization.Item.ChartBackground;
+                    break;
+                case "THN":
+                    CurrPersonalization = UserPersonalization.Item.ThinCursor;
+                    break;
+            }
+
+            if (CurrPersonalization != UserPersonalization.Item.None)
+            {
+                var pref = UserPersonalization.Current;
+                uiColorPicker.Color = pref.GetColor(CurrPersonalization);
+            }
+        }
+
+        private void OnPersonalizationColorChanged(ColorPicker sender, ColorChangedEventArgs args)
+        {
+            var pref = UserPersonalization.Current;
+            pref.SetColor(CurrPersonalization, args.NewColor);
+            SetPersonalization(pref);
+        }
+        public void SetPersonalization(UserPersonalization pref)
+        {
+            uiChartRaw.SetPersonalization(pref);
+        }
+
+        private void OnOpenPersonalization(object sender, RoutedEventArgs e)
+        {
+            uiPersonalization.Visibility = uiPersonalization.Visibility == Visibility.Visible 
+                ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+
+        #endregion // PERSONALIZATION
+
     }
 }

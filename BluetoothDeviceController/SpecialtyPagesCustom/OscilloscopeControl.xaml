@@ -8,7 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="600"
+    d:DesignHeight="450"
     d:DesignWidth="800">
     <UserControl.Resources>
         <Style TargetType="Button">
@@ -66,10 +66,9 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" MinHeight="200" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto"  />
             </Grid.RowDefinitions>
-            
+
             <!-- MAIN CHART -->
             <!-- ========== -->
             <chart:ChartControl Grid.Row="0" x:Name="uiChartRaw" 
@@ -88,7 +87,7 @@
                 </StackPanel>
             </Border>
 
-            
+
             <controls:TabView Grid.Row="1" Header="Oscilloscope Controls" 
                               SelectedIndex="0" MinHeight="100">
                 <controls:TabView.Resources>
@@ -165,7 +164,7 @@
 
                         </StackPanel>
                     </Grid>
-                    
+
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Log">
                     <Grid Style="{StaticResource sControlPanel}">
@@ -230,6 +229,11 @@
                         </TextBlock>
                     </StackPanel>
                 </controls:TabViewItem>
+                <controls:TabViewItem Header="Personalization">
+                    <StackPanel>
+                        <Button Content="Open" Click="OnOpenPersonalization" />
+                    </StackPanel>
+                </controls:TabViewItem>
                 <controls:TabViewItem Header="Advanced">
                     <StackPanel Style="{StaticResource sControlPanel}">
                         <StackPanel Orientation="Horizontal">
@@ -244,6 +248,48 @@
                     </StackPanel>
                 </controls:TabViewItem>
             </controls:TabView>
+
+            <Border x:Name="uiPersonalization" Grid.Row="0" Grid.RowSpan="2" Width="440"
+                    Visibility="Visible"
+                    Background="Bisque" HorizontalAlignment="Right" Margin="0,0,0,11"
+                    >
+                <StackPanel>
+                    <TextBlock Style="{StaticResource HeaderStyle}">Personalization</TextBlock>
+                    <Rectangle Height="5" />
+                    <Grid>
+                        <Grid.Resources>
+                            <Style TargetType="ColorSpectrum">
+                                <Setter Property="Width" Value="80" />
+                                <Setter Property="MinWidth" Value="20" />
+                                <Setter Property="MaxWidth" Value="400" />
+                                <Setter Property="Height" Value="20" />
+                                <Setter Property="MinHeight" Value="20" />
+                                <Setter Property="MaxHeight" Value="400" />
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <RadioButton Content="Background" Tag="BKG" Checked="OnPersonalization" />
+                            <RadioButton Content="Cursor" Tag="THN" Checked="OnPersonalization" />
+                        </StackPanel>
+
+                        <ColorPicker Grid.Column="1" x:Name="uiColorPicker"
+                                     ColorChanged="OnPersonalizationColorChanged" 
+                                     VerticalAlignment="Top" 
+                                     IsMoreButtonVisible="False"
+                                     IsAlphaSliderVisible="False"
+                                     IsColorSliderVisible="True"
+                                     IsColorChannelTextInputVisible="False"
+                                     IsColorPreviewVisible="False"
+                                     ColorSpectrumShape="Box"
+                                     IsColorSpectrumVisible="True"
+                                     />
+                    </Grid>
+                </StackPanel>
+            </Border>
         </Grid>
     </Border>
 </UserControl>

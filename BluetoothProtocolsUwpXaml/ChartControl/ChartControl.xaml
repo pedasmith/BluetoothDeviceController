@@ -26,14 +26,12 @@
     </UserControl.Resources>
 
     <Grid>
-        <Canvas x:Name="uiReticule">
-            <Line X1="50" X2="50" Y1="0" Y2="200" Stroke="LightBlue" StrokeThickness="5"/>
-
+        <Canvas x:Name="uiReticule" Background="MistyRose">
         </Canvas>
         <Canvas x:Name="uiCanvas" 
             PointerMoved="OnPointerMoved" PointerExited="OnPointerExit" PointerPressed="OnPointerPress"
             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Rectangle x:Name="uiBackgroundRect" Fill="Bisque" Opacity="0.01" IsHitTestVisible="True" />
+            <Rectangle x:Name="uiBackgroundRect" Fill="White" Opacity="0.01" IsHitTestVisible="True" />
             <TextBlock x:Name="uiTitle" Style="{StaticResource TitleStyle}" Text="Data Chart" Width="500" HorizontalTextAlignment="Center" />
 
             <TextBlock Canvas.Left="100" Canvas.Top="50" x:Name="uiCursor" Text="✛" FontSize="24" Visibility="Collapsed" />
