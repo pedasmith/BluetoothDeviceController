@@ -20,8 +20,9 @@ Colors are for:
 - background
 - text background for cursor + reticule scale
 
-- waveforms (1..N)
 - Cursor (Thin, and later thick)
+- waveforms (1..N)
+- Markers
 - text foreground for cursor + reticule scale
 - reticule major and minor + width + fuzzy?
 

@@ -2,6 +2,7 @@
 using BluetoothDeviceController.Charts;
 using BluetoothDeviceController.SpecialtyPagesCustom;
 using BluetoothProtocolsUwpXaml.ChartControl;
+using Microsoft.Toolkit.Uwp.UI.Animations.Behaviors;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -29,17 +30,17 @@ namespace TestOscilloscopeCode
             this.Loaded += MainPage_Loaded;
         }
 
-        private static double CalcSin(double Y_MIN, double Y_MAX, double x, double XPerWave)
+        private static double CalcSin(double Y_MIN, double Y_MAX, double x, double offsetInRadians, double XPerWave)
         {
             double Y_RANGE = (Y_MAX - Y_MIN);
             double Y_RANGE_HALF = Y_RANGE / 2.0;
 
-            double value = Y_MIN + Y_RANGE_HALF + (Y_RANGE_HALF * Math.Sin(x / XPerWave));
+            double value = Y_MIN + Y_RANGE_HALF + (Y_RANGE_HALF * Math.Sin(offsetInRadians + (x / XPerWave)));
             return value;
         }
 
         Random r = new Random();
-        private DataCollection<OscDataRecord> MakeSinWave()
+        private DataCollection<OscDataRecord> MakeSinWave(double offsetInRadians)
         {
             const double N_SAMPLES = 2000; // two seconds of data
 
@@ -72,9 +73,9 @@ namespace TestOscilloscopeCode
             for (double x = 0; x<N_SAMPLES; x++)
             {
                 //double value = Y_MIN + Y_RANGE_HALF + (Y_RANGE_HALF * Math.Sin(x / XPerWave));
-                double mainvalue = CalcSin(Y_MIN, Y_MAX, x, XPerWave);
-                double overlay1 = CalcSin(-0.1, 0.1, x, XPerWave / 10);
-                double overlay2 = CalcSin(-0.1, 0.1, x, XPerWave / 20);
+                double mainvalue = CalcSin(Y_MIN, Y_MAX, x, offsetInRadians, XPerWave);
+                double overlay1 = CalcSin(-0.1, 0.1, x, offsetInRadians, XPerWave / 10);
+                double overlay2 = CalcSin(-0.1, 0.1, x, offsetInRadians, XPerWave / 20);
                 double overlay3 = (r.NextDouble() * 0.1) - (0.1/2.0);
                 double value = mainvalue + overlay1 + overlay2 + overlay3;
 
@@ -107,10 +108,15 @@ namespace TestOscilloscopeCode
 
             await Task.Delay(1); // wait for screen up to get sizes correct.
 
-            var data = MakeSinWave();
-            int OFFSET = 80;
-            var triggers = new List<int>() { OFFSET, OFFSET+500, OFFSET+1000, OFFSET+1500 };
-            uiOsc.RedrawOscilloscopeYTime(0, data, triggers);
+            for (int line=0; line<2; line++)
+            {
+                var offset = line * 40;
+                double offsetInRadians = 0.1 * line;
+                var data = MakeSinWave(offsetInRadians);
+                int triggerOffset = 80 + offset;
+                var triggers = new List<int>() { triggerOffset, triggerOffset + 500, triggerOffset + 1000, triggerOffset + 1500 };
+                uiOsc.RedrawOscilloscopeYTime(line, data, triggers);
+            }
         }
     }
 }

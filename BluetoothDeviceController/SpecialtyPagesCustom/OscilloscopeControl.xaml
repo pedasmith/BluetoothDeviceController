@@ -62,7 +62,9 @@
         </Style>
     </UserControl.Resources>
 
-    <Border BorderBrush="DarkGreen" BorderThickness="1" Background="LightGray">
+    <Border BorderBrush="DarkGreen" BorderThickness="1" Background="LightGray"
+            MinHeight="420"
+            >
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" MinHeight="200" />
@@ -276,9 +278,13 @@
                         
                     <TextBlock Style="{StaticResource HeaderStyle}">Personalization</TextBlock>
 
-                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
-                        <RadioButton Content="Background" Tag="BKG" Checked="OnPersonalization" />
-                        <RadioButton Content="Cursor" Tag="THN" Checked="OnPersonalization" />
+                    <StackPanel x:Name="uiPersonalizationRadioPanel" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
+                        <RadioButton Content="Background" Tag="BKG" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Cursor" Tag="THN" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Wave 1" Tag="WV1" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Wave 2" Tag="WV2" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Wave 3" Tag="WV3" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Wave 4" Tag="WV4" Checked="OnPersonalizationItem" />
                     </StackPanel>
 
                     <ColorPicker Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" x:Name="uiColorPicker"

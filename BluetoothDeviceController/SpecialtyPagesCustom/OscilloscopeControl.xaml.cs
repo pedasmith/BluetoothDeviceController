@@ -12,6 +12,7 @@ using System.Reflection;
 using BluetoothDeviceController.Names;
 using Windows.UI.Xaml.Media;
 using BluetoothProtocolsUwpXaml.ChartControl;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 #if !NO_BT
 
@@ -623,6 +624,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             return uiChart.GetZoom(); 
         }  
 
+        public int GetCurrMaxNLines()
+        {
+            return uiChart.GetCurrMaxNLines();
+        }
+
         public void RedrawOscilloscopeYTime(int line, DataCollection<OscDataRecord> list, List<int> triggerIndex)
         {
             // The BT code sets up the MMData 
@@ -638,6 +644,9 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             uiChart.RedrawOscilloscopeYTime(line, list, triggerIndex);
             UpdateReticuleScale();
+
+            SetNWaveRadio(uiChart.GetCurrMaxNLines());
+            // here!here
         }
 
         public int GetNextOscilloscopeLine()
@@ -1019,7 +1028,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnPersonalization(object sender, RoutedEventArgs e)
+        private void OnPersonalizationItem(object sender, RoutedEventArgs e)
         {
             if (!this.IsLoaded) return;
 
@@ -1030,15 +1039,13 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
             switch (tag)
             {
-                default:
-                    CurrPersonalization = UserPersonalization.Item.None;
-                    break;
-                case "BKG":
-                    CurrPersonalization = UserPersonalization.Item.ChartBackground;
-                    break;
-                case "THN":
-                    CurrPersonalization = UserPersonalization.Item.ThinCursor;
-                    break;
+                default: CurrPersonalization = UserPersonalization.Item.None; break;
+                case "BKG": CurrPersonalization = UserPersonalization.Item.ChartBackground; break;
+                case "THN": CurrPersonalization = UserPersonalization.Item.ThinCursor; break;
+                case "WV1": CurrPersonalization = UserPersonalization.Item.Wave1; break;
+                case "WV2": CurrPersonalization = UserPersonalization.Item.Wave2; break;
+                case "WV3": CurrPersonalization = UserPersonalization.Item.Wave3; break;
+                case "WV4": CurrPersonalization = UserPersonalization.Item.Wave4; break;
             }
 
             if (CurrPersonalization != UserPersonalization.Item.None)
@@ -1063,6 +1070,10 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             switch (CurrPersonalization)
             {
                 case UserPersonalization.Item.ThinCursor:
+                case UserPersonalization.Item.Wave1:
+                case UserPersonalization.Item.Wave2:
+                case UserPersonalization.Item.Wave3:
+                case UserPersonalization.Item.Wave4:
                     uiThickness.Visibility = Visibility.Visible;
                     break;
                 default:
@@ -1071,6 +1082,34 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             }
         }
 
+        /// <summary>
+        /// Hides / makes visible the WV1, WV2, etc. radio buttons
+        /// </summary>
+        /// <param name="nwave"></param>
+        private void SetNWaveRadio(int nwave)
+        {
+            var collapseTags = new List<string>();
+            var visibleTags = new List<string>();
+            for (int wv=1; wv<30; wv++) // It can't hurt to add too many
+            {
+                // wv is 1-based (WV1, WV2, etc) and nwave is zero based. When 2, set WV1 and WV2.
+                if (wv <= nwave) visibleTags.Add($"WV{wv}");
+                else collapseTags.Add($"WV{wv}");
+            }
+            foreach (var child in uiPersonalizationRadioPanel.Children)
+            {
+                var radio = child as RadioButton;
+                if (radio == null) continue;
+                var tag = radio.Tag as string;
+                if (string.IsNullOrEmpty(tag)) continue;
+                if (collapseTags.Contains(tag)) radio.Visibility = Visibility.Collapsed;
+                if (visibleTags.Contains(tag)) radio.Visibility= Visibility.Visible;
+                // ignore all of the tags that aren't a WV1 or WV2
+            }
+
+
+
+        }
         private void OnPersonalizationColorChanged(ColorPicker sender, ColorChangedEventArgs args)
         {
             var pref = UserPersonalization.Current;

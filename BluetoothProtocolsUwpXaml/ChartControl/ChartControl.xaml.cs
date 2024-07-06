@@ -34,7 +34,7 @@ namespace BluetoothDeviceController.Charts
         double GetZoom();
         void RedrawOscilloscopeYTime(int line, DataCollection<OscDataRecord> list, List<int> triggerIndex);
         int GetNextOscilloscopeLine();
-        //TODO: int GetNMaxLines();
+        int GetCurrMaxNLines(); // How many oscilloscope lines are currently present, including ones in a gap that have been removed.
         void ClearLine(int lineIndex);
     }
 
@@ -225,6 +225,13 @@ namespace BluetoothDeviceController.Charts
 
         private int CurrOscilloscopeLine = -1;
         const int MAX_OSCILLOSCOPE_LINE = 3;
+
+        public int GetCurrMaxNLines()
+        {
+            var retval = AllLineData.Count;
+            return retval;
+        }
+
         public int GetNextOscilloscopeLine()
         {
             // Phase 1: return the first blank line from the existing set of lines
@@ -280,7 +287,6 @@ namespace BluetoothDeviceController.Charts
 
         private void ChartControl_Loaded(object sender, RoutedEventArgs e)
         {
-            this.uiStatus.Text = $"H={uiCanvas.ActualHeight} W={uiCanvas.ActualWidth}";
             uiBackgroundRect.Width = uiCanvas.ActualWidth;
             uiBackgroundRect.Height = uiCanvas.ActualHeight;
         }
@@ -1033,7 +1039,11 @@ namespace BluetoothDeviceController.Charts
             else
             {
                 var point = new Point(X(xtime + linedata.PerLineXOffsetInSeconds), Y(lineIndex, y));
-                linedata.LLLine.Points.Add(point);
+                // Only add points that are visible on screen.
+                if (point.X >= 0 && point.X <= uiCanvas.ActualWidth)
+                {
+                    linedata.LLLine.Points.Add(point);
+                }
                 if (MustRedraw)
                 {
                     RedrawAllLines();
@@ -1178,6 +1188,16 @@ namespace BluetoothDeviceController.Charts
             uiReticule.Background = pref.GetBrush(UserPersonalization.Item.ChartBackground);
             uiThin.Stroke = pref.GetBrush(UserPersonalization.Item.ThinCursor);
             uiThin.StrokeThickness = pref.GetThickness(UserPersonalization.Item.ThinCursor);
+
+            for (int i=0; i<AllLineData.Count; i++)
+            {
+                if (i >= 4) break;
+                var waveEnum = UserPersonalization.Item.Wave1 + i;
+                var linedata = AllLineData[i];
+                linedata.LLLine.Stroke = pref.GetBrush(waveEnum);
+                linedata.LLLine.StrokeThickness = pref.GetThickness(waveEnum);
+            }
+
         }
     }
 }

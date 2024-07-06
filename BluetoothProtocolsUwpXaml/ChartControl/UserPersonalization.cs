@@ -10,7 +10,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
 
     {
         public static UserPersonalization Current { get; set; }
-        public enum Item { None, ChartBackground, ThinCursor, };
+        public enum Item { None, ChartBackground, ThinCursor, Wave1, Wave2, Wave3, Wave4 };
         public Brush GetBrush(Item item) { return AllBrushes[(int)item]; }
         public double GetThickness(Item item) { return AllThickness[(int)item]; }
 
@@ -21,8 +21,16 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             var pref = new UserPersonalization();
             pref.SetColor(Item.ChartBackground, Colors.DarkGray);
             pref.SetColor(Item.ThinCursor, Colors.White);
+            pref.SetColor(Item.Wave1, Colors.Green);
+            pref.SetColor(Item.Wave2, Colors.Cyan);
+            pref.SetColor(Item.Wave3, Colors.Blue);
+            pref.SetColor(Item.Wave4, Colors.DarkGoldenrod);
 
             pref.SetThickness(Item.ThinCursor, 1.0);
+            pref.SetThickness(Item.Wave1, 3.0);
+            pref.SetThickness(Item.Wave2, 3.0);
+            pref.SetThickness(Item.Wave3, 3.0);
+            pref.SetThickness(Item.Wave4, 3.0);
 
             Current = pref;
         }
