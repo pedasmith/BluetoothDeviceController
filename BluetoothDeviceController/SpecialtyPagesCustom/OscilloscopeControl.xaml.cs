@@ -47,6 +47,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         public OscilloscopeControl()
         {
             this.InitializeComponent();
+            SetupPersonalizationList();
             uiChart = uiChartRaw;
             uiChartRaw.OnPointerPosition += UiChartRaw_OnPointerPosition;
             uiChartRaw.HandlePointerEvents = false; // This control will handle all of the pointer events, thanks.
@@ -1169,6 +1170,28 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             var pref = UserPersonalization.GetPersonalization(tag);
             if (pref == null) return null;
             return pref;
+        }
+
+        private void SetupPersonalizationList()
+        {
+            var prefname = "tek"; // TODO: get from user saved value.
+            ComboBoxItem selectedItem = null;
+
+            var cb = uiPersonalizationThemeList;
+            var list = UserPersonalization.GetPersonalizationList;
+            foreach (var pref in list)
+            {
+                var cbi = new ComboBoxItem()
+                {
+                    Content = pref.Name,
+                    Tag = pref.Tag,
+                };
+                ToolTipService.SetToolTip(cbi, pref.Description);
+                cb.Items.Add(cbi);
+                if (selectedItem == null) selectedItem = cbi; // always select at least one!
+                if (pref.Tag == prefname) selectedItem = cbi;
+            }
+            cb.SelectedItem = selectedItem;
         }
         #endregion // PERSONALIZATION
 

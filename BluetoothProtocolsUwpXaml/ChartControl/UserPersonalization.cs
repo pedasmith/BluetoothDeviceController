@@ -21,8 +21,6 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
         {
             if (Current != null) return;
 
-            // TODO: these are all terrible colors. Update to match classic oscilloscopes?
-
             UserPersonalization pref = Get_Debug_Personalization();
             pref = Get_Tek_Personalization();
             pref = Get_Sigent_Personalization();
@@ -52,13 +50,16 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             public string Name { get; }
             public string Tag { get; }
             public string Description { get; }
+            public override string ToString()
+            {
+                return $"{Name} tag={Tag} description={Description}";
+            }
         }
-        public List<PersonalizationDetails> GetPersonalizationList { get; } = new List<PersonalizationDetails>() 
+        public static List<PersonalizationDetails> GetPersonalizationList { get; } = new List<PersonalizationDetails>() 
         {
             new PersonalizationDetails("Modern", "sigent", "Modern style digital"),
             new PersonalizationDetails("Classic", "tek", "Classic analog"),
             new PersonalizationDetails("Debug", "debug", "Setup for debugging"),
-            // Obvious todo: high-contract and b+w
         };
 
         private static UserPersonalization Get_Debug_Personalization()

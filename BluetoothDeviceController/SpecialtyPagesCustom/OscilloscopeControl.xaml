@@ -233,10 +233,7 @@
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Personalization">
                     <StackPanel Style="{StaticResource sControlPanel}" Orientation="Horizontal">
-                        <ComboBox x:Name="uiPersonalizationThemeList" SelectedIndex="0" SelectionChanged="OnPersonalizationThemeChanged">
-                            <ComboBoxItem Content="Classic" Tag="tek" />
-                            <ComboBoxItem Content="Modern" Tag="sigent" />
-                            <ComboBoxItem Content="Debug" Tag="debug" />
+                        <ComboBox x:Name="uiPersonalizationThemeList"  SelectionChanged="OnPersonalizationThemeChanged">
                         </ComboBox>
                         <Button Content="Customize" Click="OnOpenPersonalization" />
                     </StackPanel>

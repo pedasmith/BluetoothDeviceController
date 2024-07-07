@@ -31,6 +31,20 @@ Colors are for:
 - Themes and save 
 Be sure to save the values!
 
+### Themes
+
+Set up a high-contrast and a B+W theme
+Theme should set up the setup area and dialog boxes, too
+Save user-preferred theme
+Save all custom themes and give them names
+Save and restore custom themes
+
+
+Add more themes to match classic oscilloscopes + logic analyzers.
+The debug theme isn't useful
+Can I make a themed set of colors? E.g., to distinguish wave1, 2, 3 4 for classic oscilloscopes?
+Create a colorful kindergarten scheme?
+
 ## Panning + Zooming
 
 ### Keyboard UX
