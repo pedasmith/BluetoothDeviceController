@@ -26,7 +26,9 @@ Colors are for:
 - text foreground + background for cursor + reticule scale text
 
 - dialog + tabs background (should have multiple which are auto-set from one)
--
+
+
+- Themes and save 
 Be sure to save the values!
 
 ## Panning + Zooming

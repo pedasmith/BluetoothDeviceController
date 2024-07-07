@@ -22,7 +22,9 @@ namespace TestOscilloscopeCode
         {
             UserPersonalization.Init();
             this.InitializeComponent();
-            uiOsc.SetPersonalization(UserPersonalization.Current);
+            var pref = uiOsc.GetCurrentPersonalization();
+            UserPersonalization.Current = pref;
+            uiOsc.SetPersonalization(pref);
 
             //int nerror = 0;
             //nerror += BluetoothDeviceController.Charts.ChartControl.TestMakeNiceReticuleSpace();

@@ -22,6 +22,47 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             if (Current != null) return;
 
             // TODO: these are all terrible colors. Update to match classic oscilloscopes?
+
+            UserPersonalization pref = Get_Debug_Personalization();
+            pref = Get_Tek_Personalization();
+            pref = Get_Sigent_Personalization();
+            Current = pref;
+        }
+
+
+
+        public static UserPersonalization GetPersonalization(string name)
+        {
+            switch (name)
+            {
+                default:
+                case "debug": return Get_Debug_Personalization();
+                case "tek": return Get_Tek_Personalization();
+                case "sigent": return Get_Sigent_Personalization();
+            }
+        }
+        public class PersonalizationDetails
+        {
+            public PersonalizationDetails(string name, string tag, string description)
+            {
+                Name = name;
+                Tag = tag;
+                Description = description;
+            }
+            public string Name { get; }
+            public string Tag { get; }
+            public string Description { get; }
+        }
+        public List<PersonalizationDetails> GetPersonalizationList { get; } = new List<PersonalizationDetails>() 
+        {
+            new PersonalizationDetails("Modern", "sigent", "Modern style digital"),
+            new PersonalizationDetails("Classic", "tek", "Classic analog"),
+            new PersonalizationDetails("Debug", "debug", "Setup for debugging"),
+            // Obvious todo: high-contract and b+w
+        };
+
+        private static UserPersonalization Get_Debug_Personalization()
+        {
             var pref = new UserPersonalization();
             pref.SetColor(Item.ChartBackground, Colors.DarkGray);
             pref.SetColor(Item.ThinCursor, Colors.White);
@@ -42,11 +83,34 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetThickness(Item.ReticuleMajor, 2.0);
             pref.SetThickness(Item.ReticuleMinor, 1.0);
 
-            pref = Get_Tek_Personalization();
-            Current = pref;
+            return pref;
         }
 
+        private static UserPersonalization Get_Sigent_Personalization()
+        {
+            // From Sigent-2024-Oscilloscope-Tutorial-0001-title-image-1920x1080
+            var pref = new UserPersonalization();
+            pref.SetColor(Item.ChartBackground, ColorHelper.ToColor("#FF0E0910"));
+            pref.SetColor(Item.ThinCursor, Colors.White);
+            pref.SetColor(Item.Wave1, ColorHelper.ToColor("#FFD7DDB9"));
+            pref.SetColor(Item.Wave2, ColorHelper.ToColor("#FFD7DDB9"));
+            pref.SetColor(Item.Wave3, ColorHelper.ToColor("#FFD7DDB9"));
+            pref.SetColor(Item.Wave4, ColorHelper.ToColor("#FFD7DDB9"));
+            pref.SetColor(Item.ReticuleMajor, ColorHelper.ToColor("#FFD7DDB9"));
+            pref.SetColor(Item.ReticuleMinor, ColorHelper.ToColor("#FFD7DDB9"));
+            pref.SetColor(Item.TextLabel, ColorHelper.ToColor("#FFF1F3FC"));
+            pref.SetColor(Item.TextLabelBackground, ColorHelper.ToColor("#FF55415A"));
 
+            pref.SetThickness(Item.ThinCursor, 1.0);
+            pref.SetThickness(Item.Wave1, 1.5);
+            pref.SetThickness(Item.Wave2, 1.5);
+            pref.SetThickness(Item.Wave3, 1.5);
+            pref.SetThickness(Item.Wave4, 1.5);
+            pref.SetThickness(Item.ReticuleMajor, 2.0);
+            pref.SetThickness(Item.ReticuleMinor, 1.0);
+
+            return pref;
+        }
         private static UserPersonalization Get_Tek_Personalization()
         {
             var pref = new UserPersonalization();

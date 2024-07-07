@@ -1021,7 +1021,6 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         #region PERSONALIZATION
 
 
-        //enum PersonalizationItem {  None, Background, CursorThick, CursorThin }
         UserPersonalization.Item CurrPersonalization = UserPersonalization.Item.None;
         /// <summary>
         /// Radio button for selection a personalization was clicked.
@@ -1135,7 +1134,6 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         {
             uiChartRaw.SetPersonalization(pref);
 
-
             // All the text labels.
             var fg = pref.GetBrush(UserPersonalization.Item.TextLabel);
             var bg = pref.GetBrush(UserPersonalization.Item.TextLabelBackground);
@@ -1152,8 +1150,28 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 ? Visibility.Collapsed : Visibility.Visible;
         }
 
+        private void OnPersonalizationThemeChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!IsLoaded) return;
+            DoPersonalizationFromComboBox();
+        }
 
+        private void DoPersonalizationFromComboBox()
+        {
+            var pref = GetCurrentPersonalization();
+            SetPersonalization(pref);
+        }
+
+        public UserPersonalization GetCurrentPersonalization()
+        {
+            var tag = ((uiPersonalizationThemeList.SelectedItem) as FrameworkElement)?.Tag as string;
+            if (string.IsNullOrEmpty(tag)) return null;
+            var pref = UserPersonalization.GetPersonalization(tag);
+            if (pref == null) return null;
+            return pref;
+        }
         #endregion // PERSONALIZATION
+
 
     }
 }

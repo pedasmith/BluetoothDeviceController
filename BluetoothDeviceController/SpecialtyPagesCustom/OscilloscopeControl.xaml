@@ -232,8 +232,13 @@
                     </StackPanel>
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Personalization">
-                    <StackPanel Style="{StaticResource sControlPanel}">
-                        <Button Content="Open" Click="OnOpenPersonalization" />
+                    <StackPanel Style="{StaticResource sControlPanel}" Orientation="Horizontal">
+                        <ComboBox x:Name="uiPersonalizationThemeList" SelectedIndex="0" SelectionChanged="OnPersonalizationThemeChanged">
+                            <ComboBoxItem Content="Classic" Tag="tek" />
+                            <ComboBoxItem Content="Modern" Tag="sigent" />
+                            <ComboBoxItem Content="Debug" Tag="debug" />
+                        </ComboBox>
+                        <Button Content="Customize" Click="OnOpenPersonalization" />
                     </StackPanel>
                 </controls:TabViewItem>
                 <controls:TabViewItem Header="Advanced">
@@ -252,7 +257,7 @@
             </controls:TabView>
 
             <Border x:Name="uiPersonalization" Grid.Row="0" Grid.RowSpan="2" Width="460"
-                    Visibility="Visible"
+                    Visibility="Collapsed"
                     Background="Bisque" HorizontalAlignment="Right" Margin="0,0,0,11"
                     >
                 <Grid>
