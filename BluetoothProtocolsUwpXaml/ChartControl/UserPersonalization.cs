@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
+//using Microsoft.Toolkit.Uwp.Helpers;
+using ColorHelper = Microsoft.Toolkit.Uwp.Helpers.ColorHelper;
 
 namespace BluetoothProtocolsUwpXaml.ChartControl
 {
@@ -10,7 +12,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
 
     {
         public static UserPersonalization Current { get; set; }
-        public enum Item { None, ChartBackground, ThinCursor, Wave1, Wave2, Wave3, Wave4, ReticuleMajor, ReticuleMinor };
+        public enum Item { None, ChartBackground, ThinCursor, Wave1, Wave2, Wave3, Wave4, ReticuleMajor, ReticuleMinor, TextLabel, TextLabelBackground };
         public Brush GetBrush(Item item) { return AllBrushes[(int)item]; }
         public double GetThickness(Item item) { return AllThickness[(int)item]; }
 
@@ -18,6 +20,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
         {
             if (Current != null) return;
 
+            // TODO: these are all terrible colors. Update to match classic oscilloscopes?
             var pref = new UserPersonalization();
             pref.SetColor(Item.ChartBackground, Colors.DarkGray);
             pref.SetColor(Item.ThinCursor, Colors.White);
@@ -27,6 +30,8 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetColor(Item.Wave4, Colors.DarkGoldenrod);
             pref.SetColor(Item.ReticuleMajor, Colors.LimeGreen);
             pref.SetColor(Item.ReticuleMinor, Colors.LimeGreen);
+            pref.SetColor(Item.TextLabel, Colors.Black);
+            pref.SetColor(Item.TextLabelBackground, Colors.BlanchedAlmond);
 
             pref.SetThickness(Item.ThinCursor, 1.0);
             pref.SetThickness(Item.Wave1, 3.0);
@@ -36,7 +41,34 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetThickness(Item.ReticuleMajor, 2.0);
             pref.SetThickness(Item.ReticuleMinor, 1.0);
 
+            pref = Get_Tek_Personalization();
             Current = pref;
+        }
+
+
+        private static UserPersonalization Get_Tek_Personalization()
+        {
+            var pref = new UserPersonalization();
+            pref.SetColor(Item.ChartBackground, ColorHelper.ToColor("#FF19B7C2"));
+            pref.SetColor(Item.ThinCursor, Colors.White);
+            pref.SetColor(Item.Wave1, ColorHelper.ToColor("#FFA8FFFF"));
+            pref.SetColor(Item.Wave2, ColorHelper.ToColor("#FFA8FFFF"));
+            pref.SetColor(Item.Wave3, ColorHelper.ToColor("#FFA8FFFF"));
+            pref.SetColor(Item.Wave4, ColorHelper.ToColor("#FFA8FFFF"));
+            pref.SetColor(Item.ReticuleMajor, ColorHelper.ToColor("#FF016B78"));
+            pref.SetColor(Item.ReticuleMinor, ColorHelper.ToColor("#FF016B78"));
+            pref.SetColor(Item.TextLabel, ColorHelper.ToColor("#FF1B1A14"));
+            pref.SetColor(Item.TextLabelBackground, ColorHelper.ToColor("#FF9E978D"));
+
+            pref.SetThickness(Item.ThinCursor, 1.0);
+            pref.SetThickness(Item.Wave1, 3.0);
+            pref.SetThickness(Item.Wave2, 3.0);
+            pref.SetThickness(Item.Wave3, 3.0);
+            pref.SetThickness(Item.Wave4, 3.0);
+            pref.SetThickness(Item.ReticuleMajor, 2.0);
+            pref.SetThickness(Item.ReticuleMinor, 1.0);
+
+            return pref;
         }
         public void SetColor(Item item, Color color)
         {

@@ -84,7 +84,7 @@
                     VerticalAlignment="Bottom" HorizontalAlignment="Right"
                     >
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Margin="4,0,10,0">Scale:</TextBlock>
+                    <TextBlock x:Name="uiReticuleScaleLabel"  Margin="4,0,10,0">Scale:</TextBlock>
                     <TextBlock x:Name="uiReticuleScale" MinWidth="80" TextAlignment="Right" >0.234 ms</TextBlock>
                 </StackPanel>
             </Border>
@@ -251,7 +251,7 @@
                 </controls:TabViewItem>
             </controls:TabView>
 
-            <Border x:Name="uiPersonalization" Grid.Row="0" Grid.RowSpan="2" Width="440"
+            <Border x:Name="uiPersonalization" Grid.Row="0" Grid.RowSpan="2" Width="460"
                     Visibility="Visible"
                     Background="Bisque" HorizontalAlignment="Right" Margin="0,0,0,11"
                     >
@@ -287,6 +287,8 @@
                         <RadioButton Content="Wave 4" Tag="WV4" Checked="OnPersonalizationItem" />
                         <RadioButton Content="Reticule Major" Tag="RETMAJ" Checked="OnPersonalizationItem" />
                         <RadioButton Content="Reticule Minor" Tag="RETMIN" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Label" Tag="LAB" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Label Background  " Tag="LABBKG" Checked="OnPersonalizationItem" />
                     </StackPanel>
 
                     <ColorPicker Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" x:Name="uiColorPicker"
@@ -302,6 +304,7 @@
                                     />
 
                     <Slider x:Name="uiThickness" Grid.Row="2" Grid.Column="1"
+                            Width="250"
                             Minimum="0.5" Maximum="4" StepFrequency="0.5"
                             TickFrequency="0.5" SnapsTo="Ticks"
                             ValueChanged="OnPersonalizationThicknessChanged"

@@ -1048,9 +1048,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 case "WV4": CurrPersonalization = UserPersonalization.Item.Wave4; break;
                 case "RETMAJ": CurrPersonalization = UserPersonalization.Item.ReticuleMajor; break;
                 case "RETMIN": CurrPersonalization = UserPersonalization.Item.ReticuleMinor; break;
+                case "LAB": CurrPersonalization = UserPersonalization.Item.TextLabel; break;
+                case "LABBKG": CurrPersonalization = UserPersonalization.Item.TextLabelBackground; break;
             }
 
-            if (CurrPersonalization != UserPersonalization.Item.None)
+            if (CurrPersonalization != UserPersonalization.Item.None) // Not sure this distinction really makes any difference
             {
                 var pref = UserPersonalization.Current;
                 uiColorPicker.Color = pref.GetColor(CurrPersonalization);
@@ -1058,13 +1060,17 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             }
 
             // Get / hide cursor
-            if (CurrPersonalization == UserPersonalization.Item.ThinCursor)
+            switch (CurrPersonalization)
             {
-                uiChartRaw.PointerSetCursorVisibleOnLeft(true);
-            }
-            else
-            {
-                uiChartRaw.PointerSetCursorVisible(false);
+                case UserPersonalization.Item.ThinCursor:
+                case UserPersonalization.Item.TextLabel:
+                case UserPersonalization.Item.TextLabelBackground:
+                    uiChartRaw.PointerSetCursorVisibleOnLeft(true);
+                    break;
+
+                default:
+                    uiChartRaw.PointerSetCursorVisible(false);
+                    break;
             }
 
 
@@ -1128,6 +1134,16 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
         public void SetPersonalization(UserPersonalization pref)
         {
             uiChartRaw.SetPersonalization(pref);
+
+
+            // All the text labels.
+            var fg = pref.GetBrush(UserPersonalization.Item.TextLabel);
+            var bg = pref.GetBrush(UserPersonalization.Item.TextLabelBackground);
+
+            uiReticuleScalePanel.BorderBrush = fg;
+            uiReticuleScalePanel.Background = bg;
+            uiReticuleScaleLabel.Foreground = fg;
+            uiReticuleScale.Foreground = fg;
         }
 
         private void OnOpenPersonalization(object sender, RoutedEventArgs e)

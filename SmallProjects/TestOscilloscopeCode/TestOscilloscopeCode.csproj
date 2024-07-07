@@ -208,6 +208,9 @@
   <ItemGroup>
     <None Include="_Pan_Zoom_TODO_list.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Example_Oscilloscopes\" />
+  </ItemGroup>
   <Import Project="..\..\Utilities\Utilities.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

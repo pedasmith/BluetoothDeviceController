@@ -1214,6 +1214,16 @@ namespace BluetoothDeviceController.Charts
             Reticule_Settings.MINOR_BRUSH = pref.GetBrush(UserPersonalization.Item.ReticuleMinor);
             Reticule_Settings.STROKE_MINOR_THICKNESS = pref.GetThickness(UserPersonalization.Item.ReticuleMinor);
             DrawReticule();
+
+            // All the text labels.
+            var fg = pref.GetBrush(UserPersonalization.Item.TextLabel);
+            var bg = pref.GetBrush(UserPersonalization.Item.TextLabelBackground);
+
+            uiTitle.Foreground = fg;
+            uiThinTextBorder.Background = bg;
+            uiThinTextBorder.BorderBrush = fg; // no way to set the thickness.
+            uiThinTextValue.Foreground = fg;
+            // Never actually used: uiCursor.Foreground = fg;
         }
     }
 }

@@ -17,15 +17,16 @@ Right now the zoom and pan panel is intended to be used for debugging zoom + pan
 Reticule color and size should be updated to look classier. While I'm at it, why not the moving cursor, too? And have these all be user-settable.
 
 Colors are for:
-- background
-- text background for cursor + reticule scale
 
+- screen background
 - Cursor (Thin, and later thick)
 - waveforms (1..N)
-- Markers
+- Markers (same as waves)
 - reticule major and minor + width + fuzzy? (not fuzzy; it's too hard)
-- text foreground for cursor + reticule scale
+- text foreground + background for cursor + reticule scale text
 
+- dialog + tabs background (should have multiple which are auto-set from one)
+-
 Be sure to save the values!
 
 ## Panning + Zooming
