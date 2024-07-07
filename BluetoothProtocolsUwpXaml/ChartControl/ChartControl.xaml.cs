@@ -175,13 +175,13 @@ namespace BluetoothDeviceController.Charts
             /// Color is the line color 
             /// </summary>
             /// <param name="color"></param>
-            public LineData(Color color)
+            public LineData(Color color, double thickness)
             {
                 var polyline = new Polyline()
                 {
                     Fill = null,
                     Stroke = new SolidColorBrush(color),
-                    StrokeThickness = 1.0,
+                    StrokeThickness = thickness,
                 };
                 LLLine = polyline;
                 LLMarkers = new List<Polyline>();
@@ -366,13 +366,20 @@ namespace BluetoothDeviceController.Charts
             Colors.DarkGoldenrod,
             Colors.DarkMagenta,
         };
+        double[] DefaultLineThickness = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, };
         Color GetDefaultLineColor(int lineIndex)
         {
             var index = (lineIndex % DefaultLineColors.Length);
             return DefaultLineColors[index];
         }
 
-        public static Windows.UI.Color ConvertColor(string color)
+        double GetDefaultLineThickness(int lineIndex)
+        {
+            var index = (lineIndex % DefaultLineThickness.Length);
+            return DefaultLineThickness[index];
+        }
+
+        public static Windows.UI.Color ConvertColorName(string color)
         {
             foreach (var item in typeof(Windows.UI.Colors).GetProperties())
             {
@@ -396,9 +403,9 @@ namespace BluetoothDeviceController.Charts
                 // Kind of paintful to get the color...
                 var name = (Names != null && Names.Count > newIndex) ? Names[newIndex] : "";
                 var lineDefault = UISpec.chartLineDefaults.ContainsKey(name) ? UISpec.chartLineDefaults[name] : null;
-                var color = (lineDefault == null) ? GetDefaultLineColor(AllLineData.Count) : ConvertColor(lineDefault.stroke);
-
-                AllLineData.Add(new LineData(color));
+                var color = (lineDefault == null) ? GetDefaultLineColor(newIndex) : ConvertColorName(lineDefault.stroke);
+                var thickness = GetDefaultLineThickness(newIndex);
+                AllLineData.Add(new LineData(color, thickness));
 
                 uiCanvas.Children.Add(AllLineData[newIndex].LLLine); // Actually add the polyline!
 
@@ -1189,9 +1196,10 @@ namespace BluetoothDeviceController.Charts
             uiThin.Stroke = pref.GetBrush(UserPersonalization.Item.ThinCursor);
             uiThin.StrokeThickness = pref.GetThickness(UserPersonalization.Item.ThinCursor);
 
+            // This only gets used when there's already a display up.
             for (int i=0; i<AllLineData.Count; i++)
             {
-                if (i >= 4) break;
+                if (i >= UserPersonalization.NWaveValues) break; // Number of Wave enums
                 var waveEnum = UserPersonalization.Item.Wave1 + i;
                 var linedata = AllLineData[i];
                 linedata.LLLine.Stroke = pref.GetBrush(waveEnum);
@@ -1203,6 +1211,17 @@ namespace BluetoothDeviceController.Charts
                     marker.Stroke = pref.GetBrush(waveEnum);
                     marker.StrokeThickness = pref.GetThickness(waveEnum);
                 }
+
+            }
+
+            // Set all the default colors and thicknesses.
+            for (int i=0; i<UserPersonalization.NWaveValues; i++)
+            {
+                if (i >= DefaultLineColors.Length) break;
+                var waveEnum = UserPersonalization.Item.Wave1 + i;
+                // And update the default colors, too
+                DefaultLineColors[i] = pref.GetColor(waveEnum);
+                DefaultLineThickness[i] = pref.GetThickness(waveEnum);
             }
 
             // Reticule
