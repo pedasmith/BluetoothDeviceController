@@ -90,7 +90,13 @@
             </Border>
 
 
-            <controls:TabView Grid.Row="1" Header="Oscilloscope Controls" 
+            <!-- testing personalization 
+                Background="Green" Foreground="Red"
+                FocusVisualPrimaryBrush="Aquamarine"  
+                FocusVisualSecondaryBrush="Lime"  
+            -->
+            <controls:TabView Grid.Row="1" x:Name="uiControlTabView"
+                              Header="Oscilloscope Controls" 
                               SelectedIndex="0" MinHeight="100">
                 <controls:TabView.Resources>
                     <Style TargetType="Panel" x:Key="sControlPanel">

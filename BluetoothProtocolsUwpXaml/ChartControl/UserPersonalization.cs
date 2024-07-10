@@ -35,8 +35,9 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             {
                 default:
                 case "debug": return Get_Debug_Personalization();
-                case "tek": return Get_Tek_Personalization();
                 case "sigent": return Get_Sigent_Personalization();
+                case "tek": return Get_Tek_Personalization();
+                case "ut": return Get_UT_Personalization();
             }
         }
         public class PersonalizationDetails
@@ -57,6 +58,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
         }
         public static List<PersonalizationDetails> GetPersonalizationList { get; } = new List<PersonalizationDetails>() 
         {
+            new PersonalizationDetails("New", "ut", "New digital style"),
             new PersonalizationDetails("Modern", "sigent", "Modern style digital"),
             new PersonalizationDetails("Classic", "tek", "Classic analog"),
             new PersonalizationDetails("Debug", "debug", "Setup for debugging"),
@@ -125,6 +127,31 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetColor(Item.ReticuleMinor, ColorHelper.ToColor("#FF016B78"));
             pref.SetColor(Item.TextLabel, ColorHelper.ToColor("#FF1B1A14"));
             pref.SetColor(Item.TextLabelBackground, ColorHelper.ToColor("#FF9E978D"));
+
+            pref.SetThickness(Item.ThinCursor, 1.0);
+            pref.SetThickness(Item.Wave1, 1.5);
+            pref.SetThickness(Item.Wave2, 1.5);
+            pref.SetThickness(Item.Wave3, 1.5);
+            pref.SetThickness(Item.Wave4, 1.5);
+            pref.SetThickness(Item.ReticuleMajor, 2.0);
+            pref.SetThickness(Item.ReticuleMinor, 1.0);
+
+            return pref;
+        }
+        private static UserPersonalization Get_UT_Personalization()
+        {
+            // From UN-T-2-2024.png
+            var pref = new UserPersonalization();
+            pref.SetColor(Item.ChartBackground, ColorHelper.ToColor("#FF000000"));
+            pref.SetColor(Item.ThinCursor, ColorHelper.ToColor("#FFC6A113"));
+            pref.SetColor(Item.Wave1, ColorHelper.ToColor("#FFFBFA44"));
+            pref.SetColor(Item.Wave2, ColorHelper.ToColor("#FF87FFFF"));
+            pref.SetColor(Item.Wave3, ColorHelper.ToColor("#FFFBFA44")); // duplicate the colors
+            pref.SetColor(Item.Wave4, ColorHelper.ToColor("#FF87FFFF"));
+            pref.SetColor(Item.ReticuleMajor, ColorHelper.ToColor("#FF585858"));
+            pref.SetColor(Item.ReticuleMinor, ColorHelper.ToColor("#FF585858"));
+            pref.SetColor(Item.TextLabel, ColorHelper.ToColor("#FFFAFAFA"));
+            pref.SetColor(Item.TextLabelBackground, ColorHelper.ToColor("#FF020202"));
 
             pref.SetThickness(Item.ThinCursor, 1.0);
             pref.SetThickness(Item.Wave1, 1.5);
