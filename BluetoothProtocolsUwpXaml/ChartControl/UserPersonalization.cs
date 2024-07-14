@@ -1,7 +1,11 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.UI.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Windows.UI;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Automation.Provider;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 //using Microsoft.Toolkit.Uwp.Helpers;
 using ColorHelper = Microsoft.Toolkit.Uwp.Helpers.ColorHelper;
@@ -12,7 +16,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
 
     {
         public static UserPersonalization Current { get; set; }
-        public enum Item { None, ChartBackground, ThinCursor, Wave1, Wave2, Wave3, Wave4, ReticuleMajor, ReticuleMinor, TextLabel, TextLabelBackground };
+        public enum Item { None, ChartBackground, ThinCursor, Wave1, Wave2, Wave3, Wave4, ReticuleMajor, ReticuleMinor, TextLabel, TextLabelBackground, FrameBackground, FrameText };
         public const int NWaveValues = 4;
         public Brush GetBrush(Item item) { return AllBrushes[(int)item]; }
         public double GetThickness(Item item) { return AllThickness[(int)item]; }
@@ -67,7 +71,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
         private static UserPersonalization Get_Debug_Personalization()
         {
             var pref = new UserPersonalization();
-            pref.SetColor(Item.ChartBackground, Colors.DarkGray);
+            pref.SetColor(Item.ChartBackground, Colors.FloralWhite);
             pref.SetColor(Item.ThinCursor, Colors.White);
             pref.SetColor(Item.Wave1, Colors.Green);
             pref.SetColor(Item.Wave2, Colors.Cyan);
@@ -77,6 +81,9 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetColor(Item.ReticuleMinor, Colors.LimeGreen);
             pref.SetColor(Item.TextLabel, Colors.Black);
             pref.SetColor(Item.TextLabelBackground, Colors.BlanchedAlmond);
+            //TODO:
+            pref.SetColor(Item.FrameBackground, Colors.Firebrick);
+            pref.SetColor(Item.FrameText, Colors.Beige);
 
             pref.SetThickness(Item.ThinCursor, 1.0);
             pref.SetThickness(Item.Wave1, 3.0);
@@ -85,6 +92,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetThickness(Item.Wave4, 3.0);
             pref.SetThickness(Item.ReticuleMajor, 2.0);
             pref.SetThickness(Item.ReticuleMinor, 1.0);
+
 
             return pref;
         }
@@ -103,6 +111,9 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetColor(Item.ReticuleMinor, ColorHelper.ToColor("#FFD7DDB9"));
             pref.SetColor(Item.TextLabel, ColorHelper.ToColor("#FFF1F3FC"));
             pref.SetColor(Item.TextLabelBackground, ColorHelper.ToColor("#FF55415A"));
+
+            pref.SetColor(Item.FrameBackground, ColorHelper.ToColor("#FFC9A195"));
+            pref.SetColor(Item.FrameText, ColorHelper.ToColor("#FF000000"));
 
             pref.SetThickness(Item.ThinCursor, 1.0);
             pref.SetThickness(Item.Wave1, 1.5);
@@ -128,6 +139,9 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetColor(Item.TextLabel, ColorHelper.ToColor("#FF1B1A14"));
             pref.SetColor(Item.TextLabelBackground, ColorHelper.ToColor("#FF9E978D"));
 
+            pref.SetColor(Item.FrameBackground, ColorHelper.ToColor("#FFA99F96"));
+            pref.SetColor(Item.FrameText, ColorHelper.ToColor("#FF484143"));
+
             pref.SetThickness(Item.ThinCursor, 1.0);
             pref.SetThickness(Item.Wave1, 1.5);
             pref.SetThickness(Item.Wave2, 1.5);
@@ -152,6 +166,9 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetColor(Item.ReticuleMinor, ColorHelper.ToColor("#FF585858"));
             pref.SetColor(Item.TextLabel, ColorHelper.ToColor("#FFFAFAFA"));
             pref.SetColor(Item.TextLabelBackground, ColorHelper.ToColor("#FF020202"));
+
+            pref.SetColor(Item.FrameBackground, ColorHelper.ToColor("#FFE9E9E9"));
+            pref.SetColor(Item.FrameText, ColorHelper.ToColor("#FF373839"));
 
             pref.SetThickness(Item.ThinCursor, 1.0);
             pref.SetThickness(Item.Wave1, 1.5);
@@ -198,5 +215,36 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
         public List<Color> AllColors { get; } = new List<Color>(NEnum);
         public Color GetColor(Item item) { return AllColors[(int)item]; }
         public List<Double> AllThickness { get; } = new List<Double>(NEnum);
+
+
+        public static void SetTextColor(FrameworkElement fe, Brush brush)
+        {
+            if (fe == null) return;
+
+            // Note: don't use if / else because things like TextBoxes are both controls (with a foreground) AND Textbox (with a Header)
+            if (fe is Panel panel)
+            {
+                foreach (var child in panel.Children)
+                {
+                    SetTextColor(child as FrameworkElement, brush);
+                }
+            }
+            if (fe is TextBox tbx) // List before the control
+            {
+                var children = tbx.FindDescendants<FrameworkElement>();
+                foreach (var child in children)
+                {
+                    SetTextColor(child, brush);
+                }
+            }
+            if (fe is Control b) // e.g., button
+            {
+                b.Foreground = brush;  
+            }
+            if (fe is TextBlock tb)
+            {
+                tb.Foreground = brush; 
+            }
+        }
     }
 }

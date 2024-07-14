@@ -62,7 +62,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Border BorderBrush="DarkGreen" BorderThickness="1" Background="LightGray"
+    <Border BorderBrush="DarkGreen" x:Name="uiControlBorder" BorderThickness="1" Background="Bisque"
             MinHeight="420"
             >
         <Grid>
@@ -95,16 +95,24 @@
                 FocusVisualPrimaryBrush="Aquamarine"  
                 FocusVisualSecondaryBrush="Lime"  
             -->
-            <controls:TabView Grid.Row="1" x:Name="uiControlTabView"
-                              Header="Oscilloscope Controls" 
-                              SelectedIndex="0" MinHeight="100">
-                <controls:TabView.Resources>
-                    <Style TargetType="Panel" x:Key="sControlPanel">
-                        <Setter Property="Height" Value="100" />
-                    </Style>
-                </controls:TabView.Resources>
-                <controls:TabViewItem Header="Control">
-                    <Grid Style="{StaticResource sControlPanel}">
+            <NavigationView Grid.Row="1" x:Name="uiControlTabView"
+                            ItemInvoked="OnNavigationInvoked"
+                            PaneDisplayMode="Top"
+                            IsBackButtonVisible="Collapsed"
+                            IsSettingsVisible="False" >
+                <NavigationView.Resources>
+                </NavigationView.Resources>
+                <NavigationView.MenuItems>
+                    <NavigationViewItem Content="Controls" Tag="UICONTROLS" />
+                    <NavigationViewItem Content="Zoom" Tag="UIZOOM" />
+                    <NavigationViewItem Content="Log" Tag="UILOG" />
+                    <NavigationViewItem Content="Device Info" Tag="UIDEVICEINFO" />
+                    <NavigationViewItem Content="Personalization" Tag="UIPERSONALIZATION" />
+                    <NavigationViewItem Content="Advanced" Tag="UIADVANCED" />
+                </NavigationView.MenuItems>
+                
+                <Grid x:Name="uiControlTabViewPane" MinHeight="100">
+                    <Grid Tag="UICONTROLS" >
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
@@ -151,9 +159,8 @@
                         </StackPanel>
                         <TextBlock HorizontalAlignment="Right" x:Name="uiState">????</TextBlock>
                     </Grid>
-                </controls:TabViewItem>
-                <controls:TabViewItem Header="Zoom">
-                    <Grid Style="{StaticResource sControlPanel}">
+
+                    <Grid Tag="UIZOOM" Visibility="Collapsed" >
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton Content="x1" Tag="1" Checked="OnZoom" />
@@ -173,31 +180,29 @@
                         </StackPanel>
                     </Grid>
 
-                </controls:TabViewItem>
-                <controls:TabViewItem Header="Log">
-                    <Grid Style="{StaticResource sControlPanel}">
+                    <Grid Tag="UILOG" Visibility="Collapsed" >
                         <ScrollViewer >
                             <TextBlock x:Name="uiLog" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
                         </ScrollViewer>
                     </Grid>
-                </controls:TabViewItem>
-                <controls:TabViewItem Header="Device Info">
-                    <controls:TabViewItem.Resources>
-                        <Style TargetType="TextBox">
-                            <Setter Property="Width" Value="350" />
-                            <Setter Property="Height" Value="200" />
-                        </Style>
-                        <Style TargetType="TextBlock" x:Key="sNameValueCritical">
-                            <Setter Property="FontSize" Value="16" />
-                            <Setter Property="IsTextSelectionEnabled" Value="True" />
-                        </Style>
-                        <Style TargetType="TextBlock" x:Key="sNameValueInfo">
-                            <Setter Property="FontSize" Value="10" />
-                            <Setter Property="IsTextSelectionEnabled" Value="True" />
-                        </Style>
 
-                    </controls:TabViewItem.Resources>
-                    <StackPanel Style="{StaticResource sControlPanel}">
+
+                    <StackPanel Tag="UIDEVICEINFO" Visibility="Collapsed" >
+                        <StackPanel.Resources>
+                            <Style TargetType="TextBox">
+                                <Setter Property="Width" Value="350" />
+                                <Setter Property="Height" Value="200" />
+                            </Style>
+                            <Style TargetType="TextBlock" x:Key="sNameValueCritical">
+                                <Setter Property="FontSize" Value="16" />
+                                <Setter Property="IsTextSelectionEnabled" Value="True" />
+                            </Style>
+                            <Style TargetType="TextBlock" x:Key="sNameValueInfo">
+                                <Setter Property="FontSize" Value="10" />
+                                <Setter Property="IsTextSelectionEnabled" Value="True" />
+                            </Style>
+                        </StackPanel.Resources>
+                        
                         <TextBlock Style="{StaticResource sNameValueCritical}">
                             <Run FontWeight="Bold" x:Name="uiName"></Run>
                                 
@@ -236,16 +241,14 @@
                             <Run x:Name="uiMac">__</Run>
                         </TextBlock>
                     </StackPanel>
-                </controls:TabViewItem>
-                <controls:TabViewItem Header="Personalization">
-                    <StackPanel Style="{StaticResource sControlPanel}" Orientation="Horizontal">
+
+                    <StackPanel Tag="UIPERSONALIZATION"  Visibility="Collapsed"  Orientation="Horizontal">
                         <ComboBox x:Name="uiPersonalizationThemeList"  SelectionChanged="OnPersonalizationThemeChanged">
                         </ComboBox>
-                        <Button Content="Customize" Click="OnOpenPersonalization" />
+                        <Button Content="Customize" Click="OnOpenPersonalization" VerticalAlignment="Top" />
                     </StackPanel>
-                </controls:TabViewItem>
-                <controls:TabViewItem Header="Advanced">
-                    <StackPanel Style="{StaticResource sControlPanel}">
+
+                    <StackPanel Tag="UIADVANCED"  Visibility="Collapsed" >
                         <StackPanel Orientation="Horizontal">
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoStatus" Text="*" Header="DsoStatus" Style="{StaticResource HEXStyle}"/>
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoDataScale" Text="*" Header="DsoDataScale" Style="{StaticResource HEXStyle}"/>
@@ -256,8 +259,10 @@
                             <TextBox IsReadOnly="True" x:Name="DSO_Metadata_DsoSamplingRate" Text="*" Header="DsoSamplingRate" Style="{StaticResource HEXStyle}"/>
                         </StackPanel>
                     </StackPanel>
-                </controls:TabViewItem>
-            </controls:TabView>
+
+                </Grid>
+
+            </NavigationView>
 
             <Border x:Name="uiPersonalization" Grid.Row="0" Grid.RowSpan="2" Width="460"
                     Visibility="Collapsed"
@@ -287,6 +292,8 @@
                     <TextBlock Style="{StaticResource HeaderStyle}">Personalization</TextBlock>
 
                     <StackPanel x:Name="uiPersonalizationRadioPanel" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
+                        <RadioButton Content="Frame" Tag="FRAMEBKG" Checked="OnPersonalizationItem" />
+                        <RadioButton Content="Frame Text" Tag="FRAMELABEL" Checked="OnPersonalizationItem" />
                         <RadioButton Content="Background" Tag="BKG" Checked="OnPersonalizationItem" />
                         <RadioButton Content="Cursor" Tag="THN" Checked="OnPersonalizationItem" />
                         <RadioButton Content="Wave 1" Tag="WV1" Checked="OnPersonalizationItem" />

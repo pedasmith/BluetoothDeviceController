@@ -1050,6 +1050,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 case "RETMIN": CurrPersonalization = UserPersonalization.Item.ReticuleMinor; break;
                 case "LAB": CurrPersonalization = UserPersonalization.Item.TextLabel; break;
                 case "LABBKG": CurrPersonalization = UserPersonalization.Item.TextLabelBackground; break;
+                case "FRAMEBKG": CurrPersonalization = UserPersonalization.Item.FrameText; break;
+                case "FRAMELABEL": CurrPersonalization = UserPersonalization.Item.FrameBackground; break;
             }
 
             if (CurrPersonalization != UserPersonalization.Item.None) // Not sure this distinction really makes any difference
@@ -1143,6 +1145,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             uiReticuleScalePanel.Background = bg;
             uiReticuleScaleLabel.Foreground = fg;
             uiReticuleScale.Foreground = fg;
+
+            uiControlBorder.Background = pref.GetBrush(UserPersonalization.Item.FrameBackground);
+            var frametextbrush = pref.GetBrush(UserPersonalization.Item.FrameText);
+            UserPersonalization.SetTextColor(uiControlTabViewPane, frametextbrush);
+            //uiHeaderBrush = frametextbrush as SolidColorBrush;
         }
 
         private void OnOpenPersonalization(object sender, RoutedEventArgs e)
@@ -1193,8 +1200,22 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             }
             cb.SelectedItem = selectedItem;
         }
+
         #endregion // PERSONALIZATION
 
+        private void OnNavigationInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+        {
+            var tag = (args.InvokedItemContainer as FrameworkElement)?.Tag as string;
+            if (string.IsNullOrEmpty(tag)) return;  
 
+            var children = uiControlTabViewPane.Children;
+            foreach (var child in children)
+            {
+                var fe = child as FrameworkElement;
+                if (fe == null) continue;
+                var vis = (fe.Tag as string) == tag ? Visibility.Visible : Visibility.Collapsed;
+                fe.Visibility = vis;
+            }
+        }
     }
 }
