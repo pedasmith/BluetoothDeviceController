@@ -82,7 +82,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             pref.SetColor(Item.TextLabel, Colors.Black);
             pref.SetColor(Item.TextLabelBackground, Colors.BlanchedAlmond);
             //TODO:
-            pref.SetColor(Item.FrameBackground, Colors.Firebrick);
+            pref.SetColor(Item.FrameBackground, Colors.DarkBlue);
             pref.SetColor(Item.FrameText, Colors.Beige);
 
             pref.SetThickness(Item.ThinCursor, 1.0);
@@ -229,10 +229,18 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
                     SetTextColor(child as FrameworkElement, brush);
                 }
             }
-            if (fe is TextBox tbx) // List before the control
+            if (fe is NavigationViewItem) // List before the control
             {
-                var children = tbx.FindDescendants<FrameworkElement>();
-                foreach (var child in children)
+                var descendents = fe.FindDescendants<FrameworkElement>();
+                foreach (var child in descendents)
+                {
+                    SetTextColor(child, brush);
+                }
+            }
+            if (fe is TextBox) // List before the control
+            {
+                var descendents = fe.FindDescendants<FrameworkElement>();
+                foreach (var child in descendents)
                 {
                     SetTextColor(child, brush);
                 }

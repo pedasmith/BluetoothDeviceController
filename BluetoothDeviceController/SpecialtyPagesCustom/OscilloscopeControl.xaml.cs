@@ -1050,8 +1050,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                 case "RETMIN": CurrPersonalization = UserPersonalization.Item.ReticuleMinor; break;
                 case "LAB": CurrPersonalization = UserPersonalization.Item.TextLabel; break;
                 case "LABBKG": CurrPersonalization = UserPersonalization.Item.TextLabelBackground; break;
-                case "FRAMEBKG": CurrPersonalization = UserPersonalization.Item.FrameText; break;
-                case "FRAMELABEL": CurrPersonalization = UserPersonalization.Item.FrameBackground; break;
+                case "FRAMEBKG": CurrPersonalization = UserPersonalization.Item.FrameBackground; break;
+                case "FRAMELABEL": CurrPersonalization = UserPersonalization.Item.FrameText; break;
             }
 
             if (CurrPersonalization != UserPersonalization.Item.None) // Not sure this distinction really makes any difference
@@ -1149,7 +1149,11 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
             uiControlBorder.Background = pref.GetBrush(UserPersonalization.Item.FrameBackground);
             var frametextbrush = pref.GetBrush(UserPersonalization.Item.FrameText);
             UserPersonalization.SetTextColor(uiControlTabViewPane, frametextbrush);
-            //uiHeaderBrush = frametextbrush as SolidColorBrush;
+            foreach (var menu in uiControlTabView.MenuItems)
+            {
+                UserPersonalization.SetTextColor(menu as FrameworkElement, frametextbrush);
+            }
+            
         }
 
         private void OnOpenPersonalization(object sender, RoutedEventArgs e)

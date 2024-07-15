@@ -112,7 +112,7 @@
                 </NavigationView.MenuItems>
                 
                 <Grid x:Name="uiControlTabViewPane" MinHeight="100">
-                    <Grid Tag="UICONTROLS" >
+                    <Grid Tag="UICONTROLS" Visibility="Visible" >
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
@@ -243,8 +243,10 @@
                     </StackPanel>
 
                     <StackPanel Tag="UIPERSONALIZATION"  Visibility="Collapsed"  Orientation="Horizontal">
-                        <ComboBox x:Name="uiPersonalizationThemeList"  SelectionChanged="OnPersonalizationThemeChanged">
-                        </ComboBox>
+                        <ComboBox x:Name="uiPersonalizationThemeList"  
+                                  SelectionChanged="OnPersonalizationThemeChanged"
+                                  MinWidth="100" Margin="6,6,0,0"
+                                  />
                         <Button Content="Customize" Click="OnOpenPersonalization" VerticalAlignment="Top" />
                     </StackPanel>
 
