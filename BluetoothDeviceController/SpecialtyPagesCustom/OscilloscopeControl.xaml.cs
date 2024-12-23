@@ -46,6 +46,8 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
 
         public OscilloscopeControl()
         {
+            UserPersonalization.Init();
+
             this.InitializeComponent();
             SetupPersonalizationList();
             uiChart = uiChartRaw;

@@ -2,7 +2,7 @@
 using BluetoothDeviceController.Charts;
 using BluetoothDeviceController.SpecialtyPagesCustom;
 using BluetoothProtocolsUwpXaml.ChartControl;
-using Microsoft.Toolkit.Uwp.UI.Animations.Behaviors;
+//using Microsoft.Toolkit.Uwp.UI.Animations.Behaviors;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

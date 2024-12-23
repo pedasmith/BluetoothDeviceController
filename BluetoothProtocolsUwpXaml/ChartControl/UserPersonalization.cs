@@ -1,10 +1,9 @@
-﻿using Microsoft.Toolkit.Uwp.UI.Extensions;
+﻿using Microsoft.Toolkit.Uwp.UI; 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using Windows.UI;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Automation.Provider;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 //using Microsoft.Toolkit.Uwp.Helpers;
@@ -15,7 +14,16 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
     public class UserPersonalization
 
     {
-        public static UserPersonalization Current { get; set; }
+        private static UserPersonalization _Current = null;
+        public static UserPersonalization Current
+        {
+            get
+            {
+                Init();
+                return _Current;
+            }
+            set { _Current = value; }
+        }
         public enum Item { None, ChartBackground, ThinCursor, Wave1, Wave2, Wave3, Wave4, ReticuleMajor, ReticuleMinor, TextLabel, TextLabelBackground, FrameBackground, FrameText };
         public const int NWaveValues = 4;
         public Brush GetBrush(Item item) { return AllBrushes[(int)item]; }
@@ -23,7 +31,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
 
         public static void Init()
         {
-            if (Current != null) return;
+            if (_Current != null) return;
 
             UserPersonalization pref = Get_Debug_Personalization();
             pref = Get_Tek_Personalization();
@@ -231,7 +239,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             }
             if (fe is NavigationViewItem) // List before the control
             {
-                var descendents = fe.FindDescendants<FrameworkElement>();
+                var descendents = fe.FindDescendants().OfType<FrameworkElement>();  // was different using older toolkit: .FindDescendants<FrameworkElement>();
                 foreach (var child in descendents)
                 {
                     SetTextColor(child, brush);
@@ -239,7 +247,7 @@ namespace BluetoothProtocolsUwpXaml.ChartControl
             }
             if (fe is TextBox) // List before the control
             {
-                var descendents = fe.FindDescendants<FrameworkElement>();
+                var descendents = fe.FindDescendants().OfType<FrameworkElement>();
                 foreach (var child in descendents)
                 {
                     SetTextColor(child, brush);

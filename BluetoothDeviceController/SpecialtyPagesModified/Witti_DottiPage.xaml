@@ -5,7 +5,8 @@
     xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:toolkit="using:Microsoft.UI.Xaml.Controls"
+    xmlns:toolkit_old="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:enumUtilities="using:enumUtilities"
     xmlns:protocols="using:BluetoothProtocols"
     mc:Ignorable="d"
@@ -54,7 +55,7 @@
                     </StackPanel>
                     <Rectangle Height="20" />
                     <TextBlock Style="{StaticResource HeaderStyle}" >About DOTTI</TextBlock>
-                    <toolkit:ImageEx Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/WITTI_DOTTI.PNG" />
+                    <toolkit_old:ImageEx Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/WITTI_DOTTI.PNG" />
                     <TextBlock Style="{StaticResource AboutStyle}" >
             The DOTTI is a small (65mmx65mm) rechargable-battery powered device
             with an 8x8 pixel screen. The device includes a clock mode, animations, 
@@ -103,9 +104,9 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <!-- Drawing Toolkit -->
-                        <toolkit:WrapPanel Grid.Column="1" Margin="20,0,0,0">
+                        <toolkit_old:WrapPanel Grid.Column="1" Margin="20,0,0,0">
                             <Button Content="🖌" ToolTipService.ToolTip="Eyedropper" Click="OnEyedropper" />
-                        </toolkit:WrapPanel>
+                        </toolkit_old:WrapPanel>
                         
                         <!-- Main drawing area-->
                         <Grid Grid.Column="0" x:Name="uiLedGrid">

@@ -5,7 +5,8 @@
     xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:toolkit="using:Microsoft.UI.Xaml.Controls"
+    xmlns:toolkit_old="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:enumUtilities="using:enumUtilities"
     xmlns:protocols="using:BluetoothProtocols"
     mc:Ignorable="d"
@@ -54,7 +55,7 @@
                     
                     <Rectangle Height="20" />
                     <TextBlock Style="{StaticResource HeaderStyle}" >About NOTTI</TextBlock>
-                    <toolkit:ImageEx Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/WITTI_NOTTI.PNG" />
+                    <toolkit_old:ImageEx Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/WITTI_NOTTI.PNG" />
                     <TextBlock Style="{StaticResource AboutStyle}" >
             The NOTTI is a small (approx 70mm by 90mm) rechargable-battery powered device
             with an single color LED. The LED can change color, and will light up based on a

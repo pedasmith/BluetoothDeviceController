@@ -5,7 +5,7 @@
     xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:toolkit="using:Microsoft.UI.Xaml.Controls"
     xmlns:enumUtilities="using:enumUtilities"
     xmlns:protocols="using:BluetoothProtocols"
     mc:Ignorable="d"
