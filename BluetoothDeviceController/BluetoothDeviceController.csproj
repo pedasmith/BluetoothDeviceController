@@ -779,6 +779,9 @@
     <Content Include="Assets\CharacteristicsData\Govee_H6005.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\CharacteristicsData\Zenggee_LEDnetWF.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\HelpFiles\Device_Govee_H5074.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -1,0 +1,63 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "IOTWF8FF",
+      "ClassName": "Zengge_LedLight",
+      "REM_About": "Multiple LED bulbs use this protocol including MagicLight",
+      "Links": [
+        "https://github.com/8none1/zengge_lednetwf/blob/main/readme.md",
+        "https://github.com/8none1/zengge_lednetwf/blob/main/ledwf_controller.py",
+        "https://www.magiclightbulbs.com/product-page/60-watt-wifi-multi-color-bulb"
+      ],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Name: IOTWF8FF",
+                "IOTWF8FF"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000ffff-0000-1000-8000-00805f9b34fb",
+          "Name": "LED_Control",
+          "Characteristics": [
+            {
+              "UUID": "0000ff02-0000-1000-8000-00805f9b34fb",
+              "Name": "LED_Response",
+              "Type": "U8|HEX|Junk10 U8|DEC|Counter U24|HEX|Junk11 U24|HEX|Junk12 STRING|ASCII|JsonResponse",
+              "IsRead": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "0000ff01-0000-1000-8000-00805f9b34fb",
+              "Name": "LED_Write",
+              "Type": "U16|HEX|Counter U24|HEX|Junk1 U8|DEC|Len1 U8|DEC|Len2 U24|HEX|Junk2 U8|DEC|H U8|DEC|S U8|DEC|V U16|HEX|White BYTES|HEX|Junk3",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":Write:WriteWithoutResponse:WrWw:",
+              "ExampleData": [
+                  "Example: 00 05 80 00 00 0d 0e 0b 3b a1 00 64 64 00 00 00 00 00 00 00 00"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-24:94:94:94:08:00\nCanPair:True IsPaired:False"
+    }
+  ]
+}

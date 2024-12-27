@@ -188,7 +188,7 @@ namespace BluetoothDeviceController.BleEditor
                     switch (displayFormatSecondary)
                     {
                         case "Appearance":
-                            return BluetoothDefinitionLanguage.BluetoothAppearance.AppearaceToString((ushort)dvalue);
+                            return BluetoothDefinitionLanguage.BluetoothAppearance.AppearanceToString((ushort)dvalue);
                     }
                     break;
             }

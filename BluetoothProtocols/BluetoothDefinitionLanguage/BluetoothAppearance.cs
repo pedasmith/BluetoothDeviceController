@@ -9,7 +9,8 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
     public class BluetoothAppearance
     {
         // Data from https://www.bluetooth.com/specifications/gatt/characteristics/
-        // https://www.bluetooth.com/wp-content/uploads/Sitecore-Media-Library/Gatt/Xml/Characteristics/org.bluetooth.characteristic.gap.appearance.xml
+        // page 28 and up: https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf?v=1734987409486
+        // 2024-12-23: no longer valid: https://www.bluetooth.com/wp-content/uploads/Sitecore-Media-Library/Gatt/Xml/Characteristics/org.bluetooth.characteristic.gap.appearance.xml
         // Characteristic 0x2A01, Appearance
         // Values are automatically converted from the XML (plus hand corrections)
         public enum Appearance
@@ -74,7 +75,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
             Location_and_Navigation_Pod = 5188,
             Environmental_Sensor = 5696,
         };
-        public static string AppearaceToString(UInt16 appearance)
+        public static string AppearanceToString(UInt16 appearance)
         {
             try
             {

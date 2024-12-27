@@ -78,7 +78,7 @@ namespace BluetoothDeviceController.BluetoothDefinitionLanguage
                 return $"?len={dr.UnconsumedBufferLength}";
             }
             var appearance = dr.ReadUInt16();
-            var retval = BluetoothAppearance.AppearaceToString(appearance);
+            var retval = BluetoothAppearance.AppearanceToString(appearance);
             return retval;
         }
 
