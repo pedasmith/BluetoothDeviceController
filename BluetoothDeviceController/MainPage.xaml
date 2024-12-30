@@ -10,7 +10,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     KeyUp="OnKeyUp">
 
-    <Grid>
+    <Grid KeyUp="OnKeyUp">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -31,7 +31,6 @@
 
                 <MenuFlyoutSeparator />
                 <ToggleMenuFlyoutItem x:Name="uiMenuKeepScreenOn" Text="Keep screen on" IsChecked="False" Click="MenuOnToggleScreenOn" />
-                <ToggleMenuFlyoutItem x:Name="uiMenuEnableAdvancedShortcuts" Text="Enable advanced shortcuts" IsChecked="False" Click="MenuOnToggleAdvancedShortcuts" />
             </MenuBarItem>
             <MenuBarItem Title="Filter" x:Name="uiFilterSimpleBeaconPage">
                 <MenuFlyoutItem Text="Sort by MAC address" Click="MenuOnFilterBeaconSortByMac" />
@@ -57,7 +56,7 @@
         <!-- NAVIGATION -->
         <NavigationView x:Name="uiNavigation" Grid.Row="1"
                         ItemInvoked="UiNavigation_ItemInvoked"
-                        KeyUp="OnNavigationKeyUp" GotFocus="OnNavigationGotFocus"
+                        GotFocus="OnNavigationGotFocus"
                         BackRequested="UiNavigation_BackRequested" CompactPaneLength="36" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed"
                         >
             <NavigationView.MenuItems>

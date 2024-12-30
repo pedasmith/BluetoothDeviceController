@@ -82,11 +82,12 @@ namespace BluetoothCodeGenerator
                 case "I16": return $"Int16";
                 case "U16": return $"UInt16";
                 case "I24": return $"Int32";
+                case "U24": return $"UInt32";
                 case "I32": return $"Int32";
                 case "U32": return $"UInt32";
                 case "F32": return $"float";
             }
-            return $"UNKNOWN_TYPE_{format}";
+            return $"X47_UNKNOWN_TYPE_{format}";
         }
 
         private static string ByteFormatToDataWriterCall(string format)
@@ -726,7 +727,7 @@ namespace BluetoothCodeGenerator
             retval.Macros.Add("ShortDescription", bt.ShortDescription);
             retval.Macros.Add("DefaultPin", bt.DefaultPin);
             retval.Macros.Add("DESCRIPTION", bt.Description);
-            retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::hh:mm"));
+            retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::HH:mm"));
             retval.Macros.Add("CLASSMODIFIERS", bt.ClassModifiers);
             retval.Macros.Add("HasReadDeviceName", bt.HasReadDevice_Name() ? "true" : "false");
 

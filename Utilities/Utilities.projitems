@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DataReaderReadStringRobust.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataWriterExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UIThreadHelper.cs" />
   </ItemGroup>

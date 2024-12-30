@@ -16,6 +16,10 @@ using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
+using Windows.System;
+
+using Windows.UI.Core;
+
 //using Windows.Foundation.Metadata;
 //using Windows.Storage.Streams;
 using Windows.UI.Xaml;
@@ -1628,17 +1632,6 @@ namespace BluetoothDeviceController
                 CurrDisplayRequest.RequestRelease();
             }
         }
-        private void MenuOnToggleAdvancedShortcuts(object sender, RoutedEventArgs e)
-        {
-            switch (CurrShortcutType)
-            {
-                case ShortcutType.Normal: CurrShortcutType = ShortcutType.Advanced; break;
-                default: CurrShortcutType = ShortcutType.Normal; break;
-            }
-        }
-        enum ShortcutType { Normal, Advanced };
-        ShortcutType CurrShortcutType = ShortcutType.Normal;
-
         UserPreferences.SortBy SavedBeaconSortBy = UserPreferences.SortBy.Time;
         // Can delete any time: Sort direction is in preferences now: SimpleBeaconPage.SortDirection SavedBeaconSortDirection = SimpleBeaconPage.SortDirection.Ascending;
 
@@ -1737,28 +1730,51 @@ namespace BluetoothDeviceController
 
         private void OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
-            switch (CurrShortcutType)
+            var isAlt = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Menu).HasFlag(CoreVirtualKeyStates.Down);
+            var isLAlt = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.LeftMenu).HasFlag(CoreVirtualKeyStates.Down);
+            var isRAlt = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.RightMenu).HasFlag(CoreVirtualKeyStates.Down);
+            var isCtl = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down);
+            var isShift = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
+            var isShortcut = isAlt || isCtl || isLAlt || isRAlt || isShift;
+            if (!isShortcut) return; // Alt key only.
+
+            switch (e.Key)
             {
-                case ShortcutType.Advanced:
-                    switch (e.Key)
+                case Windows.System.VirtualKey.A: // Scan type: advertisements and beacons
+                    e.Handled = true;
+                    Preferences.Scope = UserPreferences.SearchScope.Bluetooth_Beacons;
+                    break;
+                case Windows.System.VirtualKey.C: // Cancel current scan //TODO: bad idea; conflicts with regular ^C
+                    e.Handled = true;
+                    this.CancelSearch();
+                    break;
+                case Windows.System.VirtualKey.K: // Scan type: known
+                    e.Handled = true;
+                    Preferences.Scope = UserPreferences.SearchScope.Ble_Has_specialized_display;
+                    break;
+                case Windows.System.VirtualKey.N: // Scan type: Named devices
+                    e.Handled = true;
+                    Preferences.Scope = UserPreferences.SearchScope.Ble_Device_is_named;
+                    break;
+                case Windows.System.VirtualKey.P: // Scan type: COM Port (C is already taken) //TODO: bad idea; conflicts with ^P for print
+                    e.Handled = true;
+                    Preferences.Scope = UserPreferences.SearchScope.Bluetooth_Com_Device;
+                    break;
+                case Windows.System.VirtualKey.R: // Remove 
+                    e.Handled = true;
+                    var item = MostRecentNaviationGotFocus;
+                    if (item != null)
                     {
-                        case Windows.System.VirtualKey.C: // Cancel current scan
-                            e.Handled = true;
-                            this.CancelSearch();
-                            break;
-                        case Windows.System.VirtualKey.R: // Remove 
-                            e.Handled = true;
-                            var item = MostRecentNaviationGotFocus;
-                            if (item != null)
-                            {
-                                uiNavigation.MenuItems.Remove(item);
-                            }
-                            break;
-                        case Windows.System.VirtualKey.S: // Scan
-                            e.Handled = true;
-                            this.StartSearchWithUserPreferences();
-                            break;
+                        uiNavigation.MenuItems.Remove(item);
                     }
+                    break;
+                case Windows.System.VirtualKey.S: // Scan //TODO: bad idea; conflicts with normal ^S for save
+                    e.Handled = true;
+                    this.StartSearchWithUserPreferences();
+                    break;
+                case Windows.System.VirtualKey.L: // Scan type: all (a is taken)
+                    e.Handled = true;
+                    Preferences.Scope = UserPreferences.SearchScope.Ble_All_ble_devices;
                     break;
             }
         }

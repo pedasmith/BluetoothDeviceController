@@ -24,16 +24,6 @@ Select this item to keep the screen on. When selected, it will have a check-mark
 
 Note that keeping your screen on will use more power.
 
-## Enable advanced shortcuts
-
-There's a small number of special shortcuts that might make your life a little easier.
-
-|Key|Command
-|-----|-----|
-|**C**ancel|Cancel the current scan
-|**R**emove|Removes the currently highlighted device from the device navigation list. This is useful for when you make sceeen shots.
-|**S**can|Performs the current scan type
-
 
 
 # See also:

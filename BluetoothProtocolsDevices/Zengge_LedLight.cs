@@ -9,13 +9,13 @@ using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
-
+using Utilities;
 
 namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2024-12-27::11:07
+    /// This class was automatically generated 2024-12-29::20:52
     /// </summary>
 
     public partial class Zengge_LedLight : INotifyPropertyChanged
@@ -424,10 +424,10 @@ namespace BluetoothProtocols
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
             dw.WriteUInt16(  Counter);
-            dw.WriteUInt32(  Junk1);
+            dw.WriteUInt24(Junk1);
             dw.WriteByte(  Len1);
             dw.WriteByte(  Len2);
-            dw.WriteUInt32(  Junk2);
+            dw.WriteUInt24( Junk2);
             dw.WriteByte(  H);
             dw.WriteByte(  S);
             dw.WriteByte(  V);

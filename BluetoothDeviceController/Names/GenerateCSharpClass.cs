@@ -859,6 +859,14 @@ namespace BluetoothDeviceController.Names
                                 paramlist += $"UInt16 {name}";
                                 arglist += $"            dw.WriteUInt16({name});\n";
                                 break;
+                            case "I24":
+                                paramlist += $"Int32 {name}";
+                                arglist += $"            X56_dw.WriteInt32({name});\n";
+                                break;
+                            case "U24":
+                                paramlist += $"UInt32 {name}";
+                                arglist += $"            X56_dw.WriteUInt32({name});\n";
+                                break;
                             case "I32":
                                 paramlist += $"Int32 {name}";
                                 arglist += $"            dw.WriteInt32({name});\n";
