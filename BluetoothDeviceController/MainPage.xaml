@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    KeyUp="OnKeyUp">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -30,6 +31,7 @@
 
                 <MenuFlyoutSeparator />
                 <ToggleMenuFlyoutItem x:Name="uiMenuKeepScreenOn" Text="Keep screen on" IsChecked="False" Click="MenuOnToggleScreenOn" />
+                <ToggleMenuFlyoutItem x:Name="uiMenuEnableAdvancedShortcuts" Text="Enable advanced shortcuts" IsChecked="False" Click="MenuOnToggleAdvancedShortcuts" />
             </MenuBarItem>
             <MenuBarItem Title="Filter" x:Name="uiFilterSimpleBeaconPage">
                 <MenuFlyoutItem Text="Sort by MAC address" Click="MenuOnFilterBeaconSortByMac" />
@@ -55,22 +57,11 @@
         <!-- NAVIGATION -->
         <NavigationView x:Name="uiNavigation" Grid.Row="1"
                         ItemInvoked="UiNavigation_ItemInvoked"
-                        BackRequested="UiNavigation_BackRequested" CompactPaneLength="36" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed">
+                        KeyUp="OnNavigationKeyUp" GotFocus="OnNavigationGotFocus"
+                        BackRequested="UiNavigation_BackRequested" CompactPaneLength="36" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed"
+                        >
             <NavigationView.MenuItems>
-                <!-- NOTE: can remove at any time
-                <NavigationViewItem Content="💁 Help" Tag="Help" x:Name="uiMenuHelp" />
-
-                <NavigationViewItemSeparator Tag="LIST-START" />
-
-                <NavigationViewItemSeparator Tag="LIST-END" />
-                -->
-
             </NavigationView.MenuItems>
-            <!-- NOTE: can remove at any time; code is dead and functionality moved to menu
-            <NavigationView.PaneFooter>
-                <NavigationViewItem FontFamily="Segoe UI,Segoe MDL2 Assets" Content=" Leave Feedback" Tag="Feedback" x:Name="uiMenuFeedback" Tapped="OnRequestFeedback" />
-            </NavigationView.PaneFooter>
-            -->
             
             <Grid>
                 <Grid.RowDefinitions>
@@ -81,22 +72,6 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
-                <!--
-                NOTE: This ad is never display, so stop showing it.
-                <UI:AdControl x:Name="uiAdHorizontal" Grid.Row="1" ApplicationId="9pp2jw8c2nrt" AdUnitId="1100053145"
-                              AdRefreshed="OnAdRefreshed" ErrorOccurred="OnAdErrorOccurred"
-                              HorizontalAlignment="Left" VerticalAlignment="Top"
-                              Width="300" Height="250" Visibility="Collapsed"/>
-                -->
-                <!-- ADVERT: Removed 2022-12-30 for version 1.10
-                <UI:AdControl x:Name="uiAdVertical" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" ApplicationId="9pp2jw8c2nrt" AdUnitId="1100053145"
-                              AdRefreshed="OnAdRefreshed" ErrorOccurred="OnAdErrorOccurred"
-                              HorizontalAlignment="Left" VerticalAlignment="Top"
-                              Width="160" Height="600"  />
-                --> 
-                <!-- moved to the Automation menu
-                <Button Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="📰" Click="OnGenerateCode" ToolTipService.ToolTip="Generate code from Bluetooth" />
-                -->
 
                 <!-- The contents have to have a higher Z order. Otherwise if the user
                 makes a chart, the little "flag" with current cursor values will be behind
@@ -149,7 +124,6 @@
                     <LineBreak /><LineBreak /><Run>More </Run>
                     <Hyperlink NavigateUri="https://shipwrecksoftware.wordpress.com/category/bluetooth/" >Bluetooth information </Hyperlink>
                     <Run Text=" "/><Run>is at the Shipwreck Software blog</Run>
-                    
                     
                     <LineBreak /><LineBreak /><Run Text="Version: " /><Run x:Name="uiAboutVersion" />
                 </TextBlock>

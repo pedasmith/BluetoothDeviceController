@@ -2,11 +2,8 @@
 using BluetoothDeviceController.Names;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using TemplateExpander;
-using Windows.ApplicationModel.Chat;
 
 namespace BluetoothCodeGenerator
 {
@@ -54,13 +51,14 @@ namespace BluetoothCodeGenerator
             {
                 case "F32": return "Single";
                 case "F64": return "Double";
-                case "U8": return "Byte";
-                case "U16": return "UInt16";
-                case "U32": return "UInt32";
                 case "I8": return "SByte";
+                case "U8": return "Byte";
                 case "I16": return "Int16";
+                case "U16": return "UInt16";
                 case "I24": return "Int32";
+                case "U24": return "UInt32";
                 case "I32": return "Int32";
+                case "U32": return "UInt32";
                 case "BYTES": return "Bytes";
                 case "STRING": return "String";
             }
@@ -83,6 +81,7 @@ namespace BluetoothCodeGenerator
                 case "U8": return $"byte";
                 case "I16": return $"Int16";
                 case "U16": return $"UInt16";
+                case "I24": return $"Int32";
                 case "I32": return $"Int32";
                 case "U32": return $"UInt32";
                 case "F32": return $"float";
@@ -101,11 +100,22 @@ namespace BluetoothCodeGenerator
                 case "U8": return "dw.WriteByte";
                 case "I16": return "dw.WriteInt16";
                 case "U16": return "dw.WriteUInt16";
+                case "I24": return "DataWriterExtention.WriteInt24";  // TOdo: need this class defined :-)
+                case "U24": return "DataWriterExtention.WriteUInt24"; 
                 case "I32": return "dw.WriteInt32";
                 case "U32": return "dw.WriteUInt32";
                 case "F32": return "dw.WriteSingle";
             }
             return $"dw.WriteUNKNOWN_TYPE_{format}";
+        }
+        private static string ByteFormatToDataWriterCallExtra(string format)
+        {
+            switch (format)
+            {
+                case "I24": return "dw, "; 
+                case "U24": return "dw, "; 
+            }
+            return $"";
         }
         private static string ByteFormatToDataWriterCallCast(string format)
         {
@@ -122,14 +132,14 @@ namespace BluetoothCodeGenerator
             {
                 case "F32": return "0.0";
                 case "F64": return "0.0";
-                case "U8": return "0";
-                case "U16": return "0";
-                case "U24": return "0";
-                case "U32": return "0";
                 case "I8": return "0";
+                case "U8": return "0";
                 case "I16": return "0";
+                case "U16": return "0";
                 case "I24": return "0";
+                case "U24": return "0";
                 case "I32": return "0";
+                case "U32": return "0";
                 case "BYTES": return "null";
                 case "STRING": return "\"\"";
             }
@@ -453,8 +463,12 @@ namespace BluetoothCodeGenerator
                     datareadpr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
                     datareadpr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
                     datareadpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
+
+                    //NOTE: Why are these 3 write items here for a reader?
                     datareadpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
+                    datareadpr.AddMacro("ARGDWCALLEXTRA", ByteFormatToDataWriterCallExtra(item.ByteFormatPrimary));
                     datareadpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
+
                     datareadpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     datareadpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
                     datareadpr.AddMacro("DEC+OR+HEX", displayFormat);
@@ -482,6 +496,7 @@ namespace BluetoothCodeGenerator
                     datawritepr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
                     datawritepr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
                     datawritepr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
+                    datawritepr.AddMacro("ARGDWCALLEXTRA", ByteFormatToDataWriterCallExtra(item.ByteFormatPrimary));
                     datawritepr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
                     datawritepr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     datawritepr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
@@ -507,6 +522,7 @@ namespace BluetoothCodeGenerator
                     dataallpr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
                     dataallpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
                     dataallpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
+                    dataallpr.AddMacro("ARGDWCALLEXTRA", ByteFormatToDataWriterCallExtra(item.ByteFormatPrimary));
                     dataallpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
                     dataallpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     dataallpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));

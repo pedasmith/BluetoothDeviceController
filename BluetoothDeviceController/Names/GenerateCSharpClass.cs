@@ -256,6 +256,7 @@ namespace BluetoothDeviceController.Names
                 case "F64": return "Double";
                 case "U8": return "Byte";
                 case "U16": return "UInt16";
+                case "U24": return "UInt32";
                 case "U32": return "UInt32";
                 case "I8": return "SByte";
                 case "I16": return "Int16";

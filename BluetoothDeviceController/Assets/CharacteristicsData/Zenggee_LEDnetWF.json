@@ -3,6 +3,7 @@
     {
       "Name": "IOTWF8FF",
       "ClassName": "Zengge_LedLight",
+      "ClassModifiers":  "partial",
       "REM_About": "Multiple LED bulbs use this protocol including MagicLight",
       "Links": [
         "https://github.com/8none1/zengge_lednetwf/blob/main/readme.md",

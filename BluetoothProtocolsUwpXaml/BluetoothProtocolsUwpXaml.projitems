@@ -23,6 +23,10 @@
       <DependentUpon>ChartControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)ChartControl\UserPersonalization.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\DeviceInformationWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserBeaconPreferences.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserPreferences.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferences.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserSerialPortPreferencesControl.xaml.cs">
       <DependentUpon>UserSerialPortPreferencesControl.xaml</DependentUpon>
     </Compile>

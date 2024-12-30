@@ -1593,7 +1593,7 @@ namespace BluetoothDeviceController.BleEditor
                                                 var b2 = dr.ReadByte();
                                                 var msb = (byte)(dr.ByteOrder == ByteOrder.BigEndian ? b0 : b2);
                                                 var lsb = dr.ByteOrder == ByteOrder.BigEndian ? b2 : b0;
-                                                int value = (int)(msb << 16) + (b1 << 8) + (lsb);
+                                                int value = (int)(msb << 16) + (b1 << 8) + (lsb); //TODO: this should be unsigned??
                                                 dvalue = (double)value;
                                             }
                                             break;

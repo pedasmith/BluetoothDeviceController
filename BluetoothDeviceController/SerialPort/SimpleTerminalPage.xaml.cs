@@ -38,7 +38,7 @@ namespace BluetoothDeviceController.SerialPort
             uiTerminalControl.DI = DI;
             uiTerminalControl.UpdateShortcutButtons();
 
-            TerminalAdapter = new BluetoothCommTerminalAdapter(this, DI);
+            TerminalAdapter = new BluetoothCommTerminalAdapter(this, DI.di);
             await TerminalAdapter.InitAsync();
 
             ParentStatusHandler?.SetStatusActive(false);

@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>12d89dd7-fddf-43af-810e-a340bcf5f79f</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>BluetoothProtocolsDevices</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Bbc_MicroBit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BleHome_SensorBug.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CraftyRobot_Smartibot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Elegoo_MiniCar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Kano_Wand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Lionel_LionChief.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Lionel_LionChief_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mipow_Playbulb_BTL201.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mipow_Playbulb_BTL201_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Particula_GoDice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Particula_GoDice_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pokit_ProMeter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pokit_ProMeter_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Protocentral_Sensything.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Samico_BloodPressure_BG512.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TI_beLight_2540.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TI_SensorTag_1350.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TI_SensorTag_1350_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TI_SensorTag_1352.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TI_SensorTag_2541.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TI_SensorTag_2541_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triones_LedLight.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triones_LedLights_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Vion_Meter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WilliamWeilerEngineering_Skoobot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Witti_Dotti.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Witti_Dotti_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Witti_Notti.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Witti_Notti_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Zengge_LedLight.cs" />
+  </ItemGroup>
+</Project>

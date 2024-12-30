@@ -14,7 +14,7 @@ namespace BluetoothDeviceController
     public class BleAdvertisementWrapper
     {
         public BleAdvertisementWrapper() { }
-         public BleAdvertisementWrapper(BluetoothLEAdvertisementReceivedEventArgs advert)
+        public BleAdvertisementWrapper(BluetoothLEAdvertisementReceivedEventArgs advert)
         {
             BleAdvert = advert;
         }
@@ -22,7 +22,7 @@ namespace BluetoothDeviceController
         /// Which exact type of advertisement is this?
         /// </summary>
         public enum BleAdvertisementType { None, BluetoothLE, Eddystone, Govee, RuuviTag, SwitchBot }
-        public enum BleAdvertisementEddystoneSubtype {  None, Uid, Url, Tlm, Eid };
+        public enum BleAdvertisementEddystoneSubtype { None, Uid, Url, Tlm, Eid };
         public BleAdvertisementType AdvertisementType { get; set; } = BleAdvertisementType.None;
         public BleAdvertisementEddystoneSubtype AdvertisementEddystoneSubtype { get; set; } = BleAdvertisementEddystoneSubtype.None;
         /// <summary>
@@ -113,9 +113,9 @@ namespace BluetoothDeviceController
                             break;
                     }
                     break;
-                    //
-                    // SENSOR: new sensors get added here
-                    //
+                //
+                // SENSOR: new sensors get added here
+                //
                 case BleAdvertisementWrapper.BleAdvertisementType.Govee:
                     Event(GoveeDataRecord);
                     break;
@@ -134,35 +134,5 @@ namespace BluetoothDeviceController
         }
 
 
-    }
-    public class DeviceInformationWrapper
-    {
-        public DeviceInformationWrapper(DeviceInformation deviceInformation)
-        {
-            di = deviceInformation;
-        }
-        public DeviceInformationWrapper(BleAdvertisementWrapper bleAdvert)
-        {
-            BleAdvert = bleAdvert;
-        }
-        public DeviceInformation di { get; set; } = null;
-        public UserSerialPortPreferences SerialPortPreferences = null;
-        public UserBeaconPreferences BeaconPreferences = null;
-        public UserPreferences UserPreferences = null;
-        public BleAdvertisementWrapper BleAdvert = null;
-
-        bool _IsNordicUart = false;
-        bool _IsNordicUartChecked = false;
-        public BluetoothProtocolsCustom.Nordic_Uart AsNordicUart { get; internal set; } = null;
-
-        public async Task<bool> IsNordicUartAsync()
-        {
-            if (di == null) return false; // but don't update the IsNordicUartChecked
-            if (_IsNordicUartChecked) return _IsNordicUart;
-            _IsNordicUartChecked = true;
-            AsNordicUart = new BluetoothProtocolsCustom.Nordic_Uart(di);
-            var retval = await AsNordicUart.EnsureCharacteristicAsync();
-            return retval;
-        }
     }
 }

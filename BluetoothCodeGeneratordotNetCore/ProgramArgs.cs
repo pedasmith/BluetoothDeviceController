@@ -13,7 +13,7 @@ namespace BluetoothCodeGenerator
         public string ErrorMessage { get; internal set; } = "";
         public string InputJsonFile { get; internal set; } = "";
         public string InputJsonDirectory { get; internal set; } = "";
-        public string InputTemplateDirectory { get; internal set; } = ".\\";
+        public string InputTemplateDirectory { get; internal set; } = ".\\Templates";
         public string OutputDirectory { get; internal set; } = ".\\output";
         public static ProgramArgs ParseFromArgs(string[] args)
         {

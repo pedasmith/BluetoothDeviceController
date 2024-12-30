@@ -208,7 +208,6 @@
     <Compile Include="SpecialtyPagesCustom\MultiMeterControl.xaml.cs">
       <DependentUpon>MultiMeterControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SpecialtyPagesCustom\OscDataRecord.cs" />
     <Compile Include="SpecialtyPagesCustom\OscilloscopeControl.xaml.cs">
       <DependentUpon>OscilloscopeControl.xaml</DependentUpon>
     </Compile>
@@ -269,6 +268,7 @@
     <Compile Include="SpecialtyPages\WilliamWeilerEngineering_SkoobotPage.xaml.cs">
       <DependentUpon>WilliamWeilerEngineering_SkoobotPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPages\Zengge_LedLightPage.xaml.cs" />
     <Compile Include="UserPreferenceControl.xaml.cs">
       <DependentUpon>UserPreferenceControl.xaml</DependentUpon>
     </Compile>
@@ -806,6 +806,7 @@
     <Content Include="Assets\HelpFiles\Help_Menu_MenuBar.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Assets\HelpFiles\Device_Zengge_LedLight.md" />
     <None Include="Assets\HelpFiles\_List_of_item_to_do.md" />
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
@@ -1111,6 +1112,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="SpecialtyPages\Zengge_LedLightPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UserPreferenceControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1147,6 +1152,7 @@
   <Import Project="..\BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems" Label="Shared" />
   <Import Project="..\SearchControllers\SearchControllers.projitems" Label="Shared" />
   <Import Project="..\Utilities\Utilities.projitems" Label="Shared" />
+  <Import Project="..\BluetoothProtocolsDevices\BluetoothProtocolsDevices.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

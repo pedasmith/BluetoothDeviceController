@@ -58,6 +58,9 @@
     <None Update="Templates\MD_BT_DeviceController_Helpfile_template.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Templates\UWP_XAML_CSharp_BT_template.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Import Project="..\TemplateExpander\TemplateExpander.projitems" Label="Shared" />

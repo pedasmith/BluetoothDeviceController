@@ -115,9 +115,6 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\BluetoothDeviceController\SpecialtyPagesCustom\OscDataRecord.cs">
-      <Link>OscDataRecord.cs</Link>
-    </Compile>
     <Compile Include="..\..\BluetoothDeviceController\SpecialtyPagesCustom\OscilloscopeControl.xaml.cs">
       <Link>OscilloscopeControl.xaml.cs</Link>
     </Compile>
@@ -132,6 +129,9 @@
     </Compile>
     <Compile Include="..\..\BluetoothProtocols\Charts\DataCollection.cs">
       <Link>DataCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\BluetoothProtocols\Charts\OscDataRecord.cs">
+      <Link>OscDataRecord.cs</Link>
     </Compile>
     <Compile Include="..\..\BluetoothProtocols\IotNumberFormats\ValueCalculate.cs">
       <Link>FromBluetooth\ValueCalculate.cs</Link>

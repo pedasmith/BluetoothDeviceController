@@ -50,13 +50,13 @@ namespace BluetoothDeviceController.SpecialtyPages
         // CHANGE: from an override of OnNavigatedTo to a new method
         // CHANGE: rename OnNavigateTo to DoInitializeAync
         // CHANGE: public, not private
-        DeviceInformationWrapper CurrKeyboardDevice = null;
+        DeviceInformation CurrKeyboardDevice = null;
         BTAnnunciator uiAnnunciator = null;
-        public async Task DoInitializeAsync(DeviceInformationWrapper di)
+        public async Task DoInitializeAsync(DeviceInformation di)
         {
             uiAnnunciator = BTAnnunciator.Singleton;
             CurrKeyboardDevice = di;
-            var name = CurrKeyboardDevice?.di?.Name ?? "keyboard";
+            var name = CurrKeyboardDevice?.Name ?? "keyboard";
             uiAnnunciator.DeviceName = name;
             await DoInitializeAsync();
         }
@@ -65,7 +65,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
 
             uiAnnunciator.Activity(AnnunciatorActivity.ConnectionStarted);
-            if (CurrKeyboardDevice == null || CurrKeyboardDevice.di == null)
+            if (CurrKeyboardDevice == null)
             {
                 //uiAnnunciator.SetStatus(AnnunciatorStatus.NoDeviceFound, "Can't connect; no device");
                 uiAnnunciator.Activity(AnnunciatorActivity.ConnectionStoppedFailed);
@@ -73,7 +73,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
             SetStatusActive(true);
             //uiAnnunciator.SetStatus(AnnunciatorStatus.Connecting, $"Connecting to {CurrKeyboardDevice.ToString()}");
-            var ble = await BluetoothLEDevice.FromIdAsync(CurrKeyboardDevice.di.Id);
+            var ble = await BluetoothLEDevice.FromIdAsync(CurrKeyboardDevice.Id);
             if (ble == null) // Can it be null?
             {
                 uiAnnunciator.Activity(AnnunciatorActivity.ConnectionStoppedFailed);

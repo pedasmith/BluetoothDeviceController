@@ -1,11 +1,11 @@
+@echo off
+
 REM Generate all of the protocol, etc., files from the JSON device
-echo %CD%
-set REPODIR=%UserProfile%\source\repos
+echo Current directory=%CD%
+REM set REPODIR=%UserProfile%\source\repos
+
 set REPODIR=%CD%\..
 set JSONDIR=%REPODIR%\BluetoothDeviceController\Assets\CharacteristicsData
-set JSON=%JSONDIR%\TI_SensorTag_1350.json
-set JSON=%JSONDIR%\Elegoo_Mini_Car.json
-set JSON=%JSONDIR%\PokitPro_Meter.json
 set BIN= ".\bin\Debug\net6.0-windows10.0.19041.0\BluetoothCodeGeneratordotNetCore"
 if not exist output mkdir output
 
@@ -13,11 +13,12 @@ REM
 REM Normally we want to generate everything. But when we are debugging just something new,
 REM it's nicer to have just the single file handled.
 REM
-if "%~1"=="-debug" goto :debug
+if "%~1"=="-debug" goto :Debug
+if "%~1"=="-file" goto :Single
 if "%~1"=="-all" goto :All
 goto :Help
 
-goto :Debug
+
 :All
 %BIN% -verbose -inputJsonDirectory "%JSONDIR%" -inputTemplates Templates -output output
 goto :EOF
@@ -31,8 +32,17 @@ REM %BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Template
 %BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
 goto :EOF
 
+:Single
+%BIN% -inputJsonFile "%JSONDIR%\%~2" -inputTemplates Templates -output output
+goto :EOF
+
 :Help
+@echo RUN.BAT from the BluetoothCodeGeneratordotNetCore directory
+@echo This runs the Bluetooth code generator. It takes in the JSON BT description files
+@echo and a series of Template files and makes all of the BT device-specific outputs.
+@echo.
 @echo run -all to do all conversions
+@echo run -file <file> to do a single conversion. File is in the normal %JSONDIR% directory.
 @echo run -debug to just convert a few active items
 
 

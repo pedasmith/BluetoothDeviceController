@@ -129,7 +129,7 @@ namespace BTUniversalKeyboard
         {
             uiAnnunciator.Activity(AnnunciatorActivity.ScanItemUpdated);
         }
-        DeviceInformationWrapper CurrKeyboardDevice = null;
+        DeviceInformation CurrKeyboardDevice = null;
         private void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
             // Works OK. Log($"Got device: {args.Name}");
@@ -143,7 +143,7 @@ namespace BTUniversalKeyboard
 
 
                 // Connect to the device.
-                CurrKeyboardDevice = new DeviceInformationWrapper(args);
+                CurrKeyboardDevice = args;
                 UIThreadHelper.CallOnUIThread(
                     async () =>
                     {

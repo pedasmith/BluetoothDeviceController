@@ -13,13 +13,13 @@ namespace BluetoothDeviceController.SerialPort
 {
     class BluetoothCommTerminalAdapter
     {
-        public BluetoothCommTerminalAdapter(ITerminal terminal, DeviceInformationWrapper input_di)
+        public BluetoothCommTerminalAdapter(ITerminal terminal, DeviceInformation input_di)
         {
             Terminal = terminal;
             di = input_di;
         }
         ITerminal Terminal;
-        DeviceInformationWrapper di { get; set; } = null;
+        DeviceInformation di { get; set; } = null;
         public RfcommDeviceService serviceRfcomm { get; internal set; } = null;
         public StreamSocket socket { get; internal set; } = null;
         public DataWriter dw { get; internal set; } = null;
@@ -32,11 +32,11 @@ namespace BluetoothDeviceController.SerialPort
             if (serviceRfcomm == null)
             {
                 Terminal?.SetDeviceStatus($"Getting Rfcomm Device Service");
-                serviceRfcomm = await RfcommDeviceService.FromIdAsync(di.di.Id);
+                serviceRfcomm = await RfcommDeviceService.FromIdAsync(di.Id);
             }
             if (serviceRfcomm == null)
             {
-                Terminal?.ErrorFromDevice($"Unable to create the RFCOMM service from {di.di.Id}\r");
+                Terminal?.ErrorFromDevice($"Unable to create the RFCOMM service from {di.Id}\r");
                 Terminal?.SetDeviceStatus($"Unable to connect");
                 return;
             }

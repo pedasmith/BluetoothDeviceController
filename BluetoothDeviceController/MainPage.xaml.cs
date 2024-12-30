@@ -43,7 +43,7 @@ namespace BluetoothDeviceController
     }
     public enum FoundDeviceInfo { IsNew, IsDuplicate, IsOutOfRange, IsFilteredOutDb, IsFilteredOutNoName, IsError };
 
-    public enum SearchFeedbackType {  Normal, Advertisement }
+    public enum SearchFeedbackType { Normal, Advertisement }
     public interface IDoSearchFeedback // The SearchFeedbackControl
     {
         void StartSearchFeedback();
@@ -86,7 +86,7 @@ namespace BluetoothDeviceController
         const string WAND = "🖉"; // yeah, a pencil isn't really a wand.
         const string WATER = "🚰";
 
-        
+
         /// <summary>
         /// Converts a list of possible Bluetooth names into a page to display
         /// </summary>
@@ -149,9 +149,9 @@ namespace BluetoothDeviceController
         public string CurrFinalJsonSearch { get; internal set; }
         public string CurrInProgressJsonSearch { get; internal set; }
 
-        IDoSearchFeedback SearchFeedback { get; set; }  = null;
+        IDoSearchFeedback SearchFeedback { get; set; } = null;
 
- 
+
         public string ZZZZGetCurrentSearchResults()
         {
             return CurrFinalJsonSearch;
@@ -212,7 +212,7 @@ namespace BluetoothDeviceController
             SerialPortPreferences.ReadFromLocalSettings();
             UpdateUIFromPreferences();
 
-            
+
 
             // must set up searchfeedback before first navigation
             SearchFeedback = uiSearchFeedback;
@@ -386,7 +386,7 @@ namespace BluetoothDeviceController
                 var dlg = new ContentDialog()
                 {
                     Content = settings,
-                    PrimaryButtonText="OK",
+                    PrimaryButtonText = "OK",
                     Title = "Settings"
                 };
 
@@ -568,7 +568,7 @@ namespace BluetoothDeviceController
             uiDeviceProgress.IsActive = isActive;
         }
 
-#region DOCK
+        #region DOCK
 
         /// <summary>
         /// Returns true iff the new page is actually the same as the current page.
@@ -639,7 +639,7 @@ namespace BluetoothDeviceController
             {
                 var nvi = list[i] as NavigationViewItemBase;
                 var wrapper = nvi?.Tag as DeviceInformationWrapper;
-                if (wrapper != null && wrapper.di != null && String.Compare(wrapper.di.Id, diToFind.Id, true, CultureInfo.InvariantCulture)==0)
+                if (wrapper != null && wrapper.di != null && String.Compare(wrapper.di.Id, diToFind.Id, true, CultureInfo.InvariantCulture) == 0)
                 {
                     return i;
                 }
@@ -702,7 +702,7 @@ namespace BluetoothDeviceController
             string id = "??-??";
             if (wrapper.di != null)
             {
-                id = GuidGetCommon.NiceId (wrapper.di.Id);
+                id = GuidGetCommon.NiceId(wrapper.di.Id);
                 var isAll_bluetooth_devices = Preferences.Scope == UserPreferences.SearchScope.Ble_All_ble_devices;
                 bool hasDeviceName;
                 (name, hasDeviceName) = GetDeviceInformationName(wrapper.di);
@@ -872,7 +872,7 @@ namespace BluetoothDeviceController
             };
             menu.HorizontalAlignment = HorizontalAlignment.Stretch;
             uiNavigation.MenuItems.Insert(idx, menu);
-            SearchFeedback.FoundDevice(FoundDeviceInfo.IsNew); 
+            SearchFeedback.FoundDevice(FoundDeviceInfo.IsNew);
         }
 
         /// <summary>
@@ -941,7 +941,7 @@ namespace BluetoothDeviceController
         /// </summary>
         /// <param name="readType">only used for the BLE scope items</param>
         /// <param name="scope">Can be any scope: the BLE (has_specialty, named, all), advert (beacon) or COM types.</param>
-        private void StartSearchWithTime(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope, ScanTimeType scanTimeType=ScanTimeType.TimeIsPreference)
+        private void StartSearchWithTime(UserPreferences.ReadSelection readType, UserPreferences.SearchScope scope, ScanTimeType scanTimeType = ScanTimeType.TimeIsPreference)
         {
             // Track whether or no we should clear the screen. We clean the screen and the list
             // when it's a "new" search
@@ -1023,7 +1023,7 @@ namespace BluetoothDeviceController
             {
                 case UserPreferences.SearchScope.Bluetooth_Com_Device:
                     break;
-                case UserPreferences.SearchScope.Bluetooth_Beacons: 
+                case UserPreferences.SearchScope.Bluetooth_Beacons:
                     break;
                 default:
                     switch (readType)
@@ -1050,7 +1050,7 @@ namespace BluetoothDeviceController
             var sbp = ContentFrame.Content as Beacons.SimpleBeaconPage;
             sbp?.ClearDisplay(); // if it's a SimpleBeaconPage then clear it. Don't clear anything else.
         }
-        public bool GetSearchActive() 
+        public bool GetSearchActive()
         {
             var retval = MenuDeviceInformationWatcher != null || BTAdvertisementWatcher.IsActive;
             return retval;
@@ -1151,7 +1151,7 @@ namespace BluetoothDeviceController
                             Timeout_BluetoothLEAdvertisementWatcher.Interval = TimeSpan.MaxValue;
                             break;
                     }
-                    BTAdvertisementWatcher.Start(); 
+                    BTAdvertisementWatcher.Start();
                     Timeout_BluetoothLEAdvertisementWatcher.Start();
 
                     await LogAllAdapters();
@@ -1244,8 +1244,9 @@ namespace BluetoothDeviceController
 
 
             // why was this calculated? var id = GuidGetCommon.NiceId(args.Id);
-            await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
-                async () => {
+            await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                async () =>
+                {
                     try
                     {
                         await AddDeviceAsync(new DeviceInformationWrapper(args));
@@ -1331,7 +1332,7 @@ namespace BluetoothDeviceController
             //int startidx = FindListStart() + 1;
             //int endidx = FindListEnd() - 1;
             if (ct.IsCancellationRequested) return;
-            for (int i=0; i< MenuItemCache.Count; i++)
+            for (int i = 0; i < MenuItemCache.Count; i++)
             {
                 var nvi = MenuItemCache[i] as NavigationViewItemBase;
                 var di = nvi?.Tag as DeviceInformationWrapper;
@@ -1539,7 +1540,7 @@ namespace BluetoothDeviceController
             ;
         }
 #endif
-#region MENU
+        #region MENU
 #if NEVER_EVER_DEFINED
         private async void OnRequestFeedback(object sender, TappedRoutedEventArgs e)
         {
@@ -1587,7 +1588,7 @@ namespace BluetoothDeviceController
 
         }
 
-        public enum ScanTimeType {  TimeIsPreference, TimeIsInfinite};
+        public enum ScanTimeType { TimeIsPreference, TimeIsInfinite };
 
         private void MenuOnSweepBeaconAdvertisement(object sender, RoutedEventArgs e)
         {
@@ -1610,6 +1611,7 @@ namespace BluetoothDeviceController
         // Stuff needed to keep the screen on
         static Windows.System.Display.DisplayRequest CurrDisplayRequest = null;
 
+
         private void MenuOnToggleScreenOn(object sender, RoutedEventArgs e)
         {
             if (CurrDisplayRequest == null)
@@ -1626,6 +1628,16 @@ namespace BluetoothDeviceController
                 CurrDisplayRequest.RequestRelease();
             }
         }
+        private void MenuOnToggleAdvancedShortcuts(object sender, RoutedEventArgs e)
+        {
+            switch (CurrShortcutType)
+            {
+                case ShortcutType.Normal: CurrShortcutType = ShortcutType.Advanced; break;
+                default: CurrShortcutType = ShortcutType.Normal; break;
+            }
+        }
+        enum ShortcutType { Normal, Advanced };
+        ShortcutType CurrShortcutType = ShortcutType.Normal;
 
         UserPreferences.SortBy SavedBeaconSortBy = UserPreferences.SortBy.Time;
         // Can delete any time: Sort direction is in preferences now: SimpleBeaconPage.SortDirection SavedBeaconSortDirection = SimpleBeaconPage.SortDirection.Ascending;
@@ -1663,7 +1675,7 @@ namespace BluetoothDeviceController
             {
                 return;
             }
-            Preferences.MenuFilterSortDirection  = uiMenuFilterSimpleBeaconPageAscending.IsChecked ? UserPreferences.SortDirection.Ascending : UserPreferences.SortDirection.Descending;
+            Preferences.MenuFilterSortDirection = uiMenuFilterSimpleBeaconPageAscending.IsChecked ? UserPreferences.SortDirection.Ascending : UserPreferences.SortDirection.Descending;
             Preferences.SaveToLocalSettings();
             await UpdateSimpleBeaconPage();
         }
@@ -1720,6 +1732,46 @@ namespace BluetoothDeviceController
             };
             await dlg.ShowAsync();
         }
-#endregion MENU
+
+        #endregion MENU
+
+        private void OnKeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            switch (CurrShortcutType)
+            {
+                case ShortcutType.Advanced:
+                    switch (e.Key)
+                    {
+                        case Windows.System.VirtualKey.C: // Cancel current scan
+                            e.Handled = true;
+                            this.CancelSearch();
+                            break;
+                        case Windows.System.VirtualKey.R: // Remove 
+                            e.Handled = true;
+                            var item = MostRecentNaviationGotFocus;
+                            if (item != null)
+                            {
+                                uiNavigation.MenuItems.Remove(item);
+                            }
+                            break;
+                        case Windows.System.VirtualKey.S: // Scan
+                            e.Handled = true;
+                            this.StartSearchWithUserPreferences();
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        private void OnNavigationKeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            ; // After trying this, it makes more sense to do all commands globally.
+        }
+
+        NavigationViewItem MostRecentNaviationGotFocus = null;
+        private void OnNavigationGotFocus(object sender, RoutedEventArgs e)
+        {
+            MostRecentNaviationGotFocus = e.OriginalSource as NavigationViewItem;
+        }
     }
 }

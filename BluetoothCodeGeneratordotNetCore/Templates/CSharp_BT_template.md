@@ -412,7 +412,7 @@ The parameter list for writing data to the device.
 
 ## DATAWRITER If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Source=Services/Characteristics/WriteProperties CodeListSubZero="" Trim=false
 ```
-            [[ARGDWCALL]]( [[ARGDWCALLCAST]] [[DATANAME]]);
+            [[ARGDWCALL]]( [[ARGDWCALLEXTRA]][[ARGDWCALLCAST]] [[DATANAME]]);
 ```
 
 ## FUNCTION+ENUM+INITS Type=list ListOutput=parent Source=Services/Characteristics/Commands/Parameters/ValueNames CodeListSubZero=""
