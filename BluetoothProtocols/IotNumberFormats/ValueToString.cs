@@ -18,7 +18,7 @@ namespace BluetoothDeviceController.BleEditor
     /// See https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/ for details
     /// 
     // Description is Field [SP Field]*
-    // Field is Format|Display|Name|Units  e.g. U8|HEX|Green
+    // Field is Format|Display|Name|Units|DefaultValue  e.g. U8|HEX|Green
     // Format is format [^calculation]
     //     U<bitsize> or I<bitsize> or F<bitsize>
     //      bitsize is 8, 16, 24, 32 for U and I, 32 and 64 for F
@@ -32,7 +32,7 @@ namespace BluetoothDeviceController.BleEditor
     //     OEB OEL order endian; default is little-endian
     //     OOPT reset of fields are optional
     //
-    //  Display is DEC HEX FIXED STRING
+    //  Display is DEC HEX FIXED STRING Speciality^Appearance
     public class ValueParserResult
     {
         public static ValueParserResult CreateError(string str, string error)
@@ -79,6 +79,7 @@ namespace BluetoothDeviceController.BleEditor
     /// Class to perfectly parse the binary value descriptor strings.
     /// Simple example: "U8 U8" "U8|DEC|Temp|C U8|HEX|Mode"
     /// Complex example: "Q12Q4^_125_/|FIXED|Pressure|mbar"
+    /// Default example: "U8|HEX|Mode||FF"
     /// Three levels of splitting using space, vertical-bar (|) and caret (^)
     /// </summary>
     public class ValueParserSplit
@@ -97,6 +98,7 @@ namespace BluetoothDeviceController.BleEditor
         public string DisplayFormatPrimary { get; set; } = "";
         public string NamePrimary { get; set; } = "";
         public string UnitsPrimary { get; set; } = "";
+        public string DefaultValuePrimary { get; set; } = "*";
         /// <summary>
         /// Universal GET by index. Get (0,0) is the same as getting the ByteFormatPrimary. Invalid indexes return ""
         /// </summary>
@@ -109,7 +111,8 @@ namespace BluetoothDeviceController.BleEditor
             if (index1 == 0 && index2 == 0) return ByteFormatPrimary;
             if (index1 == 1 && index2 == 0) return DisplayFormatPrimary;
             if (index1 == 2 && index2 == 0) return NamePrimary;
-            if (index2 == 3 && index2 == 0) return UnitsPrimary;
+            if (index1 == 3 && index2 == 0) return UnitsPrimary;
+            if (index2 == 4 && index2 == 0) return DefaultValuePrimary;
             if (index1 >= SplitData.Length) return "";
             if (index2 >= SplitData[index1].Length) return "";
             return SplitData[index1][index2];
@@ -138,6 +141,7 @@ namespace BluetoothDeviceController.BleEditor
                     case 1: DisplayFormatPrimary = SplitData[i][0]; break;
                     case 2: NamePrimary = SplitData[i][0]; break;
                     case 3: UnitsPrimary = SplitData[i][0]; break;
+                    case 4: DefaultValuePrimary = SplitData[i][0]; break;
                 }
             }
         }

@@ -542,8 +542,8 @@ namespace BluetoothDeviceController.SpecialtyPages
                 // e.g., new UxTextValue(LED_Write_Counter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Counter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Junk1.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(LED_Write_Len1.Text, System.Globalization.NumberStyles.None),
-                new UxTextValue(LED_Write_Len2.Text, System.Globalization.NumberStyles.None),
+                new UxTextValue(LED_Write_Len1.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Len2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Junk2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_H.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_S.Text, System.Globalization.NumberStyles.None),
@@ -564,8 +564,8 @@ namespace BluetoothDeviceController.SpecialtyPages
                 // e.g., new UxTextValue(LED_Write_Counter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Counter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Junk1.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(LED_Write_Len1.Text, System.Globalization.NumberStyles.None),
-                new UxTextValue(LED_Write_Len2.Text, System.Globalization.NumberStyles.None),
+                new UxTextValue(LED_Write_Len1.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Len2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Junk2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_H.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_S.Text, System.Globalization.NumberStyles.None),
@@ -580,7 +580,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         private async Task DoWriteLED_Write(List<UxTextValue> values)
         {
-            if (values.Count != 7) return; // Change #2; TODO: Correct number here
+            if (values.Count != 10) return;
             int valueIndex = 0; // Change #3;
 
             SetStatusActive (true);

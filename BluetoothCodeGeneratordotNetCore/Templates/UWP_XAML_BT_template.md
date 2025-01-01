@@ -93,7 +93,7 @@ Feel free to add in this little explainer to the code
                     <!-- Data=[[DataName]] Characteristic=[[CharacteristicName]] Service=[[ServiceName]] -->
 
 ```
-                    <TextBox IsReadOnly="[[IS+READ+ONLY]]" x:Name="[[CharacteristicName.dotNet]]_[[DataName.dotNet]]" Text="*" Header="[[DATANAMEUSER]]" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="[[IS+READ+ONLY]]" x:Name="[[CharacteristicName.dotNet]]_[[DataName.dotNet]]" Text="[[DEFAULT+VALUE]]" Header="[[DATANAMEUSER]]" Style="{StaticResource HEXStyle}"/>
 ```
 
 ## XAML+READWRITE+BUTTON+LIST Type=list Source=Services/Characteristics/Buttons ListOutput=parent CodeListSubZero=""

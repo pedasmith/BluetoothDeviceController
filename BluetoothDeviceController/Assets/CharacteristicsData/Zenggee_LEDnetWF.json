@@ -36,7 +36,7 @@
             {
               "UUID": "0000ff02-0000-1000-8000-00805f9b34fb",
               "Name": "LED_Response",
-              "Type": "U8|HEX|Junk10 U8|DEC|Counter U24|HEX|Junk11 U24|HEX|Junk12 STRING|ASCII|JsonResponse",
+              "Type": "U8|HEX|Junk10 U8|HEX|Counter U24|HEX|Junk11 U24|HEX|Junk12 STRING|ASCII|JsonResponse",
               "IsRead": true,
               "IsNotify": true,
               "Verbs": ":Read:Notify:RdInNo:InNo:",
@@ -47,7 +47,7 @@
             {
               "UUID": "0000ff01-0000-1000-8000-00805f9b34fb",
               "Name": "LED_Write",
-              "Type": "U16|HEX|Counter U24|HEX|Junk1 U8|DEC|Len1 U8|DEC|Len2 U24|HEX|Junk2 U8|DEC|H U8|DEC|S U8|DEC|V U16|HEX|White BYTES|HEX|Junk3",
+              "Type": "U16|HEX|Counter||0500 U24|HEX|Junk1||000080 U8|HEX|Len1||0D U8|HEX|Len2||0E U24|HEX|Junk2||a13b0b U8|DEC|H||0 U8|DEC|S||100 U8|DEC|V||100 U16|HEX|White||0000 BYTES|HEX|Junk3||00_00_00_00_00_00",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "Verbs": ":Write:WriteWithoutResponse:WrWw:",

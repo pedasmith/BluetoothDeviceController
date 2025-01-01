@@ -405,7 +405,7 @@ PageCSharp+CharacteristicWriteTemplate
 
         private async Task DoWrite[[CharacteristicName.dotNet]](List<UxTextValue> values)
         {
-            if (values.Count != 7) return; // Change #2; TODO: Correct number here
+            if (values.Count != [[WRITE+NARGS]]) return;
             int valueIndex = 0; // Change #3;
 			
             SetStatusActive (true);

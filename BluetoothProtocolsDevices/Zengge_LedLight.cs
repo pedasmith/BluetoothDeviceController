@@ -436,7 +436,7 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             const int MAXBYTES = 20;
-            if (command.Length <= MAXBYTES) //TODO: make sure this works
+            if (true || (command.Length <= MAXBYTES)) //TODO: make sure this works TODO: short-cut for Zennggee
             {
                 await WriteCommandAsync(CharacteristicsEnum.LED_Write_LED_Control_enum, "LED_Write", command, GattWriteOption.WriteWithoutResponse);
             }

@@ -407,6 +407,9 @@ namespace BluetoothCodeGenerator
 
             var split = ValueParserSplit.ParseLine(btCharacteristic.Type);
 
+            string write_nargs = split.Count.ToString();
+            ch.AddMacro("WRITE+NARGS", write_nargs);
+
             // Properties are per-data which is finer grained than just per-characteristic.
             var isFirstProperty = true;
             for (int i = 0; i < split.Count; i++)
@@ -427,6 +430,7 @@ namespace BluetoothCodeGenerator
                 // DataToString.dotNet
                 var dotNetDisplayFormat = "ToString()";
                 var isDouble = ByteFormatToCSharpAsDouble(item.ByteFormatPrimary) == "AsDouble";
+                var defaultValue = "*";
                 switch (item.DisplayFormatPrimary)
                 {
                     case "DEC":
@@ -447,6 +451,11 @@ namespace BluetoothCodeGenerator
                         break;
                 }
 
+                if (item.DefaultValuePrimary != "")
+                {
+                    defaultValue = item.DefaultValuePrimary;
+                }
+                defaultValue = defaultValue.Replace("_", " "); // TODO: question: is this the right escape for spaces?
                 if (hasRead)
                 {
                     var datareadpr = new TemplateSnippet(dataname);
@@ -474,6 +483,7 @@ namespace BluetoothCodeGenerator
                     datareadpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
                     datareadpr.AddMacro("DEC+OR+HEX", displayFormat);
                     datareadpr.AddMacro("DataToString.dotNet", dotNetDisplayFormat);
+                    datareadpr.AddMacro("DEFAULT+VALUE", defaultValue);
                 }
                 if (hasWrite)
                 {
@@ -503,6 +513,7 @@ namespace BluetoothCodeGenerator
                     datawritepr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
                     datawritepr.AddMacro("DEC+OR+HEX", displayFormat);
                     datawritepr.AddMacro("DataToString.dotNet", dotNetDisplayFormat);
+                    datawritepr.AddMacro("DEFAULT+VALUE", defaultValue);
                 }
 
                 if (true) // always do this
@@ -530,6 +541,7 @@ namespace BluetoothCodeGenerator
 
                     dataallpr.AddMacro("DEC+OR+HEX", displayFormat);
                     dataallpr.AddMacro("DataToString.dotNet", dotNetDisplayFormat);
+                    dataallpr.AddMacro("DEFAULT+VALUE", defaultValue);
 
                     // Bad hack: the first item for write is also added to the characteristic
                     // This is needed for the write which should sweep up the different text boxes, but doesn't.
