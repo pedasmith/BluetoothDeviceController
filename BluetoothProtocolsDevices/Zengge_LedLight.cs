@@ -9,13 +9,14 @@ using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
+
 using Utilities;
 
 namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2024-12-29::20:52
+    /// This class was automatically generated 2025-01-02::09:23
     /// </summary>
 
     public partial class Zengge_LedLight : INotifyPropertyChanged
@@ -325,7 +326,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(CharacteristicsEnum.LED_Response_LED_Control_enum, "LED_Response", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U8|HEX|Junk10 U8|DEC|Counter U24|HEX|Junk11 U24|HEX|Junk12 STRING|ASCII|JsonResponse";
+            var datameaning = "U8|HEX|Junk10 U8|HEX|Counter U24|HEX|Junk11 U24|HEX|Junk12 STRING|ASCII|JsonResponse";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
             LED_Response_Junk10 = parseResult.ValueList.GetValue("Junk10").AsDouble;
             LED_Response_Counter = parseResult.ValueList.GetValue("Counter").AsDouble;
@@ -385,7 +386,7 @@ namespace BluetoothProtocols
 
         private void NotifyLED_ResponseCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            var datameaning = "U8|HEX|Junk10 U8|DEC|Counter U24|HEX|Junk11 U24|HEX|Junk12 STRING|ASCII|JsonResponse";
+            var datameaning = "U8|HEX|Junk10 U8|HEX|Counter U24|HEX|Junk11 U24|HEX|Junk12 STRING|ASCII|JsonResponse";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
             LED_Response_Junk10 = parseResult.ValueList.GetValue("Junk10").AsDouble;
             LED_Response_Counter = parseResult.ValueList.GetValue("Counter").AsDouble;
@@ -424,10 +425,10 @@ namespace BluetoothProtocols
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
             dw.WriteUInt16(  Counter);
-            dw.WriteUInt24(Junk1);
+            dw.WriteUInt24(  Junk1);
             dw.WriteByte(  Len1);
             dw.WriteByte(  Len2);
-            dw.WriteUInt24( Junk2);
+            dw.WriteUInt24(  Junk2);
             dw.WriteByte(  H);
             dw.WriteByte(  S);
             dw.WriteByte(  V);
@@ -435,18 +436,25 @@ namespace BluetoothProtocols
             dw.WriteBytes(  Junk3);
 
             var command = dw.DetachBuffer().ToArray();
-            const int MAXBYTES = 20;
-            if (true || (command.Length <= MAXBYTES)) //TODO: make sure this works TODO: short-cut for Zennggee
-            {
-                await WriteCommandAsync(CharacteristicsEnum.LED_Write_LED_Control_enum, "LED_Write", command, GattWriteOption.WriteWithoutResponse);
-            }
-            else for (int i=0; i<command.Length; i+= MAXBYTES)
-            {
-                // So many calculations and copying just to get a slice
-                var maxCount = Math.Min(MAXBYTES, command.Length - i);
-                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(CharacteristicsEnum.LED_Write_LED_Control_enum, "LED_Write", subcommand, GattWriteOption.WriteWithoutResponse);
-            }
+            await WriteCommandAsync(CharacteristicsEnum.LED_Write_LED_Control_enum, "LED_Write", command, GattWriteOption.WriteWithoutResponse);
+
+            // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
+            // You can send large amounts of data, and it will be fragmented automatically by the 
+            // OS using the MTU. Your application is not limited by the MTU size as to the data transfer of each packet.
+
+            // Old code, not needed. Chcked the file history; this code has always been this way
+            //const int MAXBYTES = 20;
+            //if (command.Length <= MAXBYTES) //TODO: make sure this works
+            //{
+            //    await WriteCommandAsync(CharacteristicsEnum.LED_Write_LED_Control_enum, "LED_Write", command, GattWriteOption.WriteWithoutResponse);
+            //}
+            //else for (int i=0; i<command.Length; i+= MAXBYTES)
+            //{
+            //    // So many calculations and copying just to get a slice
+            //    var maxCount = Math.Min(MAXBYTES, command.Length - i);
+            //    var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+            //    await WriteCommandAsync(CharacteristicsEnum.LED_Write_LED_Control_enum, "LED_Write", subcommand, GattWriteOption.WriteWithoutResponse);
+            //}
         }
 
 

@@ -13,6 +13,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
 
+using Utilities;
 
 namespace BluetoothProtocols
 {
@@ -395,18 +396,25 @@ The parameter list for writing data to the device.
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
 [[DATAWRITER]]
             var command = dw.DetachBuffer().ToArray();
-            const int MAXBYTES = 20;
-            if (command.Length <= MAXBYTES) //TODO: make sure this works
-            {
-                await WriteCommandAsync(CharacteristicsEnum.[[Name.dotNet]]_[[../Name.dotNet]]_enum, "[[Name.dotNet]]", command, [[WRITEMODE]]);
-            }
-            else for (int i=0; i<command.Length; i+= MAXBYTES)
-            {
-                // So many calculations and copying just to get a slice
-                var maxCount = Math.Min(MAXBYTES, command.Length - i);
-                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(CharacteristicsEnum.[[Name.dotNet]]_[[../Name.dotNet]]_enum, "[[Name.dotNet]]", subcommand, [[WRITEMODE]]);
-            }
+            await WriteCommandAsync(CharacteristicsEnum.[[Name.dotNet]]_[[../Name.dotNet]]_enum, "[[Name.dotNet]]", command, [[WRITEMODE]]);
+
+            // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
+            // You can send large amounts of data, and it will be fragmented automatically by the 
+            // OS using the MTU. Your application is not limited by the MTU size as to the data transfer of each packet.
+
+            // Old code, not needed. Chcked the file history; this code has always been this way
+            //const int MAXBYTES = 20;
+            //if (command.Length <= MAXBYTES) //TODO: make sure this works
+            //{
+            //    await WriteCommandAsync(CharacteristicsEnum.[[Name.dotNet]]_[[../Name.dotNet]]_enum, "[[Name.dotNet]]", command, [[WRITEMODE]]);
+            //}
+            //else for (int i=0; i<command.Length; i+= MAXBYTES)
+            //{
+            //    // So many calculations and copying just to get a slice
+            //    var maxCount = Math.Min(MAXBYTES, command.Length - i);
+            //    var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+            //    await WriteCommandAsync(CharacteristicsEnum.[[Name.dotNet]]_[[../Name.dotNet]]_enum, "[[Name.dotNet]]", subcommand, [[WRITEMODE]]);
+            //}
         }
 ```
 

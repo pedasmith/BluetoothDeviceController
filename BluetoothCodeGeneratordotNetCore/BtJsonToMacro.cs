@@ -101,20 +101,23 @@ namespace BluetoothCodeGenerator
                 case "U8": return "dw.WriteByte";
                 case "I16": return "dw.WriteInt16";
                 case "U16": return "dw.WriteUInt16";
-                case "I24": return "DataWriterExtention.WriteInt24";  // TOdo: need this class defined :-)
-                case "U24": return "DataWriterExtention.WriteUInt24"; 
+                case "I24": return "dw.WriteInt24";
+                case "U24": return "dw.WriteUInt24"; 
                 case "I32": return "dw.WriteInt32";
                 case "U32": return "dw.WriteUInt32";
                 case "F32": return "dw.WriteSingle";
             }
             return $"dw.WriteUNKNOWN_TYPE_{format}";
         }
+        /// <summary>
+        /// This was needed, briefly, for some special handling. Now it's obsolete but still here.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
         private static string ByteFormatToDataWriterCallExtra(string format)
         {
             switch (format)
             {
-                case "I24": return "dw, "; 
-                case "U24": return "dw, "; 
             }
             return $"";
         }
