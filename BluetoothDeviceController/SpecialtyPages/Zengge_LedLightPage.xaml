@@ -111,9 +111,9 @@
                     <TextBox IsReadOnly="False" x:Name="LED_Write_Counter" Text="0500" Header="Counter" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_FragmentFlag" Text="80" Header="FragmentFlag" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_FragCounter" Text="00" Header="FragCounter" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="LED_Write_TotalLength" Text="0D00" Header="TotalLength" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_TotalLength" Text="000D" Header="TotalLength" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_FragmentLength" Text="0E" Header="FragmentLength" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="LED_Write_Junk2" Text="a13b0b" Header="Junk2" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_Junk2" Text="0b3ba1" Header="Junk2" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_H" Text="0" Header="H" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_S" Text="100" Header="S" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_V" Text="100" Header="V" Style="{StaticResource HEXStyle}"/>

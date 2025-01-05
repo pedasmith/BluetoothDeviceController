@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2025-01-04::16:06
+    /// This class was automatically generated 2025-01-04::17:04
     /// </summary>
 
     public partial class Zengge_LedLight : INotifyPropertyChanged
@@ -393,17 +393,19 @@ namespace BluetoothProtocols
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bluetooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteUInt16(  Counter);
-            dw.WriteByte(  FragmentFlag);
-            dw.WriteByte(  FragCounter);
-            dw.WriteUInt16(  TotalLength);
-            dw.WriteByte(  FragmentLength);
-            dw.WriteUInt24(  Junk2);
-            dw.WriteByte(  H);
-            dw.WriteByte(  S);
-            dw.WriteByte(  V);
-            dw.WriteUInt16(  White);
-            dw.WriteBytes(  Junk3);
+            dw.WriteUInt16(Counter);
+            dw.WriteByte(FragmentFlag);
+            dw.WriteByte(FragCounter);
+            dw.ByteOrder = ByteOrder.BigEndian;
+            dw.WriteUInt16(TotalLength);
+            dw.WriteByte(FragmentLength);
+            dw.WriteUInt24(Junk2);
+            dw.ByteOrder = ByteOrder.LittleEndian;
+            dw.WriteByte(H);
+            dw.WriteByte(S);
+            dw.WriteByte(V);
+            dw.WriteUInt16(White);
+            dw.WriteBytes(Junk3);
 
             var command = dw.DetachBuffer().ToArray();
             await WriteCommandAsync(CharacteristicsEnum.LED_Write_LED_Control_enum, "LED_Write", command, GattWriteOption.WriteWithoutResponse);

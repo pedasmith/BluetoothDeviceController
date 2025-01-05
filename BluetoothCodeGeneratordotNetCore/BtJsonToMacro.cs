@@ -109,18 +109,7 @@ namespace BluetoothCodeGenerator
             }
             return $"dw.WriteUNKNOWN_TYPE_{format}";
         }
-        /// <summary>
-        /// This was needed, briefly, for some special handling. Now it's obsolete but still here.
-        /// </summary>
-        /// <param name="format"></param>
-        /// <returns></returns>
-        private static string ByteFormatToDataWriterCallExtra(string format)
-        {
-            //switch (format)
-            //{
-            //}
-            return $"";
-        }
+
         private static string ByteFormatToDataWriterCallCast(string format)
         {
             switch (format)
@@ -420,12 +409,19 @@ namespace BluetoothCodeGenerator
             ch.AddMacro("WRITE+NARGS", write_nargs.ToString());
 
             // Properties are per-data which is finer grained than just per-characteristic.
+            var writePrefix = ""; // will normally be nothing, but sometimes "dw.ByteOrder = ByteOrder.[Little|Big]Endian;\n    "
             var isFirstProperty = true;
             for (int i = 0; i < split.Count; i++)
             {
                 var item = split[i];
                 var dataname = item.NamePrimary;
                 if (dataname == "") dataname = $"param{i}";
+
+                switch (item.ByteFormatPrimary)
+                {
+                    case "OEB": writePrefix = "dw.ByteOrder = ByteOrder.BigEndian;\n            "; break;
+                    case "OEL": writePrefix = "dw.ByteOrder = ByteOrder.LittleEndian;\n            "; break;
+                }
                 if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
 
 
@@ -485,7 +481,6 @@ namespace BluetoothCodeGenerator
 
                     //NOTE: Why are these 3 write items here for a reader?
                     datareadpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
-                    datareadpr.AddMacro("ARGDWCALLEXTRA", ByteFormatToDataWriterCallExtra(item.ByteFormatPrimary));
                     datareadpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
 
                     datareadpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
@@ -515,8 +510,7 @@ namespace BluetoothCodeGenerator
                     datawritepr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
                     datawritepr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
                     datawritepr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
-                    datawritepr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
-                    datawritepr.AddMacro("ARGDWCALLEXTRA", ByteFormatToDataWriterCallExtra(item.ByteFormatPrimary));
+                    datawritepr.AddMacro("ARGDWCALL", writePrefix + ByteFormatToDataWriterCall(item.ByteFormatPrimary));
                     datawritepr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
                     datawritepr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     datawritepr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
@@ -543,7 +537,6 @@ namespace BluetoothCodeGenerator
                     dataallpr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
                     dataallpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
                     dataallpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
-                    dataallpr.AddMacro("ARGDWCALLEXTRA", ByteFormatToDataWriterCallExtra(item.ByteFormatPrimary));
                     dataallpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
                     dataallpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     dataallpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
@@ -561,6 +554,7 @@ namespace BluetoothCodeGenerator
                         ch.AddMacro("DEC+OR+HEX", displayFormat);
                     }
                 }
+                writePrefix = "";
                 isFirstProperty = false;
             }
             readprs = null;
