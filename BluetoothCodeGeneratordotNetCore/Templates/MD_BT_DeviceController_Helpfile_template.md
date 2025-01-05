@@ -22,7 +22,7 @@ Instrutions for adding new devices
 2. Move the XAML and XAML.CS files to BluetothDeviceController/SpecialtyPages
 3. Add the specialization to  **mainpage.xaml.cs** about line 90-135 add a specialization line like ```            new Specialization (typeof(SpecialtyPages.[[CLASSNAME]]Page), new string[] { "[[DeviceName]]" }, [[DeviceType]], "[[Maker]]", "[[ShortDescription]]"),```
 4. Compile and run!
-5. Update the version.md file in Assets/HelpFiles!
+5. Update the help_version.md file in Assets/HelpFiles!
 
 
 

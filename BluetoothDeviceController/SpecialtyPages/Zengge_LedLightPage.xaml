@@ -77,30 +77,8 @@
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
-        <!-- XAML+SERVICE+LIST for Common Configuration -->
-        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
-            <StackPanel Style="{StaticResource ChacteristicListStyle}">
-                            <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="@@" Header="Device Name" Style="{StaticResource HEXStyle}"/>
-
-                    <Button Content="Read" Click="OnReadDevice_Name" />
-
-                </GridView>
-
-
-
-
-
-            </StackPanel>
-        </controls:Expander>
         <!-- XAML+SERVICE+LIST for LED_Control -->
-        <controls:Expander Header="LED_Control" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+        <controls:Expander Header="LED_Control" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
                             <TextBlock Style="{StaticResource SubheaderStyle}">LED_Response</TextBlock>
             <GridView>
@@ -109,11 +87,11 @@
                     <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="LED_Response_Junk10" Text="@@" Header="Junk10" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="LED_Response_Counter" Text="@@" Header="Counter" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="LED_Response_Junk11" Text="@@" Header="Junk11" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="LED_Response_Junk12" Text="@@" Header="Junk12" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="LED_Response_JsonResponse" Text="@@" Header="JsonResponse" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="LED_Response_Junk10" Text="*" Header="Junk10" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="LED_Response_Counter" Text="*" Header="Counter" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="LED_Response_Junk11" Text="*" Header="Junk11" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="LED_Response_Junk12" Text="*" Header="Junk12" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="LED_Response_JsonResponse" Text="*" Header="JsonResponse" Style="{StaticResource HEXStyle}"/>
 
                     <Button Content="Read" Click="OnReadLED_Response" />
                     <Button Content="Notify" Click="OnNotifyLED_Response" />
@@ -131,9 +109,10 @@
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_Counter" Text="0500" Header="Counter" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="LED_Write_Junk1" Text="000080" Header="Junk1" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="LED_Write_Len1" Text="0D" Header="Len1" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="LED_Write_Len2" Text="0E" Header="Len2" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_FragmentFlag" Text="80" Header="FragmentFlag" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_FragCounter" Text="00" Header="FragCounter" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_TotalLength" Text="0D00" Header="TotalLength" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_FragmentLength" Text="0E" Header="FragmentLength" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_Junk2" Text="a13b0b" Header="Junk2" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_H" Text="0" Header="H" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_S" Text="100" Header="S" Style="{StaticResource HEXStyle}"/>
@@ -142,6 +121,28 @@
                     <TextBox IsReadOnly="False" x:Name="LED_Write_Junk3" Text="00 00 00 00 00 00" Header="Junk3" Style="{StaticResource HEXStyle}"/>
 
                     <Button Content="Write" Click="OnWriteLED_Write" />
+
+                </GridView>
+
+
+
+
+
+            </StackPanel>
+        </controls:Expander>
+        <!-- XAML+SERVICE+LIST for Common Configuration -->
+        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+                            <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+            <GridView>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
+
+                    <Button Content="Read" Click="OnReadDevice_Name" />
 
                 </GridView>
 

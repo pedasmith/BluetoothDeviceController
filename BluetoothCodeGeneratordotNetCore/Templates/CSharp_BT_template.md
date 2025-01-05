@@ -391,7 +391,7 @@ The parameter list for writing data to the device.
             if (!await EnsureCharacteristicAsync(CharacteristicsEnum.[[Name.dotNet]]_[[../Name.dotNet]]_enum)) return;
 
             var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bluetooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
 [[DATAWRITER]]
@@ -402,7 +402,8 @@ The parameter list for writing data to the device.
             // You can send large amounts of data, and it will be fragmented automatically by the 
             // OS using the MTU. Your application is not limited by the MTU size as to the data transfer of each packet.
 
-            // Old code, not needed. Chcked the file history; this code has always been this way
+            // Old code, not needed. After checking the file history; this code has always been this way, so it's not
+            // clear that it was ever needed.
             //const int MAXBYTES = 20;
             //if (command.Length <= MAXBYTES) //TODO: make sure this works
             //{

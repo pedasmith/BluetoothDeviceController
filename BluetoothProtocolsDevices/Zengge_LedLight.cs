@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2025-01-02::09:23
+    /// This class was automatically generated 2025-01-04::16:06
     /// </summary>
 
     public partial class Zengge_LedLight : INotifyPropertyChanged
@@ -37,13 +37,13 @@ namespace BluetoothProtocols
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         Guid[] ServiceGuids = new Guid[] {
-           Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"),
            Guid.Parse("0000ffff-0000-1000-8000-00805f9b34fb"),
+           Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"),
 
         };
         String[] ServiceNames = new string[] {
-            "Common Configuration",
             "LED_Control",
+            "Common Configuration",
 
         };
         GattDeviceService[] Services = new GattDeviceService[] {
@@ -52,15 +52,15 @@ namespace BluetoothProtocols
 
         };
         Guid[] CharacteristicGuids = new Guid[] {
-            Guid.Parse("00002a00-0000-1000-8000-00805f9b34fb"), // #0 is Device Name
             Guid.Parse("0000ff02-0000-1000-8000-00805f9b34fb"), // #0 is LED_Response
             Guid.Parse("0000ff01-0000-1000-8000-00805f9b34fb"), // #1 is LED_Write
+            Guid.Parse("00002a00-0000-1000-8000-00805f9b34fb"), // #0 is Device Name
 
         };
         String[] CharacteristicNames = new string[] {
-            "Device Name", // #0 is 00002a00-0000-1000-8000-00805f9b34fb
             "LED_Response", // #0 is 0000ff02-0000-1000-8000-00805f9b34fb
             "LED_Write", // #1 is 0000ff01-0000-1000-8000-00805f9b34fb
+            "Device Name", // #0 is 00002a00-0000-1000-8000-00805f9b34fb
 
         };
         GattCharacteristic[] Characteristics = new GattCharacteristic[] {
@@ -70,21 +70,21 @@ namespace BluetoothProtocols
 
         };
         List<HashSet<int>> MapServiceToCharacteristic = new List<HashSet<int>>() {
-            new HashSet<int>(){ 0,  },
-            new HashSet<int>(){ 1, 2,  },
+            new HashSet<int>(){ 0, 1,  },
+            new HashSet<int>(){ 2,  },
 
         };
         List<int> MapCharacteristicToService = new List<int>() {
             0, // Characteristic 0
-            1, // Characteristic 1
+            0, // Characteristic 1
             1, // Characteristic 2
             
         };
         public enum CharacteristicsEnum {
             All_enum = -1,
-            Device_Name_Common_Configuration_enum = 0,
-            LED_Response_LED_Control_enum = 1,
-            LED_Write_LED_Control_enum = 2,
+            LED_Response_LED_Control_enum = 0,
+            LED_Write_LED_Control_enum = 1,
+            Device_Name_Common_Configuration_enum = 2,
 
         };
 
@@ -248,37 +248,6 @@ namespace BluetoothProtocols
 
 
 
-        private string _Device_Name = "";
-        private bool _Device_Name_set = false;
-        public string Device_Name
-        {
-            get { return _Device_Name; }
-            internal set { if (_Device_Name_set && value == _Device_Name) return; _Device_Name = value; _Device_Name_set = true; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// Reads data
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadDevice_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum)) return null;
-            IBuffer result = await ReadAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum, "Device_Name", cacheMode);
-            if (result == null) return null;
-
-            var datameaning = "STRING|ASCII|Device_Name";
-            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-            Device_Name = parseResult.ValueList.GetValue("Device_Name").AsString;
-
-            // Hint: get the data that's been read with e.g. 
-            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
-            return parseResult.ValueList;
-        }
-
-
-
-
         private double _LED_Response_Junk10 = 0;
         private bool _LED_Response_Junk10_set = false;
         public double LED_Response_Junk10
@@ -416,18 +385,19 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteLED_Write(UInt16 Counter, UInt32 Junk1, byte Len1, byte Len2, UInt32 Junk2, byte H, byte S, byte V, UInt16 White, byte[] Junk3)
+        public async Task WriteLED_Write(UInt16 Counter, byte FragmentFlag, byte FragCounter, UInt16 TotalLength, byte FragmentLength, UInt32 Junk2, byte H, byte S, byte V, UInt16 White, byte[] Junk3)
         {
             if (!await EnsureCharacteristicAsync(CharacteristicsEnum.LED_Write_LED_Control_enum)) return;
 
             var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bluetooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
             dw.WriteUInt16(  Counter);
-            dw.WriteUInt24(  Junk1);
-            dw.WriteByte(  Len1);
-            dw.WriteByte(  Len2);
+            dw.WriteByte(  FragmentFlag);
+            dw.WriteByte(  FragCounter);
+            dw.WriteUInt16(  TotalLength);
+            dw.WriteByte(  FragmentLength);
             dw.WriteUInt24(  Junk2);
             dw.WriteByte(  H);
             dw.WriteByte(  S);
@@ -442,7 +412,8 @@ namespace BluetoothProtocols
             // You can send large amounts of data, and it will be fragmented automatically by the 
             // OS using the MTU. Your application is not limited by the MTU size as to the data transfer of each packet.
 
-            // Old code, not needed. Chcked the file history; this code has always been this way
+            // Old code, not needed. After checking the file history; this code has always been this way, so it's not
+            // clear that it was ever needed.
             //const int MAXBYTES = 20;
             //if (command.Length <= MAXBYTES) //TODO: make sure this works
             //{
@@ -456,6 +427,37 @@ namespace BluetoothProtocols
             //    await WriteCommandAsync(CharacteristicsEnum.LED_Write_LED_Control_enum, "LED_Write", subcommand, GattWriteOption.WriteWithoutResponse);
             //}
         }
+
+
+        private string _Device_Name = "";
+        private bool _Device_Name_set = false;
+        public string Device_Name
+        {
+            get { return _Device_Name; }
+            internal set { if (_Device_Name_set && value == _Device_Name) return; _Device_Name = value; _Device_Name_set = true; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<BCBasic.BCValueList> ReadDevice_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum)) return null;
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Device_Name_Common_Configuration_enum, "Device_Name", cacheMode);
+            if (result == null) return null;
+
+            var datameaning = "STRING|ASCII|Device_Name";
+            var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
+            Device_Name = parseResult.ValueList.GetValue("Device_Name").AsString;
+
+            // Hint: get the data that's been read with e.g. 
+            // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
+            return parseResult.ValueList;
+        }
+
+
 
 
 

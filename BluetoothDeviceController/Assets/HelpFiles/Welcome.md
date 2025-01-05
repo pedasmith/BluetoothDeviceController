@@ -8,6 +8,7 @@ and more devices -- please leave feedback to request specific devices!
 ## Lights that can be controlled
 
 [![Magic Light](../DevicePictures/MagicLight-175.png)](Device_MagicLight.md)
+[![Magic Light 2024](../DevicePictures/Zengge_LedLight-175.png)](Device_Zengge_LedLight.md)
 [![Mipow Playbulb](../DevicePictures/Mipow_Playbulb_BTL201-175.png)](Device_Mipow_Playbulb_BTL201.md)
 [![TI beLight](../DevicePictures/TI_beLight_2540-175.png)](Device_TI_beLight_2540.md)
 [![Smart Bulb](../DevicePictures/Triones_SmartBulbGreen-175.png)](Device_Triones.md)

@@ -32,6 +32,8 @@
         {
           "UUID": "0000ffff-0000-1000-8000-00805f9b34fb",
           "Name": "LED_Control",
+          "Description": "Controls the Magic Light bulb.",
+          "Priority":  10,
           "Characteristics": [
             {
               "UUID": "0000ff02-0000-1000-8000-00805f9b34fb",
@@ -47,12 +49,14 @@
             {
               "UUID": "0000ff01-0000-1000-8000-00805f9b34fb",
               "Name": "LED_Write",
-              "Type": "U16|HEX|Counter||0500 U24|HEX|Junk1||000080 U8|HEX|Len1||0D U8|HEX|Len2||0E U24|HEX|Junk2||a13b0b U8|DEC|H||0 U8|DEC|S||100 U8|DEC|V||100 U16|HEX|White||0000 BYTES|HEX|Junk3||00_00_00_00_00_00",
+              "Type": "U16|HEX|Counter||0500 U8|HEX|FragmentFlag||80 U8|HEX|FragCounter||00 OEB U16|HEX|TotalLength||0D00 OEL U8|HEX|FragmentLength||0E U24|HEX|Junk2||a13b0b U8|DEC|H||0 U8|DEC|S||100 U8|DEC|V||100 U16|HEX|White||0000 BYTES|HEX|Junk3||00_00_00_00_00_00",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "Verbs": ":Write:WriteWithoutResponse:WrWw:",
               "ExampleData": [
-                  "Example: 00 05 80 00 00 0d 0e 0b 3b a1 00 64 64 00 00 00 00 00 00 00 00"
+                "Example: 00 05 80 00 00 0d 0e 0b 3b a1 00 64 64 00 00 00 00 00 00 00 00",
+                "The three bytes after 0b 3b a1 control the H S V values",
+                ""
               ]
             }
           ]

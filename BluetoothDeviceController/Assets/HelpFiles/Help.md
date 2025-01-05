@@ -34,7 +34,7 @@ Not all Bluetooth Smart light bulbs are the same. This program can control some 
 
 * [Flux](Device_MagicLight.md)
 * [Mipow](Device_Mipow_Playbulb_BTL201.md)
-* [Magic Light](Device_MagicLight.md)
+* [Magic Light](Device_MagicLight.md) and newer [Magic Light](Device_Zengge_LedLight.md) bulbs
 * [TI beLight CC2540](Device_TI_beLight_2540.md)
 * [Triones](Device_Triones.md) (includes some Bluetooth strip bulbs)
 * [Witti Dotti](Device_Witti_Dotti.md)

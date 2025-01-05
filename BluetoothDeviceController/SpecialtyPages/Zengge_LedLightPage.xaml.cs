@@ -455,12 +455,14 @@ namespace BluetoothDeviceController.SpecialtyPages
 
             private double _Counter;
             public double Counter { get { return _Counter; } set { if (value == _Counter) return; _Counter = value; OnPropertyChanged(); } }
-            private double _Junk1;
-            public double Junk1 { get { return _Junk1; } set { if (value == _Junk1) return; _Junk1 = value; OnPropertyChanged(); } }
-            private double _Len1;
-            public double Len1 { get { return _Len1; } set { if (value == _Len1) return; _Len1 = value; OnPropertyChanged(); } }
-            private double _Len2;
-            public double Len2 { get { return _Len2; } set { if (value == _Len2) return; _Len2 = value; OnPropertyChanged(); } }
+            private double _FragmentFlag;
+            public double FragmentFlag { get { return _FragmentFlag; } set { if (value == _FragmentFlag) return; _FragmentFlag = value; OnPropertyChanged(); } }
+            private double _FragCounter;
+            public double FragCounter { get { return _FragCounter; } set { if (value == _FragCounter) return; _FragCounter = value; OnPropertyChanged(); } }
+            private double _TotalLength;
+            public double TotalLength { get { return _TotalLength; } set { if (value == _TotalLength) return; _TotalLength = value; OnPropertyChanged(); } }
+            private double _FragmentLength;
+            public double FragmentLength { get { return _FragmentLength; } set { if (value == _FragmentLength) return; _FragmentLength = value; OnPropertyChanged(); } }
             private double _Junk2;
             public double Junk2 { get { return _Junk2; } set { if (value == _Junk2) return; _Junk2 = value; OnPropertyChanged(); } }
             private double _H;
@@ -519,11 +521,11 @@ namespace BluetoothDeviceController.SpecialtyPages
     {
         // Copy the contents over...
         var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,Counter,Junk1,Len1,Len2,Junk2,H,S,V,White,Junk3,Notes\n");
+        sb.Append("EventDate,EventTime,Counter,FragmentFlag,FragCounter,TotalLength,FragmentLength,Junk2,H,S,V,White,Junk3,Notes\n");
         foreach (var row in LED_WriteRecordData)
         {
             var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Counter},{row.Junk1},{row.Len1},{row.Len2},{row.Junk2},{row.H},{row.S},{row.V},{row.White},{row.Junk3},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Counter},{row.FragmentFlag},{row.FragCounter},{row.TotalLength},{row.FragmentLength},{row.Junk2},{row.H},{row.S},{row.V},{row.White},{row.Junk3},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
         var str = sb.ToString();
         var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
@@ -541,9 +543,10 @@ namespace BluetoothDeviceController.SpecialtyPages
             {
                 // e.g., new UxTextValue(LED_Write_Counter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Counter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(LED_Write_Junk1.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(LED_Write_Len1.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(LED_Write_Len2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_FragmentFlag.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_FragCounter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_TotalLength.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_FragmentLength.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Junk2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_H.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_S.Text, System.Globalization.NumberStyles.None),
@@ -563,9 +566,10 @@ namespace BluetoothDeviceController.SpecialtyPages
             {
                 // e.g., new UxTextValue(LED_Write_Counter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Counter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(LED_Write_Junk1.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(LED_Write_Len1.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(LED_Write_Len2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_FragmentFlag.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_FragCounter.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_TotalLength.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_FragmentLength.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Junk2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_H.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_S.Text, System.Globalization.NumberStyles.None),
@@ -580,7 +584,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         private async Task DoWriteLED_Write(List<UxTextValue> values)
         {
-            if (values.Count != 10) return;
+            if (values.Count != 11) return;
             int valueIndex = 0; // Change #3;
 
             SetStatusActive (true);
@@ -601,32 +605,41 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     parseError = "Counter";
                 }
-                UInt32 Junk1;
-                // History: used to go into LED_Write_Junk1.Text instead of using the variable
+                Byte FragmentFlag;
+                // History: used to go into LED_Write_FragmentFlag.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedJunk1 = Utilities.Parsers.TryParseUInt32(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Junk1);
+                var parsedFragmentFlag = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out FragmentFlag);
                 valueIndex++; // Change #5
-                if (!parsedJunk1)
+                if (!parsedFragmentFlag)
                 {
-                    parseError = "Junk1";
+                    parseError = "FragmentFlag";
                 }
-                Byte Len1;
-                // History: used to go into LED_Write_Len1.Text instead of using the variable
+                Byte FragCounter;
+                // History: used to go into LED_Write_FragCounter.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedLen1 = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Len1);
+                var parsedFragCounter = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out FragCounter);
                 valueIndex++; // Change #5
-                if (!parsedLen1)
+                if (!parsedFragCounter)
                 {
-                    parseError = "Len1";
+                    parseError = "FragCounter";
                 }
-                Byte Len2;
-                // History: used to go into LED_Write_Len2.Text instead of using the variable
+                UInt16 TotalLength;
+                // History: used to go into LED_Write_TotalLength.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedLen2 = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Len2);
+                var parsedTotalLength = Utilities.Parsers.TryParseUInt16(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out TotalLength);
                 valueIndex++; // Change #5
-                if (!parsedLen2)
+                if (!parsedTotalLength)
                 {
-                    parseError = "Len2";
+                    parseError = "TotalLength";
+                }
+                Byte FragmentLength;
+                // History: used to go into LED_Write_FragmentLength.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedFragmentLength = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out FragmentLength);
+                valueIndex++; // Change #5
+                if (!parsedFragmentLength)
+                {
+                    parseError = "FragmentLength";
                 }
                 UInt32 Junk2;
                 // History: used to go into LED_Write_Junk2.Text instead of using the variable
@@ -685,7 +698,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                 if (parseError == null)
                 {
-                    await bleDevice.WriteLED_Write(Counter, Junk1, Len1, Len2, Junk2, H, S, V, White, Junk3);
+                    await bleDevice.WriteLED_Write(Counter, FragmentFlag, FragCounter, TotalLength, FragmentLength, Junk2, H, S, V, White, Junk3);
                 }
                 else
                 { //NOTE: pop up a dialog?

@@ -4,6 +4,7 @@ These bulbs have different names and they are controlled with different apps -- 
 and are controlled with the same Bluetooth protocol. (It's almost identical to the Triones protocol that some 
 other bulbs use). The Magic Light and the Flux light both show up as a "LEDBlue" device. They do not need to be paired.
 
+Magic Light now has a new (2024) line of bulbs which use a different protocol and show up as different devices.
 
 ![Magic Light](../DevicePictures/MagicLight-175.png)
 

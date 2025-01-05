@@ -116,9 +116,9 @@ namespace BluetoothCodeGenerator
         /// <returns></returns>
         private static string ByteFormatToDataWriterCallExtra(string format)
         {
-            switch (format)
-            {
-            }
+            //switch (format)
+            //{
+            //}
             return $"";
         }
         private static string ByteFormatToDataWriterCallCast(string format)
@@ -410,8 +410,14 @@ namespace BluetoothCodeGenerator
 
             var split = ValueParserSplit.ParseLine(btCharacteristic.Type);
 
-            string write_nargs = split.Count.ToString();
-            ch.AddMacro("WRITE+NARGS", write_nargs);
+            int write_nargs = 0;
+            for (int i = 0; i < split.Count; i++)
+            {
+                var item = split[i];
+                if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
+                write_nargs++;
+            }
+            ch.AddMacro("WRITE+NARGS", write_nargs.ToString());
 
             // Properties are per-data which is finer grained than just per-characteristic.
             var isFirstProperty = true;
