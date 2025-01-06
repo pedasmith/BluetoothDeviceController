@@ -70,7 +70,7 @@
             <StackPanel Grid.Column="0">
                 <TextBlock Style="{StaticResource TitleStyle}">ihoment_H6005_ device</TextBlock>
                 <TextBlock Style="{StaticResource AboutStyle}">
-                    The Govee H6055 bulb is a standard lightbulb that accepts Bluetooth commands
+                    The Govee H6055 bulb is a standard lightbulb that accepts Bluetooth commands.
                 </TextBlock>
             </StackPanel>
             <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/Govee_H6005.PNG" />
@@ -106,12 +106,12 @@
             </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Send_Start" Text="33" Header="Start" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="Send_Command" Text="05" Header="Command" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="Send_Mode" Text="02" Header="Mode" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="Send_Mode" Text="0D" Header="Mode" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="Send_R" Text="FF" Header="R" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="Send_G" Text="FF" Header="G" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="Send_B" Text="00" Header="B" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="Send_Blank" Text="00 00 00 00 00 00 00 00 00 00 00 00 00" Header="Blank" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="Send_CRC" Text="00" Header="CRC" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="Send_CRC" Text="0" Header="CRC" Style="{StaticResource HEXStyle}"/>
 
                     <Button Content="Write" Click="OnWriteSend" />
                     <Button Content="Read" Click="OnReadSend" />

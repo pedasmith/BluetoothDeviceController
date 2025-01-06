@@ -33,6 +33,7 @@ REM %BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Template
 goto :EOF
 
 :Single
+ECHO -inputJsonFile "%JSONDIR%\%~2" -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%\%~2" -inputTemplates Templates -output output
 goto :EOF
 

@@ -9,7 +9,8 @@
         "https://us.govee.com/products/govee-smart-bluetooth-rgbww-led-bulbs?_pos=1&_sid=58c8705e1&_ss=r",
         "https://github.com/jonahclarsen/bluetooth_lights_controller/blob/main/bluetooth_lights_controller/bluetooth_led.py",
         "https://github.com/chvolkmann/govee_btled/blob/master/govee_btled/bluetooth_led.py",
-        "https://github.com/Beshelmek/govee_ble_lights/blob/master/custom_components/govee-ble-lights/light.py"
+        "https://github.com/Beshelmek/govee_ble_lights/blob/master/custom_components/govee-ble-lights/light.py",
+        "https://github.com/homebridge-plugins/homebridge-govee/issues/1005"
       ],
       "Services": [
         {
@@ -108,15 +109,19 @@
               "Name": "Send",
               "REMName": "Telink SPP: Phone->Module",
               "Description": "Telink SPP: Phone->Module",
-              "Type": "U8|HEX|Start||33 U8|HEX|Command||05 U8|HEX|Mode||02 U8|HEX|R||FF U8|HEX|G||FF U8|HEX|B||00 BYTES|HEX|Blank||00_00_00_00_00_00_00_00_00_00_00_00_00 U8|HEX|CRC||UpdateXorAtEnd",
+              "Type": "U8|HEX|Start||33 U8|HEX|Command||05 U8|HEX|Mode||0D U8|HEX|R||FF U8|HEX|G||FF U8|HEX|B||00 BYTES|HEX|Blank||00_00_00_00_00_00_00_00_00_00_00_00_00 U8|HEX|CRC||UpdateXorAtEnd",
               "IsRead": true,
               "IsWriteWithoutResponse": true,
               "Verbs": ":Read:WriteWithoutResponse:RdInNo:WrWw:",
               "ExampleData": [
-                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
+                "Value for RGB:  33 05 0D RR GG BB 00 00 00 00 00 00 00 00 00 00 00 00 00 CRC",
                 "Commands: 01=Power 04=Brightness 05=Color",
-                "Mode: 02=Manual (supported) 06=Microphone (not supported) 05=Scenes (not supported)",
-                "NOTE: for the H6005, the mode is 0D for manual; 02 doesn't work at all"
+                "Color Mode: 02=Manual (supported) 06=Microphone (not supported) 05=Scenes (not supported)",
+                "NOTE: for the H6005, the mode is 0D for manual; 02 doesn't work at all",
+                "See https://github.com/homebridge-plugins/homebridge-govee/blob/latest/lib/utils/constants.js#L487",
+                "In the constants.js look for bleColourD which lists bulbs that use the 0D for color",
+                "Value for Power     :  33 01 00|01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CRC",
+                "Value for Brightness:  33 04 LEVEL 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CRC"
               ]
             }
           ]

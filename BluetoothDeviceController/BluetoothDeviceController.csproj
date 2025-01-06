@@ -344,6 +344,8 @@
     <Content Include="Assets\DevicePictures\Govee_H5074-350.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\DevicePictures\Govee_H6005-175.png" />
+    <Content Include="Assets\DevicePictures\Govee_H6005-350.png" />
     <Content Include="Assets\DevicePictures\Kano_Wand-175.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -789,9 +791,9 @@
     <Content Include="Assets\CharacteristicsData\Zenggee_LEDnetWF.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Assets\HelpFiles\Device_Govee_H5074.md">
+    <Content Include="Assets\HelpFiles\Device_Govee_H5074.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
     <Content Include="Assets\HelpFiles\Device_Lionel_LionChief.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -816,7 +818,9 @@
     <Content Include="Assets\HelpFiles\Device_Zengge_LedLight.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Assets\HelpFiles\Device_Govee_H6005.md" />
+    <Content Include="Assets\HelpFiles\Device_Govee_H6005.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\HelpFiles\_List_of_item_to_do.md" />
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>

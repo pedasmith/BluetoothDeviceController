@@ -11,21 +11,22 @@ using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
 
 using Utilities;
-using Windows.UI.Xaml.Controls;
 
 namespace BluetoothProtocols
 {
     /// <summary>
-    /// The Govee H6055 bulb is a standard lightbulb that accepts Bluetooth commands.
-    /// This class was automatically generated 2025-01-05::15:26
+    /// The Govee H6055 bulb is a standard lightbulb that accepts Bluetooth commands..
+    /// This class was automatically generated 2025-01-05::21:49
     /// </summary>
 
     public partial class Govee_H6005 : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
     // Link: https://us.govee.com/products/govee-smart-bluetooth-rgbww-led-bulbs?_pos=1&_sid=58c8705e1&_ss=r
+    // Link: https://github.com/jonahclarsen/bluetooth_lights_controller/blob/main/bluetooth_lights_controller/bluetooth_led.py
     // Link: https://github.com/chvolkmann/govee_btled/blob/master/govee_btled/bluetooth_led.py
     // Link: https://github.com/Beshelmek/govee_ble_lights/blob/master/custom_components/govee-ble-lights/light.py
+    // Link: https://github.com/homebridge-plugins/homebridge-govee/issues/1005
 
 
         public BluetoothLEDevice ble { get; set; } = null;
@@ -447,7 +448,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(CharacteristicsEnum.Send_LED_Command_enum, "Send", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U8|HEX|Start||33 U8|HEX|Command||05 U8|HEX|Mode||02 U8|HEX|R||FF U8|HEX|G||FF U8|HEX|B||00 BYTES|HEX|Blank||00_00_00_00_00_00_00_00_00_00_00_00_00 U8|HEX|CRC||00";
+            var datameaning = "U8|HEX|Start||33 U8|HEX|Command||05 U8|HEX|Mode||0D U8|HEX|R||FF U8|HEX|G||FF U8|HEX|B||00 BYTES|HEX|Blank||00_00_00_00_00_00_00_00_00_00_00_00_00 U8|HEX|CRC||UpdateXorAtEnd";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
             Send_Start = parseResult.ValueList.GetValue("Start").AsDouble;
             Send_Command = parseResult.ValueList.GetValue("Command").AsDouble;
@@ -477,7 +478,6 @@ namespace BluetoothProtocols
             // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bluetooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-
             dw.WriteByte(Start);
             dw.WriteByte(Command);
             dw.WriteByte(Mode);
@@ -849,6 +849,7 @@ namespace BluetoothProtocols
             dw.WriteBytes(OTA);
 
             var command = dw.DetachBuffer().ToArray();
+            
             await WriteCommandAsync(CharacteristicsEnum.OTA_OtaCommand_enum, "OTA", command, GattWriteOption.WriteWithoutResponse);
 
             // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
