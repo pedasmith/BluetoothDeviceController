@@ -11,6 +11,7 @@ using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
 
 using Utilities;
+using Windows.UI.Xaml.Controls;
 
 namespace BluetoothProtocols
 {
@@ -477,12 +478,6 @@ namespace BluetoothProtocols
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
 
-            // CHANGE: need to calculate the checksum.
-            byte checksum = (byte)(Start ^ Command ^ Mode ^ R ^ G ^ B);
-            CRC = checksum;
-
-
-
             dw.WriteByte(Start);
             dw.WriteByte(Command);
             dw.WriteByte(Mode);
@@ -493,6 +488,7 @@ namespace BluetoothProtocols
             dw.WriteByte(CRC);
 
             var command = dw.DetachBuffer().ToArray();
+            CrcCalculations.UpdateXorAtEnd(command);
             await WriteCommandAsync(CharacteristicsEnum.Send_LED_Command_enum, "Send", command, GattWriteOption.WriteWithoutResponse);
 
             // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100

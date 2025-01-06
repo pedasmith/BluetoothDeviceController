@@ -399,6 +399,8 @@ namespace BluetoothCodeGenerator
 
             var split = ValueParserSplit.ParseLine(btCharacteristic.Type);
 
+            var crc_xor_fixup = "";
+
             int write_nargs = 0;
             for (int i = 0; i < split.Count; i++)
             {
@@ -461,6 +463,11 @@ namespace BluetoothCodeGenerator
                     defaultValue = item.DefaultValuePrimary;
                 }
                 defaultValue = defaultValue.Replace("_", " "); // TODO: question: is this the right escape for spaces?
+                if (defaultValue == "UpdateXorAtEnd")
+                {
+                    crc_xor_fixup = "CrcCalculations.UpdateXorAtEnd(command);";
+                    defaultValue = "0"; // Makes for a nicer UX and doesn't trigger the later parses.
+                }
                 if (hasRead)
                 {
                     var datareadpr = new TemplateSnippet(dataname);
@@ -482,6 +489,7 @@ namespace BluetoothCodeGenerator
                     //NOTE: Why are these 3 write items here for a reader?
                     datareadpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
                     datareadpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
+                    datareadpr.AddMacro("XORFIXUP", crc_xor_fixup);
 
                     datareadpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     datareadpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
@@ -512,6 +520,8 @@ namespace BluetoothCodeGenerator
                     datawritepr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
                     datawritepr.AddMacro("ARGDWCALL", writePrefix + ByteFormatToDataWriterCall(item.ByteFormatPrimary));
                     datawritepr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
+                    datawritepr.AddMacro("XORFIXUP", crc_xor_fixup);
+
                     datawritepr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     datawritepr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
                     datawritepr.AddMacro("DEC+OR+HEX", displayFormat);
@@ -538,6 +548,8 @@ namespace BluetoothCodeGenerator
                     dataallpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
                     dataallpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
                     dataallpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
+                    dataallpr.AddMacro("XORFIXUP", crc_xor_fixup);
+
                     dataallpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     dataallpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
 

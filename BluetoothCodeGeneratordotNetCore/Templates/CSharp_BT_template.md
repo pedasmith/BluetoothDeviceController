@@ -396,6 +396,7 @@ The parameter list for writing data to the device.
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
 [[DATAWRITER]]
             var command = dw.DetachBuffer().ToArray();
+            [[XORFIXUP]]
             await WriteCommandAsync(CharacteristicsEnum.[[Name.dotNet]]_[[../Name.dotNet]]_enum, "[[Name.dotNet]]", command, [[WRITEMODE]]);
 
             // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100

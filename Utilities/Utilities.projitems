@@ -9,6 +9,7 @@
     <Import_RootNamespace>Utilities</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CrcCalculations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataReaderReadStringRobust.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataWriterExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumUtilities.cs" />

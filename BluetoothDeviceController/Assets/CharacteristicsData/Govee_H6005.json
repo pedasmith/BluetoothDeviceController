@@ -4,9 +4,10 @@
       "Name": "ihoment_H6005_",
       "ClassName": "Govee_H6005",
       "ClassModifiers":  "partial",
-      "Description":  "The Govee H6055 bulb is a standard lightbulb that accepts Bluetooth commands",
+      "Description":  "The Govee H6055 bulb is a standard lightbulb that accepts Bluetooth commands.",
       "Links": [
         "https://us.govee.com/products/govee-smart-bluetooth-rgbww-led-bulbs?_pos=1&_sid=58c8705e1&_ss=r",
+        "https://github.com/jonahclarsen/bluetooth_lights_controller/blob/main/bluetooth_lights_controller/bluetooth_led.py",
         "https://github.com/chvolkmann/govee_btled/blob/master/govee_btled/bluetooth_led.py",
         "https://github.com/Beshelmek/govee_ble_lights/blob/master/custom_components/govee-ble-lights/light.py"
       ],
@@ -107,14 +108,15 @@
               "Name": "Send",
               "REMName": "Telink SPP: Phone->Module",
               "Description": "Telink SPP: Phone->Module",
-              "Type": "U8|HEX|Start||33 U8|HEX|Command||05 U8|HEX|Mode||02 U8|HEX|R||FF U8|HEX|G||FF U8|HEX|B||00 BYTES|HEX|Blank||00_00_00_00_00_00_00_00_00_00_00_00_00 U8|HEX|CRC||00",
+              "Type": "U8|HEX|Start||33 U8|HEX|Command||05 U8|HEX|Mode||02 U8|HEX|R||FF U8|HEX|G||FF U8|HEX|B||00 BYTES|HEX|Blank||00_00_00_00_00_00_00_00_00_00_00_00_00 U8|HEX|CRC||UpdateXorAtEnd",
               "IsRead": true,
               "IsWriteWithoutResponse": true,
               "Verbs": ":Read:WriteWithoutResponse:RdInNo:WrWw:",
               "ExampleData": [
                 "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
                 "Commands: 01=Power 04=Brightness 05=Color",
-                "Mode: 02=Manual (supported) 06=Microphone (not supported) 05=Scenes (not supported)"
+                "Mode: 02=Manual (supported) 06=Microphone (not supported) 05=Scenes (not supported)",
+                "NOTE: for the H6005, the mode is 0D for manual; 02 doesn't work at all"
               ]
             }
           ]
