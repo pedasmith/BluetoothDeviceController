@@ -1,13 +1,14 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "ihoment_H6005_CB97",
+      "Name": "ihoment_H6005_",
       "ClassName": "Govee_H6005",
       "ClassModifiers":  "partial",
       "Description":  "The Govee H6055 bulb is a standard lightbulb that accepts Bluetooth commands",
       "Links": [
         "https://us.govee.com/products/govee-smart-bluetooth-rgbww-led-bulbs?_pos=1&_sid=58c8705e1&_ss=r",
-        "https://github.com/chvolkmann/govee_btled/blob/master/govee_btled/bluetooth_led.py"
+        "https://github.com/chvolkmann/govee_btled/blob/master/govee_btled/bluetooth_led.py",
+        "https://github.com/Beshelmek/govee_ble_lights/blob/master/custom_components/govee-ble-lights/light.py"
       ],
       "Services": [
         {
@@ -85,11 +86,12 @@
         },
         {
           "UUID": "00010203-0405-0607-0809-0a0b0c0d1910",
-          "Name": "TeCommand",
+          "Name": "LED_Command",
+          "Priority":  10,
           "Characteristics": [
             {
               "UUID": "00010203-0405-0607-0809-0a0b0c0d2b10",
-              "Name": "Rx",
+              "Name": "Response",
               "REMName": "Telink SPP: Module->Phone",
               "Description": "Telink SPP: Module->Phone",
               "Type": "BYTES|HEX|Rx",
@@ -102,15 +104,17 @@
             },
             {
               "UUID": "00010203-0405-0607-0809-0a0b0c0d2b11",
-              "Name": "Tx",
+              "Name": "Send",
               "REMName": "Telink SPP: Phone->Module",
               "Description": "Telink SPP: Phone->Module",
-              "Type": "BYTES|HEX|Tx",
+              "Type": "U8|HEX|Start||33 U8|HEX|Command||05 U8|HEX|Mode||02 U8|HEX|R||FF U8|HEX|G||FF U8|HEX|B||00 BYTES|HEX|Blank||00_00_00_00_00_00_00_00_00_00_00_00_00 U8|HEX|CRC||00",
               "IsRead": true,
               "IsWriteWithoutResponse": true,
               "Verbs": ":Read:WriteWithoutResponse:RdInNo:WrWw:",
               "ExampleData": [
-                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
+                "Commands: 01=Power 04=Brightness 05=Color",
+                "Mode: 02=Manual (supported) 06=Microphone (not supported) 05=Scenes (not supported)"
               ]
             }
           ]

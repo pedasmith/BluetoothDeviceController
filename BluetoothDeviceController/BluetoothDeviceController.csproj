@@ -237,6 +237,7 @@
     <Compile Include="SpecialtyPages\Elegoo_MiniCarPage.xaml.cs">
       <DependentUpon>Elegoo_MiniCarPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPages\Govee_H6005Page.xaml.cs" />
     <Compile Include="SpecialtyPages\IHandleStatus.cs" />
     <Compile Include="SpecialtyPages\Kano_WandPage.xaml.cs">
       <DependentUpon>Kano_WandPage.xaml</DependentUpon>
@@ -815,6 +816,7 @@
     <Content Include="Assets\HelpFiles\Device_Zengge_LedLight.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Assets\HelpFiles\Device_Govee_H6005.md" />
     <None Include="Assets\HelpFiles\_List_of_item_to_do.md" />
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
@@ -1079,6 +1081,10 @@
     <Page Include="SpecialtyPages\Elegoo_MiniCarPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPages\Govee_H6005Page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="SpecialtyPages\Kano_WandPage.xaml">
       <SubType>Designer</SubType>

@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2025-01-04::17:04
+    /// This class was automatically generated 2025-01-04::18:09
     /// </summary>
 
     public partial class Zengge_LedLight : INotifyPropertyChanged
@@ -385,7 +385,7 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteLED_Write(UInt16 Counter, byte FragmentFlag, byte FragCounter, UInt16 TotalLength, byte FragmentLength, UInt32 Junk2, byte H, byte S, byte V, UInt16 White, byte[] Junk3)
+        public async Task WriteLED_Write(UInt16 Counter, byte FragmentFlag, byte FragCounter, UInt16 TotalLength, byte FragmentLength, UInt16 Junk2, byte Cmd, byte H, byte S, byte V, byte WhiteWarm, byte WhiteBright, byte[] Junk3)
         {
             if (!await EnsureCharacteristicAsync(CharacteristicsEnum.LED_Write_LED_Control_enum)) return;
 
@@ -399,12 +399,14 @@ namespace BluetoothProtocols
             dw.ByteOrder = ByteOrder.BigEndian;
             dw.WriteUInt16(TotalLength);
             dw.WriteByte(FragmentLength);
-            dw.WriteUInt24(Junk2);
+            dw.WriteUInt16(Junk2);
             dw.ByteOrder = ByteOrder.LittleEndian;
+            dw.WriteByte(Cmd);
             dw.WriteByte(H);
             dw.WriteByte(S);
             dw.WriteByte(V);
-            dw.WriteUInt16(White);
+            dw.WriteByte(WhiteWarm);
+            dw.WriteByte(WhiteBright);
             dw.WriteBytes(Junk3);
 
             var command = dw.DetachBuffer().ToArray();

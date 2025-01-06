@@ -465,14 +465,18 @@ namespace BluetoothDeviceController.SpecialtyPages
             public double FragmentLength { get { return _FragmentLength; } set { if (value == _FragmentLength) return; _FragmentLength = value; OnPropertyChanged(); } }
             private double _Junk2;
             public double Junk2 { get { return _Junk2; } set { if (value == _Junk2) return; _Junk2 = value; OnPropertyChanged(); } }
+            private double _Cmd;
+            public double Cmd { get { return _Cmd; } set { if (value == _Cmd) return; _Cmd = value; OnPropertyChanged(); } }
             private double _H;
             public double H { get { return _H; } set { if (value == _H) return; _H = value; OnPropertyChanged(); } }
             private double _S;
             public double S { get { return _S; } set { if (value == _S) return; _S = value; OnPropertyChanged(); } }
             private double _V;
             public double V { get { return _V; } set { if (value == _V) return; _V = value; OnPropertyChanged(); } }
-            private double _White;
-            public double White { get { return _White; } set { if (value == _White) return; _White = value; OnPropertyChanged(); } }
+            private double _WhiteWarm;
+            public double WhiteWarm { get { return _WhiteWarm; } set { if (value == _WhiteWarm) return; _WhiteWarm = value; OnPropertyChanged(); } }
+            private double _WhiteBright;
+            public double WhiteBright { get { return _WhiteBright; } set { if (value == _WhiteBright) return; _WhiteBright = value; OnPropertyChanged(); } }
             private string _Junk3;
             public string Junk3 { get { return _Junk3; } set { if (value == _Junk3) return; _Junk3 = value; OnPropertyChanged(); } }
 
@@ -521,11 +525,11 @@ namespace BluetoothDeviceController.SpecialtyPages
     {
         // Copy the contents over...
         var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,Counter,FragmentFlag,FragCounter,TotalLength,FragmentLength,Junk2,H,S,V,White,Junk3,Notes\n");
+        sb.Append("EventDate,EventTime,Counter,FragmentFlag,FragCounter,TotalLength,FragmentLength,Junk2,Cmd,H,S,V,WhiteWarm,WhiteBright,Junk3,Notes\n");
         foreach (var row in LED_WriteRecordData)
         {
             var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Counter},{row.FragmentFlag},{row.FragCounter},{row.TotalLength},{row.FragmentLength},{row.Junk2},{row.H},{row.S},{row.V},{row.White},{row.Junk3},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Counter},{row.FragmentFlag},{row.FragCounter},{row.TotalLength},{row.FragmentLength},{row.Junk2},{row.Cmd},{row.H},{row.S},{row.V},{row.WhiteWarm},{row.WhiteBright},{row.Junk3},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
         var str = sb.ToString();
         var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
@@ -548,10 +552,12 @@ namespace BluetoothDeviceController.SpecialtyPages
                 new UxTextValue(LED_Write_TotalLength.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_FragmentLength.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Junk2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Cmd.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_H.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_S.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_V.Text, System.Globalization.NumberStyles.None),
-                new UxTextValue(LED_Write_White.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_WhiteWarm.Text, System.Globalization.NumberStyles.None),
+                new UxTextValue(LED_Write_WhiteBright.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_Junk3.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
 
             };
@@ -571,10 +577,12 @@ namespace BluetoothDeviceController.SpecialtyPages
                 new UxTextValue(LED_Write_TotalLength.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_FragmentLength.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_Junk2.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Cmd.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
                 new UxTextValue(LED_Write_H.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_S.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_V.Text, System.Globalization.NumberStyles.None),
-                new UxTextValue(LED_Write_White.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_WhiteWarm.Text, System.Globalization.NumberStyles.None),
+                new UxTextValue(LED_Write_WhiteBright.Text, System.Globalization.NumberStyles.None),
                 new UxTextValue(LED_Write_Junk3.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
 
             };
@@ -584,7 +592,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         private async Task DoWriteLED_Write(List<UxTextValue> values)
         {
-            if (values.Count != 11) return;
+            if (values.Count != 13) return;
             int valueIndex = 0; // Change #3;
 
             SetStatusActive (true);
@@ -641,14 +649,23 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     parseError = "FragmentLength";
                 }
-                UInt32 Junk2;
+                UInt16 Junk2;
                 // History: used to go into LED_Write_Junk2.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedJunk2 = Utilities.Parsers.TryParseUInt32(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Junk2);
+                var parsedJunk2 = Utilities.Parsers.TryParseUInt16(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Junk2);
                 valueIndex++; // Change #5
                 if (!parsedJunk2)
                 {
                     parseError = "Junk2";
+                }
+                Byte Cmd;
+                // History: used to go into LED_Write_Cmd.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedCmd = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Cmd);
+                valueIndex++; // Change #5
+                if (!parsedCmd)
+                {
+                    parseError = "Cmd";
                 }
                 Byte H;
                 // History: used to go into LED_Write_H.Text instead of using the variable
@@ -677,14 +694,23 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                     parseError = "V";
                 }
-                UInt16 White;
-                // History: used to go into LED_Write_White.Text instead of using the variable
+                Byte WhiteWarm;
+                // History: used to go into LED_Write_WhiteWarm.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedWhite = Utilities.Parsers.TryParseUInt16(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out White);
+                var parsedWhiteWarm = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out WhiteWarm);
                 valueIndex++; // Change #5
-                if (!parsedWhite)
+                if (!parsedWhiteWarm)
                 {
-                    parseError = "White";
+                    parseError = "WhiteWarm";
+                }
+                Byte WhiteBright;
+                // History: used to go into LED_Write_WhiteBright.Text instead of using the variable
+                // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
+                var parsedWhiteBright = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out WhiteBright);
+                valueIndex++; // Change #5
+                if (!parsedWhiteBright)
+                {
+                    parseError = "WhiteBright";
                 }
                 Bytes Junk3;
                 // History: used to go into LED_Write_Junk3.Text instead of using the variable
@@ -698,7 +724,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                 if (parseError == null)
                 {
-                    await bleDevice.WriteLED_Write(Counter, FragmentFlag, FragCounter, TotalLength, FragmentLength, Junk2, H, S, V, White, Junk3);
+                    await bleDevice.WriteLED_Write(Counter, FragmentFlag, FragCounter, TotalLength, FragmentLength, Junk2, Cmd, H, S, V, WhiteWarm, WhiteBright, Junk3);
                 }
                 else
                 { //NOTE: pop up a dialog?

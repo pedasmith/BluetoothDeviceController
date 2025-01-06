@@ -49,7 +49,7 @@
             {
               "UUID": "0000ff01-0000-1000-8000-00805f9b34fb",
               "Name": "LED_Write",
-              "Type": "U16|HEX|Counter||0500 U8|HEX|FragmentFlag||80 U8|HEX|FragCounter||00 OEB U16|HEX|TotalLength||000D U8|HEX|FragmentLength||0E U24|HEX|Junk2||0b3ba1 OEL U8|DEC|H||0 U8|DEC|S||100 U8|DEC|V||100 U16|HEX|White||0000 BYTES|HEX|Junk3||00_00_00_00_00_00",
+              "Type": "U16|HEX|Counter||0500 U8|HEX|FragmentFlag||80 U8|HEX|FragCounter||00 OEB U16|HEX|TotalLength||000D U8|HEX|FragmentLength||0E U16|HEX|Junk2||0b3b OEL U8|HEX|Cmd||a1 U8|DEC|H||0 U8|DEC|S||100 U8|DEC|V||100 U8|DEC|WhiteWarm||00 U8|DEC|WhiteBright||00 BYTES|HEX|Junk3||00_00_00_00_00_00",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "Verbs": ":Write:WriteWithoutResponse:WrWw:",

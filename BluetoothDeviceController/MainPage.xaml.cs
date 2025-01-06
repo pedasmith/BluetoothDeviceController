@@ -117,6 +117,7 @@ namespace BluetoothDeviceController
             new Specialization (typeof(SpecialtyPages.MIPOW_Playbulb_BTL201Page), new string[] { "PLAYBULB" }, LIGHT, "MIPOW Smart LED", "MIPOW PLAYBULB Smart LED Bulb BTL-201"),
             new Specialization (typeof(SpecialtyPages.TrionesPage), new string[] { "Triones", "LEDBlue" }, LIGHT, "LED Light", "Bluetooth controlled light (Triones protocol)"),
             new Specialization (typeof(SpecialtyPages.Zengge_LedLightPage), new string[] { "IOTWF8FF"}, LIGHT, "LED Light", "Bluetooth controlled light (Zenggee protocol)"),
+            new Specialization (typeof(SpecialtyPages.Govee_H6005Page), new string[] { "ihoment_H6005_"}, LIGHT, "LED Light", "Bluetooth controlled light (Govee protocol)"),
 
             // // // Is actually empty :-) new Specialization (typeof(SpecialtyPages.DigHoseEndPage), new string[] { "DIG", "\0IG" }, WATER, "DIG water valve", "DIG Hose-end valve"),
 

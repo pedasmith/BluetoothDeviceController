@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CraftyRobot_Smartibot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Elegoo_MiniCar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Govee_H6005.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Kano_Wand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Lionel_LionChief.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Lionel_LionChief_Custom.cs" />
