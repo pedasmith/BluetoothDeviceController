@@ -23,6 +23,9 @@
       <DependentUpon>ChartControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)ChartControl\UserPersonalization.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Lamps\LampControl.xaml.cs">
+      <DependentUpon>LampControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\DeviceInformationWrapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserBeaconPreferences.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\UserPreferences.cs" />
@@ -45,6 +48,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)ChartControl\ChartControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Lamps\LampControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

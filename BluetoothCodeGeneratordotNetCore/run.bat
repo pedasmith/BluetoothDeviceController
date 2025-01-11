@@ -14,7 +14,7 @@ REM Normally we want to generate everything. But when we are debugging just some
 REM it's nicer to have just the single file handled.
 REM
 if "%~1"=="-debug" goto :Debug
-if "%~1"=="-file" goto :Single
+if "%~1"=="-file" goto :SingleFile
 if "%~1"=="-all" goto :All
 goto :Help
 
@@ -32,7 +32,7 @@ REM %BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Template
 %BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
 goto :EOF
 
-:Single
+:SingleFile
 ECHO -inputJsonFile "%JSONDIR%\%~2" -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%\%~2" -inputTemplates Templates -output output
 goto :EOF

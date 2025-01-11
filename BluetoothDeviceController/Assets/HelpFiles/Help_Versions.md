@@ -1,13 +1,16 @@
 ﻿# Bluetooth Device Controller Versions
 
-## Version 1.11, TODO:
+## Version 1.11, 2025-01-10
 
 Added support for the Govee H5075 temperature and humidity sensor (via advertisements) and the Govee H5106 Smart Air Quality Monitor (also via advertisements).
 
+Added support for the Govee H6005 LED bulb
+
+Added support for the latest Magic Light LED bulb (2024)
 
 ## Version 1.10, 2022-12-31
 
-Added support for the Govee H5074 temperature and humidity sensor (via advertisements), the SwitchBot Thermometer and Hygrometer, and many of the Lionel LionChief Bluetooth-controlled trains.Also supported are the Particula GoDice dice. There is very early support for the awesome PokitPro Bluetooth multimeter.
+Added support for the Govee H5074 temperature and humidity sensor (via advertisements), the SwitchBot Thermometer and Hygrometer, and many of the Lionel LionChief Bluetooth-controlled trains. Also supported are the Particula GoDice dice. There is very early support for the awesome PokitPro Bluetooth multimeter.
 
 The UI was redesigned; it more carefully splits the user interface for people who want to control their Bluetooth devices (most people) and people who want to explore their Bluetooth environment.
 

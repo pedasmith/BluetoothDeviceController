@@ -1,0 +1,123 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "ELK-BTCWCTB",
+      "Aliases": [
+        "ELK-",
+        "MELK-"
+      ],
+      "ClassName": "Elk_LedLight",
+      "ClassModifiers":  "partial",
+      "Description":  "Under-counter 'stick' LED light with Bluetooth control. Can also be controlled with a small report, or via a tiny controller built into the power cord. Seems to use the same protocol as the ELK-BLEDOM controller.",
+      "Links": [
+        "https://github.com/kquinsland/JACKYLED-BLE-RGB-LED-Strip-controller",
+        "https://github.com/arduino12/ble_rgb_led_strip_controller",
+        "https://github.com/8none1/elk-bledob",
+        "https://github.com/lilgallon/DynamicLedStrips",
+        "https://github.com/TheSylex/ELK-BLEDOM-bluetooth-led-strip-controller/blob/main/README.md",
+        "https://github.com/FergusInLondon/ELK-BLEDOM/blob/master/proof-of-concept/demo.go",
+        "https://linuxthings.co.uk/blog/control-an-elk-bledom-bluetooth-led-strip",
+        "https://github.com/dave-code-ruiz/elkbledom",
+        "https://github.com/dave-code-ruiz/elkbledom/issues/11"
+      ],
+
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Name: ELK-BTCWCTB",
+                "ELK-BTCWCTB"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms U16^1.15_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  0F 00 0F 00 00 00 E8 03",
+                "18 17 0 10000"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsIndicate": true,
+              "Verbs": ":Indicate:RdInNo:InNo:"
+            }
+          ]
+        },
+        {
+          "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+          "Name": "Commands",
+          "Priority":  10,
+          "Characteristics": [
+            {
+              "UUID": "0000fff3-0000-1000-8000-00805f9b34fb",
+              "Name": "Command",
+              "Type": "U8|HEX|Start||7E U8|HEX|Counter||00 U8|HEX|Command||01 U8|HEX|P1||FF U8|HEX|P2||FF U8|HEX|P3||00 U8|HEX|P4||00 U8|HEX|P5||00 U8|HEX|End||EF",
+              "IsRead": true,
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":Read:WriteWithoutResponse:RdInNo:WrWw:",
+              "ExampleData": [
+                "INITIAL VALUE seems to be some kind of ASCII string",
+                "Value     :  53 48 59 39 36 33 33 33 32 56 34 32 00 00 00 00 00 00 00 00",
+                "Value     :   S  H  T  9  6  3  3  3  2  V  4  2 00 00 00 00 00 00 00 00 sht963332v4",
+                "COMMON COMMANDS",
+                "Brightness:  7E 00 01 BR 00 00 00 00 EF (BR=brightness 0..FF)",
+                "(speed)   :  7E 00 02 VL 00 00 00 00 EF (VL=speed)",
+                "(effect)  :  7E 00 03 VL TY 00 00 00 EF (VL=effect TY=effect type 3=normal 4=dynamic)",
+                "off       :  7E 00 04 00 00 00 00 00 EF ",
+                "on        :  7E 00 04 01 FF FF FF 00 EF ",
+                "on        :  7E 00 04 FF 00 01 02 01 EF (alternate ON command)",
+                "on/off    :  7E 00 04 FF 00 VL 00 00 EF (alternate ON command VL=0=off+1=on)",
+                "Warmth    :  7E 00 05 02 WW CC 00 00 EF (WW=warm CC=cold WW+CC must equal 100)",
+                "Color     :  7E 00 05 01 CI 00 00 00 EF (CI=color index)",
+                "RGB       :  7E 00 05 03 RR GG BB 00 EF",
+                "(effect)  :  7E 00 07 VL 00 00 00 00 EF (VL=dynamic effect sensitivity)",
+                "(timer)   :  7E 00 0D MM 00 00 00 00 EF (MM=minute)"
+              ]
+            },
+            {
+              "UUID": "0000fff4-0000-1000-8000-00805f9b34fb",
+              "Name": "Response",
+              "Type": "BYTES|HEX|Response",
+              "IsNotify": true,
+              "Verbs": ":Notify:RdInNo:InNo:"
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-be:96:02:00:01:36\nCanPair:True IsPaired:False"
+    }
+  ]
+}

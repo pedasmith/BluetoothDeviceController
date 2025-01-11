@@ -2,13 +2,16 @@
   "AllDevices": [
     {
       "Name": "IOTWF8FF",
+      "Aliases": [ "LEDnetWF000035DC8B29" ],
       "ClassName": "Zengge_LedLight",
-      "ClassModifiers":  "partial",
+      "ClassModifiers": "partial",
       "REM_About": "Multiple LED bulbs use this protocol including MagicLight",
+      "REM_MagicLight_80Watt_Name": "LEDnetWF000035DC8B29",
       "Links": [
         "https://github.com/8none1/zengge_lednetwf/blob/main/readme.md",
         "https://github.com/8none1/zengge_lednetwf/blob/main/ledwf_controller.py",
-        "https://www.magiclightbulbs.com/product-page/60-watt-wifi-multi-color-bulb"
+        "https://www.magiclightbulbs.com/product-page/60-watt-wifi-multi-color-bulb",
+        "https://www.magiclightbulbs.com/product-page/80-watt-wifi-multi-color-bulb"
       ],
       "Services": [
         {
@@ -33,7 +36,7 @@
           "UUID": "0000ffff-0000-1000-8000-00805f9b34fb",
           "Name": "LED_Control",
           "Description": "Controls the Magic Light bulb.",
-          "Priority":  10,
+          "Priority": 10,
           "Characteristics": [
             {
               "UUID": "0000ff02-0000-1000-8000-00805f9b34fb",

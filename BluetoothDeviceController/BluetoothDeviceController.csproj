@@ -237,6 +237,9 @@
     <Compile Include="SpecialtyPages\Elegoo_MiniCarPage.xaml.cs">
       <DependentUpon>Elegoo_MiniCarPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPages\Elk_LedLightPage.xaml.cs">
+      <DependentUpon>Elk_LedLightPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SpecialtyPages\Govee_H6005Page.xaml.cs" />
     <Compile Include="SpecialtyPages\IHandleStatus.cs" />
     <Compile Include="SpecialtyPages\Kano_WandPage.xaml.cs">
@@ -772,6 +775,9 @@
     <Content Include="Assets\CharacteristicsData\Bluetooth_CurrentTimeService.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\CharacteristicsData\Elk_LedLight.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\CharacteristicsData\Govee_H5074.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -1085,6 +1091,10 @@
     <Page Include="SpecialtyPages\Elegoo_MiniCarPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPages\Elk_LedLightPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="SpecialtyPages\Govee_H6005Page.xaml">
       <Generator>MSBuild:Compile</Generator>

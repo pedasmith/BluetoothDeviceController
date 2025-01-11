@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2025-01-04::18:09
+    /// This class was automatically generated 2025-01-10::10:36
     /// </summary>
 
     public partial class Zengge_LedLight : INotifyPropertyChanged
@@ -25,6 +25,7 @@ namespace BluetoothProtocols
     // Link: https://github.com/8none1/zengge_lednetwf/blob/main/readme.md
     // Link: https://github.com/8none1/zengge_lednetwf/blob/main/ledwf_controller.py
     // Link: https://www.magiclightbulbs.com/product-page/60-watt-wifi-multi-color-bulb
+    // Link: https://www.magiclightbulbs.com/product-page/80-watt-wifi-multi-color-bulb
 
 
         public BluetoothLEDevice ble { get; set; } = null;
@@ -410,6 +411,7 @@ namespace BluetoothProtocols
             dw.WriteBytes(Junk3);
 
             var command = dw.DetachBuffer().ToArray();
+            
             await WriteCommandAsync(CharacteristicsEnum.LED_Write_LED_Control_enum, "LED_Write", command, GattWriteOption.WriteWithoutResponse);
 
             // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
