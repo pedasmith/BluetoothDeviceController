@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace BluetoothProtocolsDevices.BluetoothProtocolsCustom
 {
@@ -16,7 +17,18 @@ namespace BluetoothProtocolsDevices.BluetoothProtocolsCustom
             SetColorRGB = 0x08,
         }
         public abstract Capability GetDeviceCapability();
-        public abstract void SetRGB(int R, int G, int B);
-        public abstract Task TurnOnOffAsync(bool on);
+        /// <summary>
+        /// Brightness is a value 0..1 inclusive
+        /// </summary>
+        public abstract Task<GattCommunicationStatus> SetBrightnessAsync(double brightness);
+        /// <summary>
+        /// RGB values are all 0..255
+        /// </summary>
+        public abstract Task<GattCommunicationStatus> SetRGBAsync(int R, int G, int B);
+        /// <summary>
+        /// Warmth is a value 0..1 inclusive. 0=cold 1=warm
+        /// </summary>
+        public abstract Task<GattCommunicationStatus> SetWarmthAsync(double warmth);
+        public abstract Task<GattCommunicationStatus> TurnOnOffAsync(bool on);
     }
 }

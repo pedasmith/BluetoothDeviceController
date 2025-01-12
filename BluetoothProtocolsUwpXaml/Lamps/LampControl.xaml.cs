@@ -21,5 +21,18 @@ namespace BluetoothDeviceController.Lamps
             if (Light == null) return;
             await Light.TurnOnOffAsync((sender as ToggleSwitch).IsOn);
         }
+
+        private async void OnBrightnessChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            if (Light == null) return;
+            double value = (double)e.NewValue / 100.0;
+            await Light.SetBrightnessAsync(value);
+        }
+        private async void OnWarmthChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            if (Light == null) return;
+            double value = (double)e.NewValue / 100.0;
+            await Light.SetWarmthAsync(value);
+        }
     }
 }

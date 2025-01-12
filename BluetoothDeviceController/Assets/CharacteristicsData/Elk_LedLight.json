@@ -88,7 +88,7 @@
               "IsRead": true,
               "IsWriteWithoutResponse": true,
               "Verbs": ":Read:WriteWithoutResponse:RdInNo:WrWw:",
-              "ExtraUI":  "LampControl",
+              "ExtraUI": "LampControl",
               "ExampleData": [
                 "INITIAL VALUE seems to be some kind of ASCII string",
                 "Value     :  53 48 59 39 36 33 33 33 32 56 34 32 00 00 00 00 00 00 00 00",

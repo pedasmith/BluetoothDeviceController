@@ -2,7 +2,7 @@
     x:Class="BluetoothDeviceController.Lamps.LampControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:BluetoothProtocolsUwpXaml.Lamps"
+    xmlns:local="using:BluetoothDeviceController.Lamps"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -14,7 +14,15 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+        
         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource TitleStyle}">LIGHT CONTROL</TextBlock>
-        <ToggleSwitch x:Name="uiOnOff" Toggled="OnOnOffToggled" Grid.Row="1" Header="On/Off" MinWidth="150"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1">
+            <ToggleSwitch x:Name="uiOnOff" Toggled="OnOnOffToggled" Header="On/Off" MinWidth="150" VerticalAlignment="Top"/>
+            <StackPanel>
+                <Slider x:Name="uiBrightness" Minimum="0" Maximum="100" Value="100" ValueChanged="OnBrightnessChanged" Header="Brigthness" MinWidth="250" />
+                <Slider x:Name="uiWarmth" Minimum="0" Maximum="100" Value="100" ValueChanged="OnWarmthChanged" Header="Warmth" MinWidth="250" />
+            </StackPanel>
+        </StackPanel>
+        
     </Grid>
 </UserControl>
