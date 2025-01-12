@@ -705,6 +705,33 @@ namespace BluetoothCodeGenerator
             return null;
         }
 
+        private static void Add_ExtraUI_Xaml_NS(TemplateSnippet retval, NameDevice bt)
+        {
+            string ns = "";
+            string init = "";
+            string xaml = "";
+            foreach (var service in bt.Services)
+            {
+                foreach (var characteristic in service.Characteristics)
+                {
+                    switch (characteristic.ExtraUI)
+                    {
+                        case "LampControl":
+                            if (!ns.Contains("using:BluetoothDeviceController.Lamps"))
+                            {
+                                ns += "    xmlns:lamps=\"using:BluetoothDeviceController.Lamps\"";
+                            }
+                            init += $"            this.ui{characteristic.Name.DotNetSafe()}LampControl.Light = bleDevice;\n";
+                            xaml += $"        <lamps:LampControl x:Name=\"ui{characteristic.Name.DotNetSafe()}LampControl\"></lamps:LampControl>\r\n\n";
+                            break;
+                    }
+                }
+            }
+            retval.Macros.Add("EXTRAUI+XAML+NS", ns);
+            retval.Macros.Add("EXTRAUI+XAML+CS+INIT", init);
+            retval.Macros.Add("EXTRAUI+XAML+CONTROL", xaml);
+        }
+
 
 
         /// <summary>
@@ -757,6 +784,8 @@ namespace BluetoothCodeGenerator
             retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::HH:mm"));
             retval.Macros.Add("CLASSMODIFIERS", bt.ClassModifiers);
             retval.Macros.Add("HasReadDeviceName", bt.HasReadDevice_Name() ? "true" : "false");
+
+            Add_ExtraUI_Xaml_NS(retval, bt);
 
             //Services
             var servicesByPriority = new TemplateSnippet("Services");

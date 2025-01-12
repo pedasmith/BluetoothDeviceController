@@ -66,3 +66,13 @@ You can have a characteristic's notify be automatically called by setting AutoNo
 ## Adding tables and graph
 
 See [Graphs and JSON](Json_Graphs.md) for details on creating tables and graphs
+
+## Supporting LED lamps
+
+See the Elk protocol for an example.
+
+If your device is an LED lamp, you can automatically add a control for it in the resulting XAML file. To do this, for the characteristic that controls the LED, add a JSON line: 
+
+    "ExtraUI":  "LampControl",
+
+This will add in a <lamps:LampControl> near the top of the page. However, when you do this you must also make a Custom protocol class that extents the LampControl class. You will need to implement several methods for this to work smoothly. 

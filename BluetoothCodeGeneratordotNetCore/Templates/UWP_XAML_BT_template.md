@@ -6,6 +6,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+[[EXTRAUI+XAML+NS]]
     xmlns:charts="using:BluetoothDeviceController.Charts"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -79,6 +80,7 @@
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
+[[EXTRAUI+XAML+CONTROL]]
 [[XAML+SERVICE+LIST]]
         <Button Content="REREAD" Click="OnRereadDevice" />
     </StackPanel>
@@ -305,6 +307,7 @@ TODO: investigate if this should be ListOutput=parent -- it seems like almost al
         <controls:Expander Header="[[ServiceName]]" IsExpanded="[[ServiceIsExpanded]]" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
             [[XAML+CHARACTERISTIC+LIST]]
+
             </StackPanel>
         </controls:Expander>
 ```

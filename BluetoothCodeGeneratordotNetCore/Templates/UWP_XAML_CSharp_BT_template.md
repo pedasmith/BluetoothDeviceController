@@ -3,6 +3,7 @@
 
 ```
 using BluetoothDeviceController.Charts;
+using BluetoothDeviceController.Lamps;
 using BluetoothDeviceController.Names;
 using BluetoothProtocols;
 using System;
@@ -34,6 +35,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             this.InitializeComponent();
             this.DataContext = this;
+[[EXTRAUI+XAML+CS+INIT]]
         }
         private string DeviceName = "[[CLASSNAME]]";
         private string DeviceNameUser = "[[DeviceName]]";

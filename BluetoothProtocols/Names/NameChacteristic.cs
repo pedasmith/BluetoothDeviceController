@@ -261,6 +261,7 @@ namespace BluetoothDeviceController.Names
 
         }
 
+        public string ExtraUI { get; set; } = ""; // allowed: "" or "LightControl"
         public UISpecifications UI { get; set; } = null; // default to null
         private string UuidRaw = "";
         /// <summary>

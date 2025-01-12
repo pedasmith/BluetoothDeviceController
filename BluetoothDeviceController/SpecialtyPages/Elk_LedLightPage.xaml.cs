@@ -31,7 +31,8 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             this.InitializeComponent();
             this.DataContext = this;
-            this.uiLampControl.Light = bleDevice;
+            this.uiCommandLampControl.Light = bleDevice;
+
         }
         private string DeviceName = "Elk_LedLight";
         private string DeviceNameUser = "ELK-BTCWCTB";
