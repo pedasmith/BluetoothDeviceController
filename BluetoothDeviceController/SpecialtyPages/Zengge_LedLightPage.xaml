@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:lamps="using:BluetoothDeviceController.Lamps"
     xmlns:charts="using:BluetoothDeviceController.Charts"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -77,6 +78,9 @@
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
+        <lamps:LampControl x:Name="uiLED_WriteLampControl"></lamps:LampControl>
+
+
         <!-- XAML+SERVICE+LIST for LED_Control -->
         <controls:Expander Header="LED_Control" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
@@ -108,7 +112,8 @@
                     <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="False" x:Name="LED_Write_Counter" Text="0500" Header="Counter" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_CmdFlag" Text="00" Header="CmdFlag" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_Counter" Text="05" Header="Counter" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_FragmentFlag" Text="80" Header="FragmentFlag" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_FragCounter" Text="00" Header="FragCounter" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="False" x:Name="LED_Write_TotalLength" Text="000D" Header="TotalLength" Style="{StaticResource HEXStyle}"/>
@@ -125,6 +130,7 @@
                     <Button Content="Write" Click="OnWriteLED_Write" />
 
                 </GridView>
+
 
 
 
@@ -147,6 +153,7 @@
                     <Button Content="Read" Click="OnReadDevice_Name" />
 
                 </GridView>
+
 
 
 
