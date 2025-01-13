@@ -79,7 +79,7 @@
         {
           "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
           "Name": "Commands",
-          "Priority":  10,
+          "Priority":  5,
           "Characteristics": [
             {
               "UUID": "0000fff3-0000-1000-8000-00805f9b34fb",

@@ -82,7 +82,7 @@
 
 
         <!-- XAML+SERVICE+LIST for Commands -->
-        <controls:Expander Header="Commands" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+        <controls:Expander Header="Commands" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
                             <TextBlock Style="{StaticResource SubheaderStyle}">Command</TextBlock>
             <GridView>

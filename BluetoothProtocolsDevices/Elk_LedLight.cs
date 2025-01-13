@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Under-counter 'stick' LED light with Bluetooth control. Can also be controlled with a small report, or via a tiny controller built into the power cord. Seems to use the same protocol as the ELK-BLEDOM controller..
-    /// This class was automatically generated 2025-01-11::18:55
+    /// This class was automatically generated 2025-01-12::20:21
     /// </summary>
 
     public partial class Elk_LedLight : INotifyPropertyChanged

@@ -36,7 +36,7 @@
           "UUID": "0000ffff-0000-1000-8000-00805f9b34fb",
           "Name": "LED_Control",
           "Description": "Controls the Magic Light bulb.",
-          "Priority": 10,
+          "Priority": 5,
           "Characteristics": [
             {
               "UUID": "0000ff02-0000-1000-8000-00805f9b34fb",

@@ -82,7 +82,7 @@
 
 
         <!-- XAML+SERVICE+LIST for LED_Control -->
-        <controls:Expander Header="LED_Control" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+        <controls:Expander Header="LED_Control" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
                             <TextBlock Style="{StaticResource SubheaderStyle}">LED_Response</TextBlock>
             <GridView>

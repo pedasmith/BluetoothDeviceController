@@ -1,4 +1,4 @@
-﻿using BluetoothProtocolsDevices.BluetoothProtocolsCustom;
+﻿using BluetoothProtocols;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,7 +20,7 @@ namespace BluetoothProtocols
             var result = await WriteCommand(0x7E, Counter, 0x01, bvalue, 0x00, 0x00, 0x00, 0x00, 0xEF);
             return result;
         }
-        public override async Task<GattCommunicationStatus> SetRGBAsync(int R, int G, int B)
+        public override async Task<GattCommunicationStatus> SetRGBAsync(byte R, byte G, byte B)
         {
             await Task.Delay(0);
             return GattCommunicationStatus.Unreachable;

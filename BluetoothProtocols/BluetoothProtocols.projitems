@@ -33,6 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueToString.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueToStringTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\VariableSet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Light.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Names\BleNames.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Names\GuidGetCommon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Names\NameAllBleDevices.cs" />
