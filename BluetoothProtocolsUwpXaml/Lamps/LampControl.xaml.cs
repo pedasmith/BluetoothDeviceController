@@ -20,6 +20,7 @@ namespace BluetoothDeviceController.Lamps
                 _Light = value;
                 DeviceCapability = Light.GetDeviceCapability();
                 SetVisibility(uiColor, Light.Capability.SetColorRGB);
+                SetVisibility(uiWarmth, Light.Capability.SetWarm);
             }
         } // The abstract class
 

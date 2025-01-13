@@ -89,7 +89,7 @@
         {
           "UUID": "00010203-0405-0607-0809-0a0b0c0d1910",
           "Name": "LED_Command",
-          "Priority":  10,
+          "Priority":  5,
           "Characteristics": [
             {
               "UUID": "00010203-0405-0607-0809-0a0b0c0d2b10",
@@ -100,13 +100,14 @@
               "IsRead": true,
               "IsNotify": true,
               "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "ExtraUI": "LampControl",
               "ExampleData": [
                 "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
               ]
             },
             {
               "UUID": "00010203-0405-0607-0809-0a0b0c0d2b11",
-              "Name": "Send",
+              "Name": "LED_Write",
               "REMName": "Telink SPP: Phone->Module",
               "Description": "Telink SPP: Phone->Module",
               "Type": "U8|HEX|Start||33 U8|HEX|Command||05 U8|HEX|Mode||0D U8|HEX|R||FF U8|HEX|G||FF U8|HEX|B||00 BYTES|HEX|Blank||00_00_00_00_00_00_00_00_00_00_00_00_00 U8|HEX|CRC||UpdateXorAtEnd",

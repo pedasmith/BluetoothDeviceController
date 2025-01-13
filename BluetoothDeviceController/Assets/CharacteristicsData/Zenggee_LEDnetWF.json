@@ -61,8 +61,7 @@
                 "Example  : 00 05 80 00 00 0d 0e 0b 3b a1 00 64 64 00 00 00 00 00 00 00 00",
                 "The three bytes after 0b 3b a1 control the H S V values",
                 "Power ON : 00 04 80 00 00 0d 0e 0b 3b 23 00 00 00 00 00 00 00 32 00 00 90",
-                "Power OFF: 00 5b 80 00 00 0d 0e 0b 3b 24 00 00 00 00 00 00 00 32 00 00 91",
-                "NOTE: the U16|HEX|Counter is wrong; first byte is per-command flag and second byte is counter"
+                "Power OFF: 00 5b 80 00 00 0d 0e 0b 3b 24 00 00 00 00 00 00 00 32 00 00 91"
               ]
             }
           ]

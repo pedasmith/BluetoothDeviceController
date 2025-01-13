@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:lamps="using:BluetoothDeviceController.Lamps"
     xmlns:charts="using:BluetoothDeviceController.Charts"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -77,8 +78,11 @@
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
+        <lamps:LampControl x:Name="uiResponseLampControl"></lamps:LampControl>
+
+
         <!-- XAML+SERVICE+LIST for LED_Command -->
-        <controls:Expander Header="LED_Command" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+        <controls:Expander Header="LED_Command" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
                             <TextBlock Style="{StaticResource SubheaderStyle}">Response</TextBlock>
             <GridView>
@@ -97,26 +101,27 @@
 
 
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Send</TextBlock>
+                <TextBlock Style="{StaticResource SubheaderStyle}">LED_Write</TextBlock>
             <GridView>
             <GridView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="False" x:Name="Send_Start" Text="33" Header="Start" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="Send_Command" Text="05" Header="Command" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="Send_Mode" Text="0D" Header="Mode" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="Send_R" Text="FF" Header="R" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="Send_G" Text="FF" Header="G" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="Send_B" Text="00" Header="B" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="Send_Blank" Text="00 00 00 00 00 00 00 00 00 00 00 00 00" Header="Blank" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="False" x:Name="Send_CRC" Text="0" Header="CRC" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_Start" Text="33" Header="Start" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_Command" Text="05" Header="Command" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_Mode" Text="0D" Header="Mode" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_R" Text="FF" Header="R" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_G" Text="FF" Header="G" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_B" Text="00" Header="B" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_Blank" Text="00 00 00 00 00 00 00 00 00 00 00 00 00" Header="Blank" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="False" x:Name="LED_Write_CRC" Text="0" Header="CRC" Style="{StaticResource HEXStyle}"/>
 
-                    <Button Content="Write" Click="OnWriteSend" />
-                    <Button Content="Read" Click="OnReadSend" />
+                    <Button Content="Write" Click="OnWriteLED_Write" />
+                    <Button Content="Read" Click="OnReadLED_Write" />
 
                 </GridView>
+
 
 
 
@@ -180,6 +185,7 @@
 
 
 
+
             </StackPanel>
         </controls:Expander>
         <!-- XAML+SERVICE+LIST for Generic Service -->
@@ -197,6 +203,7 @@
 
 
                 </GridView>
+
 
 
 
@@ -224,6 +231,7 @@
 
 
 
+
             </StackPanel>
         </controls:Expander>
         <!-- XAML+SERVICE+LIST for OtaCommand -->
@@ -242,6 +250,7 @@
                     <Button Content="Read" Click="OnReadOTA" />
 
                 </GridView>
+
 
 
 

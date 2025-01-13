@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Charts;
+using BluetoothDeviceController.Lamps;
 using BluetoothDeviceController.Names;
 using BluetoothProtocols;
 using System;
@@ -30,6 +31,8 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             this.InitializeComponent();
             this.DataContext = this;
+            this.uiResponseLampControl.Light = bleDevice;
+
         }
         private string DeviceName = "Govee_H6005";
         private string DeviceNameUser = "ihoment_H6005_";
@@ -956,9 +959,9 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
 
-        public class SendRecord : INotifyPropertyChanged
+        public class LED_WriteRecord : INotifyPropertyChanged
         {
-            public SendRecord()
+            public LED_WriteRecord()
             {
                 this.EventTime = DateTime.Now;
             }
@@ -992,49 +995,49 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-    public DataCollection<SendRecord> SendRecordData { get; } = new DataCollection<SendRecord>();
-    private void OnSend_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<LED_WriteRecord> LED_WriteRecordData { get; } = new DataCollection<LED_WriteRecord>();
+    private void OnLED_Write_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
     {
         if (e.Key == Windows.System.VirtualKey.Enter)
         {
             var text = (sender as TextBox).Text.Trim();
             (sender as TextBox).Text = "";
             // Add the text to the notes section
-            if (SendRecordData.Count == 0)
+            if (LED_WriteRecordData.Count == 0)
             {
-                SendRecordData.AddRecord(new SendRecord());
+                LED_WriteRecordData.AddRecord(new LED_WriteRecord());
             }
-            SendRecordData[SendRecordData.Count - 1].Note = text;
+            LED_WriteRecordData[LED_WriteRecordData.Count - 1].Note = text;
             e.Handled = true;
         }
     }
 
     // Functions called from the expander
-    private void OnKeepCountSend(object sender, SelectionChangedEventArgs e)
+    private void OnKeepCountLED_Write(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.Count != 1) return;
         int value;
         var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
         if (!ok) return;
-        SendRecordData.MaxLength = value;
+        LED_WriteRecordData.MaxLength = value;
 
         
     }
 
-    private void OnAlgorithmSend(object sender, SelectionChangedEventArgs e)
+    private void OnAlgorithmLED_Write(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.Count != 1) return;
         int value;
         var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
         if (!ok) return;
-        SendRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+        LED_WriteRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
     }
-    private void OnCopySend(object sender, RoutedEventArgs e)
+    private void OnCopyLED_Write(object sender, RoutedEventArgs e)
     {
         // Copy the contents over...
         var sb = new System.Text.StringBuilder();
         sb.Append("EventDate,EventTime,Start,Command,Mode,R,G,B,Blank,CRC,Notes\n");
-        foreach (var row in SendRecordData)
+        foreach (var row in LED_WriteRecordData)
         {
             var time24 = row.EventTime.ToString("HH:mm:ss.f");
             sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Start},{row.Command},{row.Mode},{row.R},{row.G},{row.B},{row.Blank},{row.CRC},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
@@ -1046,75 +1049,75 @@ namespace BluetoothDeviceController.SpecialtyPages
     }
 
 
-        private async void OnReadSend(object sender, RoutedEventArgs e)
+        private async void OnReadLED_Write(object sender, RoutedEventArgs e)
         {
-            await DoReadSend();
+            await DoReadLED_Write();
         }
 
-        private async Task DoReadSend()
+        private async Task DoReadLED_Write()
         {
             SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
-                var valueList = await bleDevice.ReadSend();
+                var valueList = await bleDevice.ReadLED_Write();
                 if (valueList == null)
                 {
-                    SetStatus ($"Error: unable to read Send");
+                    SetStatus ($"Error: unable to read LED_Write");
                     return;
                 }
                 
-                var record = new SendRecord();
+                var record = new LED_WriteRecord();
                 var Start = valueList.GetValue("Start");
                 if (Start.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Start.CurrentType == BCBasic.BCValue.ValueType.IsString || Start.IsArray)
                 {
                     record.Start = (double)Start.AsDouble;
-                    Send_Start.Text = record.Start.ToString("N0");
+                    LED_Write_Start.Text = record.Start.ToString("N0");
                 }
                 var Command = valueList.GetValue("Command");
                 if (Command.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Command.CurrentType == BCBasic.BCValue.ValueType.IsString || Command.IsArray)
                 {
                     record.Command = (double)Command.AsDouble;
-                    Send_Command.Text = record.Command.ToString("N0");
+                    LED_Write_Command.Text = record.Command.ToString("N0");
                 }
                 var Mode = valueList.GetValue("Mode");
                 if (Mode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Mode.CurrentType == BCBasic.BCValue.ValueType.IsString || Mode.IsArray)
                 {
                     record.Mode = (double)Mode.AsDouble;
-                    Send_Mode.Text = record.Mode.ToString("N0");
+                    LED_Write_Mode.Text = record.Mode.ToString("N0");
                 }
                 var R = valueList.GetValue("R");
                 if (R.CurrentType == BCBasic.BCValue.ValueType.IsDouble || R.CurrentType == BCBasic.BCValue.ValueType.IsString || R.IsArray)
                 {
                     record.R = (double)R.AsDouble;
-                    Send_R.Text = record.R.ToString("N0");
+                    LED_Write_R.Text = record.R.ToString("N0");
                 }
                 var G = valueList.GetValue("G");
                 if (G.CurrentType == BCBasic.BCValue.ValueType.IsDouble || G.CurrentType == BCBasic.BCValue.ValueType.IsString || G.IsArray)
                 {
                     record.G = (double)G.AsDouble;
-                    Send_G.Text = record.G.ToString("N0");
+                    LED_Write_G.Text = record.G.ToString("N0");
                 }
                 var B = valueList.GetValue("B");
                 if (B.CurrentType == BCBasic.BCValue.ValueType.IsDouble || B.CurrentType == BCBasic.BCValue.ValueType.IsString || B.IsArray)
                 {
                     record.B = (double)B.AsDouble;
-                    Send_B.Text = record.B.ToString("N0");
+                    LED_Write_B.Text = record.B.ToString("N0");
                 }
                 var Blank = valueList.GetValue("Blank");
                 if (Blank.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Blank.CurrentType == BCBasic.BCValue.ValueType.IsString || Blank.IsArray)
                 {
                     record.Blank = (string)Blank.AsString;
-                    Send_Blank.Text = record.Blank.ToString();
+                    LED_Write_Blank.Text = record.Blank.ToString();
                 }
                 var CRC = valueList.GetValue("CRC");
                 if (CRC.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CRC.CurrentType == BCBasic.BCValue.ValueType.IsString || CRC.IsArray)
                 {
                     record.CRC = (double)CRC.AsDouble;
-                    Send_CRC.Text = record.CRC.ToString("N0");
+                    LED_Write_CRC.Text = record.CRC.ToString("N0");
                 }
 
-                SendRecordData.Add(record);
+                LED_WriteRecordData.Add(record);
 
             }
             catch (Exception ex)
@@ -1125,46 +1128,46 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         // CS+CHARACTERISTIC+WRITE+METHOD
         // OK to include this method even if there are no defined buttons
-        private async void OnClickSend(object sender, RoutedEventArgs e)
+        private async void OnClickLED_Write(object sender, RoutedEventArgs e)
         {
             var values = new List<UxTextValue>()
             {
-                // e.g., new UxTextValue(Send_Start.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_Start.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_Command.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_Mode.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_R.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_G.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_B.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_Blank.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_CRC.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                // e.g., new UxTextValue(LED_Write_Start.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Start.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Command.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Mode.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_R.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_G.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_B.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Blank.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_CRC.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
 
             };
             //var text = (sender as Button).Tag as String;
-            await DoWriteSend(values);
+            await DoWriteLED_Write(values);
 
         }
 
-        private async void OnWriteSend(object sender, RoutedEventArgs e)
+        private async void OnWriteLED_Write(object sender, RoutedEventArgs e)
         {
             var values = new List<UxTextValue>()
             {
-                // e.g., new UxTextValue(Send_Start.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_Start.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_Command.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_Mode.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_R.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_G.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_B.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_Blank.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
-                new UxTextValue(Send_CRC.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                // e.g., new UxTextValue(LED_Write_Start.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Start.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Command.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Mode.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_R.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_G.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_B.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_Blank.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(LED_Write_CRC.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
 
             };
-            await DoWriteSend(values);
+            await DoWriteLED_Write(values);
 
         }
 
-        private async Task DoWriteSend(List<UxTextValue> values)
+        private async Task DoWriteLED_Write(List<UxTextValue> values)
         {
             if (values.Count != 8) return;
             int valueIndex = 0; // Change #3;
@@ -1179,7 +1182,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 string parseError = null;
 
                 Byte Start;
-                // History: used to go into Send_Start.Text instead of using the variable
+                // History: used to go into LED_Write_Start.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
                 var parsedStart = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Start);
                 valueIndex++; // Change #5
@@ -1188,7 +1191,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     parseError = "Start";
                 }
                 Byte Command;
-                // History: used to go into Send_Command.Text instead of using the variable
+                // History: used to go into LED_Write_Command.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
                 var parsedCommand = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Command);
                 valueIndex++; // Change #5
@@ -1197,7 +1200,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     parseError = "Command";
                 }
                 Byte Mode;
-                // History: used to go into Send_Mode.Text instead of using the variable
+                // History: used to go into LED_Write_Mode.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
                 var parsedMode = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Mode);
                 valueIndex++; // Change #5
@@ -1206,7 +1209,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     parseError = "Mode";
                 }
                 Byte R;
-                // History: used to go into Send_R.Text instead of using the variable
+                // History: used to go into LED_Write_R.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
                 var parsedR = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out R);
                 valueIndex++; // Change #5
@@ -1215,7 +1218,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     parseError = "R";
                 }
                 Byte G;
-                // History: used to go into Send_G.Text instead of using the variable
+                // History: used to go into LED_Write_G.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
                 var parsedG = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out G);
                 valueIndex++; // Change #5
@@ -1224,7 +1227,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     parseError = "G";
                 }
                 Byte B;
-                // History: used to go into Send_B.Text instead of using the variable
+                // History: used to go into LED_Write_B.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
                 var parsedB = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out B);
                 valueIndex++; // Change #5
@@ -1233,7 +1236,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     parseError = "B";
                 }
                 Bytes Blank;
-                // History: used to go into Send_Blank.Text instead of using the variable
+                // History: used to go into LED_Write_Blank.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
                 var parsedBlank = Utilities.Parsers.TryParseBytes(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Blank);
                 valueIndex++; // Change #5
@@ -1242,7 +1245,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                     parseError = "Blank";
                 }
                 Byte CRC;
-                // History: used to go into Send_CRC.Text instead of using the variable
+                // History: used to go into LED_Write_CRC.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
                 var parsedCRC = Utilities.Parsers.TryParseByte(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out CRC);
                 valueIndex++; // Change #5
@@ -1253,7 +1256,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
                 if (parseError == null)
                 {
-                    await bleDevice.WriteSend(Start, Command, Mode, R, G, B, Blank, CRC);
+                    await bleDevice.WriteLED_Write(Start, Command, Mode, R, G, B, Blank, CRC);
                 }
                 else
                 { //NOTE: pop up a dialog?

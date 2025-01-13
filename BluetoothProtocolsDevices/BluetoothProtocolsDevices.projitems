@@ -11,9 +11,9 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Bbc_MicroBit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BleHome_SensorBug.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Light.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Govee_H6005_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Zengge_LedLight_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CraftyRobot_Smartibot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Elegoo_MiniCar.cs" />

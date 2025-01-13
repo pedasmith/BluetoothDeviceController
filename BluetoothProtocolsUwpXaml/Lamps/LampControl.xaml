@@ -20,7 +20,7 @@
             <StackPanel Orientation="Horizontal">
                 <ToggleSwitch x:Name="uiOnOff" Toggled="OnOnOffToggled" Header="On/Off" MinWidth="150" VerticalAlignment="Top"/>
                 <StackPanel>
-                    <Slider x:Name="uiBrightness" Minimum="0" Maximum="100" Value="100" ValueChanged="OnBrightnessChanged" Header="Brigthness" MinWidth="250" />
+                    <Slider x:Name="uiBrightness" Minimum="0" Maximum="100" Value="100" ValueChanged="OnBrightnessChanged" Header="Brightness" MinWidth="250" />
                     <Slider x:Name="uiWarmth" Minimum="0" Maximum="100" Value="100" ValueChanged="OnWarmthChanged" Header="Warmth" MinWidth="250" />
                 </StackPanel>
             </StackPanel>
