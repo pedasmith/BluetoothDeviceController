@@ -1,4 +1,4 @@
-﻿using BluetoothDeviceController.BleEditor;
+﻿using BluetoothProtocols.IotNumberFormats;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -123,7 +123,7 @@ namespace BluetoothDeviceController.Names
             var cmd = "";
             foreach (var strcommand in list)
             {
-                var calculateResult = BleEditor.ValueCalculate.Calculate(strcommand, double.NaN, null, Variables);
+                var calculateResult = BluetoothProtocols.IotNumberFormats.ValueCalculate.Calculate(strcommand, double.NaN, null, Variables);
                 cmd += calculateResult.S ?? calculateResult.D.ToString();
             }
             Variables.CopyToPrev();

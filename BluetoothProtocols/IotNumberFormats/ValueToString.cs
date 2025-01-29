@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Utilities;
 using Windows.Storage.Streams;
 using static Utilities.DataReaderReadStringRobust;
+using BluetoothProtocols.IotNumberFormats;
 
 namespace BluetoothDeviceController.BleEditor
 {
@@ -60,7 +61,7 @@ namespace BluetoothDeviceController.BleEditor
         /// </summary>
         public string UserString = "??-??";
         /// <summary>
-        /// The error string from any errors encountere while parsing; otherwise just blank.
+        /// The error string from any errors encountered while parsing; otherwise just blank.
         /// </summary>
         public string ErrorString = "";
         public IList<byte> ByteResult = null;
@@ -75,89 +76,6 @@ namespace BluetoothDeviceController.BleEditor
         public BCBasic.BCValueList ValueList = new BCBasic.BCValueList();
     }
 
-    /// <summary>
-    /// Class to perfectly parse the binary value descriptor strings.
-    /// Simple example: "U8 U8" "U8|DEC|Temp|C U8|HEX|Mode"
-    /// Complex example: "Q12Q4^_125_/|FIXED|Pressure|mbar"
-    /// Default example: "U8|HEX|Mode||FF"
-    /// Three levels of splitting using space, vertical-bar (|) and caret (^)
-    /// </summary>
-    public class ValueParserSplit
-    {
-        ValueParserSplit(string value)
-        {
-            Parse(value);
-        }
-        /// <summary>
-        /// Examples: U8 F32 BYTES STRING
-        /// </summary>
-        public string ByteFormatPrimary { get; set; } = "U8";
-        /// <summary>
-        /// Examples: HEX DEC FIXED STRING 
-        /// </summary>
-        public string DisplayFormatPrimary { get; set; } = "";
-        public string NamePrimary { get; set; } = "";
-        public string UnitsPrimary { get; set; } = "";
-        public string DefaultValuePrimary { get; set; } = "*";
-        /// <summary>
-        /// Universal GET by index. Get (0,0) is the same as getting the ByteFormatPrimary. Invalid indexes return ""
-        /// </summary>
-        /// <param name="index1"></param>
-        /// <param name="index2"></param>
-        /// <returns>either the value or "" for indexes that are out of range</returns>
-        public string Get(int index1, int index2)
-        {
-            if (index1 < 0 || index2 < 0) return "";
-            if (index1 == 0 && index2 == 0) return ByteFormatPrimary;
-            if (index1 == 1 && index2 == 0) return DisplayFormatPrimary;
-            if (index1 == 2 && index2 == 0) return NamePrimary;
-            if (index1 == 3 && index2 == 0) return UnitsPrimary;
-            if (index2 == 4 && index2 == 0) return DefaultValuePrimary;
-            if (index1 >= SplitData.Length) return "";
-            if (index2 >= SplitData[index1].Length) return "";
-            return SplitData[index1][index2];
-        }
-        private static char[] Space = new char[] { ' ' };
-        private static char[] Bar = new char[] { '|' };
-        private static char[] Caret = new char[] { '^' };
-
-
-        private string[][] SplitData = null;
-        /// <summary>
-        /// ParseScanResponseServiceData after the string is split into units
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public void Parse (string value)
-        {
-            var barsplit = value.Split(Bar);
-            SplitData = new string[barsplit.Length][];
-            for (int i=0; i<barsplit.Length; i++)
-            {
-                SplitData[i] = barsplit[i].Split(Caret);
-                switch (i)
-                {
-                    case 0: ByteFormatPrimary = SplitData[i][0]; break;
-                    case 1: DisplayFormatPrimary = SplitData[i][0]; break;
-                    case 2: NamePrimary = SplitData[i][0]; break;
-                    case 3: UnitsPrimary = SplitData[i][0]; break;
-                    case 4: DefaultValuePrimary = SplitData[i][0]; break;
-                }
-            }
-        }
-
-        public static IList<ValueParserSplit> ParseLine(string value)
-        {
-            var Retval = new List<ValueParserSplit>();
-            var split = value.Split(Space);
-            for (int i=0; i<split.Length; i++)
-            {
-                var item = new ValueParserSplit(split[i]);
-                Retval.Add(item);
-            }
-            return Retval;
-        }
-    }
     public static class ValueParser
     {
         /// <summary>
@@ -205,7 +123,7 @@ namespace BluetoothDeviceController.BleEditor
         private static ValueParserResult ConvertHelper(DataReader dr, string decodeCommands)
         {
             var str = "";
-            var vps = ValueParserSplit.ParseLine(decodeCommands);
+            IList<ValueParserSplit> vps = ValueParserSplit.ParseLine(decodeCommands);
             var valueList = new BCBasic.BCValueList();
             bool isOptional = false;
 
@@ -588,14 +506,23 @@ namespace BluetoothDeviceController.BleEditor
                         default:
                             if (readcmd != readcmd.ToUpper())
                             {
-                                System.Diagnostics.Debug.WriteLine("ERROR: readcmd {readcmd} but should be uppercase");
+                                Log("ERROR: readcmd {readcmd} but should be uppercase");
+                            }
+                            int skip = command.MaxBytesRemaining;
+                            if (skip == -1)
+                            {
+                                skip = 0;
+                            }
+                            else if (skip <= -2)
+                            {
+                                return ValueParserResult.CreateError(decodeCommands, $"Unable to get MaxBytesRemaining for {readcmd}");
                             }
                             switch (readcmd.ToUpper()) //NOTE: should be all-uppercase; any lowercase is wrong
                             {
                                 case "STRING":
                                     {
                                         ReadStatus readStatus;
-                                        (stritem, readStatus) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength);
+                                        (stritem, readStatus) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength - (uint)skip);
                                         switch (readStatus)
                                         {
                                             case ReadStatus.OK:
@@ -630,7 +557,7 @@ namespace BluetoothDeviceController.BleEditor
                                         }
                                         else
                                         {
-                                            IBuffer buffer = dr.ReadBuffer(dr.UnconsumedBufferLength);
+                                            IBuffer buffer = dr.ReadBuffer(dr.UnconsumedBufferLength - (uint)skip);
                                             byteArrayItem = buffer.ToArray();
                                             var format = "X2";
                                             switch (displayFormat)
@@ -908,6 +835,12 @@ namespace BluetoothDeviceController.BleEditor
                     break;
             }
             return Retval;
+        }
+
+        private static void Log(string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message);
+            Console.WriteLine(message);
         }
     }
 }

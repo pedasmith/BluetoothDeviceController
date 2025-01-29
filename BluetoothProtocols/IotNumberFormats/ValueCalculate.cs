@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 // I16^*500/65536.FIXED.GyroX.dps
 
-namespace BluetoothDeviceController.BleEditor
+namespace BluetoothProtocols.IotNumberFormats
 {
     /// <summary>
     /// Implements a tiny calculator. It's got just enough power to handle common IOT scenarios

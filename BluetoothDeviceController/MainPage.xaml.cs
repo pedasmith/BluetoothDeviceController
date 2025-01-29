@@ -2,6 +2,7 @@
 using BluetoothDeviceController.BluetoothProtocolsCustom;
 using BluetoothDeviceController.Names;
 using BluetoothDeviceController.UserData;
+using BluetoothProtocols.IotNumberFormats;
 // ADVERT: removed 2022-12-30: using Microsoft.Advertising.WinRT.UI;
 using SearchControllers;
 using System;
@@ -202,7 +203,7 @@ namespace BluetoothDeviceController
         {
             int NError = 0;
             NError += GuidGetCommon.Test();
-            NError += BleEditor.ValueToStringTest.Test();
+            NError += BluetoothProtocols.IotNumberFormats.ValueToStringTest.Test();
             NError += Charts.DataCollection<int>.Test();
             return NError;
         }

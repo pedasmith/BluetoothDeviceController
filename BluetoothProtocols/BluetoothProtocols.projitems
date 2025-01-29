@@ -30,6 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Charts\DataCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Charts\OscDataRecord.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueCalculate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueParserSplit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueToString.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\ValueToStringTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IotNumberFormats\VariableSet.cs" />

@@ -1,5 +1,6 @@
 ﻿using BluetoothDeviceController.BleEditor;
 using BluetoothDeviceController.Names;
+using BluetoothProtocols.IotNumberFormats;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -211,7 +212,7 @@ namespace BluetoothDeviceController.SerialPort
                 cmd = "";
                 foreach (var strcommand in commandlist)
                 {
-                    var calculateResult = BleEditor.ValueCalculate.Calculate(strcommand, double.NaN, null, Variables);
+                    var calculateResult = BluetoothProtocols.IotNumberFormats.ValueCalculate.Calculate(strcommand, double.NaN, null, Variables);
                     cmd += calculateResult.S ?? calculateResult.D.ToString();
                 }
 

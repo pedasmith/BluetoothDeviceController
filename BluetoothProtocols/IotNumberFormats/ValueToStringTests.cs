@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using BluetoothDeviceController.BleEditor;
 
-namespace BluetoothDeviceController.BleEditor
+namespace BluetoothProtocols.IotNumberFormats
 {
     public class ValueToStringTest
     {
@@ -15,6 +17,7 @@ namespace BluetoothDeviceController.BleEditor
             int NError = 0;
             NError += TestSimple();
             NError += TestStringEscape();
+            NError += TestBytes();
             return NError;
         }
 
@@ -27,7 +30,33 @@ namespace BluetoothDeviceController.BleEditor
 
             NError += TestOk("I24^100_/|FIXED", "DB 07 00", "20.11"); // TI 1350 Barometer temp reading 70F-->20.11C-->2011-->7DB hex -> 00 07 DB
 
+            NError += TestOk("U8 BYTES|HEX U16|HEX", "1F 31 32 33 20 30", "1F 31 32 33 3020");
+            NError += TestOk("U8 STRING|ASCII U16|HEX", "1F 31 32 33 20 30", "1F 123 3020");
+
             return NError;
+        }
+
+        private static int TestBytes()
+        {
+            int nerror = 0;
+            var actualResult = ValueParserSplit.ParseLine("U8 U16 BYTES|HEX|MyBytes U8 U8 U8 F32");
+            var b = actualResult[2];
+            if (b.NamePrimary != "MyBytes")
+            {
+                nerror += 1;
+                Log($"ERROR: TestBytes: name is {b.NamePrimary} but expected MyBytes");
+            }
+            if (b.NBytes != -1)
+            {
+                nerror += 1;
+                Log($"ERROR: TestBytes: NBytes is {b.NBytes} but expected -1");
+            }
+            if (b.MaxBytesRemaining != 7)
+            {
+                nerror += 1;
+                Log($"ERROR: TestBytes: MaxBytesRemaining is {b.MaxBytesRemaining} but expected 7");
+            }
+            return nerror;
         }
 
         /// <summary>
@@ -41,22 +70,27 @@ namespace BluetoothDeviceController.BleEditor
         {
             int NError=0;
             var valueb = Hex(value);
-            var expectedb = Hex(value);
             var actualResult = ValueParser.Parse(valueb.AsBuffer(), commands);
             if (actualResult.Result != ValueParserResult.ResultValues.Ok)
             {
-                System.Diagnostics.Debug.WriteLine($"ERROR: ValueToStringTest:TestOk ({commands}, {value}) failed to parse at all; expected OK");
+                Log($"ERROR: ValueToStringTest:TestOk ({commands}, {value}) failed to parse at all; expected OK");
                 NError++;
             }
             else
             {
                 if (actualResult.AsString != expected)
                 {
-                    System.Diagnostics.Debug.WriteLine($"ERROR: ValueToStringTest:TestOk ({commands}, {value}) actual is {actualResult.AsString} expected {expected}");
+                    Log($"ERROR: ValueToStringTest:TestOk ({commands}, {value}) actual is {actualResult.AsString} expected {expected}");
                     NError++;
                 }
             }
             return NError;
+        }
+
+        private static void Log(string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message);
+            Console.Write(message);
         }
 
         private static byte[] Hex(string value)
@@ -64,7 +98,7 @@ namespace BluetoothDeviceController.BleEditor
             var result = ValueParser.ConvertToBuffer(value, "HEX");
             if (result.Result != ValueParserResult.ResultValues.Ok)
             {
-                System.Diagnostics.Debug.WriteLine($"ERROR: ValueToStringTest ({value}) failed to parse");
+                Log($"ERROR: ValueToStringTest ({value}) failed to parse");
                 return new byte[0];
             }
             return result.ByteResult.ToArray();
@@ -92,38 +126,38 @@ namespace BluetoothDeviceController.BleEditor
             if (escape.Contains('\0'))
             {
                 nerror++;
-                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains NULL");
+                Log($"ERROR in TestStringEscape({str}) escape {escape} contains NULL");
             }
             if (escape.Contains(' '))
             {
                 nerror++;
-                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains SPACE");
+                Log($"ERROR in TestStringEscape({str}) escape {escape} contains SPACE");
             }
             if (escape.Contains('|'))
             {
                 nerror++;
-                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains BAR");
+                Log($"ERROR in TestStringEscape({str}) escape {escape} contains BAR");
             }
             if (escape.Contains('^'))
             {
                 nerror++;
-                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains CARET");
+                Log($"ERROR in TestStringEscape({str}) escape {escape} contains CARET");
             }
             if (escape.Contains('\r'))
             {
                 nerror++;
-                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains CR");
+                Log($"ERROR in TestStringEscape({str}) escape {escape} contains CR");
             }
             if (escape.Contains('\n'))
             {
                 nerror++;
-                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} contains LF");
+                Log($"ERROR in TestStringEscape({str}) escape {escape} contains LF");
             }
             var reverse = ValueCalculate.UnescapeString(escape);
             if (reverse != str)
             {
                 nerror++;
-                System.Diagnostics.Debug.WriteLine($"ERROR in TestStringEscape({str}) escape {escape} reverse {reverse} isn't the same!");
+                Log($"ERROR in TestStringEscape({str}) escape {escape} reverse {reverse} isn't the same!");
             }
 
             return nerror;

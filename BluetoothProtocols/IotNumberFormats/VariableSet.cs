@@ -1,7 +1,7 @@
 ﻿using BluetoothDeviceController.Names;
 using System.Collections.Generic;
 
-namespace BluetoothDeviceController.BleEditor
+namespace BluetoothProtocols.IotNumberFormats
 {
     public class VariableSet
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 // Location: BluetoothProtocols/Names
@@ -261,6 +262,7 @@ namespace BluetoothDeviceController.Names
 
         }
 
+        [DefaultValue("")]
         public string ExtraUI { get; set; } = ""; // allowed: "" or "LightControl"
         public UISpecifications UI { get; set; } = null; // default to null
         private string UuidRaw = "";

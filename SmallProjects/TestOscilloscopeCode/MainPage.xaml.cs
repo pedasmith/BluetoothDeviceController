@@ -1,4 +1,4 @@
-﻿using BluetoothDeviceController.BleEditor;
+﻿using BluetoothProtocols.IotNumberFormats;
 using BluetoothDeviceController.Charts;
 using BluetoothDeviceController.SpecialtyPagesCustom;
 using BluetoothProtocolsUwpXaml.ChartControl;
