@@ -8,7 +8,7 @@
       ],
       "ClassName": "Elk_LedLight",
       "ClassModifiers":  "partial",
-      "Description":  "Under-counter 'stick' LED light with Bluetooth control. Can also be controlled with a small report, or via a tiny controller built into the power cord. Seems to use the same protocol as the ELK-BLEDOM controller.",
+      "Description":  "Under-counter 'stick' LED light with Bluetooth control. Can also be controlled with a small remote, or via a tiny controller built into the power cord. Seems to use the same protocol as the ELK-BLEDOM controller.",
       "Links": [
         "https://github.com/kquinsland/JACKYLED-BLE-RGB-LED-Strip-controller",
         "https://github.com/arduino12/ble_rgb_led_strip_controller",

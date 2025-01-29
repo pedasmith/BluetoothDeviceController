@@ -15,14 +15,17 @@ using Utilities;
 namespace BluetoothProtocols
 {
     /// <summary>
-    /// .
-    /// This class was automatically generated 2025-01-29::09:09
+    /// LED strip lightswith Bluetooth control. Can also be controlled with a small remote, or via a tiny controller built into the power cord. Seems to use the same protocol as the ELK-BLEDOM controller..
+    /// This class was automatically generated 2025-01-29::14:30
     /// </summary>
 
-    public  class Daybetter_LedLight : INotifyPropertyChanged
+    public partial class Daybetter_LedLight : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // No links for this device
+    // Link: https://daybetter.com/collections/rgbic-led-lights/products/daybetter-bluetooth-led-strip-lights-50-100ft
+    // Link: https://github.com/shindekokoro/homebridge-daybetter/blob/master/Device.js
+    // Link: https://modbus.org/docs/Modbus_over_serial_line_V1_01.pdf
+
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();

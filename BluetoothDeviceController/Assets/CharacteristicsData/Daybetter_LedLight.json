@@ -3,6 +3,13 @@
     {
       "Name": "P031_",
       "ClassName": "Daybetter_LedLight",
+      "ClassModifiers": "partial",
+      "Description": "LED strip lightswith Bluetooth control. Can also be controlled with a small IR remote. Uses a ModBus-based custom protocol.",
+      "Links": [
+        "https://daybetter.com/collections/rgbic-led-lights/products/daybetter-bluetooth-led-strip-lights-50-100ft",
+        "https://github.com/shindekokoro/homebridge-daybetter/blob/master/Device.js",
+        "https://modbus.org/docs/Modbus_over_serial_line_V1_01.pdf"
+      ],
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",
@@ -25,13 +32,19 @@
         {
           "UUID": "0000e031-0000-1000-8000-00805f9b34fb",
           "Name": "ModbusControl",
+          "Proiority":  10,
           "Characteristics": [
             {
               "UUID": "0000a031-0000-1000-8000-00805f9b34fb",
               "Name": "ModbusSend",
               "Type": "U8|HEX|Address||A0 U8|HEX|Function||15 BYTES|HEX|Command||06_FF_00_00 OEB U16|HEX|CRC||UpdateModbusCrc16AtEnd",
               "IsWrite": true,
-              "Verbs": ":Write:WrWw:"
+              "Verbs": ":Write:WrWw:",
+              "ExtraUI": "LampControl",
+              "ExampleData": [
+                "A0 13 04 0C D124 set brightness. A0 is address. 13 is set brightness; 04 seems to be the length including the length byte and CRC. 0C is the value D124 is the CRC",
+                "A0 15 06 00FFFF 1440 set to cyan (G+B). A0 is address, 15 is set RGB, 06 is the weird length 00FFFF is the color 1440 is the CRC"
+              ]
             },
             {
               "UUID": "0000f031-0000-1000-8000-00805f9b34fb",

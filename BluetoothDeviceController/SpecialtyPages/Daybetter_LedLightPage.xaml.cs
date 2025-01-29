@@ -31,6 +31,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             this.InitializeComponent();
             this.DataContext = this;
+            this.uiModbusSendLampControl.Light = bleDevice;
 
         }
         private string DeviceName = "Daybetter_LedLight";

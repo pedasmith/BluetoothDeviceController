@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-
+    xmlns:lamps="using:BluetoothDeviceController.Lamps"
     xmlns:charts="using:BluetoothDeviceController.Charts"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -71,13 +71,15 @@
             <StackPanel Grid.Column="0">
                 <TextBlock Style="{StaticResource TitleStyle}">P031_ device</TextBlock>
                 <TextBlock Style="{StaticResource AboutStyle}">
-                    
+                    LED strip lightswith Bluetooth control. Can also be controlled with a small remote, or via a tiny controller built into the power cord. Seems to use the same protocol as the ELK-BLEDOM controller.
                 </TextBlock>
             </StackPanel>
             <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/Daybetter_LedLight.PNG" />
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
+        <lamps:LampControl x:Name="uiModbusSendLampControl"></lamps:LampControl>
+
 
         <!-- XAML+SERVICE+LIST for Common Configuration -->
         <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
