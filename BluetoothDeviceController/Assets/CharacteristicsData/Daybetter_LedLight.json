@@ -1,0 +1,50 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "P031_",
+      "ClassName": "Daybetter_LedLight",
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Name: P031_1444\\0",
+                "P031_1444\\0"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000e031-0000-1000-8000-00805f9b34fb",
+          "Name": "ModbusControl",
+          "Characteristics": [
+            {
+              "UUID": "0000a031-0000-1000-8000-00805f9b34fb",
+              "Name": "ModbusSend",
+              "Type": "U8|HEX|Address||A0 U8|HEX|Function||15 BYTES|HEX|Command||06_FF_00_00 OEB U16|HEX|CRC||UpdateModbusCrc16AtEnd",
+              "IsWrite": true,
+              "Verbs": ":Write:WrWw:"
+            },
+            {
+              "UUID": "0000f031-0000-1000-8000-00805f9b34fb",
+              "Name": "ModbusReply",
+              "Type": "U8|HEX|Address U8|HEX|Function BYTES|HEX|Result U16|HEX|CRC||UpdateModbusCrc16AtEnd",
+              "IsRead": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Notify:RdInNo:InNo:"
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-e4:98:bb:c4:14:44\nCanPair:True IsPaired:False"
+    }
+  ]
+}

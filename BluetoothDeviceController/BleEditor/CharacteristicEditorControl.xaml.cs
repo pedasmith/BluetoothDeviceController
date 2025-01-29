@@ -151,7 +151,6 @@ namespace BluetoothDeviceController.BleEditor
             {
                 // NOTE: used to always try to read; this is a mistake because some devices 
                 // say they are readable but aren't. That's why there's an "When editing, automatically read from device" checkbox.
-                // here!here
                 if (AutomaticallyReadData && characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
                 {
                     var buffer = await characteristic.ReadValueAsync();

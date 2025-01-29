@@ -120,6 +120,7 @@ namespace BluetoothDeviceController
             new Specialization (typeof(SpecialtyPages.Zengge_LedLightPage), new string[] { "IOTWF8FF", "LEDnetWF"}, LIGHT, "LED Light", "Bluetooth controlled light (Zenggee protocol)"),
             new Specialization (typeof(SpecialtyPages.Govee_H6005Page), new string[] { "ihoment_H6005_"}, LIGHT, "LED Light", "Bluetooth controlled light (Govee protocol)"),
             new Specialization (typeof(SpecialtyPages.Elk_LedLightPage), new string[] { "ELK-"}, LIGHT, "LED Light", "Bluetooth controlled light (ELK protocol)"),
+            new Specialization (typeof(SpecialtyPages.Daybetter_LedLightPage), new string[] { "P031_"}, LIGHT, "LED Light", "Bluetooth controlled light (Daybetter protocol)"),
 
             // // // Is actually empty :-) new Specialization (typeof(SpecialtyPages.DigHoseEndPage), new string[] { "DIG", "\0IG" }, WATER, "DIG water valve", "DIG Hose-end valve"),
 

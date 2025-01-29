@@ -231,6 +231,7 @@
     <Compile Include="SpecialtyPages\BleHome_SensorBugPage.xaml.cs">
       <DependentUpon>BleHome_SensorBugPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPages\Daybetter_LedLightPage.xaml.cs" />
     <Compile Include="SpecialtyPages\DigHoseEndPage.xaml.cs">
       <DependentUpon>DigHoseEndPage.xaml</DependentUpon>
     </Compile>
@@ -778,6 +779,9 @@
     <Content Include="Assets\CharacteristicsData\Elk_LedLight.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Assets\CharacteristicsData\Daybetter_LedLight.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Assets\CharacteristicsData\Govee_H5074.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -1083,6 +1087,10 @@
     <Page Include="SpecialtyPages\BleHome_SensorBugPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPages\Daybetter_LedLightPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="SpecialtyPages\DigHoseEndPage.xaml">
       <SubType>Designer</SubType>

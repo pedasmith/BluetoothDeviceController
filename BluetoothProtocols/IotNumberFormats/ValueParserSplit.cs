@@ -29,9 +29,14 @@ namespace BluetoothProtocols.IotNumberFormats
         public string UnitsPrimary { get; set; } = "";
         public string DefaultValuePrimary { get; set; } = "*";
 
-        //TODO: DBG: here!here setting the NBytes and later the MaxBytesRemaining.
-        public int NBytes { get; set; } = 1; // -1 for the BYTES and STRING
-        public int MaxBytesRemaining { get; set; } = -1; // Set to >0 when the last BYTES or STRING is followed by a series of fixed-width fields (which is most of them). -1 for BYTES or STRING means to fill it in with the rest of the data.
+        /// <summary>
+        ///  Number of bytes this value uses or -1 for BYTES or STRING (and -2 when not set like the Q format)
+        /// </summary>
+        public int NBytes { get; set; } = 1;
+        /// <summary>
+        /// Set to >0 when the last BYTES or STRING is followed by a series of fixed-width fields (which is most of them). -1 for BYTES or STRING means to fill it in with the rest of the data.
+        /// </summary>
+        public int MaxBytesRemaining { get; set; } = -1; 
         /// <summary>
         /// Universal GET by index. Get (0,0) is the same as getting the ByteFormatPrimary. Invalid indexes return ""
         /// </summary>
@@ -84,6 +89,11 @@ namespace BluetoothProtocols.IotNumberFormats
 
         private static int ParseNBytes(string byteFormatPrimary)
         {
+            if (string.IsNullOrEmpty (byteFormatPrimary))
+            {
+                return 0; // does it matter what gets returned? This is actually a common case
+                // when we're reading a new device with no specialization or JSON.
+            }
             int retval = -2; // failure
             switch (byteFormatPrimary[0])
             {
@@ -95,6 +105,9 @@ namespace BluetoothProtocols.IotNumberFormats
                     {
                         retval = len / 8;
                     }
+                    break;
+                case 'O': // All the optional values are zero long
+                    retval = 0;
                     break;
                 default:
                     if (byteFormatPrimary == "STRING" || byteFormatPrimary == "BYTES")

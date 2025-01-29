@@ -469,6 +469,11 @@ namespace BluetoothCodeGenerator
                     crc_xor_fixup = "CrcCalculations.UpdateXorAtEnd(command);";
                     defaultValue = "0"; // Makes for a nicer UX and doesn't trigger the later parses.
                 }
+                else if (defaultValue == "UpdateModbusCrc16AtEnd")
+                {
+                    crc_xor_fixup = "CrcCalculations.UpdateModbusCrc16AtEnd(command);";
+                    defaultValue = "0";
+                }
                 if (hasRead)
                 {
                     var datareadpr = new TemplateSnippet(dataname);
