@@ -23,7 +23,7 @@ using static BluetoothProtocols.Elk_LedLight;
 namespace BluetoothDeviceController.SpecialtyPages
 {
     /// <summary>
-    /// Specialty page for the ELK-BTCWCTB device
+    /// Specialty page for the ELK device
     /// </summary>
     public sealed partial class Elk_LedLightPage : Page, HasId, ISetHandleStatus
     {
@@ -35,7 +35,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         }
         private string DeviceName = "Elk_LedLight";
-        private string DeviceNameUser = "ELK-BTCWCTB";
+        private string DeviceNameUser = "ELK";
 
         int ncommand = 0;
         Elk_LedLight bleDevice = new Elk_LedLight();

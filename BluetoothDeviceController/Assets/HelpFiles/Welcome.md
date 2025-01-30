@@ -7,9 +7,11 @@ and more devices -- please leave feedback to request specific devices!
 
 ## Lights that can be controlled
 
-[![Govee H6005](../DevicePictures/Daybetter_LedLight-175.png)](Device_Daybetter_LedLight.md)
+[![Daybetter](../DevicePictures/Daybetter_LedLight-175.png)](Device_Daybetter_LedLight.md)
+[![Govee H6005](../DevicePictures/Govee_H6005-175.png)](Device_Govee_H6005.md)
 [![Magic Light](../DevicePictures/MagicLight-175.png)](Device_MagicLight.md)
 [![Magic Light 2024](../DevicePictures/Zengge_LedLight-175.png)](Device_Zengge_LedLight.md)
+[![MATICOD](../DevicePictures/Maticod_LedLight-175.png)](Device_Elk_LedLight.md)
 [![Mipow Playbulb](../DevicePictures/Mipow_Playbulb_BTL201-175.png)](Device_Mipow_Playbulb_BTL201.md)
 [![TI beLight](../DevicePictures/TI_beLight_2540-175.png)](Device_TI_beLight_2540.md)
 [![Smart Bulb](../DevicePictures/Triones_SmartBulbGreen-175.png)](Device_Triones.md)

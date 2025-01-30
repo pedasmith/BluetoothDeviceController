@@ -15,13 +15,14 @@ using Utilities;
 namespace BluetoothProtocols
 {
     /// <summary>
-    /// Under-counter 'stick' LED light with Bluetooth control. Can also be controlled with a small report, or via a tiny controller built into the power cord. Seems to use the same protocol as the ELK-BLEDOM controller..
-    /// This class was automatically generated 2025-01-12::20:21
+    /// MATICOD under-counter 'stick' LED light with Bluetooth control. Can also be controlled with a small remote, or via a tiny controller built into the power cord. Seems to use the same protocol as the ELK-BLEDOM controller..
+    /// This class was automatically generated 2025-01-29::18:31
     /// </summary>
 
     public partial class Elk_LedLight : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
+    // Link: https://www.amazon.com/dp/B0C1N8WSXF
     // Link: https://github.com/kquinsland/JACKYLED-BLE-RGB-LED-Strip-controller
     // Link: https://github.com/arduino12/ble_rgb_led_strip_controller
     // Link: https://github.com/8none1/elk-bledob

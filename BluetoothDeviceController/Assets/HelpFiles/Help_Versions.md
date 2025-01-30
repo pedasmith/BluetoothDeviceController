@@ -8,6 +8,8 @@ Added support for the Daybetter LED strip light bulbs
 
 Added support for the Govee H6005 LED bulb
 
+Added support for the MATICOD under-counter LED light (ELK protocol)
+
 Added support for the latest Magic Light LED bulb (2024) 
 
 ## Version 1.10, 2022-12-31

@@ -35,6 +35,7 @@ Not all Bluetooth Smart light bulbs are the same. This program can control some 
 * [Daybetter](Device_Daybetter_LedLight.md)
 * [Flux](Device_MagicLight.md)
 * [Govee H6005](Device_Govee_H6005.md)
+* [MATICOD](Device_Elk_LedLight.md) using the ELK protocol
 * [Mipow](Device_Mipow_Playbulb_BTL201.md)
 * [Magic Light](Device_MagicLight.md) and newer [Magic Light](Device_Zengge_LedLight.md) bulbs
 * [TI beLight CC2540](Device_TI_beLight_2540.md)
