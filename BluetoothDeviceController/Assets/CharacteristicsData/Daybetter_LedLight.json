@@ -1,10 +1,11 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "P031_",
+      "Name": "Daybetter LED Light",
+      "Aliases": [ "P031_" ],
       "ClassName": "Daybetter_LedLight",
       "ClassModifiers": "partial",
-      "Description": "LED strip lightswith Bluetooth control. Can also be controlled with a small IR remote. Uses a ModBus-based custom protocol.",
+      "Description": "LED strip lights with Bluetooth control. Can also be controlled with a small IR remote. Uses a ModBus-based custom protocol.",
       "Links": [
         "https://daybetter.com/collections/rgbic-led-lights/products/daybetter-bluetooth-led-strip-lights-50-100ft",
         "https://github.com/shindekokoro/homebridge-daybetter/blob/master/Device.js",
@@ -32,7 +33,7 @@
         {
           "UUID": "0000e031-0000-1000-8000-00805f9b34fb",
           "Name": "ModbusControl",
-          "Proiority":  10,
+          "Proiority": 10,
           "Characteristics": [
             {
               "UUID": "0000a031-0000-1000-8000-00805f9b34fb",

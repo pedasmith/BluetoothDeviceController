@@ -15,8 +15,8 @@ using Utilities;
 namespace BluetoothProtocols
 {
     /// <summary>
-    /// LED strip lightswith Bluetooth control. Can also be controlled with a small remote, or via a tiny controller built into the power cord. Seems to use the same protocol as the ELK-BLEDOM controller..
-    /// This class was automatically generated 2025-01-29::14:30
+    /// LED strip lights with Bluetooth control. Can also be controlled with a small IR remote. Uses a ModBus-based custom protocol..
+    /// This class was automatically generated 2025-01-29::17:36
     /// </summary>
 
     public partial class Daybetter_LedLight : INotifyPropertyChanged

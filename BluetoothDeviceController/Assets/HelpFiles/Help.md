@@ -32,6 +32,7 @@ To control a light, click on it in the menu. Many lights will pop up with severa
 ### Lights known to be compatible with this program
 Not all Bluetooth Smart light bulbs are the same. This program can control some but not all Smart Bluetooth bulbs.
 
+* [Daybetter](Device_Daybetter_LedLight.md)
 * [Flux](Device_MagicLight.md)
 * [Govee H6005](Device_Govee_H6005.md)
 * [Mipow](Device_Mipow_Playbulb_BTL201.md)

@@ -23,7 +23,7 @@ using static BluetoothProtocols.Daybetter_LedLight;
 namespace BluetoothDeviceController.SpecialtyPages
 {
     /// <summary>
-    /// Specialty page for the P031_ device
+    /// Specialty page for the Daybetter LED Light device
     /// </summary>
     public sealed partial class Daybetter_LedLightPage : Page, HasId, ISetHandleStatus
     {
@@ -35,7 +35,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
         }
         private string DeviceName = "Daybetter_LedLight";
-        private string DeviceNameUser = "P031_";
+        private string DeviceNameUser = "Daybetter LED Light";
 
         int ncommand = 0;
         Daybetter_LedLight bleDevice = new Daybetter_LedLight();

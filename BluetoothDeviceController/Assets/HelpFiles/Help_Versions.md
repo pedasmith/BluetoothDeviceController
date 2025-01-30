@@ -4,9 +4,11 @@
 
 Added support for the Govee H5075 temperature and humidity sensor (via advertisements) and the Govee H5106 Smart Air Quality Monitor (also via advertisements).
 
+Added support for the Daybetter LED strip light bulbs
+
 Added support for the Govee H6005 LED bulb
 
-Added support for the latest Magic Light LED bulb (2024)
+Added support for the latest Magic Light LED bulb (2024) 
 
 ## Version 1.10, 2022-12-31
 
