@@ -8,6 +8,7 @@
       "Description": "LED strip lights with Bluetooth control. Can also be controlled with a small IR remote. Uses a ModBus-based custom protocol.",
       "Links": [
         "https://daybetter.com/collections/rgbic-led-lights/products/daybetter-bluetooth-led-strip-lights-50-100ft",
+        "https://daybetter.smartthingsapp.com/app/QRCode",
         "https://github.com/shindekokoro/homebridge-daybetter/blob/master/Device.js",
         "https://modbus.org/docs/Modbus_over_serial_line_V1_01.pdf"
       ],

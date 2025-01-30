@@ -16,13 +16,14 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// LED strip lights with Bluetooth control. Can also be controlled with a small IR remote. Uses a ModBus-based custom protocol..
-    /// This class was automatically generated 2025-01-29::17:36
+    /// This class was automatically generated 2025-01-29::18:03
     /// </summary>
 
     public partial class Daybetter_LedLight : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
     // Link: https://daybetter.com/collections/rgbic-led-lights/products/daybetter-bluetooth-led-strip-lights-50-100ft
+    // Link: https://daybetter.smartthingsapp.com/app/QRCode
     // Link: https://github.com/shindekokoro/homebridge-daybetter/blob/master/Device.js
     // Link: https://modbus.org/docs/Modbus_over_serial_line_V1_01.pdf
 
