@@ -809,6 +809,9 @@
     <None Include="Assets\CharacteristicsData\Govee_H5106.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Assets\CharacteristicsData\HolidayShowHome-LedLight.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\CharacteristicsData\Sphero.json" />
     <Content Include="Assets\CharacteristicsData\SwitchBot_MeterTH.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

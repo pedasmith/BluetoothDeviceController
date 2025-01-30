@@ -36,7 +36,6 @@ namespace BluetoothProtocols
             return GattCommunicationStatus.Unreachable;
         }
 
-        byte Counter = 0;
         public override async Task<GattCommunicationStatus> TurnOnOffAsync(bool On)
         {
             byte bvalue = On ? (byte)0x01 : (byte)0x00;

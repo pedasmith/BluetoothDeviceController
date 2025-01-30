@@ -1,0 +1,213 @@
+﻿{
+  "AllDevices": [
+    {
+      "Services": [
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsRead": true,
+              "IsIndicate": true,
+              "Verbs": ":Read:Indicate:RdInNo:InNo:"
+            }
+          ]
+        },
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "Name: LA7000035FBE7",
+                "LA7000035FBE7"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Appearance:  00",
+                "EXCEPTION reading data System.Exception: The operation attempted to access data outside the valid range (Exception from HRESULT: 0x8000000B)\r\n   at Windows.Storage.Streams.DataReader.ReadUInt16()\r\n   at BluetoothDeviceController.BleEditor.ValueParser.ConvertHelper(DataReader dr, String decodeCommands) index 0 command U16|Speciality|Appearance||* len 1"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms U16^1.15_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  48 60 00 00 58 02",
+                "30810 0 600"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Device Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  FF FF 00 A5 26 02 D1 01",
+                "FF FF 00 A5 26 02 D1 01"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  32 2E 30 2E 30",
+                "2.0.0"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  31 2E 30 2E 30",
+                "1.0.0"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001016-d102-11e1-9b23-00025b00a5a5",
+          "Name": "Unknown3",
+          "Characteristics": [
+            {
+              "UUID": "00001013-d102-11e1-9b23-00025b00a5a5",
+              "Name": "Unknown0",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:"
+            },
+            {
+              "UUID": "00001018-d102-11e1-9b23-00025b00a5a5",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsWrite": true,
+              "Verbs": ":Write:WrWw:"
+            },
+            {
+              "UUID": "00001014-d102-11e1-9b23-00025b00a5a5",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Notify:RdInNo:InNo:"
+            },
+            {
+              "UUID": "00001011-d102-11e1-9b23-00025b00a5a5",
+              "Name": "Unknown3",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:"
+            }
+          ]
+        },
+        {
+          "UUID": "0000fef1-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "CSR",
+          "Name": "Unknown4",
+          "Characteristics": [
+            {
+              "UUID": "c4edc000-9daf-11e3-8000-00025b000b00",
+              "Name": "Unknown0",
+              "Type": "BYTES|HEX|Unknown0",
+              "IsWrite": true,
+              "Verbs": ":Write:WrWw:"
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8001-00025b000b00",
+              "Name": "Unknown1",
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8002-00025b000b00",
+              "Name": "Unknown2",
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8003-00025b000b00",
+              "Name": "Unknown3",
+              "Type": "BYTES|HEX|Unknown3",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Write:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:"
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8004-00025b000b00",
+              "Name": "Unknown4",
+              "Type": "BYTES|HEX|Unknown4",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Write:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:"
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8005-00025b000b00",
+              "Name": "Unknown5",
+              "Type": "BYTES|HEX|Unknown5",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "c4edc000-9daf-11e3-8006-00025b000b00",
+              "Name": "Unknown6",
+              "Type": "BYTES|HEX|Unknown6",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:"
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-d4:32:8c:22:83:c4\nCanPair:True IsPaired:False"
+    }
+  ]
+}

@@ -9,7 +9,7 @@
   <Identity
     Name="48425ShipwreckSoftware.BluetoothDeviceController"
     Publisher="CN=9A3276B6-661B-463D-9598-EFFF0974120A"
-    Version="1.11.39.0" />
+    Version="1.11.41.0" />
 
   <mp:PhoneIdentity PhoneProductId="fccf7aa4-c6f4-4028-9e89-28485314c1f8" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
