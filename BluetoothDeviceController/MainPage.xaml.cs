@@ -86,6 +86,7 @@ namespace BluetoothDeviceController
         const string LIGHTNING = "🖄"; // envelope with lightning
         const string PLANT = "🪴";
         const string ROBOT = ""; // Part of the Segoe MDL2 Assets FontFamily
+        const string THERMOMETER = "🌡";
         const string TRAIN = "🚂";
         const string UART = "🖀";
         const string WAND = "🖉"; // yeah, a pencil isn't really a wand.
@@ -127,6 +128,7 @@ namespace BluetoothDeviceController
             // Data Sensors
             new Specialization (typeof(SpecialtyPages.Bbc_MicroBitPage), new string[] { "BBC micro:bit" }, DATA, "BBC micro:bit", "micro:bit with data program"),
             new Specialization (typeof(SpecialtyPages.PokitProMeterPage), new string[] { "PokitPro" }, DATA, "Pokit Pro multimeter", "Pokit Pro multimeter and digital oscilloscope"),
+            new Specialization (typeof(SpecialtyPages.ThermoPro_TP357Page), new string[] { "TP357" }, THERMOMETER, "ThermoPro temperature and humidity", "ThermoPro thermometer and hygrometer"),
 
             // Health Sensors
             new Specialization (typeof(SpecialtyPages.Samico_BloodPressure_BG512Page), new string[] { "Samico BP" }, HEALTH, "Pyle / Samico", "Blood pressure cuff"),

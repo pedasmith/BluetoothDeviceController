@@ -261,6 +261,7 @@
     <Compile Include="SpecialtyPages\Samico_BloodPressure_BG512Page.xaml.cs">
       <DependentUpon>Samico_BloodPressure_BG512Page.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPages\ThermoPro_TP357Page.xaml.cs" />
     <Compile Include="SpecialtyPages\TI_SensorTag_1350Page.xaml.cs" />
     <Compile Include="SpecialtyPages\TI_SensorTag_1352Page.xaml.cs">
       <DependentUpon>TI_SensorTag_1352Page.xaml</DependentUpon>
@@ -858,6 +859,9 @@
     <Content Include="Assets\HelpFiles\Device_Elk_LedLight.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\CharacteristicsData\ThermoPro_TP357_Temperature.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\HelpFiles\_List_of_item_to_do.md" />
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
@@ -1159,6 +1163,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="SpecialtyPages\ThermoPro_TP357Page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="SpecialtyPages\TI_SensorTag_1350Page.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1220,6 +1228,7 @@
   <Import Project="..\SearchControllers\SearchControllers.projitems" Label="Shared" />
   <Import Project="..\Utilities\Utilities.projitems" Label="Shared" />
   <Import Project="..\BluetoothProtocolsDevices\BluetoothProtocolsDevices.projitems" Label="Shared" />
+  <Import Project="..\UtilitiesCore\UtilitiesCore.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

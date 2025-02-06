@@ -3,15 +3,14 @@
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>e6b108c1-0e7e-4124-9b33-9b71570ddfad</SharedGUID>
+    <SharedGUID>8bf746aa-a6ed-4721-b52f-7ad047b25bc0</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>Utilities</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DataReaderReadStringRobust.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataWriterExtension.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EnumUtilities.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UIThreadHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ByteOnlyDataReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CrcCalculations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Protobuf.cs" />
   </ItemGroup>
 </Project>

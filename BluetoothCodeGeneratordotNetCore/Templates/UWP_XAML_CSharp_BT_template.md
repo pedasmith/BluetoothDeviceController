@@ -231,9 +231,15 @@ here!here TODO: Chart.SetDataProperties
                 {
 [[CS+CHART+SETUP+PROPERTYLIST]]
                 };
+                var propertiesWithEventTime = new System.Reflection.PropertyInfo>[]
+                {
+                    typeof(DataRecord).GetProperty("EventTime"),
+[[CS+CHART+SETUP+PROPERTYLIST]]
+                };
                 var names = new List<string>()
                 {[[CS+CHART+SETUP+NAMELIST]]
                 };
+                [[CharacteristicName.dotNet]]RecordData.TProperties = propertiesWithEventTime;
                 [[CharacteristicName.dotNet]]Chart.SetDataProperties(properties, EventTimeProperty, names);
                 [[CharacteristicName.dotNet]]Chart.SetTitle("[[CharacteristicName]] Chart");
                 [[CharacteristicName.dotNet]]Chart.UISpec = new BluetoothDeviceController.Names.UISpecifications()

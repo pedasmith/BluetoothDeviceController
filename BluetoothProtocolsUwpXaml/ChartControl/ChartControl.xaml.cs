@@ -167,7 +167,8 @@ namespace BluetoothDeviceController.Charts
         }
 
         /// <summary>
-        /// Per-line data
+        /// Per-line data; includes UI elements like color+thickness, the underlying Polyline and the UnderlyingData.
+        /// LL--- is lower level info
         /// </summary>
         class LineData
         {
@@ -221,7 +222,8 @@ namespace BluetoothDeviceController.Charts
 
         List<LineData> AllLineData = new List<LineData>();
         LineData CurrLineData {  get { return AllLineData[CurrOscilloscopeLine]; } }
-        bool CurrLineDataExists {  get { return CurrOscilloscopeLine >= 0 && CurrOscilloscopeLine < AllLineData.Count; } }
+        bool IsOscilloscopeDisplay { get; set; } = false; // Controls the reticule
+        bool CurrLineDataExists { get { return CurrOscilloscopeLine >= 0 && CurrOscilloscopeLine < AllLineData.Count; } }
 
         private int CurrOscilloscopeLine = -1;
         const int MAX_OSCILLOSCOPE_LINE = 3;
@@ -400,7 +402,7 @@ namespace BluetoothDeviceController.Charts
             {
                 int newIndex = AllLineData.Count;
 
-                // Kind of paintful to get the color...
+                // Kind of painful to get the color...
                 var name = (Names != null && Names.Count > newIndex) ? Names[newIndex] : "";
                 var lineDefault = UISpec.chartLineDefaults.ContainsKey(name) ? UISpec.chartLineDefaults[name] : null;
                 var color = (lineDefault == null) ? GetDefaultLineColor(newIndex) : ConvertColorName(lineDefault.stroke);
@@ -425,6 +427,11 @@ namespace BluetoothDeviceController.Charts
             {
                 var linedata = AllLineData[lineIndex];
                 if (!linedata.IsValid) continue; // line might have been cleared
+
+                if (CurrOscilloscopeLine == -1)
+                {
+                    CurrOscilloscopeLine = lineIndex;
+                }
                 RemoveLLMarkers(lineIndex);
                 DrawMarkers(lineIndex);
 
@@ -442,8 +449,10 @@ namespace BluetoothDeviceController.Charts
                     }
                 }
             }
-
-            DrawReticule();
+            if (IsOscilloscopeDisplay)
+            {
+                DrawReticule();
+            }
         }
 
         private LineData GetFirstLine()
@@ -663,6 +672,7 @@ namespace BluetoothDeviceController.Charts
         {
             Values = list;
             if (list.Count == 0) return; // no data means nothing to do.
+            EnsureLineExists(lineIndex);
             var linedata = AllLineData[lineIndex];
             switch (addResult)
             {
@@ -674,10 +684,17 @@ namespace BluetoothDeviceController.Charts
                         {
                             var record = list[i];
                             var x = Convert.ToDateTime(timeProperty.GetValue(record));
-                            var y = Convert.ToDouble(yProperty.GetValue(record));
+                            double y = 0.0;
+                            try
+                            {
+                                y = Convert.ToDouble(yProperty.GetValue(record));
+                            }
+                            catch (Exception) { } // Ignore all conversion errors. This happens all the time for e.g. the ThermoPro TP375
+
                             double xtime = (x.Subtract(StartTime)).TotalSeconds;
                             linedata.UnderlyingData.Add(new Point(xtime, y));
                         }
+                        linedata.IsValid = true;
                         RedrawAllLines();
                     }
                     break;
@@ -685,7 +702,14 @@ namespace BluetoothDeviceController.Charts
                     {
                         var record = list[list.Count() - 1];
                         var x = Convert.ToDateTime(timeProperty.GetValue(record));
-                        var y = Convert.ToDouble(yProperty.GetValue(record));
+                        double y = 0.0;
+                        try
+                        {
+                            y = Convert.ToDouble(yProperty.GetValue(record));
+                        }
+                        catch (Exception) { } // Ignore all conversion errors. This happens all the time for e.g. the ThermoPro TP375
+
+                        linedata.IsValid = true;
                         AddXYPoint(lineIndex, x, y);
                     }
                     break;
@@ -714,6 +738,7 @@ namespace BluetoothDeviceController.Charts
         /// <param name="list"></param>
         public void RedrawOscilloscopeYTime(int lineIndex, DataCollection<OscDataRecord> list, List<int> markerIndexList)
         {
+            IsOscilloscopeDisplay = true;
             if (DataProperties == null) return;
             if (DataProperties.Count != 1) return; // NOTE: Always exactly 1 item
             if (lineIndex < 0 || lineIndex > MAX_LINE_INDEX) return; // Bad line index = fail

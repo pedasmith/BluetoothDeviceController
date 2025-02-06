@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestOscilloscopeCode", "Sma
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BluetoothProtocolsDevices", "BluetoothProtocolsDevices\BluetoothProtocolsDevices.shproj", "{12D89DD7-FDDF-43AF-810E-A340BCF5F79F}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "UtilitiesCore", "UtilitiesCore\UtilitiesCore.shproj", "{8BF746AA-A6ED-4721-B52F-7AD047B25BC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -296,9 +298,11 @@ Global
 		BluetoothProtocols\BluetoothProtocols.projitems*{190aa0de-8e65-4a8a-8d69-4ea539c572f2}*SharedItemsImports = 13
 		SmallProjects\SampleServerXaml\SampleServerXaml.projitems*{1e823489-7f61-41df-a84e-e1484865cd96}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{1e823489-7f61-41df-a84e-e1484865cd96}*SharedItemsImports = 4
+		UtilitiesCore\UtilitiesCore.projitems*{3d43813a-308b-44f4-8b19-378627db54bf}*SharedItemsImports = 5
 		BCBasicShared\BCBasicShared.projitems*{6e37385d-aeec-4430-bab3-760b5bc0b49c}*SharedItemsImports = 4
 		BluetoothProtocols\BluetoothProtocols.projitems*{6e37385d-aeec-4430-bab3-760b5bc0b49c}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{6e37385d-aeec-4430-bab3-760b5bc0b49c}*SharedItemsImports = 4
+		UtilitiesCore\UtilitiesCore.projitems*{8bf746aa-a6ed-4721-b52f-7ad047b25bc0}*SharedItemsImports = 13
 		SearchControllers\SearchControllers.projitems*{96d6ea94-d8fb-45a0-94e2-7173d5d300be}*SharedItemsImports = 13
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{a2e9e462-e4bf-4bf6-81ec-7529b830456b}*SharedItemsImports = 13
 		SmallProjects\SampleServerXaml\SampleServerXaml.projitems*{aa5d4b4a-78ee-444e-8f0e-ceb00fdc4716}*SharedItemsImports = 13
@@ -306,6 +310,7 @@ Global
 		BluetoothProtocolsDevices\BluetoothProtocolsDevices.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
 		BluetoothProtocols\BluetoothProtocols.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
+		UtilitiesCore\UtilitiesCore.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4
 		SmallProjects\SampleServerXaml\SampleServerXaml.projitems*{cc0bf9af-cfc1-4561-b76a-0835174d1e34}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{cc0bf9af-cfc1-4561-b76a-0835174d1e34}*SharedItemsImports = 4
@@ -317,6 +322,7 @@ Global
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
 		BluetoothProtocols\BluetoothProtocols.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
 		SearchControllers\SearchControllers.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
+		UtilitiesCore\UtilitiesCore.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{f60b4b0b-5303-49be-ad26-666746d5fb28}*SharedItemsImports = 4
 		TemplateExpander\TemplateExpander.projitems*{fdc6fd5f-de83-4594-a154-c01b655bf7f1}*SharedItemsImports = 13
 	EndGlobalSection

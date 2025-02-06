@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Daybetter_LedLight.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Daybetter_LedLight_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Govee_H6005_Custom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ThermoPro_TP357.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Zengge_LedLight_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CraftyRobot_Smartibot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Elegoo_MiniCar.cs" />

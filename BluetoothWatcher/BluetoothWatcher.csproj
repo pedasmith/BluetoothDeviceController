@@ -304,6 +304,7 @@
   <Import Project="..\BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems" Label="Shared" />
   <Import Project="..\Utilities\Utilities.projitems" Label="Shared" />
   <Import Project="..\BluetoothProtocolsDevices\BluetoothProtocolsDevices.projitems" Label="Shared" />
+  <Import Project="..\UtilitiesCore\UtilitiesCore.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
