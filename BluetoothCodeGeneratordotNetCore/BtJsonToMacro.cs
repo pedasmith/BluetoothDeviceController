@@ -389,6 +389,9 @@ namespace BluetoothCodeGenerator
             var allprs = new TemplateSnippet("Properties"); // Properties aka args 
             ch.AddChild("Properties", allprs); // always add, even if it's got nothing in it.
 
+            var notignoredprs = new TemplateSnippet("NotIgnoredProperties"); // Properties aka args 
+            ch.AddChild("NotIgnoredProperties", notignoredprs); // always add, even if it's got nothing in it.
+
             var readprs = new TemplateSnippet("ReadProperties"); // Properties aka args -- e.g., ColorR, ColorG, ColorB
             ch.AddChild("ReadProperties", readprs); // always add, even if it's got nothing in it.
             bool hasRead = btCharacteristic.IsRead || btCharacteristic.IsNotify || btCharacteristic.IsIndicate;
@@ -533,6 +536,19 @@ namespace BluetoothCodeGenerator
                     datawritepr.AddMacro("DEFAULT+VALUE", defaultValue);
                 }
 
+                if (!dataname.EndsWith("Ignore")) //TODO: make this correct
+                {
+                    var datanotignoredpr = new TemplateSnippet(dataname);
+                    notignoredprs.AddChild(dataname, datanotignoredpr);
+
+                    datanotignoredpr.AddMacro("NAME", name);
+                    datanotignoredpr.AddMacro("CHDATANAME", split.Count == 1
+                        ? btCharacteristic.Name.DotNetSafe()
+                        : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
+                    datanotignoredpr.AddMacro("DATANAME", dataname.DotNetSafe());
+                    datanotignoredpr.AddMacro("DataName", dataname);
+                    datanotignoredpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
+                }
                 if (true) // always do this
                 {
                     var dataallpr = new TemplateSnippet(dataname);

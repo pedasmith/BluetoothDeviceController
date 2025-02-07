@@ -96,7 +96,7 @@
               "Name": "Data",
               "REM_Name": "Telink SPP: Module->Phone",
               "Description": "Telink SPP: Module->Phone",
-              "Type": "U8|HEX|Opcode U8|HEX|Unknown1 U8|HEX|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX|CrcExtra",
+              "Type": "U8|HEX|OpcodeIgnore U8|HEX|Unknown1Ignore U8|HEX|FlagIgnore U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX|CrcExtraIgnore",
               "IsRead": true,
               "IsNotify": true,
               "AutoNotify": true,

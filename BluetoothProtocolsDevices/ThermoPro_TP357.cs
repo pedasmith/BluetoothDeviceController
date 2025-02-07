@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// ThermoPro temperature and humidity meter.
-    /// This class was automatically generated 2025-02-04::09:03
+    /// This class was automatically generated 2025-02-06::10:27
     /// </summary>
 
     public partial class ThermoPro_TP357 : INotifyPropertyChanged
@@ -270,26 +270,26 @@ namespace BluetoothProtocols
 
 
 
-        private double _Data_Opcode = 0;
-        private bool _Data_Opcode_set = false;
-        public double Data_Opcode
+        private double _Data_OpcodeIgnore = 0;
+        private bool _Data_OpcodeIgnore_set = false;
+        public double Data_OpcodeIgnore
         {
-            get { return _Data_Opcode; }
-            internal set { if (_Data_Opcode_set && value == _Data_Opcode) return; _Data_Opcode = value; _Data_Opcode_set = true; OnPropertyChanged(); }
+            get { return _Data_OpcodeIgnore; }
+            internal set { if (_Data_OpcodeIgnore_set && value == _Data_OpcodeIgnore) return; _Data_OpcodeIgnore = value; _Data_OpcodeIgnore_set = true; OnPropertyChanged(); }
         }
-        private double _Data_Unknown1 = 0;
-        private bool _Data_Unknown1_set = false;
-        public double Data_Unknown1
+        private double _Data_Unknown1Ignore = 0;
+        private bool _Data_Unknown1Ignore_set = false;
+        public double Data_Unknown1Ignore
         {
-            get { return _Data_Unknown1; }
-            internal set { if (_Data_Unknown1_set && value == _Data_Unknown1) return; _Data_Unknown1 = value; _Data_Unknown1_set = true; OnPropertyChanged(); }
+            get { return _Data_Unknown1Ignore; }
+            internal set { if (_Data_Unknown1Ignore_set && value == _Data_Unknown1Ignore) return; _Data_Unknown1Ignore = value; _Data_Unknown1Ignore_set = true; OnPropertyChanged(); }
         }
-        private double _Data_Flag = 0;
-        private bool _Data_Flag_set = false;
-        public double Data_Flag
+        private double _Data_FlagIgnore = 0;
+        private bool _Data_FlagIgnore_set = false;
+        public double Data_FlagIgnore
         {
-            get { return _Data_Flag; }
-            internal set { if (_Data_Flag_set && value == _Data_Flag) return; _Data_Flag = value; _Data_Flag_set = true; OnPropertyChanged(); }
+            get { return _Data_FlagIgnore; }
+            internal set { if (_Data_FlagIgnore_set && value == _Data_FlagIgnore) return; _Data_FlagIgnore = value; _Data_FlagIgnore_set = true; OnPropertyChanged(); }
         }
         private double _Data_Temperature = 0;
         private bool _Data_Temperature_set = false;
@@ -305,12 +305,12 @@ namespace BluetoothProtocols
             get { return _Data_Humidity; }
             internal set { if (_Data_Humidity_set && value == _Data_Humidity) return; _Data_Humidity = value; _Data_Humidity_set = true; OnPropertyChanged(); }
         }
-        private string _Data_CrcExtra = null;
-        private bool _Data_CrcExtra_set = false;
-        public string Data_CrcExtra
+        private string _Data_CrcExtraIgnore = null;
+        private bool _Data_CrcExtraIgnore_set = false;
+        public string Data_CrcExtraIgnore
         {
-            get { return _Data_CrcExtra; }
-            internal set { if (_Data_CrcExtra_set && value == _Data_CrcExtra) return; _Data_CrcExtra = value; _Data_CrcExtra_set = true; OnPropertyChanged(); }
+            get { return _Data_CrcExtraIgnore; }
+            internal set { if (_Data_CrcExtraIgnore_set && value == _Data_CrcExtraIgnore) return; _Data_CrcExtraIgnore = value; _Data_CrcExtraIgnore_set = true; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -328,14 +328,14 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(CharacteristicsEnum.Data_SensorData_enum, "Data", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U8|HEX|Opcode U8|HEX|Unknown1 U8|HEX|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX|CrcExtra";
+            var datameaning = "U8|HEX|OpcodeIgnore U8|HEX|Unknown1Ignore U8|HEX|FlagIgnore U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX|CrcExtraIgnore";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-            Data_Opcode = parseResult.ValueList.GetValue("Opcode").AsDouble;
-            Data_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
-            Data_Flag = parseResult.ValueList.GetValue("Flag").AsDouble;
+            Data_OpcodeIgnore = parseResult.ValueList.GetValue("OpcodeIgnore").AsDouble;
+            Data_Unknown1Ignore = parseResult.ValueList.GetValue("Unknown1Ignore").AsDouble;
+            Data_FlagIgnore = parseResult.ValueList.GetValue("FlagIgnore").AsDouble;
             Data_Temperature = parseResult.ValueList.GetValue("Temperature").AsDouble;
             Data_Humidity = parseResult.ValueList.GetValue("Humidity").AsDouble;
-            Data_CrcExtra = parseResult.ValueList.GetValue("CrcExtra").AsString;
+            Data_CrcExtraIgnore = parseResult.ValueList.GetValue("CrcExtraIgnore").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
@@ -394,14 +394,14 @@ namespace BluetoothProtocols
 
         private void NotifyDataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            var datameaning = "U8|HEX|Opcode U8|HEX|Unknown1 U8|HEX|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX|CrcExtra";
+            var datameaning = "U8|HEX|OpcodeIgnore U8|HEX|Unknown1Ignore U8|HEX|FlagIgnore U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX|CrcExtraIgnore";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-            Data_Opcode = parseResult.ValueList.GetValue("Opcode").AsDouble;
-            Data_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
-            Data_Flag = parseResult.ValueList.GetValue("Flag").AsDouble;
+            Data_OpcodeIgnore = parseResult.ValueList.GetValue("OpcodeIgnore").AsDouble;
+            Data_Unknown1Ignore = parseResult.ValueList.GetValue("Unknown1Ignore").AsDouble;
+            Data_FlagIgnore = parseResult.ValueList.GetValue("FlagIgnore").AsDouble;
             Data_Temperature = parseResult.ValueList.GetValue("Temperature").AsDouble;
             Data_Humidity = parseResult.ValueList.GetValue("Humidity").AsDouble;
-            Data_CrcExtra = parseResult.ValueList.GetValue("CrcExtra").AsString;
+            Data_CrcExtraIgnore = parseResult.ValueList.GetValue("CrcExtraIgnore").AsString;
 
             DataEvent?.Invoke(parseResult);
 
