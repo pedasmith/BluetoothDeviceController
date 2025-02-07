@@ -652,18 +652,18 @@ namespace BluetoothDeviceController.SpecialtyPages
             private DateTime _EventTime;
             public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
 
-            private double _OpcodeIgnore;
-            public double OpcodeIgnore { get { return _OpcodeIgnore; } set { if (value == _OpcodeIgnore) return; _OpcodeIgnore = value; OnPropertyChanged(); } }
-            private double _Unknown1Ignore;
-            public double Unknown1Ignore { get { return _Unknown1Ignore; } set { if (value == _Unknown1Ignore) return; _Unknown1Ignore = value; OnPropertyChanged(); } }
-            private double _FlagIgnore;
-            public double FlagIgnore { get { return _FlagIgnore; } set { if (value == _FlagIgnore) return; _FlagIgnore = value; OnPropertyChanged(); } }
+            private double _Opcode;
+            public double Opcode { get { return _Opcode; } set { if (value == _Opcode) return; _Opcode = value; OnPropertyChanged(); } }
+            private double _Unknown1;
+            public double Unknown1 { get { return _Unknown1; } set { if (value == _Unknown1) return; _Unknown1 = value; OnPropertyChanged(); } }
+            private double _Flag;
+            public double Flag { get { return _Flag; } set { if (value == _Flag) return; _Flag = value; OnPropertyChanged(); } }
             private double _Temperature;
             public double Temperature { get { return _Temperature; } set { if (value == _Temperature) return; _Temperature = value; OnPropertyChanged(); } }
             private double _Humidity;
             public double Humidity { get { return _Humidity; } set { if (value == _Humidity) return; _Humidity = value; OnPropertyChanged(); } }
-            private string _CrcExtraIgnore;
-            public string CrcExtraIgnore { get { return _CrcExtraIgnore; } set { if (value == _CrcExtraIgnore) return; _CrcExtraIgnore = value; OnPropertyChanged(); } }
+            private string _CrcExtra;
+            public string CrcExtra { get { return _CrcExtra; } set { if (value == _CrcExtra) return; _CrcExtra = value; OnPropertyChanged(); } }
 
             private String _Note;
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
@@ -711,11 +711,11 @@ namespace BluetoothDeviceController.SpecialtyPages
     {
         // Copy the contents over...
         var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,OpcodeIgnore,Unknown1Ignore,FlagIgnore,Temperature,Humidity,CrcExtraIgnore,Notes\n");
+        sb.Append("EventDate,EventTime,Opcode,Unknown1,Flag,Temperature,Humidity,CrcExtra,Notes\n");
         foreach (var row in DataRecordData)
         {
             var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.OpcodeIgnore},{row.Unknown1Ignore},{row.FlagIgnore},{row.Temperature},{row.Humidity},{row.CrcExtraIgnore},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Opcode},{row.Unknown1},{row.Flag},{row.Temperature},{row.Humidity},{row.CrcExtra},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
         var str = sb.ToString();
         var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
@@ -777,7 +777,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 tableType="standard",
 chartType="ytime",
 chartCommand="AddYTime<DataRecord>(addResult, DataRecordData)",
-chartDefaultMaxY=100,
+chartDefaultMaxY=50,
 chartDefaultMinY=0,
         chartLineDefaults={
                         { "Temperature", new ChartLineDefaults() {
@@ -808,23 +808,23 @@ chartDefaultMinY=0,
                 var valueList = data.ValueList;
                 
                 var record = new DataRecord();
-                var OpcodeIgnore = valueList.GetValue("OpcodeIgnore");
-                if (OpcodeIgnore.CurrentType == BCBasic.BCValue.ValueType.IsDouble || OpcodeIgnore.CurrentType == BCBasic.BCValue.ValueType.IsString || OpcodeIgnore.IsArray)
+                var Opcode = valueList.GetValue("Opcode");
+                if (Opcode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Opcode.CurrentType == BCBasic.BCValue.ValueType.IsString || Opcode.IsArray)
                 {
-                    record.OpcodeIgnore = (double)OpcodeIgnore.AsDouble;
-                    Data_OpcodeIgnore.Text = record.OpcodeIgnore.ToString("N0");
+                    record.Opcode = (double)Opcode.AsDouble;
+                    Data_Opcode.Text = record.Opcode.ToString("N0");
                 }
-                var Unknown1Ignore = valueList.GetValue("Unknown1Ignore");
-                if (Unknown1Ignore.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Unknown1Ignore.CurrentType == BCBasic.BCValue.ValueType.IsString || Unknown1Ignore.IsArray)
+                var Unknown1 = valueList.GetValue("Unknown1");
+                if (Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsString || Unknown1.IsArray)
                 {
-                    record.Unknown1Ignore = (double)Unknown1Ignore.AsDouble;
-                    Data_Unknown1Ignore.Text = record.Unknown1Ignore.ToString("N0");
+                    record.Unknown1 = (double)Unknown1.AsDouble;
+                    Data_Unknown1.Text = record.Unknown1.ToString("N0");
                 }
-                var FlagIgnore = valueList.GetValue("FlagIgnore");
-                if (FlagIgnore.CurrentType == BCBasic.BCValue.ValueType.IsDouble || FlagIgnore.CurrentType == BCBasic.BCValue.ValueType.IsString || FlagIgnore.IsArray)
+                var Flag = valueList.GetValue("Flag");
+                if (Flag.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Flag.CurrentType == BCBasic.BCValue.ValueType.IsString || Flag.IsArray)
                 {
-                    record.FlagIgnore = (double)FlagIgnore.AsDouble;
-                    Data_FlagIgnore.Text = record.FlagIgnore.ToString("N0");
+                    record.Flag = (double)Flag.AsDouble;
+                    Data_Flag.Text = record.Flag.ToString("N0");
                 }
                 var Temperature = valueList.GetValue("Temperature");
                 if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
@@ -838,11 +838,11 @@ chartDefaultMinY=0,
                     record.Humidity = (double)Humidity.AsDouble;
                     Data_Humidity.Text = record.Humidity.ToString("N0");
                 }
-                var CrcExtraIgnore = valueList.GetValue("CrcExtraIgnore");
-                if (CrcExtraIgnore.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CrcExtraIgnore.CurrentType == BCBasic.BCValue.ValueType.IsString || CrcExtraIgnore.IsArray)
+                var CrcExtra = valueList.GetValue("CrcExtra");
+                if (CrcExtra.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CrcExtra.CurrentType == BCBasic.BCValue.ValueType.IsString || CrcExtra.IsArray)
                 {
-                    record.CrcExtraIgnore = (string)CrcExtraIgnore.AsString;
-                    Data_CrcExtraIgnore.Text = record.CrcExtraIgnore.ToString();
+                    record.CrcExtra = (string)CrcExtra.AsString;
+                    Data_CrcExtra.Text = record.CrcExtra.ToString();
                 }
 
                 var addResult = DataRecordData.AddRecord(record);
@@ -873,23 +873,23 @@ chartDefaultMinY=0,
                 }
                 
                 var record = new DataRecord();
-                var OpcodeIgnore = valueList.GetValue("OpcodeIgnore");
-                if (OpcodeIgnore.CurrentType == BCBasic.BCValue.ValueType.IsDouble || OpcodeIgnore.CurrentType == BCBasic.BCValue.ValueType.IsString || OpcodeIgnore.IsArray)
+                var Opcode = valueList.GetValue("Opcode");
+                if (Opcode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Opcode.CurrentType == BCBasic.BCValue.ValueType.IsString || Opcode.IsArray)
                 {
-                    record.OpcodeIgnore = (double)OpcodeIgnore.AsDouble;
-                    Data_OpcodeIgnore.Text = record.OpcodeIgnore.ToString("N0");
+                    record.Opcode = (double)Opcode.AsDouble;
+                    Data_Opcode.Text = record.Opcode.ToString("N0");
                 }
-                var Unknown1Ignore = valueList.GetValue("Unknown1Ignore");
-                if (Unknown1Ignore.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Unknown1Ignore.CurrentType == BCBasic.BCValue.ValueType.IsString || Unknown1Ignore.IsArray)
+                var Unknown1 = valueList.GetValue("Unknown1");
+                if (Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsString || Unknown1.IsArray)
                 {
-                    record.Unknown1Ignore = (double)Unknown1Ignore.AsDouble;
-                    Data_Unknown1Ignore.Text = record.Unknown1Ignore.ToString("N0");
+                    record.Unknown1 = (double)Unknown1.AsDouble;
+                    Data_Unknown1.Text = record.Unknown1.ToString("N0");
                 }
-                var FlagIgnore = valueList.GetValue("FlagIgnore");
-                if (FlagIgnore.CurrentType == BCBasic.BCValue.ValueType.IsDouble || FlagIgnore.CurrentType == BCBasic.BCValue.ValueType.IsString || FlagIgnore.IsArray)
+                var Flag = valueList.GetValue("Flag");
+                if (Flag.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Flag.CurrentType == BCBasic.BCValue.ValueType.IsString || Flag.IsArray)
                 {
-                    record.FlagIgnore = (double)FlagIgnore.AsDouble;
-                    Data_FlagIgnore.Text = record.FlagIgnore.ToString("N0");
+                    record.Flag = (double)Flag.AsDouble;
+                    Data_Flag.Text = record.Flag.ToString("N0");
                 }
                 var Temperature = valueList.GetValue("Temperature");
                 if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
@@ -903,11 +903,11 @@ chartDefaultMinY=0,
                     record.Humidity = (double)Humidity.AsDouble;
                     Data_Humidity.Text = record.Humidity.ToString("N0");
                 }
-                var CrcExtraIgnore = valueList.GetValue("CrcExtraIgnore");
-                if (CrcExtraIgnore.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CrcExtraIgnore.CurrentType == BCBasic.BCValue.ValueType.IsString || CrcExtraIgnore.IsArray)
+                var CrcExtra = valueList.GetValue("CrcExtra");
+                if (CrcExtra.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CrcExtra.CurrentType == BCBasic.BCValue.ValueType.IsString || CrcExtra.IsArray)
                 {
-                    record.CrcExtraIgnore = (string)CrcExtraIgnore.AsString;
-                    Data_CrcExtraIgnore.Text = record.CrcExtraIgnore.ToString();
+                    record.CrcExtra = (string)CrcExtra.AsString;
+                    Data_CrcExtra.Text = record.CrcExtra.ToString();
                 }
 
                 DataRecordData.Add(record);

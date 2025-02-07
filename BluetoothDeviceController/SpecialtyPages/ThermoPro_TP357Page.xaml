@@ -89,12 +89,12 @@
                     <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Data_OpcodeIgnore" Text="*" Header="OpcodeIgnore" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Data_Unknown1Ignore" Text="*" Header="Unknown1Ignore" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Data_FlagIgnore" Text="*" Header="FlagIgnore" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Data_Opcode" Text="*" Header="Opcode" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Data_Unknown1" Text="*" Header="Unknown1" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Data_Flag" Text="*" Header="Flag" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="True" x:Name="Data_Temperature" Text="*" Header="Temperature" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="True" x:Name="Data_Humidity" Text="*" Header="Humidity" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Data_CrcExtraIgnore" Text="*" Header="CrcExtraIgnore" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Data_CrcExtra" Text="*" Header="CrcExtra" Style="{StaticResource HEXStyle}"/>
 
                     <Button Content="Read" Click="OnReadData" />
                     <Button Content="Notify" Click="OnNotifyData" />

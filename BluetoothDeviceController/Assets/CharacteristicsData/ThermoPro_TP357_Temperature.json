@@ -96,7 +96,7 @@
               "Name": "Data",
               "REM_Name": "Telink SPP: Module->Phone",
               "Description": "Telink SPP: Module->Phone",
-              "Type": "U8|HEX|OpcodeIgnore U8|HEX|Unknown1Ignore U8|HEX|FlagIgnore U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX|CrcExtraIgnore",
+              "Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra",
               "IsRead": true,
               "IsNotify": true,
               "AutoNotify": true,
@@ -104,7 +104,7 @@
                 "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 0,
-                "chartDefaultMaxY": 100,
+                "chartDefaultMaxY": 50,
                 "chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)",
                 "chartLineDefaults": {
                   "Temperature": {

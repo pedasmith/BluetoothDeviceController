@@ -1,5 +1,11 @@
 ﻿# Bluetooth Device Controller Versions
 
+## Version 1.12, 2025-02-07
+
+Added support for the ThermPro TP357 Thermometer / Hygrometer (Humidity meter) and fixed all of the data charting.
+
+
+
 ## Version 1.11, 2025-01-10
 
 Added support for the Govee H5075 temperature and humidity sensor (via advertisements) and the Govee H5106 Smart Air Quality Monitor (also via advertisements).

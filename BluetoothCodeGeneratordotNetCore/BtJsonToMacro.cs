@@ -389,8 +389,8 @@ namespace BluetoothCodeGenerator
             var allprs = new TemplateSnippet("Properties"); // Properties aka args 
             ch.AddChild("Properties", allprs); // always add, even if it's got nothing in it.
 
-            var notignoredprs = new TemplateSnippet("NotIgnoredProperties"); // Properties aka args 
-            ch.AddChild("NotIgnoredProperties", notignoredprs); // always add, even if it's got nothing in it.
+            var nothiddenprs = new TemplateSnippet("NotHiddenProperties"); // Properties aka args 
+            ch.AddChild("NotHiddenProperties", nothiddenprs); // always add, even if it's got nothing in it.
 
             var readprs = new TemplateSnippet("ReadProperties"); // Properties aka args -- e.g., ColorR, ColorG, ColorB
             ch.AddChild("ReadProperties", readprs); // always add, even if it's got nothing in it.
@@ -536,18 +536,18 @@ namespace BluetoothCodeGenerator
                     datawritepr.AddMacro("DEFAULT+VALUE", defaultValue);
                 }
 
-                if (!dataname.EndsWith("Ignore")) //TODO: make this correct
+                if (!item.IsHidden)
                 {
-                    var datanotignoredpr = new TemplateSnippet(dataname);
-                    notignoredprs.AddChild(dataname, datanotignoredpr);
+                    var datanothiddenpr = new TemplateSnippet(dataname);
+                    nothiddenprs.AddChild(dataname, datanothiddenpr);
 
-                    datanotignoredpr.AddMacro("NAME", name);
-                    datanotignoredpr.AddMacro("CHDATANAME", split.Count == 1
+                    datanothiddenpr.AddMacro("NAME", name);
+                    datanothiddenpr.AddMacro("CHDATANAME", split.Count == 1
                         ? btCharacteristic.Name.DotNetSafe()
                         : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
-                    datanotignoredpr.AddMacro("DATANAME", dataname.DotNetSafe());
-                    datanotignoredpr.AddMacro("DataName", dataname);
-                    datanotignoredpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
+                    datanothiddenpr.AddMacro("DATANAME", dataname.DotNetSafe());
+                    datanothiddenpr.AddMacro("DataName", dataname);
+                    datanothiddenpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
                 }
                 if (true) // always do this
                 {

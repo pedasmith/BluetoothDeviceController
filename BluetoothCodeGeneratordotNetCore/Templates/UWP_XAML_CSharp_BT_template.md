@@ -207,13 +207,13 @@ TODO: Did the changes but no tests yet: This is based on the formula of whether 
 [[CharacteristicName.dotNet]]Chart.[[CS+CHART+REDRAW+VERB+REGULAR]][[CS+CHART+REDRAW+VERB+ALT]]<[[CharacteristicName.dotNet]]Record>([[CharacteristicName.dotNet]]RecordData);
 ```
 
-## CS+CHART+SETUP+PROPERTYLIST If="[[TableType]] contains standard" Type=list Source=ServicesByOriginalOrder/Characteristics/NotIgnoredProperties ListOutput=parent
+## CS+CHART+SETUP+PROPERTYLIST If="[[TableType]] contains standard" Type=list Source=ServicesByOriginalOrder/Characteristics/NotHiddenProperties ListOutput=parent
 
 ```
                     typeof([[CharacteristicName.dotNet]]Record).GetProperty("[[DATANAME]]"),
 ```
 
-## CS+CHART+SETUP+NAMELIST If="[[TableType]] contains standard" Type=list Source=ServicesByOriginalOrder/Characteristics/NotIgnoredProperties ListOutput=parent Trim=true
+## CS+CHART+SETUP+NAMELIST If="[[TableType]] contains standard" Type=list Source=ServicesByOriginalOrder/Characteristics/NotHiddenProperties ListOutput=parent Trim=true
 
 This was originally DATA5+LIST DATA5_LIST
 

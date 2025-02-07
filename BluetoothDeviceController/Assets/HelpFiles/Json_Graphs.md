@@ -30,16 +30,11 @@ This JSON sample is from the Nordic Thingy temperature characteristic. In the ch
 
 ## To make a table
 
-To make a table, add a UI : { } JSON element and in that element add add a **"tableType": "standard"**. This will automatically generate
-the charting UI code in the XAML and and code-behind. The chart UI will include date, time, all of the data in the Type field, 
-and a Notes column (adding notes to the data turns out to be super useful)
+To make a table, add a UI : { } JSON element and in that element add add a **"tableType": "standard"**. This will automatically generate the charting UI code in the XAML and and code-behind. The chart UI will include date, time, all of the data in the Type field, and a Notes column (adding notes to the data turns out to be super useful)
 
 ## To make a chart
 
-The simplest chart is like the table: add a UI : { } JSON element and add add a **"chartType": "ytime"** and also 
-a **"chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"**. You will need both commands;
-without the first the chart won't be made, and without the second the chart won't be added to. The resulting chart UI 
-in the XAML and code-behind will be a time-oriented chart with one line per data value in the Type data.
+The simplest chart is like the table: add a UI : { } JSON element and add add a **"chartType": "ytime"** and also a **"chartCommand": "AddYTime<[[CHARACTERISTICNAME]]Record>(addResult, [[CHARACTERISTICNAME]]RecordData)"**. You will need both commands; without the first the chart won't be made, and without the second the chart won't be added to. The resulting chart UI in the XAML and code-behind will be a time-oriented chart with one line per data value in the Type data.
 
 You can customize the chart with these values
 - **chartMinY** **chartMaxY** will set the min and max Y value range. This is useful when a sensor provides data in a range (like an accelerometer)

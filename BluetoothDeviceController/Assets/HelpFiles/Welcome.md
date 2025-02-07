@@ -28,6 +28,7 @@ and more devices -- please leave feedback to request specific devices!
 [![RuuviTag](../DevicePictures/Ruuvi_RuuviTag-175.png)](Device_Ruuvi_RuuviTag.md)
 [![Sensything](../DevicePictures/Protocentral_Sensything-175.png)](Device_Protocentral_Sensything.md)
 [![SwitchBot MeterTH](../DevicePictures/SwitchBot_MeterTH-175.png)](Device_SwitchBot_MeterTH.md)
+[![ThermoPro TP357](../DevicePictures/ThermoPro_TP357-175.png)](Device_ThermoPro_TP357.md)
 [![TI 1352 Sensor Tag](../DevicePictures/TI_SensorTag_1352-175.png)](Device_TI_SensorTag_1352.md)
 [![TI Sensor Tag 1350](../DevicePictures/TI_SensorTag_1350-175.png)](Device_TI_SensorTag_1350.md)
 [![TI Original Sensor Tag](../DevicePictures/TI_SensorTag_2541-175.png)](Device_TI_SensorTag_2541.md)

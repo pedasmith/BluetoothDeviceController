@@ -25,6 +25,7 @@ namespace BluetoothProtocols.IotNumberFormats
         /// Examples: HEX DEC FIXED STRING 
         /// </summary>
         public string DisplayFormatPrimary { get; set; } = "";
+        
         public string NamePrimary { get; set; } = "";
         public string UnitsPrimary { get; set; } = "";
         public string DefaultValuePrimary { get; set; } = "*";
@@ -54,6 +55,18 @@ namespace BluetoothProtocols.IotNumberFormats
             if (index1 >= SplitData.Length) return "";
             if (index2 >= SplitData[index1].Length) return "";
             return SplitData[index1][index2];
+        }
+
+        public bool IsHidden
+        {
+            get
+            {
+                var hidden = Get(1, 2); // e.g., U8|HEX^^HIDDEN|Opcode
+                if (hidden == "HIDDEN") return true;
+                else if (hidden == "") return false;
+                Log("ERROR: unknown hidden type {hidden}");
+                return false;
+            }
         }
         private static char[] Space = new char[] { ' ' };
         private static char[] Bar = new char[] { '|' };

@@ -56,6 +56,7 @@ Bulbs that are definitely not compatible include the C by GE bulb, the Philips H
 * [RuuviTag](Device_Ruuvi_RuuviTag.md)
 * [Sensything](Device_Protocentral_Sensything.md)
 * [SwitchBot MeterTH](Device_SwitchBot_MeterTH.md)
+* [ThermoPro TP357](Device_ThermoPro_TP357.md) 
 * [TI SensorTag 1352](Device_TI_SensorTag_1352.md), also known as the Multi-Sensor
 * [TI SensorTag 1350 and 2650](Device_TI_SensorTag_1350.md)
 * [(Obsolete) TI SensorTag 2541](Device_TI_SensorTag_2541.md)
