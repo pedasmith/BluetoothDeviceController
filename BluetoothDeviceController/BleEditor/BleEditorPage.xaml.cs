@@ -4,24 +4,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -33,6 +22,9 @@ namespace BluetoothDeviceController.BleEditor
     /// </summary>
     public sealed partial class BleEditorPage : Page, HasId
     {
+        public static BleEditorPage GlobalEditorPage = null;
+        public static IReactToEditor MainReactToEditor = null;
+
         BluetoothLEDevice ble;
         public string JsonAsList { get; internal set; } = "";
         public string JsonAsSingle { get; internal set; } = "";
@@ -96,7 +88,8 @@ namespace BluetoothDeviceController.BleEditor
         {
             var di = args.Parameter as DeviceInformationWrapper;
             uiProgress.IsActive = true;
-
+            GlobalEditorPage = this;
+            MainReactToEditor.EditorStarted();
             try
             {
                 if (di.di == null)
@@ -408,6 +401,11 @@ namespace BluetoothDeviceController.BleEditor
 
         private void OnCopyData_Json(object sender, RoutedEventArgs e)
         {
+
+            DoCopyData_Json();
+        }
+        public void DoCopyData_Json()
+        { 
             var dp = new DataPackage();
             dp.SetText(JsonAsList);
             dp.Properties.Title = "JSON Bluetooth data";

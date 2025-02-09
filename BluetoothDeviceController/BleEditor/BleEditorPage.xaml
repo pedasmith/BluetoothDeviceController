@@ -16,7 +16,7 @@
             
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Visibility="Collapsed">
             <DropDownButton Content="Copy language">
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
@@ -28,6 +28,6 @@
                 </DropDownButton.Flyout>
             </DropDownButton>
         </StackPanel>
-        <TextBlock x:Name="uiRawData" TextWrapping="Wrap" IsTextSelectionEnabled="True" ></TextBlock>
+        <TextBlock x:Name="uiRawData" TextWrapping="Wrap" IsTextSelectionEnabled="True" Visibility="Collapsed" ></TextBlock>
     </StackPanel>
 </Page>

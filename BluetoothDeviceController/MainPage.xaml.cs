@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Beacons;
+using BluetoothDeviceController.BleEditor;
 using BluetoothDeviceController.BluetoothProtocolsCustom;
 using BluetoothDeviceController.Names;
 using BluetoothDeviceController.UserData;
@@ -60,11 +61,16 @@ namespace BluetoothDeviceController
         void SetSearchFeedbackType(SearchFeedbackType feedbackType);
     }
 
+    public interface IReactToEditor
+    {
+        void EditorStarted();
+    }
+
 
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page, IDoSearch, IDockParent, SpecialtyPages.IHandleStatus, IDeviceDisplay
+    public sealed partial class MainPage : Page, IDoSearch, IDockParent, SpecialtyPages.IHandleStatus, IDeviceDisplay, IReactToEditor
     {
 #if DEBUG
         const bool ALLOW_AD = false;
@@ -170,6 +176,7 @@ namespace BluetoothDeviceController
         public MainPage()
         {
             BTAdvertisementWatcher.DeviceDisplay = this;
+            BleEditorPage.MainReactToEditor = this;
 
             UserPreferences.MainUserPreferences = Preferences;
             this.InitializeComponent();
@@ -1578,6 +1585,11 @@ namespace BluetoothDeviceController
             var value = CurrInProgressJsonSearch;
             CopyJsonToClipboardCorrectly(value); // Always copy, even if the result is blank.
         }
+        private void OnMenuAutomationEditorCopyJson(object sender, RoutedEventArgs e)
+        {
+            if (BleEditorPage.GlobalEditorPage == null) return;
+            BleEditorPage.GlobalEditorPage.DoCopyData_Json();
+        }
 
         /// <summary>
         /// E.G. CopyJsonToClipboardCorrectly(CurrFinalJsonSearch)
@@ -1795,6 +1807,11 @@ namespace BluetoothDeviceController
         private void OnNavigationGotFocus(object sender, RoutedEventArgs e)
         {
             MostRecentNaviationGotFocus = e.OriginalSource as NavigationViewItem;
+        }
+
+        public void EditorStarted()
+        {
+            uiMenuDeveloperCopyEditorAsJson.IsEnabled = true;
         }
     }
 }

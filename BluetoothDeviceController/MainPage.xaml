@@ -24,11 +24,9 @@
                 <MenuFlyoutItem Text="Full BLE sweep" Click="MenuOnSweepBleFull" />
                 <MenuFlyoutItem Text="✀ Copy BLE sweep results as JSON" Click="OnMenuAutomationSearchCopyJson"  />
                 
-                <!-- Use the BluetoothCodeGeneratordotNetCore program now, not this code.
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="📰 Generate code from Bluetooth" Click="MenuOnGenerateCode" ToolTipService.ToolTip="Generate code from Bluetooth" />
-                -->
-
+                <MenuFlyoutItem Text="✀ Copy BLE editor data as JSON" Click="OnMenuAutomationEditorCopyJson" x:Name="uiMenuDeveloperCopyEditorAsJson" IsEnabled="False" />
+                
                 <MenuFlyoutSeparator />
                 <ToggleMenuFlyoutItem x:Name="uiMenuKeepScreenOn" Text="Keep screen on" IsChecked="False" Click="MenuOnToggleScreenOn" />
             </MenuBarItem>
