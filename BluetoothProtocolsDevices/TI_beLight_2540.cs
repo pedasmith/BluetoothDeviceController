@@ -10,15 +10,16 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
 
+using Utilities;
 
 namespace BluetoothProtocols
 {
     /// <summary>
-    /// .
-    /// This class was automatically generated 2022-12-08::04:43
+    /// Hi-intensity LED light developer kit from TI.
+    /// This class was automatically generated 2025-02-09::11:22
     /// </summary>
 
-    public  class TI_beLight_2540 : INotifyPropertyChanged
+    public partial class TI_beLight_2540 : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
     // Link: http://www.ti.com/tool/tidc-bluetooth-low-energy-light
@@ -117,10 +118,10 @@ namespace BluetoothProtocols
         }
 
         bool readCharacteristics = false;
-        public async Task<bool> EnsureCharacteristicAsync(CharacteristicsEnum characteristicIndex = CharacteristicsEnum.All_enum, bool forceReread = false)
+        public async Task<GattCommunicationStatus> EnsureCharacteristicAsync(CharacteristicsEnum characteristicIndex = CharacteristicsEnum.All_enum, bool forceReread = false)
         {
-            if (Characteristics.Length == 0) return false;
-            if (ble == null) return false; // might not be initialized yet
+            if (Characteristics.Length == 0) return GattCommunicationStatus.Unreachable;
+            if (ble == null) return GattCommunicationStatus.Unreachable; // might not be initialized yet
 
             if (characteristicIndex != CharacteristicsEnum.All_enum)
             {
@@ -129,20 +130,20 @@ namespace BluetoothProtocols
                 if (serviceStatus.Status != GattCommunicationStatus.Success)
                 {
                     Status.ReportStatus($"Unable to get service {ServiceNames[serviceIndex]}", serviceStatus);
-                    return false;
+                    return serviceStatus.Status;
                 }
                 if (serviceStatus.Services.Count != 1)
                 {
                     Status.ReportStatus($"Unable to get valid service count ({serviceStatus.Services.Count}) for {ServiceNames[serviceIndex]}", serviceStatus);
-                    return false;
+                    return GattCommunicationStatus.Unreachable;
                 }
                 var service = serviceStatus.Services[0];
                 var characteristicsStatus = await EnsureCharacteristicOne(service, characteristicIndex);
                 if (characteristicsStatus.Status != GattCommunicationStatus.Success)
                 {
-                    return false;
+                    return characteristicsStatus.Status;
                 }
-                return true;
+                return GattCommunicationStatus.Success;
             }
 
             GattCharacteristicsResult lastResult = null;
@@ -158,7 +159,7 @@ namespace BluetoothProtocols
                     if (serviceStatus.Status != GattCommunicationStatus.Success)
                     {
                         Status.ReportStatus($"Unable to get service {ServiceNames[serviceIndex]}", serviceStatus);
-                        return false;
+                        return GattCommunicationStatus.Unreachable;
                     }
                     if (serviceStatus.Services.Count != 1)
                     {
@@ -172,7 +173,7 @@ namespace BluetoothProtocols
                         var characteristicsStatus = await EnsureCharacteristicOne(service, (CharacteristicsEnum)index);
                         if (characteristicsStatus.Status != GattCommunicationStatus.Success)
                         {
-                            return false;
+                            return characteristicsStatus.Status;
                         }
                         lastResult = characteristicsStatus;
                     }
@@ -183,7 +184,8 @@ namespace BluetoothProtocols
                 //Status.ReportStatus("OK: Connected to device", lastResult);
                 readCharacteristics = true;
             }
-            return readCharacteristics;
+            // Not quite right, but close.
+            return readCharacteristics ? GattCommunicationStatus.Success : GattCommunicationStatus.Unreachable;
         }
 
 
@@ -194,7 +196,7 @@ namespace BluetoothProtocols
         /// <param name="method" ></param>
         /// <param name="command" ></param>
         /// <returns></returns>
-        private async Task WriteCommandAsync(CharacteristicsEnum characteristicIndex, string method, byte[] command, GattWriteOption writeOption)
+        private async Task<GattCommunicationStatus> WriteCommandAsync(CharacteristicsEnum characteristicIndex, string method, byte[] command, GattWriteOption writeOption)
         {
             GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
             try
@@ -210,10 +212,11 @@ namespace BluetoothProtocols
             {
                 // NOTE: should add a way to reset
             }
+            return result;
         }
         /// <summary>
         /// Generic read method; takes in a cache mode which defaults to uncached.
-        /// Calls ReportStatus on either sucess or failure
+        /// Calls ReportStatus on either success or failure
         /// </summary>
         /// <param name="characteristicIndex">Index number of the characteristic</param>
         /// <param name="method" >Name of the actual method; is just used for logging</param>
@@ -260,29 +263,43 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteRed(byte Red)
+        public async Task<GattCommunicationStatus> WriteRed(byte Red)
         {
-            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Red_Lamp_Control_enum)) return;
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Red_Lamp_Control_enum);
+            if (ensureResult != GattCommunicationStatus.Success) 
+            {
+                return ensureResult;
+            }
 
             var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bluetooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(  Red);
+            dw.WriteByte(Red);
 
             var command = dw.DetachBuffer().ToArray();
-            const int MAXBYTES = 20;
-            if (command.Length <= MAXBYTES) //TODO: make sure this works
-            {
-                await WriteCommandAsync(CharacteristicsEnum.Red_Lamp_Control_enum, "Red", command, GattWriteOption.WriteWithResponse);
-            }
-            else for (int i=0; i<command.Length; i+= MAXBYTES)
-            {
-                // So many calculations and copying just to get a slice
-                var maxCount = Math.Min(MAXBYTES, command.Length - i);
-                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(CharacteristicsEnum.Red_Lamp_Control_enum, "Red", subcommand, GattWriteOption.WriteWithResponse);
-            }
+            
+            var retval = await WriteCommandAsync(CharacteristicsEnum.Red_Lamp_Control_enum, "Red", command, GattWriteOption.WriteWithResponse);
+
+            // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
+            // You can send large amounts of data, and it will be fragmented automatically by the 
+            // OS using the MTU. Your application is not limited by the MTU size as to the data transfer of each packet.
+
+            // Old code, not needed. After checking the file history; this code has always been this way, so it's not
+            // clear that it was ever needed.
+            //const int MAXBYTES = 20;
+            //if (command.Length <= MAXBYTES) //TODO: make sure this works
+            //{
+            //    await WriteCommandAsync(CharacteristicsEnum.Red_Lamp_Control_enum, "Red", command, GattWriteOption.WriteWithResponse);
+            //}
+            //else for (int i=0; i<command.Length; i+= MAXBYTES)
+            //{
+            //    // So many calculations and copying just to get a slice
+            //    var maxCount = Math.Min(MAXBYTES, command.Length - i);
+            //    var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+            //    await WriteCommandAsync(CharacteristicsEnum.Red_Lamp_Control_enum, "Red", subcommand, GattWriteOption.WriteWithResponse);
+            //}
+            return retval;
         }
 
 
@@ -294,29 +311,43 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteGreen(byte Green)
+        public async Task<GattCommunicationStatus> WriteGreen(byte Green)
         {
-            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Green_Lamp_Control_enum)) return;
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Green_Lamp_Control_enum);
+            if (ensureResult != GattCommunicationStatus.Success) 
+            {
+                return ensureResult;
+            }
 
             var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bluetooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(  Green);
+            dw.WriteByte(Green);
 
             var command = dw.DetachBuffer().ToArray();
-            const int MAXBYTES = 20;
-            if (command.Length <= MAXBYTES) //TODO: make sure this works
-            {
-                await WriteCommandAsync(CharacteristicsEnum.Green_Lamp_Control_enum, "Green", command, GattWriteOption.WriteWithResponse);
-            }
-            else for (int i=0; i<command.Length; i+= MAXBYTES)
-            {
-                // So many calculations and copying just to get a slice
-                var maxCount = Math.Min(MAXBYTES, command.Length - i);
-                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(CharacteristicsEnum.Green_Lamp_Control_enum, "Green", subcommand, GattWriteOption.WriteWithResponse);
-            }
+            
+            var retval = await WriteCommandAsync(CharacteristicsEnum.Green_Lamp_Control_enum, "Green", command, GattWriteOption.WriteWithResponse);
+
+            // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
+            // You can send large amounts of data, and it will be fragmented automatically by the 
+            // OS using the MTU. Your application is not limited by the MTU size as to the data transfer of each packet.
+
+            // Old code, not needed. After checking the file history; this code has always been this way, so it's not
+            // clear that it was ever needed.
+            //const int MAXBYTES = 20;
+            //if (command.Length <= MAXBYTES) //TODO: make sure this works
+            //{
+            //    await WriteCommandAsync(CharacteristicsEnum.Green_Lamp_Control_enum, "Green", command, GattWriteOption.WriteWithResponse);
+            //}
+            //else for (int i=0; i<command.Length; i+= MAXBYTES)
+            //{
+            //    // So many calculations and copying just to get a slice
+            //    var maxCount = Math.Min(MAXBYTES, command.Length - i);
+            //    var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+            //    await WriteCommandAsync(CharacteristicsEnum.Green_Lamp_Control_enum, "Green", subcommand, GattWriteOption.WriteWithResponse);
+            //}
+            return retval;
         }
 
 
@@ -328,29 +359,43 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteBlue(byte Blue)
+        public async Task<GattCommunicationStatus> WriteBlue(byte Blue)
         {
-            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Blue_Lamp_Control_enum)) return;
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Blue_Lamp_Control_enum);
+            if (ensureResult != GattCommunicationStatus.Success) 
+            {
+                return ensureResult;
+            }
 
             var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bluetooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(  Blue);
+            dw.WriteByte(Blue);
 
             var command = dw.DetachBuffer().ToArray();
-            const int MAXBYTES = 20;
-            if (command.Length <= MAXBYTES) //TODO: make sure this works
-            {
-                await WriteCommandAsync(CharacteristicsEnum.Blue_Lamp_Control_enum, "Blue", command, GattWriteOption.WriteWithResponse);
-            }
-            else for (int i=0; i<command.Length; i+= MAXBYTES)
-            {
-                // So many calculations and copying just to get a slice
-                var maxCount = Math.Min(MAXBYTES, command.Length - i);
-                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(CharacteristicsEnum.Blue_Lamp_Control_enum, "Blue", subcommand, GattWriteOption.WriteWithResponse);
-            }
+            
+            var retval = await WriteCommandAsync(CharacteristicsEnum.Blue_Lamp_Control_enum, "Blue", command, GattWriteOption.WriteWithResponse);
+
+            // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
+            // You can send large amounts of data, and it will be fragmented automatically by the 
+            // OS using the MTU. Your application is not limited by the MTU size as to the data transfer of each packet.
+
+            // Old code, not needed. After checking the file history; this code has always been this way, so it's not
+            // clear that it was ever needed.
+            //const int MAXBYTES = 20;
+            //if (command.Length <= MAXBYTES) //TODO: make sure this works
+            //{
+            //    await WriteCommandAsync(CharacteristicsEnum.Blue_Lamp_Control_enum, "Blue", command, GattWriteOption.WriteWithResponse);
+            //}
+            //else for (int i=0; i<command.Length; i+= MAXBYTES)
+            //{
+            //    // So many calculations and copying just to get a slice
+            //    var maxCount = Math.Min(MAXBYTES, command.Length - i);
+            //    var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+            //    await WriteCommandAsync(CharacteristicsEnum.Blue_Lamp_Control_enum, "Blue", subcommand, GattWriteOption.WriteWithResponse);
+            //}
+            return retval;
         }
 
 
@@ -362,29 +407,43 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteWhite(byte White)
+        public async Task<GattCommunicationStatus> WriteWhite(byte White)
         {
-            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.White_Lamp_Control_enum)) return;
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.White_Lamp_Control_enum);
+            if (ensureResult != GattCommunicationStatus.Success) 
+            {
+                return ensureResult;
+            }
 
             var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bluetooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(  White);
+            dw.WriteByte(White);
 
             var command = dw.DetachBuffer().ToArray();
-            const int MAXBYTES = 20;
-            if (command.Length <= MAXBYTES) //TODO: make sure this works
-            {
-                await WriteCommandAsync(CharacteristicsEnum.White_Lamp_Control_enum, "White", command, GattWriteOption.WriteWithResponse);
-            }
-            else for (int i=0; i<command.Length; i+= MAXBYTES)
-            {
-                // So many calculations and copying just to get a slice
-                var maxCount = Math.Min(MAXBYTES, command.Length - i);
-                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(CharacteristicsEnum.White_Lamp_Control_enum, "White", subcommand, GattWriteOption.WriteWithResponse);
-            }
+            
+            var retval = await WriteCommandAsync(CharacteristicsEnum.White_Lamp_Control_enum, "White", command, GattWriteOption.WriteWithResponse);
+
+            // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
+            // You can send large amounts of data, and it will be fragmented automatically by the 
+            // OS using the MTU. Your application is not limited by the MTU size as to the data transfer of each packet.
+
+            // Old code, not needed. After checking the file history; this code has always been this way, so it's not
+            // clear that it was ever needed.
+            //const int MAXBYTES = 20;
+            //if (command.Length <= MAXBYTES) //TODO: make sure this works
+            //{
+            //    await WriteCommandAsync(CharacteristicsEnum.White_Lamp_Control_enum, "White", command, GattWriteOption.WriteWithResponse);
+            //}
+            //else for (int i=0; i<command.Length; i+= MAXBYTES)
+            //{
+            //    // So many calculations and copying just to get a slice
+            //    var maxCount = Math.Min(MAXBYTES, command.Length - i);
+            //    var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+            //    await WriteCommandAsync(CharacteristicsEnum.White_Lamp_Control_enum, "White", subcommand, GattWriteOption.WriteWithResponse);
+            //}
+            return retval;
         }
 
 
@@ -396,32 +455,46 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="Period"></param>
         /// <returns></returns>
-        public async Task WriteSetColor(byte Red, byte Green, byte Blue, byte White)
+        public async Task<GattCommunicationStatus> WriteSetColor(byte Red, byte Green, byte Blue, byte White)
         {
-            if (!await EnsureCharacteristicAsync(CharacteristicsEnum.SetColor_Lamp_Control_enum)) return;
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.SetColor_Lamp_Control_enum);
+            if (ensureResult != GattCommunicationStatus.Success) 
+            {
+                return ensureResult;
+            }
 
             var dw = new DataWriter();
-            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bleutooth is normally Little Endian
+            // Bluetooth standard: From v4.2 of the spec, Vol 3, Part G (which covers GATT), page 523: Bluetooth is normally Little Endian
             dw.ByteOrder = ByteOrder.LittleEndian;
             dw.UnicodeEncoding = UnicodeEncoding.Utf8;
-            dw.WriteByte(  Red);
-            dw.WriteByte(  Green);
-            dw.WriteByte(  Blue);
-            dw.WriteByte(  White);
+            dw.WriteByte(Red);
+            dw.WriteByte(Green);
+            dw.WriteByte(Blue);
+            dw.WriteByte(White);
 
             var command = dw.DetachBuffer().ToArray();
-            const int MAXBYTES = 20;
-            if (command.Length <= MAXBYTES) //TODO: make sure this works
-            {
-                await WriteCommandAsync(CharacteristicsEnum.SetColor_Lamp_Control_enum, "SetColor", command, GattWriteOption.WriteWithResponse);
-            }
-            else for (int i=0; i<command.Length; i+= MAXBYTES)
-            {
-                // So many calculations and copying just to get a slice
-                var maxCount = Math.Min(MAXBYTES, command.Length - i);
-                var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-                await WriteCommandAsync(CharacteristicsEnum.SetColor_Lamp_Control_enum, "SetColor", subcommand, GattWriteOption.WriteWithResponse);
-            }
+            
+            var retval = await WriteCommandAsync(CharacteristicsEnum.SetColor_Lamp_Control_enum, "SetColor", command, GattWriteOption.WriteWithResponse);
+
+            // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
+            // You can send large amounts of data, and it will be fragmented automatically by the 
+            // OS using the MTU. Your application is not limited by the MTU size as to the data transfer of each packet.
+
+            // Old code, not needed. After checking the file history; this code has always been this way, so it's not
+            // clear that it was ever needed.
+            //const int MAXBYTES = 20;
+            //if (command.Length <= MAXBYTES) //TODO: make sure this works
+            //{
+            //    await WriteCommandAsync(CharacteristicsEnum.SetColor_Lamp_Control_enum, "SetColor", command, GattWriteOption.WriteWithResponse);
+            //}
+            //else for (int i=0; i<command.Length; i+= MAXBYTES)
+            //{
+            //    // So many calculations and copying just to get a slice
+            //    var maxCount = Math.Min(MAXBYTES, command.Length - i);
+            //    var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
+            //    await WriteCommandAsync(CharacteristicsEnum.SetColor_Lamp_Control_enum, "SetColor", subcommand, GattWriteOption.WriteWithResponse);
+            //}
+            return retval;
         }
 
 

@@ -221,7 +221,6 @@
     <Compile Include="SpecialtyPagesModified\Lionel_LionChiefPage.xaml.cs">
       <DependentUpon>Lionel_LionChiefPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SpecialtyPagesModified\TI_beLight_2540Page.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\TrionesPage.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\Witti_DottiPage.xaml.cs" />
     <Compile Include="SpecialtyPagesModified\Witti_NottiPage.xaml.cs" />
@@ -262,6 +261,7 @@
       <DependentUpon>Samico_BloodPressure_BG512Page.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpecialtyPages\ThermoPro_TP357Page.xaml.cs" />
+    <Compile Include="SpecialtyPages\TI_beLight_2540Page.xaml.cs" />
     <Compile Include="SpecialtyPages\TI_SensorTag_1350Page.xaml.cs" />
     <Compile Include="SpecialtyPages\TI_SensorTag_1352Page.xaml.cs">
       <DependentUpon>TI_SensorTag_1352Page.xaml</DependentUpon>
@@ -1116,10 +1116,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SpecialtyPagesModified\TI_beLight_2540Page.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="SpecialtyPagesModified\TrionesPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1185,6 +1181,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SpecialtyPages\ThermoPro_TP357Page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SpecialtyPages\TI_beLight_2540Page.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

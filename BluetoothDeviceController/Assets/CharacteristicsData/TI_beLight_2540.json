@@ -3,8 +3,11 @@
     {
       "Name": "beLight",
       "ClassName": "TI_beLight_2540",
+      "ClassModifiers": "partial",
+      "Description":  "Hi-intensity LED light developer kit from TI",
+
       "REM_About": "TI beLight high-intensity developer kit",
-      "SuppressFile": ":SuppressXAML:",
+      "REM uses standard LED light XAML now: SuppressFile": ":SuppressXAML:",
       "Links": [
         "http://www.ti.com/tool/tidc-bluetooth-low-energy-light",
         "http://www.ti.com/lit/ug/swru392a/swru392a.pdf"
@@ -41,6 +44,7 @@
             },
             {
               "UUID": "0000ffb5-0000-1000-8000-00805f9b34fb",
+              "ExtraUI": "LampControl",
               "Name": "SetColor",
               "IsWrite": true,
               "Type": "U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|White"

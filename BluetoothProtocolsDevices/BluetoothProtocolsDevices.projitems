@@ -6,7 +6,7 @@
     <SharedGUID>12d89dd7-fddf-43af-810e-a340bcf5f79f</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>BluetoothProtocolsDevices</Import_RootNamespace>
+    <Import_RootNamespace>BluetoothProtocols</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Bbc_MicroBit.cs" />
@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Daybetter_LedLight_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Govee_H6005_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ThermoPro_TP357.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TI_beLight_2540_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Zengge_LedLight_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CraftyRobot_Smartibot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Elegoo_MiniCar.cs" />
