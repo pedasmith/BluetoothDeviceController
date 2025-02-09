@@ -34,12 +34,12 @@ namespace BluetoothDeviceController.UserData
         }
 
         /// <summary>
-        /// Adds the given id+name to the list of name mappings AND saves
+        /// Adds or updates the given id+name to the list of name mappings AND saves
         /// </summary>
         /// <param name="id"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static async Task AddAsync(string id, string name)
+        public static async Task AddOrUpdateAsync(string id, string name)
         {
             if (AllMappings == null)
             {
@@ -65,7 +65,6 @@ namespace BluetoothDeviceController.UserData
                     await SaveAsync();
                 }
             }
-
         }
 
         private const string fname = @"NameMapping.json";
@@ -112,7 +111,6 @@ namespace BluetoothDeviceController.UserData
             {
                 System.Diagnostics.Debug.WriteLine($"ERROR: User NameMappings Write: {e.Message}");
             }
-
         }
     }
 }

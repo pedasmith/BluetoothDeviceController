@@ -456,7 +456,7 @@ namespace BluetoothDeviceController
 
         private void SetParentScrolltype(Specialization.ParentScrollType scrollType)
         {
-            Log($"DBG: TODO: SetParentScrollType: {scrollType}");
+            Log($"NOTE: SetParentScrollType: {scrollType}. Is this work complete?");
             switch (scrollType)
             {
                 case Specialization.ParentScrollType.ParentShouldScroll:
@@ -523,7 +523,8 @@ namespace BluetoothDeviceController
                 }
                 else
                 {
-                    var (deviceName, hasDeviceName) = GetDeviceInformationName(deviceWrapper?.di);
+                    // Don't allow the mapped name; those are picked by the user any might not map to the potential names in the Specializations.
+                    var (deviceName, hasDeviceName) = GetDeviceInformationName(deviceWrapper?.di, DeviceInformationNameType.NoMappedName);
                     if (deviceName.StartsWith("Pokit"))
                     {
                         ;// handy hook for debugging
@@ -680,17 +681,20 @@ namespace BluetoothDeviceController
             return -1;
         }
 
+        enum DeviceInformationNameType {  PreferMappedName, NoMappedName };
+
         /// <summary>
         /// Smart routine that returns the name of the device. Might return NULL if the device is an un-named one. 
         /// Uses the UserNameMapping as appropriate.
         /// </summary>
         /// <param name="di"></param>
         /// <returns></returns>
-        private static (string name, bool hasName) GetDeviceInformationName(DeviceInformation di)
+        private static (string name, bool hasName) GetDeviceInformationName(DeviceInformation di, DeviceInformationNameType flags = DeviceInformationNameType.PreferMappedName)
         {
             // Preferred names, in order, are the mapping name, the navigateTo.Name and the navigateTo.Id.
             var mapping = UserNameMappings.Get(di.Id);
-            var name = mapping?.Name ?? null;
+            string name = null; 
+            if (String.IsNullOrEmpty(name) && flags == DeviceInformationNameType.PreferMappedName) name = mapping?.Name ?? null;
             var hasName = true;
             if (String.IsNullOrEmpty(name)) name = di.Name;
             if (String.IsNullOrEmpty(name)) name = di.Id;
@@ -709,20 +713,22 @@ namespace BluetoothDeviceController
         List<NavigationViewItem> MenuItemCache = new List<NavigationViewItem>();
 
         /// <summary>
-        /// Adds device to navigation list. Called both when a device is added and when it's being updated
+        /// Adds or update device to navigation list. Called both when a device is added and when it's being updated
         /// </summary>
         /// <param name="wrapper"></param>
         /// <returns></returns>
-        private async Task AddDeviceAsync(DeviceInformationWrapper wrapper)
+        private async Task AddOrUpdateDeviceAsync(DeviceInformationWrapper wrapper)
         {
             int idx = -1;
             string name = "???";
+            string unmappedName = "???";
             string id = "??-??";
             if (wrapper.di != null)
             {
                 id = GuidGetCommon.NiceId(wrapper.di.Id);
                 var isAll_bluetooth_devices = Preferences.Scope == UserPreferences.SearchScope.Ble_All_ble_devices;
                 bool hasDeviceName;
+                (unmappedName, hasDeviceName) = GetDeviceInformationName(wrapper.di, DeviceInformationNameType.NoMappedName);
                 (name, hasDeviceName) = GetDeviceInformationName(wrapper.di);
                 if (!hasDeviceName && !isAll_bluetooth_devices)
                 {
@@ -763,7 +769,7 @@ namespace BluetoothDeviceController
             var now = DateTime.Now.ToString("HH:mm:ss.f");
             Log($"{id}: Cache: Added at {DateTime.Now.ToString("HH:mm:ss.f")}: Device added to cache");
 
-            var specialization = Specialization.Get(Specializations, name);
+            var specialization = Specialization.Get(Specializations, unmappedName);
             if (specialization == null)
             {
                 // NOTE: this is a real problem. The IsNordicUartAsync takes quite a while to run;
@@ -788,7 +794,7 @@ namespace BluetoothDeviceController
                 return;
             }
 
-            var icon = GetIconForName(name);
+            var icon = GetOverrideIconForName(unmappedName);
             Log($"{id}: Icon: At {DateTime.Now.ToString("HH:mm:ss.f")}: Device has icon {icon}");
             var dmec = new DeviceMenuEntryControl(wrapper, name, specialization, icon);
             dmec.SettingsClick += OnDeviceSettingsClick;
@@ -801,7 +807,11 @@ namespace BluetoothDeviceController
 
         const string OTHER = "🜹";
 
-        private static string GetIconForName(string name)
+        /// <summary>
+        /// Simple handwritten method that provides icons for a small number of well-known devices.
+        /// Returns the default 🜹 icon for most devices.
+        /// </summary>
+        private static string GetOverrideIconForName(string name)
         {
             string icon = null;
             switch (name)
@@ -812,6 +822,7 @@ namespace BluetoothDeviceController
                 case "Surface Pen": icon = "🖉"; break;
                 default: icon = OTHER; break;
             }
+            if (name.StartsWith("Pebble M")) return "🖰";
             return icon;
         }
         #endregion 
@@ -861,7 +872,7 @@ namespace BluetoothDeviceController
             // by the SimpleBeaconPage. 
             SimpleBeaconPage.TheSimpleBeaconPage.IsPaused = SearchFeedback.GetIsPaused(); // Transfer the search feedback UX jsonSearchText to the SimpleBeaconPage.
             // Yes, this is pretty awkward.
-            deviceWrapper.BleAdvert.Event(deviceWrapper.BleAdvert); // TODO: why is this called again?
+            deviceWrapper.BleAdvert.Event(deviceWrapper.BleAdvert); // NOTE: why is this called again?
 
             if (idx != -1)
             {
@@ -880,7 +891,7 @@ namespace BluetoothDeviceController
             // Otherwise make a new entry
             idx = uiNavigation.MenuItems.Count(); // Add to the end of the list
 
-            string icon = GetIconForName(name);
+            string icon = GetOverrideIconForName(name);
             var dmec = new DeviceMenuEntryControl(deviceWrapper, name, specialization, icon);
             dmec.SettingsClick += OnDeviceSettingsClick;
             var menu = new NavigationViewItem()
@@ -929,9 +940,10 @@ namespace BluetoothDeviceController
                 // Please update the settings, but only if they have changed.
                 if (perdevice.UserName != originalDeviceName)
                 {
-                    await UserNameMappings.AddAsync(di.di.Id, perdevice.UserName);
+                    await UserNameMappings.AddOrUpdateAsync(di.di.Id, perdevice.UserName);
                 }
-                // Update the UI????
+                // var (newDeviceName, newHasDeviceName) = GetDeviceInformationName(di.di);
+                await AddOrUpdateDeviceAsync(di);
             }
         }
 
@@ -1267,7 +1279,7 @@ namespace BluetoothDeviceController
                 {
                     try
                     {
-                        await AddDeviceAsync(new DeviceInformationWrapper(args));
+                        await AddOrUpdateDeviceAsync(new DeviceInformationWrapper(args));
                     }
                     catch (Exception)
                     {
@@ -1483,8 +1495,8 @@ namespace BluetoothDeviceController
                     // The loops are there because 'technically' there could be multiple services and
                     // characteristics with the same ID. In practice, never.
 
-                    // TODO: allow this to be set. We often want to use the cache (it's much faster)
-                    // but sometimes the cache is 
+                    // NOTE: allow this to be set. We often want to use the cache (it's much faster)
+                    // but sometimes the cache is out of date
                     var services = await ble.GetGattServicesForUuidAsync(CommonConfigurationGuid1800, CurrCacheMode);
                     if (services.Status != GattCommunicationStatus.Success) continue;
 
