@@ -96,11 +96,12 @@
         },
         {
           "UUID": "494e5445-4c4c-495f-524f-434b535f4857",
-          "Name": "Unknown3",
+          "Name": "Commands",
           "Characteristics": [
             {
               "UUID": "494e5445-4c4c-495f-524f-434b535f2011",
-              "Name": "Govee SPP: protocol",
+              "Name": "Device",
+              "REMName": "Govee SPP: protocol",
               "Description": "Govee SPP: protocol",
               "Type": "BYTES|HEX|Spp",
               "IsRead": true,
@@ -113,7 +114,8 @@
             },
             {
               "UUID": "494e5445-4c4c-495f-524f-434b535f2012",
-              "Name": "Govee SPP: cmd",
+              "Name": "CommandAlt",
+              "REMName": "Govee SPP: cmd",
               "Description": "Govee SPP: cmd",
               "Type": "BYTES|HEX|SppCmd",
               "IsRead": true,
@@ -126,7 +128,8 @@
             },
             {
               "UUID": "494e5445-4c4c-495f-524f-434b535f2013",
-              "Name": "Govee SPP: transmit",
+              "Name": "Data",
+              "REMName": "Govee SPP: transmit",
               "Description": "Govee SPP: transmit",
               "Type": "BYTES|HEX|SppTx",
               "IsRead": true,
@@ -140,7 +143,7 @@
         },
         {
           "UUID": "00010203-0405-0607-0809-0a0b0c0d1912",
-          "Name": "Unknown4",
+          "Name": "UnknownOTA",
           "Characteristics": [
             {
               "UUID": "00010203-0405-0607-0809-0a0b0c0d2b12",

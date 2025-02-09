@@ -22,6 +22,7 @@ and more devices -- please leave feedback to request specific devices!
 ## Data sensors that can be read
 [![BBC micro:bit](../DevicePictures/Bbc_MicroBit-175.png)](Device_Bbc_MicroBit.md)
 [![Govee H5074](../DevicePictures/Govee_H5074-175.png)](Device_Govee_H5074.md)
+[![Govee H5075](../DevicePictures/Govee_H5075-175.png)](Device_Govee_H5075.md)
 [![Kano Wand](../DevicePictures/Kano_Wand-175.png)](Device_Kano_Wand.md)
 [![Nordic Thingy](../DevicePictures/Nordic_Thingy-175.png)](Device_Nordic_Thingy.md)
 [![Pyle PHBPBW40](../DevicePictures/Samico_BloodPressure_BG512-175.png)](Device_Samico_BloodPressure_BG512.md)
