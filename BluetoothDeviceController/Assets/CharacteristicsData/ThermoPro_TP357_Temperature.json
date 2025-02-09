@@ -101,6 +101,8 @@
               "IsNotify": true,
               "AutoNotify": true,
               "UI": {
+                "Expand": true,
+                "TitleSuffix":  "Tracker",
                 "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 0,
@@ -114,7 +116,7 @@
                     "stroke": "DarkBlue"
                   }
                 }
-                },
+              },
                 "Verbs": ":Read:Notify:RdInNo:InNo:",
                 "ExampleData": [
                   "Value:  00",

@@ -89,12 +89,8 @@
                     <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Data_Opcode" Text="*" Header="Opcode" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Data_Unknown1" Text="*" Header="Unknown1" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Data_Flag" Text="*" Header="Flag" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="True" x:Name="Data_Temperature" Text="*" Header="Temperature" Style="{StaticResource HEXStyle}"/>
                     <TextBox IsReadOnly="True" x:Name="Data_Humidity" Text="*" Header="Humidity" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Data_CrcExtra" Text="*" Header="CrcExtra" Style="{StaticResource HEXStyle}"/>
 
                     <Button Content="Read" Click="OnReadData" />
                     <Button Content="Notify" Click="OnNotifyData" />
@@ -103,12 +99,13 @@
 
 
 
-                    <controls:Expander Header="Data Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                    <controls:Expander Header="Data Tracker" IsExpanded="true" MinWidth="550" HorizontalAlignment="Left">
                         <StackPanel MinWidth="550">
                             <charts:ChartControl Height="200" Width="500" x:Name="DataChart" />
 
-                            <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="DataGrid" ItemsSource="{Binding DataRecordData}" />
-                            <TextBox  x:Name="Data_Notebox" KeyDown="OnData_NoteKeyDown" />
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="DataGrid" ItemsSource="{Binding DataRecordData}" />
+
+                        <TextBox  x:Name="Data_Notebox" KeyDown="OnData_NoteKeyDown" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                 <ComboBox SelectionChanged="OnKeepCountData" Header="Keep how many items?" SelectedIndex="2">
                                     <ComboBoxItem Tag="10">10</ComboBoxItem>

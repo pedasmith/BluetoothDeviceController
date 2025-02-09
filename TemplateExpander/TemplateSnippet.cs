@@ -120,6 +120,14 @@ namespace TemplateExpander
             }
         }
 
+        public static void AddMacroList(List<TemplateSnippet> list, string name, string text)
+        {
+            foreach (var snippet in list)
+            {
+                snippet.AddMacro(name, text);
+            }
+        }
+
         public TemplateSnippet Parent { get; set; }
         public string Errors { get; internal set; } = "";
 

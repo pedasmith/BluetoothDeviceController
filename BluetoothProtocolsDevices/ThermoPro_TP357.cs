@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// ThermoPro temperature and humidity meter.
-    /// This class was automatically generated 2025-02-07::09:10
+    /// This class was automatically generated 2025-02-08::16:25
     /// </summary>
 
     public partial class ThermoPro_TP357 : INotifyPropertyChanged

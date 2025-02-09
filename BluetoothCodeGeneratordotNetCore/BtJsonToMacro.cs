@@ -211,6 +211,12 @@ namespace BluetoothCodeGenerator
 
                 var UI_AsCSharp = btCharacteristic.UI?.AsCSharpString() ?? "";
                 ch.Macros.Add("UISPECS", UI_AsCSharp);
+                if (btCharacteristic.UI != null)
+                {
+                    ch.Macros.Add("UI.ExpandChart", btCharacteristic.UI.Expand ? "true" : "false");
+                    ch.Macros.Add("UI.TitleSuffix", btCharacteristic.UI.TitleSuffix);
+                }
+
                 if (UI_AsCSharp.Contains ("[[CHARACTERISTICNAME]]"))
                 {
                     // Just a little bit of weirdness here :-)
@@ -477,104 +483,63 @@ namespace BluetoothCodeGenerator
                     crc_xor_fixup = "CrcCalculations.UpdateModbusCrc16AtEnd(command);";
                     defaultValue = "0";
                 }
-                if (hasRead)
+                var datareadpr = new TemplateSnippet(dataname);
+                var datawritepr = new TemplateSnippet(dataname);
+                var datanothiddenpr = new TemplateSnippet(dataname);
+                var dataallpr = new TemplateSnippet(dataname);
+
+                var prlist = new List<TemplateSnippet>() { datareadpr, datawritepr, datanothiddenpr, dataallpr };
+
+                // Universal for all data__pr items
+                if (true)
                 {
-                    var datareadpr = new TemplateSnippet(dataname);
-                    readprs.AddChild(dataname, datareadpr);
-
-                    datareadpr.AddMacro("NAME", name);
-                    datareadpr.AddMacro("CHDATANAME", split.Count == 1
-                        ? btCharacteristic.Name.DotNetSafe()
-                        : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
-                    datareadpr.AddMacro("DATANAME", dataname.DotNetSafe());
-                    datareadpr.AddMacro("DataName", dataname);
-                    datareadpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
-                    datareadpr.AddMacro("IS+READ+ONLY", isReadOnly ? "True" : "False");
-                    datareadpr.AddMacro("DATANAMEUSER", dataname.Replace("_", " "));
-                    datareadpr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
-                    datareadpr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
-                    datareadpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
-
-                    //NOTE: Why are these 3 write items here for a reader?
-                    datareadpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
-                    datareadpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
-
-                    datareadpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
-                    datareadpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
-                    datareadpr.AddMacro("DEC+OR+HEX", displayFormat);
-                    datareadpr.AddMacro("DataToString.dotNet", dotNetDisplayFormat);
-                    datareadpr.AddMacro("DEFAULT+VALUE", defaultValue);
-                }
-                if (hasWrite)
-                {
-                    var datawritepr = new TemplateSnippet(dataname);
-                    writeprs.AddChild(dataname, datawritepr);
+                    TemplateSnippet.AddMacroList(prlist, "NAME", name);
 
                     // CHDATANAME is either char_data (to make it more unique) or just plain characteristicname.
                     // If a charateristic has just a single data item, that one item doesn't need a seperate name here.
                     // so characteristic "temparature" with a single data value "temperature" will get a chdataname
                     // of "temperature". If there were two data value (temp and humidity) they would get unique names
                     // (temperature_temp and temperature_humidity)
-                    datawritepr.AddMacro("NAME", name);
-                    datawritepr.AddMacro("CHDATANAME", split.Count == 1
+                    TemplateSnippet.AddMacroList(prlist, "CHDATANAME", split.Count == 1
                         ? btCharacteristic.Name.DotNetSafe()
                         : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
-                    datawritepr.AddMacro("DATANAME", dataname.DotNetSafe());
-                    datawritepr.AddMacro("DATANAMEUSER", dataname.Replace("_", " "));
-                    datawritepr.AddMacro("DataName", dataname);
-                    datawritepr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
-                    datawritepr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
-                    datawritepr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
-                    datawritepr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
-                    datawritepr.AddMacro("ARGDWCALL", writePrefix + ByteFormatToDataWriterCall(item.ByteFormatPrimary));
-                    datawritepr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "DATANAME", dataname.DotNetSafe());
+                    TemplateSnippet.AddMacroList(prlist, "DataName", dataname);
+                    TemplateSnippet.AddMacroList(prlist, "DataName.dotNet", dataname.DotNetSafe());
+                    TemplateSnippet.AddMacroList(prlist, "DATANAMEUSER", dataname.Replace("_", " "));
 
-                    datawritepr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
-                    datawritepr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
-                    datawritepr.AddMacro("DEC+OR+HEX", displayFormat);
-                    datawritepr.AddMacro("DataToString.dotNet", dotNetDisplayFormat);
-                    datawritepr.AddMacro("DEFAULT+VALUE", defaultValue);
+                    TemplateSnippet.AddMacroList(prlist, "VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
+
+                    //NOTE: Are these really needed for all? Why are these 3 write items here for a reader?
+                    TemplateSnippet.AddMacroList(prlist, "ARGDWCALL", writePrefix + ByteFormatToDataWriterCall(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
+
+                    TemplateSnippet.AddMacroList(prlist, "AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
+                    TemplateSnippet.AddMacroList(prlist, "DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
+
+                    TemplateSnippet.AddMacroList(prlist, "DEC+OR+HEX", displayFormat);
+                    TemplateSnippet.AddMacroList(prlist, "DataToString.dotNet", dotNetDisplayFormat);
+                    TemplateSnippet.AddMacroList(prlist, "DEFAULT+VALUE", defaultValue);
+
+                    datareadpr.AddMacro("IS+READ+ONLY", isReadOnly ? "True" : "False");
                 }
-
+                if (hasRead)
+                {
+                    readprs.AddChild(dataname, datareadpr);
+                }
+                if (hasWrite)
+                {
+                    writeprs.AddChild(dataname, datawritepr);
+                }
                 if (!item.IsHidden)
                 {
-                    var datanothiddenpr = new TemplateSnippet(dataname);
                     nothiddenprs.AddChild(dataname, datanothiddenpr);
-
-                    datanothiddenpr.AddMacro("NAME", name);
-                    datanothiddenpr.AddMacro("CHDATANAME", split.Count == 1
-                        ? btCharacteristic.Name.DotNetSafe()
-                        : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
-                    datanothiddenpr.AddMacro("DATANAME", dataname.DotNetSafe());
-                    datanothiddenpr.AddMacro("DataName", dataname);
-                    datanothiddenpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
                 }
                 if (true) // always do this
                 {
-                    var dataallpr = new TemplateSnippet(dataname);
                     allprs.AddChild(dataname, dataallpr);
-
-                    dataallpr.AddMacro("NAME", name);
-                    dataallpr.AddMacro("CHDATANAME", split.Count == 1
-                        ? btCharacteristic.Name.DotNetSafe()
-                        : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
-                    dataallpr.AddMacro("DATANAME", dataname.DotNetSafe());
-                    dataallpr.AddMacro("DataName", dataname);
-                    dataallpr.AddMacro("DataName.dotNet", dataname.DotNetSafe());
-                    dataallpr.AddMacro("IS+READ+ONLY", isReadOnly ? "True" : "False");
-                    dataallpr.AddMacro("DATANAMEUSER", dataname.Replace("_", " "));
-                    dataallpr.AddMacro("VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
-                    dataallpr.AddMacro("VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
-                    dataallpr.AddMacro("VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
-                    dataallpr.AddMacro("ARGDWCALL", ByteFormatToDataWriterCall(item.ByteFormatPrimary));
-                    dataallpr.AddMacro("ARGDWCALLCAST", ByteFormatToDataWriterCallCast(item.ByteFormatPrimary));
-
-                    dataallpr.AddMacro("AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
-                    dataallpr.AddMacro("DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
-
-                    dataallpr.AddMacro("DEC+OR+HEX", displayFormat);
-                    dataallpr.AddMacro("DataToString.dotNet", dotNetDisplayFormat);
-                    dataallpr.AddMacro("DEFAULT+VALUE", defaultValue);
 
                     // Bad hack: the first item for write is also added to the characteristic
                     // This is needed for the write which should sweep up the different text boxes, but doesn't.

@@ -149,7 +149,7 @@ Was the DATA3_LIST a.k.a. the DATA3+LIST
 
 
 
-## CS+UPDATE+DATA+VALUE Type=list Source=ServicesByOriginalOrder/Characteristics/Properties ListOutput=parent
+## CS+UPDATE+DATA+VALUE Type=list Source=ServicesByOriginalOrder/Characteristics/NotHiddenProperties ListOutput=parent
 
 Was PageCSharp+CharacteristicNotify+DataTemplates
 
@@ -162,7 +162,7 @@ Was PageCSharp+CharacteristicNotify+DataTemplates
                 }
 ```
 
-## CS+READ+FROM+VALUELIST Type=list Source=ServicesByOriginalOrder/Characteristics/Properties ListOutput=parent
+## CS+READ+FROM+VALUELIST Type=list Source=ServicesByOriginalOrder/Characteristics/NotHiddenProperties ListOutput=parent
 
 Was DATA1_LIST a.k.a. DATA1+LIST
 PageCSharp+CharacteristicRead+DataTemplates
@@ -252,6 +252,19 @@ here!here TODO: Chart.SetDataProperties
 ```
 [[CharacteristicName.dotNet]]Chart.[[UICHARTCOMMAND]];
 ```
+
+## CS+TABLE+METHODS If="[[TableType]] contains standard" Type=list Source=Services/Characteristics ListOutput=child 
+
+We only add in the XAML+TABLE if the characteristic.UI?.tableType is not null or empty (but it's never null). Valid tableType values are "standard" or nothing.
+
+```
+private void OnAutogeneratingColumn[[CharacteristicName.dotNet]](object sender, DataGridAutoGeneratingColumnEventArgs e)
+{
+    ; // Handy spot for a debugger here!here
+ //...
+}
+```
+
 
 ## CS+CHARACTERISTIC+NOTIFY+METHOD If="[[Verbs]] contains :InNo:" Type=list Source=ServicesByOriginalOrder/Characteristics ListOutput=child
 
@@ -622,6 +635,7 @@ PageCSharp+CharacteristicRecordTemplate
 [[CS+CHARACTERISTIC+READ+METHOD]]
 [[CS+CHARACTERISTIC+WRITE+METHOD]]
 [[CS+XAML+UILIST]]
+[[CS+TABLE+METHODS]]
 
 ```
 

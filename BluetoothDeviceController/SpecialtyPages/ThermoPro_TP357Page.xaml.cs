@@ -808,24 +808,6 @@ chartDefaultMinY=0,
                 var valueList = data.ValueList;
                 
                 var record = new DataRecord();
-                var Opcode = valueList.GetValue("Opcode");
-                if (Opcode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Opcode.CurrentType == BCBasic.BCValue.ValueType.IsString || Opcode.IsArray)
-                {
-                    record.Opcode = (double)Opcode.AsDouble;
-                    Data_Opcode.Text = record.Opcode.ToString("N0");
-                }
-                var Unknown1 = valueList.GetValue("Unknown1");
-                if (Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsString || Unknown1.IsArray)
-                {
-                    record.Unknown1 = (double)Unknown1.AsDouble;
-                    Data_Unknown1.Text = record.Unknown1.ToString("N0");
-                }
-                var Flag = valueList.GetValue("Flag");
-                if (Flag.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Flag.CurrentType == BCBasic.BCValue.ValueType.IsString || Flag.IsArray)
-                {
-                    record.Flag = (double)Flag.AsDouble;
-                    Data_Flag.Text = record.Flag.ToString("N0");
-                }
                 var Temperature = valueList.GetValue("Temperature");
                 if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
                 {
@@ -837,12 +819,6 @@ chartDefaultMinY=0,
                 {
                     record.Humidity = (double)Humidity.AsDouble;
                     Data_Humidity.Text = record.Humidity.ToString("N0");
-                }
-                var CrcExtra = valueList.GetValue("CrcExtra");
-                if (CrcExtra.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CrcExtra.CurrentType == BCBasic.BCValue.ValueType.IsString || CrcExtra.IsArray)
-                {
-                    record.CrcExtra = (string)CrcExtra.AsString;
-                    Data_CrcExtra.Text = record.CrcExtra.ToString();
                 }
 
                 var addResult = DataRecordData.AddRecord(record);
@@ -873,24 +849,6 @@ chartDefaultMinY=0,
                 }
                 
                 var record = new DataRecord();
-                var Opcode = valueList.GetValue("Opcode");
-                if (Opcode.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Opcode.CurrentType == BCBasic.BCValue.ValueType.IsString || Opcode.IsArray)
-                {
-                    record.Opcode = (double)Opcode.AsDouble;
-                    Data_Opcode.Text = record.Opcode.ToString("N0");
-                }
-                var Unknown1 = valueList.GetValue("Unknown1");
-                if (Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsString || Unknown1.IsArray)
-                {
-                    record.Unknown1 = (double)Unknown1.AsDouble;
-                    Data_Unknown1.Text = record.Unknown1.ToString("N0");
-                }
-                var Flag = valueList.GetValue("Flag");
-                if (Flag.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Flag.CurrentType == BCBasic.BCValue.ValueType.IsString || Flag.IsArray)
-                {
-                    record.Flag = (double)Flag.AsDouble;
-                    Data_Flag.Text = record.Flag.ToString("N0");
-                }
                 var Temperature = valueList.GetValue("Temperature");
                 if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
                 {
@@ -902,12 +860,6 @@ chartDefaultMinY=0,
                 {
                     record.Humidity = (double)Humidity.AsDouble;
                     Data_Humidity.Text = record.Humidity.ToString("N0");
-                }
-                var CrcExtra = valueList.GetValue("CrcExtra");
-                if (CrcExtra.CurrentType == BCBasic.BCValue.ValueType.IsDouble || CrcExtra.CurrentType == BCBasic.BCValue.ValueType.IsString || CrcExtra.IsArray)
-                {
-                    record.CrcExtra = (string)CrcExtra.AsString;
-                    Data_CrcExtra.Text = record.CrcExtra.ToString();
                 }
 
                 DataRecordData.Add(record);

@@ -2,7 +2,7 @@
   "profiles": {
     "BluetoothCodeGeneratordotNetCore": {
       "commandName": "Project",
-      "commandLineArgs": " -inputJsonFile \"..\\BluetoothDeviceController\\Assets\\CharacteristicsData\\Elk_LedLight.json\" -inputTemplates Templates -output output\r\n",
+      "commandLineArgs": " -inputJsonFile \"..\\BluetoothDeviceController\\Assets\\CharacteristicsData\\ThermoPro_TP357_Temperature.json\" -inputTemplates Templates -output output\r\n",
       "workingDirectory": "C:\\Users\\toomr\\source\\repos\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore",
       "remoteDebugEnabled": true
     }

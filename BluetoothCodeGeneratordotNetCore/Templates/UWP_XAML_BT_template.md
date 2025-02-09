@@ -89,7 +89,7 @@
 
 
 
-## XAML+CHARACTERISTIC+DATA+PROPERTY Type=list Source=Services/Characteristics/Properties ListOutput=parent
+## XAML+CHARACTERISTIC+DATA+PROPERTY Type=list Source=Services/Characteristics/NotHiddenProperties ListOutput=parent
 
 Feel free to add in this little explainer to the code
                     <!-- Data=[[DataName]] Characteristic=[[CharacteristicName]] Service=[[ServiceName]] -->
@@ -245,10 +245,13 @@ Was PageXamlCharacteristicEnumButtonPanelTemplate
 We only add in the XAML+TABLE if the characteristic.UI?.tableType is not null or empty (but it's never null). Valid tableType values are "standard" or nothing.
 
 ```
-                    <controls:Expander Header="[[CharacteristicName]] Data tracker" IsExpanded="false" MinWidth="550" HorizontalAlignment="Left">
+                    <controls:Expander Header="[[CharacteristicName]] [[UI.TitleSuffix]]" IsExpanded="[[UI.ExpandChart]]" MinWidth="550" HorizontalAlignment="Left">
                         <StackPanel MinWidth="550">
                             [[XAML+CHART]]
-                            <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="[[CharacteristicName.dotNet]]Grid" ItemsSource="{Binding [[CharacteristicName.dotNet]]RecordData}" />
+                            <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="[[CharacteristicName.dotNet]]Grid"
+                                ItemsSource="{Binding [[CharacteristicName.dotNet]]RecordData}" 
+                                AutoGeneratingColumn="OnAutogeneratingColumn[[CharacteristicName.dotNet]]"
+                            />
                             <TextBox  x:Name="[[CharacteristicName.dotNet]]_Notebox" KeyDown="On[[CharacteristicName.dotNet]]_NoteKeyDown" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                 <ComboBox SelectionChanged="OnKeepCount[[CharacteristicName.dotNet]]" Header="Keep how many items?" SelectedIndex="2">

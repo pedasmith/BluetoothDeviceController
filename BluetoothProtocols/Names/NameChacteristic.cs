@@ -69,6 +69,8 @@ namespace BluetoothDeviceController.Names
         public string tableType { get; set; } = "";
         public string chartType { get; set; } = "";
         public string chartCommand { get; set; } = "";
+        public bool Expand { get; set; } = false; // default is false; must be set true in the JSON.
+        public string TitleSuffix { get; set; } = "Data tracker";
 
         public double? chartDefaultMaxY { get; set; } = null;
         public double? chartMaxY { get; set; } = null;
