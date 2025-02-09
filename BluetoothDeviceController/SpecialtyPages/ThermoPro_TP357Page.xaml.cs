@@ -16,6 +16,7 @@ using Windows.Devices.Enumeration;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using static BluetoothProtocols.ThermoPro_TP357;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -270,6 +271,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
 
+
         public class AppearanceRecord : INotifyPropertyChanged
         {
             public AppearanceRecord()
@@ -380,6 +382,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 SetStatus ($"Error: exception: {ex.Message}");
             }
         }
+
 
 
 
@@ -521,6 +524,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
 
+
         // Functions for Device Info
         public class PNP_IDRecord : INotifyPropertyChanged
         {
@@ -632,6 +636,7 @@ namespace BluetoothDeviceController.SpecialtyPages
                 SetStatus ($"Error: exception: {ex.Message}");
             }
         }
+
 
 
 
@@ -873,6 +878,15 @@ chartDefaultMinY=0,
 
 
 
+        private void OnAutogeneratingColumnData(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            if (e.Column.Header.ToString() == "Opcode") e.Cancel = true;
+            if (e.Column.Header.ToString() == "Unknown1") e.Cancel = true;
+            if (e.Column.Header.ToString() == "Flag") e.Cancel = true;
+            if (e.Column.Header.ToString() == "CrcExtra") e.Cancel = true;
+
+        }
+
         public class CommandRecord : INotifyPropertyChanged
         {
             public CommandRecord()
@@ -1049,6 +1063,7 @@ chartDefaultMinY=0,
                 SetStatus($"Error: exception: {ex.Message}");
             }
         }
+
 
 
 

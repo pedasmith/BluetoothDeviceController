@@ -103,9 +103,11 @@
                         <StackPanel MinWidth="550">
                             <charts:ChartControl Height="200" Width="500" x:Name="DataChart" />
 
-                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="DataGrid" ItemsSource="{Binding DataRecordData}" />
-
-                        <TextBox  x:Name="Data_Notebox" KeyDown="OnData_NoteKeyDown" />
+                            <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="DataGrid"
+                                ItemsSource="{Binding DataRecordData}" 
+                                AutoGeneratingColumn="OnAutogeneratingColumnData"
+                            />
+                            <TextBox  x:Name="Data_Notebox" KeyDown="OnData_NoteKeyDown" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                 <ComboBox SelectionChanged="OnKeepCountData" Header="Keep how many items?" SelectedIndex="2">
                                     <ComboBoxItem Tag="10">10</ComboBoxItem>

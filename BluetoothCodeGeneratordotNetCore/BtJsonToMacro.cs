@@ -395,6 +395,9 @@ namespace BluetoothCodeGenerator
             var allprs = new TemplateSnippet("Properties"); // Properties aka args 
             ch.AddChild("Properties", allprs); // always add, even if it's got nothing in it.
 
+            var hiddenprs = new TemplateSnippet("HiddenProperties"); // Properties aka args 
+            ch.AddChild("HiddenProperties", hiddenprs); // always add, even if it's got nothing in it.
+
             var nothiddenprs = new TemplateSnippet("NotHiddenProperties"); // Properties aka args 
             ch.AddChild("NotHiddenProperties", nothiddenprs); // always add, even if it's got nothing in it.
 
@@ -486,9 +489,10 @@ namespace BluetoothCodeGenerator
                 var datareadpr = new TemplateSnippet(dataname);
                 var datawritepr = new TemplateSnippet(dataname);
                 var datanothiddenpr = new TemplateSnippet(dataname);
+                var datahiddenpr = new TemplateSnippet(dataname);
                 var dataallpr = new TemplateSnippet(dataname);
 
-                var prlist = new List<TemplateSnippet>() { datareadpr, datawritepr, datanothiddenpr, dataallpr };
+                var prlist = new List<TemplateSnippet>() { datareadpr, datawritepr, datanothiddenpr, datahiddenpr, dataallpr };
 
                 // Universal for all data__pr items
                 if (true)
@@ -519,11 +523,12 @@ namespace BluetoothCodeGenerator
                     TemplateSnippet.AddMacroList(prlist, "AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     TemplateSnippet.AddMacroList(prlist, "DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
 
+                    TemplateSnippet.AddMacroList(prlist, "PropertyIsHidden", item.IsHidden ? "true" : "false");
                     TemplateSnippet.AddMacroList(prlist, "DEC+OR+HEX", displayFormat);
                     TemplateSnippet.AddMacroList(prlist, "DataToString.dotNet", dotNetDisplayFormat);
                     TemplateSnippet.AddMacroList(prlist, "DEFAULT+VALUE", defaultValue);
 
-                    datareadpr.AddMacro("IS+READ+ONLY", isReadOnly ? "True" : "False");
+                    TemplateSnippet.AddMacroList(prlist, "IS+READ+ONLY", isReadOnly ? "True" : "False");
                 }
                 if (hasRead)
                 {
@@ -533,7 +538,11 @@ namespace BluetoothCodeGenerator
                 {
                     writeprs.AddChild(dataname, datawritepr);
                 }
-                if (!item.IsHidden)
+                if (item.IsHidden)
+                {
+                    hiddenprs.AddChild(dataname, datahiddenpr);
+                }
+                else
                 {
                     nothiddenprs.AddChild(dataname, datanothiddenpr);
                 }

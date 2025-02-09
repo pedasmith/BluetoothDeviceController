@@ -20,6 +20,7 @@ using Windows.Devices.Enumeration;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using static BluetoothProtocols.[[CLASSNAME]];
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -253,16 +254,23 @@ here!here TODO: Chart.SetDataProperties
 [[CharacteristicName.dotNet]]Chart.[[UICHARTCOMMAND]];
 ```
 
-## CS+TABLE+METHODS If="[[TableType]] contains standard" Type=list Source=Services/Characteristics ListOutput=child 
 
-We only add in the XAML+TABLE if the characteristic.UI?.tableType is not null or empty (but it's never null). Valid tableType values are "standard" or nothing.
+## CS+TABLE+AUTOGEN+LINE If="[[TableType]] contains standard" Type=list Source=ServicesByOriginalOrder/Characteristics/HiddenProperties ListOutput=parent 
 
 ```
-private void OnAutogeneratingColumn[[CharacteristicName.dotNet]](object sender, DataGridAutoGeneratingColumnEventArgs e)
-{
-    ; // Handy spot for a debugger here!here
- //...
-}
+            if (e.Column.Header.ToString() == "[[DataName.dotNet]]") e.Cancel = [[PropertyIsHidden]];
+```
+
+
+## CS+TABLE+METHODS If="[[TableType]] contains standard" Type=list Source=ServicesByOriginalOrder/Characteristics ListOutput=child 
+
+
+
+```
+        private void OnAutogeneratingColumn[[CharacteristicName.dotNet]](object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+[[CS+TABLE+AUTOGEN+LINE]]
+        }
 ```
 
 
