@@ -128,7 +128,7 @@ namespace Utilities
 
         public class Message
         {
-            byte[] b = new byte[] { 0xC2, 0x6A, 0x00, 0xD6, 0x00, 0x23, 0x2C }; // from ThermPro
+            byte[] b = new byte[] { 0xC2, 0x6A, 0x00, 0xD6, 0x00, 0x23, 0x2C }; // from ThermoPro, but it's not actually protobuf!
 
         }
 

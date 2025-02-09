@@ -81,7 +81,7 @@
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
 [[EXTRAUI+XAML+CONTROL]]
-[[XAML+SERVICE+LIST]]
+[[Xaml.Service.List]]
         <Button Content="REREAD" Click="OnRereadDevice" />
     </StackPanel>
 </Page>
@@ -240,77 +240,67 @@ Was PageXamlCharacteristicEnumButtonPanelTemplate
 ```
 
 
-## XAML+TABLE If="[[TableType]] contains standard" Type=list Source=Services/Characteristics ListOutput=child 
+## Xaml.Table If="[[TableType]] contains standard" Type=list Source=Services/Characteristics ListOutput=child 
 
 We only add in the XAML+TABLE if the characteristic.UI?.tableType is not null or empty (but it's never null). Valid tableType values are "standard" or nothing.
 
 ```
-                    <controls:Expander Header="[[CharacteristicName]] [[UI.TitleSuffix]]" IsExpanded="[[UI.ExpandChart]]" MinWidth="550" HorizontalAlignment="Left">
-                        <StackPanel MinWidth="550">
-                            [[XAML+CHART]]
-                            <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="[[CharacteristicName.dotNet]]Grid"
+                <controls:Expander Header="[[CharacteristicName]] [[UI.TitleSuffix]]" 
+                    IsExpanded="[[UI.ExpandChart]]" MinWidth="550" HorizontalAlignment="Left">
+                    <StackPanel MinWidth="550">
+                        [[XAML+CHART]]
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="[[CharacteristicName.dotNet]]Grid"
                                 ItemsSource="{Binding [[CharacteristicName.dotNet]]RecordData}" 
                                 AutoGeneratingColumn="OnAutogeneratingColumn[[CharacteristicName.dotNet]]"
-                            />
-                            <TextBox  x:Name="[[CharacteristicName.dotNet]]_Notebox" KeyDown="On[[CharacteristicName.dotNet]]_NoteKeyDown" />
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                <ComboBox SelectionChanged="OnKeepCount[[CharacteristicName.dotNet]]" Header="Keep how many items?" SelectedIndex="2">
-                                    <ComboBoxItem Tag="10">10</ComboBoxItem>
-                                    <ComboBoxItem Tag="100">100</ComboBoxItem>
-                                    <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
-                                    <ComboBoxItem Tag="10000">10K</ComboBoxItem>
-                                </ComboBox>
-                                <Rectangle Width="5" />
-                                <ComboBox SelectionChanged="OnAlgorithm[[CharacteristicName.dotNet]]" Header="Remove algorithm?" SelectedIndex="0">
-                                    <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
-                                    <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
-                                </ComboBox>
-                                <Button Content = "Copy" Click="OnCopy[[CharacteristicName.dotNet]]" />
-                            </StackPanel>
+                        />
+                        <TextBox  x:Name="[[CharacteristicName.dotNet]]_Notebox" KeyDown="On[[CharacteristicName.dotNet]]_NoteKeyDown" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <ComboBox SelectionChanged="OnKeepCount[[CharacteristicName.dotNet]]" Header="Keep how many items?" SelectedIndex="2">
+                                <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                            </ComboBox>
+                            <Rectangle Width="5" />
+                            <ComboBox SelectionChanged="OnAlgorithm[[CharacteristicName.dotNet]]" Header="Remove algorithm?" SelectedIndex="0">
+                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content = "Copy" Click="OnCopy[[CharacteristicName.dotNet]]" />
                         </StackPanel>
-                    </controls:Expander>
+                    </StackPanel>
+                </controls:Expander>
 ```
 
-## XAML+CHARACTERISTIC+LIST Type=list Source=Services/Characteristics ListOutput=parent
+## Xaml.Characteristic.List Type=list Source=Services/Characteristics ListOutput=parent
 
-TODO: the original code would add a </stackpanel><stackpanel> every 5 items. That keeps everything a bit 
+History: the original code would add a </stackpanel><stackpanel> every 5 items. That keeps everything a bit 
 more tidy. However, that's not possible with the new system.
 
-Instead, the code should be updated to be a GridView where the ItemsPanel is set to be an ItemsWrapGrid
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid MaximumRowsOrColumns="3"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
+Instead, the code has been updated to be a GridView where the ItemsPanel is set to be an ItemsWrapGrid with a MaximumRowsOrColumns
 
 ```
                 <TextBlock Style="{StaticResource SubheaderStyle}">[[CharacteristicName]]</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-[[XAML+CHARACTERISTIC+DATA+PROPERTY]]
-[[XAML+READWRITE+BUTTON+LIST]]
-                </GridView>
-[[XAML+ENUM+BUTTON+LIST+PANEL]]
-[[XAML+FUNCTIONUI+LIST+PANEL]]
-[[XAML+UILIST+PANEL]]
-[[XAML+TABLE]]
+                <GridView>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+[[XAML+CHARACTERISTIC+DATA+PROPERTY]][[XAML+READWRITE+BUTTON+LIST]]                </GridView>
+[[XAML+ENUM+BUTTON+LIST+PANEL]][[XAML+FUNCTIONUI+LIST+PANEL]][[XAML+UILIST+PANEL]][[Xaml.Table]]
 ```
 
 
-## XAML+SERVICE+LIST Type=list Source=ServicesByPriority
+## Xaml.Service.List Type=list Source=ServicesByPriority
 
 TODO: investigate if this should be ListOutput=parent -- it seems like almost all Type=list should be a ListOutput=parent 
 
 ```
-        <!-- XAML+SERVICE+LIST for [[ServiceName]] -->
+        <!-- Xaml.Service.List for [[ServiceName]] -->
         <controls:Expander Header="[[ServiceName]]" IsExpanded="[[ServiceIsExpanded]]" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-            [[XAML+CHARACTERISTIC+LIST]]
-
+[[Xaml.Characteristic.List]]
             </StackPanel>
         </controls:Expander>
 ```

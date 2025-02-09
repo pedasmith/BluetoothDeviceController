@@ -2,7 +2,7 @@
 
 ## Version 1.12, 2025-02-07
 
-Added support for the ThermPro TP357 Thermometer / Hygrometer (Humidity meter) and fixed all of the data charting.
+Added support for the ThermoPro TP357 Thermometer / Hygrometer (Humidity meter) and fixed all of the data charting.
 
 
 
