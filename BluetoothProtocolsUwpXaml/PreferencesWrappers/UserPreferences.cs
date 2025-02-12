@@ -40,6 +40,12 @@
         public bool BeaconIgnoreMicrosoftRome { get; set; } = true; // TODO: Save/Restore and add to UX
         public double BeaconDbLevel { get; set; } = -80.0; // default min db level for beacon advert
 
+        /// <summary>
+        /// When RSSI is zero, it means we didn't really see the device
+        /// </summary>
+        public bool SuppressRssiZeroDevice { get; set; } = true;
+        // TODO: make this user-settable.
+
         public enum SortBy { Mac, Time, Rss, };
         public enum SortDirection { Ascending, Descending };
         /// <summary>

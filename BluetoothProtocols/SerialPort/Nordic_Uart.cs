@@ -70,7 +70,8 @@ namespace BluetoothDeviceController.BluetoothProtocolsCustom
             var TxGuid = Guid.Parse(Tx_Characteristic_Name);
             var RvGuid = Guid.Parse(Rv_Characteristic_Name);
 
-            var services = await Device.GetGattServicesForUuidAsync(TransmitGuid);
+            // 2025-02-12: Use cached mode for speed. Not sure it really helps :-(
+            var services = await Device.GetGattServicesForUuidAsync(TransmitGuid, BluetoothCacheMode.Cached);
             if (services.Status != GattCommunicationStatus.Success) return IsUart;
             foreach (var service in services.Services) // Should be exactly 1!
             {

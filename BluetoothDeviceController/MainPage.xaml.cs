@@ -47,7 +47,7 @@ namespace BluetoothDeviceController
         void PauseCheckUpdated(bool newIsChecked);
         void ClearDisplay();
     }
-    public enum FoundDeviceInfo { IsNew, IsDuplicate, IsOutOfRange, IsFilteredOutDb, IsFilteredOutNoName, IsError };
+    public enum FoundDeviceInfo { IsNew, IsDuplicate, IsOutOfRange, IsFilteredOutDb, IsFilteredOutNoName, IsNotReallyPresent, IsError };
 
     public enum SearchFeedbackType { Normal, Advertisement }
     public interface IDoSearchFeedback // The SearchFeedbackControl
@@ -767,7 +767,12 @@ namespace BluetoothDeviceController
             };
             MenuItemCache.Add(menu); // must add to cache before we do any awaits.
             var now = DateTime.Now.ToString("HH:mm:ss.f");
-            Log($"{id}: Cache: Added at {DateTime.Now.ToString("HH:mm:ss.f")}: Device added to cache");
+            Log($"{id}: Cache: Added at {DateTime.Now.ToString("HH:mm:ss.f")}: Device added to cache {unmappedName}");
+
+            if (unmappedName.StartsWith("FS9721"))
+            {
+                ; // Handy value to hang a debugger on.
+            }
 
             var specialization = Specialization.Get(Specializations, unmappedName);
             if (specialization == null)
@@ -838,6 +843,11 @@ namespace BluetoothDeviceController
             if (bleAdvert == null)
             {
                 SearchFeedback.FoundDevice(FoundDeviceInfo.IsError); // send in reason for why it's filtered
+                return;
+            }
+            if (bleAdvert.RawSignalStrengthInDBm == 0 && Preferences.SuppressRssiZeroDevice)
+            {
+                SearchFeedback.FoundDevice(FoundDeviceInfo.IsNotReallyPresent); // send in reason for why it's filtered
                 return;
             }
             if (bleAdvert.RawSignalStrengthInDBm <= SIGNAL_STRENGTH_THRESHOLD)
@@ -1259,16 +1269,44 @@ namespace BluetoothDeviceController
         {
             // Play around with getting a strength jsonSearchText!
             var id = GuidGetCommon.NiceId(args.Id);
-            object strength = null;
-            args.Properties.TryGetValue("System.Devices.Aep.SignalStrength", out strength);
+            int strength = -1000;// handy sentinal value
+            object strengthObj = null;
+
+            bool gotStrength = args.Properties.TryGetValue("System.Devices.Aep.SignalStrength", out strengthObj);
             var now = DateTime.Now.ToString("HH:mm:ss.f");
-            if (strength != null && strength is int)
+            if (strengthObj == null)
             {
-                Log($"DeviceWatcher: Added at {now}: Device {id} added with strength {strength}");
+                strength = 0;
+                Log($"DeviceWatcher: Added at {now}: Device {id} added with no strength");
+            }
+            else if (strengthObj is int)
+            {
+                strength = (int)strengthObj;
+                Log($"DeviceWatcher: Added at {now}: Device {id} added with strength {strengthObj}");
             }
             else
             {
-                Log($"DeviceWatcher: Added at {now}: Device {id} added with no strength");
+                // Not really possible; strength if present is always an int
+                Log($"DeviceWatcher: Added at {now}: Device {id} added with no strength type={strengthObj.GetType()}");
+            }
+            if (args != null)
+            {
+                id = GuidGetCommon.NiceId(args.Id);
+                var (unmappedName, hasDeviceName) = GetDeviceInformationName(args, DeviceInformationNameType.NoMappedName);
+                if (!unmappedName.Contains("FS9721"))
+                {
+                    // return; // TODO: here!here: DBG: just look at the FS9721 for right now.
+                    ; // Handy spot to set a debug breakpoint.
+                }
+            }
+            if (strength == 0 && Preferences.SuppressRssiZeroDevice)
+            {
+                await uiNavigation.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                    () =>
+                    {
+                        SearchFeedback.FoundDevice(FoundDeviceInfo.IsNotReallyPresent); // send in reason for why it's filtered
+                    }
+                );
             }
 
 
