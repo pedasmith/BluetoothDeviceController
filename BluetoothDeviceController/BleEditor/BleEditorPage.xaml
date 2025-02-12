@@ -16,6 +16,11 @@
             
         </StackPanel>
 
+        <!--
+        JSON is on the Developer menu now; other language are created
+        by the BluetoothCodeGeneratordotNetCore program.
+        -->
+        <!--
         <StackPanel Orientation="Horizontal" Visibility="Collapsed">
             <DropDownButton Content="Copy language">
                 <DropDownButton.Flyout>
@@ -28,6 +33,8 @@
                 </DropDownButton.Flyout>
             </DropDownButton>
         </StackPanel>
+        -->
         <TextBlock x:Name="uiRawData" TextWrapping="Wrap" IsTextSelectionEnabled="True" Visibility="Collapsed" ></TextBlock>
+        <TextBlock x:Name="uiBleError" TextWrapping="Wrap" IsTextSelectionEnabled="True" Visibility="Visible" ></TextBlock>
     </StackPanel>
 </Page>

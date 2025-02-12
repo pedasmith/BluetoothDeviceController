@@ -18,7 +18,7 @@ using Windows.UI.Xaml.Navigation;
 namespace BluetoothDeviceController.BleEditor
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// BleEditorPage lets the user fiddle with BLE devices
     /// </summary>
     public sealed partial class BleEditorPage : Page, HasId
     {
@@ -55,19 +55,23 @@ namespace BluetoothDeviceController.BleEditor
             {
                 case GattCommunicationStatus.AccessDenied:
                     raw = $"BLE: ERROR: Access is denied";
+                    DisplayError($"BLE: ERROR: Access is denied");
                     break;
                 case GattCommunicationStatus.ProtocolError:
                     if (protocolError.HasValue)
                     {
                         raw = $"BLE: Protocol error {protocolError.Value}\n";
+                        DisplayError ($"BLE: Protocol error {protocolError.Value}");
                     }
                     else
                     {
                         raw = $"BLE: Protocol error (no protocol error value)\n";
+                        DisplayError ($"BLE: Protocol error (no protocol error value)");
                     }
                     break;
                 case GattCommunicationStatus.Unreachable:
                     raw = $"BLE: ERROR: device is unreachable\n";
+                    DisplayError ($"BLE: ERROR: device is unreachable");
                     break;
             }
             return raw;
@@ -119,6 +123,7 @@ namespace BluetoothDeviceController.BleEditor
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"ERROR: unable to navigate {ex.Message}");
+                DisplayError($"ERROR: unable to navigate {ex.Message}");
                 // I don't know of any exceptions. But if there are any, supress them completely.
             }
             NavigationComplete = true ;
@@ -166,9 +171,9 @@ namespace BluetoothDeviceController.BleEditor
                 return property;
             }
         }
-        //TODO: make this settable. Right now, we sometimes get old cached data when
-        // we would strongly prefer uncached data. For now, set to be always uncached
-        // because that's my current problem.
+        /// <summary>
+        /// Set the type of read: either uncached (the default) or cached (which can't actually be set)
+        /// </summary>
         BluetoothCacheMode CurrCacheMode = BluetoothCacheMode.Uncached;
         private async Task DisplayBluetooth(NameDevice knownDevice, DeviceInformationWrapper di, BluetoothLEDevice ble, bool automaticallyReadData)
         {
@@ -199,42 +204,10 @@ namespace BluetoothDeviceController.BleEditor
             {
                 // Happens if another program is trying to use the device!
                 raw = $"BLE: ERROR: Another app is using this device.\n";
+                DisplayError($"BLE: ERROR: Another app is using this device.");
             }
             else
             {
-                // TODO: remove this code which is only here while I investigate the WESCALE scale
-#if NEVER_EVER_DEFINED
-                {
-                    // WESCALE: no gatt services
-                    var services = ble.GattServices;
-                    var count = services.Count;
-                    var devacc = ble.DeviceAccessInformation;
-                    var devaccstatus = devacc.CurrentStatus;
-
-                    foreach (var service in services)
-                    {
-                        var chars = service.GetAllCharacteristics();
-                    }
-                    try
-                    {
-                        var guid = Guid.Parse("0000fff0-0000-1000-8000-00805f9b34fb");
-                        var request = await ble.RequestAccessAsync();
-
-                        var allservice = await ble.GetGattServicesForUuidAsync(guid);
-                        var servicefff0 = ble.GetGattService(guid);
-                        var charsfff0 = servicefff0.GetAllCharacteristics();
-                        var countfff0 = charsfff0.Count;
-                        foreach (var ch in charsfff0)
-                        {
-                            ;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ;
-                    }
-                }
-#endif
                 GattDeviceServicesResult result = null;
                 try
                 {
@@ -255,16 +228,22 @@ namespace BluetoothDeviceController.BleEditor
                     else
                     {
                         raw += $"EXCEPTION: while getting Gatt services: {ex.Message}";
+                        DisplayError($"EXCEPTION: while getting Gatt services: {ex.Message}");
                     }
                 }
                 if (result == null)
                 {
                     raw += $"Major error: while reading Gatt services, unable to read ";
+                    DisplayError ($"Major error: while reading Gatt services, unable to read ");
                 }
                 else if (result.Status != GattCommunicationStatus.Success)
                 {
                     int nservice = result.Services.Count;
-                    raw += GetStatusString(result.Status, result.ProtocolError);
+                    var statusString = GetStatusString(result.Status, result.ProtocolError);
+                    raw += statusString;
+                    DisplayError($"Error: unable to connect to device: {statusString}");
+                    // TODO: right here, update the screen so the user isn't as puzzled and frustrated.
+                    // Failing to get FS9721 BT Multimeter data for no obvious reason.
                 }
                 else
                 {
@@ -290,7 +269,9 @@ namespace BluetoothDeviceController.BleEditor
                             var cresult = await service.GetCharacteristicsAsync(CurrCacheMode);
                             if (cresult.Status != GattCommunicationStatus.Success)
                             {
-                                raw += GetStatusString(cresult.Status, cresult.ProtocolError);
+                                var statusString = GetStatusString(cresult.Status, cresult.ProtocolError);
+                                raw += statusString;
+                                DisplayError($"Error getting characteristic: {statusString}");
                             }
                             else
                             {
@@ -372,6 +353,7 @@ namespace BluetoothDeviceController.BleEditor
                                     catch (Exception e)
                                     {
                                         raw += $"    Exception reading value: {e.HResult} {e.Message}\n";
+                                        DisplayError("Exception reading value: {e.HResult} {e.Message}");
                                     }
 
                                     // Update the UI with the latest discovery
@@ -384,6 +366,7 @@ namespace BluetoothDeviceController.BleEditor
                         catch (Exception e)
                         {
                             raw += $"    Exception reading characteristic: {e.HResult} {e.Message}\n";
+                            DisplayError ($"    Exception reading characteristic: {e.HResult} {e.Message}");
                         }
                     }
                 }
@@ -397,13 +380,12 @@ namespace BluetoothDeviceController.BleEditor
 
         }
 
-
-
-        private void OnCopyData_Json(object sender, RoutedEventArgs e)
+        private void DisplayError (string error)
         {
-
-            DoCopyData_Json();
+            uiBleError.Text += error + "\n";
         }
+
+
         public void DoCopyData_Json()
         { 
             var dp = new DataPackage();
@@ -412,6 +394,12 @@ namespace BluetoothDeviceController.BleEditor
             Clipboard.SetContent(dp);
         }
 
+#if NEVER_EVER_DEFINED
+        private void OnCopyData_Json(object sender, RoutedEventArgs e)
+        {
+
+            DoCopyData_Json();
+        }
         private void OnCopyData_NetProtocol(object sender, RoutedEventArgs e)
         {
             var dp = new DataPackage();
@@ -459,5 +447,6 @@ namespace BluetoothDeviceController.BleEditor
             dp.Properties.Title = "Class to read and write Bluetooth data";
             Clipboard.SetContent(dp);
         }
+#endif
     }
 }

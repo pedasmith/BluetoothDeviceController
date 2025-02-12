@@ -110,6 +110,17 @@
               "Verbs": ":Read:Write:Notify:RdInNo:InNo:WrWw:",
               "ExampleData": [
                 "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ],
+              "ZZCommands": [
+                {
+                  "Name": "Get Battery level",
+                  "Values": [
+                    {
+                      "Field": "Spp",
+                      "Value": "aa 08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 a2"
+                    }
+                  ]
+                }
               ]
             },
             {
@@ -137,6 +148,44 @@
               "Verbs": ":Read:Notify:RdInNo:InNo:",
               "ExampleData": [
                 "Value:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ],
+              "MatchResults": [
+                {
+                  "Name": "Alarm Humidity Setting",
+                  "Case": "aa 03",
+                  "MatchBytes": "SppTx",
+                  "Type": "U8|HEX|Prefix||A8 U8|HEX|Opcode||03 U8|DEC|OnOff U16^100_/|FIXED|HumidityPercentLowerTrigger U16^100_/|FIXED|HumidityPercentUpperTrigger BYTES|HEX|Zeros U8|HEX|Crc||XorAtEnd"
+                },
+                {
+                  "Name": "Alarm Temperature Setting",
+                  "Case": "aa 04",
+                  "MatchBytes": "SppTx",
+                  "Type": "U8|HEX|Prefix||A8 U8|HEX|Opcode||04 U8|DEC|OnOff U16^100_/|FIXED|TemperaturePercentLowerTrigger U16^100_/|FIXED|TemperaturePercentUpperTrigger BYTES|HEX|Zeros U8|HEX|Crc||XorAtEnd"
+                },
+                {
+                  "Name": "Humidity Calibration",
+                  "Case": "aa 06",
+                  "MatchBytes": "SppTx",
+                  "Type": "U8|HEX|Prefix||A8 U8|HEX|Opcode||06 I16^100_/|FIXED|HumidityCalibration BYTES|HEX|Zeros U8|HEX|Crc||XorAtEnd"
+                },
+                {
+                  "Name": "Temperature Calibration",
+                  "Case": "aa 07",
+                  "MatchBytes": "SppTx",
+                  "Type": "U8|HEX|Prefix||A8 U8|HEX|Opcode||07 I16^100_/|FIXED|TemperatureCalibration BYTES|HEX|Zeros U8|HEX|Crc||XorAtEnd"
+                },
+                {
+                  "Name": "Battery",
+                  "Case": "aa 08",
+                  "MatchBytes": "SppTx",
+                  "Type": "U8|HEX|Prefix||A8 U8|HEX|Opcode||08 U8|DEC|BatteryPercent BYTES|HEX|Zeros U8|HEX|Crc||XorAtEnd"
+                },
+                {
+                  "Name": "Current Value",
+                  "Case": "aa 0a",
+                  "MatchBytes": "SppTx",
+                  "Type": "U8|HEX|Prefix||A8 U8|HEX|Opcode||07 I16^100_/|FIXED|TemperatureCalibration BYTES|HEX|Zeros U8|HEX|Crc||XorAtEnd"
+                }
               ]
             }
           ]
