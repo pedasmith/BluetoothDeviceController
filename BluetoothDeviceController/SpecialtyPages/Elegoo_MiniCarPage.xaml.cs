@@ -1,4 +1,5 @@
 ﻿using BluetoothDeviceController.Charts;
+using BluetoothDeviceController.Lamps;
 using BluetoothDeviceController.Names;
 using BluetoothProtocols;
 using System;
@@ -15,6 +16,7 @@ using Windows.Devices.Enumeration;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using static BluetoothProtocols.Elegoo_MiniCar;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -30,6 +32,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         {
             this.InitializeComponent();
             this.DataContext = this;
+
         }
         private string DeviceName = "Elegoo_MiniCar";
         private string DeviceNameUser = "ELEGOO BT16";
@@ -233,6 +236,7 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
 
+
         public class CommandRecord : INotifyPropertyChanged
         {
             public CommandRecord()
@@ -314,18 +318,34 @@ namespace BluetoothDeviceController.SpecialtyPages
         // OK to include this method even if there are no defined buttons
         private async void OnClickCommand(object sender, RoutedEventArgs e)
         {
-            var text = (sender as Button).Tag as String;
-            await DoWriteCommand (text, System.Globalization.NumberStyles.Integer);
+            var values = new List<UxTextValue>()
+            {
+                // e.g., new UxTextValue(Command_Command.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(Command_Command.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+
+            };
+            //var text = (sender as Button).Tag as String;
+            await DoWriteCommand(values);
+
         }
 
         private async void OnWriteCommand(object sender, RoutedEventArgs e)
         {
-            var text = Command_Command.Text;
-            await DoWriteCommand (text, System.Globalization.NumberStyles.AllowHexSpecifier);
+            var values = new List<UxTextValue>()
+            {
+                // e.g., new UxTextValue(Command_Command.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+                new UxTextValue(Command_Command.Text, System.Globalization.NumberStyles.AllowHexSpecifier),
+
+            };
+            await DoWriteCommand(values);
+
         }
 
-        private async Task DoWriteCommand(string text, System.Globalization.NumberStyles dec_or_hex)
+        private async Task DoWriteCommand(List<UxTextValue> values)
         {
+            if (values.Count != 1) return;
+            int valueIndex = 0; // Change #3;
+
             SetStatusActive (true);
             ncommand++;
             try
@@ -338,7 +358,8 @@ namespace BluetoothDeviceController.SpecialtyPages
                 String Command;
                 // History: used to go into Command_Command.Text instead of using the variable
                 // History: used to used DEC_OR_HEX for parsing instead of the newer dec_or_hex variable that's passed in
-                var parsedCommand = Utilities.Parsers.TryParseString(text, dec_or_hex, null, out Command);
+                var parsedCommand = Utilities.Parsers.TryParseString(values[valueIndex].Text, values[valueIndex].Dec_or_hex, null, out Command);
+                valueIndex++; // Change #5
                 if (!parsedCommand)
                 {
                     parseError = "Command";
@@ -560,6 +581,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             var commandString = commandWrite.DoCompute();
             await bleDevice.WriteCommand(commandString);
         }
+
 
 
 

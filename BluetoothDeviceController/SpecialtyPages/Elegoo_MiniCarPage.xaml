@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+
     xmlns:charts="using:BluetoothDeviceController.Charts"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -77,41 +78,32 @@
         </Grid>
         <ProgressRing x:Name="uiProgress" />
         <TextBlock x:Name="uiStatus" />
-        <!-- XAML+SERVICE+LIST for Car -->
+
+        <!-- Xaml.Service.List for Car -->
         <controls:Expander Header="Car" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
             <StackPanel Style="{StaticResource ChacteristicListStyle}">
-                            <TextBlock Style="{StaticResource SubheaderStyle}">Result</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
+                <TextBlock Style="{StaticResource SubheaderStyle}">Result</TextBlock>
+                <GridView>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
                     <TextBox IsReadOnly="True" x:Name="Result_Result" Text="*" Header="Result" Style="{StaticResource HEXStyle}"/>
-
                     <Button Content="Notify" Click="OnNotifyResult" />
-
                 </GridView>
-
-
-
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Command</TextBlock>
-            <GridView>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
+                <GridView>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
                     <TextBox IsReadOnly="False" x:Name="Command_Command" Text="*" Header="Command" Style="{StaticResource HEXStyle}"/>
-
                     <Button Content="Write" Click="OnWriteCommand" />
-
                 </GridView>
-
-
                 <StackPanel>
-                    <Slider Header="Beep Tone" Value="100" Minimum="1" Maximum="255" ValueChanged="Beep2_Tone_SliderChanged" />
                     <Button Content="Obstacle" Click="ObstacleAvoidance_ButtonClick" />
                     <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4">
                     <StackPanel>
@@ -163,7 +155,6 @@
                     </VariableSizedWrapGrid>
 
                 </StackPanel>   
-
 
 
             </StackPanel>

@@ -29,7 +29,7 @@
               "IsWriteWithoutResponse": true,
 
               "REM": "REM: UIType, Target, Set[], Label",
-              "UIList": [
+              "UIList_UI": [
                 {
                   "UIType": "ButtonFor",
                   "Target": "ObstacleAvoidance"
@@ -173,7 +173,7 @@
                 { "UIType": "RowEnd" }
 
               ],
-              "Commands": {
+              "UIList_Commands": {
                 "ObstacleAvoidance": {
                   "Label": "Obstacle",
                   "Alt": "Obstacle Avoidance Mode",

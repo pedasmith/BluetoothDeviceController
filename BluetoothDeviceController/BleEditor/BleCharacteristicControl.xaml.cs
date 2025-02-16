@@ -210,9 +210,9 @@ namespace BluetoothDeviceController.BleEditor
                 ;
             }
 
-            if (NC != null && NC.Commands != null)
+            if (NC != null && NC.UIList_Commands != null)
             {
-                foreach (var (_, command) in NC.Commands)
+                foreach (var (_, command) in NC.UIList_Commands)
                 {
                     command.InitVariables();
                     command.WriteCharacteristic = this;
@@ -271,14 +271,14 @@ namespace BluetoothDeviceController.BleEditor
             Stack<Panel> stack = new Stack<Panel>();
             var SPACE = new char[] { ' ' };
 
-            if (NC == null || NC.UIList == null) return;
+            if (NC == null || NC.UIList_UI == null) return;
 
-            foreach (var simple in NC.UIList)
+            foreach (var simple in NC.UIList_UI)
             {
                 // Find the target
                 Command command = null;
                 var tlist = string.IsNullOrEmpty (simple.Target) ? new string[] { "" } : simple.Target.Split(SPACE);
-                NC.Commands.TryGetValue(tlist[0], out command);
+                NC.UIList_Commands.TryGetValue(tlist[0], out command);
 
 
                 switch (simple.UIType)
@@ -413,12 +413,12 @@ namespace BluetoothDeviceController.BleEditor
             if (target.Length != 2) return;
 
             Command command = null;
-            NC.Commands.TryGetValue(target[0], out command);
+            NC.UIList_Commands.TryGetValue(target[0], out command);
             if (command != null)
             {
                 command.Parameters[target[1]].CurrValue = e.NewValue;
             }
-            NC.Commands.TryGetValue(simple.ComputeTarget ?? "", out command);
+            NC.UIList_Commands.TryGetValue(simple.ComputeTarget ?? "", out command);
             if (command != null)
             {
                 await command.DoCommand();
@@ -439,7 +439,7 @@ namespace BluetoothDeviceController.BleEditor
                 var target = setter.Split(new char[] { ' ' });
                 if (target.Length == 3)
                 {
-                    NC.Commands.TryGetValue(target[0], out command);
+                    NC.UIList_Commands.TryGetValue(target[0], out command);
                     if (command != null && command.Parameters.ContainsKey(target[1]))
                     {
                         var variable = command.Parameters[target[1]];
@@ -449,7 +449,7 @@ namespace BluetoothDeviceController.BleEditor
                 }
             }
 
-            NC.Commands.TryGetValue(simple.Target, out command);
+            NC.UIList_Commands.TryGetValue(simple.Target, out command);
             if (command != null)
             {
                 await command.DoCommand();

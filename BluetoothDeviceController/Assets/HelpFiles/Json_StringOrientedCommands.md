@@ -9,7 +9,7 @@ For example, the single **ffe28** characteristic on the Elegoo mini-car supports
 {CLEAR[Mode]}
 ```
 
-The CLEAR mode parameter can be 0, 1, 2, or 3; 1 will turn off the lights, 2 will stop the car, 3 will turn off the buzzer (but won't interupt the BEEP mode) and 0 will do all three types of clear at once.
+The curly-braces {} are part of the commands that have to be sent to the car. The CLEAR mode parameter can be 0, 1, 2, or 3; 1 will turn off the lights, 2 will stop the car, 3 will turn off the buzzer (but won't interupt the BEEP mode) and 0 will do all three types of clear at once.
 
 
 ## Commands and UIList
@@ -29,7 +29,7 @@ This is done by pasting together 5 different sub-strings. Some are constant; som
 
 A **$** will indicate a string. The **${BEEPS[** command is simply the string **{BEEPS[**
 Sub-commands are indicated with an **_** underscore. Each subcommand is handled in turn. The **GN** command will get a numerical value (parameter) by name. The **$Tone_GN** part is two sub-commands: **Tone** is just the string "Duration" and then GN will get the value of Tone from the parameter list. 
-There a complete language for the sub-commands; it's a stack-based RPN style language. $Duration_GN_1000_/ is four sub-commands: the string Duration, the command **GN** to Get Numerical value, and then the number 1000 and a divide request. The end result is that the Duration number is returned, divided by 1000.
+Sub-commands form a complete stack-based RPN type language. For example, **$Duration_GN_1000_/** is four sub-commands: the string Duration, the command **GN** to Get Numerical value of whatever string is on the stack (in this case, the string Duration), and then the number 1000 and a divide request. The end result is that the Duration number is returned, divided by 1000.
 The **GS** command will also get a parameter by name, but will get the string value, not the numeric value.
 
 ## Command Parameters

@@ -196,6 +196,10 @@ namespace BluetoothCodeGenerator
                                         continue;
                                     }
                                     //var btdata = jsonData; // Switch to closer to the real thing! CreateMockBt.Create();
+                                    if (child.Name == "Protocol")
+                                    {
+                                        ; // Handy place for a debugger.
+                                    }
                                     var expandOk = Expander.ExpandChildTemplatesIntoMacros(child, btdata);
                                     if (!string.IsNullOrEmpty(expandOk))
                                     {

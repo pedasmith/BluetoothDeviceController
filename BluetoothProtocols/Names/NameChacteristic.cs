@@ -20,6 +20,10 @@ namespace BluetoothDeviceController.Names
             if (double.IsNaN(N)) return defaultN;
             return (int)N;
         }
+        //public override string ToString()
+        //{
+        //    return $"SimpleUI: type={UIType} target={Target} label={Label} fname={FunctionName}";
+        //}
     }
 
     public class ButtonPerButtonUI
@@ -66,10 +70,22 @@ namespace BluetoothDeviceController.Names
         /// a mediocre set of buttons (bad labels, etc).
         /// </summary>
         public ButtonUI buttonUI { get; set; } 
+        /// <summary>
+        /// TableType is either blank or "standard"
+        /// </summary>
         public string tableType { get; set; } = "";
         public string chartType { get; set; } = "";
+        /// <summary>
+        /// UICHARTCOMMAND
+        /// </summary>
         public string chartCommand { get; set; } = "";
+        /// <summary>
+        /// When TRUE, the extra UI (Chart, Table) will be automatically expanded. Default is false for compatibility.
+        /// </summary>
         public bool Expand { get; set; } = false; // default is false; must be set true in the JSON.
+        /// <summary>
+        /// Is UI.TitleSuffix; is the title of the expander for tables and charts
+        /// </summary>
         public string TitleSuffix { get; set; } = "Data tracker";
 
         public double? chartDefaultMaxY { get; set; } = null;
@@ -333,10 +349,13 @@ namespace BluetoothDeviceController.Names
 
         /// <summary>
         /// List of commands that use this one characterisic. Is used by e.g. the Elegoo MiniCar
-        /// where there's one characteristic that uses a series of commands like {BEEP[10]}
+        /// in the UIList where there's one characteristic that uses a series of commands like {BEEP[10]}
         /// </summary>
-        public Dictionary<string, Command> Commands { get; } = new Dictionary<string, Command>();
-        public List<SimpleUI> UIList { get; } = new List<SimpleUI>();
+        public Dictionary<string, Command> UIList_Commands { get; } = new Dictionary<string, Command>();
+        /// <summary>
+        /// Used by Elegoo_MiniCar in combination with the Commands values
+        /// </summary>
+        public List<SimpleUI> UIList_UI { get; } = new List<SimpleUI>();
         public override string ToString()
         {
             return $"{Name}:{UUID}";

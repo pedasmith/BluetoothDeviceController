@@ -133,7 +133,7 @@ namespace BluetoothDeviceController.Names
                         functionlist += function;
                     }
                     // All of the string-oriented commands
-                    if (characteristic.UIList.Count > 0)
+                    if (characteristic.UIList_UI.Count > 0)
                     {
                         var liststr = Generate_PageCSharp_UIList(characteristic, replace);
                         functionlist += liststr;
@@ -148,14 +148,14 @@ namespace BluetoothDeviceController.Names
         private static string Generate_PageCSharp_UIList(NameCharacteristic characteristic, SortedDictionary<string, string> replace)
         {
             var liststr = "";
-            foreach (var simpleUI in characteristic.UIList)
+            foreach (var simpleUI in characteristic.UIList_UI)
             {
                 Command target = null;
                 string[] targetlist = null;
                 if (!string.IsNullOrEmpty(simpleUI.Target))
                 {
                     targetlist = simpleUI.Target.Split(new char[] { ' ' });
-                    target = characteristic.Commands[targetlist[0]];
+                    target = characteristic.UIList_Commands[targetlist[0]];
                     replace["[[COMMAND]]"] = DotNetSafe(targetlist[0]);
                     replace["[[FUNCTIONNAME]]"] = DotNetSafe(simpleUI.FunctionName ?? targetlist[0]);
                     replace["[[LABEL]]"] = string.IsNullOrEmpty(simpleUI.Label) ? target.Label : simpleUI.Label;
@@ -211,7 +211,7 @@ namespace BluetoothDeviceController.Names
                     // currValue to the value of the Forward string
                     var setlist = setitem.Split(new char[] { ' ' });
                     if (setlist.Length < 3) continue;
-                    var cmd = characteristic.Commands[setlist[0]];
+                    var cmd = characteristic.UIList_Commands[setlist[0]];
                     var param = cmd.Parameters[setlist[1]];
                     var value = param.ValueNames[setlist[2]];
                     replace["[[PARAMETER]]"] = setlist[1];
@@ -536,7 +536,7 @@ namespace BluetoothDeviceController.Names
                     ;
 
                     // All of the string-oriented commands
-                    if (characteristic.UIList.Count > 0)
+                    if (characteristic.UIList_UI.Count > 0)
                     {
                         var liststr = Generate_PageXaml_UIList(characteristic, replace);
                         replace["[[FUNCTIONUILIST]]"] = liststr;
@@ -567,7 +567,7 @@ namespace BluetoothDeviceController.Names
         {
             var liststr = "";
             int ntab = 5;
-            foreach (var simpleUI in characteristic.UIList)
+            foreach (var simpleUI in characteristic.UIList_UI)
             {
                 Command target = null;
                 string[] targetlist = null;
@@ -575,7 +575,7 @@ namespace BluetoothDeviceController.Names
                 if (!string.IsNullOrEmpty(simpleUI.Target))
                 {
                     targetlist = simpleUI.Target.Split(new char[] { ' ' });
-                    target = characteristic.Commands[targetlist[0]];
+                    target = characteristic.UIList_Commands[targetlist[0]];
                     replace["[[COMMAND]]"] = DotNetSafe(targetlist[0]);
                     replace["[[FUNCTIONNAME]]"] = DotNetSafe(simpleUI.FunctionName ?? targetlist[0]);
                     replace["[[LABEL]]"] = string.IsNullOrEmpty(simpleUI.Label) ? target.Label : simpleUI.Label;
@@ -954,7 +954,7 @@ namespace BluetoothDeviceController.Names
                             : "GattWriteOption.WriteWithResponse";
                         Retval += Replace(Generate_CSharp_Templates.Protocol_WriteMethodTemplate, replace);
                     }
-                    foreach (var (functionname, command) in characteristic.Commands)
+                    foreach (var (functionname, command) in characteristic.UIList_Commands)
                     {
                         // Set these up before replacing in the per-param values.
                         replace["[[FUNCTION_COMPUTE]]"] = command.Compute;

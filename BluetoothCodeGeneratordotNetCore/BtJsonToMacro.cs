@@ -258,7 +258,11 @@ namespace BluetoothCodeGenerator
             // Commands
             var cmds = new TemplateSnippet("Commands");
             ch.AddChild("Commands", cmds); // always add, even if it's got nothing in it.
-            foreach (var (dataname, command) in btCharacteristic.Commands)
+            if (btCharacteristic.UIList_Commands.Count > 0)
+            {
+                ; // handy place to place a break command
+            }
+            foreach (var (dataname, command) in btCharacteristic.UIList_Commands)
             {
                 var pr = new TemplateSnippet(dataname);
                 cmds.AddChild(dataname, pr);
@@ -584,7 +588,7 @@ namespace BluetoothCodeGenerator
             var uiList = new TemplateSnippet("UIList");
             ch.AddChild("UIList", uiList); // always add, even if it's got nothing in it.
             var nui = 0;
-            foreach (var simpleUI in btCharacteristic.UIList)
+            foreach (var simpleUI in btCharacteristic.UIList_UI)
             {
                 Command cmd = null;
                 VariableDescription cmdsub = null;
@@ -640,7 +644,7 @@ namespace BluetoothCodeGenerator
                 var setlist = set0.Split(new char[] { ' ' });
                 if (setlist.Length >= 3)
                 {
-                    var setcmd = btCharacteristic.Commands[setlist[0]];
+                    var setcmd = btCharacteristic.UIList_Commands[setlist[0]];
                     var param = setcmd.Parameters[setlist[1]];
                     var value = param.ValueNames[setlist[2]];
                     singleUI.AddMacro("Set0_Parameter", setlist[1]);
@@ -694,7 +698,7 @@ namespace BluetoothCodeGenerator
         private static Command GetCorrespondingCommand(NameCharacteristic btCharacteristic, string target)
         {
             if (target == null) return null;
-            if (btCharacteristic.Commands.TryGetValue (target, out Command value))
+            if (btCharacteristic.UIList_Commands.TryGetValue (target, out Command value))
             {
                 return value;
             }

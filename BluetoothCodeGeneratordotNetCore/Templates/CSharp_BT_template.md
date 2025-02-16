@@ -344,6 +344,7 @@ namespace BluetoothProtocols
 ## METHOD+PROPERTY Type=list If="[[Verbs]] contains :RdInNo:" Type=list ListOutput=parent Source=Services/Characteristics/ReadProperties CodeListSubZero=""
 
 ```
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private [[VARIABLETYPE+DS]] _[[CHDATANAME]] = [[DOUBLE+OR+STRING+DEFAULT]];
         private bool _[[CHDATANAME]]_set = false;
         public [[VARIABLETYPE+DS]] [[CHDATANAME]]
@@ -359,6 +360,7 @@ Replace the simple Reads Data comment with this better snippet.
  TODO:         /// Reads data for Characteristic=[[Name]] Service=[[../Name]] 
 
 ```
+        // 
         /// <summary>
         /// Reads data
         /// </summary>
@@ -506,6 +508,7 @@ In my **TODO:** list
 - How should I handle the argument lists?
 
 ```
+// method.list for [[Name.dotNet]]
 [[METHOD+PROPERTY]]
 [[METHOD+READ]]
 [[METHOD+NOTIFY]]
