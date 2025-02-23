@@ -103,20 +103,20 @@ namespace BluetoothDeviceController.Names
                     replace["[[NOTIFYCONVERT]]"] = characteristic.NotifyConvert ?? "";
                     replace["[[NOTIFYCONFIGURE]]"] = characteristic.NotifyConfigure ?? "";
 
-                    var split = ValueParserSplit.ParseLine(characteristic.Type);
+                    var split = ParserFieldList.ParseLine(characteristic.Type);
                     if (characteristic.IsWrite || characteristic.IsWriteWithoutResponse)
                     {
-                        var function = Generate_PageCSharp_function(replace, split, Generate_CSharp_Templates.PageCSharp_CharacteristicWriteTemplate, Generate_CSharp_Templates.PageCSharp_CharacteristicWrite_DataTemplates);
+                        var function = Generate_PageCSharp_function(replace, split.Fields, Generate_CSharp_Templates.PageCSharp_CharacteristicWriteTemplate, Generate_CSharp_Templates.PageCSharp_CharacteristicWrite_DataTemplates);
                         functionlist += function;
                     }
                     if (characteristic.IsRead || characteristic.IsNotify)
                     {
-                        var function = Generate_PageCSharp_function(replace, split, Generate_CSharp_Templates.PageCSharp_CharacteristicRecordTemplate, Generate_CSharp_Templates.PageCSharp_CharacteristicRecord_DataTemplates);
+                        var function = Generate_PageCSharp_function(replace, split.Fields, Generate_CSharp_Templates.PageCSharp_CharacteristicRecordTemplate, Generate_CSharp_Templates.PageCSharp_CharacteristicRecord_DataTemplates);
                         functionlist += function;
                     }
                     if (characteristic.IsRead)
                     {
-                        var function = Generate_PageCSharp_function(replace, split, Generate_CSharp_Templates.PageCSharp_CharacteristicReadTemplate, Generate_CSharp_Templates.PageCSharp_CharacteristicRead_DataTemplates);
+                        var function = Generate_PageCSharp_function(replace, split.Fields, Generate_CSharp_Templates.PageCSharp_CharacteristicReadTemplate, Generate_CSharp_Templates.PageCSharp_CharacteristicRead_DataTemplates);
                         functionlist += function;
                     }
                     if (characteristic.IsNotify)
@@ -129,7 +129,7 @@ namespace BluetoothDeviceController.Names
                             // NOTE: maybe also have a live indicator on the button?
                             replace["[[NOTIFYVALUELIST]]"] += "            GattClientCharacteristicConfigurationDescriptorValue.Notify,\n";
                         }
-                        var function = Generate_PageCSharp_function(replace, split, Generate_CSharp_Templates.PageCSharp_CharacteristicNotifyTemplate, Generate_CSharp_Templates.PageCSharp_CharacteristicNotify_DataTemplates);
+                        var function = Generate_PageCSharp_function(replace, split.Fields, Generate_CSharp_Templates.PageCSharp_CharacteristicNotifyTemplate, Generate_CSharp_Templates.PageCSharp_CharacteristicNotify_DataTemplates);
                         functionlist += function;
                     }
                     // All of the string-oriented commands
@@ -320,7 +320,7 @@ namespace BluetoothDeviceController.Names
             }
             return $"double";
         }
-        private static string Generate_PageCSharp_function(SortedDictionary<string, string> replace, IList<ValueParserSplit> split, string characteristicTemplate, string[] dataTemplates)
+        private static string Generate_PageCSharp_function(SortedDictionary<string, string> replace, IList<ParserField> split, string characteristicTemplate, string[] dataTemplates)
         {
             string[] datalist = new string[dataTemplates.Length];
             for (int ii=0; ii<dataTemplates.Length; ii++)
@@ -416,7 +416,7 @@ namespace BluetoothDeviceController.Names
             return Retval;
         }
 
-        static private bool ItemIsSuppressed(ValueParserSplit item)
+        static private bool ItemIsSuppressed(ParserField item)
         {
             bool retval = false;
             if (item.ByteFormatPrimary.StartsWith('O')) retval = true; // skip OEL and OEB (little and big endian indicators)
@@ -451,7 +451,7 @@ namespace BluetoothDeviceController.Names
                     var datalist = "";
                     var readwriteButtonList = "";
                     var enumButtonList = "";
-                    var split = ValueParserSplit.ParseLine(characteristic.Type);
+                    var split = ParserFieldList.ParseLine(characteristic.Type);
 
                     var isReadOnly = true;
                     int nbutton = 0;
@@ -491,9 +491,9 @@ namespace BluetoothDeviceController.Names
                     const int maxItemsPerRow = 6;
                     // Correctly calculate the number of buttons and fields.
                     int nitems = 0;
-                    for (int i = 0; i < split.Count; i++)
+                    for (int i = 0; i < split.Fields.Count; i++)
                     {
-                        var item = split[i];
+                        var item = split.Fields[i];
                         if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
                         nitems++;
                     }
@@ -508,9 +508,9 @@ namespace BluetoothDeviceController.Names
                     // I want to split at 4, 8, 12, etc.
                     // i % splitCount == 0 && i>0
 
-                    for (int i=0; i<split.Count; i++)
+                    for (int i=0; i<split.Fields.Count; i++)
                     {
-                        var item = split[i];
+                        var item = split.Fields[i];
                         if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
 
                         replace["[[IS_READ_ONLY]]"] = isReadOnly ? "True" : "False";
@@ -823,9 +823,9 @@ namespace BluetoothDeviceController.Names
                 {
                     var paramlist = "";
                     var arglist = "";
-                    var vpwlist = ValueParserSplit.ParseLine(characteristic.Type);
+                    var vpwlist = ParserFieldList.ParseLine(characteristic.Type);
                     int paramCount = 0;
-                    foreach (var param in vpwlist)
+                    foreach (var param in vpwlist.Fields)
                     {
                         var name = param.NamePrimary.DotNetSafe();
                         if (name == "") name = $"param{paramCount}";
@@ -907,12 +907,12 @@ namespace BluetoothDeviceController.Names
                     var propertySet = "";
                     if (hasProperty)
                     {
-                        var split = ValueParserSplit.ParseLine(characteristic.Type);
+                        var split = ParserFieldList.ParseLine(characteristic.Type);
 
                         // Properties are per-data which is finer grained than just per-characteristic.
-                        for (int i = 0; i < split.Count; i++)
+                        for (int i = 0; i < split.Fields.Count; i++)
                         {
-                            var item = split[i];
+                            var item = split.Fields[i];
                             var dataname = item.NamePrimary;
                             if (dataname == "") dataname = $"param{i}";
                             if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
@@ -922,7 +922,7 @@ namespace BluetoothDeviceController.Names
                             // so characteristic "temparature" with a single data value "temperature" will get a chdataname
                             // of "temperature". If there were two data value (temp and humidity) they would get unique names
                             // (temperature_temp and temperature_humidity)
-                            replace["[[CHDATANAME]]"] = split.Count == 1 
+                            replace["[[CHDATANAME]]"] = split.Fields.Count == 1 
                                 ? characteristic.Name.DotNetSafe() 
                                 : characteristic.Name.DotNetSafe()+ "_" + dataname.DotNetSafe();
                             replace["[[DATANAME]]"] = dataname.DotNetSafe();

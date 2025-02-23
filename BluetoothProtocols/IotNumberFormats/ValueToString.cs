@@ -30,8 +30,10 @@ namespace BluetoothDeviceController.BleEditor
     //         P means the number is a decimal e.g. for P8 the number is 0..99 
     //     BYTES
     //     STRING -- display is ASCII
+    //     XRS^elementname1_elementname2_elementname3||name = array of records (defined by ODE Option Define Element)
     //     OEB OEL order endian; default is little-endian
     //     OOPT reset of fields are optional
+    //
     //
     //  Display is DEC HEX FIXED STRING Speciality^Appearance
     public class ValueParserResult
@@ -123,16 +125,16 @@ namespace BluetoothDeviceController.BleEditor
         private static ValueParserResult ConvertHelper(DataReader dr, string decodeCommands)
         {
             var str = "";
-            IList<ValueParserSplit> vps = ValueParserSplit.ParseLine(decodeCommands);
+            var vps = ParserFieldList.ParseLine(decodeCommands);
             var valueList = new BCBasic.BCValueList();
             bool isOptional = false;
 
-            for (int i = 0; i < vps.Count; i++)
+            for (int i = 0; i < vps.Fields.Count; i++)
             {
                 var stritem = "";
                 byte[] byteArrayItem = null;
 
-                var command = vps[i];
+                var command = vps.Fields[i];
                 var readcmd = command.ByteFormatPrimary;
                 var readindicator = readcmd[0];
                 var displayFormat = command.DisplayFormatPrimary;

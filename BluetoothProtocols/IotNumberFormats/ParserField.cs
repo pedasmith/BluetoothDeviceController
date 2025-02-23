@@ -4,16 +4,19 @@ using System.Text;
 
 namespace BluetoothProtocols.IotNumberFormats
 {
+
     /// <summary>
-    /// Class to perfectly parse the binary value descriptor strings.
+    /// Class to perfectly parse the one field binary value descriptor strings.
     /// Simple example: "U8 U8" "U8|DEC|Temp|C U8|HEX|Mode"
     /// Complex example: "Q12Q4^_125_/|FIXED|Pressure|mbar"
+    /// ODE example: ODE^Temp|U8|DEC|Temp|C
     /// Default example: "U8|HEX|Mode||FF"
-    /// Three levels of splitting using space, vertical-bar (|) and caret (^)
+    /// Three levels of splitting using space, vertical-bar (|) and caret (^) and sometimes underscore (_)
+    /// Fields are ByteFormat (U8) DisplayFormat (DEC) Name (Temp) Units (c) DefaultValue (0)
     /// </summary>
-    public class ValueParserSplit
+    public class ParserField
     {
-        ValueParserSplit(string value)
+        public ParserField(string value)
         {
             Parse(value);
         }
@@ -68,7 +71,7 @@ namespace BluetoothProtocols.IotNumberFormats
                 return false;
             }
         }
-        private static char[] Space = new char[] { ' ' };
+        public static char[] Space = new char[] { ' ' };
         private static char[] Bar = new char[] { '|' };
         private static char[] Caret = new char[] { '^' };
 
@@ -132,52 +135,13 @@ namespace BluetoothProtocols.IotNumberFormats
             return retval;
         }
 
-        public static IList<ValueParserSplit> ParseLine(string value)
-        {
-            var Retval = new List<ValueParserSplit>();
-            var split = value.Split(Space);
-            for (int i = 0; i < split.Length; i++)
-            {
-                var item = new ValueParserSplit(split[i]);
-                Retval.Add(item);
-            }
-
-            // Now go back and fill in the RemainingSize value for the last BYTES or STRING item.
-            var remainder = 0;
-            for (int i=Retval.Count - 1; i>= 0; i--)
-            {
-                var item = Retval[i];
-                if (item.NBytes >= 0) remainder += item.NBytes;
-                else if (item.NBytes <= -2) remainder = -2; // meaning we couldn't calculate the amount
-                else if (item.NBytes == -1)
-                {
-                    if (remainder <= -2)
-                    {
-                        // There was a error; spit it out.
-                        Log($"ERROR: ValueParserSplit:ParseLine: remainder is {remainder} at index {i}; that's a failure");
-                    }
-                    else if (remainder == -1)
-                    {
-                        // Also a error, but a different one
-                        Log($"ERROR: ValueParserSplit:ParseLine: remainder is {remainder} at index {i}");
-                    }
-                    else if (remainder > 0)
-                    {
-                        item.MaxBytesRemaining = remainder; // if the BYTE is the last item, keep MaxBytesRemaining the same.
-                    }
-                    break; // Only fill in one value.
-                }
-            }
-
-            return Retval;
-        }
 
         public override string ToString()
         {
             return $"{ByteFormatPrimary}|{DisplayFormatPrimary}|{NamePrimary}|{UnitsPrimary}|{DefaultValuePrimary}";
         }
 
-        private static void Log(string message)
+        public static void Log(string message)
         {
             Console.WriteLine(message);
             System.Diagnostics.Debug.WriteLine(message);

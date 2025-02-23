@@ -10,7 +10,7 @@ namespace BluetoothCodeGenerator
 {
     internal static class BtJsonToMacro
     {
-        static private bool ItemIsSuppressed(ValueParserSplit item)
+        static private bool ItemIsSuppressed(ParserField item)
         {
             bool retval = false;
             if (item.ByteFormatPrimary.StartsWith('O')) retval = true; // skip OEL and OEB (little and big endian indicators)
@@ -414,14 +414,14 @@ namespace BluetoothCodeGenerator
             bool hasWrite = btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse;
 
 
-            var split = ValueParserSplit.ParseLine(btCharacteristic.Type);
+            var split = ParserFieldList.ParseLine(btCharacteristic.Type);
 
             var crc_xor_fixup = "";
 
             int write_nargs = 0;
-            for (int i = 0; i < split.Count; i++)
+            for (int i = 0; i < split.Fields.Count; i++)
             {
-                var item = split[i];
+                var item = split.Fields[i];
                 if (ItemIsSuppressed(item)) continue; // skip OEL and OEB (little and big endian indicators)
                 write_nargs++;
             }
@@ -430,9 +430,9 @@ namespace BluetoothCodeGenerator
             // Properties are per-data which is finer grained than just per-characteristic.
             var writePrefix = ""; // will normally be nothing, but sometimes "dw.ByteOrder = ByteOrder.[Little|Big]Endian;\n    "
             var isFirstProperty = true;
-            for (int i = 0; i < split.Count; i++)
+            for (int i = 0; i < split.Fields.Count; i++)
             {
-                var item = split[i];
+                var item = split.Fields[i];
                 var dataname = item.NamePrimary;
                 if (dataname == "") dataname = $"param{i}";
 
@@ -508,7 +508,7 @@ namespace BluetoothCodeGenerator
                     // so characteristic "temparature" with a single data value "temperature" will get a chdataname
                     // of "temperature". If there were two data value (temp and humidity) they would get unique names
                     // (temperature_temp and temperature_humidity)
-                    TemplateSnippet.AddMacroList(prlist, "CHDATANAME", split.Count == 1
+                    TemplateSnippet.AddMacroList(prlist, "CHDATANAME", split.Fields.Count == 1
                         ? btCharacteristic.Name.DotNetSafe()
                         : btCharacteristic.Name.DotNetSafe() + "_" + dataname.DotNetSafe());
                     TemplateSnippet.AddMacroList(prlist, "DATANAME", dataname.DotNetSafe());

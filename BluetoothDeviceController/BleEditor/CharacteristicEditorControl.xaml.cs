@@ -61,11 +61,11 @@ namespace BluetoothDeviceController.BleEditor
 
         private void SetDisplayType(string type)
         {
-            var vps = ValueParserSplit.ParseLine(type);
-            if (vps.Count != 1) return; // if there are multiple values, give up and let the user struggle with HEX
-            BytesFormat = vps[0].ByteFormatPrimary;
-            DisplayFormat = vps[0].DisplayFormatPrimary;
-            DisplayFormatSecondary = vps[0].Get(1, 1);
+            var vps = ParserFieldList.ParseLine(type);
+            if (vps.Fields.Count != 1) return; // if there are multiple values, give up and let the user struggle with HEX
+            BytesFormat = vps.Fields[0].ByteFormatPrimary;
+            DisplayFormat = vps.Fields[0].DisplayFormatPrimary;
+            DisplayFormatSecondary = vps.Fields[0].Get(1, 1);
 
             if (DisplayFormat == "ASCII" && DisplayFormatSecondary == "LONG")
             {
@@ -184,9 +184,9 @@ namespace BluetoothDeviceController.BleEditor
             uiButtons.Children.Clear();
 
             // What's the name of the value?
-            var parse = ValueParserSplit.ParseLine(NC.Type);
-            if (parse.Count != 1) return; // We can only do buttons when there is only one choice.
-            var value1 = parse[0];
+            var parse = ParserFieldList.ParseLine(NC.Type);
+            if (parse.Fields.Count != 1) return; // We can only do buttons when there is only one choice.
+            var value1 = parse.Fields[0];
             if (value1.ByteFormatPrimary != "U8") return; // can only handle enums for now
             var name = value1.NamePrimary;
             // Get the corresponding enums

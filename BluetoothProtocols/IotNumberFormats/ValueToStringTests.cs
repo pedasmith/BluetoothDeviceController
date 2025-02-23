@@ -39,8 +39,8 @@ namespace BluetoothProtocols.IotNumberFormats
         private static int TestBytes()
         {
             int nerror = 0;
-            var actualResult = ValueParserSplit.ParseLine("U8 U16 BYTES|HEX|MyBytes U8 U8 U8 F32");
-            var b = actualResult[2];
+            var actualResult = ParserFieldList.ParseLine("U8 U16 BYTES|HEX|MyBytes U8 U8 U8 F32");
+            var b = actualResult.Fields[2];
             if (b.NamePrimary != "MyBytes")
             {
                 nerror += 1;

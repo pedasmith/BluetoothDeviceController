@@ -181,11 +181,11 @@ namespace BluetoothDeviceController.BleEditor
 
             // If there's a readable value with displayFormatPrimary=ASCII and secondary of LONG (ASCII^LONG)
             // then make the text area multi-line
-            var vps = ValueParserSplit.ParseLine(NC?.Type ?? "");
-            if (vps.Count == 1)
+            var vps = ParserFieldList.ParseLine(NC?.Type ?? "");
+            if (vps.Fields.Count == 1)
             {
-                var displayFormat = vps[0].DisplayFormatPrimary;
-                var displayFormatSecondary = vps[0].Get(1, 1);
+                var displayFormat = vps.Fields[0].DisplayFormatPrimary;
+                var displayFormatSecondary = vps.Fields[0].Get(1, 1);
                 switch (displayFormat)
                 {
                     case "ASCII":

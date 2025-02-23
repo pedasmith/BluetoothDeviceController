@@ -96,13 +96,16 @@
               "Name": "Data",
               "REM_Name": "Telink SPP: Module->Phone",
               "Description": "Telink SPP: Module->Phone",
-              "Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra",
+              "ZZZ_Orig_Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra",
+              "ZZZZ_Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent XR^Temperature_Humidity||Data BYTES|HEX^^HIDDEN|CrcExtra",
+              "Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra",
+              "ZZZ_History_Type": "U8|HEX|Opcode||A7 U16|DEC|Time U8|HEX|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent XRS^Temperature_Humidity||HistoricalData",
               "IsRead": true,
               "IsNotify": true,
               "AutoNotify": true,
-              "UI": {
+              "ZZZ_UI": {
                 "Expand": true,
-                "TitleSuffix":  "Tracker",
+                "TitleSuffix": "Tracker",
                 "tableType": "standard",
                 "chartType": "ytime",
                 "chartDefaultMinY": 0,
@@ -117,13 +120,13 @@
                   }
                 }
               },
-                "Verbs": ":Read:Notify:RdInNo:InNo:",
-                "ExampleData": [
-                  "Value:  00",
-                  "Fahr: C2 6A 00 E1 00 22 2C",
-                  "Celc: C2 6A 01 E1 00 23 2C   22.5 32%"
-                ]
-              },
+              "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "Value:  00",
+                "Fahr: C2 6A 00 E1 00 22 2C",
+                "Celc: C2 6A 01 E1 00 23 2C   22.5 32%"
+              ]
+            },
               {
                 "UUID": "00010203-0405-0607-0809-0a0b0c0d2b11",
                 "Name": "Command",
