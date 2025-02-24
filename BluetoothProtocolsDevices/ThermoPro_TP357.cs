@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// ThermoPro temperature and humidity meter.
-    /// This class was automatically generated 2025-02-08::19:29
+    /// This class was automatically generated 2025-02-23::14:48
     /// </summary>
 
     public partial class ThermoPro_TP357 : INotifyPropertyChanged
@@ -270,6 +270,8 @@ namespace BluetoothProtocols
 
 
 
+// method.list for Data
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Data_Opcode = 0;
         private bool _Data_Opcode_set = false;
         public double Data_Opcode
@@ -277,6 +279,7 @@ namespace BluetoothProtocols
             get { return _Data_Opcode; }
             internal set { if (_Data_Opcode_set && value == _Data_Opcode) return; _Data_Opcode = value; _Data_Opcode_set = true; OnPropertyChanged(); }
         }
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Data_Unknown1 = 0;
         private bool _Data_Unknown1_set = false;
         public double Data_Unknown1
@@ -284,6 +287,7 @@ namespace BluetoothProtocols
             get { return _Data_Unknown1; }
             internal set { if (_Data_Unknown1_set && value == _Data_Unknown1) return; _Data_Unknown1 = value; _Data_Unknown1_set = true; OnPropertyChanged(); }
         }
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Data_Flag = 0;
         private bool _Data_Flag_set = false;
         public double Data_Flag
@@ -291,6 +295,7 @@ namespace BluetoothProtocols
             get { return _Data_Flag; }
             internal set { if (_Data_Flag_set && value == _Data_Flag) return; _Data_Flag = value; _Data_Flag_set = true; OnPropertyChanged(); }
         }
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Data_Temperature = 0;
         private bool _Data_Temperature_set = false;
         public double Data_Temperature
@@ -298,6 +303,7 @@ namespace BluetoothProtocols
             get { return _Data_Temperature; }
             internal set { if (_Data_Temperature_set && value == _Data_Temperature) return; _Data_Temperature = value; _Data_Temperature_set = true; OnPropertyChanged(); }
         }
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Data_Humidity = 0;
         private bool _Data_Humidity_set = false;
         public double Data_Humidity
@@ -305,6 +311,7 @@ namespace BluetoothProtocols
             get { return _Data_Humidity; }
             internal set { if (_Data_Humidity_set && value == _Data_Humidity) return; _Data_Humidity = value; _Data_Humidity_set = true; OnPropertyChanged(); }
         }
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private string _Data_CrcExtra = null;
         private bool _Data_CrcExtra_set = false;
         public string Data_CrcExtra
@@ -313,6 +320,7 @@ namespace BluetoothProtocols
             internal set { if (_Data_CrcExtra_set && value == _Data_CrcExtra) return; _Data_CrcExtra = value; _Data_CrcExtra_set = true; OnPropertyChanged(); }
         }
 
+        // 
         /// <summary>
         /// Reads data
         /// </summary>
@@ -328,7 +336,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(CharacteristicsEnum.Data_SensorData_enum, "Data", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra";
+            var datameaning = "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
             Data_Opcode = parseResult.ValueList.GetValue("Opcode").AsDouble;
             Data_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
@@ -394,7 +402,7 @@ namespace BluetoothProtocols
 
         private void NotifyDataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            var datameaning = "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra";
+            var datameaning = "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
             Data_Opcode = parseResult.ValueList.GetValue("Opcode").AsDouble;
             Data_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
@@ -417,6 +425,8 @@ namespace BluetoothProtocols
 
 
 
+// method.list for Command
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private string _Command = null;
         private bool _Command_set = false;
         public string Command
@@ -425,6 +435,7 @@ namespace BluetoothProtocols
             internal set { if (_Command_set && value == _Command) return; _Command = value; _Command_set = true; OnPropertyChanged(); }
         }
 
+        // 
         /// <summary>
         /// Reads data
         /// </summary>
@@ -495,6 +506,8 @@ namespace BluetoothProtocols
         }
 
 
+// method.list for Device_Name
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private string _Device_Name = "";
         private bool _Device_Name_set = false;
         public string Device_Name
@@ -503,6 +516,7 @@ namespace BluetoothProtocols
             internal set { if (_Device_Name_set && value == _Device_Name) return; _Device_Name = value; _Device_Name_set = true; OnPropertyChanged(); }
         }
 
+        // 
         /// <summary>
         /// Reads data
         /// </summary>
@@ -597,6 +611,8 @@ namespace BluetoothProtocols
 
 
 
+// method.list for Appearance
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Appearance = 0;
         private bool _Appearance_set = false;
         public double Appearance
@@ -605,6 +621,7 @@ namespace BluetoothProtocols
             internal set { if (_Appearance_set && value == _Appearance) return; _Appearance = value; _Appearance_set = true; OnPropertyChanged(); }
         }
 
+        // 
         /// <summary>
         /// Reads data
         /// </summary>
@@ -632,6 +649,8 @@ namespace BluetoothProtocols
 
 
 
+// method.list for Connection_Parameter
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Connection_Parameter_Interval_Min = 0;
         private bool _Connection_Parameter_Interval_Min_set = false;
         public double Connection_Parameter_Interval_Min
@@ -639,6 +658,7 @@ namespace BluetoothProtocols
             get { return _Connection_Parameter_Interval_Min; }
             internal set { if (_Connection_Parameter_Interval_Min_set && value == _Connection_Parameter_Interval_Min) return; _Connection_Parameter_Interval_Min = value; _Connection_Parameter_Interval_Min_set = true; OnPropertyChanged(); }
         }
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Connection_Parameter_Interval_Max = 0;
         private bool _Connection_Parameter_Interval_Max_set = false;
         public double Connection_Parameter_Interval_Max
@@ -646,6 +666,7 @@ namespace BluetoothProtocols
             get { return _Connection_Parameter_Interval_Max; }
             internal set { if (_Connection_Parameter_Interval_Max_set && value == _Connection_Parameter_Interval_Max) return; _Connection_Parameter_Interval_Max = value; _Connection_Parameter_Interval_Max_set = true; OnPropertyChanged(); }
         }
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Connection_Parameter_Latency = 0;
         private bool _Connection_Parameter_Latency_set = false;
         public double Connection_Parameter_Latency
@@ -653,6 +674,7 @@ namespace BluetoothProtocols
             get { return _Connection_Parameter_Latency; }
             internal set { if (_Connection_Parameter_Latency_set && value == _Connection_Parameter_Latency) return; _Connection_Parameter_Latency = value; _Connection_Parameter_Latency_set = true; OnPropertyChanged(); }
         }
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private double _Connection_Parameter_Timeout = 0;
         private bool _Connection_Parameter_Timeout_set = false;
         public double Connection_Parameter_Timeout
@@ -661,6 +683,7 @@ namespace BluetoothProtocols
             internal set { if (_Connection_Parameter_Timeout_set && value == _Connection_Parameter_Timeout) return; _Connection_Parameter_Timeout = value; _Connection_Parameter_Timeout_set = true; OnPropertyChanged(); }
         }
 
+        // 
         /// <summary>
         /// Reads data
         /// </summary>
@@ -691,6 +714,8 @@ namespace BluetoothProtocols
 
 
 
+// method.list for PNP_ID
+        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
         private string _PNP_ID = "";
         private bool _PNP_ID_set = false;
         public string PNP_ID
@@ -699,6 +724,7 @@ namespace BluetoothProtocols
             internal set { if (_PNP_ID_set && value == _PNP_ID) return; _PNP_ID = value; _PNP_ID_set = true; OnPropertyChanged(); }
         }
 
+        // 
         /// <summary>
         /// Reads data
         /// </summary>

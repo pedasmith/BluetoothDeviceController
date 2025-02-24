@@ -353,15 +353,18 @@ namespace BluetoothDeviceController.BleEditor
                         case 'O':
                             switch (readcmd)
                             {
-                                case "OEB":
+                                case "ODE": // ODE = Option Define Element; ignored while building 
+                                    resultState = ResultState.NoResult;
+                                    break;
+                                case "OEB": // OEB = Option Endian Big-endian
                                     resultState = ResultState.NoResult;
                                     dr.ByteOrder = ByteOrder.BigEndian;
                                     break;
-                                case "OEL":
+                                case "OEL": // OEL = Option Endian Little-endian
                                     resultState = ResultState.NoResult;
                                     dr.ByteOrder = ByteOrder.LittleEndian;
                                     break;
-                                case "OOPT":
+                                case "OOPT": // OOPT = rest of items are optional
                                     isOptional = true;
                                     break;
                                 default:

@@ -23,7 +23,7 @@ namespace BluetoothDeviceController.Names
             // Find the matching characteristic ID
             foreach (var device in allDevices.AllDevices)
             {
-                if (name.StartsWith(device.Name ?? ""))
+                if (!string.IsNullOrEmpty(device.Name) && name.StartsWith(device.Name))
                 {
                     return device;
                 }

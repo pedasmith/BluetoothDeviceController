@@ -13,8 +13,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace BluetoothDeviceController.BleEditor
 {
     /// <summary>
@@ -217,7 +215,7 @@ namespace BluetoothDeviceController.BleEditor
                 {
                     if (CurrCacheMode == BluetoothCacheMode.Uncached)
                     {
-                        // TODO: BUG: DBG: weird BT issue: trying to get uncached services
+                        // NOTE: BUG: weird BT issue: trying to get uncached services
                         // will sometimes result in massive failures.
                         raw += $"EXCEPTION: while getting uncached Gatt services; will retry. Connection status={ble.ConnectionStatus}: {ex.Message}\n";
                         var diinfo = ble.DeviceAccessInformation.CurrentStatus;
@@ -242,7 +240,7 @@ namespace BluetoothDeviceController.BleEditor
                     var statusString = GetStatusString(result.Status, result.ProtocolError);
                     raw += statusString;
                     DisplayError($"Error: unable to connect to device: {statusString}");
-                    // TODO: right here, update the screen so the user isn't as puzzled and frustrated.
+                    // NOTE: right here, update the screen so the user isn't as puzzled and frustrated.
                     // Failing to get FS9721 BT Multimeter data for no obvious reason.
                 }
                 else
@@ -256,9 +254,6 @@ namespace BluetoothDeviceController.BleEditor
                     foreach (var service in result.Services)
                     {
                         await header.AddServiceAsync(ble, service);
-                        var shouldDisplay = ServiceShouldBeEdited(service);
-                        //TODO: if we're gather data for the JSON, we should include all services. However, shouldDisplay is actually never used.
-                        shouldDisplay = true;
 
                         var defaultService = knownDevice.GetService(service.Uuid.ToString("D"));
                         var wireService = new NameService(service, defaultService, serviceCount++);
@@ -393,60 +388,5 @@ namespace BluetoothDeviceController.BleEditor
             dp.Properties.Title = "JSON Bluetooth data";
             Clipboard.SetContent(dp);
         }
-
-#if NEVER_EVER_DEFINED
-        private void OnCopyData_Json(object sender, RoutedEventArgs e)
-        {
-
-            DoCopyData_Json();
-        }
-        private void OnCopyData_NetProtocol(object sender, RoutedEventArgs e)
-        {
-            var dp = new DataPackage();
-            if (WireDevice == null)
-            {
-                dp.SetText("No data and therefore no class");
-            }
-            else
-            {
-                var str = GenerateCSharpClass.GenerateProtocol(WireDevice);
-                dp.SetText(str);
-            }
-            dp.Properties.Title = "Class to read and write Bluetooth data";
-            Clipboard.SetContent(dp);
-        }
-
-        private void OnCopyData_PageXaml(object sender, RoutedEventArgs e)
-        {
-            var dp = new DataPackage();
-            if (WireDevice == null)
-            {
-                dp.SetText("No data and therefore no class");
-            }
-            else
-            {
-                var str = GenerateCSharpClass.GeneratePageXaml(WireDevice);
-                dp.SetText(str);
-            }
-            dp.Properties.Title = "Class to read and write Bluetooth data";
-            Clipboard.SetContent(dp);
-        }
-
-        private void OnCopyData_PageNet(object sender, RoutedEventArgs e)
-        {
-            var dp = new DataPackage();
-            if (WireDevice == null)
-            {
-                dp.SetText("No data and therefore no class");
-            }
-            else
-            {
-                var str = GenerateCSharpClass.GeneratePageCSharp(WireDevice);
-                dp.SetText(str);
-            }
-            dp.Properties.Title = "Class to read and write Bluetooth data";
-            Clipboard.SetContent(dp);
-        }
-#endif
     }
 }

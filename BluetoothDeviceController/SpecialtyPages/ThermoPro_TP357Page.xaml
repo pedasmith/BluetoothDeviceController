@@ -94,32 +94,6 @@
                     <Button Content="Read" Click="OnReadData" />
                     <Button Content="Notify" Click="OnNotifyData" />
                 </GridView>
-                <controls:Expander Header="Data Tracker" 
-                    IsExpanded="true" MinWidth="550" HorizontalAlignment="Left">
-                    <StackPanel MinWidth="550">
-                        <charts:ChartControl Height="200" Width="500" x:Name="DataChart" />
-
-                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="DataGrid"
-                                ItemsSource="{Binding DataRecordData}" 
-                                AutoGeneratingColumn="OnAutogeneratingColumnData"
-                        />
-                        <TextBox  x:Name="Data_Notebox" KeyDown="OnData_NoteKeyDown" />
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                            <ComboBox SelectionChanged="OnKeepCountData" Header="Keep how many items?" SelectedIndex="2">
-                                <ComboBoxItem Tag="10">10</ComboBoxItem>
-                                <ComboBoxItem Tag="100">100</ComboBoxItem>
-                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
-                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
-                            </ComboBox>
-                            <Rectangle Width="5" />
-                            <ComboBox SelectionChanged="OnAlgorithmData" Header="Remove algorithm?" SelectedIndex="0">
-                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
-                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
-                            </ComboBox>
-                            <Button Content = "Copy" Click="OnCopyData" />
-                        </StackPanel>
-                    </StackPanel>
-                </controls:Expander>
 
                 <TextBlock Style="{StaticResource SubheaderStyle}">Command</TextBlock>
                 <GridView>

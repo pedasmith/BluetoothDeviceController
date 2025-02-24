@@ -700,8 +700,7 @@ namespace BluetoothDeviceController.SpecialtyPages
         if (!ok) return;
         DataRecordData.MaxLength = value;
 
-        DataChart.RedrawYTime<DataRecord>(DataRecordData);
-
+        
     }
 
     private void OnAlgorithmData(object sender, SelectionChangedEventArgs e)
@@ -757,45 +756,6 @@ namespace BluetoothDeviceController.SpecialtyPages
                 var result = await bleDevice.NotifyDataAsync(notifyType);
                 
 
-                var EventTimeProperty = typeof(DataRecord).GetProperty("EventTime");
-                var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
-                {
-                    typeof(DataRecord).GetProperty("Temperature"),
-                    typeof(DataRecord).GetProperty("Humidity"),
-
-                };
-                var propertiesWithEventTime = new System.Reflection.PropertyInfo[]
-                {
-                    typeof(DataRecord).GetProperty("EventTime"),
-                    typeof(DataRecord).GetProperty("Temperature"),
-                    typeof(DataRecord).GetProperty("Humidity"),
-
-                };
-                var names = new List<string>()
-                {"Temperature","Humidity",
-                };
-                DataRecordData.TProperties = propertiesWithEventTime;
-                DataChart.SetDataProperties(properties, EventTimeProperty, names);
-                DataChart.SetTitle("Data Chart");
-                DataChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
-{
-tableType="standard",
-chartType="ytime",
-chartCommand="AddYTime<DataRecord>(addResult, DataRecordData)",
-chartDefaultMaxY=50,
-chartDefaultMinY=0,
-        chartLineDefaults={
-                        { "Temperature", new ChartLineDefaults() {
-                            stroke="DarkGreen",
-                            }
-                        },
-                        { "Humidity", new ChartLineDefaults() {
-                            stroke="DarkBlue",
-                            }
-                        },
-                    },
-}
-;
 
             }
             catch (Exception ex)
@@ -828,8 +788,7 @@ chartDefaultMinY=0,
 
                 var addResult = DataRecordData.AddRecord(record);
 
-                DataChart.AddYTime<DataRecord>(addResult, DataRecordData);
-
+                
                 // Original update was to make this CHART+COMMAND
                 });
             }
@@ -878,14 +837,6 @@ chartDefaultMinY=0,
 
 
 
-        private void OnAutogeneratingColumnData(object sender, DataGridAutoGeneratingColumnEventArgs e)
-        {
-            if (e.Column.Header.ToString() == "Opcode") e.Cancel = true;
-            if (e.Column.Header.ToString() == "Unknown1") e.Cancel = true;
-            if (e.Column.Header.ToString() == "Flag") e.Cancel = true;
-            if (e.Column.Header.ToString() == "CrcExtra") e.Cancel = true;
-
-        }
 
         public class CommandRecord : INotifyPropertyChanged
         {

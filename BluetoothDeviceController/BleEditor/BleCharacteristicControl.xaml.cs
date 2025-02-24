@@ -17,8 +17,6 @@ using BluetoothProtocols.IotNumberFormats;
 
 namespace BluetoothDeviceController.BleEditor
 {
-
-
     public sealed partial class BleCharacteristicControl : UserControl, IWriteCharacteristic
     {
         //string On = "⌁"; // Electrical arrow u+2301

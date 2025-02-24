@@ -33,6 +33,9 @@ namespace BluetoothProtocols.IotNumberFormats
         public string UnitsPrimary { get; set; } = "";
         public string DefaultValuePrimary { get; set; } = "*";
 
+        public enum FieldType {  Regular, ODE };
+        public FieldType FieldTypePrimary { get; internal set; } = ParserField.FieldType.Regular;
+
         /// <summary>
         ///  Number of bytes this value uses or -1 for BYTES or STRING (and -2 when not set like the Q format)
         /// </summary>
@@ -60,6 +63,38 @@ namespace BluetoothProtocols.IotNumberFormats
             return SplitData[index1][index2];
         }
 
+
+
+        public IList<ParserField> GetXRFields(ParserFieldList pfl)
+        {
+            // Example: XR^Temperature_Humidity||Data would return the 'Temperature' and 'Humidity' fields
+            // Those fields must have been defined by the ODE command.
+
+            List<ParserField> retval = new List<ParserField>();
+            if (FieldTypePrimary != FieldType.ODE)
+            {
+                Log($"ERROR: ParserField for {this.ToString()} via {pfl.ToString()} is not an ODE");
+                return retval; // always an error.
+            }
+            var list = Get(0, 1).Split(new char[] { '_' });
+            foreach (var name in list)
+            {
+                ParserField field;
+                var hasfield = pfl.ODEs.TryGetValue(name, out field);
+                if (!hasfield)
+                {
+                    Log($"ERROR: ParserField can't find {name} for {this.ToString()} via {pfl.ToString()} is not defined as an ODE");
+                    retval.Clear();
+                    return retval; // never progress with this kind of error.
+                }
+                else
+                {
+                    retval.Add(field);
+                }
+            }
+            return retval;
+        }
+
         public bool IsHidden
         {
             get
@@ -71,11 +106,24 @@ namespace BluetoothProtocols.IotNumberFormats
                 return false;
             }
         }
+        /// <summary>
+        /// Split an entire command into fields by spaces. EG: "U8|HEX U8|HEX U16^100_/|DEC" is three fields.
+        /// </summary>
         public static char[] Space = new char[] { ' ' };
+
+        /// <summary>
+        /// Split a field into sections with a bar. E.G., splitting U16^100_/|DEC into two sections 16^100_/ and DEC
+        /// </summary>
         private static char[] Bar = new char[] { '|' };
+        /// <summary>
+        /// Split a section into subsections with a caret (^). E.G., splitting U16^100_/ into subsetions U16 and 100_/
+        /// </summary>
         private static char[] Caret = new char[] { '^' };
 
-
+        /// <summary>
+        /// Contains all of the raw data for the fields and sub-fields. Each field is divided by a bar and then 
+        /// by a caret into sub-fields.
+        /// </summary>
         private string[][] SplitData = null;
         /// <summary>
         /// ParseScanResponseServiceData after the string is split into units.
@@ -85,6 +133,28 @@ namespace BluetoothProtocols.IotNumberFormats
         /// <returns></returns>
         private void Parse(string value)
         {
+            if (value.StartsWith ("ODE")) // ODE = Option Define Element
+            {
+                // An ODE looks like ODE|U8|DEC|Humidity|Percent. To parse, set value to be everything
+                // after the first bar and parse normally except that we also set the FieldTypePrimary to
+                // ODE. That way the ParserFieldList can handle it correctly.
+
+                FieldTypePrimary = FieldType.ODE;
+
+                var idx = value.IndexOf(Bar[0]);
+                if (idx == -1)
+                {
+                    // total error.
+                    value = "";
+                }
+                else
+                {
+                    value = value.Substring(idx + 1);
+                    // And now parse like normal!
+                }
+            }
+
+
             var barsplit = value.Split(Bar);
             SplitData = new string[barsplit.Length][];
             for (int i = 0; i < barsplit.Length; i++)

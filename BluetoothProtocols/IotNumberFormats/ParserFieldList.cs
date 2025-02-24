@@ -25,7 +25,16 @@ namespace BluetoothProtocols.IotNumberFormats
             for (int i = 0; i < split.Length; i++)
             {
                 var item = new ParserField(split[i]);
-                Retval.Fields.Add(item);
+                switch (item.FieldTypePrimary)
+                {
+                    case ParserField.FieldType.Regular:
+                        Retval.Fields.Add(item);
+                        break;
+                    case ParserField.FieldType.ODE:
+                        // Add to the ODEs using the field's name
+                        Retval.ODEs.Add(item.NamePrimary, item);
+                        break;
+                }
             }
 
             // Now go back and fill in the RemainingSize value for the last BYTES or STRING item.
