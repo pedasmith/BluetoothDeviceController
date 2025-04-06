@@ -293,6 +293,7 @@ Global
 		SolutionGuid = {62DCA7A6-8C59-4330-98B9-0EF91B6BAD39}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		BluetoothProtocols\BluetoothProtocols.projitems*{0132b2b2-9d02-49e3-b3ca-4dd2218617a6}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{0132b2b2-9d02-49e3-b3ca-4dd2218617a6}*SharedItemsImports = 4
 		BluetoothProtocolsDevices\BluetoothProtocolsDevices.projitems*{12d89dd7-fddf-43af-810e-a340bcf5f79f}*SharedItemsImports = 13
 		BluetoothProtocols\BluetoothProtocols.projitems*{190aa0de-8e65-4a8a-8d69-4ea539c572f2}*SharedItemsImports = 13

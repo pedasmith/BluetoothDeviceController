@@ -33,7 +33,11 @@ namespace BluetoothProtocols.IotNumberFormats
         public string UnitsPrimary { get; set; } = "";
         public string DefaultValuePrimary { get; set; } = "*";
 
-        public enum FieldType {  Regular, ODE };
+        /// <summary>
+        /// Most field are like U8|HEX|Pressure but some are ODE (option define element) or ODR (option define record)
+        /// where an ODE is like ODE|U8|HEX|Pressure ODE|U16^100_/|FIXED|Temperture ODR^Pressure_Temperature||EnvironmentalData
+        /// </summary>
+        public enum FieldType {  Regular, ODE, ODR };
         public FieldType FieldTypePrimary { get; internal set; } = ParserField.FieldType.Regular;
 
         /// <summary>
@@ -65,7 +69,7 @@ namespace BluetoothProtocols.IotNumberFormats
 
 
 
-        public IList<ParserField> GetXRFields(ParserFieldList pfl)
+        public IList<ParserField> ZZZGetXRFields(ParserFieldList pfl)
         {
             // Example: XR^Temperature_Humidity||Data would return the 'Temperature' and 'Humidity' fields
             // Those fields must have been defined by the ODE command.
@@ -152,6 +156,11 @@ namespace BluetoothProtocols.IotNumberFormats
                     value = value.Substring(idx + 1);
                     // And now parse like normal!
                 }
+            }
+            else if (value.StartsWith("ODR")) // ODR = Option Define Record where a record is a list of elements
+            {
+                // ODR looks like ODR^Temperature_Humidity||EnvironmentData
+                FieldTypePrimary = FieldType.ODR;
             }
 
 

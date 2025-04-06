@@ -66,7 +66,7 @@
               "UUID": "f000ffc1-0451-4000-b000-000000000000",
               "Name": "Img Identify",
               "Description": "Img Identify",
-              "Type": "BYTES|HEX|Img Identify",
+              "Type": "BYTES|HEX|Img_Identify",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "IsNotify": true
@@ -75,7 +75,7 @@
               "UUID": "f000ffc2-0451-4000-b000-000000000000",
               "Name": "Img Block",
               "Description": "Img Block",
-              "Type": "BYTES|HEX|Img Block",
+              "Type": "BYTES|HEX|Img_Block",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "IsNotify": true

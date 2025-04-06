@@ -1,0 +1,169 @@
+{
+  "AllDevices": [
+    {
+      "Name": "CT01",
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Name: CT01",
+                "CT01"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Appearance:  00 00",
+                "Unknown"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Generic Service",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "IsRead": true,
+              "IsIndicate": true,
+              "Verbs": ":Read:Indicate:RdInNo:InNo:",
+              "ExampleData": [
+                "Value:  01 00 FF FF",
+                "1 65535"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "ZZZDevice Info",
+          "Characteristics": [
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manufacturer Name",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  44 69 61 6C 6F 67 20 53 65 6D 69",
+                "Dialog Semi"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  44 41 31 34 35 33 31",
+                "DA14531"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  76 5F 36 2E 30 2E 31 34 2E 31 31 31 34",
+                "v_6.0.14.1114"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  76 5F 36 2E 30 2E 31 34 2E 31 31 31 34",
+                "v_6.0.14.1114"
+              ]
+            },
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  12 34 56 FF FE 9A BC DE",
+                "12 34 56 FF FE 9A BC DE"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Value:  01 D2 00 80 05 00 01",
+                "01 D2 00 80 05 00 01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000cec0-0000-1000-8000-00805f9b34fb",
+          "Name": "SensorData",
+          "Characteristics": [
+            {
+              "UUID": "0000cec1-0000-1000-8000-00805f9b34fb",
+              "Name": "Write Reply",
+              "Description": "Write Reply",
+              "Type": "BYTES|HEX|Write_Reply",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Write:Notify:RdInNo:InNo:WrWw:",
+              "ExampleData": [
+                "Value: "
+              ]
+            },
+            {
+              "UUID": "0000cec2-0000-1000-8000-00805f9b34fb",
+              "Name": "Nodify Info",
+              "Description": "Nodify Info",
+              "Type": "U8|HEX^^HIDDEN|STX U8|DEC^^HIDDEN|Len U16|HEX^^HIDDEN|Op U16^400_-_10.94_/|FIXED|Temp|c U8|DEC|Humidity BYTES|HEX^LONG|Nodify_Info U8|HEX|Final",
+              "IsNotify": true,
+              "Verbs": ":Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "-- -- -- -- ** -- ** ** -- -- -- ** ** ** ** --  59=89 29=41 64=100 17=23 36=54 16=22",
+                " 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15",
+                "AA 0D A1 00 59 02 29 64 14 15 09 17 01 36 16 BB",
+                "AA 0D A1 00 5B 02 2C 64 14 15 09 17 01 39 10 BB",
+                "AA 0D A1 00 5B 02 2C 64 14 15 09 17 01 39 10 BB",
+                "AA 0D A1 00 57 02 2C 5F 14 15 09 1C 08 2D 2C BB",
+                "AA 0D A1 00 57 02 2C 5F 14 15 09 1C 08 2E 2B BB",
+                "Byte 5 (0x59) might be temp and h",
+                "Room temp: 21.2c humidity 36%  212(dec)=D4(hex) 36(dec)=24(hex)"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLE2c:0d:a7:c8:53:33-cf:66:33:02:19:a3\nCanPair:True IsPaired:False"
+    }
+  ]
+}

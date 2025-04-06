@@ -115,6 +115,18 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\AdvancedCalculator\AdvancedCalculatorUniversal\BCBasic\RunTimeLibrary\RTLCsvRfc4180.cs">
+      <Link>FromBCBasic\RTLCsvRfc4180.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\AdvancedCalculator\BCBasic\BCBasic.Shared\BCValue.cs">
+      <Link>FromBCBasic\BCValue.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\AdvancedCalculator\BCBasic\BCBasic.Shared\BCValueList.cs">
+      <Link>FromBCBasic\BCValueList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\BluetoothDeviceController\BCBasic\MockClasses.cs">
+      <Link>FromBCBasic\MockClasses.cs</Link>
+    </Compile>
     <Compile Include="..\..\BluetoothDeviceController\SpecialtyPagesCustom\OscilloscopeControl.xaml.cs">
       <Link>OscilloscopeControl.xaml.cs</Link>
     </Compile>
@@ -126,27 +138,6 @@
     </Compile>
     <Compile Include="..\..\BluetoothProtocolsUwpXaml\ChartControl\UserPersonalization.cs">
       <Link>FromBluetooth\UserPersonalization.cs</Link>
-    </Compile>
-    <Compile Include="..\..\BluetoothProtocols\Charts\DataCollection.cs">
-      <Link>DataCollection.cs</Link>
-    </Compile>
-    <Compile Include="..\..\BluetoothProtocols\Charts\OscDataRecord.cs">
-      <Link>OscDataRecord.cs</Link>
-    </Compile>
-    <Compile Include="..\..\BluetoothProtocols\IotNumberFormats\ValueCalculate.cs">
-      <Link>FromBluetooth\ValueCalculate.cs</Link>
-    </Compile>
-    <Compile Include="..\..\BluetoothProtocols\IotNumberFormats\VariableSet.cs">
-      <Link>FromBluetooth\VariableSet.cs</Link>
-    </Compile>
-    <Compile Include="..\..\BluetoothProtocols\Names\GuidGetCommon.cs">
-      <Link>FromBluetooth\GuidGetCommon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\BluetoothProtocols\Names\NameChacteristic.cs">
-      <Link>FromBluetooth\NameChacteristic.cs</Link>
-    </Compile>
-    <Compile Include="..\..\BluetoothProtocols\Names\SerialConfig.cs">
-      <Link>FromBluetooth\SerialConfig.cs</Link>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -210,6 +201,9 @@
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.8.6</Version>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.3</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="_Pan_Zoom_TODO_list.md" />
@@ -218,6 +212,7 @@
     <Folder Include="Assets\Example_Oscilloscopes\" />
   </ItemGroup>
   <Import Project="..\..\Utilities\Utilities.projitems" Label="Shared" />
+  <Import Project="..\..\BluetoothProtocols\BluetoothProtocols.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

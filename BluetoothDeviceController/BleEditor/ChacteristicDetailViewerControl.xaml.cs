@@ -1,5 +1,6 @@
 ﻿using BluetoothDefinitionLanguage;
 using BluetoothDeviceController.BluetoothDefinitionLanguage;
+using BluetoothProtocols.IotNumberFormats;
 using System;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -20,9 +21,9 @@ namespace BluetoothDeviceController.BleEditor
             this.InitializeComponent();
         }
 
-        public async Task InitAsync(GattDeviceService service, GattCharacteristic characteristic, string preferredFormat)
+        public async Task InitAsync(GattDeviceService service, GattCharacteristic characteristic, ParserFieldList preferredFormat)
         {
-            uiPreferredFormat.Text = preferredFormat;
+            uiPreferredFormat.Text = preferredFormat.ToString();
 
             string str = null;
             try

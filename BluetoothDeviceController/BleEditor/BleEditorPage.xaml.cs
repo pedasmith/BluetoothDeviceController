@@ -195,7 +195,7 @@ namespace BluetoothDeviceController.BleEditor
             WireDevice.Description = knownDevice.Description;
 
 
-            uiRawData.Text = Newtonsoft.Json.JsonConvert.SerializeObject(WireDevice, jsonFormat); //, jsonSettings);
+            uiRawData.Text = Newtonsoft.Json.JsonConvert.SerializeObject(WireDevice, jsonFormat, jsonSettings);
             string raw = "";
 
             if (ble == null)
@@ -287,7 +287,7 @@ namespace BluetoothDeviceController.BleEditor
                                     }
 
                                     var defaultCharacteristic = defaultService?.GetChacteristic(characteristic.Uuid.ToString("D"));
-                                    var wireCharacteristic = new NameCharacteristic(characteristic, defaultCharacteristic, characteristicCount++);
+                                    var wireCharacteristic = new NameCharacteristic(characteristic, defaultService, defaultCharacteristic, characteristicCount++);
                                     wireService.Characteristics.Add(wireCharacteristic);
 
                                     if (wireCharacteristic.Suppress)

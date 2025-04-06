@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BluetoothProtocols.IotNumberFormats;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
@@ -234,11 +236,11 @@ namespace BluetoothDeviceController.Names
         {
 
         }
-        public NameCharacteristic(GattCharacteristic characteristic, NameCharacteristic defaultCharacteristic, int count = -1)
+        public NameCharacteristic(GattCharacteristic characteristic, NameService service, NameCharacteristic defaultCharacteristic, int count = -1)
         {
             UUID = characteristic.Uuid.ToString("D");
-            Name = null; 
-            
+            Name = null;
+
             // Priority: default characteristic, user description, unknown
             if (defaultCharacteristic != null)
             {
@@ -261,11 +263,19 @@ namespace BluetoothDeviceController.Names
             {
                 ;
             }
-            if (Name.Contains ("20") || Name.Contains ("humi_cmd"))
+            if (Name.Contains("20") || Name.Contains("humi_cmd"))
             {
                 ; // something for the debugger to hook to.
             }
             Type = defaultCharacteristic == null ? $"BYTES|HEX|{Name}" : defaultCharacteristic.Type;
+            TypePFL.Globals = service?.ServiceTypePFL;
+            if (service != null && defaultCharacteristic != null)
+            {
+                if (service?.ServiceTypePFL != null || defaultCharacteristic.Type.Contains("XR^EnvironmentData"))
+                {
+                    ; // handy place to put a debugger to verify it's being set.
+                }
+            }
             IsRead = characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read);
             if (SuppressRead) IsRead = false;
             IsWrite = characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Write);
@@ -301,11 +311,27 @@ namespace BluetoothDeviceController.Names
         }
         public string Name { get; set; }
         public string Description { get; set; }
+
         public bool Suppress { get; set; } = false; // when set, the UI doesn't need to see this characteristic.
+
+        [JsonIgnore]
+        public ParserFieldList TypePFL = null;
+        string _Type = null;
+
         /// <summary>
-        /// Says how to interpret the results -- e.g. "U8|HEX|Red U8|HEX|Green U8|HEX|Blue". Can be parsed with ValueParserSplit.
+        /// Says how to interpret the results -- e.g. "U8|HEX|Red U8|HEX|Green U8|HEX|Blue". Can be parsed with ParserFieldList.ParseLine.
         /// </summary>
-        public string Type { get; set; }
+        public string Type { get { return _Type; } 
+            set 
+            { 
+                _Type = value; 
+                if (value.Contains ("XR^EnvironmentData"))
+                {
+                    ; // Handy place to hang a debugger
+                }
+                TypePFL = ParserFieldList.ParseLine(value); 
+            } 
+        }
 
         // These are used when generating C# classes
         public bool IsRead { get; set; }

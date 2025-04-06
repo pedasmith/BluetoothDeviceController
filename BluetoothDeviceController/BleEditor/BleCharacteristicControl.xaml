@@ -44,7 +44,7 @@
         </StackPanel>        
         
         <!-- Set up the set of icons for read, write, etc including refresh -->
-        <StackPanel Grid.Column="2" Orientation="Horizontal" MinWidth="88"> 
+        <StackPanel Grid.Column="2" Orientation="Horizontal" MinWidth="88" VerticalAlignment="Top"> 
             <Panel.Resources>
                 <Style TargetType="TextBlock">
                     <Setter Property="FontSize" Value="18"/>
@@ -53,7 +53,7 @@
                     <Setter Property="Height" Value="30" />
                 </Style>
             </Panel.Resources>
-            <Grid Tapped="OnNotifyTapped">
+            <Grid Tapped="OnNotifyTapped" x:Name="uiNotifyOnFlagBackground" Background="Beige">
                 <TextBlock x:Name="uiNotifyFlag" Text="🄽" />
                 <TextBlock x:Name="uiNotifyOnFlag" Text="⌁" Padding="0,13,0,0" FontSize="16" ToolTipService.ToolTip="Notify" />
             </Grid>
@@ -73,6 +73,11 @@
             <TextBlock x:Name="uiExtendedPropertiesFlag" Text="🅇" ToolTipService.ToolTip="Can Extended Properties" />
             <TextBlock x:Name="uiReliableWritesFlag" Text="🄻" ToolTipService.ToolTip="Can Write (reliable)" />
             <TextBlock x:Name="uiWritableAuxilariesFlag" Text="🄰" ToolTipService.ToolTip="Can Write (auxilaries)" />
+
+            <!-- Copy flags -->
+            <TextBlock x:Name="uiCopyFlag" Tapped="OnCopyTapped" Text="" FontFamily="Segoe Fluent Icons" ToolTipService.ToolTip="Copy data" />
+            <TextBlock x:Name="uiClearFlag" Tapped="OnClearTapped" Text="⎚" ToolTipService.ToolTip="Clear data" />
+
         </StackPanel>
         <TextBlock Grid.Column="3" Text="⸱⸱⸱" Tapped="OnShowMoreTapped" IsTextSelectionEnabled="False" FontWeight="Bold" FontSize="14" Padding="4,4,0,0" ToolTipService.ToolTip="Details"/>
         <TextBlock Grid.Column="4" Text="🖎" x:Name="uiEditFlag" Tapped="OnEditTapped" IsTextSelectionEnabled="False" FontWeight="Bold" FontSize="14" Padding="4,4,0,0" ToolTipService.ToolTip="Edit"/>

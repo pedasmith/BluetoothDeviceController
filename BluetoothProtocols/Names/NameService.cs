@@ -1,6 +1,8 @@
 ﻿using BluetoothDeviceController.BluetoothDefinitionLanguage;
+using BluetoothProtocols.IotNumberFormats;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,6 +67,15 @@ namespace BluetoothDeviceController.Names
         /// </summary>
         public bool Suppress { get; set; } = false;
         public string Description { get; set; } = null;
+
+        /// <summary>
+        /// From the ServiceType, a per-service value that's intended to define (with ODE=Option Define Element and ODR=Option Define Record) elements. This is passed in as the "global" ParserFieldList for each characteristic.
+        /// </summary>
+        string _ServiceType = "";
+        [DefaultValue("")]
+        public string ServiceType { get { return _ServiceType; } set { _ServiceType = value; ServiceTypePFL = ParserFieldList.ParseLine(value); } }
+
+        public ParserFieldList ServiceTypePFL = null;
 
         /// <summary>
         /// Display priority. Default is 0; max should be 10. Services with higher priorities are displayed first.

@@ -24,6 +24,9 @@ namespace BluetoothDeviceController
     public sealed partial class DeviceMenuEntryControl : UserControl
     {
         public delegate void DeviceSettingsHandler(object source, DeviceInformationWrapper wrapper);
+
+        // Generally calls the MainPage.xaml OnDeviceSettingsClick(object source, DeviceInformationWrapper di) about line 920
+        // That in turn generally creates a PerDeviceSetting object in the pop-up.
         public event DeviceSettingsHandler SettingsClick;
 
         public DeviceInformationWrapper Wrapper;

@@ -12,6 +12,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using BluetoothProtocols.IotNumberFormats;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.UI.Xaml.Media;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -39,9 +41,9 @@ namespace BluetoothDeviceController.BleEditor
         bool NotifySetup = false;
         NameCharacteristic NC = null;
         IList<string> ArchivedData = new List<String>();
-        string DefaultFormat = "BYTES|HEX";
-        string PreferredFormat = null;
-        enum ValueShowMethod { Overwrite, Append };
+        ParserFieldList DefaultFormat = ParserFieldList.ParseLine("BYTES|HEX");
+        ParserFieldList PreferredFormat = null;
+        enum ValueShowMethod { Overwrite, Append, AppendNewLineTop };
         ValueShowMethod CurrValueShowMethod = BleCharacteristicControl.ValueShowMethod.Overwrite;
         public ObservableCollection<Command> Commands { get; } = new ObservableCollection<Command>();
         public bool AutomaticallyReadData { get; internal set; } = true;
@@ -66,9 +68,35 @@ namespace BluetoothDeviceController.BleEditor
             Service = service;
             Characteristic = characteristic;
             NC = BleNames.Get(device, service, characteristic);
-            if (characteristic.Uuid.ToString().Contains("aaf3f6d5"))
+            if (characteristic.Uuid.ToString().Contains("cec2"))
             {
                 ; // Handy place to hang a debugger
+            }
+            if (NC != null && NC.Type.Contains("XR^EnvironmentData"))
+            {
+                ; // Handy place to hang a debugger
+            }
+
+            // If there's a readable value with displayFormatPrimary=ASCII and secondary of LONG (ASCII^LONG)
+            // then make the text area multi-line
+            // Ditto if it's HEX
+            var vps = ParserFieldList.ParseLine(NC?.Type ?? "");
+            if (vps.Fields.Count == 1)
+            {
+                var displayFormat = vps.Fields[0].DisplayFormatPrimary;
+                var displayFormatSecondary = vps.Fields[0].Get(1, 1);
+                switch (displayFormatSecondary)
+                {
+                    case "LONG":
+                        switch (displayFormat)
+                        {
+                            case "ASCII":
+                            case "HEX":
+                                CurrValueShowMethod = displayFormat == "ASCII" ? ValueShowMethod.Append : ValueShowMethod.AppendNewLineTop;
+                                break;
+                        }
+                        break;
+                }
             }
 
             var props = characteristic.CharacteristicProperties;
@@ -88,6 +116,9 @@ namespace BluetoothDeviceController.BleEditor
             uiExtendedPropertiesFlag.Visibility = props.HasFlag(GattCharacteristicProperties.ExtendedProperties) ? Visibility.Visible : Visibility.Collapsed;
             uiReliableWritesFlag.Visibility = props.HasFlag(GattCharacteristicProperties.ReliableWrites) ? Visibility.Visible : Visibility.Collapsed;
             uiWritableAuxilariesFlag.Visibility = props.HasFlag(GattCharacteristicProperties.WritableAuxiliaries) ? Visibility.Visible : Visibility.Collapsed;
+
+            uiClearFlag.Visibility = CurrValueShowMethod == ValueShowMethod.Overwrite ? Visibility.Collapsed : Visibility.Visible;
+            uiCopyFlag.Visibility = CurrValueShowMethod == ValueShowMethod.Overwrite ? Visibility.Collapsed : Visibility.Visible;
 
             // Set the little edit marker
             uiEditFlag.Visibility = (props.HasFlag(GattCharacteristicProperties.Write)
@@ -177,27 +208,21 @@ namespace BluetoothDeviceController.BleEditor
                 ; // Handy line to hang a debugger on.
             }
 
+
             // If there's a readable value with displayFormatPrimary=ASCII and secondary of LONG (ASCII^LONG)
             // then make the text area multi-line
-            var vps = ParserFieldList.ParseLine(NC?.Type ?? "");
-            if (vps.Fields.Count == 1)
+            // Ditto if it's HEX
+            if (CurrValueShowMethod != ValueShowMethod.Overwrite)
+            { 
+                var h = uiValueShow.ActualHeight;
+                uiValueShowScroll.MinHeight = h * 3;
+                uiValueShowScroll.MaxHeight = h * 7;
+            }
+            if (CurrValueShowMethod == ValueShowMethod.AppendNewLineTop)
             {
-                var displayFormat = vps.Fields[0].DisplayFormatPrimary;
-                var displayFormatSecondary = vps.Fields[0].Get(1, 1);
-                switch (displayFormat)
-                {
-                    case "ASCII":
-                        switch (displayFormatSecondary)
-                        {
-                            case "LONG":
-                                var h = uiValueShow.ActualHeight;
-                                uiValueShowScroll.MinHeight = h * 3;
-                                uiValueShowScroll.MaxHeight = h * 7;
-                                CurrValueShowMethod = ValueShowMethod.Append;
-                                break;
-                        }
-                        break;
-                }
+                MAX_APPEND_LEN = 40_000; // much larger just because I can (and it's handy for the CT01)
+                uiValueShow.FontFamily = new Windows.UI.Xaml.Media.FontFamily("Cascadia Code");
+                uiValueShow.FontSize = 12;
             }
             try
             {
@@ -454,6 +479,8 @@ namespace BluetoothDeviceController.BleEditor
             }
         }
 
+        private ParserFieldList BytesHexPFL = ParserFieldList.ParseLine("BYTES|HEX");
+
         private async Task DoReadAsync(bool ignoreUnreadableValues)
         {
             var props = Characteristic.CharacteristicProperties;
@@ -471,7 +498,7 @@ namespace BluetoothDeviceController.BleEditor
                     }
                     else
                     {
-                        var decode = NC?.Type ?? "BYTES|HEX"; // default is hex
+                        var decode = NC?.TypePFL ?? BytesHexPFL; // "BYTES|HEX"; // default is hex
                         var result = ValueParser.Parse(vresult.Value, decode);
                         valuestr = result.AsString;
                     }
@@ -498,10 +525,17 @@ namespace BluetoothDeviceController.BleEditor
             {
                 AddString(valuestr);
             }
+            NAddString = 0; // Force to the initial value!
         }
+        int MAX_APPEND_LEN = 1000;
+        int NAddString = 0;
 
         private void AddString(string valuestr)
         {
+            if (NAddString == 0) // The initial value ("Tap the __ to get") is an addstring, but the count is forced back to zero.
+            {
+                uiValueShow.Text = ""; // Otherwise for the append actions the initial text will be visible.
+            }
             switch (CurrValueShowMethod)
             {
                 case ValueShowMethod.Overwrite:
@@ -510,8 +544,7 @@ namespace BluetoothDeviceController.BleEditor
                 case ValueShowMethod.Append:
                     {
                         var currLen = uiValueShow.Text.Length;
-                        const int maxLen = 1000;
-                        if (currLen <= maxLen)
+                        if (currLen <= MAX_APPEND_LEN)
                         {
                             uiValueShow.Text += valuestr;
                         }
@@ -519,12 +552,24 @@ namespace BluetoothDeviceController.BleEditor
                         {
                             // Chop down the old value ruthlessly!
                             var newtext = (uiValueShow.Text + valuestr);
-                            newtext = newtext.Substring(newtext.Length - maxLen);
+                            newtext = newtext.Substring(newtext.Length - MAX_APPEND_LEN);
                             uiValueShow.Text = newtext;
                         }
                     }
                     break;
+                case ValueShowMethod.AppendNewLineTop:
+                    {
+                        var newtext = valuestr + "\n" + uiValueShow.Text;
+                        if (newtext.Length > MAX_APPEND_LEN)
+                        {
+                            // Chop it down ruthlessly
+                            newtext = newtext.Substring(0, MAX_APPEND_LEN / 2);
+                        }
+                        uiValueShow.Text = newtext;
+                    }
+                    break;
             }
+            NAddString += 1;
         }
 
         private string GetStatusString(GattCommunicationStatus status, byte? protocolError)
@@ -619,24 +664,33 @@ namespace BluetoothDeviceController.BleEditor
                 uiNotifyOnFlag.Visibility = Visibility.Collapsed;
             }
         }
+
+        Brush[] NotifyBackgroundBrush = new Brush[]
+        {
+            new SolidColorBrush(new Windows.UI.Color() { A=0, R=0xFF, G=0xFF, B=0xFF}),
+            new SolidColorBrush(new Windows.UI.Color() { A=0x50, R=0x80, G=0x80, B=0x80}),
+        };
+        int NotifyBackgroundBrushIndex = 0;
         private async void Characteristic_ValueChanged(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             string valuestr = "";
             lock (this)
             {
-                var decode = PreferredFormat ?? NC?.Type ?? DefaultFormat; // default is hex
+                var decode = PreferredFormat ?? NC?.TypePFL ?? DefaultFormat; // default is hex
                 var result = ValueParser.Parse(args.CharacteristicValue, decode);
                 valuestr = result.AsString;
             }
             await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
             {
+                NotifyBackgroundBrushIndex = (NotifyBackgroundBrushIndex + 1) % NotifyBackgroundBrush.Length;
+                uiNotifyOnFlagBackground.Background = NotifyBackgroundBrush[NotifyBackgroundBrushIndex];
                 AddString(valuestr);
             });
         }
 
         private async void OnShowMoreTapped(object sender, TappedRoutedEventArgs e)
         {
-            var decode = PreferredFormat ?? NC?.Type ?? DefaultFormat; // default is hex
+            var decode = PreferredFormat ?? NC?.TypePFL ?? DefaultFormat; // default is hex
 
             var cvc = new ChacteristicDetailViewerControl();
             await cvc.InitAsync(Service, Characteristic, decode);
@@ -658,7 +712,9 @@ namespace BluetoothDeviceController.BleEditor
 
             if (cvc.PreferredFormatChanged)
             {
-                PreferredFormat = cvc.PreferredFormat;
+                var pfl = ParserFieldList.ParseLine(cvc.PreferredFormat);
+                pfl.Globals = PreferredFormat?.Globals;
+                PreferredFormat = pfl; // was when this was all strings: cvc.PreferredFormat;
             }
         }
 
@@ -676,7 +732,7 @@ namespace BluetoothDeviceController.BleEditor
         {
             GattWriteOption writeOption = PreferredWriteOption();
             var bytes = Encoding.UTF8.GetBytes(str);
-            const int MAXBYTES = 20;
+            const int MAXBYTES = 20;// TODO: hasn't this been demonstrated to be pointless? The BT API already does the chopping up for us.
             if (bytes.Length > MAXBYTES)
             {
                 GattWriteResult status = null;
@@ -698,6 +754,19 @@ namespace BluetoothDeviceController.BleEditor
                 return status;
             }
         }
+        private void OnCopyTapped(object sender, TappedRoutedEventArgs e)
+        {
+            var text = uiValueShow.Text;
+            var dp = new DataPackage();
+            dp.RequestedOperation = DataPackageOperation.Copy;
+            dp.SetText(text);
+            Clipboard.SetContent(dp);
+        }
+        private void OnClearTapped(object sender, TappedRoutedEventArgs e)
+        {
+            uiValueShow.Text = "";
+        }
+
         private async void OnEditTapped(object sender, TappedRoutedEventArgs e)
         {
             GattWriteOption writeOption = PreferredWriteOption();

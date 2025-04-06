@@ -813,6 +813,9 @@
     <Content Include="Assets\CharacteristicsData\Elk_LedLight.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\CharacteristicsData\CozyTime_CT01.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\CharacteristicsData\Daybetter_LedLight.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -883,6 +886,7 @@
     <Content Include="Assets\HelpFiles\Device_Govee_H5075.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Assets\CharacteristicsData\_Recognizing_BT_Protocols.md" />
     <None Include="Assets\HelpFiles\_List_of_item_to_do.md" />
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>

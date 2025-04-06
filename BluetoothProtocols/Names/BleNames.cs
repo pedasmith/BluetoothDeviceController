@@ -172,6 +172,17 @@ namespace BluetoothDeviceController.Names
                         {
                             foreach (var characteristic in service.Characteristics)
                             {
+                                if (characteristic.Type.Contains ("XR^EnvironmentData"))
+                                {
+                                    ; // handy place for a debugger
+                                }
+                                if (characteristic.TypePFL.Globals == null)
+                                {
+                                    if (service.ServiceTypePFL != null)
+                                    {
+                                        characteristic.TypePFL.Globals = service.ServiceTypePFL;
+                                    }
+                                }
                                 if (!characteristic.IsIndicate && !characteristic.IsNotify
                                     && !characteristic.IsRead
                                     && !characteristic.IsWrite && !characteristic.IsWriteWithoutResponse)

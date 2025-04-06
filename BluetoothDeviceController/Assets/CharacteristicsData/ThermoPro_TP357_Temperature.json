@@ -90,6 +90,7 @@
           "UUID": "00010203-0405-0607-0809-0a0b0c0d1910",
           "Name": "SensorData",
           "Priority": 10,
+          "ServiceType": "ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent ODR^Temperature_Humidity||EnvironmentData",
           "Characteristics": [
             {
               "UUID": "00010203-0405-0607-0809-0a0b0c0d2b10",
@@ -99,7 +100,7 @@
               "ZZZ_Orig_Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra",
               "ZZ_Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra",
               "ZZZ_History_Type": "U8|HEX|Opcode||A7 U16|DEC|Time U8|HEX|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent XRS^Temperature_Humidity||HistoricalData",
-              "Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent XR^Temperature_Humidity||Data BYTES|HEX^^HIDDEN|CrcExtra",
+              "Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag XR^EnvironmentData||Data BYTES|HEX^^HIDDEN|CrcExtra",
               "IsRead": true,
               "IsNotify": true,
               "AutoNotify": true,
@@ -127,22 +128,22 @@
                 "Celc: C2 6A 01 E1 00 23 2C   22.5 32%"
               ]
             },
-              {
-                "UUID": "00010203-0405-0607-0809-0a0b0c0d2b11",
-                "Name": "Command",
-                "REM_Name": "Telink SPP: Phone->Module",
-                "Description": "Telink SPP: Phone->Module",
-                "Type": "BYTES|HEX|Command",
-                "IsRead": true,
-                "IsWriteWithoutResponse": true,
-                "Verbs": ":Read:WriteWithoutResponse:RdInNo:WrWw:",
-                "ExampleData": [
-                  "Value:  00",
-                  "Send DAY values: A7 01 00 7A",
-                  "Send WEEK values: A6 01 00 6A",
-                  "Send YEAR values: A8 01 00 8A"
-                ]
-              }
+            {
+              "UUID": "00010203-0405-0607-0809-0a0b0c0d2b11",
+              "Name": "Command",
+              "REM_Name": "Telink SPP: Phone->Module",
+              "Description": "Telink SPP: Phone->Module",
+              "Type": "BYTES|HEX|Command",
+              "IsRead": true,
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":Read:WriteWithoutResponse:RdInNo:WrWw:",
+              "ExampleData": [
+                "Value:  00",
+                "Send DAY values: A7 01 00 7A",
+                "Send WEEK values: A6 01 00 6A",
+                "Send YEAR values: A8 01 00 8A"
+              ]
+            }
           ]
         },
         {

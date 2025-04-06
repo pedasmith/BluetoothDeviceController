@@ -11,9 +11,12 @@
 
     <StackPanel>
         <TextBox Header="Name" x:Name="uiName" KeyDown="UiName_KeyDown" ></TextBox>
-        <TextBlock>
+        <TextBlock IsTextSelectionEnabled="True">
             <Run FontWeight="Bold">Device Name:</Run>
             <Run x:Name="uiDeviceName">(name)</Run>
+            <LineBreak />
+            <Run FontWeight="Bold">MAC address:</Run>
+            <Run x:Name="uiDeviceMacAddress">(name)</Run>
             <LineBreak /><Run FontWeight="Bold">Device Id:</Run>
             <Run x:Name="uiDeviceId">(id)</Run>
         </TextBlock>
