@@ -88,13 +88,13 @@
         },
         {
           "UUID": "00010203-0405-0607-0809-0a0b0c0d1910",
-          "Name": "SensorData",
+          "Name": "Sensor_Service",
           "Priority": 10,
           "ServiceType": "ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent ODR^Temperature_Humidity||EnvironmentData",
           "Characteristics": [
             {
               "UUID": "00010203-0405-0607-0809-0a0b0c0d2b10",
-              "Name": "Data",
+              "Name": "Sensor_Data",
               "REM_Name": "Telink SPP: Module->Phone",
               "Description": "Telink SPP: Module->Phone",
               "ZZZ_Orig_Type": "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra",

@@ -49,7 +49,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             bleDevice.ble = ble;
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
             await DoReadDevice_Name();
-            await DoNotifyData();
+            await DoNotifySensor_Data();
 
         }
 
@@ -641,10 +641,10 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
 
-        // Functions for SensorData
-        public class DataRecord : INotifyPropertyChanged
+        // Functions for Sensor_Service
+        public class Sensor_DataRecord : INotifyPropertyChanged
         {
-            public DataRecord()
+            public Sensor_DataRecord()
             {
                 this.EventTime = DateTime.Now;
             }
@@ -663,10 +663,8 @@ namespace BluetoothDeviceController.SpecialtyPages
             public double Unknown1 { get { return _Unknown1; } set { if (value == _Unknown1) return; _Unknown1 = value; OnPropertyChanged(); } }
             private double _Flag;
             public double Flag { get { return _Flag; } set { if (value == _Flag) return; _Flag = value; OnPropertyChanged(); } }
-            private double _Temperature;
-            public double Temperature { get { return _Temperature; } set { if (value == _Temperature) return; _Temperature = value; OnPropertyChanged(); } }
-            private double _Humidity;
-            public double Humidity { get { return _Humidity; } set { if (value == _Humidity) return; _Humidity = value; OnPropertyChanged(); } }
+            private double _Data;
+            public double Data { get { return _Data; } set { if (value == _Data) return; _Data = value; OnPropertyChanged(); } }
             private string _CrcExtra;
             public string CrcExtra { get { return _CrcExtra; } set { if (value == _CrcExtra) return; _CrcExtra = value; OnPropertyChanged(); } }
 
@@ -674,52 +672,52 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-    public DataCollection<DataRecord> DataRecordData { get; } = new DataCollection<DataRecord>();
-    private void OnData_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Sensor_DataRecord> Sensor_DataRecordData { get; } = new DataCollection<Sensor_DataRecord>();
+    private void OnSensor_Data_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
     {
         if (e.Key == Windows.System.VirtualKey.Enter)
         {
             var text = (sender as TextBox).Text.Trim();
             (sender as TextBox).Text = "";
             // Add the text to the notes section
-            if (DataRecordData.Count == 0)
+            if (Sensor_DataRecordData.Count == 0)
             {
-                DataRecordData.AddRecord(new DataRecord());
+                Sensor_DataRecordData.AddRecord(new Sensor_DataRecord());
             }
-            DataRecordData[DataRecordData.Count - 1].Note = text;
+            Sensor_DataRecordData[Sensor_DataRecordData.Count - 1].Note = text;
             e.Handled = true;
         }
     }
 
     // Functions called from the expander
-    private void OnKeepCountData(object sender, SelectionChangedEventArgs e)
+    private void OnKeepCountSensor_Data(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.Count != 1) return;
         int value;
         var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
         if (!ok) return;
-        DataRecordData.MaxLength = value;
+        Sensor_DataRecordData.MaxLength = value;
 
         
     }
 
-    private void OnAlgorithmData(object sender, SelectionChangedEventArgs e)
+    private void OnAlgorithmSensor_Data(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.Count != 1) return;
         int value;
         var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
         if (!ok) return;
-        DataRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+        Sensor_DataRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
     }
-    private void OnCopyData(object sender, RoutedEventArgs e)
+    private void OnCopySensor_Data(object sender, RoutedEventArgs e)
     {
         // Copy the contents over...
         var sb = new System.Text.StringBuilder();
-        sb.Append("EventDate,EventTime,Opcode,Unknown1,Flag,Temperature,Humidity,CrcExtra,Notes\n");
-        foreach (var row in DataRecordData)
+        sb.Append("EventDate,EventTime,Opcode,Unknown1,Flag,Data,CrcExtra,Notes\n");
+        foreach (var row in Sensor_DataRecordData)
         {
             var time24 = row.EventTime.ToString("HH:mm:ss.f");
-            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Opcode},{row.Unknown1},{row.Flag},{row.Temperature},{row.Humidity},{row.CrcExtra},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
+            sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.Opcode},{row.Unknown1},{row.Flag},{row.Data},{row.CrcExtra},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
         }
         var str = sb.ToString();
         var datapackage = new DataPackage() { RequestedOperation = DataPackageOperation.Copy };
@@ -727,33 +725,33 @@ namespace BluetoothDeviceController.SpecialtyPages
         Clipboard.SetContent(datapackage);
     }
 
-        GattClientCharacteristicConfigurationDescriptorValue[] NotifyDataSettings = {
+        GattClientCharacteristicConfigurationDescriptorValue[] NotifySensor_DataSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
 
             GattClientCharacteristicConfigurationDescriptorValue.None,
         };
-        int DataNotifyIndex = 0;
-        bool DataNotifySetup = false;
-        private async void OnNotifyData(object sender, RoutedEventArgs e)
+        int Sensor_DataNotifyIndex = 0;
+        bool Sensor_DataNotifySetup = false;
+        private async void OnNotifySensor_Data(object sender, RoutedEventArgs e)
         {
-            await DoNotifyData();
+            await DoNotifySensor_Data();
         }
 
-        private async Task DoNotifyData()
+        private async Task DoNotifySensor_Data()
         {
             SetStatusActive (true);
             ncommand++;
             try
             {
                 // Only set up the event callback once.
-                if (!DataNotifySetup)
+                if (!Sensor_DataNotifySetup)
                 {
-                    DataNotifySetup = true;
-                    bleDevice.DataEvent += BleDevice_DataEvent;
+                    Sensor_DataNotifySetup = true;
+                    bleDevice.Sensor_DataEvent += BleDevice_Sensor_DataEvent;
                 }
-                var notifyType = NotifyDataSettings[DataNotifyIndex];
-                DataNotifyIndex = (DataNotifyIndex + 1) % NotifyDataSettings.Length;
-                var result = await bleDevice.NotifyDataAsync(notifyType);
+                var notifyType = NotifySensor_DataSettings[Sensor_DataNotifyIndex];
+                Sensor_DataNotifyIndex = (Sensor_DataNotifyIndex + 1) % NotifySensor_DataSettings.Length;
+                var result = await bleDevice.NotifySensor_DataAsync(notifyType);
                 
 
 
@@ -764,7 +762,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-        private async void BleDevice_DataEvent(BleEditor.ValueParserResult data)
+        private async void BleDevice_Sensor_DataEvent(BleEditor.ValueParserResult data)
         {
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
@@ -772,21 +770,15 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                 var valueList = data.ValueList;
                 
-                var record = new DataRecord();
-                var Temperature = valueList.GetValue("Temperature");
-                if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
+                var record = new Sensor_DataRecord();
+                var Data = valueList.GetValue("Data");
+                if (Data.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Data.CurrentType == BCBasic.BCValue.ValueType.IsString || Data.IsArray)
                 {
-                    record.Temperature = (double)Temperature.AsDouble;
-                    Data_Temperature.Text = record.Temperature.ToString("F3");
-                }
-                var Humidity = valueList.GetValue("Humidity");
-                if (Humidity.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Humidity.CurrentType == BCBasic.BCValue.ValueType.IsString || Humidity.IsArray)
-                {
-                    record.Humidity = (double)Humidity.AsDouble;
-                    Data_Humidity.Text = record.Humidity.ToString("N0");
+                    record.Data = (double)Data.AsDouble;
+                    Sensor_Data_Data.Text = record.Data.ToString();
                 }
 
-                var addResult = DataRecordData.AddRecord(record);
+                var addResult = Sensor_DataRecordData.AddRecord(record);
 
                 
                 // Original update was to make this CHART+COMMAND
@@ -794,39 +786,33 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-        private async void OnReadData(object sender, RoutedEventArgs e)
+        private async void OnReadSensor_Data(object sender, RoutedEventArgs e)
         {
-            await DoReadData();
+            await DoReadSensor_Data();
         }
 
-        private async Task DoReadData()
+        private async Task DoReadSensor_Data()
         {
             SetStatusActive (true); // the false happens in the bluetooth status handler.
             ncommand++;
             try
             {
-                var valueList = await bleDevice.ReadData();
+                var valueList = await bleDevice.ReadSensor_Data();
                 if (valueList == null)
                 {
-                    SetStatus ($"Error: unable to read Data");
+                    SetStatus ($"Error: unable to read Sensor_Data");
                     return;
                 }
                 
-                var record = new DataRecord();
-                var Temperature = valueList.GetValue("Temperature");
-                if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
+                var record = new Sensor_DataRecord();
+                var Data = valueList.GetValue("Data");
+                if (Data.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Data.CurrentType == BCBasic.BCValue.ValueType.IsString || Data.IsArray)
                 {
-                    record.Temperature = (double)Temperature.AsDouble;
-                    Data_Temperature.Text = record.Temperature.ToString("F3");
-                }
-                var Humidity = valueList.GetValue("Humidity");
-                if (Humidity.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Humidity.CurrentType == BCBasic.BCValue.ValueType.IsString || Humidity.IsArray)
-                {
-                    record.Humidity = (double)Humidity.AsDouble;
-                    Data_Humidity.Text = record.Humidity.ToString("N0");
+                    record.Data = (double)Data.AsDouble;
+                    Sensor_Data_Data.Text = record.Data.ToString();
                 }
 
-                DataRecordData.Add(record);
+                Sensor_DataRecordData.Add(record);
 
             }
             catch (Exception ex)

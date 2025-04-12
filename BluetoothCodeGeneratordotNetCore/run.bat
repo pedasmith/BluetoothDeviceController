@@ -15,6 +15,7 @@ REM it's nicer to have just the single file handled.
 REM
 if "%~1"=="-debug" goto :Debug
 if "%~1"=="-file" goto :SingleFile
+if "%~1"=="-singlefile" goto :SingleFile
 if "%~1"=="-all" goto :All
 goto :Help
 
@@ -43,7 +44,7 @@ goto :EOF
 @echo and a series of Template files and makes all of the BT device-specific outputs.
 @echo.
 @echo run -all to do all conversions
-@echo run -file <file> to do a single conversion. File is in the normal %JSONDIR% directory.
+@echo run -file ^<file^> to do a single conversion. File is in the normal %JSONDIR% directory.
 @echo run -debug to just convert a few active items
 
 

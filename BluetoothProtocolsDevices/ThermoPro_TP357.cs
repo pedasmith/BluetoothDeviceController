@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// ThermoPro temperature and humidity meter.
-    /// This class was automatically generated 2025-02-23::14:48
+    /// This class was automatically generated 2025-04-10::20:22
     /// </summary>
 
     public partial class ThermoPro_TP357 : INotifyPropertyChanged
@@ -44,7 +44,7 @@ namespace BluetoothProtocols
 
         };
         String[] ServiceNames = new string[] {
-            "SensorData",
+            "Sensor_Service",
             "Common Configuration",
             "Device Info",
 
@@ -56,7 +56,7 @@ namespace BluetoothProtocols
 
         };
         Guid[] CharacteristicGuids = new Guid[] {
-            Guid.Parse("00010203-0405-0607-0809-0a0b0c0d2b10"), // #0 is Data
+            Guid.Parse("00010203-0405-0607-0809-0a0b0c0d2b10"), // #0 is Sensor_Data
             Guid.Parse("00010203-0405-0607-0809-0a0b0c0d2b11"), // #1 is Command
             Guid.Parse("00002a00-0000-1000-8000-00805f9b34fb"), // #0 is Device Name
             Guid.Parse("00002a01-0000-1000-8000-00805f9b34fb"), // #1 is Appearance
@@ -65,7 +65,7 @@ namespace BluetoothProtocols
 
         };
         String[] CharacteristicNames = new string[] {
-            "Data", // #0 is 00010203-0405-0607-0809-0a0b0c0d2b10
+            "Sensor_Data", // #0 is 00010203-0405-0607-0809-0a0b0c0d2b10
             "Command", // #1 is 00010203-0405-0607-0809-0a0b0c0d2b11
             "Device Name", // #0 is 00002a00-0000-1000-8000-00805f9b34fb
             "Appearance", // #1 is 00002a01-0000-1000-8000-00805f9b34fb
@@ -99,8 +99,8 @@ namespace BluetoothProtocols
         };
         public enum CharacteristicsEnum {
             All_enum = -1,
-            Data_SensorData_enum = 0,
-            Command_SensorData_enum = 1,
+            Sensor_Data_Sensor_Service_enum = 0,
+            Command_Sensor_Service_enum = 1,
             Device_Name_Common_Configuration_enum = 2,
             Appearance_Common_Configuration_enum = 3,
             Connection_Parameter_Common_Configuration_enum = 4,
@@ -270,54 +270,46 @@ namespace BluetoothProtocols
 
 
 
-// method.list for Data
+// method.list for Sensor_Data
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Data_Opcode = 0;
-        private bool _Data_Opcode_set = false;
-        public double Data_Opcode
+        private double _Sensor_Data_Opcode = 0;
+        private bool _Sensor_Data_Opcode_set = false;
+        public double Sensor_Data_Opcode
         {
-            get { return _Data_Opcode; }
-            internal set { if (_Data_Opcode_set && value == _Data_Opcode) return; _Data_Opcode = value; _Data_Opcode_set = true; OnPropertyChanged(); }
+            get { return _Sensor_Data_Opcode; }
+            internal set { if (_Sensor_Data_Opcode_set && value == _Sensor_Data_Opcode) return; _Sensor_Data_Opcode = value; _Sensor_Data_Opcode_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Data_Unknown1 = 0;
-        private bool _Data_Unknown1_set = false;
-        public double Data_Unknown1
+        private double _Sensor_Data_Unknown1 = 0;
+        private bool _Sensor_Data_Unknown1_set = false;
+        public double Sensor_Data_Unknown1
         {
-            get { return _Data_Unknown1; }
-            internal set { if (_Data_Unknown1_set && value == _Data_Unknown1) return; _Data_Unknown1 = value; _Data_Unknown1_set = true; OnPropertyChanged(); }
+            get { return _Sensor_Data_Unknown1; }
+            internal set { if (_Sensor_Data_Unknown1_set && value == _Sensor_Data_Unknown1) return; _Sensor_Data_Unknown1 = value; _Sensor_Data_Unknown1_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Data_Flag = 0;
-        private bool _Data_Flag_set = false;
-        public double Data_Flag
+        private double _Sensor_Data_Flag = 0;
+        private bool _Sensor_Data_Flag_set = false;
+        public double Sensor_Data_Flag
         {
-            get { return _Data_Flag; }
-            internal set { if (_Data_Flag_set && value == _Data_Flag) return; _Data_Flag = value; _Data_Flag_set = true; OnPropertyChanged(); }
+            get { return _Sensor_Data_Flag; }
+            internal set { if (_Sensor_Data_Flag_set && value == _Sensor_Data_Flag) return; _Sensor_Data_Flag = value; _Sensor_Data_Flag_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Data_Temperature = 0;
-        private bool _Data_Temperature_set = false;
-        public double Data_Temperature
+        private double _Sensor_Data_Data = 0.0; // TODO: fix this autogen code OtherTypeXR;
+        private bool _Sensor_Data_Data_set = false;
+        public double Sensor_Data_Data
         {
-            get { return _Data_Temperature; }
-            internal set { if (_Data_Temperature_set && value == _Data_Temperature) return; _Data_Temperature = value; _Data_Temperature_set = true; OnPropertyChanged(); }
+            get { return _Sensor_Data_Data; }
+            internal set { if (_Sensor_Data_Data_set && value == _Sensor_Data_Data) return; _Sensor_Data_Data = value; _Sensor_Data_Data_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Data_Humidity = 0;
-        private bool _Data_Humidity_set = false;
-        public double Data_Humidity
+        private string _Sensor_Data_CrcExtra = null;
+        private bool _Sensor_Data_CrcExtra_set = false;
+        public string Sensor_Data_CrcExtra
         {
-            get { return _Data_Humidity; }
-            internal set { if (_Data_Humidity_set && value == _Data_Humidity) return; _Data_Humidity = value; _Data_Humidity_set = true; OnPropertyChanged(); }
-        }
-        // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private string _Data_CrcExtra = null;
-        private bool _Data_CrcExtra_set = false;
-        public string Data_CrcExtra
-        {
-            get { return _Data_CrcExtra; }
-            internal set { if (_Data_CrcExtra_set && value == _Data_CrcExtra) return; _Data_CrcExtra = value; _Data_CrcExtra_set = true; OnPropertyChanged(); }
+            get { return _Sensor_Data_CrcExtra; }
+            internal set { if (_Sensor_Data_CrcExtra_set && value == _Sensor_Data_CrcExtra) return; _Sensor_Data_CrcExtra = value; _Sensor_Data_CrcExtra_set = true; OnPropertyChanged(); }
         }
 
         // 
@@ -326,24 +318,23 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<BCBasic.BCValueList> ReadData(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<BCBasic.BCValueList> ReadSensor_Data(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Data_SensorData_enum);
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Sensor_Data_Sensor_Service_enum);
             if (ensureResult != GattCommunicationStatus.Success) 
             {
                 return null;
             }
-            IBuffer result = await ReadAsync(CharacteristicsEnum.Data_SensorData_enum, "Data", cacheMode);
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Sensor_Data_Sensor_Service_enum, "Sensor_Data", cacheMode);
             if (result == null) return null;
 
-            var datameaning = "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra";
+            var datameaning = "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag XR^EnvironmentData||Data BYTES|HEX^^HIDDEN|CrcExtra";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(result, datameaning);
-            Data_Opcode = parseResult.ValueList.GetValue("Opcode").AsDouble;
-            Data_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
-            Data_Flag = parseResult.ValueList.GetValue("Flag").AsDouble;
-            Data_Temperature = parseResult.ValueList.GetValue("Temperature").AsDouble;
-            Data_Humidity = parseResult.ValueList.GetValue("Humidity").AsDouble;
-            Data_CrcExtra = parseResult.ValueList.GetValue("CrcExtra").AsString;
+            Sensor_Data_Opcode = parseResult.ValueList.GetValue("Opcode").AsDouble;
+            Sensor_Data_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
+            Sensor_Data_Flag = parseResult.ValueList.GetValue("Flag").AsDouble;
+            Sensor_Data_Data = parseResult.ValueList.GetValue("Data").AsDouble;
+            Sensor_Data_CrcExtra = parseResult.ValueList.GetValue("CrcExtra").AsString;
 
             // Hint: get the data that's been read with e.g. 
             // var value = parseResult.ValueList.GetValue("LightRaw").AsDouble;
@@ -352,14 +343,14 @@ namespace BluetoothProtocols
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
-        /// Event for notifications; DataEvent += _my function_
+        /// Event for notifications; Sensor_DataEvent += _my function_
         /// </summary>
-        public event BluetoothDataEvent DataEvent = null;
+        public event BluetoothDataEvent Sensor_DataEvent = null;
         /// <summary>
         /// We only want to set the internal callback once, and never need to remove it.
         /// </summary>
 
-        private bool NotifyData_ValueChanged_Set = false;
+        private bool NotifySensor_Data_ValueChanged_Set = false;
 
         /// <summary>
         /// Sets up the notifications; 
@@ -368,59 +359,58 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
 
-        public async Task<bool> NotifyDataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifySensor_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Data_SensorData_enum);
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Sensor_Data_Sensor_Service_enum);
             if (ensureResult != GattCommunicationStatus.Success) 
             {
                 return false;
             }
 
-            var ch = Characteristics[(int)CharacteristicsEnum.Data_SensorData_enum];
+            var ch = Characteristics[(int)CharacteristicsEnum.Sensor_Data_Sensor_Service_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
             {
                 result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-                if (!NotifyData_ValueChanged_Set)
+                if (!NotifySensor_Data_ValueChanged_Set)
                 {
                     // Only set the event callback once
-                    NotifyData_ValueChanged_Set = true;
-                    ch.ValueChanged += NotifyDataCallback;
+                    NotifySensor_Data_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifySensor_DataCallback;
                 }
 
             }
             catch (Exception e)
             {
-                Status.ReportStatus($"NotifyData: {e.Message}", result);
+                Status.ReportStatus($"NotifySensor_Data: {e.Message}", result);
                 return false;
             }
-            Status.ReportStatus($"NotifyData: set notification", result);
+            Status.ReportStatus($"NotifySensor_Data: set notification", result);
 
             return true;
         }
 
-        private void NotifyDataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
+        private void NotifySensor_DataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
-            var datameaning = "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag ODE|U16^10_/|FIXED|Temperature|c ODE|U8|DEC|Humidity|Percent U16^10_/|FIXED|Temperature|c U8|DEC|Humidity|Percent BYTES|HEX^^HIDDEN|CrcExtra";
+            var datameaning = "U8|HEX^^HIDDEN|Opcode U8|HEX^^HIDDEN|Unknown1 U8|HEX^^HIDDEN|Flag XR^EnvironmentData||Data BYTES|HEX^^HIDDEN|CrcExtra";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-            Data_Opcode = parseResult.ValueList.GetValue("Opcode").AsDouble;
-            Data_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
-            Data_Flag = parseResult.ValueList.GetValue("Flag").AsDouble;
-            Data_Temperature = parseResult.ValueList.GetValue("Temperature").AsDouble;
-            Data_Humidity = parseResult.ValueList.GetValue("Humidity").AsDouble;
-            Data_CrcExtra = parseResult.ValueList.GetValue("CrcExtra").AsString;
+            Sensor_Data_Opcode = parseResult.ValueList.GetValue("Opcode").AsDouble;
+            Sensor_Data_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
+            Sensor_Data_Flag = parseResult.ValueList.GetValue("Flag").AsDouble;
+            Sensor_Data_Data = parseResult.ValueList.GetValue("Data").AsDouble;
+            Sensor_Data_CrcExtra = parseResult.ValueList.GetValue("CrcExtra").AsString;
 
-            DataEvent?.Invoke(parseResult);
+            Sensor_DataEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifyDataRemoveCharacteristicCallback() 
+        public void NotifySensor_DataRemoveCharacteristicCallback() 
         {
-            var ch = Characteristics[(int)CharacteristicsEnum.Data_SensorData_enum];
+            var ch = Characteristics[(int)CharacteristicsEnum.Sensor_Data_Sensor_Service_enum];
             if (ch == null) return;
-            NotifyData_ValueChanged_Set = false;
-            ch.ValueChanged -= NotifyDataCallback;
+            NotifySensor_Data_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifySensor_DataCallback;
         }
 
 
@@ -443,12 +433,12 @@ namespace BluetoothProtocols
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<BCBasic.BCValueList> ReadCommand(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Command_SensorData_enum);
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Command_Sensor_Service_enum);
             if (ensureResult != GattCommunicationStatus.Success) 
             {
                 return null;
             }
-            IBuffer result = await ReadAsync(CharacteristicsEnum.Command_SensorData_enum, "Command", cacheMode);
+            IBuffer result = await ReadAsync(CharacteristicsEnum.Command_Sensor_Service_enum, "Command", cacheMode);
             if (result == null) return null;
 
             var datameaning = "BYTES|HEX|Command";
@@ -468,7 +458,7 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public async Task<GattCommunicationStatus> WriteCommand(byte[] Command)
         {
-            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Command_SensorData_enum);
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Command_Sensor_Service_enum);
             if (ensureResult != GattCommunicationStatus.Success) 
             {
                 return ensureResult;
@@ -482,7 +472,7 @@ namespace BluetoothProtocols
 
             var command = dw.DetachBuffer().ToArray();
             
-            var retval = await WriteCommandAsync(CharacteristicsEnum.Command_SensorData_enum, "Command", command, GattWriteOption.WriteWithoutResponse);
+            var retval = await WriteCommandAsync(CharacteristicsEnum.Command_Sensor_Service_enum, "Command", command, GattWriteOption.WriteWithoutResponse);
 
             // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.genericattributeprofile.gattsession.maxpdusize?view=winrt-26100
             // You can send large amounts of data, and it will be fragmented automatically by the 
@@ -493,14 +483,14 @@ namespace BluetoothProtocols
             //const int MAXBYTES = 20;
             //if (command.Length <= MAXBYTES) //TODO: make sure this works
             //{
-            //    await WriteCommandAsync(CharacteristicsEnum.Command_SensorData_enum, "Command", command, GattWriteOption.WriteWithoutResponse);
+            //    await WriteCommandAsync(CharacteristicsEnum.Command_Sensor_Service_enum, "Command", command, GattWriteOption.WriteWithoutResponse);
             //}
             //else for (int i=0; i<command.Length; i+= MAXBYTES)
             //{
             //    // So many calculations and copying just to get a slice
             //    var maxCount = Math.Min(MAXBYTES, command.Length - i);
             //    var subcommand = new ArraySegment<byte>(command, i, maxCount).ToArray();
-            //    await WriteCommandAsync(CharacteristicsEnum.Command_SensorData_enum, "Command", subcommand, GattWriteOption.WriteWithoutResponse);
+            //    await WriteCommandAsync(CharacteristicsEnum.Command_Sensor_Service_enum, "Command", subcommand, GattWriteOption.WriteWithoutResponse);
             //}
             return retval;
         }

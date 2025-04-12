@@ -230,6 +230,7 @@
     <Compile Include="SpecialtyPages\BleHome_SensorBugPage.xaml.cs">
       <DependentUpon>BleHome_SensorBugPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SpecialtyPages\CozyTime_CT01Page.xaml.cs" />
     <Compile Include="SpecialtyPages\Daybetter_LedLightPage.xaml.cs" />
     <Compile Include="SpecialtyPages\DigHoseEndPage.xaml.cs">
       <DependentUpon>DigHoseEndPage.xaml</DependentUpon>
@@ -887,6 +888,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Assets\CharacteristicsData\_Recognizing_BT_Protocols.md" />
+    <Content Include="Assets\HelpFiles\Device_CozyTime_CT01.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\HelpFiles\_List_of_item_to_do.md" />
     <None Include="BluetoothDeviceController_TemporaryKey.pfx" />
   </ItemGroup>
@@ -1139,6 +1143,10 @@
     <Page Include="SpecialtyPages\BleHome_SensorBugPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialtyPages\CozyTime_CT01Page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="SpecialtyPages\Daybetter_LedLightPage.xaml">
       <Generator>MSBuild:Compile</Generator>

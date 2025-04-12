@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BleHome_SensorBug.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothProtocolsCustom\Viatom_PulseOximeter_PC60FW_Factory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CozyTime_CT01.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Daybetter_LedLight.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Daybetter_LedLight_Custom.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Govee_H6005_Custom.cs" />

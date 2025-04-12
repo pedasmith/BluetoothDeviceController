@@ -267,7 +267,8 @@ namespace BluetoothDeviceController.Names
             {
                 ; // something for the debugger to hook to.
             }
-            Type = defaultCharacteristic == null ? $"BYTES|HEX|{Name}" : defaultCharacteristic.Type;
+            var nameNoSpaces = Name.Replace(" ", "_");
+            Type = defaultCharacteristic == null ? $"BYTES|HEX|{nameNoSpaces}" : defaultCharacteristic.Type;
             TypePFL.Globals = service?.ServiceTypePFL;
             if (service != null && defaultCharacteristic != null)
             {
