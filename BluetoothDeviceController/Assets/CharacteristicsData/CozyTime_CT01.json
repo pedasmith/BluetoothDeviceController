@@ -159,7 +159,7 @@
               "Type": "U8|HEX^^HIDDEN|STX U8|DEC^^HIDDEN|Len U8|HEX^^HIDDEN|Op U8|HEX|Button U16^400_-_10.94_/|FIXED|Temperature|c U8|DEC|Humidity U32|HEX|Unknown1 U8|DEC|DD U8|DEC|HH U8|DEC|MM U8|DEC|SS U8|HEX^^HIDDEN|Final",
               "IsNotify": true,
               "AutoNotify": true,
-              "ZZZ_UI": {
+              "UI": {
                 "Expand": true,
                 "TitleSuffix": "Tracker",
                 "tableType": "standard",

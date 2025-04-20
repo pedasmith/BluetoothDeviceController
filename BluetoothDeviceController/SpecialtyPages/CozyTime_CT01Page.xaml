@@ -95,23 +95,49 @@
                     <Button Content="Notify" Click="OnNotifyControl" />
                 </GridView>
 
-                <TextBlock Style="{StaticResource SubheaderStyle}">Sensor_Data</TextBlock>
+                <TextBlock Style="{StaticResource SubheaderStyle}">Sensor_DataZZZ</TextBlock>
                 <GridView>
                     <GridView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
                         </ItemsPanelTemplate>
                     </GridView.ItemsPanel>
-                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_Button" Text="*" Header="Button" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_Temperature" Text="*" Header="Temperature" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_Humidity" Text="*" Header="Humidity" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_Unknown1" Text="*" Header="Unknown1" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_DD" Text="*" Header="DD" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_HH" Text="*" Header="HH" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_MM" Text="*" Header="MM" Style="{StaticResource HEXStyle}"/>
-                    <TextBox IsReadOnly="True" x:Name="Sensor_Data_SS" Text="*" Header="SS" Style="{StaticResource HEXStyle}"/>
-                    <Button Content="Notify" Click="OnNotifySensor_Data" />
+                    <TextBox IsReadOnly="True" x:Name="Sensor_DataZZZ_Button" Text="*" Header="Button" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_DataZZZ_Temperature" Text="*" Header="Temperature" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_DataZZZ_Humidity" Text="*" Header="Humidity" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_DataZZZ_Unknown1" Text="*" Header="Unknown1" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_DataZZZ_DD" Text="*" Header="DD" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_DataZZZ_HH" Text="*" Header="HH" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_DataZZZ_MM" Text="*" Header="MM" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="Sensor_DataZZZ_SS" Text="*" Header="SS" Style="{StaticResource HEXStyle}"/>
+                    <Button Content="Notify" Click="OnNotifySensor_DataZZZ" />
                 </GridView>
+                <controls:Expander Header="Sensor_DataZZZ Tracker" 
+                    IsExpanded="true" MinWidth="550" HorizontalAlignment="Left">
+                    <StackPanel MinWidth="550">
+                        <charts:ChartControl Height="200" Width="500" x:Name="Sensor_DataZZZChart" />
+
+                        <controls:DataGrid Style="{StaticResource TableStyle}" x:Name="Sensor_DataZZZGrid"
+                                ItemsSource="{Binding Sensor_DataZZZRecordData}" 
+                                AutoGeneratingColumn="OnAutogeneratingColumnSensor_DataZZZ"
+                        />
+                        <TextBox  x:Name="Sensor_DataZZZ_Notebox" KeyDown="OnSensor_DataZZZ_NoteKeyDown" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <ComboBox SelectionChanged="OnKeepCountSensor_DataZZZ" Header="Keep how many items?" SelectedIndex="2">
+                                <ComboBoxItem Tag="10">10</ComboBoxItem>
+                                <ComboBoxItem Tag="100">100</ComboBoxItem>
+                                <ComboBoxItem Tag="1000">1,000</ComboBoxItem>
+                                <ComboBoxItem Tag="10000">10K</ComboBoxItem>
+                            </ComboBox>
+                            <Rectangle Width="5" />
+                            <ComboBox SelectionChanged="OnAlgorithmSensor_DataZZZ" Header="Remove algorithm?" SelectedIndex="0">
+                                <ComboBoxItem Tag="1" ToolTipService.ToolTip="Keep a random sample of data">Keep random sample</ComboBoxItem>
+                                <ComboBoxItem Tag="0" ToolTipService.ToolTip="Keep the most recent data">Keep latest data</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content = "Copy" Click="OnCopySensor_DataZZZ" />
+                        </StackPanel>
+                    </StackPanel>
+                </controls:Expander>
 
 
             </StackPanel>

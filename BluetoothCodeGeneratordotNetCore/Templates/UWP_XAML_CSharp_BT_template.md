@@ -234,7 +234,7 @@ here!here TODO: Chart.SetDataProperties
                 };
                 var propertiesWithEventTime = new System.Reflection.PropertyInfo[]
                 {
-                    typeof(DataRecord).GetProperty("EventTime"),
+                    EventTimeProperty,
 [[CS+CHART+SETUP+PROPERTYLIST]]
                 };
                 var names = new List<string>()

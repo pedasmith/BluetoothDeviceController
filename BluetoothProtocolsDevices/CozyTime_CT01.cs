@@ -16,7 +16,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// CozyTime Smart Wireless Thermo-Hygrometer.
-    /// This class was automatically generated 2025-04-12::08:56
+    /// This class was automatically generated 2025-04-12::09:13
     /// </summary>
 
     public  class CozyTime_CT01 : INotifyPropertyChanged
@@ -56,7 +56,7 @@ namespace BluetoothProtocols
         };
         Guid[] CharacteristicGuids = new Guid[] {
             Guid.Parse("0000cec1-0000-1000-8000-00805f9b34fb"), // #0 is Control
-            Guid.Parse("0000cec2-0000-1000-8000-00805f9b34fb"), // #1 is Sensor_Data
+            Guid.Parse("0000cec2-0000-1000-8000-00805f9b34fb"), // #1 is Sensor_DataZZZ
             Guid.Parse("00002a00-0000-1000-8000-00805f9b34fb"), // #0 is Device Name
             Guid.Parse("00002a01-0000-1000-8000-00805f9b34fb"), // #1 is Appearance
             Guid.Parse("00002a29-0000-1000-8000-00805f9b34fb"), // #0 is Manufacturer Name
@@ -69,7 +69,7 @@ namespace BluetoothProtocols
         };
         String[] CharacteristicNames = new string[] {
             "Control", // #0 is 0000cec1-0000-1000-8000-00805f9b34fb
-            "Sensor_Data", // #1 is 0000cec2-0000-1000-8000-00805f9b34fb
+            "Sensor_DataZZZ", // #1 is 0000cec2-0000-1000-8000-00805f9b34fb
             "Device Name", // #0 is 00002a00-0000-1000-8000-00805f9b34fb
             "Appearance", // #1 is 00002a01-0000-1000-8000-00805f9b34fb
             "Manufacturer Name", // #0 is 00002a29-0000-1000-8000-00805f9b34fb
@@ -115,7 +115,7 @@ namespace BluetoothProtocols
         public enum CharacteristicsEnum {
             All_enum = -1,
             Control_Sensor_Service_enum = 0,
-            Sensor_Data_Sensor_Service_enum = 1,
+            Sensor_DataZZZ_Sensor_Service_enum = 1,
             Device_Name_Common_Configuration_enum = 2,
             Appearance_Common_Configuration_enum = 3,
             Manufacturer_Name_Device_Info_enum = 4,
@@ -437,115 +437,115 @@ namespace BluetoothProtocols
         }
 
 
-// method.list for Sensor_Data
+// method.list for Sensor_DataZZZ
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_STX = 0;
-        private bool _Sensor_Data_STX_set = false;
-        public double Sensor_Data_STX
+        private double _Sensor_DataZZZ_STX = 0;
+        private bool _Sensor_DataZZZ_STX_set = false;
+        public double Sensor_DataZZZ_STX
         {
-            get { return _Sensor_Data_STX; }
-            internal set { if (_Sensor_Data_STX_set && value == _Sensor_Data_STX) return; _Sensor_Data_STX = value; _Sensor_Data_STX_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_STX; }
+            internal set { if (_Sensor_DataZZZ_STX_set && value == _Sensor_DataZZZ_STX) return; _Sensor_DataZZZ_STX = value; _Sensor_DataZZZ_STX_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_Len = 0;
-        private bool _Sensor_Data_Len_set = false;
-        public double Sensor_Data_Len
+        private double _Sensor_DataZZZ_Len = 0;
+        private bool _Sensor_DataZZZ_Len_set = false;
+        public double Sensor_DataZZZ_Len
         {
-            get { return _Sensor_Data_Len; }
-            internal set { if (_Sensor_Data_Len_set && value == _Sensor_Data_Len) return; _Sensor_Data_Len = value; _Sensor_Data_Len_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_Len; }
+            internal set { if (_Sensor_DataZZZ_Len_set && value == _Sensor_DataZZZ_Len) return; _Sensor_DataZZZ_Len = value; _Sensor_DataZZZ_Len_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_Op = 0;
-        private bool _Sensor_Data_Op_set = false;
-        public double Sensor_Data_Op
+        private double _Sensor_DataZZZ_Op = 0;
+        private bool _Sensor_DataZZZ_Op_set = false;
+        public double Sensor_DataZZZ_Op
         {
-            get { return _Sensor_Data_Op; }
-            internal set { if (_Sensor_Data_Op_set && value == _Sensor_Data_Op) return; _Sensor_Data_Op = value; _Sensor_Data_Op_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_Op; }
+            internal set { if (_Sensor_DataZZZ_Op_set && value == _Sensor_DataZZZ_Op) return; _Sensor_DataZZZ_Op = value; _Sensor_DataZZZ_Op_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_Button = 0;
-        private bool _Sensor_Data_Button_set = false;
-        public double Sensor_Data_Button
+        private double _Sensor_DataZZZ_Button = 0;
+        private bool _Sensor_DataZZZ_Button_set = false;
+        public double Sensor_DataZZZ_Button
         {
-            get { return _Sensor_Data_Button; }
-            internal set { if (_Sensor_Data_Button_set && value == _Sensor_Data_Button) return; _Sensor_Data_Button = value; _Sensor_Data_Button_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_Button; }
+            internal set { if (_Sensor_DataZZZ_Button_set && value == _Sensor_DataZZZ_Button) return; _Sensor_DataZZZ_Button = value; _Sensor_DataZZZ_Button_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_Temperature = 0;
-        private bool _Sensor_Data_Temperature_set = false;
-        public double Sensor_Data_Temperature
+        private double _Sensor_DataZZZ_Temperature = 0;
+        private bool _Sensor_DataZZZ_Temperature_set = false;
+        public double Sensor_DataZZZ_Temperature
         {
-            get { return _Sensor_Data_Temperature; }
-            internal set { if (_Sensor_Data_Temperature_set && value == _Sensor_Data_Temperature) return; _Sensor_Data_Temperature = value; _Sensor_Data_Temperature_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_Temperature; }
+            internal set { if (_Sensor_DataZZZ_Temperature_set && value == _Sensor_DataZZZ_Temperature) return; _Sensor_DataZZZ_Temperature = value; _Sensor_DataZZZ_Temperature_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_Humidity = 0;
-        private bool _Sensor_Data_Humidity_set = false;
-        public double Sensor_Data_Humidity
+        private double _Sensor_DataZZZ_Humidity = 0;
+        private bool _Sensor_DataZZZ_Humidity_set = false;
+        public double Sensor_DataZZZ_Humidity
         {
-            get { return _Sensor_Data_Humidity; }
-            internal set { if (_Sensor_Data_Humidity_set && value == _Sensor_Data_Humidity) return; _Sensor_Data_Humidity = value; _Sensor_Data_Humidity_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_Humidity; }
+            internal set { if (_Sensor_DataZZZ_Humidity_set && value == _Sensor_DataZZZ_Humidity) return; _Sensor_DataZZZ_Humidity = value; _Sensor_DataZZZ_Humidity_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_Unknown1 = 0;
-        private bool _Sensor_Data_Unknown1_set = false;
-        public double Sensor_Data_Unknown1
+        private double _Sensor_DataZZZ_Unknown1 = 0;
+        private bool _Sensor_DataZZZ_Unknown1_set = false;
+        public double Sensor_DataZZZ_Unknown1
         {
-            get { return _Sensor_Data_Unknown1; }
-            internal set { if (_Sensor_Data_Unknown1_set && value == _Sensor_Data_Unknown1) return; _Sensor_Data_Unknown1 = value; _Sensor_Data_Unknown1_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_Unknown1; }
+            internal set { if (_Sensor_DataZZZ_Unknown1_set && value == _Sensor_DataZZZ_Unknown1) return; _Sensor_DataZZZ_Unknown1 = value; _Sensor_DataZZZ_Unknown1_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_DD = 0;
-        private bool _Sensor_Data_DD_set = false;
-        public double Sensor_Data_DD
+        private double _Sensor_DataZZZ_DD = 0;
+        private bool _Sensor_DataZZZ_DD_set = false;
+        public double Sensor_DataZZZ_DD
         {
-            get { return _Sensor_Data_DD; }
-            internal set { if (_Sensor_Data_DD_set && value == _Sensor_Data_DD) return; _Sensor_Data_DD = value; _Sensor_Data_DD_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_DD; }
+            internal set { if (_Sensor_DataZZZ_DD_set && value == _Sensor_DataZZZ_DD) return; _Sensor_DataZZZ_DD = value; _Sensor_DataZZZ_DD_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_HH = 0;
-        private bool _Sensor_Data_HH_set = false;
-        public double Sensor_Data_HH
+        private double _Sensor_DataZZZ_HH = 0;
+        private bool _Sensor_DataZZZ_HH_set = false;
+        public double Sensor_DataZZZ_HH
         {
-            get { return _Sensor_Data_HH; }
-            internal set { if (_Sensor_Data_HH_set && value == _Sensor_Data_HH) return; _Sensor_Data_HH = value; _Sensor_Data_HH_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_HH; }
+            internal set { if (_Sensor_DataZZZ_HH_set && value == _Sensor_DataZZZ_HH) return; _Sensor_DataZZZ_HH = value; _Sensor_DataZZZ_HH_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_MM = 0;
-        private bool _Sensor_Data_MM_set = false;
-        public double Sensor_Data_MM
+        private double _Sensor_DataZZZ_MM = 0;
+        private bool _Sensor_DataZZZ_MM_set = false;
+        public double Sensor_DataZZZ_MM
         {
-            get { return _Sensor_Data_MM; }
-            internal set { if (_Sensor_Data_MM_set && value == _Sensor_Data_MM) return; _Sensor_Data_MM = value; _Sensor_Data_MM_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_MM; }
+            internal set { if (_Sensor_DataZZZ_MM_set && value == _Sensor_DataZZZ_MM) return; _Sensor_DataZZZ_MM = value; _Sensor_DataZZZ_MM_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_SS = 0;
-        private bool _Sensor_Data_SS_set = false;
-        public double Sensor_Data_SS
+        private double _Sensor_DataZZZ_SS = 0;
+        private bool _Sensor_DataZZZ_SS_set = false;
+        public double Sensor_DataZZZ_SS
         {
-            get { return _Sensor_Data_SS; }
-            internal set { if (_Sensor_Data_SS_set && value == _Sensor_Data_SS) return; _Sensor_Data_SS = value; _Sensor_Data_SS_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_SS; }
+            internal set { if (_Sensor_DataZZZ_SS_set && value == _Sensor_DataZZZ_SS) return; _Sensor_DataZZZ_SS = value; _Sensor_DataZZZ_SS_set = true; OnPropertyChanged(); }
         }
         // METHOD+PROPERTY for ListOutput=parent Source=Services/Characteristics/ReadProperties
-        private double _Sensor_Data_Final = 0;
-        private bool _Sensor_Data_Final_set = false;
-        public double Sensor_Data_Final
+        private double _Sensor_DataZZZ_Final = 0;
+        private bool _Sensor_DataZZZ_Final_set = false;
+        public double Sensor_DataZZZ_Final
         {
-            get { return _Sensor_Data_Final; }
-            internal set { if (_Sensor_Data_Final_set && value == _Sensor_Data_Final) return; _Sensor_Data_Final = value; _Sensor_Data_Final_set = true; OnPropertyChanged(); }
+            get { return _Sensor_DataZZZ_Final; }
+            internal set { if (_Sensor_DataZZZ_Final_set && value == _Sensor_DataZZZ_Final) return; _Sensor_DataZZZ_Final = value; _Sensor_DataZZZ_Final_set = true; OnPropertyChanged(); }
         }
 
 
         // Returns a string with the status; starts with OK for good status.
         /// <summary>
-        /// Event for notifications; Sensor_DataEvent += _my function_
+        /// Event for notifications; Sensor_DataZZZEvent += _my function_
         /// </summary>
-        public event BluetoothDataEvent Sensor_DataEvent = null;
+        public event BluetoothDataEvent Sensor_DataZZZEvent = null;
         /// <summary>
         /// We only want to set the internal callback once, and never need to remove it.
         /// </summary>
 
-        private bool NotifySensor_Data_ValueChanged_Set = false;
+        private bool NotifySensor_DataZZZ_ValueChanged_Set = false;
 
         /// <summary>
         /// Sets up the notifications; 
@@ -554,65 +554,65 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
 
-        public async Task<bool> NotifySensor_DataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifySensor_DataZZZAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Sensor_Data_Sensor_Service_enum);
+            var ensureResult = await EnsureCharacteristicAsync(CharacteristicsEnum.Sensor_DataZZZ_Sensor_Service_enum);
             if (ensureResult != GattCommunicationStatus.Success) 
             {
                 return false;
             }
 
-            var ch = Characteristics[(int)CharacteristicsEnum.Sensor_Data_Sensor_Service_enum];
+            var ch = Characteristics[(int)CharacteristicsEnum.Sensor_DataZZZ_Sensor_Service_enum];
             if (ch == null) return false;
             GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
             try
             {
                 result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-                if (!NotifySensor_Data_ValueChanged_Set)
+                if (!NotifySensor_DataZZZ_ValueChanged_Set)
                 {
                     // Only set the event callback once
-                    NotifySensor_Data_ValueChanged_Set = true;
-                    ch.ValueChanged += NotifySensor_DataCallback;
+                    NotifySensor_DataZZZ_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifySensor_DataZZZCallback;
                 }
 
             }
             catch (Exception e)
             {
-                Status.ReportStatus($"NotifySensor_Data: {e.Message}", result);
+                Status.ReportStatus($"NotifySensor_DataZZZ: {e.Message}", result);
                 return false;
             }
-            Status.ReportStatus($"NotifySensor_Data: set notification", result);
+            Status.ReportStatus($"NotifySensor_DataZZZ: set notification", result);
 
             return true;
         }
 
-        private void NotifySensor_DataCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
+        private void NotifySensor_DataZZZCallback(GattCharacteristic sender, GattValueChangedEventArgs args) 
         {
             var datameaning = "U8|HEX^^HIDDEN|STX U8|DEC^^HIDDEN|Len U8|HEX^^HIDDEN|Op U8|HEX|Button U16^400_-_10.94_/|FIXED|Temperature|c U8|DEC|Humidity U32|HEX|Unknown1 U8|DEC|DD U8|DEC|HH U8|DEC|MM U8|DEC|SS U8|HEX^^HIDDEN|Final";
             var parseResult = BluetoothDeviceController.BleEditor.ValueParser.Parse(args.CharacteristicValue, datameaning);
-            Sensor_Data_STX = parseResult.ValueList.GetValue("STX").AsDouble;
-            Sensor_Data_Len = parseResult.ValueList.GetValue("Len").AsDouble;
-            Sensor_Data_Op = parseResult.ValueList.GetValue("Op").AsDouble;
-            Sensor_Data_Button = parseResult.ValueList.GetValue("Button").AsDouble;
-            Sensor_Data_Temperature = parseResult.ValueList.GetValue("Temperature").AsDouble;
-            Sensor_Data_Humidity = parseResult.ValueList.GetValue("Humidity").AsDouble;
-            Sensor_Data_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
-            Sensor_Data_DD = parseResult.ValueList.GetValue("DD").AsDouble;
-            Sensor_Data_HH = parseResult.ValueList.GetValue("HH").AsDouble;
-            Sensor_Data_MM = parseResult.ValueList.GetValue("MM").AsDouble;
-            Sensor_Data_SS = parseResult.ValueList.GetValue("SS").AsDouble;
-            Sensor_Data_Final = parseResult.ValueList.GetValue("Final").AsDouble;
+            Sensor_DataZZZ_STX = parseResult.ValueList.GetValue("STX").AsDouble;
+            Sensor_DataZZZ_Len = parseResult.ValueList.GetValue("Len").AsDouble;
+            Sensor_DataZZZ_Op = parseResult.ValueList.GetValue("Op").AsDouble;
+            Sensor_DataZZZ_Button = parseResult.ValueList.GetValue("Button").AsDouble;
+            Sensor_DataZZZ_Temperature = parseResult.ValueList.GetValue("Temperature").AsDouble;
+            Sensor_DataZZZ_Humidity = parseResult.ValueList.GetValue("Humidity").AsDouble;
+            Sensor_DataZZZ_Unknown1 = parseResult.ValueList.GetValue("Unknown1").AsDouble;
+            Sensor_DataZZZ_DD = parseResult.ValueList.GetValue("DD").AsDouble;
+            Sensor_DataZZZ_HH = parseResult.ValueList.GetValue("HH").AsDouble;
+            Sensor_DataZZZ_MM = parseResult.ValueList.GetValue("MM").AsDouble;
+            Sensor_DataZZZ_SS = parseResult.ValueList.GetValue("SS").AsDouble;
+            Sensor_DataZZZ_Final = parseResult.ValueList.GetValue("Final").AsDouble;
 
-            Sensor_DataEvent?.Invoke(parseResult);
+            Sensor_DataZZZEvent?.Invoke(parseResult);
 
         }
 
-        public void NotifySensor_DataRemoveCharacteristicCallback() 
+        public void NotifySensor_DataZZZRemoveCharacteristicCallback() 
         {
-            var ch = Characteristics[(int)CharacteristicsEnum.Sensor_Data_Sensor_Service_enum];
+            var ch = Characteristics[(int)CharacteristicsEnum.Sensor_DataZZZ_Sensor_Service_enum];
             if (ch == null) return;
-            NotifySensor_Data_ValueChanged_Set = false;
-            ch.ValueChanged -= NotifySensor_DataCallback;
+            NotifySensor_DataZZZ_ValueChanged_Set = false;
+            ch.ValueChanged -= NotifySensor_DataZZZCallback;
         }
 
 

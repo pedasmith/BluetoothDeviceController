@@ -49,7 +49,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             bleDevice.ble = ble;
             bleDevice.Status.OnBluetoothStatus += bleDevice_OnBluetoothStatus;
             await DoReadDevice_Name();
-            await DoNotifySensor_Data();
+            await DoNotifySensor_DataZZZ();
 
         }
 
@@ -1253,9 +1253,9 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
 
-        public class Sensor_DataRecord : INotifyPropertyChanged
+        public class Sensor_DataZZZRecord : INotifyPropertyChanged
         {
-            public Sensor_DataRecord()
+            public Sensor_DataZZZRecord()
             {
                 this.EventTime = DateTime.Now;
             }
@@ -1297,49 +1297,50 @@ namespace BluetoothDeviceController.SpecialtyPages
             public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
         }
 
-    public DataCollection<Sensor_DataRecord> Sensor_DataRecordData { get; } = new DataCollection<Sensor_DataRecord>();
-    private void OnSensor_Data_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+    public DataCollection<Sensor_DataZZZRecord> Sensor_DataZZZRecordData { get; } = new DataCollection<Sensor_DataZZZRecord>();
+    private void OnSensor_DataZZZ_NoteKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
     {
         if (e.Key == Windows.System.VirtualKey.Enter)
         {
             var text = (sender as TextBox).Text.Trim();
             (sender as TextBox).Text = "";
             // Add the text to the notes section
-            if (Sensor_DataRecordData.Count == 0)
+            if (Sensor_DataZZZRecordData.Count == 0)
             {
-                Sensor_DataRecordData.AddRecord(new Sensor_DataRecord());
+                Sensor_DataZZZRecordData.AddRecord(new Sensor_DataZZZRecord());
             }
-            Sensor_DataRecordData[Sensor_DataRecordData.Count - 1].Note = text;
+            Sensor_DataZZZRecordData[Sensor_DataZZZRecordData.Count - 1].Note = text;
             e.Handled = true;
         }
     }
 
     // Functions called from the expander
-    private void OnKeepCountSensor_Data(object sender, SelectionChangedEventArgs e)
+    private void OnKeepCountSensor_DataZZZ(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.Count != 1) return;
         int value;
         var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
         if (!ok) return;
-        Sensor_DataRecordData.MaxLength = value;
+        Sensor_DataZZZRecordData.MaxLength = value;
 
-        
+        Sensor_DataZZZChart.RedrawYTime<Sensor_DataZZZRecord>(Sensor_DataZZZRecordData);
+
     }
 
-    private void OnAlgorithmSensor_Data(object sender, SelectionChangedEventArgs e)
+    private void OnAlgorithmSensor_DataZZZ(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.Count != 1) return;
         int value;
         var ok = Int32.TryParse((e.AddedItems[0] as FrameworkElement).Tag as string, out value);
         if (!ok) return;
-        Sensor_DataRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
+        Sensor_DataZZZRecordData.RemoveAlgorithm = (RemoveRecordAlgorithm)value;
     }
-    private void OnCopySensor_Data(object sender, RoutedEventArgs e)
+    private void OnCopySensor_DataZZZ(object sender, RoutedEventArgs e)
     {
         // Copy the contents over...
         var sb = new System.Text.StringBuilder();
         sb.Append("EventDate,EventTime,STX,Len,Op,Button,Temperature,Humidity,Unknown1,DD,HH,MM,SS,Final,Notes\n");
-        foreach (var row in Sensor_DataRecordData)
+        foreach (var row in Sensor_DataZZZRecordData)
         {
             var time24 = row.EventTime.ToString("HH:mm:ss.f");
             sb.Append($"{row.EventTime.ToShortDateString()},{time24},{row.STX},{row.Len},{row.Op},{row.Button},{row.Temperature},{row.Humidity},{row.Unknown1},{row.DD},{row.HH},{row.MM},{row.SS},{row.Final},{AdvancedCalculator.BCBasic.RunTimeLibrary.RTLCsvRfc4180.Encode(row.Note)}\n");
@@ -1350,35 +1351,86 @@ namespace BluetoothDeviceController.SpecialtyPages
         Clipboard.SetContent(datapackage);
     }
 
-        GattClientCharacteristicConfigurationDescriptorValue[] NotifySensor_DataSettings = {
+        GattClientCharacteristicConfigurationDescriptorValue[] NotifySensor_DataZZZSettings = {
             GattClientCharacteristicConfigurationDescriptorValue.Notify,
 
             GattClientCharacteristicConfigurationDescriptorValue.None,
         };
-        int Sensor_DataNotifyIndex = 0;
-        bool Sensor_DataNotifySetup = false;
-        private async void OnNotifySensor_Data(object sender, RoutedEventArgs e)
+        int Sensor_DataZZZNotifyIndex = 0;
+        bool Sensor_DataZZZNotifySetup = false;
+        private async void OnNotifySensor_DataZZZ(object sender, RoutedEventArgs e)
         {
-            await DoNotifySensor_Data();
+            await DoNotifySensor_DataZZZ();
         }
 
-        private async Task DoNotifySensor_Data()
+        private async Task DoNotifySensor_DataZZZ()
         {
             SetStatusActive (true);
             ncommand++;
             try
             {
                 // Only set up the event callback once.
-                if (!Sensor_DataNotifySetup)
+                if (!Sensor_DataZZZNotifySetup)
                 {
-                    Sensor_DataNotifySetup = true;
-                    bleDevice.Sensor_DataEvent += BleDevice_Sensor_DataEvent;
+                    Sensor_DataZZZNotifySetup = true;
+                    bleDevice.Sensor_DataZZZEvent += BleDevice_Sensor_DataZZZEvent;
                 }
-                var notifyType = NotifySensor_DataSettings[Sensor_DataNotifyIndex];
-                Sensor_DataNotifyIndex = (Sensor_DataNotifyIndex + 1) % NotifySensor_DataSettings.Length;
-                var result = await bleDevice.NotifySensor_DataAsync(notifyType);
+                var notifyType = NotifySensor_DataZZZSettings[Sensor_DataZZZNotifyIndex];
+                Sensor_DataZZZNotifyIndex = (Sensor_DataZZZNotifyIndex + 1) % NotifySensor_DataZZZSettings.Length;
+                var result = await bleDevice.NotifySensor_DataZZZAsync(notifyType);
                 
 
+                var EventTimeProperty = typeof(Sensor_DataZZZRecord).GetProperty("EventTime");
+                var properties = new System.Collections.Generic.List<System.Reflection.PropertyInfo>()
+                {
+                    typeof(Sensor_DataZZZRecord).GetProperty("Button"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("Temperature"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("Humidity"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("Unknown1"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("DD"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("HH"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("MM"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("SS"),
+
+                };
+                var propertiesWithEventTime = new System.Reflection.PropertyInfo[]
+                {
+                    EventTimeProperty,
+                    typeof(Sensor_DataZZZRecord).GetProperty("Button"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("Temperature"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("Humidity"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("Unknown1"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("DD"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("HH"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("MM"),
+                    typeof(Sensor_DataZZZRecord).GetProperty("SS"),
+
+                };
+                var names = new List<string>()
+                {"Button","Temperature","Humidity","Unknown1","DD","HH","MM","SS",
+                };
+                Sensor_DataZZZRecordData.TProperties = propertiesWithEventTime;
+                Sensor_DataZZZChart.SetDataProperties(properties, EventTimeProperty, names);
+                Sensor_DataZZZChart.SetTitle("Sensor_DataZZZ Chart");
+                Sensor_DataZZZChart.UISpec = new BluetoothDeviceController.Names.UISpecifications()
+{
+tableType="standard",
+chartType="ytime",
+chartCommand="AddYTime<Sensor_DataZZZRecord>(addResult, Sensor_DataZZZRecordData)",
+chartDefaultMaxY=50,
+chartDefaultMinY=0,
+        chartLineDefaults={
+                        { "Temperature", new ChartLineDefaults() {
+                            stroke="DarkGreen",
+                            }
+                        },
+                        { "Humidity", new ChartLineDefaults() {
+                            stroke="DarkBlue",
+                            }
+                        },
+                    },
+}
+;
 
             }
             catch (Exception ex)
@@ -1387,7 +1439,7 @@ namespace BluetoothDeviceController.SpecialtyPages
             }
         }
 
-        private async void BleDevice_Sensor_DataEvent(BleEditor.ValueParserResult data)
+        private async void BleDevice_Sensor_DataZZZEvent(BleEditor.ValueParserResult data)
         {
             if (data.Result == BleEditor.ValueParserResult.ResultValues.Ok)
             {
@@ -1395,59 +1447,60 @@ namespace BluetoothDeviceController.SpecialtyPages
                 {
                 var valueList = data.ValueList;
                 
-                var record = new Sensor_DataRecord();
+                var record = new Sensor_DataZZZRecord();
                 var Button = valueList.GetValue("Button");
                 if (Button.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Button.CurrentType == BCBasic.BCValue.ValueType.IsString || Button.IsArray)
                 {
                     record.Button = (double)Button.AsDouble;
-                    Sensor_Data_Button.Text = record.Button.ToString("N0");
+                    Sensor_DataZZZ_Button.Text = record.Button.ToString("N0");
                 }
                 var Temperature = valueList.GetValue("Temperature");
                 if (Temperature.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Temperature.CurrentType == BCBasic.BCValue.ValueType.IsString || Temperature.IsArray)
                 {
                     record.Temperature = (double)Temperature.AsDouble;
-                    Sensor_Data_Temperature.Text = record.Temperature.ToString("F3");
+                    Sensor_DataZZZ_Temperature.Text = record.Temperature.ToString("F3");
                 }
                 var Humidity = valueList.GetValue("Humidity");
                 if (Humidity.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Humidity.CurrentType == BCBasic.BCValue.ValueType.IsString || Humidity.IsArray)
                 {
                     record.Humidity = (double)Humidity.AsDouble;
-                    Sensor_Data_Humidity.Text = record.Humidity.ToString("N0");
+                    Sensor_DataZZZ_Humidity.Text = record.Humidity.ToString("N0");
                 }
                 var Unknown1 = valueList.GetValue("Unknown1");
                 if (Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsDouble || Unknown1.CurrentType == BCBasic.BCValue.ValueType.IsString || Unknown1.IsArray)
                 {
                     record.Unknown1 = (double)Unknown1.AsDouble;
-                    Sensor_Data_Unknown1.Text = record.Unknown1.ToString("N0");
+                    Sensor_DataZZZ_Unknown1.Text = record.Unknown1.ToString("N0");
                 }
                 var DD = valueList.GetValue("DD");
                 if (DD.CurrentType == BCBasic.BCValue.ValueType.IsDouble || DD.CurrentType == BCBasic.BCValue.ValueType.IsString || DD.IsArray)
                 {
                     record.DD = (double)DD.AsDouble;
-                    Sensor_Data_DD.Text = record.DD.ToString("N0");
+                    Sensor_DataZZZ_DD.Text = record.DD.ToString("N0");
                 }
                 var HH = valueList.GetValue("HH");
                 if (HH.CurrentType == BCBasic.BCValue.ValueType.IsDouble || HH.CurrentType == BCBasic.BCValue.ValueType.IsString || HH.IsArray)
                 {
                     record.HH = (double)HH.AsDouble;
-                    Sensor_Data_HH.Text = record.HH.ToString("N0");
+                    Sensor_DataZZZ_HH.Text = record.HH.ToString("N0");
                 }
                 var MM = valueList.GetValue("MM");
                 if (MM.CurrentType == BCBasic.BCValue.ValueType.IsDouble || MM.CurrentType == BCBasic.BCValue.ValueType.IsString || MM.IsArray)
                 {
                     record.MM = (double)MM.AsDouble;
-                    Sensor_Data_MM.Text = record.MM.ToString("N0");
+                    Sensor_DataZZZ_MM.Text = record.MM.ToString("N0");
                 }
                 var SS = valueList.GetValue("SS");
                 if (SS.CurrentType == BCBasic.BCValue.ValueType.IsDouble || SS.CurrentType == BCBasic.BCValue.ValueType.IsString || SS.IsArray)
                 {
                     record.SS = (double)SS.AsDouble;
-                    Sensor_Data_SS.Text = record.SS.ToString("N0");
+                    Sensor_DataZZZ_SS.Text = record.SS.ToString("N0");
                 }
 
-                var addResult = Sensor_DataRecordData.AddRecord(record);
+                var addResult = Sensor_DataZZZRecordData.AddRecord(record);
 
-                
+                Sensor_DataZZZChart.AddYTime<Sensor_DataZZZRecord>(addResult, Sensor_DataZZZRecordData);
+
                 // Original update was to make this CHART+COMMAND
                 });
             }
@@ -1456,6 +1509,14 @@ namespace BluetoothDeviceController.SpecialtyPages
 
 
 
+        private void OnAutogeneratingColumnSensor_DataZZZ(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            if (e.Column.Header.ToString() == "STX") e.Cancel = true;
+            if (e.Column.Header.ToString() == "Len") e.Cancel = true;
+            if (e.Column.Header.ToString() == "Op") e.Cancel = true;
+            if (e.Column.Header.ToString() == "Final") e.Cancel = true;
+
+        }
 
 
 
