@@ -43,6 +43,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BluetoothProtocolsDevices",
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "UtilitiesCore", "UtilitiesCore\UtilitiesCore.shproj", "{8BF746AA-A6ED-4721-B52F-7AD047B25BC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestNmeaGpsParser", "TestNmeaGpsParser\TestNmeaGpsParser.csproj", "{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -277,6 +279,26 @@ Global
 		{0132B2B2-9D02-49E3-B3CA-4DD2218617A6}.Release|x86.ActiveCfg = Release|x86
 		{0132B2B2-9D02-49E3-B3CA-4DD2218617A6}.Release|x86.Build.0 = Release|x86
 		{0132B2B2-9D02-49E3-B3CA-4DD2218617A6}.Release|x86.Deploy.0 = Release|x86
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|ARM.Build.0 = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|x64.Build.0 = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Debug|x86.Build.0 = Debug|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|ARM.ActiveCfg = Release|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|ARM.Build.0 = Release|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|ARM64.Build.0 = Release|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|x64.ActiveCfg = Release|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|x64.Build.0 = Release|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|x86.ActiveCfg = Release|Any CPU
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -288,6 +310,7 @@ Global
 		{6E37385D-AEEC-4430-BAB3-760B5BC0B49C} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
 		{CC0BF9AF-CFC1-4561-B76A-0835174D1E34} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
 		{0132B2B2-9D02-49E3-B3CA-4DD2218617A6} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
+		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62DCA7A6-8C59-4330-98B9-0EF91B6BAD39}
@@ -300,6 +323,7 @@ Global
 		SmallProjects\SampleServerXaml\SampleServerXaml.projitems*{1e823489-7f61-41df-a84e-e1484865cd96}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{1e823489-7f61-41df-a84e-e1484865cd96}*SharedItemsImports = 4
 		UtilitiesCore\UtilitiesCore.projitems*{3d43813a-308b-44f4-8b19-378627db54bf}*SharedItemsImports = 5
+		UtilitiesCore\UtilitiesCore.projitems*{5b3a0828-cfb8-4ed9-97ec-13502ca517b9}*SharedItemsImports = 5
 		BCBasicShared\BCBasicShared.projitems*{6e37385d-aeec-4430-bab3-760b5bc0b49c}*SharedItemsImports = 4
 		BluetoothProtocols\BluetoothProtocols.projitems*{6e37385d-aeec-4430-bab3-760b5bc0b49c}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{6e37385d-aeec-4430-bab3-760b5bc0b49c}*SharedItemsImports = 4
