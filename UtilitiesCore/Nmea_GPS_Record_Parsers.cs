@@ -13,6 +13,7 @@ using System.Text;
 #endif
 namespace Parsers.Nmea
 {
+
     public class GPGGA_Data : Nmea_Data
     {
         // Potential checks: are all the lengths accurate?
@@ -95,7 +96,7 @@ namespace Parsers.Nmea
         public string OpcodeString { get { return GetPart(0); } }
         public string TimeString { get { return GetPart(1); } }
         public Nmea_Time_Fields Time = new Nmea_Time_Fields();
-        public string LatitudeString { get { return GetPart(2); } } // DDMM.dddd dd=decimal minutes
+        public string LatitudeString { get { return GetPart(2); } } 
         public string LatitudeNorthSouthString { get { return GetPart(3); } } // N S
         public Nmea_Latitude_Fields Latitude = new Nmea_Latitude_Fields();
 
@@ -128,10 +129,71 @@ namespace Parsers.Nmea
         {
             return $"{OpcodeString} {Time} {Latitude} {Longitude} fix indicator={PositionFixIndicator} nsatellites={SatellitesUsed} altitude={MlsAltitude} {MlsAltitudeUnits} separation={GeoidSeparation} {GeoidSeparationUnits}";
         }
-
-
     }
 
+    public class GPGLL_Data : Nmea_Data
+    {
+        public GPGLL_Data(string str)
+            : base(str)
+        {
+            if (NmeaParts.Length < 6)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
+                return;
+            }
+            if (OpcodeString != "$GPGLL")
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
+                return;
+            }
+
+            ParseStatus = Latitude.Parse(LatitudeString, LatitudeNorthSouthString);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
+            ParseStatus = Longitude.Parse(LongitudeString, LongitudeEastWestString);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
+            ParseStatus = Time.Parse(TimeString, Nmea_Time_Fields.ParseOptionsType.hhmmss_sss);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
+            switch (ValidityString)
+            {
+                case "A": Validity = ValidityType.ValidCurrentData; break;
+                case "V": Validity = ValidityType.InvalidCurrentData; break;
+                case "B": Validity = ValidityType.ValidStoredData; break;
+                case "W": Validity = ValidityType.InvalidStoredData; break;
+                default:
+                    ParseStatus = Nmea_Gps_Parser.ParseResult.ValidityInvalid;
+                    return;
+            }
+
+            ParseStatus = Nmea_Gps_Parser.ParseResult.Ok;
+        }
+
+        public string OpcodeString { get { return GetPart(0); } }
+
+        public string LatitudeString { get { return GetPart(1); } } 
+        public string LatitudeNorthSouthString { get { return GetPart(2); } } // N S
+        public Nmea_Latitude_Fields Latitude = new Nmea_Latitude_Fields();
+
+        public string LongitudeString { get { return GetPart(3); } } // Degrees.MMdd
+        public string LongitudeEastWestString { get { return GetPart(4); } } // E W
+        public Nmea_Longitude_Fields Longitude = new Nmea_Longitude_Fields();
+
+        public string TimeString { get { return GetPart(5); } }
+        public Nmea_Time_Fields Time = new Nmea_Time_Fields();
+
+        public string ValidityString { get { return GetPart(6); } } // A=valid current data B=valid stored data V=invalid current data W=invalid stored data
+        public enum ValidityType { ValidCurrentData, ValidStoredData, InvalidCurrentData, InvalidStoredData };
+        public ValidityType Validity;
+        public override string ToString()
+        {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} {Latitude} {Longitude} {Time}";
+
+            return $"{OpcodeString} {Latitude} {Longitude} {Time}";
+        }
+    }
 
     public class GPGSA_Data : Nmea_Data
     {
@@ -215,7 +277,7 @@ namespace Parsers.Nmea
         public string OpcodeString { get { return GetPart(0); } }
         public string TimeString { get { return GetPart(1); } }
         public Nmea_Time_Fields Time = new Nmea_Time_Fields();
-        public string LatitudeString { get { return GetPart(2); } } // DDMM.dddd dd=decimal minutes
+        public string LatitudeString { get { return GetPart(2); } } 
         public string LatitudeNorthSouthString { get { return GetPart(3); } } // N S
         public Nmea_Latitude_Fields Latitude = new Nmea_Latitude_Fields();
 
@@ -315,7 +377,7 @@ namespace Parsers.Nmea
         public string ValidityString { get { return GetPart(2); } } // A=valid current data B=valid stored data V=invalid current data W=invalid stored data
         public enum ValidityType { ValidCurrentData, ValidStoredData, InvalidCurrentData, InvalidStoredData };
         public ValidityType Validity;
-        public string LatitudeString { get { return GetPart(3); } } // DDMM.dddd dd=decimal minutes
+        public string LatitudeString { get { return GetPart(3); } } 
         public string LatitudeNorthSouthString { get { return GetPart(4); } } // N S
         public Nmea_Latitude_Fields Latitude = new Nmea_Latitude_Fields();
 

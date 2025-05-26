@@ -66,6 +66,14 @@ namespace Parsers.Nmea
                 else OnGpggaParseError?.Invoke(this, data);
                 return data.ParseStatus;
             }
+            else if (Nmea.StartsWith("$GPGLL,"))
+            {
+                var data = new GPGLL_Data(Nmea);
+                OnNmeaAll?.Invoke(this, data);
+                if (data.ParseStatus == ParseResult.Ok) OnGpgllOk?.Invoke(this, data);
+                else OnGpgllParseError?.Invoke(this, data);
+                return data.ParseStatus;
+            }
             else if (Nmea.StartsWith("$GPRMC,"))
             {
                 var data = new GPRMC_Data(Nmea);
@@ -103,6 +111,10 @@ namespace Parsers.Nmea
 
         public event EventHandler<GPGGA_Data> OnGpggaOk;
         public event EventHandler<GPGGA_Data> OnGpggaParseError;
+
+        public event EventHandler<GPGLL_Data> OnGpgllOk;
+        public event EventHandler<GPGLL_Data> OnGpgllParseError;
+
 
         public event EventHandler<GPVTG_Data> OnGpvtgOk;
         public event EventHandler<GPVTG_Data> OnGpvtgParseError;

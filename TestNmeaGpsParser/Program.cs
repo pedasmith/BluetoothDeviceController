@@ -14,6 +14,8 @@ namespace TestNmeaGpsParser
             parser.OnNmeaUnknown += Parser_OnNmeaUnknown;
             parser.OnGpggaOk += Parser_OnGpggaOk;
             parser.OnGpggaParseError += Parser_OnGpggaParseError;
+            parser.OnGpgllOk += Parser_OnGpgllOk;
+            parser.OnGpgllParseError += Parser_OnGpgllParseError;
             parser.OnGprmcOk += Parser_OnGprmcOk;
             parser.OnGprmcParseError += Parser_OnGprmcParseError;
             parser.OnGpvtgOk += Parser_OnGpvtgOk;
@@ -33,25 +35,34 @@ namespace TestNmeaGpsParser
         }
 
 
-        private static void Parser_OnGprmcOk(object? sender, GPRMC_Data e)
-        {
-            Console.WriteLine($"GPRMC:OK: {e}");
-        }
-
-        private static void Parser_OnGprmcParseError(object? sender, GPRMC_Data e)
-        {
-            Console.WriteLine($"GPRMC:Error: {e}");
-        }
 
         private static void Parser_OnGpggaParseError(object? sender, GPGGA_Data e)
         {
             Console.WriteLine($"GPGGA:Error: {e}");
         }
-
         private static void Parser_OnGpggaOk(object? sender, GPGGA_Data e)
         {
             Console.WriteLine($"GPGGA:OK: {e}");
         }
+
+        private static void Parser_OnGpgllParseError(object? sender, GPGLL_Data e)
+        {
+            Console.WriteLine($"GPGLL:Error: {e}");
+        }
+        private static void Parser_OnGpgllOk(object? sender, GPGLL_Data e)
+        {
+            Console.WriteLine($"GPGLL:OK: {e}");
+        }
+
+        private static void Parser_OnGprmcOk(object? sender, GPRMC_Data e)
+        {
+            Console.WriteLine($"GPRMC:OK: {e}");
+        }
+        private static void Parser_OnGprmcParseError(object? sender, GPRMC_Data e)
+        {
+            Console.WriteLine($"GPRMC:Error: {e}");
+        }
+
         private static void Parser_OnGpvtgOk(object? sender, GPVTG_Data e)
         {
             Console.WriteLine($"GPVTG:OK: {e}");
@@ -60,6 +71,7 @@ namespace TestNmeaGpsParser
         {
             Console.WriteLine($"GPVTG:ERROR: {e}");
         }
+
         private static void Parser_OnGpzdaOk(object? sender, GPZDA_Data e)
         {
             Console.WriteLine($"GPZDA:OK: {e}");
