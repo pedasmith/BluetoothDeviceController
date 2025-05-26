@@ -16,6 +16,8 @@ namespace TestNmeaGpsParser
             parser.OnGpggaParseError += Parser_OnGpggaParseError;
             parser.OnGprmcOk += Parser_OnGprmcOk;
             parser.OnGprmcParseError += Parser_OnGprmcParseError;
+            parser.OnGpvtgOk += Parser_OnGpvtgOk;
+            parser.OnGpvtgParseError += Parser_OnGpvtgParseError;
 
             var lines = example.Split(new char[] { '\n', '\r' }); 
             foreach (var line in lines)
@@ -26,6 +28,15 @@ namespace TestNmeaGpsParser
                     var result = parser.Parse(trim);
                 }
             }
+        }
+
+        private static void Parser_OnGpvtgOk(object? sender, GPVTG_Data e)
+        {
+            Console.WriteLine($"GPVTG:OK: {e}");
+        }
+        private static void Parser_OnGpvtgParseError(object? sender, GPVTG_Data e)
+        {
+            Console.WriteLine($"GPVTG:ERROR: {e}");
         }
 
         private static void Parser_OnGprmcOk(object? sender, GPRMC_Data e)

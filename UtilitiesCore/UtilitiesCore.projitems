@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ByteOnlyDataReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CrcCalculations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NMEA_GPS_Parser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Nmea_GPS_Record_Parsers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Protobuf.cs" />
   </ItemGroup>
 </Project>
