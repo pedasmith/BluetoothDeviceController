@@ -40,6 +40,8 @@ namespace Parsers.Nmea
             GeoidSeparationInvalid, GeoidSeparationUnitsInvalid,
 
             // GPGSA additional errors
+            Mode1Invalid, Mode2Invalid,
+            PdopInvalid,
 
             // GPVTG additinal errors
             CourseTrueInvalid, CourseTrueUnitsInvalid,
@@ -48,9 +50,12 @@ namespace Parsers.Nmea
             VelocityKphInvalid, VelocityKphUnitsInvalid,
 
             // GPZDA
-            LoclZoneHourInvalid,
+            LocalZoneHourInvalid,
 
             // GPGLL
+
+            // GPPWR
+            GppwrIsNotUnderstoodByAnyoneOnTheInternet,
 
             OtherError
         }
@@ -72,6 +77,22 @@ namespace Parsers.Nmea
                 OnNmeaAll?.Invoke(this, data);
                 if (data.ParseStatus == ParseResult.Ok) OnGpgllOk?.Invoke(this, data);
                 else OnGpgllParseError?.Invoke(this, data);
+                return data.ParseStatus;
+            }
+            else if (Nmea.StartsWith("$GPGSA,"))
+            {
+                var data = new GPGSA_Data(Nmea);
+                OnNmeaAll?.Invoke(this, data);
+                if (data.ParseStatus == ParseResult.Ok) OnGpgsaOk?.Invoke(this, data);
+                else OnGpgsaParseError?.Invoke(this, data);
+                return data.ParseStatus;
+            }
+            else if (Nmea.StartsWith("$GPPWR,"))
+            {
+                var data = new GPPWR_Data(Nmea);
+                OnNmeaAll?.Invoke(this, data);
+                if (data.ParseStatus == ParseResult.Ok) OnGppwrOk?.Invoke(this, data);
+                else OnGppwrParseError?.Invoke(this, data);
                 return data.ParseStatus;
             }
             else if (Nmea.StartsWith("$GPRMC,"))
@@ -106,8 +127,6 @@ namespace Parsers.Nmea
 
             return retval;
         }
-        public event EventHandler<GPRMC_Data> OnGprmcOk;
-        public event EventHandler<GPRMC_Data> OnGprmcParseError;
 
         public event EventHandler<GPGGA_Data> OnGpggaOk;
         public event EventHandler<GPGGA_Data> OnGpggaParseError;
@@ -115,6 +134,14 @@ namespace Parsers.Nmea
         public event EventHandler<GPGLL_Data> OnGpgllOk;
         public event EventHandler<GPGLL_Data> OnGpgllParseError;
 
+        public event EventHandler<GPGSA_Data> OnGpgsaOk;
+        public event EventHandler<GPGSA_Data> OnGpgsaParseError;
+
+        public event EventHandler<GPPWR_Data> OnGppwrOk;
+        public event EventHandler<GPPWR_Data> OnGppwrParseError;
+
+        public event EventHandler<GPRMC_Data> OnGprmcOk;
+        public event EventHandler<GPRMC_Data> OnGprmcParseError;
 
         public event EventHandler<GPVTG_Data> OnGpvtgOk;
         public event EventHandler<GPVTG_Data> OnGpvtgParseError;

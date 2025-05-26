@@ -16,6 +16,10 @@ namespace TestNmeaGpsParser
             parser.OnGpggaParseError += Parser_OnGpggaParseError;
             parser.OnGpgllOk += Parser_OnGpgllOk;
             parser.OnGpgllParseError += Parser_OnGpgllParseError;
+            parser.OnGpgsaOk += Parser_OnGpgsaOk;
+            parser.OnGpgsaParseError += Parser_OnGpgsaParseError;
+            parser.OnGppwrOk += Parser_OnGppwrOk;
+            parser.OnGppwrParseError += Parser_OnGppwrParseError;
             parser.OnGprmcOk += Parser_OnGprmcOk;
             parser.OnGprmcParseError += Parser_OnGprmcParseError;
             parser.OnGpvtgOk += Parser_OnGpvtgOk;
@@ -53,6 +57,24 @@ namespace TestNmeaGpsParser
         {
             Console.WriteLine($"GPGLL:OK: {e}");
         }
+        private static void Parser_OnGpgsaParseError(object? sender, GPGSA_Data e)
+        {
+            Console.WriteLine($"GPGSA:Error: {e}");
+        }
+        private static void Parser_OnGpgsaOk(object? sender, GPGSA_Data e)
+        {
+            Console.WriteLine($"GPGSA:OK: {e}");
+        }
+
+        private static void Parser_OnGppwrOk(object? sender, GPPWR_Data e)
+        {
+            Console.WriteLine($"GPPWR:OK: {e}");
+        }
+        private static void Parser_OnGppwrParseError(object? sender, GPPWR_Data e)
+        {
+            Console.WriteLine($"GPPWR:Error: {e}");
+        }
+
 
         private static void Parser_OnGprmcOk(object? sender, GPRMC_Data e)
         {

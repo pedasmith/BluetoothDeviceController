@@ -16,8 +16,6 @@ namespace Parsers.Nmea
 
     public class GPGGA_Data : Nmea_Data
     {
-        // Potential checks: are all the lengths accurate?
-
         public GPGGA_Data(string str)
             : base(str)
         {
@@ -29,6 +27,7 @@ namespace Parsers.Nmea
             if (OpcodeString != "$GPGGA")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
+                return;
             }
 
             ParseStatus = Time.Parse(TimeString);
@@ -197,12 +196,10 @@ namespace Parsers.Nmea
 
     public class GPGSA_Data : Nmea_Data
     {
-        // Potential checks: are all the lengths accurate?
-
         public GPGSA_Data(string str)
             : base(str)
         {
-            if (NmeaParts.Length < 15)
+            if (NmeaParts.Length < 17)
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
                 return;
@@ -210,31 +207,32 @@ namespace Parsers.Nmea
             if (OpcodeString != "$GPGSA")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
+                return;
             }
 
-            ParseStatus = Time.Parse(TimeString);
-            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
-
-            ParseStatus = Latitude.Parse(LatitudeString, LatitudeNorthSouthString);
-            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
-
-            ParseStatus = Longitude.Parse(LongitudeString, LongitudeEastWestString);
-            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+            switch (Mode1String)
+            {
+                case "A": Mode1 = Mode1Type.Automatic; break;
+                case "M": Mode1 = Mode1Type.Manual; break;
+                default:
+                    ParseStatus = Nmea_Gps_Parser.ParseResult.Mode1Invalid;
+                    return;
+            }
 
             bool parseOk = true;
             int intval = 0;
-            parseOk = parseOk && Int32.TryParse(PositionFixIndicatorString, out intval);
-            if (!parseOk)
+            parseOk = parseOk && Int32.TryParse(Mode2String, out intval);
+            if (!parseOk || intval < 1 || intval >3)
             {
-                ParseStatus = Nmea_Gps_Parser.ParseResult.PositionFixIndicatorInvalid;
+                ParseStatus = Nmea_Gps_Parser.ParseResult.Mode2Invalid;
                 return;
             }
-            PositionFixIndicator = (PositionFixIndicatorType)intval;
+            Mode2 = (Mode2Type)intval;
 
-            parseOk = parseOk && Int32.TryParse(SatellitesUsedString, out SatellitesUsed);
+            parseOk = parseOk && Double.TryParse(PdopString, out Pdop);
             if (!parseOk)
             {
-                ParseStatus = Nmea_Gps_Parser.ParseResult.SatellitesUsedInvalid;
+                ParseStatus = Nmea_Gps_Parser.ParseResult.PdopInvalid;
                 return;
             }
 
@@ -245,73 +243,103 @@ namespace Parsers.Nmea
                 return;
             }
 
-            parseOk = parseOk && Double.TryParse(MlsAltitudeString, out MlsAltitude);
-            if (!parseOk)
-            {
-                ParseStatus = Nmea_Gps_Parser.ParseResult.MlsAltitudeInvalid;
-                return;
-            }
-            switch (MlsAltitudeUnitsString)
-            {
-                case "M": MlsAltitudeUnits = AltitudeUnitsType.Meter; break;
-                default:
-                    ParseStatus = Nmea_Gps_Parser.ParseResult.MlsAltitudeUnitsInvalid;
-                    return;
-            }
+            ParseStatus = Nmea_Gps_Parser.ParseResult.Ok;
 
-            parseOk = parseOk && Double.TryParse(GeoidSeparationString, out GeoidSeparation);
-            if (!parseOk)
-            {
-                ParseStatus = Nmea_Gps_Parser.ParseResult.GeoidSeparationInvalid;
-                return;
-            }
-            switch (GeoidSeparationUnitsString)
-            {
-                case "M": GeoidSeparationUnits = AltitudeUnitsType.Meter; break;
-                default:
-                    ParseStatus = Nmea_Gps_Parser.ParseResult.GeoidSeparationUnitsInvalid;
-                    return;
-            }
         }
 
         public string OpcodeString { get { return GetPart(0); } }
-        public string TimeString { get { return GetPart(1); } }
-        public Nmea_Time_Fields Time = new Nmea_Time_Fields();
-        public string LatitudeString { get { return GetPart(2); } } 
-        public string LatitudeNorthSouthString { get { return GetPart(3); } } // N S
-        public Nmea_Latitude_Fields Latitude = new Nmea_Latitude_Fields();
 
-        public string LongitudeString { get { return GetPart(4); } } // Degrees.MMdd
-        public string LongitudeEastWestString { get { return GetPart(5); } } // E W
-        public Nmea_Longitude_Fields Longitude = new Nmea_Longitude_Fields();
+        public string Mode1String {  get  { return GetPart(1); } }
+        public enum Mode1Type {  Manual, Automatic};
+        public Mode1Type Mode1;
+        public string Mode2String {  get  { return GetPart(2); } }
+        public enum Mode2Type {  FixNotAvailable=1, Is2D=2, Is3D=3}
+        public Mode2Type Mode2;
 
-        public string PositionFixIndicatorString { get { return GetPart(6); } }
-        public enum PositionFixIndicatorType { Invalid = 0, GpsSpsMode_Valid = 1, GpsDifferentialMode_Valid = 2, DeadReckoningMode_Valid = 6, }
-        public PositionFixIndicatorType PositionFixIndicator;
+        public string SatelliteUsed01 { get { return GetPart(3); } }
+        public string SatelliteUsed02 { get { return GetPart(4); } }
+        public string SatelliteUsed03 { get { return GetPart(5); } }
+        public string SatelliteUsed04 { get { return GetPart(6); } }
+        public string SatelliteUsed05 { get { return GetPart(7); } }
+        public string SatelliteUsed06 { get { return GetPart(8); } }
+        public string SatelliteUsed07 { get { return GetPart(9); } }
+        public string SatelliteUsed08 { get { return GetPart(10); } }
+        public string SatelliteUsed09 { get { return GetPart(11); } }
+        public string SatelliteUsed10 { get { return GetPart(12); } }
+        public string SatelliteUsed11 { get { return GetPart(13); } }
+        public string SatelliteUsed12 { get { return GetPart(14); } }
 
-        public string SatellitesUsedString { get { return GetPart(7); } }
-        public int SatellitesUsed;
-        public string HdopString { get { return GetPart(8); } }
+        public string PdopString { get { return GetPart(15); } }
+        public double Pdop;
+        public string HdopString { get { return GetPart(16); } }
         public double Hdop;
 
-        public string MlsAltitudeString { get { return GetPart(9); } }
-        public double MlsAltitude;
-        public string MlsAltitudeUnitsString { get { return GetPart(10); } }
-        public enum AltitudeUnitsType { Meter };
-        public AltitudeUnitsType MlsAltitudeUnits;
-        public string GeoidSeparationString { get { return GetPart(11); } }
-        public double GeoidSeparation;
-        public string GeoidSeparationUnitsString { get { return GetPart(12); } }
-        public AltitudeUnitsType GeoidSeparationUnits;
-        public string AgeOfDifferentialCorrection { get { return GetPart(13); } }
-        // Also a Differential Reference Station ID that's added to the checksum
 
         public override string ToString()
         {
-            return $"{OpcodeString} {Time} {Latitude} {Longitude} fix indicator={PositionFixIndicator} nsatellites={SatellitesUsed} altitude={MlsAltitude} {MlsAltitudeUnits} separation={GeoidSeparation} {GeoidSeparationUnits}";
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return $"{ParseStatus} {OriginalNmeaString} {OpcodeString} {Mode1} {Mode2} Satellites={SatelliteUsed01},{SatelliteUsed02},{SatelliteUsed03},{SatelliteUsed04},{SatelliteUsed05},{SatelliteUsed06},{SatelliteUsed07},{SatelliteUsed08},{SatelliteUsed09},{SatelliteUsed10},{SatelliteUsed11},{SatelliteUsed12}  PDOP={Pdop} HDOP={Hdop}";
+            }
+            return $"{OpcodeString} {Mode1} {Mode2} Satellites={SatelliteUsed01},{SatelliteUsed02},{SatelliteUsed03},{SatelliteUsed04},{SatelliteUsed05},{SatelliteUsed06},{SatelliteUsed07},{SatelliteUsed08},{SatelliteUsed09},{SatelliteUsed10},{SatelliteUsed11},{SatelliteUsed12}  PDOP={Pdop} HDOP={Hdop}";
+        }
+    }
+
+    public class GPGSV_Data : Nmea_Data
+    {
+
+        public GPGSV_Data(string str)
+            : base(str)
+        {
+            if (NmeaParts.Length < 3)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
+                return;
+            }
+            if (OpcodeString != "$GPGSV")
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
+                return;
+            }
+
+            ParseStatus = Nmea_Gps_Parser.ParseResult.GppwrIsNotUnderstoodByAnyoneOnTheInternet;
+
         }
 
+        public string OpcodeString { get { return GetPart(0); } }
+        public override string ToString()
+        {
+            return $"{OpcodeString} {ParseStatus} raw={OriginalNmeaString}";
+        }
+    }
 
+
+    public class GPPWR_Data : Nmea_Data
+    {
+
+        public GPPWR_Data(string str)
+            : base(str)
+        {
+            if (NmeaParts.Length < 3)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
+                return;
+            }
+            if (OpcodeString != "$GPPWR")
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
+                return;
+            }
+
+            ParseStatus = Nmea_Gps_Parser.ParseResult.GppwrIsNotUnderstoodByAnyoneOnTheInternet;
+
+        }
+
+        public string OpcodeString { get { return GetPart(0); } }
+        public override string ToString()
+        {
+            return $"{OpcodeString} {ParseStatus} raw={OriginalNmeaString}";
+        }
     }
 
     public class GPRMC_Data : Nmea_Data
