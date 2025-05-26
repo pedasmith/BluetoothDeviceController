@@ -18,6 +18,8 @@ namespace TestNmeaGpsParser
             parser.OnGprmcParseError += Parser_OnGprmcParseError;
             parser.OnGpvtgOk += Parser_OnGpvtgOk;
             parser.OnGpvtgParseError += Parser_OnGpvtgParseError;
+            parser.OnGpzdaOk += Parser_OnGpzdaOk;
+            parser.OnGpzdaParseError += Parser_OnGpzdaParseError;
 
             var lines = example.Split(new char[] { '\n', '\r' }); 
             foreach (var line in lines)
@@ -30,14 +32,6 @@ namespace TestNmeaGpsParser
             }
         }
 
-        private static void Parser_OnGpvtgOk(object? sender, GPVTG_Data e)
-        {
-            Console.WriteLine($"GPVTG:OK: {e}");
-        }
-        private static void Parser_OnGpvtgParseError(object? sender, GPVTG_Data e)
-        {
-            Console.WriteLine($"GPVTG:ERROR: {e}");
-        }
 
         private static void Parser_OnGprmcOk(object? sender, GPRMC_Data e)
         {
@@ -57,6 +51,22 @@ namespace TestNmeaGpsParser
         private static void Parser_OnGpggaOk(object? sender, GPGGA_Data e)
         {
             Console.WriteLine($"GPGGA:OK: {e}");
+        }
+        private static void Parser_OnGpvtgOk(object? sender, GPVTG_Data e)
+        {
+            Console.WriteLine($"GPVTG:OK: {e}");
+        }
+        private static void Parser_OnGpvtgParseError(object? sender, GPVTG_Data e)
+        {
+            Console.WriteLine($"GPVTG:ERROR: {e}");
+        }
+        private static void Parser_OnGpzdaOk(object? sender, GPZDA_Data e)
+        {
+            Console.WriteLine($"GPZDA:OK: {e}");
+        }
+        private static void Parser_OnGpzdaParseError(object? sender, GPZDA_Data e)
+        {
+            Console.WriteLine($"GPZDA:ERROR: {e}");
         }
 
         private static void Parser_OnNmeaUnknown(object? sender, Nmea_Data e)

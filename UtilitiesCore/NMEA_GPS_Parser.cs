@@ -47,6 +47,11 @@ namespace Parsers.Nmea
             VelocityKnotsUnitsInvalid,
             VelocityKphInvalid, VelocityKphUnitsInvalid,
 
+            // GPZDA
+            LoclZoneHourInvalid,
+
+            // GPGLL
+
             OtherError
         }
         public ParseResult Parse(string Nmea)
@@ -77,6 +82,14 @@ namespace Parsers.Nmea
                 else OnGpvtgParseError?.Invoke(this, data);
                 return data.ParseStatus;
             }
+            else if (Nmea.StartsWith("$GPZDA,"))
+            {
+                var data = new GPZDA_Data(Nmea);
+                OnNmeaAll?.Invoke(this, data);
+                if (data.ParseStatus == ParseResult.Ok) OnGpzdaOk?.Invoke(this, data);
+                else OnGpzdaParseError?.Invoke(this, data);
+                return data.ParseStatus;
+            }
             else
             {
                 var data = new Nmea_Data(Nmea);
@@ -93,6 +106,9 @@ namespace Parsers.Nmea
 
         public event EventHandler<GPVTG_Data> OnGpvtgOk;
         public event EventHandler<GPVTG_Data> OnGpvtgParseError;
+
+        public event EventHandler<GPZDA_Data> OnGpzdaOk;
+        public event EventHandler<GPZDA_Data> OnGpzdaParseError;
 
         public event EventHandler<Nmea_Data> OnNmeaAll;
         public event EventHandler<Nmea_Data> OnNmeaUnknown;

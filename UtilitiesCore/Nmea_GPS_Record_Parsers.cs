@@ -334,7 +334,6 @@ namespace Parsers.Nmea
         {
             return $"{OpcodeString} {Time} {Latitude} {Longitude} {Date} validity={Validity} velocity={VelocityKnots} heading={HeadingDegreesTrue}";
         }
-        // Whoops; part of checksum: public string PositioningString { get { return GetPart(10); } } // A=autonomous D-differential E=estimated (dead reckoning) M=manual S=simulator N=no values
     }
 
     public class GPVTG_Data : Nmea_Data
@@ -451,6 +450,62 @@ namespace Parsers.Nmea
         }
     }
 
+    public class GPZDA_Data : Nmea_Data
+    {
+        public GPZDA_Data(string str)
+            : base(str)
+        {
+            if (NmeaParts.Length < 6)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
+                return;
+            }
+            if (OpcodeString != "$GPZDA")
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
+                return;
+            }
+
+            ParseStatus = Time.Parse(TimeString, Nmea_Time_Fields.ParseOptionsType.hhmmss_sss);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
+            ParseStatus = Date.Parse(DayString, MonthString, YearString);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
+            bool parseOk = true;
+
+            parseOk = parseOk && Int32.TryParse(LocalZoneHourString, out LocalZoneHour);
+            if (!parseOk)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.SatellitesUsedInvalid;
+                return;
+            }
+
+
+            ParseStatus = Nmea_Gps_Parser.ParseResult.Ok;
+        }
+
+        public string OpcodeString { get { return GetPart(0); } }
+        public string TimeString { get { return GetPart(1); } }
+        public Nmea_Time_Fields Time = new Nmea_Time_Fields();
+
+        public string DayString { get { return GetPart(2); } }
+        public string MonthString { get { return GetPart(3); } }
+        public string YearString { get { return GetPart(4); } }
+        Nmea_Date_Fields Date = new Nmea_Date_Fields();
+
+        public string LocalZoneHourString {  get { return GetPart(5); } }
+        public int LocalZoneHour;
+        public override string ToString()
+        {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} {Time} {Date} Time zone={LocalZoneHour}";
+
+            return $"{OpcodeString} {Time} {Date} Time zone={LocalZoneHour}";
+        }
+    }
+
+
     public class Nmea_Date_Fields
     {
 
@@ -458,7 +513,7 @@ namespace Parsers.Nmea
 
         public override string ToString()
         {
-            return $"{DateYear}-{DateMonth}-{DateDay}";
+            return $"{DateYear}-{DateMonth:D2}-{DateDay:D2}";
         }
 
 
@@ -481,6 +536,24 @@ namespace Parsers.Nmea
             }
             return Nmea_Gps_Parser.ParseResult.Ok;
         }
+
+        public Nmea_Gps_Parser.ParseResult Parse(string DayString, string MonthString, String YearString)
+        {
+            if (DayString.Length != 2 || MonthString.Length != 2 || YearString.Length != 4)
+            {
+                return Nmea_Gps_Parser.ParseResult.DateStringWrongLength;
+            }
+            var parseOk = true;
+            parseOk = parseOk && Int32.TryParse(DayString, out DateDay);
+            parseOk = parseOk && Int32.TryParse(MonthString, out DateMonth);
+            parseOk = parseOk && Int32.TryParse(YearString, out DateYear);
+            if (!parseOk)
+            {
+                return Nmea_Gps_Parser.ParseResult.DateStringInvalid;
+            }
+            return Nmea_Gps_Parser.ParseResult.Ok;
+        }
+
     }
     public class Nmea_Latitude_Fields
     {
@@ -491,7 +564,7 @@ namespace Parsers.Nmea
 
         public override string ToString()
         {
-            return $"{LatitudeDegrees}:{LatitudeMinutes} {LatitudeNorthSouth}";
+            return $"{LatitudeDegrees}° {LatitudeMinutes} {LatitudeNorthSouth}";
         }
 
         public Nmea_Gps_Parser.ParseResult Parse(string LatitudeString, string LatitudeNorthSouthString)
@@ -542,7 +615,7 @@ namespace Parsers.Nmea
 
         public override string ToString()
         {
-            return $"{LongitudeDegrees}.{LongitudeMinutes} {LongitudeEastWest}";
+            return $"{LongitudeDegrees}° {LongitudeMinutes} {LongitudeEastWest}";
         }
 
         public Nmea_Gps_Parser.ParseResult Parse(string LongitudeString, string LongitudeEastWestString)
@@ -588,10 +661,10 @@ namespace Parsers.Nmea
 
         public override string ToString()
         {
-            return $"{TimeHours}:{TimeMinutes}:{TimeSeconds}";
+            return $"{TimeHours:D2}:{TimeMinutes:D2}:{TimeSeconds}";
         }
-
-        public Nmea_Gps_Parser.ParseResult Parse(string TimeString)
+        public enum ParseOptionsType {  hhmmss_sss, hhmmss }
+        public Nmea_Gps_Parser.ParseResult Parse(string TimeString, ParseOptionsType options=ParseOptionsType.hhmmss_sss)
         {
             bool parseOk;
 
@@ -602,14 +675,26 @@ namespace Parsers.Nmea
             var hhstr = TimeString.Substring(0, 2);
             var mmstr = TimeString.Substring(2, 2);
             var ssstr = TimeString.Substring(4, 2);
-            var dotstr = TimeString.Substring(6, 1);
-            var sssstr = TimeString.Substring(7, 3);
+            string dotstr="";
+            string sssstr="";
+            if (options.HasFlag(ParseOptionsType.hhmmss_sss))
+            {
+                dotstr = TimeString.Substring(6, 1);
+                sssstr = TimeString.Substring(7, 3);
+            }
             parseOk = true;
             parseOk = parseOk && Int32.TryParse(hhstr, out TimeHours);
             parseOk = parseOk && Int32.TryParse(mmstr, out TimeMinutes);
             parseOk = parseOk && Int32.TryParse(ssstr, out SecondsInteger);
-            parseOk = parseOk && Int32.TryParse(sssstr, out SecondsDecimal);
-            parseOk = parseOk && dotstr == ".";
+            if (options.HasFlag(ParseOptionsType.hhmmss_sss))
+            {
+                parseOk = parseOk && Int32.TryParse(sssstr, out SecondsDecimal);
+                parseOk = parseOk && dotstr == ".";
+            }
+            else
+            {
+                SecondsDecimal = 0; // is e.g. hhmmss and there's no fractional seconds.
+            }
             if (!parseOk)
             {
                 return Nmea_Gps_Parser.ParseResult.TimeStringInvalid;
