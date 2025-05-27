@@ -41,21 +41,26 @@ namespace Parsers.Nmea
 
             // GPGSA additional errors
             Mode1Invalid, Mode2Invalid,
-            PdopInvalid,
+            PdopInvalid, VdopInvalid,
 
-            // GPVTG additinal errors
+            // GPRMC additional errors
+            MagneticVariationInvalid,
+            EastWestIndicatorInvalid,
+
+            // GPVTG additional errors
             CourseTrueInvalid, CourseTrueUnitsInvalid,
             CourseMagneticInvalid, CourseMagneticUnitsInvalid,
             VelocityKnotsUnitsInvalid,
             VelocityKphInvalid, VelocityKphUnitsInvalid,
 
             // GPZDA
-            LocalZoneHourInvalid,
+            LocalZoneHourInvalid, LocalZoneMinutesInvalid,
 
             // GPGLL
+            ModeInvalid,
 
             // GPPWR
-            GppwrIsNotUnderstoodByAnyoneOnTheInternet,
+            OpcodeIsNotUnderstoodByAnyoneOnTheInternet,
 
             OtherError
         }

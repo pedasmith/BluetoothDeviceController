@@ -5,9 +5,17 @@ namespace TestNmeaGpsParser
 {
     internal class Program
     {
+        static int Test()
+        {
+            int nerror = 0;
+            nerror += Nmea_Data.Test();
+
+            return nerror;
+        }
         static void Main(string[] args)
         {
             Console.WriteLine("Testing Nmea Gps parser");
+            Test();
 
             var example = Parsers.Nmea.Nmea_Gps_Parser.Example_02;
             var parser = new Nmea_Gps_Parser();

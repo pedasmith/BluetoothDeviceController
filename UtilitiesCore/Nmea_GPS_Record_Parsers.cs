@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Utilities.Protobuf;
 
 // FindBitPattern tries to be more nullable enabled.
 // Need this super weird set of ifs because:
@@ -121,12 +122,16 @@ namespace Parsers.Nmea
         public double GeoidSeparation;
         public string GeoidSeparationUnitsString { get { return GetPart(12); } }
         public AltitudeUnitsType GeoidSeparationUnits;
-        public string AgeOfDifferentialCorrection { get { return GetPart(13); } }
-        // Also a Differential Reference Station ID that's added to the checksum
+        public string AgeOfDifferentialCorrectionString { get { return GetPart(13); } }
+        public string DifferentialReferenceStationsIdString { get { return LastElement; } } // is the 0000 in the 0000*5E checksum
 
         public override string ToString()
         {
-            return $"{OpcodeString} {Time} {Latitude} {Longitude} fix indicator={PositionFixIndicator} nsatellites={SatellitesUsed} altitude={MlsAltitude} {MlsAltitudeUnits} separation={GeoidSeparation} {GeoidSeparationUnits}";
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} {Time} {Latitude} {Longitude} fix indicator={PositionFixIndicator} nsatellites={SatellitesUsed} altitude={MlsAltitude} {MlsAltitudeUnits} separation={GeoidSeparation} {GeoidSeparationUnits} station={DifferentialReferenceStationsIdString}";
+            }
+            return $"{OpcodeString} {Time} {Latitude} {Longitude} fix indicator={PositionFixIndicator} nsatellites={SatellitesUsed} altitude={MlsAltitude} {MlsAltitudeUnits} separation={GeoidSeparation} {GeoidSeparationUnits} station={DifferentialReferenceStationsIdString}";
         }
     }
 
@@ -166,6 +171,9 @@ namespace Parsers.Nmea
                     return;
             }
 
+            ParseStatus = Mode.Parse(ModeString);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
             ParseStatus = Nmea_Gps_Parser.ParseResult.Ok;
         }
 
@@ -185,12 +193,16 @@ namespace Parsers.Nmea
         public string ValidityString { get { return GetPart(6); } } // A=valid current data B=valid stored data V=invalid current data W=invalid stored data
         public enum ValidityType { ValidCurrentData, ValidStoredData, InvalidCurrentData, InvalidStoredData };
         public ValidityType Validity;
+
+        public string ModeString {  get { return LastElement; } }
+        Nmea_Mode_Field Mode = new Nmea_Mode_Field();
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
-                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} {Latitude} {Longitude} {Time}";
-
-            return $"{OpcodeString} {Latitude} {Longitude} {Time}";
+            {
+                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} {Latitude} {Longitude} {Time} {Mode}";
+            }
+            return $"{OpcodeString} {Latitude} {Longitude} {Time} {Mode}";
         }
     }
 
@@ -243,6 +255,13 @@ namespace Parsers.Nmea
                 return;
             }
 
+            parseOk = parseOk && Double.TryParse(VdopString, out Vdop);
+            if (!parseOk)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.VdopInvalid;
+                return;
+            }
+
             ParseStatus = Nmea_Gps_Parser.ParseResult.Ok;
 
         }
@@ -273,18 +292,22 @@ namespace Parsers.Nmea
         public double Pdop;
         public string HdopString { get { return GetPart(16); } }
         public double Hdop;
-
+        public string VdopString {  get { return LastElement; } }
+        public double Vdop;
 
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
             {
-                return $"{ParseStatus} {OriginalNmeaString} {OpcodeString} {Mode1} {Mode2} Satellites={SatelliteUsed01},{SatelliteUsed02},{SatelliteUsed03},{SatelliteUsed04},{SatelliteUsed05},{SatelliteUsed06},{SatelliteUsed07},{SatelliteUsed08},{SatelliteUsed09},{SatelliteUsed10},{SatelliteUsed11},{SatelliteUsed12}  PDOP={Pdop} HDOP={Hdop}";
+                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} {Mode1} {Mode2} Satellites={SatelliteUsed01},{SatelliteUsed02},{SatelliteUsed03},{SatelliteUsed04},{SatelliteUsed05},{SatelliteUsed06},{SatelliteUsed07},{SatelliteUsed08},{SatelliteUsed09},{SatelliteUsed10},{SatelliteUsed11},{SatelliteUsed12}  PDOP={Pdop} HDOP={Hdop} VDOP={Vdop}";
             }
-            return $"{OpcodeString} {Mode1} {Mode2} Satellites={SatelliteUsed01},{SatelliteUsed02},{SatelliteUsed03},{SatelliteUsed04},{SatelliteUsed05},{SatelliteUsed06},{SatelliteUsed07},{SatelliteUsed08},{SatelliteUsed09},{SatelliteUsed10},{SatelliteUsed11},{SatelliteUsed12}  PDOP={Pdop} HDOP={Hdop}";
+            return $"{OpcodeString} {Mode1} {Mode2} Satellites={SatelliteUsed01},{SatelliteUsed02},{SatelliteUsed03},{SatelliteUsed04},{SatelliteUsed05},{SatelliteUsed06},{SatelliteUsed07},{SatelliteUsed08},{SatelliteUsed09},{SatelliteUsed10},{SatelliteUsed11},{SatelliteUsed12}  PDOP={Pdop} HDOP={Hdop} VDOP={Vdop}";
         }
     }
 
+    /// <summary>
+    /// In progress! TODO:
+    /// </summary>
     public class GPGSV_Data : Nmea_Data
     {
 
@@ -302,7 +325,7 @@ namespace Parsers.Nmea
                 return;
             }
 
-            ParseStatus = Nmea_Gps_Parser.ParseResult.GppwrIsNotUnderstoodByAnyoneOnTheInternet;
+            ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIsNotUnderstoodByAnyoneOnTheInternet;
 
         }
 
@@ -313,6 +336,9 @@ namespace Parsers.Nmea
         }
     }
 
+    /// <summary>
+    /// There are no definitive descriptions of GPGSV
+    /// </summary>
 
     public class GPPWR_Data : Nmea_Data
     {
@@ -331,7 +357,7 @@ namespace Parsers.Nmea
                 return;
             }
 
-            ParseStatus = Nmea_Gps_Parser.ParseResult.GppwrIsNotUnderstoodByAnyoneOnTheInternet;
+            ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIsNotUnderstoodByAnyoneOnTheInternet;
 
         }
 
@@ -396,6 +422,31 @@ namespace Parsers.Nmea
             ParseStatus = Date.Parse(DateString);
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
 
+            if (MagneticVariationString != "")
+            {
+                parseOk = parseOk && Double.TryParse(MagneticVariationString, out MagneticVariation);
+                if (!parseOk)
+                {
+                    ParseStatus = Nmea_Gps_Parser.ParseResult.MagneticVariationInvalid;
+                    return;
+                }
+            }
+
+            if (EastWestIndicatorString != "")
+            {
+                switch (EastWestIndicatorString)
+                {
+                    case "E": EastWestIndicator = EastWestType.East; break;
+                    case "W": EastWestIndicator = EastWestType.West; break;
+                    default:
+                        ParseStatus = Nmea_Gps_Parser.ParseResult.EastWestIndicatorInvalid;
+                        return;
+                }
+            }
+
+            ParseStatus = Mode.Parse(ModeString);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
             ParseStatus = Nmea_Gps_Parser.ParseResult.Ok;
         }
 
@@ -420,9 +471,22 @@ namespace Parsers.Nmea
         public string DateString { get { return GetPart(9); } } // ddmmyy
         public Nmea_Date_Fields Date = new Nmea_Date_Fields();
 
+        public string MagneticVariationString {  get { return GetPart(10); } }
+        public double MagneticVariation;
+
+        public string EastWestIndicatorString {  get { return GetPart(11); } }
+        public enum EastWestType {  NotSpecified, East, West };
+        public EastWestType EastWestIndicator;
+
+        public string ModeString { get { return LastElement; } }
+        public Nmea_Mode_Field Mode = new Nmea_Mode_Field();
         public override string ToString()
         {
-            return $"{OpcodeString} {Time} {Latitude} {Longitude} {Date} validity={Validity} velocity={VelocityKnots} heading={HeadingDegreesTrue}";
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} {Time} {Latitude} {Longitude} {Date} validity={Validity} velocity={VelocityKnots} heading={HeadingDegreesTrue} variation={MagneticVariation} {EastWestIndicator} mode={Mode}";
+            }
+            return $"{OpcodeString} {Time} {Latitude} {Longitude} {Date} validity={Validity} velocity={VelocityKnots} heading={HeadingDegreesTrue} variation={MagneticVariation} {EastWestIndicator} mode={Mode}";
         }
     }
 
@@ -507,6 +571,9 @@ namespace Parsers.Nmea
                     return;
             }
 
+            ParseStatus = Mode.Parse(ModeString);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
             ParseStatus = Nmea_Gps_Parser.ParseResult.Ok;
         }
 
@@ -530,13 +597,16 @@ namespace Parsers.Nmea
         public string SpeedKphUnitsString { get { return GetPart(8); } }
         public SpeedUnitsType SpeedKphUnits;
 
+        public string ModeString { get { return LastElement; } } 
+        public Nmea_Mode_Field Mode = new Nmea_Mode_Field();
 
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
-                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} Course={CourseTrue} ({CourseTrueReferenceUnits}) AKA {CourseMagnetic} ({CourseMagneticReferenceUnits}) velocity={SpeedKnots} {SpeedKnotsUnits} AKA {SpeedKph} {SpeedKphUnits}";
-
-            return $"{OpcodeString} Course={CourseTrue} ({CourseTrueReferenceUnits}) AKA {CourseMagnetic} ({CourseMagneticReferenceUnits}) velocity={SpeedKnots} {SpeedKnotsUnits} AKA {SpeedKph} {SpeedKphUnits}";
+            {
+                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} Course={CourseTrue} ({CourseTrueReferenceUnits}) AKA {CourseMagnetic} ({CourseMagneticReferenceUnits}) velocity={SpeedKnots} {SpeedKnotsUnits} AKA {SpeedKph} {SpeedKphUnits} mode={Mode}";
+            }
+            return $"{OpcodeString} Course={CourseTrue} ({CourseTrueReferenceUnits}) AKA {CourseMagnetic} ({CourseMagneticReferenceUnits}) velocity={SpeedKnots} {SpeedKnotsUnits} AKA {SpeedKph} {SpeedKphUnits} mode={Mode}";
         }
     }
 
@@ -564,10 +634,17 @@ namespace Parsers.Nmea
 
             bool parseOk = true;
 
-            parseOk = parseOk && Int32.TryParse(LocalZoneHourString, out LocalZoneHour);
+            parseOk = parseOk && Int32.TryParse(LocalZoneHoursString, out LocalZoneHours);
             if (!parseOk)
             {
-                ParseStatus = Nmea_Gps_Parser.ParseResult.SatellitesUsedInvalid;
+                ParseStatus = Nmea_Gps_Parser.ParseResult.LocalZoneHourInvalid;
+                return;
+            }
+
+            parseOk = parseOk && Int32.TryParse(LocalZoneMinutesString, out LocalZoneMinutes);
+            if (!parseOk)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.LocalZoneMinutesInvalid;
                 return;
             }
 
@@ -584,14 +661,19 @@ namespace Parsers.Nmea
         public string YearString { get { return GetPart(4); } }
         Nmea_Date_Fields Date = new Nmea_Date_Fields();
 
-        public string LocalZoneHourString {  get { return GetPart(5); } }
-        public int LocalZoneHour;
+        public string LocalZoneHoursString {  get { return GetPart(5); } }
+        public int LocalZoneHours;
+
+        public string LocalZoneMinutesString {  get { return LastElement; } }
+        public int LocalZoneMinutes;
+
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
-                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} {Time} {Date} Time zone={LocalZoneHour}";
-
-            return $"{OpcodeString} {Time} {Date} Time zone={LocalZoneHour}";
+            {
+                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} {Time} {Date} Time zone={LocalZoneHours}:{LocalZoneMinutes:D2}";
+            }
+            return $"{OpcodeString} {Time} {Date} Time zone={LocalZoneHours:D2}:{LocalZoneMinutes:D2}";
         }
     }
 
@@ -744,6 +826,35 @@ namespace Parsers.Nmea
         }
     }
 
+    public class Nmea_Mode_Field
+    {
+        public enum ModeType { Autonomous, DifferentialDGP, EstimatedDeadREcoking, Manual, Simulator, NotValid }
+        public ModeType Mode;
+
+        public Nmea_Gps_Parser.ParseResult Parse(string ModeString)
+        {
+            // From https://www.cypress.bc.ca/documents/Report_Messages/CTM200/msg_82_GPRMC.html
+            // e is the positioning system mode indicator(NMEA 0183 v3.0 only): A = autonomous mode, D = Differential mode, E = Estimated(dead reckoning) mode, M = Manual input mode, S = Simulator mode, N = Data not valid. Note: The CTM internal GPS module supports autonomous mode only.
+            switch (ModeString)
+            {
+                case "A": Mode = ModeType.Autonomous; break;
+                case "D": Mode = ModeType.DifferentialDGP; break;
+                case "E": Mode = ModeType.EstimatedDeadREcoking; break;
+                case "M": Mode = ModeType.Manual; break;
+                case "N": Mode = ModeType.NotValid; break;
+                case "S": Mode = ModeType.Simulator; break;
+                default:
+                    return Nmea_Gps_Parser.ParseResult.ModeInvalid;
+            }
+            return Nmea_Gps_Parser.ParseResult.Ok;
+        }
+
+        public override string ToString()
+        {
+            return Mode.ToString();
+        }
+    }
+
     public class Nmea_Time_Fields
     {
         public int TimeHours, TimeMinutes, SecondsInteger, SecondsDecimal;
@@ -801,6 +912,62 @@ namespace Parsers.Nmea
             ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeUnknown; // nice default :-)
             OriginalNmeaString = str;
             NmeaParts = str.Split(',');
+            // Might be old style ,*VV
+            // Might be new style ,value*VV where the value is the last value
+            var chk = ChecksumStringRaw;
+            var starpos = chk.IndexOf("*");
+            if (starpos < 1)
+            {
+                LastElement = "";
+                Checksum = chk;
+            }
+            else
+            {
+                LastElement = chk.Substring(0, starpos);
+                Checksum = chk.Substring(starpos); // include the "*"
+            }
+        }
+
+        static public int Test()
+        {
+            int nerror = 0;
+            var v1 = new Nmea_Data("NAME,1,2,3*99");
+            if (v1.LastElement != "3")
+            {
+                nerror++;
+                Console.WriteLine($"Error: expected 3 not {v1.LastElement} in {v1}");
+            }
+            if (v1.Checksum != "*99")
+            {
+                nerror++;
+                Console.WriteLine($"Error: expexted *99 not {v1.Checksum} in {v1}");
+            }
+
+            v1 = new Nmea_Data("NAME,1,2,*98");
+            if (v1.LastElement != "")
+            {
+                nerror++;
+                Console.WriteLine($"Error: expected blank not {v1.LastElement} in {v1}");
+            }
+            if (v1.Checksum != "*98")
+            {
+                nerror++;
+                Console.WriteLine($"Error: expexted *98 not {v1.Checksum} in {v1}");
+            }
+
+            v1 = new Nmea_Data("NAME,1,2,97");
+            if (v1.LastElement != "")
+            {
+                nerror++;
+                Console.WriteLine($"Error: expected blank not {v1.LastElement} in {v1}");
+            }
+            if (v1.Checksum != "97")
+            {
+                nerror++;
+                Console.WriteLine($"Error: expexted 97 not {v1.Checksum} in {v1}");
+            }
+
+            return nerror;
         }
 
         public override string ToString()
@@ -809,18 +976,19 @@ namespace Parsers.Nmea
         }
         public Nmea_Gps_Parser.ParseResult ParseStatus { get; set; } = Nmea_Gps_Parser.ParseResult.OtherError; // default to error.
 
-        public string ChecksumString { get { return GetPart(-1); } }
+        public string ChecksumStringRaw { get { return GetPart(-1); } }
         public string[] NmeaParts { get; internal set; }
+
+        public string Checksum { get; internal set; }
+        public string LastElement { get; internal set; }
         protected string GetPart(int index)
         {
             if (NmeaParts.Length == 0) return "";
-            if (index == -1) return GetPart(NmeaParts.Length - 1);
+            if (index == -1) return NmeaParts[NmeaParts.Length - 1];
             if (index >= NmeaParts.Length - 1) return ""; // The only way to get the checksum (last value) is to ask for -1.
             return NmeaParts[index];
         }
 
         public string OriginalNmeaString { get; set; } = "";
     }
-
-
 }
