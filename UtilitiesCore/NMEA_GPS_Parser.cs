@@ -60,6 +60,8 @@ namespace Parsers.Nmea
             ModeInvalid,
 
             // GPPWR
+            VoltageInvalid,
+            ChargingStatusInvalid,
             OpcodeIsNotUnderstoodByAnyoneOnTheInternet,
 
             OtherError

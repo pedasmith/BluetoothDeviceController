@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Utilities.Protobuf;
+
 
 // FindBitPattern tries to be more nullable enabled.
 // Need this super weird set of ifs because:
@@ -342,6 +342,15 @@ namespace Parsers.Nmea
 
     public class GPPWR_Data : Nmea_Data
     {
+        // See: https://github.com/Knio/pynmea2/issues/56
+        // It looks like PWR is a proprietary addition to the XGPS160 (and other models from Dual? Other brands? No idea.).
+        // Their docs say:
+        // The PPWR sentence contains device specific information and looks like this:
+        // $GPPWR,0876,0,0,0,0,00,F,0,97,1,3,000,00190108EEEE,0017E9B92122*74
+        // • Element #1, 0876, is the battery voltage. Battery voltage is not valid while the device is charging.
+        // • Element #5 is the charging status: 1 = charging, 0 = not charging.
+
+        //That comes from the SDK documentation which isn't on their site, we had to request it.
 
         public GPPWR_Data(string str)
             : base(str)
@@ -357,14 +366,38 @@ namespace Parsers.Nmea
                 return;
             }
 
-            ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIsNotUnderstoodByAnyoneOnTheInternet;
+            bool parseOk = true;
 
+            parseOk = parseOk && double.TryParse(VoltageString, out Voltage);
+            if (!parseOk)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.VoltageInvalid;
+                return;
+            }
+            Voltage = Voltage / 100.0; // Seems logical?
+
+            switch (ChargingStatusString)
+            {
+                case "0": ChargingStatus = ChargingStatusType.NotCharging; break;
+                case "1": ChargingStatus = ChargingStatusType.Charging; break;
+                default:
+                    ParseStatus = Nmea_Gps_Parser.ParseResult.ChargingStatusInvalid;
+                    return;
+            }
+
+            ParseStatus = Nmea_Gps_Parser.ParseResult.Ok;
         }
 
         public string OpcodeString { get { return GetPart(0); } }
+        public string VoltageString {  get {  return GetPart(1); } }
+        public double Voltage;
+        public string ChargingStatusString {  get { return GetPart(5); } }
+        public enum ChargingStatusType {  Charging, NotCharging };
+        public ChargingStatusType ChargingStatus;
+
         public override string ToString()
         {
-            return $"{OpcodeString} {ParseStatus} raw={OriginalNmeaString}";
+            return $"{OpcodeString} volts={Voltage} {ChargingStatus} raw={OriginalNmeaString}";
         }
     }
 
