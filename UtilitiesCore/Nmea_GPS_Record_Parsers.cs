@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿/// This file is classes that can parse an NMEA format string into classes. The classes must be given
+/// the correct kind of string (e.g., the GPGGA_Data class must be given an NMEA line that starts with $GPGGA).
+/// The overall parser is in NMEA_GPS_Parser.cs
 
 
-// FindBitPattern tries to be more nullable enabled.
+// Why is the weird #if here? Because FindBitPattern tries to be more nullable enabled.
 // Need this super weird set of ifs because:
 // 1. many of my projects are "old" and give errors when #nullable disable is present
 // 2. I can't use the ? for the events because old projects don't do that
 // 3. But for FindBitPattern I need to suppress the warning just for this file.
+
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 #if NET9_0_OR_GREATER
 #nullable disable
@@ -861,7 +865,7 @@ namespace Parsers.Nmea
 
     public class Nmea_Mode_Field
     {
-        public enum ModeType { Autonomous, DifferentialDGP, EstimatedDeadREcoking, Manual, Simulator, NotValid }
+        public enum ModeType { NotSpecified, Autonomous, DifferentialDGP, EstimatedDeadREcoking, Manual, Simulator, NotValid }
         public ModeType Mode;
 
         public Nmea_Gps_Parser.ParseResult Parse(string ModeString)
@@ -870,6 +874,7 @@ namespace Parsers.Nmea
             // e is the positioning system mode indicator(NMEA 0183 v3.0 only): A = autonomous mode, D = Differential mode, E = Estimated(dead reckoning) mode, M = Manual input mode, S = Simulator mode, N = Data not valid. Note: The CTM internal GPS module supports autonomous mode only.
             switch (ModeString)
             {
+                case "": Mode = ModeType.NotSpecified; break;
                 case "A": Mode = ModeType.Autonomous; break;
                 case "D": Mode = ModeType.DifferentialDGP; break;
                 case "E": Mode = ModeType.EstimatedDeadREcoking; break;

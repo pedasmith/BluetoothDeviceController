@@ -5,6 +5,10 @@ namespace TestNmeaGpsParser
 {
     internal class Program
     {
+        /// <summary>
+        /// Calls all of the internal static self-test methods.
+        /// </summary>
+        /// <returns>Number of errors; should always be 0</returns>
         static int Test()
         {
             int nerror = 0;
@@ -12,12 +16,64 @@ namespace TestNmeaGpsParser
 
             return nerror;
         }
+        private static void Log(String str)
+        {
+            Console.WriteLine(str);
+        }
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Testing Nmea Gps parser");
+            Log("Nmea Gps Program");
             Test();
 
-            var example = Parsers.Nmea.Nmea_Gps_Parser.Example_02;
+            for (int i=0; i<args.Length; i++)
+            {
+                var arg = args[i];
+                bool hasParam = i < (args.Length - 1);
+                var argParam = hasParam ? args[i + 1] : "";
+                switch (arg)
+                {
+                    default:
+                        Log($"ERROR: Unknown argument {arg}");
+                        break;
+                    case "-example":
+                        {
+                            i++;
+                            string text = "";
+                            switch (argParam)
+                            {
+                                default:
+                                case "01":
+                                    text = File.ReadAllText("Assets\\ExampleNmeaFiles\\Example_01.nmea");
+                                    break;
+                                case "02":
+                                    text = File.ReadAllText("Assets\\ExampleNmeaFiles\\Example_02.nmea");
+                                    break;
+                            }
+                            Log($"Using example NMEA text {argParam}");
+                            Demonstrate_Callbacks(text);
+                        }
+                        break;
+                    case "-file":
+                        i++;
+                        try
+                        {
+                            Log($"Reading file {argParam}");
+                            var text = File.ReadAllText(argParam);
+                            Demonstrate_Callbacks(text);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error: {ex.Message}");
+                        }
+                        break;
+                }
+            }
+        }
+
+        #region Demonstrate_Callbacks
+        static void Demonstrate_Callbacks(string example)
+        {
             var parser = new Nmea_Gps_Parser();
             parser.OnNmeaUnknown += Parser_OnNmeaUnknown;
             parser.OnGpggaOk += Parser_OnGpggaOk;
@@ -35,7 +91,7 @@ namespace TestNmeaGpsParser
             parser.OnGpzdaOk += Parser_OnGpzdaOk;
             parser.OnGpzdaParseError += Parser_OnGpzdaParseError;
 
-            var lines = example.Split(new char[] { '\n', '\r' }); 
+            var lines = example.Split(new char[] { '\n', '\r' });
             foreach (var line in lines)
             {
                 var trim = line.Trim();
@@ -45,9 +101,6 @@ namespace TestNmeaGpsParser
                 }
             }
         }
-
-
-
         private static void Parser_OnGpggaParseError(object? sender, GPGGA_Data e)
         {
             Console.WriteLine($"GPGGA:Error: {e}");
@@ -115,5 +168,6 @@ namespace TestNmeaGpsParser
         {
             Console.WriteLine($"Unknown: {e}");
         }
+        #endregion
     }
 }

@@ -9,4 +9,17 @@
 
   <Import Project="..\UtilitiesCore\UtilitiesCore.projitems" Label="Shared" />
 
+  <ItemGroup>
+    <None Remove="Assets\ExampleNmeaFiles\Example_02.nmea" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\ExampleNmeaFiles\Example_01.nmea">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ExampleNmeaFiles\Example_02.nmea">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
