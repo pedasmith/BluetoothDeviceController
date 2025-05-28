@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TestNmeaGpsParser": {
+      "commandName": "Project",
+      "commandLineArgs": "-match xgps150 -listcom"
+    }
+  }
+}

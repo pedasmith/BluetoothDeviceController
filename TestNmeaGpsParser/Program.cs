@@ -1,8 +1,24 @@
 ﻿
 using Parsers.Nmea;
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Rfcomm;
+using Windows.Devices.Enumeration;
 
 namespace TestNmeaGpsParser
 {
+    class UserOptions
+    {
+        public string Match = "*";
+        public bool Matches(string devicename)
+        {
+            if (Match == "*") return true;
+
+            var nameup = devicename.ToUpper();
+            var matchup = Match.ToUpper();
+            if (nameup.Contains(matchup)) return true;
+            return false;
+        }
+    }
     internal class Program
     {
         /// <summary>
@@ -20,9 +36,10 @@ namespace TestNmeaGpsParser
         {
             Console.WriteLine(str);
         }
-
+        [STAThread]
         static void Main(string[] args)
         {
+            UserOptions options = new UserOptions();
             Log("Nmea Gps Program");
             Test();
 
@@ -67,9 +84,85 @@ namespace TestNmeaGpsParser
                             Console.WriteLine($"Error: {ex.Message}");
                         }
                         break;
+                    case "-listcom":
+                        ListBluetooth(options);
+                        break;
+                    case "-match":
+                        i++;
+                        options.Match = argParam;
+                        break;
                 }
             }
         }
+
+        #region Demonstrate_Windows
+        // Note: to make this work, the TargetFramework was set to     <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
+        // The completely magical string -windows10.0.17763.0 makes it work, but isn't documented in any
+        // logical spot. See https://blogs.windows.com/windowsdeveloper/2020/09/03/calling-windows-apis-in-net5/
+        // for details.
+        private static async void ListBluetooth(UserOptions options)
+        {
+            int nNotMatch = 0;
+            int nMatch = 0;
+            DeviceInformation? firstMatch = null;
+            DeviceInformationCollection PairedBluetoothDevices = await DeviceInformation.FindAllAsync(BluetoothDevice.GetDeviceSelectorFromPairingState(true));
+            foreach (DeviceInformation? device in PairedBluetoothDevices)
+            {
+                if (options.Matches(device.Name))
+                {
+                    nMatch++;
+                    Log($"Info: device name={device.Name}");
+                    if (firstMatch == null) firstMatch = device;
+                }
+                else
+                {
+                    nNotMatch++;
+                }
+            }
+            Log($"List complete. N. Match={nMatch} Not matching={nNotMatch}");
+
+            // Now let's try to connect
+            if (firstMatch == null) return;
+
+            var accessStatus = DeviceAccessInformation.CreateFromId(firstMatch.Id);
+            if (accessStatus.CurrentStatus != DeviceAccessStatus.Allowed)
+            {
+                Log($"Can't connect: access status={accessStatus.CurrentStatus}");
+                return;
+            }
+
+            BluetoothDevice? bt = null;
+            try
+            {
+                Log($"About to get device from id={firstMatch.Id}");
+                bt = await BluetoothDevice.FromIdAsync(firstMatch.Id);
+                Log($"Result: {bt}");
+                if (bt == null)
+                {
+                    Log($"Unable to get BT device: FromId returned null");
+                    return;
+                }
+                Log($"Got device: connection status={bt.ConnectionStatus} address={bt.BluetoothAddress}");
+            }
+            catch (Exception ex)
+            {
+                Log($"Can't get BT device: reason={ex.Message}");
+                return;
+            }
+
+            try
+            {
+                var rfcommServices = await bt.GetRfcommServicesAsync(BluetoothCacheMode.Uncached);
+                Log($"RfcommServices count={rfcommServices.Services.Count}");
+            }
+            catch (Exception ex)
+            {
+                Log($"Can't get BT comm services: reason={ex.Message}");
+                return;
+            }
+        }
+
+        #endregion
 
         #region Demonstrate_Callbacks
         static void Demonstrate_Callbacks(string example)

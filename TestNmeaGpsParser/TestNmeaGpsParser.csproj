@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+	  <!-- See https://learn.microsoft.com/en-us/dotnet/standard/frameworks -->
+    <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

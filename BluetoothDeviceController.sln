@@ -45,6 +45,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "UtilitiesCore", "UtilitiesC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestNmeaGpsParser", "TestNmeaGpsParser\TestNmeaGpsParser.csproj", "{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestNmeaGpsParserWpf", "TestNmeaGpsParserWpf\TestNmeaGpsParserWpf.csproj", "{726FADA0-9999-4EBE-A86E-276D505569D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -299,6 +301,26 @@ Global
 		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|x64.Build.0 = Release|Any CPU
 		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9}.Release|x86.Build.0 = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|ARM.Build.0 = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|x64.Build.0 = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Debug|x86.Build.0 = Debug|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|ARM.ActiveCfg = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|ARM.Build.0 = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|ARM64.Build.0 = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|x64.ActiveCfg = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|x64.Build.0 = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|x86.ActiveCfg = Release|Any CPU
+		{726FADA0-9999-4EBE-A86E-276D505569D7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -311,6 +333,7 @@ Global
 		{CC0BF9AF-CFC1-4561-B76A-0835174D1E34} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
 		{0132B2B2-9D02-49E3-B3CA-4DD2218617A6} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
 		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
+		{726FADA0-9999-4EBE-A86E-276D505569D7} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62DCA7A6-8C59-4330-98B9-0EF91B6BAD39}
@@ -327,6 +350,7 @@ Global
 		BCBasicShared\BCBasicShared.projitems*{6e37385d-aeec-4430-bab3-760b5bc0b49c}*SharedItemsImports = 4
 		BluetoothProtocols\BluetoothProtocols.projitems*{6e37385d-aeec-4430-bab3-760b5bc0b49c}*SharedItemsImports = 4
 		Utilities\Utilities.projitems*{6e37385d-aeec-4430-bab3-760b5bc0b49c}*SharedItemsImports = 4
+		UtilitiesCore\UtilitiesCore.projitems*{726fada0-9999-4ebe-a86e-276d505569d7}*SharedItemsImports = 5
 		UtilitiesCore\UtilitiesCore.projitems*{8bf746aa-a6ed-4721-b52f-7ad047b25bc0}*SharedItemsImports = 13
 		SearchControllers\SearchControllers.projitems*{96d6ea94-d8fb-45a0-94e2-7173d5d300be}*SharedItemsImports = 13
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{a2e9e462-e4bf-4bf6-81ec-7529b830456b}*SharedItemsImports = 13

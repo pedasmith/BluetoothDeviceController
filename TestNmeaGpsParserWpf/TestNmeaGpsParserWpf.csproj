@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+	  <!-- See https://learn.microsoft.com/en-us/dotnet/standard/frameworks -->
+	  <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <Import Project="..\UtilitiesCore\UtilitiesCore.projitems" Label="Shared" />
+
+</Project>
