@@ -3,6 +3,7 @@ using Parsers.Nmea;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
+using Windows.Storage.Pickers;
 
 namespace TestNmeaGpsParser
 {
@@ -36,12 +37,25 @@ namespace TestNmeaGpsParser
         {
             Console.WriteLine(str);
         }
+
+
+
         [STAThread]
         static void Main(string[] args)
         {
+            var p = new Program();
+            p.DoMain(args);
+        }
+
+        void DoMain(string[] args)
+        { 
             UserOptions options = new UserOptions();
             Log("Nmea Gps Program");
             Test();
+
+            // Initialize the folder picker with the window handle (HWND).
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            //WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hWnd);
 
             for (int i=0; i<args.Length; i++)
             {
@@ -100,7 +114,7 @@ namespace TestNmeaGpsParser
         // The completely magical string -windows10.0.17763.0 makes it work, but isn't documented in any
         // logical spot. See https://blogs.windows.com/windowsdeveloper/2020/09/03/calling-windows-apis-in-net5/
         // for details.
-        private static async void ListBluetooth(UserOptions options)
+        private async void ListBluetooth(UserOptions options)
         {
             int nNotMatch = 0;
             int nMatch = 0;

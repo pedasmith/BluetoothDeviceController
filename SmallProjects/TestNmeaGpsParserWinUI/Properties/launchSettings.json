@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TestNmeaGpsParserWinUI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "TestNmeaGpsParserWinUI (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,25 +1,33 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
 
 using Parsers.Nmea;
-//using Windows.Devices.Bluetooth;
-//using Windows.Devices.Bluetooth.Rfcomm;
-//using Windows.Devices.Enumeration;
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Rfcomm;
+using Windows.Devices.Enumeration;
 
-namespace TestNmeaGpsParserWpf
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
+
+namespace TestNmeaGpsParserWinUI
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public partial class MainWindow : Window
+    public sealed partial class MainWindow : Window
     {
         class UserOptions
         {
@@ -39,24 +47,35 @@ namespace TestNmeaGpsParserWpf
             Match = "xgps150"
         };
 
+        /// <summary>
+        /// Calls all of the internal static self-test methods.
+        /// </summary>
+        /// <returns>Number of errors; should always be 0</returns>
+        static int Test()
+        {
+            int nerror = 0;
+            nerror += Nmea_Data.Test();
+
+            return nerror;
+        }
+
         private void Log(string str)
         {
-            uiLog.Text += str = "\n";
+            uiLog.Text += str + "\n";
         }
         public MainWindow()
         {
             InitializeComponent();
+            Test();
         }
 
         private void OnListComm(object sender, RoutedEventArgs e)
         {
-
+            ListBluetooth(Options);
         }
 
-        private static async void ListBluetooth(UserOptions options)
+        private async void ListBluetooth(UserOptions options)
         {
-            await Task.Delay(1);
-#if NEVER_EVER_DEFINED
             int nNotMatch = 0;
             int nMatch = 0;
             DeviceInformation? firstMatch = null;
@@ -104,7 +123,7 @@ namespace TestNmeaGpsParserWpf
                 Log($"Can't get BT device: reason={ex.Message}");
                 return;
             }
-
+            return;
             try
             {
                 var rfcommServices = await bt.GetRfcommServicesAsync(BluetoothCacheMode.Uncached);
@@ -115,7 +134,7 @@ namespace TestNmeaGpsParserWpf
                 Log($"Can't get BT comm services: reason={ex.Message}");
                 return;
             }
-#endif
+
         }
     }
 }
