@@ -7,7 +7,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="TestNmeaGpsParserWinUI">
+    Title="Bluetooth NMEA GPS parser"
+    
+    >
 
     <Window.SystemBackdrop>
         <MicaBackdrop />
@@ -23,8 +25,14 @@
             <Button Content="List"  Click="OnListComm" />
         </StackPanel>
         <ScrollViewer Grid.Row="2" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Visible">
-            <TextBlock x:Name="uiLog" VerticalAlignment="Stretch" Text="LOGGER!" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="300"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="uiLog" Grid.Column="0" VerticalAlignment="Stretch" Text="LOGGER!"  />
+                <TextBox x:Name="uiLogImportantData" Grid.Column="1" IsReadOnly="True" Text="Data" TextWrapping="Wrap" />
+            </Grid>
         </ScrollViewer>
-
     </Grid>
 </Window>

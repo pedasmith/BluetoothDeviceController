@@ -190,6 +190,9 @@ namespace BluetoothDeviceController.BluetoothProtocolsCustom
             dw.WriteString(Data);
 
             var command = dw.DetachBuffer().ToArray();
+            // TODO: Later, I learned that although classic LE is limited to 20 bytes (a) modern ones aren't limied and
+            // (b) the Windows Bluetooth API will automatically handle the case of trying to send "too much" data at once.
+            // Next time this code is used, consider removing this loop as it is a waste of time.
             const int MAXBYTES = 20;
             for (int i = 0; i < command.Length; i += MAXBYTES)
             {
