@@ -8,6 +8,9 @@ using Windows.Storage.Streams;
 
 namespace BluetoothDeviceController.SerialPort
 {
+    /// <summary>
+    /// Connects the Windows RFCOMM serial port service to an "ITerminal" which can handle it.
+    /// </summary>
     class BluetoothCommTerminalAdapter
     {
         public BluetoothCommTerminalAdapter(ITerminal terminal, DeviceInformation input_di)

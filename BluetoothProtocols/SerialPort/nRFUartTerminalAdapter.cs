@@ -28,6 +28,7 @@ namespace BluetoothDeviceController.SerialPort
         {
             if (nrf == null) return;
 
+            // Why is this even here? All of these are essentially guaranteed to work 100% of the time.
             try {
                 Terminal?.SetDeviceStatus($"Connecting to device");
                 Terminal?.SetDeviceStatus($"Connection OK");
