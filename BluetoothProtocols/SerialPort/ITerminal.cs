@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BluetoothDeviceController.SerialPort
+﻿namespace BluetoothDeviceController.SerialPort
 {
+    /// <summary>
+    /// Used by terminal-like controls to be the main interface between the code that handles a device and the user.
+    /// This might be a "real" terminal like a Telnet terminal, or a serial port terminal (they are subtely different :-) )
+    /// or to a serial-using device like a the Dual XGPS150A GPS device which has a serial interface but which produces
+    /// a rich data stream which the GPS page can display.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="data"></param>
     public delegate void TerminalSendDataEventHandler(object sender, string data);
     public interface ITerminal
     {
@@ -27,6 +29,4 @@ namespace BluetoothDeviceController.SerialPort
 
         void SetDeviceStatus(string status);
     }
-
-
 }
