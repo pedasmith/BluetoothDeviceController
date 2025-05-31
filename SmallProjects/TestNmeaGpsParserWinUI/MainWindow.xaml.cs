@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Foundation.Diagnostics;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 
@@ -27,10 +29,15 @@ using Windows.Storage.Streams;
 
 namespace TestNmeaGpsParserWinUI
 {
+    interface IHandleStreamSocketLine
+    {
+        void Log(string str);
+        void HandleLine(string line);
+    }
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainWindow : Window
+    public sealed partial class MainWindow : Window, IHandleStreamSocketLine
     {
         class UserOptions
         {
@@ -62,7 +69,7 @@ namespace TestNmeaGpsParserWinUI
             return nerror;
         }
 
-        private void Log(string str)
+        public void Log(string str)
         {
             UIThreadHelper.CallOnUIThread(this, () =>
             {
@@ -192,80 +199,22 @@ namespace TestNmeaGpsParserWinUI
                 return;
             }
             cts = new CancellationTokenSource();
-            StreamSocket? socket = await MakeConnectedSocket(serviceRfcomm);
+            StreamSocket? socket = await BluetoothSocketHelper.MakeConnectedSocket(this, serviceRfcomm);
             if (socket == null) return;
 
             var istream = socket.OutputStream;
 
-            readAll = Task.Run(async () =>
-            {
-                var ct = cts.Token;
-                var dr = new DataReader(socket.InputStream);
-                dr.InputStreamOptions = InputStreamOptions.Partial;
-                const int READBUFFER = 2000;
-                bool keepGoing = true;
-                while (!ct.IsCancellationRequested && keepGoing)
-                {
-                    uint n = 0;
-                    try
-                    {
-                        Log($"trying to read");
-                        n = await dr.LoadAsync(READBUFFER).AsTask(ct);
-                        Log($"read OK");
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        n = 0;
-                        keepGoing = false;
-                    }
-                    catch (Exception ex)
-                    {
-                        Log($"ERROR: Receiving: {ex.Message}\r");
-                        Log($"Socket read failed");
-                        n = 0;
-                        keepGoing = false;
-                    }
-                    if (n > 0)
-                    {
-                        // Got some data from the device
-                        var str = dr.ReadString(dr.UnconsumedBufferLength);
+            readAll = Task.Run( async () => { await BluetoothSocketHelper.ReadLines(this, socket, cts.Token); });
 
-                        // Give the string to the terminal
-                        Log(str);
-                    }
-                    else
-                    {
-                        keepGoing = false;
-                    }
-                }
-                readAll = null; // The task is going away; null it out.
-            });
 
             Log("All steps completed");
         }
 
-        /// <summary>
-        /// Requires the Bluetooth capability (otherwise it dies at the ConnectAsync with HResult 8007277c which is barely documented)
-        /// </summary>
-        /// <param name="serviceRfcomm"></param>
-        /// <returns></returns>
-        private async Task<StreamSocket?> MakeConnectedSocket(RfcommDeviceService serviceRfcomm)
+
+
+        public void HandleLine(string line)
         {
-            StreamSocket? socket = new StreamSocket();
-            var istream = socket.OutputStream;
-            try
-            {
-                Log($"Connecting to device");
-                await socket.ConnectAsync(serviceRfcomm.ConnectionHostName, serviceRfcomm.ConnectionServiceName);
-                Log($"Connection OK");
-            }
-            catch (Exception ex)
-            {
-                Log($"Exception connecting to Rfcomm/Spp. Exception {ex.Message}\r");
-                Log($"Failed to connect");
-                socket = null;
-            }
-            return socket;
+            Log(line);
         }
 
         Task? readAll;
@@ -276,6 +225,100 @@ namespace TestNmeaGpsParserWinUI
 
 namespace Utilities
 {
+    static class BluetoothSocketHelper
+    {
+        /// <summary>
+        /// Requires the Bluetooth capability (otherwise it dies at the ConnectAsync with HResult 8007277c which is barely documented)
+        /// </summary>
+        /// <param name="serviceRfcomm"></param>
+        /// <returns></returns>
+        public static async Task<StreamSocket?> MakeConnectedSocket(TestNmeaGpsParserWinUI.IHandleStreamSocketLine logger, RfcommDeviceService serviceRfcomm)
+        {
+            StreamSocket? socket = new StreamSocket();
+            var istream = socket.OutputStream;
+            try
+            {
+                logger.Log($"Connecting to device");
+                await socket.ConnectAsync(serviceRfcomm.ConnectionHostName, serviceRfcomm.ConnectionServiceName);
+                logger.Log($"Connection OK");
+            }
+            catch (Exception ex)
+            {
+                logger.Log($"Exception connecting to Rfcomm/Spp. Exception {ex.Message}\r");
+                logger.Log($"Failed to connect");
+                socket = null;
+            }
+            return socket;
+        }
+
+        public static async Task ReadLines(TestNmeaGpsParserWinUI.IHandleStreamSocketLine logger, StreamSocket socket, CancellationToken ct)
+        {
+            var oldLine = "";
+            var dr = new DataReader(socket.InputStream);
+            dr.InputStreamOptions = InputStreamOptions.Partial;
+            const int READBUFFER = 2000;
+            bool keepGoing = true;
+            while (!ct.IsCancellationRequested && keepGoing)
+            {
+                uint n = 0;
+                try
+                {
+                    logger.Log($"trying to read");
+                    n = await dr.LoadAsync(READBUFFER).AsTask(ct);
+                    logger.Log($"read OK {n}");
+                }
+                catch (TaskCanceledException)
+                {
+                    n = 0;
+                    keepGoing = false;
+                }
+                catch (Exception ex)
+                {
+                    logger.Log($"ERROR: Receiving: {ex.Message}\r");
+                    logger.Log($"Socket read failed");
+                    n = 0;
+                    keepGoing = false;
+                }
+                if (n > 0)
+                {
+                    // Got some data from the device
+                    var str = dr.ReadString(dr.UnconsumedBufferLength);
+                    if (str.Contains("\r\n"))
+                    {
+                        bool lastHasCRLF = str.EndsWith("\r\n");
+
+                        var lines = str.Split("\r\n");
+                        int lastIndex = lines.Length - 1;
+                        logger.HandleLine(oldLine + lines[0]);
+                        if (lines.Length > 1)
+                        {
+                            for (int i = 1; i <= lastIndex; i++)
+                            {
+                                bool isLast = i == lastIndex;
+                                if (!isLast || lastHasCRLF)
+                                {
+                                    logger.HandleLine(lines[i]);
+                                }
+                            }
+                        }
+                        oldLine = lastHasCRLF ? "" : lines[lastIndex];
+                    }
+                    else
+                    {
+                        oldLine += str;
+                        // Pause a little bit and let the GPS buffer a little bit
+                        await Task.Delay(50); // time is in milliseconds
+                    }
+                }
+                else
+                {
+                    keepGoing = false;
+                }
+            }
+        }
+    }
+
+
     static class UIThreadHelper
     {
         /// <summary>
