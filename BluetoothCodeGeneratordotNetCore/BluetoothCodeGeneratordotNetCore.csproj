@@ -69,4 +69,6 @@
 
   <Import Project="..\Utilities\Utilities.projitems" Label="Shared" />
 
+  <Import Project="..\BluetoothProtocolsSerial\BluetoothProtocolsSerial.projitems" Label="Shared" />
+
 </Project>

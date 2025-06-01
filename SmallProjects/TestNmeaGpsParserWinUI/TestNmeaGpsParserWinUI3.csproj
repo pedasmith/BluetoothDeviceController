@@ -38,6 +38,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
+    <PackageReference Include="System.Runtime.WindowsRuntime.UI.Xaml" Version="4.7.0" />
   </ItemGroup>
 
   <!--
@@ -57,4 +58,6 @@
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
   </PropertyGroup>
   <Import Project="..\..\UtilitiesCore\UtilitiesCore.projitems" Label="Shared" />
+  <Import Project="..\..\BluetoothProtocolsSerial\BluetoothProtocolsSerial.projitems" Label="Shared" />
+  <Import Project="..\..\WinUI3Controls\WinUI3Controls.projitems" Label="Shared" />
 </Project>
