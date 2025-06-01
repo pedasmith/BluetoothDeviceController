@@ -2,7 +2,7 @@
 
 byte[] data1 = { 0x01, 0x01, 0x0E, 0x16, 0x8D, 0x59 };
 byte[] data = { 0x01, 0x01, 0x0D, 0xBA, 0xE8, 0x69 };
-string ZZct01hex = "AA 0D A1 00 59 02 29 64 14 15 09 17 01 36 16 BB";
+//string ZZct01hex = "AA 0D A1 00 59 02 29 64 14 15 09 17 01 36 16 BB";
 string ct01hex = "00 00 00 00 66 02 00 00 00 00";
 byte[] ct01 = FindBitPattern.ConvertFromHex(ct01hex);
 

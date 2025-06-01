@@ -10,6 +10,9 @@
     d:DesignWidth="400">
 
     <Grid>
+		<StackPanel>
+			<TextBlock>GPS CONTROL</TextBlock>
+		</StackPanel>
 
     </Grid>
 </UserControl>
