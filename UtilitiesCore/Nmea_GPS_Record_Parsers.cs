@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-#if NET9_0_OR_GREATER
+#if NET8_0_OR_GREATER
 #nullable disable
 #endif
 namespace Parsers.Nmea

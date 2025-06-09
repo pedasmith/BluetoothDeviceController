@@ -2,7 +2,7 @@
   "profiles": {
     "TestNmeaGpsParser": {
       "commandName": "Project",
-      "commandLineArgs": "-match xgps150 -listcom"
+      "commandLineArgs": "-match xgps150 -noshowmatching -showaqs -listdeviceselectors"
     }
   }
 }

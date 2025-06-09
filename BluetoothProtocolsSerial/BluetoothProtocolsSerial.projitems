@@ -9,6 +9,8 @@
     <Import_RootNamespace>BluetoothProtocolsSerial</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Serial\BluetoothCommTerminalAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serial\ITerminal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serial\RfcommOptions.cs" />
   </ItemGroup>
 </Project>

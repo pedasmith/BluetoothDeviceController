@@ -9,6 +9,43 @@
     /// <param name="sender"></param>
     /// <param name="data"></param>
     public delegate void TerminalSendDataEventHandler(object sender, string data);
+
+    public static class TerminalSupport
+    {
+        public enum ConnectionState
+        {
+            NotStarted,
+            ScanningForDevices,
+            ConnectingToDevice,
+            SendingAndRecieving,
+        };
+        public enum ConnectionSubstate
+        {
+            ScanningForDevicesStarted,
+            ScanningForDeviceCompleted,
+        }
+
+        public static string StateAsString(ConnectionState state, ConnectionSubstate substate, double value=-999)
+        {
+            switch (state)
+            {
+                case ConnectionState.ScanningForDevices:
+                    switch (substate)
+                    {
+                        case ConnectionSubstate.ScanningForDevicesStarted: return "Scanning";
+                        case ConnectionSubstate.ScanningForDeviceCompleted: return $"Found {value} devices";
+                    }
+                    break;
+            }
+            return $"State={state} substate={substate}";
+        }
+
+        public static string StateAsIcon(ConnectionState state, ConnectionSubstate substate)
+        {
+            return "CHECK";
+        }
+    }
+
     public interface ITerminal
     {
         /// <summary>
@@ -27,6 +64,10 @@
         /// <param name="error"></param>
         void ErrorFromDevice(string error);
 
+        /// <summary>
+        /// Cheap and cheerful status. The better status is the longer one that take in more details.
+        /// </summary>
         void SetDeviceStatus(string status);
+        void SetDeviceStatusEx(TerminalSupport.ConnectionState status, TerminalSupport.ConnectionSubstate substate, string text="", double value=-999);
     }
 }

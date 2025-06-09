@@ -10,9 +10,44 @@
     d:DesignWidth="400">
 
     <Grid>
-		<StackPanel>
-			<TextBlock>GPS CONTROL</TextBlock>
-		</StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Style="{StaticResource sTitle}">GPS control</TextBlock>
+        <TabView Grid.Row="1" SelectedIndex="2">
+            <TabViewItem Header="Map">
+
+            </TabViewItem>
+            <TabViewItem Header="Position">
+
+            </TabViewItem>
+            <TabViewItem Header="Log">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Style="{StaticResource HeaderTextBlockStyle}">GPS Connection Log</TextBlock>
+                    <ScrollViewer Grid.Row="1">
+                        <TextBlock x:Name="uiLog" Text="(program initialized)"  />
+                    </ScrollViewer>
+                </Grid>
+
+            </TabViewItem>
+        </TabView>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" x:Name="uiIcon" />
+            <TextBlock Grid.Column="1" x:Name="uiStatus" />
+            <TextBlock Grid.Column="2" x:Name="uiSubstatus" />
+        </Grid>
 
     </Grid>
 </UserControl>

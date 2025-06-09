@@ -8,7 +8,7 @@ using System.Text;
 // 2. I can't use the ? for the events because old projects don't do that
 // 3. But for FindBitPattern I need to suppress the warning just for this file.
 
-#if NET9_0_OR_GREATER
+#if NET8_0_OR_GREATER
 #nullable disable
 #endif
 

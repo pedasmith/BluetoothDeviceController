@@ -1,3 +1,5 @@
+using BluetoothDeviceController.SerialPort;
+using BluetoothProtocolsSerial.Serial;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -39,23 +41,12 @@ namespace TestNmeaGpsParserWinUI
     /// </summary>
     public sealed partial class MainWindow : Window, IHandleStreamSocketLine
     {
-        class UserOptions
-        {
-            public string Match = "*";
-            public bool Matches(string devicename)
-            {
-                if (Match == "*") return true;
 
-                var nameup = devicename.ToUpper();
-                var matchup = Match.ToUpper();
-                if (nameup.Contains(matchup)) return true;
-                return false;
-            }
-        }
-        UserOptions Options = new UserOptions()
+        RfcommOptions Options = new RfcommOptions()
         {
             Match = "xgps150"
         };
+        BluetoothCommTerminalAdapter? BtTerminalAdapter = null;
 
         /// <summary>
         /// Calls all of the internal static self-test methods.
@@ -90,121 +81,108 @@ namespace TestNmeaGpsParserWinUI
                 uiLog.Text = header;
             });
         }
+
+
         public MainWindow()
         {
             InitializeComponent();
             Test();
-            ListBluetooth(Options);
+            DoAll(uiGps, Options);
         }
 
         private void OnListComm(object sender, RoutedEventArgs e)
         {
-            ListBluetooth(Options);
+            DoAll(uiGps, Options);
         }
 
-        private async void ListBluetooth(UserOptions options)
+        private async void DoAll(ITerminal terminal, RfcommOptions options)
         {
+            terminal.SetDeviceStatusEx(TerminalSupport.ConnectionState.ScanningForDevices, TerminalSupport.ConnectionSubstate.ScanningForDevicesStarted);
             LogClear();
             int nNotMatch = 0;
             int nMatch = 0;
-            DeviceInformation? firstMatch = null;
-            DeviceInformationCollection PairedBluetoothDevices = await DeviceInformation.FindAllAsync(BluetoothDevice.GetDeviceSelectorFromPairingState(true));
+            DeviceInformation? deviceInfoSelected = null;
+
+            var discoveryType = BluetoothCommTerminalAdapter.DiscoveryType.BluetoothDevice;
+            //var discoveryType = BluetoothCommTerminalAdapter.DiscoveryType.SerialDevice; // Does not work; error 80070079
+
+
+            // this is the working one: 2025-06-04 DeviceInformationCollection PairedBluetoothDevices = await DeviceInformation.FindAllAsync(BluetoothDevice.GetDeviceSelectorFromPairingState(true));
+            // There actually three ways to make this. I haven't tried the third way yet
+            var aqs = BluetoothCommTerminalAdapter.GetDeviceSelector(discoveryType);
+
+            var picker = new DevicePicker();
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(this));
+            picker.Filter.SupportedDeviceSelectors.Add(aqs);
+            var selected = await picker.PickSingleDeviceAsync(new Rect(50, 200, 10, 10)); // Rect is where it flie out from
+
+            DeviceInformationCollection PairedBluetoothDevices = await DeviceInformation.FindAllAsync(aqs);
             foreach (DeviceInformation? device in PairedBluetoothDevices)
             {
+                // BluetoothDevice will be e.g. XGPS150-HEXHEX and BluetoothRfcommDevice will be e.g. SPP Dev
                 if (options.Matches(device.Name))
                 {
                     nMatch++;
                     Log($"Info: device name={device.Name}");
                     LogCopyable(device.Name);
-                    if (firstMatch == null) firstMatch = device;
+                    if (nMatch == 1) deviceInfoSelected = device; // first one
                 }
                 else
                 {
                     nNotMatch++;
+
+                    Log($"Info: Not matching: device name={device.Name}");
+                    LogCopyable(device.Name);
+
+                    // what the heck, select it anyway.
+                    if (deviceInfoSelected == null) deviceInfoSelected = device;
                 }
             }
             Log($"List complete. N. Match={nMatch} Not matching={nNotMatch}");
 
             // Now let's try to connect
-            if (firstMatch == null) return;
+            if (deviceInfoSelected == null) return;
 
-            var accessStatus = DeviceAccessInformation.CreateFromId(firstMatch.Id);
-            if (accessStatus.CurrentStatus != DeviceAccessStatus.Allowed)
-            {
-                Log($"Can't connect: access status={accessStatus.CurrentStatus}");
-                return;
-            }
-
-            BluetoothDevice? bt = null;
-            try
-            {
-                Log($"About to get device from id={firstMatch.Id}");
-                LogCopyable(firstMatch.Id);
-                bt = await BluetoothDevice.FromIdAsync(firstMatch.Id);
-                Log($"Result: {bt}");
-                if (bt == null)
-                {
-                    Log($"Unable to get BT device: FromId returned null");
-                    return;
-                }
-                Log($"Got device: connection status={bt.ConnectionStatus} address={bt.BluetoothAddress}");
-            }
-            catch (Exception ex)
-            {
-                Log($"Can't get BT device: reason={ex.Message}");
-                return;
-            }
-
-            switch (bt.ConnectionStatus)
-            {
-                case BluetoothConnectionStatus.Disconnected:
-                    Log("Device is unconnected. Press the power button to connect?");
-                    break; ;
-            }
-            Log("Step 80: Get the RfcommServces");
-            // All serial services are:
-            // SPP: 00001101-0000-1000-8000-00805f9b34fb
-            // 00000000-deca-fade-deca-deafdecacaff	Accessory-side MFi/iAP(2) protocol https://wiomoc.de/misc/posts/mfi_iap.html
-            // See https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.rfcomm.rfcommserviceid?view=winrt-26100 for sample list.
-
-            RfcommDeviceService? serviceRfcomm = null;
-            // RfcommDeviceService API: https://learn.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.rfcomm.rfcommdeviceservice?view=winrt-26100
-            try
-            {
-                var rfcommServices = await bt.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort, BluetoothCacheMode.Uncached);
-                Log($"RfcommServices uncached count={rfcommServices.Services.Count}");
-
-                rfcommServices = await bt.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort, BluetoothCacheMode.Cached);
-                //var rfcommServices = await bt.GetRfcommServicesAsync(BluetoothCacheMode.Cached);
-                Log($"RfcommServices cached count={rfcommServices.Services.Count}");
+            BtTerminalAdapter = new BluetoothCommTerminalAdapter(terminal, deviceInfoSelected, discoveryType);
 
 
-                foreach (var service in rfcommServices.Services)
-                {
-                    if (serviceRfcomm == null) serviceRfcomm = service;
-                    Log($"Service: name={service.ConnectionServiceName}");
-                    Log($"    id={service.ServiceId.Uuid} host={service.ConnectionHostName}");
-                    LogCopyable(service.ServiceId.Uuid.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                Log($"Can't get BT comm services: reason={ex.Message}");
-                return;
-            }
-
-            if (serviceRfcomm == null)
+            await BtTerminalAdapter.EnsureRfcommService();
+            if (BtTerminalAdapter.RfcommDeviceService == null)
             {
                 Log($"There are no serial services avaiable.");
                 return;
             }
-            cts = new CancellationTokenSource();
-            StreamSocket? socket = await BluetoothSocketHelper.MakeConnectedSocket(this, serviceRfcomm);
-            if (socket == null) return;
 
-            var istream = socket.OutputStream;
+            BtTerminalAdapter.cts = new CancellationTokenSource();
 
-            readAll = Task.Run( async () => { await BluetoothSocketHelper.ReadLines(this, socket, cts.Token); });
+            IInputStream? inputStream = null;
+#if NEVER_EVER_DEFINED
+            // I can't get SerialDevice to work
+            if (BtTerminalAdapter.SerialDevice != null)
+            {
+                istream = BtTerminalAdapter.SerialDevice.InputStream;
+            }
+#endif
+            if (inputStream == null)
+            {
+                // Log some date from the RfcommDeviceService
+                Log($"ConnectionHostName: {BtTerminalAdapter.RfcommDeviceService.ConnectionHostName}");
+                Log($"ConnectionServiceName: {BtTerminalAdapter.RfcommDeviceService.ConnectionServiceName}");
+                LogCopyable($"{BtTerminalAdapter.RfcommDeviceService.ConnectionHostName}");
+                LogCopyable($"{BtTerminalAdapter.RfcommDeviceService.ConnectionServiceName}");
+
+                await BtTerminalAdapter.EnsureConnectedSocket();
+
+                if (BtTerminalAdapter.Socket == null) return;
+
+                inputStream = BtTerminalAdapter.Socket.InputStream;
+            }
+
+            readAll = Task.Run( async () => 
+            {
+                // await BluetoothSocketHelper.ReadLines(this, BtTerminalAdapter.Socket, inputStream, BtTerminalAdapter.cts.Token);
+                await BluetoothSocketHelper.ReadLines(this, inputStream, BtTerminalAdapter.cts.Token);
+            });
 
 
             Log("All steps completed");
@@ -251,10 +229,10 @@ namespace Utilities
             return socket;
         }
 
-        public static async Task ReadLines(TestNmeaGpsParserWinUI.IHandleStreamSocketLine logger, StreamSocket socket, CancellationToken ct)
+        public static async Task ReadLines(TestNmeaGpsParserWinUI.IHandleStreamSocketLine logger, /* StreamSocket socket, */ IInputStream inputStream, CancellationToken ct)
         {
             var oldLine = "";
-            var dr = new DataReader(socket.InputStream);
+            var dr = new DataReader(inputStream);
             dr.InputStreamOptions = InputStreamOptions.Partial;
             const int READBUFFER = 2000;
             bool keepGoing = true;

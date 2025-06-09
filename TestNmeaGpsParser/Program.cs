@@ -1,5 +1,6 @@
 ﻿
 using Parsers.Nmea;
+using System.Linq.Expressions;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
@@ -19,6 +20,11 @@ namespace TestNmeaGpsParser
             if (nameup.Contains(matchup)) return true;
             return false;
         }
+
+        public bool AllowSlowLists = false;
+        public bool ShowMatchingDevices = true;
+        public bool ShowAqsQuery = false;
+        public bool TraceEachQuery = false;
     }
     internal class Program
     {
@@ -54,8 +60,12 @@ namespace TestNmeaGpsParser
             Test();
 
             // Initialize the folder picker with the window handle (HWND).
-            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            //var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
             //WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hWnd);
+
+            List<SelectorInfo> selectors = new List<SelectorInfo>();
+            Task? task;
+
 
             for (int i=0; i<args.Length; i++)
             {
@@ -67,6 +77,14 @@ namespace TestNmeaGpsParser
                     default:
                         Log($"ERROR: Unknown argument {arg}");
                         break;
+                    case "-aqs":
+                        i++;
+                        selectors.Clear();
+                        task = FillSelectorsFromAqsQuery(selectors, "AQS", argParam, options, false);
+                        task.Wait();
+                        DisplaySelectors(selectors, options);
+                        break;
+
                     case "-example":
                         {
                             i++;
@@ -101,10 +119,37 @@ namespace TestNmeaGpsParser
                     case "-listcom":
                         ListBluetooth(options);
                         break;
+                    case "-listdeviceselectors":
+                        selectors.Clear();
+                        options.TraceEachQuery = true;
+                        task = FillSelectorsFromDevicesAsync(selectors, options);
+                        task.Wait();
+                        options.TraceEachQuery = false;
+                        DisplaySelectors(selectors, options);
+                        break;
                     case "-match":
                         i++;
                         options.Match = argParam;
                         break;
+                    case "-slowlist":
+                        options.AllowSlowLists = true;
+                        break;
+                    case "-noslowlist":
+                        options.AllowSlowLists = false;
+                        break;
+                    case "-showaqs":
+                        options.ShowAqsQuery = true;
+                        break;
+                    case "-noshowaqs":
+                        options.ShowAqsQuery = false;
+                        break;
+                    case "-showmatching":
+                        options.ShowMatchingDevices = true;
+                        break;
+                    case "-noshowmatching":
+                        options.ShowMatchingDevices = false;
+                        break;
+
                 }
             }
         }
@@ -274,6 +319,188 @@ namespace TestNmeaGpsParser
         private static void Parser_OnNmeaUnknown(object? sender, Nmea_Data e)
         {
             Console.WriteLine($"Unknown: {e}");
+        }
+        #endregion
+
+        #region List_DeviceSelectors
+
+        public class SelectorInfo
+        {
+            public SelectorInfo(string name, string selector, DeviceInformation? di)
+            {
+                Name = name;
+                Selector = selector;
+                DI = di;
+            }
+            public string Name = "";
+            public string Selector = "";
+            public DeviceInformation? DI;
+
+        }
+        public async Task FillSelectorsFromDevicesAsync(List<SelectorInfo> selectors, UserOptions options)
+        {
+            const bool IsSlow = true;
+
+            await FillSelectorsFromAqsQuery(selectors, "Bluetooth.BluetoothAdapter", Windows.Devices.Bluetooth.BluetoothAdapter.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Bluetooth.BluetoothDevice", Windows.Devices.Bluetooth.BluetoothDevice.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Bluetooth.BluetoothLEDevice", Windows.Devices.Bluetooth.BluetoothLEDevice.GetDeviceSelector(), options);
+
+            await FillSelectorsFromAqsQuery(selectors, "Bluetooth.Rfcomm.ObexFileTransfer", RfcommDeviceService.GetDeviceSelector(RfcommServiceId.ObexFileTransfer), options);
+            await FillSelectorsFromAqsQuery(selectors, "Bluetooth.Rfcomm.PhoneBookAccessPce", RfcommDeviceService.GetDeviceSelector(RfcommServiceId.PhoneBookAccessPce), options);
+            await FillSelectorsFromAqsQuery(selectors, "Bluetooth.Rfcomm.PhoneBookAccessPse", RfcommDeviceService.GetDeviceSelector(RfcommServiceId.PhoneBookAccessPse), options);
+            await FillSelectorsFromAqsQuery(selectors, "Bluetooth.Rfcomm.SerialPort", RfcommDeviceService.GetDeviceSelector(RfcommServiceId.SerialPort), options);
+            await FillSelectorsFromAqsQuery(selectors, "Bluetooth.Rfcomm.GenericFileTransfer", RfcommDeviceService.GetDeviceSelector(RfcommServiceId.GenericFileTransfer), options);
+
+            // All the sensors are together
+            await FillSelectorsFromAqsQuery(selectors, "Accelerometer(Gravity)", Windows.Devices.Sensors.Accelerometer.GetDeviceSelector(Windows.Devices.Sensors.AccelerometerReadingType.Gravity), options);
+            await FillSelectorsFromAqsQuery(selectors, "Acceleromter(Linear)", Windows.Devices.Sensors.Accelerometer.GetDeviceSelector(Windows.Devices.Sensors.AccelerometerReadingType.Linear), options);
+            await FillSelectorsFromAqsQuery(selectors, "Acceleromter(Standard)", Windows.Devices.Sensors.Accelerometer.GetDeviceSelector(Windows.Devices.Sensors.AccelerometerReadingType.Standard), options);
+            await FillSelectorsFromAqsQuery(selectors, "Activity", Windows.Devices.Sensors.ActivitySensor.GetDeviceSelector(), options);
+            //await ListDeviceSelectorOne(selectors, "Activity", Windows.Devices.Sensors.Altimeter.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Barometer", Windows.Devices.Sensors.Barometer.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Compass", Windows.Devices.Sensors.Compass.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Gyrometer", Windows.Devices.Sensors.Gyrometer.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "HingeAngle", Windows.Devices.Sensors.HingeAngleSensor.GetDeviceSelector(), options);
+            //await ListDeviceSelectorOne(selectors, "HumanPresence", Windows.Devices.Sensors.HumanPresenseSensor.GetDeviceSelector(), options);
+
+            await FillSelectorsFromAqsQuery(selectors, "Inclinometer(Absolute)", Windows.Devices.Sensors.Inclinometer.GetDeviceSelector(Windows.Devices.Sensors.SensorReadingType.Absolute), options);
+            await FillSelectorsFromAqsQuery(selectors, "Inclinomter(Relative)", Windows.Devices.Sensors.Inclinometer.GetDeviceSelector(Windows.Devices.Sensors.SensorReadingType.Relative), options);
+            await FillSelectorsFromAqsQuery(selectors, "Light", Windows.Devices.Sensors.LightSensor.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Magnetometer", Windows.Devices.Sensors.Magnetometer.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Orientation(Absolute)", Windows.Devices.Sensors.OrientationSensor.GetDeviceSelector(Windows.Devices.Sensors.SensorReadingType.Absolute), options);
+            await FillSelectorsFromAqsQuery(selectors, "Orientation(Relative)", Windows.Devices.Sensors.OrientationSensor.GetDeviceSelector(Windows.Devices.Sensors.SensorReadingType.Relative), options);
+            await FillSelectorsFromAqsQuery(selectors, "Pedometer", Windows.Devices.Sensors.Pedometer.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Proximity", Windows.Devices.Sensors.ProximitySensor.GetDeviceSelector(), options);
+            //await ListDeviceSelectorOne(selectors, "Activity", Windows.Devices.Sensors.SimpleOrientation.GetDeviceSelector(), options);
+
+            // All of the POS devices together
+            await FillSelectorsFromAqsQuery(selectors, "BarcodeScanner", Windows.Devices.PointOfService.BarcodeScanner.GetDeviceSelector(), options, IsSlow);
+            await FillSelectorsFromAqsQuery(selectors, "CashDrawer", Windows.Devices.PointOfService.CashDrawer.GetDeviceSelector(), options, IsSlow);
+            await FillSelectorsFromAqsQuery(selectors, "LineDisplay", Windows.Devices.PointOfService.LineDisplay.GetDeviceSelector(), options, IsSlow);
+            await FillSelectorsFromAqsQuery(selectors, "MagneticStripeReader", Windows.Devices.PointOfService.MagneticStripeReader.GetDeviceSelector(), options, IsSlow);
+            await FillSelectorsFromAqsQuery(selectors, "PosPrinter", Windows.Devices.PointOfService.PosPrinter.GetDeviceSelector(), options, IsSlow);
+
+
+            // Everything else alphabetical
+            await FillSelectorsFromAqsQuery(selectors, "3DPrinter", Windows.Devices.Printers.Print3DDevice.GetDeviceSelector(), options);
+            //does not exist?await ListDeviceSelectorOne(selectors, "DisplayMuxDevice", Windows.Devices.Display.Core.DisplayMuxDevice.GetDeviceSelector());
+            await FillSelectorsFromAqsQuery(selectors, "DIAL(WiDi)", Windows.Media.DialProtocol.DialDevice.GetDeviceSelector("WiDi"), options, IsSlow);
+            await FillSelectorsFromAqsQuery(selectors, "DIAL(org.smarttv-alliance)", Windows.Media.DialProtocol.DialDevice.GetDeviceSelector("org.smarttv-alliance"), options, IsSlow);
+
+            await FillSelectorsFromAqsQuery(selectors, "I2C", Windows.Devices.I2c.I2cDevice.GetDeviceSelector(), options);
+
+            await FillSelectorsFromAqsQuery(selectors, "Lamp", Windows.Devices.Lights.Lamp.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "LampArray", Windows.Devices.Lights.LampArray.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "MediaFrameSourceGroup", Windows.Media.Capture.Frames.MediaFrameSourceGroup.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Midi(In)", Windows.Devices.Midi.MidiInPort.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Midi(Out)", Windows.Devices.Midi.MidiOutPort.GetDeviceSelector(), options);
+
+            await FillSelectorsFromAqsQuery(selectors, "MobileBroadband", Windows.Networking.NetworkOperators.MobileBroadbandModem.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "PortableCalendar", Windows.Devices.Portable.ServiceDevice.GetDeviceSelector(Windows.Devices.Portable.ServiceDeviceType.CalendarService), options);
+            await FillSelectorsFromAqsQuery(selectors, "PortableContacts", Windows.Devices.Portable.ServiceDevice.GetDeviceSelector(Windows.Devices.Portable.ServiceDeviceType.ContactsService), options);
+            await FillSelectorsFromAqsQuery(selectors, "PortableDeviceStatus", Windows.Devices.Portable.ServiceDevice.GetDeviceSelector(Windows.Devices.Portable.ServiceDeviceType.DeviceStatusService), options);
+            await FillSelectorsFromAqsQuery(selectors, "PortableNotes", Windows.Devices.Portable.ServiceDevice.GetDeviceSelector(Windows.Devices.Portable.ServiceDeviceType.NotesService), options);
+            await FillSelectorsFromAqsQuery(selectors, "PortableRingtones", Windows.Devices.Portable.ServiceDevice.GetDeviceSelector(Windows.Devices.Portable.ServiceDeviceType.RingtonesService), options);
+            await FillSelectorsFromAqsQuery(selectors, "PortableSms", Windows.Devices.Portable.ServiceDevice.GetDeviceSelector(Windows.Devices.Portable.ServiceDeviceType.SmsService), options);
+            await FillSelectorsFromAqsQuery(selectors, "PortableTasks", Windows.Devices.Portable.ServiceDevice.GetDeviceSelector(Windows.Devices.Portable.ServiceDeviceType.TasksService), options);
+            await FillSelectorsFromAqsQuery(selectors, "PortableStorage", Windows.Devices.Portable.StorageDevice.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "ProjectionManager", Windows.UI.ViewManagement.ProjectionManager.GetDeviceSelector(), options, IsSlow);
+            await FillSelectorsFromAqsQuery(selectors, "PWM", Windows.Devices.Pwm.PwmController.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Radio", Windows.Devices.Radios.Radio.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Scanner", Windows.Devices.Scanners.ImageScanner.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "SerialDevice", Windows.Devices.SerialCommunication.SerialDevice.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Sms", Windows.Devices.Sms.SmsDevice.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Sms(2)", Windows.Devices.Sms.SmsDevice2.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "SPI", Windows.Devices.Spi.SpiDevice.GetDeviceSelector(), options);
+            //await ListDeviceSelectorOne(selectors, "USB", Windows.Devices.Usb.UsbDevice.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "Vibrator", Windows.Devices.Haptics.VibrationDevice.GetDeviceSelector(), options);
+
+            await FillSelectorsFromAqsQuery(selectors, "WiFi", Windows.Devices.WiFi.WiFiAdapter.GetDeviceSelector(), options);
+            await FillSelectorsFromAqsQuery(selectors, "WiFiDirect", Windows.Devices.WiFiDirect.WiFiDirectDevice.GetDeviceSelector(), options);
+        }
+
+        public void DisplaySelectors(List<SelectorInfo> selectors, UserOptions options)
+        { 
+            // Potential
+            // HidDevice takes two weird parameters
+
+            if (options.ShowMatchingDevices)
+            {
+                Log("Device\tName\tId\tKind");
+                foreach (var item in selectors)
+                {
+                    if (item.DI == null)
+                    {
+                        Log($"{item.Name}\t\t\t");
+                    }
+                    else
+                    {
+                        Log($"{item.Name}\t{item.DI.Name}\t{item.DI.Id}\t{item.DI.Kind}");
+                    }
+                }
+            }
+            if (options.ShowAqsQuery)
+            {
+                Log("Device,AQS");
+                var oldname = "---no-a-real-name";
+                foreach (var item in selectors)
+                {
+                    if (item.Name == oldname) continue;
+                    oldname = item.Name;
+
+                    Log($"{item.Name},{item.Selector}");
+                }
+            }
+        }
+
+        private async Task FillSelectorsFromAqsQuery(IList<SelectorInfo> selectors, string name, string aqsQuery, UserOptions options, bool isSlow=false)
+        {
+            if (options.TraceEachQuery)
+            {
+                Log($"{name}");
+            }
+            try
+            {
+                if (options.ShowAqsQuery && !options.ShowMatchingDevices)
+                {
+                    selectors.Add(new SelectorInfo(name, aqsQuery, null));
+                }
+                else if (isSlow && !options.AllowSlowLists)
+                {
+                    selectors.Add(new SelectorInfo(name+"(not queried)", aqsQuery, null));
+                }
+                else
+                {
+                    DeviceInformationKind kind = DeviceInformationKind.DeviceInterface;
+                    DeviceInformationCollection devices = await DeviceInformation.FindAllAsync(aqsQuery, null, kind);
+                    var n = devices.Count;
+                    if (n == 0)
+                    {
+                        selectors.Add(new SelectorInfo(name, aqsQuery, null));
+                    }
+                    else
+                    {
+                        int nadded = 0;
+                        foreach (DeviceInformation? device in devices)
+                        {
+                            if (device != null)
+                            {
+                                selectors.Add(new SelectorInfo(name, aqsQuery, device));
+                                nadded++;
+                            }
+                            if (nadded == 0)
+                            {
+                                selectors.Add(new SelectorInfo(name, aqsQuery, null));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"    Error: exception {ex.Message}");
+                selectors.Add(new SelectorInfo(name + "EXCEPTION" + ex.Message, aqsQuery, null));
+            }
         }
         #endregion
     }

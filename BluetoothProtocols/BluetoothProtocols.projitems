@@ -45,7 +45,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Names\NamesUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Names\SerialConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PreferencesWrappers\BleAdvertisementWrapper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SerialPort\BluetoothCommTerminalAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SerialPort\Nordic_Uart.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SerialPort\nRFUartTerminalAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SerialPort\SerialConfig.cs" />
