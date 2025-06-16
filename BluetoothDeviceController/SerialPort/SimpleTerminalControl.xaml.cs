@@ -418,7 +418,7 @@ namespace BluetoothDeviceController.SerialPort
             ParentTerminal.SetDeviceStatus(status);
         }
 
-        public void SetDeviceStatusEx(TerminalSupport.ConnectionState status, TerminalSupport.ConnectionSubstate substate, string text, double value)
+        public void SetDeviceStatusEx(ConnectionState status, ConnectionSubstate substate, string text, double value)
         {
             ParentTerminal.SetDeviceStatus(text);
         }

@@ -1,13 +1,19 @@
-﻿using System;
+﻿using BluetoothDeviceController.SerialPort;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.Windows.Media.Capture;
+using Parsers.Nmea;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using TestNmeaGpsParserWinUI;
+using Utilities;
+using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using BluetoothDeviceController.SerialPort;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Windows.Foundation.Diagnostics;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -20,14 +26,164 @@ namespace WinUI3Controls
 {
     public sealed partial class GpsControl : UserControl, ITerminal
     {
+        public ObservableCollection<NmeaMessageSummary> MessageHistory { get; } = new ObservableCollection<NmeaMessageSummary>();
+        private Nmea_Gps_Parser NmeaParser { get; }  = new Nmea_Gps_Parser();
         public GpsControl()
         {
             this.InitializeComponent();
+            this.DataContext = this;
+
+            NmeaParser.OnGpggaOk += NmeaParser_OnGpggaOk;
+            NmeaParser.OnGpgllOk += NmeaParser_OnGpgllOk;
+            NmeaParser.OnGppwrOk += NmeaParser_OnGppwrOk;
+            NmeaParser.OnGprmcOk += NmeaParser_OnGprmcOk;
+            NmeaParser.OnGpvtgOk += NmeaParser_OnGpvtgOk;
+            NmeaParser.OnGpzdaOk += NmeaParser_OnGpzdaOk;
+
+            NmeaParser.OnNmeaAll += NmeaParser_OnNmeaAll;
         }
+
+        private void NmeaParser_OnNmeaAll(object sender, Nmea_Data e)
+        {
+            var summary = FindSummary(e.GetFirstPart());
+            summary.Add(e);
+            // It's an observablecollection, so everything updates automatically.
+        }
+
+        private NmeaMessageSummary FindSummary(string name)
+        {
+            NmeaMessageSummary summary;
+            for (int i = 0; i < MessageHistory.Count; i++)
+            {
+                summary = MessageHistory[i];
+                if (summary.Name == name)
+                {
+                    return summary;
+                }
+            }
+            summary = new NmeaMessageSummary(name, name); // TODO: add the explanation
+            MessageHistory.Add(summary);
+
+            return summary;
+        }
+
+
+        private void NmeaParser_OnGpggaOk(object sender, GPGGA_Data e)
+        {
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
+                {
+                    uiLatLongUpdateTime.Text = $"{e.Time}";
+                    uiLatitude.Text = $"{e.Latitude}";
+                    uiLongitude.Text = $"{e.Longitude}";
+                    
+                    uiUpdateSource.Text = $"{e.OpcodeString}";
+                }
+            });
+        }
+
+        private void NmeaParser_OnGpgllOk(object sender, GPGLL_Data e)
+        {
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
+                {
+                    uiMode.Text = $"{e.Mode}";
+                    uiLatLongUpdateTime.Text = $"{e.Time}";
+                    uiLatitude.Text = $"{e.Latitude}";
+                    uiLongitude.Text = $"{e.Longitude}";
+                    uiUpdateSource.Text = $"{e.OpcodeString}";
+                }
+            });
+        }
+
+
+
+
+        private void NmeaParser_OnGppwrOk(object sender, GPPWR_Data e)
+        {
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
+                {
+                    uiChargingStatus.Text = e.ChargingStatus == GPPWR_Data.ChargingStatusType.NotCharging ? "Not charging" : "Charging";
+                    uiVoltage.Text = e.Voltage.ToString("F2");
+                }
+            });
+        }
+
+        private void NmeaParser_OnGprmcOk(object sender, GPRMC_Data e)
+        {
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
+                {
+                    uiMode.Text = $"{e.Mode}";
+                    uiLatLongUpdateTime.Text = $"{e.Time}";
+                    uiLatitude.Text = $"{e.Latitude}";
+                    uiLongitude.Text = $"{e.Longitude}";
+                    uiUpdateSource.Text = $"{e.OpcodeString}";
+
+                    uiVelocityKnots.Text = $"{e.VelocityKnots}";
+                    uiHeadingTrue.Text = $"{e.HeadingDegreesTrue}";
+                    uiMagneticVariation.Text = $"{e.MagneticVariation}";
+                }
+            });
+        }
+
+
+
+
+        private void NmeaParser_OnGpvtgOk(object sender, GPVTG_Data e)
+        {
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
+                {
+                    uiMode.Text = $"{e.Mode}";
+                    uiUpdateSource.Text = $"{e.OpcodeString}";
+
+                    uiVelocityKnots.Text = $"{e.SpeedKnots}";
+                    uiVelocityKph.Text = $"{e.SpeedKph}";
+                    uiHeadingTrue.Text = $"{e.CourseTrue}";
+                    uiMagneticVariation.Text = $"{e.CourseMagnetic}";
+                }
+            });
+        }
+
+        private void NmeaParser_OnGpzdaOk(object sender, GPZDA_Data e)
+        {
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
+                {
+                    uiLatLongUpdateTime.Text = $"{e.Time}";
+                    uiUpdateSource.Text = $"{e.OpcodeString}";
+                    uiLocalZoneHours.Text = $"{e.LocalZoneHours}";
+                    uiLocalZoneMinutes.Text = $"{e.LocalZoneMinutes}";
+                }
+            });
+        }
+
 
         private void Log(string message)
         {
-            uiLog.Text += message + "\n";
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
+                {
+                    uiLog.Text += message + "\n";
+                }
+            });
+        }
+
+        private void LogClear()
+        {
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                uiLog.Text = "";
+            });
         }
 
         public event TerminalSendDataEventHandler OnSendData;
@@ -37,21 +193,110 @@ namespace WinUI3Controls
             Log(error);
         }
 
-        public void ReceivedData(string data)
+        public void ReceivedData(string message)
         {
-            Log(data);
+            if (message == "") return;
+
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                // Must do all this on a UI thread.
+                NmeaParser.Parse(message); // all messages from a GPS device will be an NMEA one.
+                uiLastMessage.Text = message;
+            });
         }
 
         public void SetDeviceStatus(string status)
         {
             Log(status);
         }
-        public void SetDeviceStatusEx(TerminalSupport.ConnectionState status, TerminalSupport.ConnectionSubstate substate, string text, double value)
+        public void SetDeviceStatusEx(ConnectionState status, ConnectionSubstate substate, string text, double value)
         {
-            var icon = TerminalSupport.StateAsIcon(status, substate);
-            uiIcon.Text = icon;
-            uiSubstatus.Text = TerminalSupport.StateAsString(status, substate, value);
-            uiStatus.Text = status.ToString();
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                bool handled = true;
+                switch (status)
+                {
+                    case ConnectionState.UX:
+                        switch (substate)
+                        {
+                            case ConnectionSubstate.UXReset:
+                                LogClear();
+                                break;
+                            default:
+                                handled = false;
+                                break;
+                        }
+                        break;
+                    case ConnectionState.ScanningForDevices:
+                        switch(substate)
+                        {
+                            case ConnectionSubstate.SfdStarted:
+                                uiStatus.Text = "Scanning...";
+                                break;
+                            case ConnectionSubstate.SfdCompletedOk:
+                                uiStatus.Text = "Scanning OK";
+                                break;
+                            default:
+                                handled = false;
+                                break;
+                        }
+                        break;
+                    case ConnectionState.VerifyDeviceCapabilities:
+                        switch (substate)
+                        {
+                            default:
+                                handled = false;
+                                break;
+                        }
+                        break;
+                    case ConnectionState.ConnectingToDevice:
+                        switch (substate)
+                        {
+                            case ConnectionSubstate.CtdStarted:
+                                uiStatus.Text = "Connecting...";
+                                break;
+                            case ConnectionSubstate.CtdCompletedOk:
+                                uiStatus.Text = "Connected";
+                                break;
+                            default:
+                                handled = false;
+                                break;
+                        }
+                        break;
+                    case ConnectionState.SendingAndRecieving:
+                        switch (substate)
+                        {
+                            case ConnectionSubstate.SRWaitingForData:
+                                uiReadIcon.Text = "⚪";
+                                break;
+                            case ConnectionSubstate.SRGotData:
+                                uiReadIcon.Text = "⚫";
+                                break;
+                            case ConnectionSubstate.SRException:
+                                uiReadIcon.Text = "⛒";
+                                uiSubstatus.Text = text;
+                                break;
+                            case ConnectionSubstate.SRCancelled:
+                                uiReadIcon.Text = "⦵";
+                                break;
+                            default:
+                                handled = false;
+                                break;
+                        }
+                        break;
+                    default:
+                        handled = false;
+                        break;
+                }
+
+                if (!handled)
+                {
+                    var icon = TerminalSupport.StateAsIcon(status, substate);
+                    uiIcon.Text = icon;
+                    uiSubstatus.Text = TerminalSupport.StateAsString(status, substate, value);
+                    uiStatus.Text = status.ToString();
+                }
+            });
         }
     }
 }

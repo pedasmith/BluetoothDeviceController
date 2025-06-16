@@ -24,9 +24,9 @@ namespace BluetoothDeviceController.SerialPort
     {
         public enum DiscoveryType {  BluetoothDevice, BluetoothRfcommDevice,
 #if SERIAL_DEVICE_WORKS
-            SerialDevice
+            SerialDevice, // Does not work; error 80070079
 #endif
-            };
+        };
         public DiscoveryType CurrDiscoveryType = DiscoveryType.BluetoothDevice;
         public BluetoothCommTerminalAdapter(ITerminal terminal, DeviceInformation input_di, DiscoveryType discoveryType=DiscoveryType.BluetoothDevice)
         {
@@ -71,70 +71,95 @@ namespace BluetoothDeviceController.SerialPort
                 switch (CurrDiscoveryType)
                 {
                     case DiscoveryType.BluetoothDevice:
-                        Terminal?.SetDeviceStatus($"About to get device from id={ChosenDeviceInfo.Id}");
-                        Terminal?.SetDeviceStatus(ChosenDeviceInfo.Id);
+                        //Terminal?.SetDeviceStatus($"About to get device from id={ChosenDeviceInfo.Id}");
+                        //Terminal?.SetDeviceStatus(ChosenDeviceInfo.Id);
+                        Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcStarted, ChosenDeviceInfo.Name);
 
                         if (BluetoothDevice == null)
                         {
+                            Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcGettingDevice, ChosenDeviceInfo.Id);
                             BluetoothDevice = await Windows.Devices.Bluetooth.BluetoothDevice.FromIdAsync(ChosenDeviceInfo.Id);
-                            Terminal?.SetDeviceStatus($"Result: {BluetoothDevice}");
+                            //Terminal?.SetDeviceStatus($"Result: {BluetoothDevice}");
+                            if (BluetoothDevice == null)
+                            {
+                                Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcNoDevice, ChosenDeviceInfo.Name);
+                                return;
+                            }
+                            else
+                            {
+                                Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcGotDevice, ChosenDeviceInfo.Name);
+                            }
                         }
                         else
                         {
-                            Terminal?.SetDeviceStatus($"Reusing BluetoothDevice: {BluetoothDevice}");
+                            Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcReusingDevice, BluetoothDevice.ToString());
+                            //Terminal?.SetDeviceStatus($"Reusing BluetoothDevice: {BluetoothDevice}");
                         }
-                        if (BluetoothDevice == null)
-                        {
-                            Terminal?.SetDeviceStatus($"Unable to get BT device: FromId returned null");
-                            return;
-                        }
-                        Terminal?.SetDeviceStatus($"Got device: connection status={BluetoothDevice.ConnectionStatus} address={BluetoothDevice.BluetoothAddress}");
+
+                        //Terminal?.SetDeviceStatus($"Got device: connection status={BluetoothDevice.ConnectionStatus} address={BluetoothDevice.BluetoothAddress}");
 
                         try
                         {
                             var rfcommDeviceServices = await BluetoothDevice.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort, BluetoothCacheMode.Uncached);
-                            Terminal?.SetDeviceStatus($"RfcommServices uncached count={rfcommDeviceServices.Services.Count}");
+                            Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcUncachedServiceCount, "", rfcommDeviceServices.Services.Count);
 
                             // bt is BluetoothDevice
                             rfcommDeviceServices = await BluetoothDevice.GetRfcommServicesAsync(BluetoothCacheMode.Cached);
-                            Terminal?.SetDeviceStatus($"RfcommServices all Rfcomm cached count={rfcommDeviceServices.Services.Count}");
-                            Terminal?.SetDeviceStatus($"Cached Rfcomm Services");
+                            Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcCachedServiceCount, "", rfcommDeviceServices.Services.Count);
                             foreach (var rfcommDeviceService in rfcommDeviceServices.Services)
                             {
-                                if (RfcommDeviceService == null) RfcommDeviceService = rfcommDeviceService;
-                                Terminal?.SetDeviceStatus($"ServiceId={rfcommDeviceService.ServiceId.Uuid}");
-                                Terminal?.SetDeviceStatus($"Service: ConnectionHostName={rfcommDeviceService.ConnectionHostName}");
-                                Terminal?.SetDeviceStatus($"Service: ConnectionServiceName={rfcommDeviceService.ConnectionServiceName}");
-                                Terminal?.SetDeviceStatus($" ");
+                                //if (RfcommDeviceService == null) RfcommDeviceService = rfcommDeviceService;
+                                //Terminal?.SetDeviceStatus($"ServiceId={rfcommDeviceService.ServiceId.Uuid}");
+                                //Terminal?.SetDeviceStatus($"Service: ConnectionHostName={rfcommDeviceService.ConnectionHostName}");
+                                //Terminal?.SetDeviceStatus($"Service: ConnectionServiceName={rfcommDeviceService.ConnectionServiceName}");
+                                //Terminal?.SetDeviceStatus($" ");
                                 //Terminal?.SetDeviceStatus(rfcommDeviceService.ServiceId.Uuid.ToString());
                             }
 
                             rfcommDeviceServices = await BluetoothDevice.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort, BluetoothCacheMode.Cached);
-                            Terminal?.SetDeviceStatus($"RfcommServices SerialPort cached count={rfcommDeviceServices.Services.Count}");
+                            Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcCachedServiceCount, "", rfcommDeviceServices.Services.Count);
 
-                            Terminal?.SetDeviceStatus($"Cached Serial Port Services");
+                            //Terminal?.SetDeviceStatus($"Cached Serial Port Services");
 
                             foreach (var rfcommDeviceService in rfcommDeviceServices.Services)
                             {
                                 if (RfcommDeviceService == null) RfcommDeviceService = rfcommDeviceService;
-                                Terminal?.SetDeviceStatus($"ServiceId={rfcommDeviceService.ServiceId.Uuid}");
-                                Terminal?.SetDeviceStatus($"Service: ConnectionHostName={rfcommDeviceService.ConnectionHostName}");
-                                Terminal?.SetDeviceStatus($"Service: ConnectionServiceName={rfcommDeviceService.ConnectionServiceName}");
-                                Terminal?.SetDeviceStatus($" ");
+                                //Terminal?.SetDeviceStatus($"ServiceId={rfcommDeviceService.ServiceId.Uuid}");
+                                //Terminal?.SetDeviceStatus($"Service: ConnectionHostName={rfcommDeviceService.ConnectionHostName}");
+                                //Terminal?.SetDeviceStatus($"Service: ConnectionServiceName={rfcommDeviceService.ConnectionServiceName}");
+                                //Terminal?.SetDeviceStatus($" ");
                                 //Terminal?.SetDeviceStatus(rfcommDeviceService.ServiceId.Uuid.ToString());
+                            }
+
+                            if (RfcommDeviceService == null)
+                            {
+                                Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcNoServices);
+                            }
+                            else
+                            {
+                                Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcCompletedOk);
                             }
                         }
                         catch (Exception ex)
                         {
-                            Terminal?.SetDeviceStatus($"Can't get BT comm services: reason={ex.Message}");
+                            Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcException, ex.Message);
                             return;
                         }
                         break;
 
                     case DiscoveryType.BluetoothRfcommDevice:
                         // 
-                        Terminal?.SetDeviceStatus($"Getting Rfcomm Device Service");
+                        Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcStarted, ChosenDeviceInfo.Name);
                         RfcommDeviceService = await RfcommDeviceService.FromIdAsync(ChosenDeviceInfo.Id);
+                        if (RfcommDeviceService == null)
+                        {
+                            Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcNoServices);
+                        }
+                        else
+                        {
+                            Terminal?.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcCompletedOk);
+                        }
+
                         break;
 #if SERIAL_DEVICE_WORKS
                     case DiscoveryType.SerialDevice:
@@ -162,14 +187,16 @@ namespace BluetoothDeviceController.SerialPort
                 Socket = new StreamSocket();
                 try
                 {
-                    Terminal?.SetDeviceStatus($"Connecting to device");
+                    Terminal?.SetDeviceStatusEx(ConnectionState.ConnectingToDevice, ConnectionSubstate.CtdStarted);
+                    Terminal?.SetDeviceStatusEx(ConnectionState.ConnectingToDevice, ConnectionSubstate.CtdHostName, RfcommDeviceService.ConnectionHostName.ToString());
+                    Terminal?.SetDeviceStatusEx(ConnectionState.ConnectingToDevice, ConnectionSubstate.CtdServiceName, RfcommDeviceService.ConnectionServiceName.ToString());
+
                     await Socket.ConnectAsync(RfcommDeviceService.ConnectionHostName, RfcommDeviceService.ConnectionServiceName);
-                    Terminal?.SetDeviceStatus($"Connection OK");
+                    Terminal?.SetDeviceStatusEx(ConnectionState.ConnectingToDevice, ConnectionSubstate.CtdCompletedOk);
                 }
                 catch (Exception ex)
                 {
-                    Terminal?.ErrorFromDevice($"Exception connecting to Rfcomm/Spp. Exception {ex.Message} {ex.HResult}\r");
-                    Terminal?.SetDeviceStatus($"Failed to connect");
+                    Terminal?.SetDeviceStatusEx(ConnectionState.ConnectingToDevice, ConnectionSubstate.CtdException, ex.Message + $"\tHRESULT={ex.HResult}");
                     Socket = null;
                 }
             }

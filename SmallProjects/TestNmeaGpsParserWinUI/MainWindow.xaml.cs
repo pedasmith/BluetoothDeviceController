@@ -25,6 +25,7 @@ using Windows.Foundation.Collections;
 using Windows.Foundation.Diagnostics;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
+using static BluetoothDeviceController.SerialPort.TerminalSupport;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -41,7 +42,7 @@ namespace TestNmeaGpsParserWinUI
     /// </summary>
     public sealed partial class MainWindow : Window, IHandleStreamSocketLine
     {
-
+        public static MainWindow? MainWindowWindow = null;
         RfcommOptions Options = new RfcommOptions()
         {
             Match = "xgps150"
@@ -64,7 +65,8 @@ namespace TestNmeaGpsParserWinUI
         {
             UIThreadHelper.CallOnUIThread(this, () =>
             {
-                uiLog.Text += str + "\n";
+                uiGps.SetDeviceStatus(str);
+                //uiLog.Text += str + "\n";
             });
         }
         private void LogCopyable(string str)
@@ -76,17 +78,17 @@ namespace TestNmeaGpsParserWinUI
        }
         private void LogClear(string header = "")
         {
-            UIThreadHelper.CallOnUIThread(this, () =>
-            {
-                uiLog.Text = header;
-            });
+            ;
         }
 
-
+        public bool MainWindowIsClosed = false;
         public MainWindow()
         {
+            MainWindowWindow = this;
+            MainWindowWindow.Closed += (s, e) => { MainWindowIsClosed = true; };
             InitializeComponent();
             Test();
+
             DoAll(uiGps, Options);
         }
 
@@ -95,97 +97,95 @@ namespace TestNmeaGpsParserWinUI
             DoAll(uiGps, Options);
         }
 
+        /* Don't need the picker
+var picker = new DevicePicker();
+WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(this));
+picker.Filter.SupportedDeviceSelectors.Add(aqs);
+var selected = await picker.PickSingleDeviceAsync(new Rect(50, 200, 10, 10)); // Rect is where it flies out from
+*/
+
         private async void DoAll(ITerminal terminal, RfcommOptions options)
         {
-            terminal.SetDeviceStatusEx(TerminalSupport.ConnectionState.ScanningForDevices, TerminalSupport.ConnectionSubstate.ScanningForDevicesStarted);
-            LogClear();
-            int nNotMatch = 0;
-            int nMatch = 0;
+            terminal.SetDeviceStatusEx(ConnectionState.UX, ConnectionSubstate.UXReset);
+
             DeviceInformation? deviceInfoSelected = null;
-
             var discoveryType = BluetoothCommTerminalAdapter.DiscoveryType.BluetoothDevice;
-            //var discoveryType = BluetoothCommTerminalAdapter.DiscoveryType.SerialDevice; // Does not work; error 80070079
 
-
-            // this is the working one: 2025-06-04 DeviceInformationCollection PairedBluetoothDevices = await DeviceInformation.FindAllAsync(BluetoothDevice.GetDeviceSelectorFromPairingState(true));
-            // There actually three ways to make this. I haven't tried the third way yet
-            var aqs = BluetoothCommTerminalAdapter.GetDeviceSelector(discoveryType);
-
-            var picker = new DevicePicker();
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(this));
-            picker.Filter.SupportedDeviceSelectors.Add(aqs);
-            var selected = await picker.PickSingleDeviceAsync(new Rect(50, 200, 10, 10)); // Rect is where it flie out from
-
-            DeviceInformationCollection PairedBluetoothDevices = await DeviceInformation.FindAllAsync(aqs);
-            foreach (DeviceInformation? device in PairedBluetoothDevices)
+            // Find a device to connect to
+            try
             {
-                // BluetoothDevice will be e.g. XGPS150-HEXHEX and BluetoothRfcommDevice will be e.g. SPP Dev
-                if (options.Matches(device.Name))
-                {
-                    nMatch++;
-                    Log($"Info: device name={device.Name}");
-                    LogCopyable(device.Name);
-                    if (nMatch == 1) deviceInfoSelected = device; // first one
-                }
-                else
-                {
-                    nNotMatch++;
+                terminal.SetDeviceStatusEx(ConnectionState.ScanningForDevices, ConnectionSubstate.SfdStarted);
 
-                    Log($"Info: Not matching: device name={device.Name}");
-                    LogCopyable(device.Name);
+                int nNotMatch = 0;
+                int nMatch = 0;
+                var aqs = BluetoothCommTerminalAdapter.GetDeviceSelector(discoveryType);
+                DeviceInformationCollection PairedBluetoothDevices = await DeviceInformation.FindAllAsync(aqs);
+                foreach (DeviceInformation? device in PairedBluetoothDevices)
+                {
+                    // BluetoothDevice will be e.g. XGPS150-HEXHEX and BluetoothRfcommDevice will be e.g. SPP Dev
+                    if (options.Matches(device.Name))
+                    {
+                        nMatch++;
+                        Log($"Info: device name={device.Name}");
+                        LogCopyable(device.Name);
+                        if (nMatch == 1) deviceInfoSelected = device; // first one
+                    }
+                    else
+                    {
+                        nNotMatch++;
 
-                    // what the heck, select it anyway.
-                    if (deviceInfoSelected == null) deviceInfoSelected = device;
+                        //Log($"Info: Not matching: device name={device.Name}");
+                        //LogCopyable(device.Name);
+                    }
                 }
+                Log($"List complete. N. Match={nMatch} Not matching={nNotMatch}");
+
+                // Now let's try to connect
+                if (deviceInfoSelected == null)
+                {
+                    terminal.SetDeviceStatusEx(ConnectionState.ScanningForDevices, ConnectionSubstate.SfdNoDeviceFound);
+                    return;
+                }
+                terminal.SetDeviceStatusEx(ConnectionState.ScanningForDevices, ConnectionSubstate.SfdCompletedOk, "", nMatch);
             }
-            Log($"List complete. N. Match={nMatch} Not matching={nNotMatch}");
+            catch (Exception ex)
+            {
+                terminal.SetDeviceStatusEx(ConnectionState.ScanningForDevices, ConnectionSubstate.SfdException, ex.Message);
+                return;
+            }
 
-            // Now let's try to connect
-            if (deviceInfoSelected == null) return;
+
 
             BtTerminalAdapter = new BluetoothCommTerminalAdapter(terminal, deviceInfoSelected, discoveryType);
-
-
             await BtTerminalAdapter.EnsureRfcommService();
             if (BtTerminalAdapter.RfcommDeviceService == null)
             {
-                Log($"There are no serial services avaiable.");
+                terminal.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcNoServices);
                 return;
             }
+            terminal.SetDeviceStatusEx(ConnectionState.VerifyDeviceCapabilities, ConnectionSubstate.VdcCompletedOk);
+
 
             BtTerminalAdapter.cts = new CancellationTokenSource();
 
             IInputStream? inputStream = null;
-#if NEVER_EVER_DEFINED
-            // I can't get SerialDevice to work
-            if (BtTerminalAdapter.SerialDevice != null)
+
+            await BtTerminalAdapter.EnsureConnectedSocket(); // Duplicates Handles all the ConnectingToDevice state
+
+            if (BtTerminalAdapter.Socket == null)
             {
-                istream = BtTerminalAdapter.SerialDevice.InputStream;
-            }
-#endif
-            if (inputStream == null)
-            {
-                // Log some date from the RfcommDeviceService
-                Log($"ConnectionHostName: {BtTerminalAdapter.RfcommDeviceService.ConnectionHostName}");
-                Log($"ConnectionServiceName: {BtTerminalAdapter.RfcommDeviceService.ConnectionServiceName}");
-                LogCopyable($"{BtTerminalAdapter.RfcommDeviceService.ConnectionHostName}");
-                LogCopyable($"{BtTerminalAdapter.RfcommDeviceService.ConnectionServiceName}");
-
-                await BtTerminalAdapter.EnsureConnectedSocket();
-
-                if (BtTerminalAdapter.Socket == null) return;
-
-                inputStream = BtTerminalAdapter.Socket.InputStream;
+                return;
             }
 
-            readAll = Task.Run( async () => 
+            inputStream = BtTerminalAdapter.Socket.InputStream;
+
+            terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRStarted);
+            readAll = Task.Run(async () =>
             {
                 // await BluetoothSocketHelper.ReadLines(this, BtTerminalAdapter.Socket, inputStream, BtTerminalAdapter.cts.Token);
-                await BluetoothSocketHelper.ReadLines(this, inputStream, BtTerminalAdapter.cts.Token);
+                await BluetoothSocketHelper.ReadLines(uiGps, inputStream, BtTerminalAdapter.cts.Token);
             });
-
-
-            Log("All steps completed");
+                //Log("All steps completed");
         }
 
 
@@ -205,6 +205,8 @@ namespace Utilities
 {
     static class BluetoothSocketHelper
     {
+
+#if NEVER_EVER_DEFINED
         /// <summary>
         /// Requires the Bluetooth capability (otherwise it dies at the ConnectAsync with HResult 8007277c which is barely documented)
         /// </summary>
@@ -228,8 +230,8 @@ namespace Utilities
             }
             return socket;
         }
-
-        public static async Task ReadLines(TestNmeaGpsParserWinUI.IHandleStreamSocketLine logger, /* StreamSocket socket, */ IInputStream inputStream, CancellationToken ct)
+#endif
+        public static async Task ReadLines(ITerminal terminal, /* StreamSocket socket, */ IInputStream inputStream, CancellationToken ct)
         {
             var oldLine = "";
             var dr = new DataReader(inputStream);
@@ -241,33 +243,34 @@ namespace Utilities
                 uint n = 0;
                 try
                 {
-                    logger.Log($"trying to read");
+                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRWaitingForData);
                     n = await dr.LoadAsync(READBUFFER).AsTask(ct);
-                    logger.Log($"read OK {n}");
+                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRGotData, "", n);
                 }
                 catch (TaskCanceledException)
                 {
                     n = 0;
                     keepGoing = false;
+                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRCancelled);
                 }
                 catch (Exception ex)
                 {
-                    logger.Log($"ERROR: Receiving: {ex.Message}\r");
-                    logger.Log($"Socket read failed");
+                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRException, ex.Message);
                     n = 0;
                     keepGoing = false;
                 }
                 if (n > 0)
                 {
                     // Got some data from the device
-                    var str = dr.ReadString(dr.UnconsumedBufferLength);
+                    var str = oldLine + dr.ReadString(dr.UnconsumedBufferLength);
+                    oldLine = "";
                     if (str.Contains("\r\n"))
                     {
                         bool lastHasCRLF = str.EndsWith("\r\n");
 
                         var lines = str.Split("\r\n");
                         int lastIndex = lines.Length - 1;
-                        logger.HandleLine(oldLine + lines[0]);
+                        terminal.ReceivedData(lines[0]);
                         if (lines.Length > 1)
                         {
                             for (int i = 1; i <= lastIndex; i++)
@@ -275,7 +278,7 @@ namespace Utilities
                                 bool isLast = i == lastIndex;
                                 if (!isLast || lastHasCRLF)
                                 {
-                                    logger.HandleLine(lines[i]);
+                                    terminal.ReceivedData(lines[i]);
                                 }
                             }
                         }
@@ -283,9 +286,9 @@ namespace Utilities
                     }
                     else
                     {
-                        oldLine += str;
+                        oldLine = str;
                         // Pause a little bit and let the GPS buffer a little bit
-                        await Task.Delay(50); // time is in milliseconds
+                        await Task.Delay(250); // time is in milliseconds
                     }
                 }
                 else
@@ -317,6 +320,8 @@ namespace Utilities
         /// <param name="priority"></param>
         public static void CallOnUIThread(Window w, Action f, Microsoft.UI.Dispatching.DispatcherQueuePriority priority = Microsoft.UI.Dispatching.DispatcherQueuePriority.Low)
         {
+            if (w == null || w.DispatcherQueue == null) return;
+
             bool isQueued = w.DispatcherQueue.TryEnqueue(priority,() => { f(); } );
         }
     }

@@ -1,5 +1,25 @@
 ﻿namespace BluetoothDeviceController.SerialPort
 {
+
+    public enum ConnectionState
+    {
+        NotStarted,
+        UX,
+        ScanningForDevices,
+        VerifyDeviceCapabilities,
+        ConnectingToDevice,
+        SendingAndRecieving,
+    };
+    public enum ConnectionSubstate
+    {
+        UXReset,
+        SfdStarted, SfdCompletedOk, SfdNoDeviceFound, SfdException, 
+        VdcStarted, VdcCompletedOk, VdcException, VdcGettingDevice,VdcGotDevice,  VdcReusingDevice, VdcNoDevice, VdcCachedServiceCount, VdcUncachedServiceCount, VdcNoServices,
+        CtdStarted, CtdCompletedOk, CtdException, CtdHostName, CtdServiceName, 
+
+        SRStarted, SRWaitingForData, SRGotData, SRCancelled, SRException,
+    }
+
     /// <summary>
     /// Used by terminal-like controls to be the main interface between the code that handles a device and the user.
     /// This might be a "real" terminal like a Telnet terminal, or a serial port terminal (they are subtely different :-) )
@@ -12,19 +32,6 @@
 
     public static class TerminalSupport
     {
-        public enum ConnectionState
-        {
-            NotStarted,
-            ScanningForDevices,
-            ConnectingToDevice,
-            SendingAndRecieving,
-        };
-        public enum ConnectionSubstate
-        {
-            ScanningForDevicesStarted,
-            ScanningForDeviceCompleted,
-        }
-
         public static string StateAsString(ConnectionState state, ConnectionSubstate substate, double value=-999)
         {
             switch (state)
@@ -32,8 +39,8 @@
                 case ConnectionState.ScanningForDevices:
                     switch (substate)
                     {
-                        case ConnectionSubstate.ScanningForDevicesStarted: return "Scanning";
-                        case ConnectionSubstate.ScanningForDeviceCompleted: return $"Found {value} devices";
+                        case ConnectionSubstate.SfdStarted: return "Scanning";
+                        case ConnectionSubstate.SfdCompletedOk: return $"Found {value} devices";
                     }
                     break;
             }
@@ -68,6 +75,6 @@
         /// Cheap and cheerful status. The better status is the longer one that take in more details.
         /// </summary>
         void SetDeviceStatus(string status);
-        void SetDeviceStatusEx(TerminalSupport.ConnectionState status, TerminalSupport.ConnectionSubstate substate, string text="", double value=-999);
+        void SetDeviceStatusEx(ConnectionState status, ConnectionSubstate substate, string text="", double value=-999);
     }
 }

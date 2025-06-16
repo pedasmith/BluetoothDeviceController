@@ -43,5 +43,10 @@ namespace BluetoothProtocols.Beacons
         public string HeaderString { get; set; } = null;
         public string DisplayString { get; set; } = null;
         public BluetoothLEAdvertisementReceivedEventArgs Args { get; set; } = null;
+
+        public override string ToString()
+        {
+            return DisplayString ?? $"SimpleBeaconHistory: {Address}";
+        }
     }
 }

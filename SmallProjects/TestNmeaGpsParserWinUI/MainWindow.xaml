@@ -25,17 +25,13 @@
         <StackPanel Grid.Row="1">
             <Button Content="List"  Click="OnListComm" />
         </StackPanel>
-        <ScrollViewer Grid.Row="2" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Visible">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="300"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock x:Name="uiLog" Grid.Column="0" VerticalAlignment="Stretch" Text="LOGGER!"  />
-                <winui3:GpsControl x:Name="uiGps" Grid.Column="1" />
-                <TextBox x:Name="uiLogImportantData" Grid.Column="2" IsReadOnly="True" Text="Data" TextWrapping="Wrap" />
-            </Grid>
-        </ScrollViewer>
+        <Grid Grid.Row="2" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+            <winui3:GpsControl x:Name="uiGps" Grid.Column="0" />
+            <TextBox x:Name="uiLogImportantData" Grid.Column="1" IsReadOnly="True" Text="Data" TextWrapping="Wrap" />
+        </Grid>
     </Grid>
 </Window>

@@ -19,6 +19,9 @@ using System.Text;
 namespace Parsers.Nmea
 {
 
+    /// <summary>
+    /// Advanced position; includes lat/long/time/altitude/satellites and more
+    /// </summary>
     public class GPGGA_Data : Nmea_Data
     {
         public GPGGA_Data(string str)
@@ -139,6 +142,9 @@ namespace Parsers.Nmea
         }
     }
 
+    /// <summary>
+    /// Simple position: include lat/long/time
+    /// </summary>
     public class GPGLL_Data : Nmea_Data
     {
         public GPGLL_Data(string str)
@@ -198,8 +204,11 @@ namespace Parsers.Nmea
         public enum ValidityType { ValidCurrentData, ValidStoredData, InvalidCurrentData, InvalidStoredData };
         public ValidityType Validity;
 
+        /// <summary>
+        /// Mode is the type of fix e.g. dead reckoning and more
+        /// </summary>
         public string ModeString {  get { return LastElement; } }
-        Nmea_Mode_Field Mode = new Nmea_Mode_Field();
+        public Nmea_Mode_Field Mode = new Nmea_Mode_Field();
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
@@ -210,6 +219,9 @@ namespace Parsers.Nmea
         }
     }
 
+    /// <summary>
+    /// Detailed satellite information
+    /// </summary>
     public class GPGSA_Data : Nmea_Data
     {
         public GPGSA_Data(string str)
@@ -341,7 +353,7 @@ namespace Parsers.Nmea
     }
 
     /// <summary>
-    /// There are no definitive descriptions of GPGSV
+    /// Power info. Includes charging status and voltage. There are no definitive descriptions of GPGSV
     /// </summary>
 
     public class GPPWR_Data : Nmea_Data
@@ -372,13 +384,33 @@ namespace Parsers.Nmea
 
             bool parseOk = true;
 
-            parseOk = parseOk && double.TryParse(VoltageString, out Voltage);
-            if (!parseOk)
+            // See https://github.com/platypii/BASElineFlightComputer/blob/96471257f83c238af16681f118aa80cc4f053d71/common/src/main/java/com/platypii/baseline/location/NMEA.java#L16
+            // See https://github.com/dualav/XGPS160-SDK-iOS/blob/f4786798000c6efae72638f4826de031d0ece0a4/XGPS160API.m#L4
             {
-                ParseStatus = Nmea_Gps_Parser.ParseResult.VoltageInvalid;
-                return;
+                int hexval = -1;
+                parseOk = parseOk && Int32.TryParse(VoltageString, System.Globalization.NumberStyles.HexNumber, null, out hexval);
+                if (parseOk)
+                {
+                    // AFAICT: these values are for one specific device where the person knows the
+                    // upper and lower voltage bounds.
+                    //const int MinVal = 1091;
+                    //const int MaxVal = 1280;
+                    //Voltage = 100.0 * (hexval - MinVal) / (MaxVal - MinVal); // TODO: Voltage is really BatteryChargePercent
+                    Voltage = (double)hexval / 100.0; // just voltage?
+                }
+                else
+                {
+                    ParseStatus = Nmea_Gps_Parser.ParseResult.VoltageInvalid;
+                }
             }
-            Voltage = Voltage / 100.0; // Seems logical?
+
+            //parseOk = parseOk && double.TryParse(VoltageString, out Voltage);
+            //if (!parseOk)
+            //{
+            //    ParseStatus = Nmea_Gps_Parser.ParseResult.VoltageInvalid;
+            //    return;
+            //}
+            //Voltage = Voltage / 100.0; // Seems logical?
 
             switch (ChargingStatusString)
             {
@@ -405,6 +437,9 @@ namespace Parsers.Nmea
         }
     }
 
+    /// <summary>
+    /// Position fix includes lat/long/time and velocity
+    /// </summary>
     public class GPRMC_Data : Nmea_Data
     {
         public GPRMC_Data(string str)
@@ -625,7 +660,7 @@ namespace Parsers.Nmea
         public string CourseMagneticReferenceUnitsString { get { return GetPart(4); } }
         public CourseReferenceType CourseMagneticReferenceUnits;
         public string SpeedKnotsString { get { return GetPart(5); } }
-        double SpeedKnots;
+        public double SpeedKnots;
         public string SpeedKnotsUnitsString { get { return GetPart(6); } }
         public enum SpeedUnitsType {  Knots, Kph };
         public SpeedUnitsType SpeedKnotsUnits;
@@ -862,7 +897,9 @@ namespace Parsers.Nmea
 
         }
     }
-
+    /// <summary>
+    /// Type of fix; include manual/simulator/estimated dead reckoning and more
+    /// </summary>
     public class Nmea_Mode_Field
     {
         public enum ModeType { NotSpecified, Autonomous, DifferentialDGP, EstimatedDeadREcoking, Manual, Simulator, NotValid }
@@ -900,7 +937,7 @@ namespace Parsers.Nmea
 
         public override string ToString()
         {
-            return $"{TimeHours:D2}:{TimeMinutes:D2}:{TimeSeconds}";
+            return $"{TimeHours:D2}:{TimeMinutes:D2}:{SecondsInteger:D2}.{SecondsDecimal:D2}";
         }
         public enum ParseOptionsType {  hhmmss_sss, hhmmss }
         public Nmea_Gps_Parser.ParseResult Parse(string TimeString, ParseOptionsType options=ParseOptionsType.hhmmss_sss)
@@ -1025,6 +1062,10 @@ namespace Parsers.Nmea
             if (index == -1) return NmeaParts[NmeaParts.Length - 1];
             if (index >= NmeaParts.Length - 1) return ""; // The only way to get the checksum (last value) is to ask for -1.
             return NmeaParts[index];
+        }
+        public string GetFirstPart()
+        {
+            return GetPart(0);
         }
 
         public string OriginalNmeaString { get; set; } = "";

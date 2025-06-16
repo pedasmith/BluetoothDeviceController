@@ -1,5 +1,9 @@
 ﻿# List of work items
 
+## Issues sees
+
+FIXED: The advertisement display seems to be broken. What I'd expect is that clicking on a "device" on the left side would show the associated advertisements. Instead, nothing is shown
+   (cause: when selecting a specific BT address, and it was an apple device, it would be filtered out)
 ## Oscilloscope
 
 - Poke constantly (e.g., 10 times or for 5 seconds)

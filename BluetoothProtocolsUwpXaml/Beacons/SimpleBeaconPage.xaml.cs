@@ -314,9 +314,14 @@ namespace BluetoothDeviceController.Beacons
             {
                 return true;
             }
-            if (bleAddressFilter != 0 && item.Address != bleAddressFilter)
+            // If the bleAddressFilter is set to non-zero, then it's the only filter we want.
+            if (bleAddressFilter != 0)
             {
-                return true;
+                if (item.Address != bleAddressFilter)
+                {
+                    return true;
+                }
+                return false;
             }
             bool isApple10 = IsApple10(item.Args);
             bool isMicrosoftRome = IsMicrosoftRome(item.Args);

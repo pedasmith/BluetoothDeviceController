@@ -128,7 +128,7 @@ namespace BluetoothDeviceController.SpecialtyPagesCustom
                     ParentStatusHandler?.SetStatusText(text);
                 });
         }
-        public async void SetDeviceStatusEx(TerminalSupport.ConnectionState status, TerminalSupport.ConnectionSubstate substate, string text, double value)
+        public async void SetDeviceStatusEx(ConnectionState status, ConnectionSubstate substate, string text, double value)
         {
             await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
                 () => {
