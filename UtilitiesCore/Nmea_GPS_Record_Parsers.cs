@@ -144,7 +144,7 @@ namespace Parsers.Nmea
         public string GeoidSeparationUnitsString { get { return GetPart(12); } }
         public AltitudeUnitsType GeoidSeparationUnits;
         public string AgeOfDifferentialCorrectionString { get { return GetPart(13); } }
-        public string DifferentialReferenceStationsIdString { get { return LastElement; } } // is the 0000 in the 0000*5E checksum
+        public string DifferentialReferenceStationsIdString { get { return GetPart(14); } } // is the 0000 in the 0000*5E checksum
 
         public override string SummaryString
         {
@@ -160,7 +160,7 @@ namespace Parsers.Nmea
             get
             {
                 if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
-                return $"{Latitude} {Longitude}\nTime: {Time}\nFix type: {EnumToString(PositionFixIndicator)}\nN. Satellites: {SatellitesUsed}\nHDOP: {Hdop}\nMLS Altitude: {MlsAltitude} {MlsAltitudeUnits}\nGeoid Separation: {GeoidSeparation} {GeoidSeparationUnits}\nAge differential corretion: {AgeOfDifferentialCorrectionString}\nDifferential Reference Station: {DifferentialReferenceStationsIdString}";
+                return $"{Latitude} {Longitude}\nTime: {Time}\nFix type: {EnumToString(PositionFixIndicator)}\nN. Satellites: {SatellitesUsed}\nHDOP: {Hdop}\nMLS Altitude: {MlsAltitude} {MlsAltitudeUnits}\nGeoid Separation: {GeoidSeparation} {GeoidSeparationUnits}\nAge differential correction: {AgeOfDifferentialCorrectionString}\nDifferential Reference Station: {DifferentialReferenceStationsIdString}";
             }
         }
 
@@ -251,7 +251,7 @@ namespace Parsers.Nmea
         /// <summary>
         /// Mode is the type of fix e.g. dead reckoning and more
         /// </summary>
-        public string ModeString {  get { return LastElement; } }
+        public string ModeString {  get { return GetPart(7); } }
         public Nmea_Mode_Field Mode = new Nmea_Mode_Field();
 
 
@@ -410,7 +410,7 @@ namespace Parsers.Nmea
         /// Horizontal Dilution of Precision
         /// </summary>
         public double Hdop;
-        public string VdopString {  get { return LastElement; } }
+        public string VdopString {  get { return GetPart(17); } }
         /// <summary>
         /// Vertical Dilution of Precision
         /// </summary>
@@ -430,20 +430,20 @@ namespace Parsers.Nmea
             get
             {
                 if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
-                var retval = "";
-                retval += string.IsNullOrEmpty(SatelliteUsed01) ? "" : $"\nSatellite 01: {SatelliteUsed01}";
-                retval += string.IsNullOrEmpty(SatelliteUsed02) ? "" : $"\nSatellite 02: {SatelliteUsed02}";
-                retval += string.IsNullOrEmpty(SatelliteUsed03) ? "" : $"\nSatellite 03: {SatelliteUsed03}";
-                retval += string.IsNullOrEmpty(SatelliteUsed04) ? "" : $"\nSatellite 04: {SatelliteUsed04}";
-                retval += string.IsNullOrEmpty(SatelliteUsed05) ? "" : $"\nSatellite 05: {SatelliteUsed05}";
-                retval += string.IsNullOrEmpty(SatelliteUsed06) ? "" : $"\nSatellite 06: {SatelliteUsed06}";
-                retval += string.IsNullOrEmpty(SatelliteUsed07) ? "" : $"\nSatellite 07: {SatelliteUsed07}";
-                retval += string.IsNullOrEmpty(SatelliteUsed08) ? "" : $"\nSatellite 08: {SatelliteUsed08}";
-                retval += string.IsNullOrEmpty(SatelliteUsed09) ? "" : $"\nSatellite 09: {SatelliteUsed09}";
-                retval += string.IsNullOrEmpty(SatelliteUsed10) ? "" : $"\nSatellite 10: {SatelliteUsed10}";
-                retval += string.IsNullOrEmpty(SatelliteUsed11) ? "" : $"\nSatellite 11: {SatelliteUsed11}";
-                retval += string.IsNullOrEmpty(SatelliteUsed12) ? "" : $"\nSatellite 12: {SatelliteUsed12}";
-                retval += $"\nPosition DOP: {PdopString}\nHoriontal DOP: {HdopString}\nVertical DOP: {VdopString}";
+                var retval = $"Mode: {Mode1}\nFix: {EnumToString(Mode2)}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed01) ? "" : $"Satellite 01: {SatelliteUsed01}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed02) ? "" : $"Satellite 02: {SatelliteUsed02}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed03) ? "" : $"Satellite 03: {SatelliteUsed03}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed04) ? "" : $"Satellite 04: {SatelliteUsed04}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed05) ? "" : $"Satellite 05: {SatelliteUsed05}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed06) ? "" : $"Satellite 06: {SatelliteUsed06}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed07) ? "" : $"Satellite 07: {SatelliteUsed07}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed08) ? "" : $"Satellite 08: {SatelliteUsed08}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed09) ? "" : $"Satellite 09: {SatelliteUsed09}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed10) ? "" : $"Satellite 10: {SatelliteUsed10}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed11) ? "" : $"Satellite 11: {SatelliteUsed11}\n";
+                retval += string.IsNullOrEmpty(SatelliteUsed12) ? "" : $"Satellite 12: {SatelliteUsed12}\n";
+                retval += $"Position DOP: {PdopString}\nHoriontal DOP: {HdopString}\nVertical DOP: {VdopString}";
                 return retval;
             }
         }
@@ -865,7 +865,7 @@ namespace Parsers.Nmea
         public string EastWestIndicatorString { get { return GetPart(11); } }
         public EastWestType EastWestIndicator;
 
-        public string ModeString { get { return LastElement; } }
+        public string ModeString { get { return GetPart(12); } }
         public Nmea_Mode_Field Mode = new Nmea_Mode_Field();
 
         public override string SummaryString
@@ -1008,7 +1008,7 @@ namespace Parsers.Nmea
         public string SpeedKphUnitsString { get { return GetPart(8); } }
         public SpeedUnitsType SpeedKphUnits;
 
-        public string ModeString { get { return LastElement; } } 
+        public string ModeString { get { return GetPart(9); } } 
         public Nmea_Mode_Field Mode = new Nmea_Mode_Field();
 
         public override string SummaryString
@@ -1103,7 +1103,7 @@ namespace Parsers.Nmea
         public string LocalZoneHoursString {  get { return GetPart(5); } }
         public int LocalZoneHours;
 
-        public string LocalZoneMinutesString {  get { return LastElement; } }
+        public string LocalZoneMinutesString {  get { return GetPart(6); } }
         public int LocalZoneMinutes;
 
         public override string SummaryString

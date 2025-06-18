@@ -11,35 +11,33 @@ namespace Parsers.Nmea
         /// Splits an NMEA string into its parts
         /// </summary>
         /// <param name="str"></param>
+
         public Nmea_Data(string str)
         {
             ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeUnknown; // nice default :-)
             OriginalNmeaString = str;
-            NmeaParts = str.Split(',');
-            // Might be old style ,*VV
-            // Might be new style ,value*VV where the value is the last value
-            var chk = ChecksumStringRaw;
-            var starpos = chk.IndexOf("*");
+
+            var starpos = str.IndexOf("*");
             if (starpos < 1)
             {
-                LastElement = "";
-                Checksum = chk;
+                Checksum = "";
             }
             else
             {
-                LastElement = chk.Substring(0, starpos);
-                Checksum = chk.Substring(starpos); // include the "*"
+                Checksum = str.Substring(starpos);
+                str = str.Substring(0, starpos);
             }
-        }
 
+            NmeaParts = str.Split(',');
+        }
         static public int Test()
         {
             int nerror = 0;
             var v1 = new Nmea_Data("NAME,1,2,3*99");
-            if (v1.LastElement != "3")
+            if (v1.GetPart(3) != "3")
             {
                 nerror++;
-                Console.WriteLine($"Error: expected 3 not {v1.LastElement} in {v1}");
+                Console.WriteLine($"Error: expected 3 not {v1.GetPart(3)} in {v1}");
             }
             if (v1.Checksum != "*99")
             {
@@ -63,10 +61,10 @@ namespace Parsers.Nmea
             }
 
             v1 = new Nmea_Data("NAME,1,2,*98");
-            if (v1.LastElement != "")
+            if (v1.GetPart(3) != "")
             {
                 nerror++;
-                Console.WriteLine($"Error: expected blank not {v1.LastElement} in {v1}");
+                Console.WriteLine($"Error: expected blank not {v1.GetPart(3)} in {v1}");
             }
             if (v1.Checksum != "*98")
             {
@@ -75,15 +73,15 @@ namespace Parsers.Nmea
             }
 
             v1 = new Nmea_Data("NAME,1,2,97");
-            if (v1.LastElement != "")
+            if (v1.GetPart(4) != "")
             {
                 nerror++;
-                Console.WriteLine($"Error: expected blank not {v1.LastElement} in {v1}");
+                Console.WriteLine($"Error: expected blank not {v1.GetPart(4)} in {v1}");
             }
-            if (v1.Checksum != "97")
+            if (v1.Checksum != "")
             {
                 nerror++;
-                Console.WriteLine($"Error: expexted 97 not {v1.Checksum} in {v1}");
+                Console.WriteLine($"Error: expexted blank not {v1.Checksum} in {v1}");
             }
 
             return nerror;
@@ -102,17 +100,13 @@ namespace Parsers.Nmea
         public virtual string ParseErrorString { get { return $"{GetPart(0)} {ParseStatus} {OriginalNmeaString}"; } }
         public Nmea_Gps_Parser.ParseResult ParseStatus { get; set; } = Nmea_Gps_Parser.ParseResult.OtherError; // default to error.
 
-        public string ChecksumStringRaw { get { return GetPart(-1); } }
         public string[] NmeaParts { get; internal set; }
 
         public string Checksum { get; internal set; }
-        public string LastElement { get; internal set; }
         public string GetPart(int index)
         {
             if (NmeaParts.Length == 0) return "";
-            if (index == -1) return NmeaParts[NmeaParts.Length - 1];
-            if (index == NmeaParts.Length - 1) return LastElement; // The only way to get the checksum (last value) is to ask for -1.
-            if (index > NmeaParts.Length - 1) return ""; // The only way to get the checksum (last value) is to ask for -1.
+            if (index > NmeaParts.Length - 1) return ""; 
             return NmeaParts[index];
         }
         public string GetFirstPart()
@@ -123,12 +117,12 @@ namespace Parsers.Nmea
         {
             switch (name)
             {
-                case "$GPGGA": return "Time and position plus fix type";
+                case "$GPGGA": return "Position and time plus fix type";
                 case "$GPGLL": return "Latitude and longitude";
                 case "$GPGSA": return "Satellite data plus operating mode and DOP values";
                 case "$GPGSV": return "Satellite ID and position";
                 case "$GPPWR": return "Power data";
-                case "$GPRMC": return "Time, position, course, speed";
+                case "$GPRMC": return "Position, time, course and speed";
                 case "$GPVTG": return "Course and speed relative to ground";
                 case "$GPZDA": return "Time and date";
                 case "$": return "";
