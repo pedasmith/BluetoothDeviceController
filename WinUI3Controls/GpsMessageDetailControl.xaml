@@ -1,0 +1,21 @@
+﻿<UserControl
+    x:Class="WinUI3Controls.GpsMessageDetailControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinUI3Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid>
+        <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Padding="4">
+            <TextBlock IsTextSelectionEnabled="True" TextWrapping="Wrap">
+                <Run x:Name="uiHistoryDetailHeader" FontWeight="Bold" Text="{Binding HeaderString}" /><LineBreak />
+                <Run x:Name="uiHistoryDetailText" Text="{Binding DetailString}" /><LineBreak />
+                <Run x:Name="uiHistoryDetailExplanation" Text="{Binding ExplanationString}" />
+            </TextBlock>
+        </Border>
+    </Grid>
+</UserControl>

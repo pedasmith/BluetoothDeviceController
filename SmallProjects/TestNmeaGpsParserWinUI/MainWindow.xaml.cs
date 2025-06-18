@@ -179,7 +179,7 @@ var selected = await picker.PickSingleDeviceAsync(new Rect(50, 200, 10, 10)); //
 
             inputStream = BtTerminalAdapter.Socket.InputStream;
 
-            terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRStarted);
+            terminal.SetDeviceStatusEx(ConnectionState.SendingAndReceiving, ConnectionSubstate.SRStarted);
             readAll = Task.Run(async () =>
             {
                 // await BluetoothSocketHelper.ReadLines(this, BtTerminalAdapter.Socket, inputStream, BtTerminalAdapter.cts.Token);
@@ -243,19 +243,19 @@ namespace Utilities
                 uint n = 0;
                 try
                 {
-                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRWaitingForData);
+                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndReceiving, ConnectionSubstate.SRWaitingForData);
                     n = await dr.LoadAsync(READBUFFER).AsTask(ct);
-                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRGotData, "", n);
+                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndReceiving, ConnectionSubstate.SRGotData, "", n);
                 }
                 catch (TaskCanceledException)
                 {
                     n = 0;
                     keepGoing = false;
-                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRCancelled);
+                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndReceiving, ConnectionSubstate.SRCancelled);
                 }
                 catch (Exception ex)
                 {
-                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndRecieving, ConnectionSubstate.SRException, ex.Message);
+                    terminal.SetDeviceStatusEx(ConnectionState.SendingAndReceiving, ConnectionSubstate.SRException, ex.Message);
                     n = 0;
                     keepGoing = false;
                 }

@@ -8,7 +8,7 @@
         ScanningForDevices,
         VerifyDeviceCapabilities,
         ConnectingToDevice,
-        SendingAndRecieving,
+        SendingAndReceiving,
     };
     public enum ConnectionSubstate
     {

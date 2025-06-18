@@ -1,7 +1,6 @@
 ﻿using BluetoothDeviceController.SerialPort;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.Windows.Media.Capture;
 using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
@@ -43,6 +42,14 @@ namespace WinUI3Controls
             NmeaParser.OnNmeaAll += NmeaParser_OnNmeaAll;
         }
 
+        public void HistoryOnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1) return;
+            var item = e.AddedItems[0] as NmeaMessageSummary;
+            if (item == null) return;
+            uiHistoryMessageDetail.DataContext = item.MostRecentData;
+        }
+
         private void NmeaParser_OnNmeaAll(object sender, Nmea_Data e)
         {
             var summary = FindSummary(e.GetFirstPart());
@@ -61,7 +68,7 @@ namespace WinUI3Controls
                     return summary;
                 }
             }
-            summary = new NmeaMessageSummary(name, name); // TODO: add the explanation
+            summary = new NmeaMessageSummary(name);
             MessageHistory.Add(summary);
 
             return summary;
@@ -263,7 +270,7 @@ namespace WinUI3Controls
                                 break;
                         }
                         break;
-                    case ConnectionState.SendingAndRecieving:
+                    case ConnectionState.SendingAndReceiving:
                         switch (substate)
                         {
                             case ConnectionSubstate.SRWaitingForData:

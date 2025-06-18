@@ -2,6 +2,10 @@
 /// the correct kind of string (e.g., the GPGGA_Data class must be given an NMEA line that starts with $GPGGA).
 /// The overall parser is in NMEA_GPS_Parser.cs
 
+using System;
+using System.Collections.Generic;
+using System.Text;
+
 
 // Why is the weird #if here? Because FindBitPattern tries to be more nullable enabled.
 // Need this super weird set of ifs because:
@@ -9,13 +13,13 @@
 // 2. I can't use the ? for the events because old projects don't do that
 // 3. But for FindBitPattern I need to suppress the warning just for this file.
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 #if NET8_0_OR_GREATER
 #nullable disable
 #endif
+
+
+// Parser information
+// SiRF NMEA Reference Manual, January 2005 revision 1.3 www.SIRF.com
 namespace Parsers.Nmea
 {
 
@@ -132,6 +136,31 @@ namespace Parsers.Nmea
         public string AgeOfDifferentialCorrectionString { get { return GetPart(13); } }
         public string DifferentialReferenceStationsIdString { get { return LastElement; } } // is the 0000 in the 0000*5E checksum
 
+        public override string SummaryString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = $"{Latitude} {Longitude} {Time} {PositionFixIndicator}";
+                return retval;
+            }
+        }
+        public override string DetailString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                return $"{Latitude} {Longitude}\nTime: {Time}\nFix type: {PositionFixIndicator}\nN. Satellites: {SatellitesUsed}\nHDOP: {Hdop}\nMLS Altitude: {MlsAltitude} {MlsAltitudeUnits}\nGeoid Separation: {GeoidSeparation} {GeoidSeparationUnits}\nAge differential corretion: {AgeOfDifferentialCorrectionString}\nDifferential Reference Station: {DifferentialReferenceStationsIdString}\n{OriginalNmeaString}";
+            }
+        }
+        public override string HeaderString
+        {
+            get
+            {
+                return $"Time and position";
+            }
+        }
+
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
@@ -209,6 +238,34 @@ namespace Parsers.Nmea
         /// </summary>
         public string ModeString {  get { return LastElement; } }
         public Nmea_Mode_Field Mode = new Nmea_Mode_Field();
+
+
+        public override string SummaryString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = $"{Latitude} {Longitude} {Time} {Mode}";
+                retval += $" {Validity}";
+                return retval;
+            }
+        }
+        public override string DetailString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                return $"{Latitude} {Longitude}\nTime: {Time}\nStatus={Validity}\nMode={Mode}\n{OriginalNmeaString}";
+            }
+        }
+        public override string HeaderString
+        {
+            get
+            {
+                return $"Geographic Position - Lattitude/Longitude";
+            }
+        }
+
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
@@ -304,13 +361,82 @@ namespace Parsers.Nmea
         public string SatelliteUsed11 { get { return GetPart(13); } }
         public string SatelliteUsed12 { get { return GetPart(14); } }
 
+        public int NSatelliteUsed
+        {
+            get
+            {
+                int retval = 0;
+                retval += string.IsNullOrEmpty(SatelliteUsed01) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed02) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed03) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed04) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed05) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed06) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed07) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed08) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed09) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed10) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed11) ? 0 : 1;
+                retval += string.IsNullOrEmpty(SatelliteUsed12) ? 0 : 1;
+                return retval;
+            }
+        }
+       
         public string PdopString { get { return GetPart(15); } }
+        /// <summary>
+        /// Position Dilution of Precision
+        /// </summary>
         public double Pdop;
         public string HdopString { get { return GetPart(16); } }
+        /// <summary>
+        /// Horizontal Dilution of Precision
+        /// </summary>
         public double Hdop;
         public string VdopString {  get { return LastElement; } }
+        /// <summary>
+        /// Vertical Dilution of Precision
+        /// </summary>
         public double Vdop;
 
+        public override string SummaryString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = $"N. Satellites: {NSatelliteUsed} {Mode1} {Mode2}";
+                return retval;
+            }
+        }
+        public override string DetailString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = "";
+                retval += string.IsNullOrEmpty(SatelliteUsed01) ? "" : $"\nSatellite 01: {SatelliteUsed01}";
+                retval += string.IsNullOrEmpty(SatelliteUsed02) ? "" : $"\nSatellite 02: {SatelliteUsed02}";
+                retval += string.IsNullOrEmpty(SatelliteUsed03) ? "" : $"\nSatellite 03: {SatelliteUsed03}";
+                retval += string.IsNullOrEmpty(SatelliteUsed04) ? "" : $"\nSatellite 04: {SatelliteUsed04}";
+                retval += string.IsNullOrEmpty(SatelliteUsed05) ? "" : $"\nSatellite 05: {SatelliteUsed05}";
+                retval += string.IsNullOrEmpty(SatelliteUsed06) ? "" : $"\nSatellite 06: {SatelliteUsed06}";
+                retval += string.IsNullOrEmpty(SatelliteUsed07) ? "" : $"\nSatellite 07: {SatelliteUsed07}";
+                retval += string.IsNullOrEmpty(SatelliteUsed08) ? "" : $"\nSatellite 08: {SatelliteUsed08}";
+                retval += string.IsNullOrEmpty(SatelliteUsed09) ? "" : $"\nSatellite 09: {SatelliteUsed09}";
+                retval += string.IsNullOrEmpty(SatelliteUsed10) ? "" : $"\nSatellite 10: {SatelliteUsed10}";
+                retval += string.IsNullOrEmpty(SatelliteUsed11) ? "" : $"\nSatellite 11: {SatelliteUsed11}";
+                retval += string.IsNullOrEmpty(SatelliteUsed12) ? "" : $"\nSatellite 12: {SatelliteUsed12}";
+                retval += $"\nPosition DOP: {PdopString}\nHoriontal DOP: {HdopString}\nVertical DOP: {VdopString}";
+                retval += $"\n{OriginalNmeaString}";
+                return retval;
+            }
+        }
+        public override string HeaderString
+        {
+            get
+            {
+                return $"Satellite data including Dilution of Precision";
+            }
+        }
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
@@ -321,12 +447,59 @@ namespace Parsers.Nmea
         }
     }
 
+    public class GPGSV_Satellite_Data
+    {
+        public Nmea_Gps_Parser.ParseResult Init (Nmea_Data data, int starting_index)
+        {
+            Id = data.GetPart(starting_index + 0);
+            ElevationString = data.GetPart(starting_index + 1);
+            AzimuthString = data.GetPart(starting_index + 2);
+            SignalToNoiseRatioString = data.GetPart(starting_index + 3);
+
+            bool parseOk = true;
+            int value = 0;
+
+            parseOk = parseOk && Int32.TryParse(ElevationString, out value);
+            if (!parseOk) return Nmea_Gps_Parser.ParseResult.ElevationInvalid;
+            Elevation = value;
+
+            parseOk = parseOk && Int32.TryParse(AzimuthString, out value);
+            if (!parseOk) return Nmea_Gps_Parser.ParseResult.AzimuthInvalid;
+            Azimuth = value;
+
+            parseOk = parseOk && Int32.TryParse(SignalToNoiseRatioString, out value);
+            if (!parseOk) return Nmea_Gps_Parser.ParseResult.SignalToNoiseRationInvalid;
+            SignalToNoiseRatio = value;
+
+            return Nmea_Gps_Parser.ParseResult.Ok;
+        }
+        public string Id { get; internal set; }
+        public string ElevationString { get; internal set; }
+        public int Elevation { get; internal set; }
+        public string AzimuthString { get; internal set; }
+        public int Azimuth {  get; internal set; }
+        public string SignalToNoiseRatioString { get; internal set; }
+        public int SignalToNoiseRatio { get; internal set; }
+
+        public string SatelliteDetailString
+        {
+            get
+            {
+                return $"{Id:D3} {Elevation:D3} {Azimuth:D3} {SignalToNoiseRatio:D3}";
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"{Id:D3} {Elevation:D3} {Azimuth:D3} {SignalToNoiseRatio:D3}";
+        }
+
+    }
     /// <summary>
     /// In progress! TODO:
     /// </summary>
     public class GPGSV_Data : Nmea_Data
     {
-
         public GPGSV_Data(string str)
             : base(str)
         {
@@ -341,14 +514,102 @@ namespace Parsers.Nmea
                 return;
             }
 
-            ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIsNotUnderstoodByAnyoneOnTheInternet;
+            bool parseOk = true;
+            int value = 0;
+            parseOk = parseOk && Int32.TryParse(NMessageString, out value);
+            if (!parseOk)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.NMessageInvalid;
+                return;
+            }
+            NMessage = value;
 
+            parseOk = parseOk && Int32.TryParse(MessageIndexString, out value);
+            if (!parseOk)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.MessageIndexInvalid;
+                return;
+            }
+            MessageIndex = value;
+
+            parseOk = parseOk && Int32.TryParse(NSatelliteInViewString, out value);
+            if (!parseOk)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.NSatelliteInViewInvalid;
+                return;
+            }
+            NSatelliteInView = value;
+
+            Data.Clear();
+            Data.Add(new GPGSV_Satellite_Data());
+            Data.Add(new GPGSV_Satellite_Data());
+            Data.Add(new GPGSV_Satellite_Data());
+            Data.Add(new GPGSV_Satellite_Data());
+
+            ParseStatus = Data[0].Init(this, 4);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
+            ParseStatus = Data[1].Init(this, 8);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
+            ParseStatus = Data[2].Init(this, 12);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
+
+            ParseStatus = Data[3].Init(this, 16);
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return;
         }
 
+
+
         public string OpcodeString { get { return GetPart(0); } }
+
+        public string NMessageString { get { return GetPart(1); } }
+        public int NMessage { get; internal set; }
+
+        public string MessageIndexString {  get {  return GetPart(2); } }
+        public int MessageIndex { get; internal set; }  
+        public string NSatelliteInViewString {  get { return GetPart(3); } }
+        public int NSatelliteInView { get; internal set; }
+
+        public List<GPGSV_Satellite_Data> Data = new List<GPGSV_Satellite_Data>();
+
+        public override string SummaryString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = $"Message {MessageIndex} of {NMessage} NSatelliteInView={NSatelliteInView} {Data[0].Id} is {Data[0].SatelliteDetailString}";
+                return retval;
+            }
+        }
+        public override string DetailString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = $"NMessages: {NMessage}\nMessage Index: {MessageIndex}\nSatellites in view: {NSatelliteInView}\n";
+                retval += Data[0].SatelliteDetailString + "\n";
+                retval += Data[1].SatelliteDetailString + "\n";
+                retval += Data[2].SatelliteDetailString + "\n";
+                retval += Data[3].SatelliteDetailString + "\n";
+                retval += $"{OriginalNmeaString}";
+                return retval;
+            }
+        }
+        public override string HeaderString
+        {
+            get
+            {
+                return $"Individual satellite data";
+            }
+        }
         public override string ToString()
         {
-            return $"{OpcodeString} {ParseStatus} raw={OriginalNmeaString}";
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return $"{OpcodeString} {ParseStatus} {OriginalNmeaString} Message {MessageIndex} of {NMessage} NSatelliteInView={NSatelliteInView}";
+            }
+            return $"{OpcodeString} Message {MessageIndex} of {NMessage} NSatelliteInView={NSatelliteInView}";
         }
     }
 
@@ -429,7 +690,42 @@ namespace Parsers.Nmea
         public double Voltage;
         public string ChargingStatusString {  get { return GetPart(5); } }
         public enum ChargingStatusType {  Charging, NotCharging };
+        public static string EnumToString(ChargingStatusType value)
+        {
+            switch (value)
+            {
+                case ChargingStatusType.Charging: return "Charging";
+                case ChargingStatusType.NotCharging: return "Not charging";
+            }
+            return value.ToString();
+        }
         public ChargingStatusType ChargingStatus;
+
+        public override string SummaryString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = $"Battery {Voltage} volts {EnumToString(ChargingStatus)}";
+                return retval;
+            }
+        }
+        public override string DetailString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = $"Voltage: {Voltage} volts\nCharging status: {EnumToString(ChargingStatus)}\n{OriginalNmeaString}";
+                return retval;
+            }
+        }
+        public override string HeaderString
+        {
+            get
+            {
+                return $"Power data";
+            }
+        }
 
         public override string ToString()
         {
@@ -528,6 +824,18 @@ namespace Parsers.Nmea
         public string ValidityString { get { return GetPart(2); } } // A=valid current data B=valid stored data V=invalid current data W=invalid stored data
         public enum ValidityType { ValidCurrentData, ValidStoredData, InvalidCurrentData, InvalidStoredData };
         public ValidityType Validity;
+
+        public static string EnumToString(ValidityType value)
+        {
+            switch (value)
+            {
+                case ValidityType.ValidCurrentData: return "Valid (current data)";
+                case ValidityType.ValidStoredData: return "Valid (stored data)";
+                case ValidityType.InvalidCurrentData: return "Invalid (current data)";
+                case ValidityType.InvalidStoredData: return "Invalid (stored data)";
+            }
+            return value.ToString();
+        }
         public string LatitudeString { get { return GetPart(3); } } 
         public string LatitudeNorthSouthString { get { return GetPart(4); } } // N S
         public Nmea_Latitude_Fields Latitude = new Nmea_Latitude_Fields();
@@ -549,9 +857,49 @@ namespace Parsers.Nmea
         public string EastWestIndicatorString {  get { return GetPart(11); } }
         public enum EastWestType {  NotSpecified, East, West };
         public EastWestType EastWestIndicator;
+        public static string EnumToString(EastWestType value)
+        {
+            switch (value)
+            {
+                case EastWestType.East: return "East";
+                case EastWestType.West: return "West";
+                case EastWestType.NotSpecified: return "";
+            }
+            return value.ToString();
+        }
 
         public string ModeString { get { return LastElement; } }
         public Nmea_Mode_Field Mode = new Nmea_Mode_Field();
+
+        public override string SummaryString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = $"{Latitude} {Longitude} At {Date} {Time} Validity={EnumToString(Validity)}";
+                return retval;
+            }
+        }
+        public override string DetailString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                var retval = $"{Latitude} {Longitude}\nTime: {Time}\nDate: {Date.ToString()}\nValidity: {EnumToString(Validity)}\n";
+                if (VelocityKnotsString != "") retval += $"Velocity: {VelocityKnots} knots\n";
+                if (HeadingDegreesTrueString != "") retval += $"Heading: {HeadingDegreesTrue}° (true)\n";
+                if (MagneticVariationString != "") retval += $"Magnetic variation: {MagneticVariation}° {EnumToString(EastWestIndicator)}\n";
+                retval += $"Navigation mode: {Mode}\n{OriginalNmeaString}";
+                return retval;
+            }
+        }
+        public override string HeaderString
+        {
+            get
+            {
+                return $"Position, course and speed";
+            }
+        }
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
@@ -672,6 +1020,42 @@ namespace Parsers.Nmea
         public string ModeString { get { return LastElement; } } 
         public Nmea_Mode_Field Mode = new Nmea_Mode_Field();
 
+        public override string SummaryString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                string retval = "";
+                if (CourseTrueString != "") retval += $"Course={CourseTrue} (true) ";
+                if (CourseMagneticString != "") retval += $"Course={CourseMagnetic} (magnetic) ";
+                if (SpeedKnotsString != "") retval += $"Speed={SpeedKnots} knots ";
+                if (SpeedKphString != "") retval += $"Speed={SpeedKph} kph ";
+                retval += $"Mode={Mode}";
+                return retval;
+            }
+        }
+        public override string DetailString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                string retval = "";
+                if (CourseTrueString != "") retval += $"Course: {CourseTrue} (true)\n";
+                if (CourseMagneticString != "") retval += $"Course: {CourseMagnetic} (magnetic)\n";
+                if (SpeedKnotsString != "") retval += $"Speed: {SpeedKnots} knots\n";
+                if (SpeedKphString != "") retval += $"Speed: {SpeedKph} kph\n";
+                retval += $"Mode: {Mode}";
+                return retval;
+            }
+        }
+        public override string HeaderString
+        {
+            get
+            {
+                return $"Course and speed relative to the ground";
+            }
+        }
+
         public override string ToString()
         {
             if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
@@ -738,6 +1122,32 @@ namespace Parsers.Nmea
 
         public string LocalZoneMinutesString {  get { return LastElement; } }
         public int LocalZoneMinutes;
+
+        public override string SummaryString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                string retval = $"{Date} {Time} Time zone={LocalZoneHours:D2}:{LocalZoneMinutes:D2}";
+                return retval;
+            }
+        }
+        public override string DetailString
+        {
+            get
+            {
+                if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok) return ParseErrorString;
+                string retval = $"{Date} {Time}\nTime zone: {LocalZoneHours:D2}:{LocalZoneMinutes:D2}";
+                return retval;
+            }
+        }
+        public override string HeaderString
+        {
+            get
+            {
+                return $"Date and time plus local time zone";
+            }
+        }
 
         public override string ToString()
         {
@@ -980,94 +1390,5 @@ namespace Parsers.Nmea
 
     }
 
-    public class Nmea_Data
-    {
-        public Nmea_Data(string str)
-        {
-            ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeUnknown; // nice default :-)
-            OriginalNmeaString = str;
-            NmeaParts = str.Split(',');
-            // Might be old style ,*VV
-            // Might be new style ,value*VV where the value is the last value
-            var chk = ChecksumStringRaw;
-            var starpos = chk.IndexOf("*");
-            if (starpos < 1)
-            {
-                LastElement = "";
-                Checksum = chk;
-            }
-            else
-            {
-                LastElement = chk.Substring(0, starpos);
-                Checksum = chk.Substring(starpos); // include the "*"
-            }
-        }
-
-        static public int Test()
-        {
-            int nerror = 0;
-            var v1 = new Nmea_Data("NAME,1,2,3*99");
-            if (v1.LastElement != "3")
-            {
-                nerror++;
-                Console.WriteLine($"Error: expected 3 not {v1.LastElement} in {v1}");
-            }
-            if (v1.Checksum != "*99")
-            {
-                nerror++;
-                Console.WriteLine($"Error: expexted *99 not {v1.Checksum} in {v1}");
-            }
-
-            v1 = new Nmea_Data("NAME,1,2,*98");
-            if (v1.LastElement != "")
-            {
-                nerror++;
-                Console.WriteLine($"Error: expected blank not {v1.LastElement} in {v1}");
-            }
-            if (v1.Checksum != "*98")
-            {
-                nerror++;
-                Console.WriteLine($"Error: expexted *98 not {v1.Checksum} in {v1}");
-            }
-
-            v1 = new Nmea_Data("NAME,1,2,97");
-            if (v1.LastElement != "")
-            {
-                nerror++;
-                Console.WriteLine($"Error: expected blank not {v1.LastElement} in {v1}");
-            }
-            if (v1.Checksum != "97")
-            {
-                nerror++;
-                Console.WriteLine($"Error: expexted 97 not {v1.Checksum} in {v1}");
-            }
-
-            return nerror;
-        }
-
-        public override string ToString()
-        {
-            return $"{OriginalNmeaString}  parse={ParseStatus}";
-        }
-        public Nmea_Gps_Parser.ParseResult ParseStatus { get; set; } = Nmea_Gps_Parser.ParseResult.OtherError; // default to error.
-
-        public string ChecksumStringRaw { get { return GetPart(-1); } }
-        public string[] NmeaParts { get; internal set; }
-
-        public string Checksum { get; internal set; }
-        public string LastElement { get; internal set; }
-        protected string GetPart(int index)
-        {
-            if (NmeaParts.Length == 0) return "";
-            if (index == -1) return NmeaParts[NmeaParts.Length - 1];
-            if (index >= NmeaParts.Length - 1) return ""; // The only way to get the checksum (last value) is to ask for -1.
-            return NmeaParts[index];
-        }
-        public string GetFirstPart()
-        {
-            return GetPart(0);
-        }
-
-        public string OriginalNmeaString { get; set; } = "";
-    }
+    
 }

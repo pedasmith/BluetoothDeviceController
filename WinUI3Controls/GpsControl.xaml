@@ -30,22 +30,28 @@
 
             </TabViewItem>
             <TabViewItem Header="History">
-                <ScrollView>
-                    <ListView ItemsSource="{Binding MessageHistory}">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Padding="5" >
-                                    <TextBlock Width="80" Text="{Binding Name}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
-                                    <TextBlock Width="30" Text="{Binding NOk}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
-                                    <TextBlock Width="30" Text="{Binding NError}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
-                                    <TextBlock Text="{Binding LastMessageDecoded}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
-                                </StackPanel>
-                            </DataTemplate>
-
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </ScrollView>
-
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto"  />
+                        <RowDefinition Height="auto"  />
+                    </Grid.RowDefinitions>
+                    <ScrollView Grid.Row="0">
+                        <ListView x:Name="uiHistoryList" ItemsSource="{Binding MessageHistory}" SelectionChanged="HistoryOnSelectionChanged">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Padding="5"  >
+                                        <TextBlock Width="80" Text="{Binding Name}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                        <TextBlock Width="30" Text="{Binding NOk}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                        <TextBlock Width="30" Text="{Binding NError}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                        <TextBlock Text="{Binding LastMessageSummary}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </ScrollView>
+                    <local:GpsMessageDetailControl Grid.Row="1" x:Name="uiHistoryMessageDetail" />
+                </Grid>
             </TabViewItem>
             <TabViewItem Header="Position">
                 <Grid>

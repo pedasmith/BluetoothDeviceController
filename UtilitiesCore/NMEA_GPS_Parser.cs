@@ -41,7 +41,7 @@ namespace Parsers.Nmea
 
             // GPGSA additional errors
             Mode1Invalid, Mode2Invalid,
-            PdopInvalid, VdopInvalid,
+            PdopInvalid, VdopInvalid, /* there's already an Hdop originally added for GPGGA */
 
             // GPRMC additional errors
             MagneticVariationInvalid,
@@ -63,6 +63,10 @@ namespace Parsers.Nmea
             VoltageInvalid,
             ChargingStatusInvalid,
             OpcodeIsNotUnderstoodByAnyoneOnTheInternet,
+
+            // GPGSV
+            NMessageInvalid, MessageIndexInvalid, NSatelliteInViewInvalid,
+            ElevationInvalid, AzimuthInvalid, SignalToNoiseRationInvalid,
 
             OtherError
         }

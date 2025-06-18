@@ -15,18 +15,19 @@ namespace TestNmeaGpsParserWinUI
 {
     public class NmeaMessageSummary: INotifyPropertyChanged
     {
-        public NmeaMessageSummary(string name, string explanation) { Name = name; Explanation = explanation; }
+        public NmeaMessageSummary(string name) { Name = name; }
         /// <summary>
         /// Message name e.g. $GPGGA
         /// </summary>
         public string Name { get { return name; }  internal set { name = value; OnPropertyChanged(); } }
         private string name = "";
 
-        public string LastMessageDecoded { get { return lastMessageDecoded; } internal set {  lastMessageDecoded = value; OnPropertyChanged(); } }
-        private string lastMessageDecoded = "";
+        public string LastMessageSummary { get { return MostRecentData.SummaryString; } }
+        public string LastMessageDetails { get { return MostRecentData.DetailString; } }
+        public string LastMessageHeader{ get { return MostRecentData.HeaderString; } }
 
-        public string Explanation { get { return explanation; } internal set { explanation = value; OnPropertyChanged(); } }
-        private string explanation = "";
+
+        public string Explanation { get { return Nmea_Data.OpcodeExplanation(MostRecentData?.GetFirstPart()); } }
         /// <summary>
         /// Number of OK messages
         /// </summary>
@@ -38,6 +39,8 @@ namespace TestNmeaGpsParserWinUI
         public int NTotal {  get { return NOk + NError; } }
         public DateTimeOffset FirstMessage { get; set; } = DateTimeOffset.MaxValue;
         public DateTimeOffset LastMessage { get; set;} = DateTimeOffset.MinValue;
+
+        public Nmea_Data MostRecentData { get; internal set; } = null;
 
         public void Add (Nmea_Data data)
         {
@@ -51,13 +54,16 @@ namespace TestNmeaGpsParserWinUI
                 FirstMessage = now;
             }
             LastMessage = now;
-            LastMessageDecoded = data.ToString(); // All Nmea_Data derived classes have usable ToString overrides.
+            MostRecentData = data;
 
             OnPropertyChanged(isOk ? "NOk" : "NError");
             OnPropertyChanged("NTotal");
             if (setFirst) OnPropertyChanged("FirstMessage");
             OnPropertyChanged("LastMessage");
-            OnPropertyChanged("LastMessageDecoded");
+            OnPropertyChanged("LastMessageSummary");
+            OnPropertyChanged("LastMessageDetails");
+            OnPropertyChanged("LastMessageHeader");
+            OnPropertyChanged("LastMessageExplanation");
         }
 
 

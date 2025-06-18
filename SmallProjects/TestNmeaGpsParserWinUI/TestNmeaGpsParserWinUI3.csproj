@@ -13,6 +13,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="Assets\_TODO_list.md" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="AppDictionary.xaml" />
     <None Remove="NmeaMessageHistory.xaml" />
   </ItemGroup>
