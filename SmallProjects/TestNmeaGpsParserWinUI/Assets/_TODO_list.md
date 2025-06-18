@@ -5,7 +5,7 @@
 
 Although much of the annunciator is done, and all the foundation is complete, there's too much slop
 
-## Checksum
+## Complete: Checksum
 
 From the *SiRF* NMEA PDF, page 2.1 in one of the footnotes.
 
@@ -17,19 +17,23 @@ characters representing the contents of the checksum. Use of checksums is requir
 
 ## Smaller to-do items
 
-2025-06-17      Support the Dual switch set either way
-2025-06-17      The messages dont' really start with $; that's just message framing
+2025-06-17 Support the Dual switch set either way
 
-2025-06-17 DONE Update GPGSV to well-handle satellite data 
-2025-06-17 DONE Update all parsers, not just GPGLL, for the fancy new header/detail/explanation system
-2025-06-17 DONE Make a single (static) method for the explanation
-2025-06-17 DONE The output has a BindingExpression failure at startup (trivial; just set the DataContext to null)
-2025-06-17 DONE In the history tab, automatically update the detail view when the selected value changes
+### Completed
 
-Completed 2-25-06-18
-2025-06-17 DONE Make nice versions of all enum for detail display
-2025-06-18 DONE Duplicating the header-type info is pointless. And the raw NMEA should be seperate.
-2025-06-18 DONE Hide the detail box when there's nothing selected
+Completed 2025-06-17
+2025-06-17 Update GPGSV to well-handle satellite data 
+2025-06-17 Update all parsers, not just GPGLL, for the fancy new header/detail/explanation system
+2025-06-17 Make a single (static) method for the explanation
+2025-06-17 The output has a BindingExpression failure at startup (trivial; just set the DataContext to null)
+2025-06-17 In the history tab, automatically update the detail view when the selected value changes
+
+Completed 2025-06-18
+2025-06-17 Make nice versions of all enum for detail display
+2025-06-18 Duplicating the header-type info is pointless. And the raw NMEA should be seperate.
+2025-06-18 Hide the detail box when there's nothing selected
+2025-06-17 The messages dont' really start with $; that's just message framing
+2025-06-17 Check for checksums     
 
 
 ## Copy

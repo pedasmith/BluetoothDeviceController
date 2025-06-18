@@ -30,12 +30,16 @@ namespace Parsers.Nmea
         public GPGGA_Data(string str)
             : base(str)
         {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return; // base didn't build, probably because it's somehow an invalid command.
+            }
             if (NmeaParts.Length < 15)
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
                 return;
             }
-            if (OpcodeString != "$GPGGA")
+            if (OpcodeString != "GPGGA")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
                 return;
@@ -183,12 +187,16 @@ namespace Parsers.Nmea
         public GPGLL_Data(string str)
             : base(str)
         {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return; // base didn't build, probably because it's somehow an invalid command.
+            }
             if (NmeaParts.Length < 6)
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
                 return;
             }
-            if (OpcodeString != "$GPGLL")
+            if (OpcodeString != "GPGLL")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
                 return;
@@ -292,12 +300,16 @@ namespace Parsers.Nmea
         public GPGSA_Data(string str)
             : base(str)
         {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return; // base didn't build, probably because it's somehow an invalid command.
+            }
             if (NmeaParts.Length < 17)
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
                 return;
             }
-            if (OpcodeString != "$GPGSA")
+            if (OpcodeString != "GPGSA")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
                 return;
@@ -513,12 +525,16 @@ namespace Parsers.Nmea
         public GPGSV_Data(string str)
             : base(str)
         {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return; // base didn't build, probably because it's somehow an invalid command.
+            }
             if (NmeaParts.Length < 3)
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
                 return;
             }
-            if (OpcodeString != "$GPGSV")
+            if (OpcodeString != "GPGSV")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
                 return;
@@ -634,12 +650,16 @@ namespace Parsers.Nmea
         public GPPWR_Data(string str)
             : base(str)
         {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return; // base didn't build, probably because it's somehow an invalid command.
+            }
             if (NmeaParts.Length < 3)
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
                 return;
             }
-            if (OpcodeString != "$GPPWR")
+            if (OpcodeString != "GPPWR")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
                 return;
@@ -739,12 +759,16 @@ namespace Parsers.Nmea
         public GPRMC_Data(string str)
             : base(str)
         {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return; // base didn't build, probably because it's somehow an invalid command.
+            }
             if (NmeaParts.Length < 12) // Really 12?
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
                 return;
             }
-            if (OpcodeString != "$GPRMC")
+            if (OpcodeString != "GPRMC")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
                 return;
@@ -906,12 +930,16 @@ namespace Parsers.Nmea
         public GPVTG_Data(string str)
             : base(str)
         {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return; // base didn't build, probably because it's somehow an invalid command.
+            }
             if (NmeaParts.Length < 10)
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
                 return;
             }
-            if (OpcodeString != "$GPVTG")
+            if (OpcodeString != "GPVTG")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
                 return;
@@ -1054,12 +1082,16 @@ namespace Parsers.Nmea
         public GPZDA_Data(string str)
             : base(str)
         {
+            if (ParseStatus != Nmea_Gps_Parser.ParseResult.Ok)
+            {
+                return; // base didn't build, probably because it's somehow an invalid command.
+            }
             if (NmeaParts.Length < 6)
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.NotEnoughFields;
                 return;
             }
-            if (OpcodeString != "$GPZDA")
+            if (OpcodeString != "GPZDA")
             {
                 ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeIncorrect;
                 return;

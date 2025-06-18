@@ -22,8 +22,16 @@ namespace Parsers.Nmea
         // https://cdn.sparkfun.com/assets/a/3/2/f/a/NMEA_Reference_Manual-Rev2.1-Dec07.pdf
         // https://www.cypress.bc.ca/documents/Report_Messages/CTM200/msg_82_GPRMC.html
 
-        public enum ParseResult {  Ok, NotEnoughFields, 
-            OpcodeUnknown, OpcodeIncorrect,
+        public enum ParseResult {  Ok, OpcodeUnknown,
+
+            ZeroLength, NoStartingDollarSign, 
+            ChecksumLengthTooShort, ChecksumLengthTooLong, ChecksumNotHex, ChecksumValueImpossible, ChecksumDoesntMatch, 
+            
+
+            OpcodeIncorrect, // NMEA string sent to the wrong parser.
+
+            // Starting with GPRMC
+            NotEnoughFields,
             TimeStringWrongLength, TimeStringInvalid,
             ValidityInvalid,
             LatitudeStringWrongLength, LatitudeStringInvalid, LatitudeNorthSouthInvalid,
@@ -53,18 +61,18 @@ namespace Parsers.Nmea
             VelocityKnotsUnitsInvalid,
             VelocityKphInvalid, VelocityKphUnitsInvalid,
 
-            // GPZDA
+            // GPZDA additional errors
             LocalZoneHourInvalid, LocalZoneMinutesInvalid,
 
-            // GPGLL
+            // GPGLL additional errors
             ModeInvalid,
 
-            // GPPWR
+            // GPPWR additional errors
             VoltageInvalid,
             ChargingStatusInvalid,
             OpcodeIsNotUnderstoodByAnyoneOnTheInternet,
 
-            // GPGSV
+            // GPGSV additional errors
             NMessageInvalid, MessageIndexInvalid, NSatelliteInViewInvalid,
             ElevationInvalid, AzimuthInvalid, SignalToNoiseRationInvalid,
 
@@ -162,6 +170,5 @@ namespace Parsers.Nmea
 
         public event EventHandler<Nmea_Data> OnNmeaAll;
         public event EventHandler<Nmea_Data> OnNmeaUnknown;
-
     }
 }

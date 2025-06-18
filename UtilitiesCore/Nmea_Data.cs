@@ -1,6 +1,7 @@
 ﻿using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Parsers.Nmea
@@ -10,11 +11,11 @@ namespace Parsers.Nmea
         /// <summary>
         /// Splits an NMEA string into its parts
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="str">Example: $GPPWR,0876,0,0,0,0,00,F,0,97,1,3,000,00190108EEEE,0017E9B92122*74</param>
 
         public Nmea_Data(string str)
         {
-            ParseStatus = Nmea_Gps_Parser.ParseResult.OpcodeUnknown; // nice default :-)
+            ParseStatus = Nmea_Gps_Parser.ParseResult.Ok; // Starts Ok then gets flipped to an error as appropriate.
             OriginalNmeaString = str;
 
             var starpos = str.IndexOf("*");
@@ -26,6 +27,63 @@ namespace Parsers.Nmea
             {
                 Checksum = str.Substring(starpos);
                 str = str.Substring(0, starpos);
+
+                if (Checksum.Length < 3) // includes the *
+                {
+                    ParseStatus = Nmea_Gps_Parser.ParseResult.ChecksumLengthTooShort;
+                }
+                else if (Checksum.Length > 3) // includes the *
+                {
+                    ParseStatus = Nmea_Gps_Parser.ParseResult.ChecksumLengthTooLong;
+                }
+                else
+                {
+                    int value = -1;
+                    var ok = Int32.TryParse(Checksum.Substring(1), NumberStyles.AllowHexSpecifier, null, out value);
+                    ChecksumValue = value;
+                    if (!ok)
+                    {
+                        ParseStatus = Nmea_Gps_Parser.ParseResult.ChecksumNotHex;
+                    }
+                    else
+                    {
+                        if (value >= 128 || value < 0)
+                        {
+                            ParseStatus = Nmea_Gps_Parser.ParseResult.ChecksumValueImpossible;
+                        }
+                        else
+                        {
+                            // Actually calulate the checksum!
+                            var checkstr = str.Substring(1); // Don't include $
+                            int checkvalue = 0;
+                            for (int i=0; i<checkstr.Length; i++)
+                            {
+                                int b = (checkstr[i]) & 0x7F; // Remove all but the bottom bits
+                                checkvalue = checkvalue ^ b; // XOR
+                            }
+                            if (checkvalue != ChecksumValue)
+                            {
+                                ParseStatus = Nmea_Gps_Parser.ParseResult.ChecksumDoesntMatch;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (str.Length < 1)
+            {
+                ParseStatus = Nmea_Gps_Parser.ParseResult.ZeroLength;
+            }
+            else
+            {
+                if (!str.StartsWith("$"))
+                {
+                    ParseStatus = Nmea_Gps_Parser.ParseResult.NoStartingDollarSign;
+                }
+                else
+                {
+                    str = str.Substring(1); // Remove the $
+                }
             }
 
             NmeaParts = str.Split(',');
@@ -103,6 +161,7 @@ namespace Parsers.Nmea
         public string[] NmeaParts { get; internal set; }
 
         public string Checksum { get; internal set; }
+        public int ChecksumValue { get; internal set; }
         public string GetPart(int index)
         {
             if (NmeaParts.Length == 0) return "";
@@ -117,14 +176,14 @@ namespace Parsers.Nmea
         {
             switch (name)
             {
-                case "$GPGGA": return "Position and time plus fix type";
-                case "$GPGLL": return "Latitude and longitude";
-                case "$GPGSA": return "Satellite data plus operating mode and DOP values";
-                case "$GPGSV": return "Satellite ID and position";
-                case "$GPPWR": return "Power data";
-                case "$GPRMC": return "Position, time, course and speed";
-                case "$GPVTG": return "Course and speed relative to ground";
-                case "$GPZDA": return "Time and date";
+                case "GPGGA": return "Position and time plus fix type";
+                case "GPGLL": return "Latitude and longitude";
+                case "GPGSA": return "Satellite data plus operating mode and DOP values";
+                case "GPGSV": return "Satellite ID and position";
+                case "GPPWR": return "Power data";
+                case "GPRMC": return "Position, time, course and speed";
+                case "GPVTG": return "Course and speed relative to ground";
+                case "GPZDA": return "Time and date";
                 case "$": return "";
             }
             return name;
