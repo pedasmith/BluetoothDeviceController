@@ -14,20 +14,30 @@ Marine Electronic Devices. Checksum consists of a binary exclusive OR the lower 
 and before the “*” symbols. The resulting 7-bit binary number is displayed as the ASCII equivalent of two hexadecimal 
 characters representing the contents of the checksum. Use of checksums is required on all input messages.
 
-## Support input messages?
-
-There's a bunch of input messages for a bunch of things. Should they be supported?
-
-Maybe have a user-enterable string and then I add the asterisk + checksum?
 
 ## Smaller to-do items
+
+2025-06-17      Support the Dual switch set either way
+2025-06-17      The messages dont' really start with $; that's just message framing
 
 2025-06-17 DONE Update GPGSV to well-handle satellite data 
 2025-06-17 DONE Update all parsers, not just GPGLL, for the fancy new header/detail/explanation system
 2025-06-17 DONE Make a single (static) method for the explanation
 2025-06-17 DONE The output has a BindingExpression failure at startup (trivial; just set the DataContext to null)
+2025-06-17 DONE In the history tab, automatically update the detail view when the selected value changes
 
-2025-06-17      In the history tab, automatically update the detail view when the selected value changes
-2025-06-17      Support the Dual switch set either way
-2025-06-17      The messages dont' really start with $; that's just message framing
+Completed 2-25-06-18
+2025-06-17 DONE Make nice versions of all enum for detail display
+2025-06-18 DONE Duplicating the header-type info is pointless. And the raw NMEA should be seperate.
+2025-06-18 DONE Hide the detail box when there's nothing selected
 
+
+## Copy
+
+Be able to copy data out from all tabs, including tabular data
+
+
+## Later Skater: Support input messages?
+
+There's a bunch of input messages for a bunch of things. Should they be supported?
+Maybe have a user-enterable string and then I add the asterisk + checksum?

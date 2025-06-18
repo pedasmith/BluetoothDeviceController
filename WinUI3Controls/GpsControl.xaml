@@ -38,19 +38,28 @@
                     </Grid.RowDefinitions>
                     <ScrollView Grid.Row="0">
                         <ListView x:Name="uiHistoryList" ItemsSource="{Binding MessageHistory}" SelectionChanged="HistoryOnSelectionChanged">
+                            <ListView.Header>
+                                <StackPanel Orientation="Horizontal" Padding="5" Margin="15,0,0,0"  >
+                                    <TextBlock Width="80" Text="NMEA" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                    <TextBlock Width="50" Text="OK" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                    <TextBlock Width="70" Text="Corrupted" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                    <TextBlock Text="Summary" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                </StackPanel>
+
+                            </ListView.Header>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Padding="5"  >
                                         <TextBlock Width="80" Text="{Binding Name}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
-                                        <TextBlock Width="30" Text="{Binding NOk}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
-                                        <TextBlock Width="30" Text="{Binding NError}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
-                                        <TextBlock Text="{Binding LastMessageSummary}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                        <TextBlock Width="50" Text="{Binding NOk}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                        <TextBlock Width="70" Text="{Binding NError}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
+                                        <TextBlock Text="{Binding MostRecentData.SummaryString}" Style="{ThemeResource BaseTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}" Margin="12,0,0,0"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
                     </ScrollView>
-                    <local:GpsMessageDetailControl Grid.Row="1" x:Name="uiHistoryMessageDetail" />
+                    <local:GpsMessageDetailControl Grid.Row="1" x:Name="uiHistoryMessageDetail"  Visibility="Collapsed"/>
                 </Grid>
             </TabViewItem>
             <TabViewItem Header="Position">
@@ -71,9 +80,9 @@
 <Run>Longitude          : </Run><Run x:Name="uiLongitude" Text="(not set)" />
 <Run>Velocity KPH       : </Run><Run x:Name="uiVelocityKph" Text="(not set)" />
 <Run>Velocity Knots     : </Run><Run x:Name="uiVelocityKnots" Text="(not set)" />
-<Run>Heading (magnetic) : </Run><Run x:Name="uiHeadingMagnetic" Text="(not set)" />
 <Run>Heading (true)     : </Run><Run x:Name="uiHeadingTrue" Text="(not set)" />
-<Run>Magnetic Varition  : </Run><Run x:Name="uiMagneticVariation" Text="(not set)" />
+<Run>Heading (magnetic) : </Run><Run x:Name="uiHeadingMagnetic" Text="(not set)" />
+<Run>Magnetic Variation : </Run><Run x:Name="uiMagneticVariation" Text="(not set)" />
 <Run>Source             : </Run><Run x:Name="uiUpdateSource" Text="(not set)" />
 <Run>Mode               : </Run><Run x:Name="uiMode" Text="(not set)" />
 <Run>Battery            : </Run><Run x:Name="uiVoltage" Text="(not set)" /><Run> Volts. </Run><Run x:Name="uiChargingStatus" Text="" />

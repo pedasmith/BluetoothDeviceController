@@ -97,7 +97,6 @@ namespace Parsers.Nmea
         public virtual string SummaryString { get { return ToString(); } }
         public virtual string DetailString { get { return ToString(); } }
 
-        public virtual string HeaderString { get { return GetPart(0); } }
         public string ExplanationString { get { return OpcodeExplanation(GetPart(0)); } }
 
         public virtual string ParseErrorString { get { return $"{GetPart(0)} {ParseStatus} {OriginalNmeaString}"; } }

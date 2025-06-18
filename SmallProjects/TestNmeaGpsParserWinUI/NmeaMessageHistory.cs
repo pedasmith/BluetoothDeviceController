@@ -22,9 +22,6 @@ namespace TestNmeaGpsParserWinUI
         public string Name { get { return name; }  internal set { name = value; OnPropertyChanged(); } }
         private string name = "";
 
-        public string LastMessageSummary { get { return MostRecentData.SummaryString; } }
-        public string LastMessageDetails { get { return MostRecentData.DetailString; } }
-        public string LastMessageHeader{ get { return MostRecentData.HeaderString; } }
 
 
         public string Explanation { get { return Nmea_Data.OpcodeExplanation(MostRecentData?.GetFirstPart()); } }

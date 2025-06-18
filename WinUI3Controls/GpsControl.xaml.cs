@@ -42,19 +42,28 @@ namespace WinUI3Controls
             NmeaParser.OnNmeaAll += NmeaParser_OnNmeaAll;
         }
 
+        private string CurrHistoryNmeaName = "";
         public void HistoryOnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count != 1) return;
             var item = e.AddedItems[0] as NmeaMessageSummary;
             if (item == null) return;
+            uiHistoryMessageDetail.Visibility = Visibility.Visible;
             uiHistoryMessageDetail.DataContext = item.MostRecentData;
+            CurrHistoryNmeaName = item.Name;
         }
 
         private void NmeaParser_OnNmeaAll(object sender, Nmea_Data e)
         {
-            var summary = FindSummary(e.GetFirstPart());
-            summary.Add(e);
-            // It's an observablecollection, so everything updates automatically.
+            var name = e.GetFirstPart();
+            var summary = FindSummary(name);
+            summary.Add(e); // It's an observablecollection, so everything updates automatically.
+
+            if (name == CurrHistoryNmeaName)
+            {
+                uiHistoryMessageDetail.Visibility = Visibility.Visible;
+                uiHistoryMessageDetail.DataContext = e;
+            }
         }
 
         private NmeaMessageSummary FindSummary(string name)
@@ -106,8 +115,6 @@ namespace WinUI3Controls
         }
 
 
-
-
         private void NmeaParser_OnGppwrOk(object sender, GPPWR_Data e)
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
@@ -127,6 +134,7 @@ namespace WinUI3Controls
                 if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
                 {
                     uiMode.Text = $"{e.Mode}";
+                    uiLatLongUpdateDate.Text = $"{e.Date}";
                     uiLatLongUpdateTime.Text = $"{e.Time}";
                     uiLatitude.Text = $"{e.Latitude}";
                     uiLongitude.Text = $"{e.Longitude}";

@@ -12,9 +12,9 @@
     <Grid>
         <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Padding="4">
             <TextBlock IsTextSelectionEnabled="True" TextWrapping="Wrap">
-                <Run x:Name="uiHistoryDetailHeader" FontWeight="Bold" Text="{Binding HeaderString}" /><LineBreak />
-                <Run x:Name="uiHistoryDetailText" Text="{Binding DetailString}" /><LineBreak />
-                <Run x:Name="uiHistoryDetailExplanation" Text="{Binding ExplanationString}" />
+                <Run FontWeight="Bold" Text="{Binding ExplanationString}" /><LineBreak />
+                <Run Text="{Binding DetailString}" /><LineBreak /><LineBreak />
+                <Run Text="{Binding OriginalNmeaString}" />
             </TextBlock>
         </Border>
     </Grid>
