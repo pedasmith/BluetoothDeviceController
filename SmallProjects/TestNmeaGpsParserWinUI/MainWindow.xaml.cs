@@ -1,31 +1,13 @@
 using BluetoothDeviceController.SerialPort;
 using BluetoothProtocolsSerial.Serial;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using Parsers.Nmea;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Sockets;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Utilities;
-using Windows.Devices.Bluetooth;
-using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Foundation.Diagnostics;
-using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
-using static BluetoothDeviceController.SerialPort.TerminalSupport;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -104,7 +86,7 @@ picker.Filter.SupportedDeviceSelectors.Add(aqs);
 var selected = await picker.PickSingleDeviceAsync(new Rect(50, 200, 10, 10)); // Rect is where it flies out from
 */
 
-        private async void DoAll(ITerminal terminal, RfcommOptions options)
+        private async void DoAll(ITerminal terminal, RfcommOptions options) // terminal (ITerminal) is a GpsControl
         {
             terminal.SetDeviceStatusEx(ConnectionState.UX, ConnectionSubstate.UXReset);
 

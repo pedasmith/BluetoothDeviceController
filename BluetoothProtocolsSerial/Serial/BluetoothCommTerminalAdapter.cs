@@ -196,7 +196,7 @@ namespace BluetoothDeviceController.SerialPort
                 }
                 catch (Exception ex)
                 {
-                    Terminal?.SetDeviceStatusEx(ConnectionState.ConnectingToDevice, ConnectionSubstate.CtdException, ex.Message + $"\tHRESULT={ex.HResult}");
+                    Terminal?.SetDeviceStatusEx(ConnectionState.ConnectingToDevice, ConnectionSubstate.CtdException, ex.Message + $"\tHRESULT={ex.HResult:X8}");
                     Socket = null;
                 }
             }

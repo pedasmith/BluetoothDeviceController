@@ -14,8 +14,8 @@
     {
         UXReset,
         SfdStarted, SfdCompletedOk, SfdNoDeviceFound, SfdException, 
-        VdcStarted, VdcCompletedOk, VdcException, VdcGettingDevice,VdcGotDevice,  VdcReusingDevice, VdcNoDevice, VdcCachedServiceCount, VdcUncachedServiceCount, VdcNoServices,
-        CtdStarted, CtdCompletedOk, CtdException, CtdHostName, CtdServiceName, 
+        VdcStarted, VdcCompletedOk, VdcGettingDevice, VdcGotDevice,  VdcReusingDevice, VdcCachedServiceCount, VdcUncachedServiceCount, VdcNoDevice, VdcNoServices, VdcException,
+        CtdStarted, CtdCompletedOk, CtdHostName, CtdServiceName, CtdException,
 
         SRStarted, SRWaitingForData, SRGotData, SRCancelled, SRException,
     }

@@ -224,6 +224,11 @@ namespace WinUI3Controls
         {
             Log(status);
         }
+        private int VdcCachedServiceCount = -1;
+        private int VdcUncachedServiceCount = -1;
+        private string CtdHostName = "";
+        private string CtdServiceName = "";
+
         public void SetDeviceStatusEx(ConnectionState status, ConnectionSubstate substate, string text, double value)
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
@@ -235,6 +240,17 @@ namespace WinUI3Controls
                         switch (substate)
                         {
                             case ConnectionSubstate.UXReset:
+                                uiStatus.Text = "";
+                                uiSubstatus.Text = "";
+                                uiIcon.Text = " ";
+                                uiReadIcon.Text = " ";
+
+                                // Reset saved values
+                                VdcCachedServiceCount = -1;
+                                VdcUncachedServiceCount = -1;
+                                CtdHostName = "";
+                                CtdServiceName = "";
+
                                 LogClear();
                                 break;
                             default:
@@ -247,9 +263,21 @@ namespace WinUI3Controls
                         {
                             case ConnectionSubstate.SfdStarted:
                                 uiStatus.Text = "Scanning...";
+                                uiSubstatus.Text = "";
+                                uiIcon.Text = "🗲";
+                                uiReadIcon.Text = " ";
                                 break;
                             case ConnectionSubstate.SfdCompletedOk:
                                 uiStatus.Text = "Scanning OK";
+                                break;
+                            case ConnectionSubstate.SfdException:
+                                uiStatus.Text = "Unable to scan";
+                                uiIcon.Text = "🛑";
+                                uiSubstatus.Text = text;
+                                break;
+                            case ConnectionSubstate.SfdNoDeviceFound:
+                                uiStatus.Text = "No devices found";
+                                uiIcon.Text = "🛑";
                                 break;
                             default:
                                 handled = false;
@@ -259,6 +287,44 @@ namespace WinUI3Controls
                     case ConnectionState.VerifyDeviceCapabilities:
                         switch (substate)
                         {
+                            case ConnectionSubstate.VdcStarted:
+                                uiStatus.Text = "Checking...";
+                                uiSubstatus.Text = "";
+                                uiIcon.Text = "🖄";
+                                uiReadIcon.Text = " ";
+                                break;
+                            case ConnectionSubstate.VdcGettingDevice:
+                                uiStatus.Text = "Checking...getting device";
+                                break;
+                            case ConnectionSubstate.VdcGotDevice:
+                                uiStatus.Text = "Checking...got device";
+                                break;
+                            case ConnectionSubstate.VdcReusingDevice:
+                                uiStatus.Text = "Checking...reusing device";
+                                break;
+                            case ConnectionSubstate.VdcCachedServiceCount:
+                                VdcUncachedServiceCount = (int)value;
+                                break;
+                            case ConnectionSubstate.VdcUncachedServiceCount:
+                                VdcUncachedServiceCount = (int)value;
+                                break;
+                            case ConnectionSubstate.VdcCompletedOk:
+                                uiStatus.Text = "Device OK";
+                                break;
+
+                            case ConnectionSubstate.VdcNoDevice:
+                                uiStatus.Text = "Device is not a device";
+                                uiIcon.Text = "🛑";
+                                break;
+                            case ConnectionSubstate.VdcNoServices:
+                                uiStatus.Text = "Device has no COM services";
+                                uiIcon.Text = "🛑";
+                                break;
+                            case ConnectionSubstate.VdcException:
+                                uiStatus.Text = "Unable to check";
+                                uiIcon.Text = "🛑";
+                                uiSubstatus.Text = text;
+                                break;
                             default:
                                 handled = false;
                                 break;
@@ -269,9 +335,23 @@ namespace WinUI3Controls
                         {
                             case ConnectionSubstate.CtdStarted:
                                 uiStatus.Text = "Connecting...";
+                                uiSubstatus.Text = "";
+                                uiIcon.Text = "🗱";
+                                uiReadIcon.Text = " ";
                                 break;
                             case ConnectionSubstate.CtdCompletedOk:
                                 uiStatus.Text = "Connected";
+                                break;
+                            case ConnectionSubstate.CtdHostName:
+                                CtdHostName = text;
+                                break;
+                            case ConnectionSubstate.CtdServiceName:
+                                CtdServiceName = text;
+                                break;
+                            case ConnectionSubstate.CtdException:
+                                uiStatus.Text = "Unable to connect";
+                                uiSubstatus.Text = text;
+                                uiIcon.Text = "🛑";
                                 break;
                             default:
                                 handled = false;
@@ -281,6 +361,12 @@ namespace WinUI3Controls
                     case ConnectionState.SendingAndReceiving:
                         switch (substate)
                         {
+                            case ConnectionSubstate.SRStarted:
+                                uiSubstatus.Text = "";
+                                uiStatus.Text = "Ready";
+                                uiIcon.Text = "✔";
+                                uiReadIcon.Text = " ";
+                                break;
                             case ConnectionSubstate.SRWaitingForData:
                                 uiReadIcon.Text = "⚪";
                                 break;

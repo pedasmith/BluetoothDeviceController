@@ -23,7 +23,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="1">
-            <Button Content="List"  Click="OnListComm" />
+            <Button Content="Connect"  Click="OnListComm" />
         </StackPanel>
         <Grid Grid.Row="2" >
             <Grid.ColumnDefinitions>

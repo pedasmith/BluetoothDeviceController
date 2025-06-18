@@ -110,15 +110,17 @@
         </TabView>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="40" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" x:Name="uiIcon" />
-            <TextBlock Grid.Column="1" x:Name="uiStatus" />
-            <TextBlock Grid.Column="2" x:Name="uiSubstatus" />
-            <TextBlock Grid.Column="3" x:Name="uiReadIcon" />
+            <TextBlock Grid.Column="1">
+                <Run x:Name="uiStatus" />
+                <Run Text="   " />
+                <Run x:Name="uiSubstatus" />
+            </TextBlock>
+            <TextBlock Grid.Column="2" x:Name="uiReadIcon" />
         </Grid>
 
     </Grid>
