@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ByteOnlyDataReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConvertLatitudeLongitude.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CrcCalculations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nmea_Data.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NMEA_GPS_Parser.cs" />

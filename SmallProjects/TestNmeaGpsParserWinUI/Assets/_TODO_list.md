@@ -1,19 +1,9 @@
 ﻿
 # TODO list for the TestNmeaGpsParserWinUI3 app
 
-## Annnunciator isn't complete
+## Map, V1
 
-Although much of the annunciator is done, and all the foundation is complete, there's too much slop
-
-## Complete: Checksum
-
-From the *SiRF* NMEA PDF, page 2.1 in one of the footnotes.
-
-CKSUM is a two-hex character checksum as defined in the NMEA specification, NMEA-0183 Standard For Interfacing 
-Marine Electronic Devices. Checksum consists of a binary exclusive OR the lower 7 bits of each character after the “$” 
-and before the “*” symbols. The resulting 7-bit binary number is displayed as the ASCII equivalent of two hexadecimal 
-characters representing the contents of the checksum. Use of checksums is required on all input messages.
-
+- convert lat / long to Degrees Decimal (DD). 
 
 ## Smaller to-do items
 
@@ -45,3 +35,17 @@ Be able to copy data out from all tabs, including tabular data
 
 There's a bunch of input messages for a bunch of things. Should they be supported?
 Maybe have a user-enterable string and then I add the asterisk + checksum?
+
+
+## Complete: 2025-06-18 Annnunciator isn't complete
+
+Although much of the annunciator is done, and all the foundation is complete, there's too much slop
+
+## Complete: 2025-06-18 Checksum
+
+From the *SiRF* NMEA PDF, page 2.1 in one of the footnotes.
+
+CKSUM is a two-hex character checksum as defined in the NMEA specification, NMEA-0183 Standard For Interfacing 
+Marine Electronic Devices. Checksum consists of a binary exclusive OR the lower 7 bits of each character after the “$” 
+and before the “*” symbols. The resulting 7-bit binary number is displayed as the ASCII equivalent of two hexadecimal 
+characters representing the contents of the checksum. Use of checksums is required on all input messages.

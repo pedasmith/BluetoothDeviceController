@@ -39,6 +39,7 @@ namespace TestNmeaGpsParserWinUI
         {
             int nerror = 0;
             nerror += Nmea_Data.Test();
+            nerror += ConvertLatitudeLongitude.Test();
 
             return nerror;
         }
@@ -244,7 +245,22 @@ namespace Utilities
                 if (n > 0)
                 {
                     // Got some data from the device
-                    var str = oldLine + dr.ReadString(dr.UnconsumedBufferLength);
+                    string str = "";
+                    try
+                    {
+                        str = oldLine + dr.ReadString(dr.UnconsumedBufferLength);
+                    }
+                    catch (Exception)
+                    {
+                        // TODO: when set to Apple mode!
+                        byte[] bs = new byte[dr.UnconsumedBufferLength];
+                        dr.ReadBytes(bs);
+                        foreach (var b in bs)
+                        {
+                            str += $"{b:X2} ";
+                        }
+                        str = oldLine + str + "\r\n";
+                    }
                     oldLine = "";
                     if (str.Contains("\r\n"))
                     {

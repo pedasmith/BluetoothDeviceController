@@ -1216,7 +1216,12 @@ namespace Parsers.Nmea
 
     public class Nmea_Latitude_Fields
     {
-        int LatitudeDegrees, LatitudeMinutesInteger, LatitudeMinutesDecimal;
+        public Nmea_Latitude_Fields()
+        {
+        }
+
+        public int LatitudeDegrees;
+        int LatitudeMinutesInteger, LatitudeMinutesDecimal;
         public double LatitudeMinutes { get { return LatitudeMinutesInteger + (double)LatitudeMinutesDecimal / 10_000.0; } }
         public enum NorthSouthType { North, South };
         public NorthSouthType LatitudeNorthSouth;
@@ -1226,6 +1231,12 @@ namespace Parsers.Nmea
             return $"{LatitudeDegrees}° {LatitudeMinutes:F4} {LatitudeNorthSouth}";
         }
 
+        /// <summary>
+        /// Example latitude string: 4734.1234 and the NorthSouth is N or S.
+        /// </summary>
+        /// <param name="LatitudeString"></param>
+        /// <param name="LatitudeNorthSouthString"></param>
+        /// <returns></returns>
         public Nmea_Gps_Parser.ParseResult Parse(string LatitudeString, string LatitudeNorthSouthString)
         {
             bool parseOk = true;
@@ -1250,7 +1261,7 @@ namespace Parsers.Nmea
             switch (LatitudeNorthSouthString)
             {
                 case "N": LatitudeNorthSouth = NorthSouthType.North; break;
-                case "S": LatitudeNorthSouth = NorthSouthType.North; break;
+                case "S": LatitudeNorthSouth = NorthSouthType.South; break;
                 default:
                     return Nmea_Gps_Parser.ParseResult.LatitudeNorthSouthInvalid;
             }

@@ -303,7 +303,7 @@ namespace WinUI3Controls
                                 uiStatus.Text = "Checking...reusing device";
                                 break;
                             case ConnectionSubstate.VdcCachedServiceCount:
-                                VdcUncachedServiceCount = (int)value;
+                                VdcCachedServiceCount = (int)value;
                                 break;
                             case ConnectionSubstate.VdcUncachedServiceCount:
                                 VdcUncachedServiceCount = (int)value;
