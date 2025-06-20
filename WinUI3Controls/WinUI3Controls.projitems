@@ -19,7 +19,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)GpsControl.xaml.cs">
+    <Compile Include="C:\temp\2025\junk.nmea">
       <DependentUpon>GpsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)GpsMessageDetailControl.xaml.cs">
