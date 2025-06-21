@@ -37,7 +37,7 @@ namespace Utilities
             {
                 retval = -retval;
             }
-            if (retval < -180 || retval > 190)
+            if (retval < -180 || retval > 180)
             {
                 RuntimeConversionErrors++;
                 Log($"Error: convert lat returns {retval} which is out-of-range. Input {field}");

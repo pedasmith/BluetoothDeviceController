@@ -52,6 +52,8 @@ namespace TestNmeaGpsParserWinUI
                 //uiLog.Text += str + "\n";
             });
         }
+
+#if NEVER_EVER_DEFINED
         private void LogCopyable(string str)
         {
             UIThreadHelper.CallOnUIThread(this, () =>
@@ -59,6 +61,7 @@ namespace TestNmeaGpsParserWinUI
                 uiLogImportantData.Text += str + "\n";
             });
        }
+#endif
         private void LogClear(string header = "")
         {
             ;
@@ -110,7 +113,7 @@ var selected = await picker.PickSingleDeviceAsync(new Rect(50, 200, 10, 10)); //
                     {
                         nMatch++;
                         Log($"Info: device name={device.Name}");
-                        LogCopyable(device.Name);
+                        // // //LogCopyable(device.Name);
                         if (nMatch == 1) deviceInfoSelected = device; // first one
                     }
                     else
