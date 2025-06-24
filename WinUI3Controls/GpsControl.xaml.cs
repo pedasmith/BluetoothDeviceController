@@ -5,17 +5,13 @@ using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+
 using TestNmeaGpsParserWinUI;
 using Utilities;
-using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Diagnostics;
-using static System.Net.Mime.MediaTypeNames;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -155,7 +151,7 @@ namespace WinUI3Controls
                     uiHeadingTrue.Text = $"{e.HeadingDegreesTrue}";
                     uiMagneticVariation.Text = $"{e.MagneticVariation}";
 
-                    uiMap.AddLatitudeAndLongitude(e.Latitude.AsDecimal, e.Longitude.AsDecimal);
+                    uiMap.AddNmea(e);
                 }
             });
         }
