@@ -6,14 +6,9 @@ using Microsoft.UI.Xaml.Shapes;
 using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Devices.Bluetooth.Background;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.ApplicationSettings;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Windows.Foundation.Diagnostics;
+
 
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -39,10 +34,12 @@ namespace WinUI3Controls
             Detail = nmea.DetailString;
         }
     }
+
     public sealed partial class SimpleMapControl : UserControl
     {
         public SimpleMapControl()
         {
+            InitZoom();
             this.InitializeComponent();
             this.Loaded += SimpleMapControl_Loaded;
         }
@@ -51,117 +48,205 @@ namespace WinUI3Controls
 
         private void SimpleMapControl_Loaded(object sender, RoutedEventArgs e)
         {
-            OnAddFakePoints(null, null);
-        }
+            Canvas.SetLeft(uiMapItemCanvas, PADX);
+            Canvas.SetTop(uiMapItemCanvas, PADY);
 
-        private void OnViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+            //OnAddFakePoints(null, null);
+        }
+        private void OnMapCanvasSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (e.IsIntermediate) return;
-            SetZoom();
+            var rect = new RectangleGeometry();
+            rect.Rect = new Rect(0, 0, uiMapCanvas.ActualWidth, uiMapCanvas.ActualHeight);
+            uiMapCanvas.Clip = rect;
         }
 
-        private void OnViewChanged(ScrollView sender, object args)
+        int NPointReleasedSuppress = 0;
+        private void OnManipulationComplete(object sender, Microsoft.UI.Xaml.Input.ManipulationCompletedRoutedEventArgs e)
         {
-            SetZoom();
+            NPointReleasedSuppress++;
+
+            var newscale = e.Cumulative.Scale;
+            var startLeft = Canvas.GetLeft(uiMapItemCanvas);
+            var startTop = Canvas.GetTop(uiMapItemCanvas);
+
+            if (newscale != 1.0)
+            {
+                // Where is the final point?
+                var touchPosition = e.Position; // "the" touch position which isn't obvious for pinchy gestures.
+                var startLat = (touchPosition.X - startLeft) / ZoomFactor;
+                var startLong = (touchPosition.Y - startTop) / ZoomFactor;
+
+                // Zooming
+                ZoomFactor *= newscale;
+
+                var newStartLeft = touchPosition.X - (startLat * ZoomFactor);
+                var newStartTop = touchPosition.Y - (startLong * ZoomFactor);
+
+                UpdateZoom();
+                Canvas.SetLeft(uiMapItemCanvas, newStartLeft);
+                Canvas.SetTop(uiMapItemCanvas, newStartTop);
+
+                Log($"Complete: scale={ZoomFactor:F2} delta={newscale:F2} lat={startLat:F2} start x={startLeft:F2} y={startTop:F2}");
+            }
+            else
+            {
+                var dx = e.Cumulative.Translation.X;
+                var dy = e.Cumulative.Translation.Y;
+                // Panning
+                Canvas.SetLeft(uiMapItemCanvas, startLeft + dx);
+                Canvas.SetTop(uiMapItemCanvas, startTop + dy);
+                Log($"Complete: x={dx:F2} oldx={startLeft:F2} y={dy:F2} oldy={startTop:F2}");
+            }
         }
-        private double RegularLineThickness {  
-            get 
-            { 
-                var retval = 1.5 / uiZoom.ZoomFactor;
-                retval = Math.Max(.2, retval);
-                return retval;
-            } 
-        }
-        private void SetZoom()
+
+        private void OnPointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
-            // If the zoom level changed, change the line size
-            var newzoom = RegularLineThickness;
+            if (NPointReleasedSuppress <= 0)
+            {
+                var startLeft = Canvas.GetLeft(uiMapItemCanvas);
+                var startTop = Canvas.GetTop(uiMapItemCanvas);
 
-            uiMapPositionPolyline.StrokeThickness = newzoom;
-            uiCursorMostRecent.StrokeThickness = newzoom;
-            uiCursorStart.StrokeThickness = newzoom;
-            Log($"Zoom: zoom={uiZoom.ZoomFactor} thickness={newzoom}");
+                var touchPosition = e.GetCurrentPoint(uiZoom).Position; // "the" touch position which isn't obvious for pinchy gestures.
 
+                // where is the touchPosition in lat/long?
+                var lat = (touchPosition.X - startLeft) / ZoomFactor;
+
+
+
+                Log($"Release: touch x={touchPosition.X:F2} start x={startLeft:F2} lat={lat:F2} ");
+            }
+            NPointReleasedSuppress--;
+            if (NPointReleasedSuppress < 0) NPointReleasedSuppress = 0;
+        }
+
+        private void OnManipulationStarting(object sender, Microsoft.UI.Xaml.Input.ManipulationStartingRoutedEventArgs e)
+        {
+        }
+
+        private void OnManipulationStart(object sender, Microsoft.UI.Xaml.Input.ManipulationStartedRoutedEventArgs e)
+        {
+        }
+        public enum LogLevel {  Normal, None};
+        private double ZoomFactor { get; set; } = 1.0;
+        private double RegularLineThickness { get; } = 1;
+        private void UpdateZoom()
+        {
+            // InitZoom();
+            DS.Clear();
+
+            //uiMapPositionPolyline.Points.Clear();
+            uiMapPositionCanvas.Children.Clear();
+            uiMapMarkerCanvas.Children.Clear();
+            uiCursorMostRecent.Points.Clear();
+            uiCursorStart.Points.Clear();
+
+            int nsegments = 0;
+            foreach (var data in MapData)
+            {
+                nsegments += DrawMapDataItem(data, LogLevel.None);
+            }
+            Log($"UpdateZoom: nsegment={nsegments}");
+        }
+
+        private void InitZoom()
+        {
+            ZoomFactor = 1.0;
         }
 
         void OnClear(object sender, RoutedEventArgs e)
         {
-            uiMapPositionPolyline.Points.Clear();
+            uiMapPositionCanvas.Children.Clear();
             MapData.Clear();
         }
 
         void OnRedraw(object sender, RoutedEventArgs e)
         {
-            uiMapPositionPolyline.Points.Clear();
+            uiMapPositionCanvas.Children.Clear();
+            int nsegments = 0;
             foreach (var data in MapData)
             {
-                DrawMapDataItem(data);
+                nsegments += DrawMapDataItem(data, LogLevel.None);
             }
         }
 
 
         void OnAddFakePoints(object sender, RoutedEventArgs e)
         {
-            var lines = FakeNmea[CurrFakeNmea].Split("\r\n");
+            int nsegments = 0;
+            var lines = FakeNmea[CurrFakeNmea % FakeNmea.Length].Split("\r\n");
             foreach (var line in lines)
             {
                 var gprc = new GPRMC_Data(line);
-                AddNmea(gprc);
+                gprc.Latitude.LatitudeMinutesDecimal += (CurrFakeNmea * 50);
+                nsegments += AddNmea(gprc, LogLevel.None);
             }
 
             // Boop the index so next time the button is pressed we get the next set of data.
             CurrFakeNmea += 1;
-            if (CurrFakeNmea >= FakeNmea.Length)
-            {
-                CurrFakeNmea = 0;
-            }
+            Log($"Add fake points: nsegments={nsegments}");
         }
 
-        public void AddNmea(GPRMC_Data gprc)
+        public int AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal)
         {
+            int nsegments = 0;
             switch (gprc.ParseStatus)
             {
                 case Nmea_Gps_Parser.ParseResult.Ok:
                     var data = new MapDataItem(gprc);
                     MapData.Add(data);
-                    DrawMapDataItem(data);
-                    //AddLatitudeAndLongitude(mdi);
+                    nsegments += DrawMapDataItem(data, logLevel);
                     break;
                 default:
                     Log($"Error: FakePoints parse {gprc.ParseStatus} data {gprc.OriginalNmeaString}");
                     break;
             }
+            return nsegments;
         }
-        public void DrawMapDataItem(MapDataItem data)
+        public int DrawMapDataItem(MapDataItem data, LogLevel logLevel)
         {
-            AddLatitudeAndLongitude(data);
+            var retval = AddLatitudeAndLongitude(data, logLevel);
+            return retval;
         }
 
 
         class DrawingState
         {
+            public DrawingState() { Clear(); }
+            public void Clear()
+            {
+                StartingLatitude = double.MaxValue;
+                StartingLongitude = double.MaxValue;
+                IsFirstPoint = true;
+            }
+            public Line Line(double x1, double y1, double x2, double y2)
+            {
+                return new Line()
+                {
+                    Stroke = PositionLineBrush,
+                    StrokeThickness = 1.0,
+                    X1 = x1,
+                    Y1 = y1,
+                    X2 = x2,
+                    Y2 = y2,
+                };
+            }
+            public Line Line(Point p1, Point p2)
+            {
+                return new Line()
+                {
+                    Stroke = PositionLineBrush,
+                    StrokeThickness = 1.0,
+                    X1 = p1.X,
+                    Y1 = p1.Y,
+                    X2 = p2.X,
+                    Y2 = p2.Y,
+                };
+            }
             public double StartingLatitude = double.MaxValue;
             public double StartingLongitude = double.MaxValue;
-            public double MinX = 0.0;
-            public double MaxX = 00;
-            public double MinY = 0.0;
-            public double MaxY = 0.0;
+            public Point P1 { get; set; }
+            public bool IsFirstPoint = true;
 
-            public double DeltaMinX = 0.0;
-            public double DeltaMinY = 0.0;
-            public bool UpdateMinMax(double x, double y)
-            {
-                bool retval = false;
-                DeltaMinX = 0.0;
-                DeltaMinY = 0.0;
-                if (x < MinX) { DeltaMinX = MinX - x;  MinX = x; retval = true; }
-                if (x > MaxX) { MaxX = x; retval = true; }
-                if (y < MinY) { DeltaMinY = MinY - y;  MinY = y; retval = true; }
-                if (y > MaxY) { MaxY = y; retval = true; }
-                return retval;
-            }
-            public double Width {  get { return MaxX - MinX; } }
-            public double Height {  get { return MaxY - MinY; } }
         }
         DrawingState DS = new DrawingState();
 
@@ -177,126 +262,111 @@ namespace WinUI3Controls
         /// The Y value 0...large where 90N will be 0 and 90S a very large number. Like the X value, the difference between 4511.2345N 
         /// and 4511.2346N is "1". The weird Y system is needed because in XAML, lower Y values are at the top.
         /// AND the lat and longitude are all relative to the starting lat and long
+        /// 
+        /// Note: point X and Y values can also be negative; they aren't always positive.
         /// </summary>
-        /// <param name="latitude"></param>
-        /// <param name="longitude"></param>
-        /// <returns></returns>
+
         private Point LatitudeLongitudeToPoint(double latitude, double longitude)
         {
             var p = new Point(
-                ((longitude - DS.StartingLongitude) * 60 * 10000),
-                ((-(latitude - DS.StartingLatitude)) * 60 * 10000)
+                ZoomFactor * ((longitude - DS.StartingLongitude) * 60 * 10000),
+                ZoomFactor * ((-(latitude - DS.StartingLatitude)) * 60 * 10000)
                 );
             return p;
         }
 
         Brush MarkerBrush = new SolidColorBrush(Colors.Red);
+        static Brush PositionLineBrush = new SolidColorBrush(Colors.Blue);
 
         /// <summary>
         /// Takes in a MapDataItem and plots it. Also uses StartingLatitude which might be double.MaxValue for the first point.
         /// </summary>
-
-        public void AddLatitudeAndLongitude(MapDataItem data)
+        public int AddLatitudeAndLongitude(MapDataItem data, LogLevel logLevel)
         {
-            var pline = uiMapPositionPolyline;
-            var line = pline.Points;
+            int retval = 0;
+            var holdercanvas = uiMapCanvas;
 
             double latitude = data.Latitude.AsDecimal + 90; // so it's 0...180
             double longitude = data.Longitude.AsDecimal + 180; // so it's 0..360    
 
 
-            if (line.Count == 0) // Is the first point
+            if (DS.IsFirstPoint) // current_points.Count == 0) // Is the first point
             {
                 DS.StartingLatitude = latitude;
                 DS.StartingLongitude = longitude;
-                SetZoom(); // This is the ideal time to set the starting zoom level
+                // InitZoom(); // This is the ideal time to set the starting zoom level
             }
-            var newp = LatitudeLongitudeToPoint(latitude , longitude);
-            line.Add(newp);
-            var sizeChanged = DS.UpdateMinMax(newp.X, newp.Y);
+            var newp = LatitudeLongitudeToPoint(latitude, longitude);
 
-            // Now throw in the adjustments
-            if (sizeChanged)
+            if (!DS.IsFirstPoint)
             {
-                uiMapCanvas.Width += DS.Width + PADX + PADX;
-                uiMapMarkerCanvas.Width = uiMapCanvas.Width;
 
-                uiMapCanvas.Height = DS.Height + PADY + PADY;
-                uiMapMarkerCanvas.Height = uiMapCanvas.Height;
-
-                if (DS.DeltaMinX != 0)
+                var maxDelta = Math.Max(Math.Abs(DS.P1.X - newp.X), Math.Abs(DS.P1.Y - newp.Y));
+                const double MAX_SEGMENT_LENGTH = 100.0;
+                if (maxDelta < MAX_SEGMENT_LENGTH)
                 {
-                    Canvas.SetLeft(pline, -DS.MinX + PADX);
-                    foreach (var child in uiMapMarkerCanvas.Children)
-                    {
-                        Canvas.SetLeft(child, Canvas.GetLeft(child) + DS.DeltaMinX);
-                    }
+                    var line = DS.Line(DS.P1, newp);
+                    uiMapPositionCanvas.Children.Add(line);
+                    retval += 1;
                 }
-                Canvas.SetTop(pline, -DS.MinY + PADY);
-                if (DS.DeltaMinY != 0)
+                else
                 {
-                    foreach (var child in uiMapMarkerCanvas.Children)
+                    var x1 = DS.P1.X;
+                    var y1 = DS.P1.Y;
+                    var nsegment = Math.Round(maxDelta / MAX_SEGMENT_LENGTH);
+                    var dx = (newp.X - DS.P1.X) / nsegment;
+                    var dy = (newp.Y - DS.P1.Y) / nsegment;
+                    for (double i = 1; i <= nsegment; i++)
                     {
-                        Canvas.SetTop(child, Canvas.GetTop(child) + DS.DeltaMinY);
+                        var line = DS.Line(x1, y1, x1+dx, y1+dy);
+                        uiMapPositionCanvas.Children.Add(line);
+
+                        x1 = x1 + dx;
+                        y1 = y1 + dy;
+                        retval += 1;
                     }
                 }
             }
-
-            // TODO: and move all the points in the uiMapMarkerCanvas?
+            DS.P1 = newp;
 
             const double MarkerSize = 3;
             var marker = new Ellipse() { Height = MarkerSize, Width = MarkerSize, StrokeThickness = 0, Fill = MarkerBrush };
             uiMapMarkerCanvas.Children.Add(marker);
-            Canvas.SetLeft(marker, newp.X - MarkerSize / 2.0 - DS.MinX + PADX);
-            Canvas.SetTop(marker, newp.Y - MarkerSize / 2.0 - DS.MinY + PADY);
+            Canvas.SetLeft(marker, newp.X - MarkerSize / 2.0);
+            Canvas.SetTop(marker, newp.Y - MarkerSize / 2.0);
 
             // Move the cursor
-            var lastp = line[line.Count - 1];
+            var lastp = newp; //  current_points[current_points.Count - 1];
             var CS = 4;
             uiCursorMostRecent.Points.Clear();
             uiCursorMostRecent.Points.Add(lastp);
-            uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y+CS));
-            uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y-CS));
+            uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y + CS));
+            uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y - CS));
             uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y));
-            uiCursorMostRecent.Points.Add(new Point(lastp.X-CS, lastp.Y));
-            uiCursorMostRecent.Points.Add(new Point(lastp.X+CS, lastp.Y));
+            uiCursorMostRecent.Points.Add(new Point(lastp.X - CS, lastp.Y));
+            uiCursorMostRecent.Points.Add(new Point(lastp.X + CS, lastp.Y));
             uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y));
-            Canvas.SetLeft(uiCursorMostRecent, -DS.MinX + PADX);
-            Canvas.SetTop(uiCursorMostRecent, -DS.MinY + PADY);
 
-            lastp = line[0];
-            uiCursorStart.Points.Clear();
-            uiCursorStart.Points.Add(lastp);
-            uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y + CS));
-            uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y - CS));
-            uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y));
-            uiCursorStart.Points.Add(new Point(lastp.X - CS, lastp.Y));
-            uiCursorStart.Points.Add(new Point(lastp.X + CS, lastp.Y));
-            uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y));
-            Canvas.SetLeft(uiCursorStart, -DS.MinX + PADX);
-            Canvas.SetTop(uiCursorStart, -DS.MinY + PADY);
-
-
-            // Fix up the ratio
-            var ratio = uiMapCanvas.Width / uiMapCanvas.Height;
-            if (ratio < 1.95)
+            if (uiCursorStart.Points.Count == 0)
             {
-                // Too skinny. Make it wider
-                uiMapCanvas.Width = uiMapCanvas.Height * RATIO_GOAL;
-                uiMapMarkerCanvas.Width = uiMapCanvas.Width;
+                lastp = newp; // current_points[0];
+                uiCursorStart.Points.Clear();
+                uiCursorStart.Points.Add(lastp);
+                uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y + CS));
+                uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y - CS));
+                uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y));
+                uiCursorStart.Points.Add(new Point(lastp.X - CS, lastp.Y));
+                uiCursorStart.Points.Add(new Point(lastp.X + CS, lastp.Y));
+                uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y));
             }
-            else if (ratio > 2.05) // Too wide. Make it taller
+            DS.IsFirstPoint = false;
+            switch (logLevel)
             {
-                uiMapCanvas.Height = uiMapCanvas.Width / RATIO_GOAL;
-                uiMapCanvas.Height = uiMapCanvas.Height;
+                case LogLevel.Normal:
+                    Log($"{newp.X:F2} {newp.Y:F2} ");
+                    break;
             }
-
-            Log($"{newp.X:F2} {newp.Y:F2} ");
-        }
-
-        private void SetMostRecent()
-        {
-
+            return retval;
         }
 
         class PointsData
@@ -398,7 +468,7 @@ $GPRMC,184521.000,A,4700.4021,N,12201.8033,W,000.0,151.7,200625,,,A
 $GPRMC,184522.000,A,4700.4020,N,12201.8033,W,001.2,306.5,200625,,,A
 $GPRMC,184523.000,A,4700.4022,N,12201.8037,W,000.0,306.5,200625,,,A",
 
-    };
+        };
 
 
     }

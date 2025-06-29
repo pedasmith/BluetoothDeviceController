@@ -27,7 +27,8 @@ namespace TestNmeaGpsParserWinUI
         public static MainWindow? MainWindowWindow = null;
         RfcommOptions Options = new RfcommOptions()
         {
-            Match = "xgps150"
+            Match = "xgps150",
+            // Match = "inReach", // uses unknown binary protocol
         };
         BluetoothCommTerminalAdapter? BtTerminalAdapter = null;
 

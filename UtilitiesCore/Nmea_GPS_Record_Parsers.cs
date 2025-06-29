@@ -1218,7 +1218,7 @@ namespace Parsers.Nmea
     public class Nmea_Latitude_Fields
     {
         public int LatitudeDegrees;
-        int LatitudeMinutesInteger, LatitudeMinutesDecimal;
+        public int LatitudeMinutesInteger, LatitudeMinutesDecimal;
         public double LatitudeMinutes { get { return LatitudeMinutesInteger + (double)LatitudeMinutesDecimal / 10_000.0; } }
         public double AsDecimal { get { return ConvertLatitudeLongitude.ConvertToDecimal(this); } }
 
