@@ -3,11 +3,15 @@
 
 ## Map, V1
 
-- convert lat / long to Degrees Decimal (DD). 
+- DONE convert lat / long to Degrees Decimal (DD). 
+- 2025-06-28 Status: trivial map with lines is being prototyped. But the line-drawing code in XAML is weak: too often, a long line will be truncated. 
+
+Work item : clump points that are close together. Update the circle so that a "clumpier" area is bigger, but with a max size.
+Work item : always draw the first 1000? segements and the last 2000? segments (but be careful of the overlap). 
 
 ## Smaller to-do items
 
-2025-06-17 Support the Dual switch set either way
+2025-06-17 ABANDONED Support the Dual switch set either way. Result: it's a weird binary that I haven't cracked 
 
 ### Completed
 
@@ -39,7 +43,7 @@ Maybe have a user-enterable string and then I add the asterisk + checksum?
 
 ## Complete: 2025-06-18 Annnunciator isn't complete
 
-Although much of the annunciator is done, and all the foundation is complete, there's too much slop
+Although much of the annunciator is done, and all the foundation is complete, there's too much slop. Update: all done!
 
 ## Complete: 2025-06-18 Checksum
 
