@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using Utilities;
 
 
 // Why is the weird #if here? Because FindBitPattern tries to be more nullable enabled.
@@ -1216,13 +1217,11 @@ namespace Parsers.Nmea
 
     public class Nmea_Latitude_Fields
     {
-        public Nmea_Latitude_Fields()
-        {
-        }
-
         public int LatitudeDegrees;
-        int LatitudeMinutesInteger, LatitudeMinutesDecimal;
+        public int LatitudeMinutesInteger, LatitudeMinutesDecimal;
         public double LatitudeMinutes { get { return LatitudeMinutesInteger + (double)LatitudeMinutesDecimal / 10_000.0; } }
+        public double AsDecimal { get { return ConvertLatitudeLongitude.ConvertToDecimal(this); } }
+
         public enum NorthSouthType { North, South };
         public NorthSouthType LatitudeNorthSouth;
 
@@ -1279,6 +1278,7 @@ namespace Parsers.Nmea
 
         public int LongitudeDegrees, LongitudeMinutesInteger, LongitudeMinutesDecimal;
         public double LongitudeMinutes { get { return LongitudeMinutesInteger + (double)LongitudeMinutesDecimal / 10_000.0; } }
+        public double AsDecimal {  get { return ConvertLatitudeLongitude.ConvertToDecimal(this); } }
 
         public enum EastWestType { East, West };
         public EastWestType LongitudeEastWest;

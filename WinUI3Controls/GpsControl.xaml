@@ -25,8 +25,9 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Style="{StaticResource sTitle}">GPS control</TextBlock>
-        <TabView Grid.Row="1" SelectedIndex="2" VerticalAlignment="Stretch">
+        <TabView Grid.Row="1" SelectedIndex="0" VerticalAlignment="Stretch">
             <TabViewItem Header="Map">
+                <local:SimpleMapControl x:Name="uiMap" />
 
             </TabViewItem>
             <TabViewItem Header="History">
@@ -100,10 +101,27 @@
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Style="{StaticResource HeaderTextBlockStyle}">GPS Connection Log</TextBlock>
-                    <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch">
-                        <TextBlock x:Name="uiLog" Text="(program initialized)"  />
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="300" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource HeaderTextBlockStyle}">GPS Connection Log</TextBlock>
+                    <ScrollViewer Grid.Row="1" Grid.Column="0"  VerticalAlignment="Stretch">
+                        <TextBlock x:Name="uiLog" Text="(program initialized)" IsTextSelectionEnabled="True" />
                     </ScrollViewer>
+                    <Grid Grid.Row="1" Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Content="Clear" Click="OnNmeaCommandsClear" />
+                            <Button Content="Copy" Click="OnNmeaCommandsCopy" />
+                        </StackPanel>
+                        <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch">
+                            <TextBlock x:Name="uiNmeaCommands" IsTextSelectionEnabled="True" />
+                        </ScrollViewer>
+                    </Grid>
                 </Grid>
 
             </TabViewItem>

@@ -76,4 +76,7 @@
   <Import Project="..\..\UtilitiesCore\UtilitiesCore.projitems" Label="Shared" />
   <Import Project="..\..\BluetoothProtocolsSerial\BluetoothProtocolsSerial.projitems" Label="Shared" />
   <Import Project="..\..\WinUI3Controls\WinUI3Controls.projitems" Label="Shared" />
+  <ItemGroup>
+    <Compile Update="C:\Users\toomr\source\repos\BluetoothDeviceController\WinUI3Controls\GpsControl.xaml.cs" Link="GpsControl.xaml.cs" />
+  </ItemGroup>
 </Project>

@@ -5,12 +5,10 @@ using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+
 using TestNmeaGpsParserWinUI;
 using Utilities;
-using Windows.ApplicationModel.Background;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Diagnostics;
@@ -58,6 +56,15 @@ namespace WinUI3Controls
             var name = e.GetFirstPart();
             var summary = FindSummary(name);
             summary.Add(e); // It's an observablecollection, so everything updates automatically.
+
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
+            {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
+                {
+                    uiNmeaCommands.Text += e.OriginalNmeaString + "\r\n";
+                }
+            });
+
 
             if (name == CurrHistoryNmeaName)
             {
@@ -143,6 +150,8 @@ namespace WinUI3Controls
                     uiVelocityKnots.Text = $"{e.VelocityKnots}";
                     uiHeadingTrue.Text = $"{e.HeadingDegreesTrue}";
                     uiMagneticVariation.Text = $"{e.MagneticVariation}";
+
+                    uiMap.AddNmea(e);
                 }
             });
         }
@@ -206,6 +215,18 @@ namespace WinUI3Controls
         public void ErrorFromDevice(string error)
         {
             Log(error);
+        }
+        void OnNmeaCommandsClear(object sender, RoutedEventArgs e)
+        {
+            uiNmeaCommands.Text = "";
+        }
+        void OnNmeaCommandsCopy(object sender, RoutedEventArgs e)
+        {
+            var text = uiNmeaCommands.Text;
+            var dp = new DataPackage();
+            dp.RequestedOperation = DataPackageOperation.Copy;
+            dp.SetText(text);
+            Clipboard.SetContent(dp);
         }
 
         public void ReceivedData(string message)

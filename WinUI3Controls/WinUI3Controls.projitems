@@ -17,6 +17,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)SimpleMapControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)GpsControl.xaml.cs">
@@ -24,6 +28,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)GpsMessageDetailControl.xaml.cs">
       <DependentUpon>GpsMessageDetailControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)SimpleMapControl.xaml.cs">
+      <DependentUpon>SimpleMapControl.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>
