@@ -8,6 +8,8 @@
 
 Work item : DONE 2025-06-29 clump points that are close together. Update the circle so that a "clumpier" area is bigger, but with a max size.
 Work item : always draw the first 1000? segements and the last 2000? segments (but be careful of the overlap). 
+Work item: Colors seem off for start / end
+Work item: doesn't set the starting point reliably (it assumes the first point is the reference point, but it's not.)
 
 ## Smaller to-do items
 

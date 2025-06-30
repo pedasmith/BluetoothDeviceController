@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 
@@ -150,10 +151,6 @@ namespace WinUI3Controls
         private double RegularLineThickness { get; } = 1;
         private void UpdateZoom()
         {
-            // InitZoom();
-            DS.Clear();
-
-            //uiMapPositionPolyline.Points.Clear();
             uiMapPositionCanvas.Children.Clear();
             uiMapMarkerCanvas.Children.Clear();
             uiCursorMostRecent.Points.Clear();
@@ -165,22 +162,33 @@ namespace WinUI3Controls
 
         private int DrawLines(LogLevel logLevel)
         {
+            DS.Clear();
+
             int nstartsegments = 0;
             int nendsegments = 0;
             int i;
             for (i = MapData.Count - 1; i >= 0 && nendsegments < MAX_ENDING_SEGMENTS; i--)
             {
                 var data = MapData[i];
-                nendsegments += DrawMapDataItem(data, LineType.EndingLine, logLevel);
+                var pflag = PointTypeFlag.Normal;
+                if (i == MapData.Count - 1) pflag |= PointTypeFlag.IsLastPoint;
+                nendsegments += DrawMapDataItem(data, LineType.EndingLine, pflag, logLevel);
                 if (nendsegments > MAX_ENDING_SEGMENTS) break;
             }
             var EarliestEndMapItemIndex = i; // TODO: off by one?
+            DS.IsFirstPointOfSegment = true;
+            DS.EarliestPointOfLastSegment = DS.LastPoint;
             for (i = 0; i<= EarliestEndMapItemIndex; i++)
             {
                 var data = MapData[i];
-                nstartsegments += DrawMapDataItem(data, LineType.StartingLine, logLevel);
+                var pflag = PointTypeFlag.Normal;
+                if (i == 0) pflag |= PointTypeFlag.IsFirstPoint;
+                nstartsegments += DrawMapDataItem(data, LineType.StartingLine, pflag, logLevel);
                 if (nstartsegments > MAX_STARTING_SEGMENTS) break;
             }
+            // Draw the connector (TODO: except when I should not)
+            DS.LastPoint = DS.EarliestPointOfLastSegment; // reset the "last point"
+            nstartsegments += DrawMapDataItem(MapData[i], LineType.ConnectingLine, PointTypeFlag.Normal, logLevel);
             // TODO need the connector! and there's a weird jump between the earliest 'end' 
             // brush and the start of the 'start' brushes.
 
@@ -245,6 +253,8 @@ namespace WinUI3Controls
                             Log($"DBG: Added NMEA into group {prev.GroupedPoints.Count}");
                             var oldw = prev.Dot.Width;
                             var marker_size = CalculateMarkerSize(prev);
+
+                            // Update drawing
                             var delta = (marker_size - oldw) / 2.0;
                             if (delta > 0.0)
                             {
@@ -253,16 +263,20 @@ namespace WinUI3Controls
                                 Canvas.SetTop(prev.Dot, Canvas.GetTop(prev.Dot) - delta);
                             }
                         }
-                        else
+                        else // new last point
                         {
                             MapData.Add(data);
-                            nsegments += DrawMapDataItem(data, LineType.EndingLine, logLevel);
+
+                            // Update drawing
+                            nsegments += DrawMapDataItem(data, LineType.EndingLine, PointTypeFlag.IsLastPoint, logLevel);
                         }
                     }
-                    else
+                    else // is first point
                     {
                         MapData.Add(data);
-                        nsegments += DrawMapDataItem(data, LineType.EndingLine, logLevel);
+
+                        // Update Drawing
+                        nsegments += DrawMapDataItem(data, LineType.EndingLine, PointTypeFlag.IsFirstPoint, logLevel);
                     }
                     break;
                 default:
@@ -271,9 +285,9 @@ namespace WinUI3Controls
             }
             return nsegments;
         }
-        public int DrawMapDataItem(MapDataItem data, LineType lineType, LogLevel logLevel)
+        public int DrawMapDataItem(MapDataItem data, LineType lineType, PointTypeFlag pflag, LogLevel logLevel)
         {
-            var retval = DrawLatitudeAndLongitude(data, lineType, logLevel);
+            var retval = DrawLatitudeAndLongitude(data, lineType, pflag, logLevel);
             return retval;
         }
 
@@ -288,7 +302,8 @@ namespace WinUI3Controls
             {
                 StartingLatitude = double.MaxValue;
                 StartingLongitude = double.MaxValue;
-                IsFirstPoint = true;
+                IsFirstPointOfMap = true;
+                IsFirstPointOfSegment = true;
             }
 
             private DoubleCollection GetDash(LineType lineType)
@@ -297,35 +312,28 @@ namespace WinUI3Controls
                 // for an explanation of what these do.
                 // Weirdly, you can't reuse one of these.
 
-                var retval = new DoubleCollection();
                 switch (lineType)
                 {
-                    case LineType.StartingLine:
-                        retval.Add(1);
-                        break;
-                    default:
-                    case LineType.EndingLine:
-                        retval.Add(2);
-                        break;
-                    case LineType.SkippedIntermediate:
+                    case LineType.ConnectingLine:
+                        var retval = new DoubleCollection();
                         retval.Add(3);
                         retval.Add(1);
                         retval.Add(1);
                         retval.Add(1);
                         retval.Add(1);
                         retval.Add(1);
-                        break;
+                        return retval;
                 }
-                return retval;
+                return null;
             }
             private Brush GetLineBrush(LineType lineType)
             {
                 switch (lineType)
                 {
-                    case LineType.StartingLine: return PositionLineBrush2; // As of 2025-06-29, Green
+                    case LineType.StartingLine: return PositionLineBrush; // As of 2025-06-29, Green
                     default:
-                    case LineType.EndingLine: return PositionLineBrush;
-                    case LineType.SkippedIntermediate: return PositionLineBrush2;
+                    case LineType.EndingLine: return PositionLineBrush2;
+                    case LineType.ConnectingLine: return PositionLineBrush3;
                 }
             }
             public Line CreateLine(LineType lineType, double x1, double y1, double x2, double y2)
@@ -356,8 +364,10 @@ namespace WinUI3Controls
             }
             public double StartingLatitude = double.MaxValue;
             public double StartingLongitude = double.MaxValue;
-            public Point P1 { get; set; }
-            public bool IsFirstPoint = true;
+            public Point LastPoint { get; set; }
+            public Point EarliestPointOfLastSegment;
+            public bool IsFirstPointOfMap = true;
+            public bool IsFirstPointOfSegment = true;
 
         }
         DrawingState DS = new DrawingState();
@@ -397,14 +407,16 @@ namespace WinUI3Controls
         }
 
         Brush MarkerBrush = new SolidColorBrush(Colors.Red);
-        static Brush PositionLineBrush = new SolidColorBrush(Colors.Blue);
-        static Brush PositionLineBrush2 = new SolidColorBrush(Colors.Green);
-        public enum LineType {  StartingLine, EndingLine, SkippedIntermediate }
+        static Brush PositionLineBrush = new SolidColorBrush(Colors.DarkCyan);
+        static Brush PositionLineBrush2 = new SolidColorBrush(Colors.DarkGreen);
+        static Brush PositionLineBrush3 = new SolidColorBrush(Colors.Red);
+        public enum LineType {  StartingLine, EndingLine, ConnectingLine }
+        [Flags] public enum PointTypeFlag { Normal=0, IsFirstPoint=1, IsLastPoint=2 }
 
         /// <summary>
         /// Takes in a MapDataItem and plots it. Also uses StartingLatitude which might be double.MaxValue for the first point.
         /// </summary>
-        public int DrawLatitudeAndLongitude(MapDataItem data, LineType lineType, LogLevel logLevel)
+        public int DrawLatitudeAndLongitude(MapDataItem data, LineType lineType, PointTypeFlag pflag, LogLevel logLevel)
         {
             int retval = 0;
             var holdercanvas = uiMapCanvas;
@@ -413,32 +425,30 @@ namespace WinUI3Controls
             double longitude = data.Longitude.AsDecimal + 180; // so it's 0..360    
 
 
-            if (DS.IsFirstPoint) // current_points.Count == 0) // Is the first point
+            if (DS.IsFirstPointOfMap)  // Everything is relative to the first point
             {
                 DS.StartingLatitude = latitude;
                 DS.StartingLongitude = longitude;
-                // InitZoom(); // This is the ideal time to set the starting zoom level
             }
             var newp = LatitudeLongitudeToPoint(latitude, longitude);
 
-            if (!DS.IsFirstPoint)
+            if (!DS.IsFirstPointOfSegment)
             {
-
-                var maxDelta = Math.Max(Math.Abs(DS.P1.X - newp.X), Math.Abs(DS.P1.Y - newp.Y));
+                var maxDelta = Math.Max(Math.Abs(DS.LastPoint.X - newp.X), Math.Abs(DS.LastPoint.Y - newp.Y));
                 const double MAX_SEGMENT_LENGTH = 100.0;
                 if (maxDelta < MAX_SEGMENT_LENGTH)
                 {
-                    var line = DS.CreateLine(lineType, DS.P1, newp);
+                    var line = DS.CreateLine(lineType, DS.LastPoint, newp);
                     uiMapPositionCanvas.Children.Add(line);
                     retval += 1;
                 }
                 else
                 {
-                    var x1 = DS.P1.X;
-                    var y1 = DS.P1.Y;
+                    var x1 = DS.LastPoint.X;
+                    var y1 = DS.LastPoint.Y;
                     var nsegment = Math.Round(maxDelta / MAX_SEGMENT_LENGTH);
-                    var dx = (newp.X - DS.P1.X) / nsegment;
-                    var dy = (newp.Y - DS.P1.Y) / nsegment;
+                    var dx = (newp.X - DS.LastPoint.X) / nsegment;
+                    var dy = (newp.Y - DS.LastPoint.Y) / nsegment;
                     for (double i = 1; i <= nsegment; i++)
                     {
                         var line = DS.CreateLine(lineType, x1, y1, x1+dx, y1+dy);
@@ -450,7 +460,7 @@ namespace WinUI3Controls
                     }
                 }
             }
-            DS.P1 = newp;
+            DS.LastPoint = newp;
 
             var marker_size = CalculateMarkerSize(data);
             var marker = new Ellipse() { Height = marker_size, Width = marker_size, StrokeThickness = 0, Fill = MarkerBrush };
@@ -460,30 +470,32 @@ namespace WinUI3Controls
             data.Dot = marker;
 
             // Move the cursor
-            var lastp = newp; //  current_points[current_points.Count - 1];
             var CS = 4;
-            uiCursorMostRecent.Points.Clear();
-            uiCursorMostRecent.Points.Add(lastp);
-            uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y + CS));
-            uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y - CS));
-            uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y));
-            uiCursorMostRecent.Points.Add(new Point(lastp.X - CS, lastp.Y));
-            uiCursorMostRecent.Points.Add(new Point(lastp.X + CS, lastp.Y));
-            uiCursorMostRecent.Points.Add(new Point(lastp.X, lastp.Y));
-
-            if (uiCursorStart.Points.Count == 0)
+            if (pflag.HasFlag(PointTypeFlag.IsLastPoint))
             {
-                lastp = newp; // current_points[0];
-                uiCursorStart.Points.Clear();
-                uiCursorStart.Points.Add(lastp);
-                uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y + CS));
-                uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y - CS));
-                uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y));
-                uiCursorStart.Points.Add(new Point(lastp.X - CS, lastp.Y));
-                uiCursorStart.Points.Add(new Point(lastp.X + CS, lastp.Y));
-                uiCursorStart.Points.Add(new Point(lastp.X, lastp.Y));
+                uiCursorMostRecent.Points.Clear();
+                uiCursorMostRecent.Points.Add(newp);
+                uiCursorMostRecent.Points.Add(new Point(newp.X, newp.Y + CS));
+                uiCursorMostRecent.Points.Add(new Point(newp.X, newp.Y - CS));
+                uiCursorMostRecent.Points.Add(new Point(newp.X, newp.Y));
+                uiCursorMostRecent.Points.Add(new Point(newp.X - CS, newp.Y));
+                uiCursorMostRecent.Points.Add(new Point(newp.X + CS, newp.Y));
+                uiCursorMostRecent.Points.Add(new Point(newp.X, newp.Y));
             }
-            DS.IsFirstPoint = false;
+
+            if (pflag.HasFlag(PointTypeFlag.IsFirstPoint))
+            {
+                uiCursorStart.Points.Clear();
+                uiCursorStart.Points.Add(newp);
+                uiCursorStart.Points.Add(new Point(newp.X, newp.Y + CS));
+                uiCursorStart.Points.Add(new Point(newp.X, newp.Y - CS));
+                uiCursorStart.Points.Add(new Point(newp.X, newp.Y));
+                uiCursorStart.Points.Add(new Point(newp.X - CS, newp.Y));
+                uiCursorStart.Points.Add(new Point(newp.X + CS, newp.Y));
+                uiCursorStart.Points.Add(new Point(newp.X, newp.Y));
+            }
+            DS.IsFirstPointOfMap = false;
+            DS.IsFirstPointOfSegment = false;
             switch (logLevel)
             {
                 case LogLevel.Normal:
