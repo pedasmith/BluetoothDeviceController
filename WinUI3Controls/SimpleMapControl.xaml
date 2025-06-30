@@ -41,7 +41,7 @@
 
                         <Polyline x:Name="uiCursorMostRecent"
                           Points=""
-                          Stroke="LightBlue" StrokeThickness="2.5"
+                          Stroke="DarkCyan" StrokeThickness="2.5"
                           Canvas.Left="0" Canvas.Top="0" Opacity=".8"
                          />
 

@@ -2,12 +2,14 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Shapes;
 using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Windows.Foundation;
-using Windows.Foundation.Diagnostics;
+
 
 
 
@@ -25,6 +27,11 @@ namespace WinUI3Controls
         public Nmea_Longitude_Fields Longitude;
         public string Summary;
         public string Detail;
+        /// <summary>
+        /// List of all points involved with a group. A group might only have one point.
+        /// </summary>
+        public List<Nmea_Data> GroupedPoints = new List<Nmea_Data>();
+        public Ellipse Dot = null;
 
         public MapDataItem(GPRMC_Data nmea) 
         {
@@ -32,6 +39,22 @@ namespace WinUI3Controls
             Longitude = nmea.Longitude;
             Summary = nmea.SummaryString;
             Detail = nmea.DetailString;
+            GroupedPoints.Add(nmea);
+        }
+
+        /// <summary>
+        /// Returns the distance between two points. The distance is simply
+        /// the larger of the delta latitude and delta longitude. The value is always >= 0.
+        /// </summary>
+        /// <param name="value2"></param>
+        /// <returns></returns>
+        public double Distance(MapDataItem value2)
+        {
+            double retval = 0.0;
+            double lat = Math.Abs(value2.Latitude.AsDecimal - Latitude.AsDecimal);
+            double lon = Math.Abs(value2.Longitude.AsDecimal - Longitude.AsDecimal);
+            retval = Math.Max(lat, lon);
+            return retval;
         }
     }
 
@@ -108,11 +131,7 @@ namespace WinUI3Controls
 
                 var touchPosition = e.GetCurrentPoint(uiZoom).Position; // "the" touch position which isn't obvious for pinchy gestures.
 
-                // where is the touchPosition in lat/long?
                 var lat = (touchPosition.X - startLeft) / ZoomFactor;
-
-
-
                 Log($"Release: touch x={touchPosition.X:F2} start x={startLeft:F2} lat={lat:F2} ");
             }
             NPointReleasedSuppress--;
@@ -140,13 +159,36 @@ namespace WinUI3Controls
             uiCursorMostRecent.Points.Clear();
             uiCursorStart.Points.Clear();
 
-            int nsegments = 0;
-            foreach (var data in MapData)
-            {
-                nsegments += DrawMapDataItem(data, LogLevel.None);
-            }
+            var nsegments = DrawLines(LogLevel.None);
             Log($"UpdateZoom: nsegment={nsegments}");
         }
+
+        private int DrawLines(LogLevel logLevel)
+        {
+            int nstartsegments = 0;
+            int nendsegments = 0;
+            int i;
+            for (i = MapData.Count - 1; i >= 0 && nendsegments < MAX_ENDING_SEGMENTS; i--)
+            {
+                var data = MapData[i];
+                nendsegments += DrawMapDataItem(data, LineType.EndingLine, logLevel);
+                if (nendsegments > MAX_ENDING_SEGMENTS) break;
+            }
+            var EarliestEndMapItemIndex = i; // TODO: off by one?
+            for (i = 0; i<= EarliestEndMapItemIndex; i++)
+            {
+                var data = MapData[i];
+                nstartsegments += DrawMapDataItem(data, LineType.StartingLine, logLevel);
+                if (nstartsegments > MAX_STARTING_SEGMENTS) break;
+            }
+            // TODO need the connector! and there's a weird jump between the earliest 'end' 
+            // brush and the start of the 'start' brushes.
+
+            return nendsegments + nstartsegments;
+        }
+
+        const int MAX_STARTING_SEGMENTS = 5;
+        const int MAX_ENDING_SEGMENTS = 5;
 
         private void InitZoom()
         {
@@ -162,11 +204,7 @@ namespace WinUI3Controls
         void OnRedraw(object sender, RoutedEventArgs e)
         {
             uiMapPositionCanvas.Children.Clear();
-            int nsegments = 0;
-            foreach (var data in MapData)
-            {
-                nsegments += DrawMapDataItem(data, LogLevel.None);
-            }
+            int nsegments = DrawLines(LogLevel.None);
         }
 
 
@@ -193,8 +231,39 @@ namespace WinUI3Controls
             {
                 case Nmea_Gps_Parser.ParseResult.Ok:
                     var data = new MapDataItem(gprc);
-                    MapData.Add(data);
-                    nsegments += DrawMapDataItem(data, logLevel);
+                    if (MapData.Count >= 1)
+                    {
+                        // The 0.0001 is a ten-thousandth of a minute. But the distances
+                        // are in DD, so I need something a good bit smaller.
+                        const double GROUPING_DISTANCE = 0.0005 / 60.0; // about 5*1.8 meters
+                        var prev = MapData[MapData.Count - 1];
+                        var distance = prev.Distance(data);
+                        Log($"DBG: distance={distance}");
+                        if (distance < GROUPING_DISTANCE)
+                        {
+                            prev.GroupedPoints.Add(gprc); // and I'll just abandon the new MapDataItem
+                            Log($"DBG: Added NMEA into group {prev.GroupedPoints.Count}");
+                            var oldw = prev.Dot.Width;
+                            var marker_size = CalculateMarkerSize(prev);
+                            var delta = (marker_size - oldw) / 2.0;
+                            if (delta > 0.0)
+                            {
+                                Log($"DBG: resize dot; move left from {Canvas.GetLeft(prev.Dot)} by {delta}");
+                                Canvas.SetLeft(prev.Dot, Canvas.GetLeft(prev.Dot) - delta);
+                                Canvas.SetTop(prev.Dot, Canvas.GetTop(prev.Dot) - delta);
+                            }
+                        }
+                        else
+                        {
+                            MapData.Add(data);
+                            nsegments += DrawMapDataItem(data, LineType.EndingLine, logLevel);
+                        }
+                    }
+                    else
+                    {
+                        MapData.Add(data);
+                        nsegments += DrawMapDataItem(data, LineType.EndingLine, logLevel);
+                    }
                     break;
                 default:
                     Log($"Error: FakePoints parse {gprc.ParseStatus} data {gprc.OriginalNmeaString}");
@@ -202,40 +271,83 @@ namespace WinUI3Controls
             }
             return nsegments;
         }
-        public int DrawMapDataItem(MapDataItem data, LogLevel logLevel)
+        public int DrawMapDataItem(MapDataItem data, LineType lineType, LogLevel logLevel)
         {
-            var retval = AddLatitudeAndLongitude(data, logLevel);
+            var retval = DrawLatitudeAndLongitude(data, lineType, logLevel);
             return retval;
         }
 
 
         class DrawingState
         {
-            public DrawingState() { Clear(); }
+            public DrawingState() 
+            {
+                Clear(); 
+            }
             public void Clear()
             {
                 StartingLatitude = double.MaxValue;
                 StartingLongitude = double.MaxValue;
                 IsFirstPoint = true;
             }
-            public Line Line(double x1, double y1, double x2, double y2)
+
+            private DoubleCollection GetDash(LineType lineType)
+            {
+                // See https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.shapes.shape.strokedasharray?view=windows-app-sdk-1.7
+                // for an explanation of what these do.
+                // Weirdly, you can't reuse one of these.
+
+                var retval = new DoubleCollection();
+                switch (lineType)
+                {
+                    case LineType.StartingLine:
+                        retval.Add(1);
+                        break;
+                    default:
+                    case LineType.EndingLine:
+                        retval.Add(2);
+                        break;
+                    case LineType.SkippedIntermediate:
+                        retval.Add(3);
+                        retval.Add(1);
+                        retval.Add(1);
+                        retval.Add(1);
+                        retval.Add(1);
+                        retval.Add(1);
+                        break;
+                }
+                return retval;
+            }
+            private Brush GetLineBrush(LineType lineType)
+            {
+                switch (lineType)
+                {
+                    case LineType.StartingLine: return PositionLineBrush2; // As of 2025-06-29, Green
+                    default:
+                    case LineType.EndingLine: return PositionLineBrush;
+                    case LineType.SkippedIntermediate: return PositionLineBrush2;
+                }
+            }
+            public Line CreateLine(LineType lineType, double x1, double y1, double x2, double y2)
             {
                 return new Line()
                 {
-                    Stroke = PositionLineBrush,
+                    Stroke = GetLineBrush(lineType),
                     StrokeThickness = 1.0,
+                    StrokeDashArray = GetDash(lineType),
                     X1 = x1,
                     Y1 = y1,
                     X2 = x2,
                     Y2 = y2,
                 };
             }
-            public Line Line(Point p1, Point p2)
+            public Line CreateLine(LineType lineType, Point p1, Point p2)
             {
                 return new Line()
                 {
-                    Stroke = PositionLineBrush,
+                    Stroke = GetLineBrush(lineType),
                     StrokeThickness = 1.0,
+                    StrokeDashArray = GetDash(lineType),
                     X1 = p1.X,
                     Y1 = p1.Y,
                     X2 = p2.X,
@@ -275,13 +387,24 @@ namespace WinUI3Controls
             return p;
         }
 
+        private double CalculateMarkerSize(MapDataItem data)
+        {
+            const double MIN_MARKER_SIZE = 3;
+            const double MAX_MARKER_SIZE = 10;
+            var marker_size = MIN_MARKER_SIZE * data.GroupedPoints.Count;
+            marker_size = Math.Min(marker_size, MAX_MARKER_SIZE);
+            return marker_size;
+        }
+
         Brush MarkerBrush = new SolidColorBrush(Colors.Red);
         static Brush PositionLineBrush = new SolidColorBrush(Colors.Blue);
+        static Brush PositionLineBrush2 = new SolidColorBrush(Colors.Green);
+        public enum LineType {  StartingLine, EndingLine, SkippedIntermediate }
 
         /// <summary>
         /// Takes in a MapDataItem and plots it. Also uses StartingLatitude which might be double.MaxValue for the first point.
         /// </summary>
-        public int AddLatitudeAndLongitude(MapDataItem data, LogLevel logLevel)
+        public int DrawLatitudeAndLongitude(MapDataItem data, LineType lineType, LogLevel logLevel)
         {
             int retval = 0;
             var holdercanvas = uiMapCanvas;
@@ -305,7 +428,7 @@ namespace WinUI3Controls
                 const double MAX_SEGMENT_LENGTH = 100.0;
                 if (maxDelta < MAX_SEGMENT_LENGTH)
                 {
-                    var line = DS.Line(DS.P1, newp);
+                    var line = DS.CreateLine(lineType, DS.P1, newp);
                     uiMapPositionCanvas.Children.Add(line);
                     retval += 1;
                 }
@@ -318,7 +441,7 @@ namespace WinUI3Controls
                     var dy = (newp.Y - DS.P1.Y) / nsegment;
                     for (double i = 1; i <= nsegment; i++)
                     {
-                        var line = DS.Line(x1, y1, x1+dx, y1+dy);
+                        var line = DS.CreateLine(lineType, x1, y1, x1+dx, y1+dy);
                         uiMapPositionCanvas.Children.Add(line);
 
                         x1 = x1 + dx;
@@ -329,11 +452,12 @@ namespace WinUI3Controls
             }
             DS.P1 = newp;
 
-            const double MarkerSize = 3;
-            var marker = new Ellipse() { Height = MarkerSize, Width = MarkerSize, StrokeThickness = 0, Fill = MarkerBrush };
+            var marker_size = CalculateMarkerSize(data);
+            var marker = new Ellipse() { Height = marker_size, Width = marker_size, StrokeThickness = 0, Fill = MarkerBrush };
             uiMapMarkerCanvas.Children.Add(marker);
-            Canvas.SetLeft(marker, newp.X - MarkerSize / 2.0);
-            Canvas.SetTop(marker, newp.Y - MarkerSize / 2.0);
+            Canvas.SetLeft(marker, newp.X - marker_size / 2.0);
+            Canvas.SetTop(marker, newp.Y - marker_size / 2.0);
+            data.Dot = marker;
 
             // Move the cursor
             var lastp = newp; //  current_points[current_points.Count - 1];

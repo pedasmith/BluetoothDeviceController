@@ -10,7 +10,8 @@ namespace Utilities
     {
         private static int RuntimeConversionErrors = 0;
         /// <summary>
-        /// Returns a value -90 to 90; "S" is negative
+        /// Returns a value -90.00 to 90.00; "S" is negative
+        /// Example: lat 30 15.1234 is 30.251234 (I think :-)
         /// </summary>
         public static double ConvertToDecimal(Nmea_Latitude_Fields field)
         {
@@ -28,7 +29,7 @@ namespace Utilities
         }
 
         /// <summary>
-        /// Longitude: Returns a value -180 to 180; "W" is negative
+        /// Longitude: Returns a value -180.0 to 180.0; "W" is negative (e.g., Los Angeles is negative)
         /// </summary>
         public static double ConvertToDecimal(Nmea_Longitude_Fields field)
         {

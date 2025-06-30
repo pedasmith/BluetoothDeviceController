@@ -6,7 +6,7 @@
 - DONE convert lat / long to Degrees Decimal (DD). 
 - 2025-06-28 Status: trivial map with lines is being prototyped. But the line-drawing code in XAML is weak: too often, a long line will be truncated. 
 
-Work item : clump points that are close together. Update the circle so that a "clumpier" area is bigger, but with a max size.
+Work item : DONE 2025-06-29 clump points that are close together. Update the circle so that a "clumpier" area is bigger, but with a max size.
 Work item : always draw the first 1000? segements and the last 2000? segments (but be careful of the overlap). 
 
 ## Smaller to-do items

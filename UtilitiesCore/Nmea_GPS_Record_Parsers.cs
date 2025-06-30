@@ -1219,6 +1219,10 @@ namespace Parsers.Nmea
     {
         public int LatitudeDegrees;
         public int LatitudeMinutesInteger, LatitudeMinutesDecimal;
+        /// <summary>
+        /// Minutes part of the Latitude. Is the Integer part plus the decimal part 
+        /// (the decimal part is divided by 10_000 since it's stored as a number of ten-thousdands of a minute)
+        /// </summary>
         public double LatitudeMinutes { get { return LatitudeMinutesInteger + (double)LatitudeMinutesDecimal / 10_000.0; } }
         public double AsDecimal { get { return ConvertLatitudeLongitude.ConvertToDecimal(this); } }
 
