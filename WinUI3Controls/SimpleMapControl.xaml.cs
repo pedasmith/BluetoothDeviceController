@@ -1,17 +1,18 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Shapes;
 using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using TestNmeaGpsParserWinUI;
+using Utilities;
 using Windows.Foundation;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-
 
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -46,6 +47,7 @@ namespace WinUI3Controls
         /// <summary>
         /// Returns the distance between two points. The distance is simply
         /// the larger of the delta latitude and delta longitude. The value is always >= 0.
+        /// This isn't scaled, and isn't calculated using the DS.Starting positions
         /// </summary>
         /// <param name="value2"></param>
         /// <returns></returns>
@@ -57,31 +59,135 @@ namespace WinUI3Controls
             retval = Math.Max(lat, lon);
             return retval;
         }
+
+        public double Distance(double latitude0, double longitude0)
+        {
+            double retval = 0.0;
+            double lat = Math.Abs(latitude0 - Latitude.AsDecimalFromZero);
+            double lon = Math.Abs(longitude0 - Longitude.AsDecimalFromZero);
+            retval = Math.Max(lat, lon);
+            return retval;
+        }
     }
 
     public sealed partial class SimpleMapControl : UserControl
     {
+        Random R = new Random(); // I need a way to distinguish one map control from another. Would use the "address", but that's not a thing in C#.
+        int RandomValue = 0;
         public SimpleMapControl()
         {
-            InitZoom();
+            RandomValue = R.Next();
             this.InitializeComponent();
             this.Loaded += SimpleMapControl_Loaded;
+            this.Unloaded += SimpleMapControl_Unloaded;
         }
+
+        private void SimpleMapControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Log($"SimpleMapControl: Unloaded called: Random={RandomValue}");
+        }
+
+        public enum LogLevel { Normal, None };
+        const int MAX_STARTING_SEGMENTS = 10;
+        const int MAX_ENDING_SEGMENTS = 10;
+        const double SCALEFACTOR_INIT = 3.0;
+
+        // Constants for the size and shape of the map area
+        //const double RATIO_GOAL = 2.0; // E.g, 2.0 means twice as wide as it is high
+        //const double PADX = 200;
+        //const double PADY = PADX / RATIO_GOAL;
+        static Brush MarkerBrush = new SolidColorBrush(Colors.Red);
+        static Brush PositionLineStartingBrush = new SolidColorBrush(Colors.DarkGreen);
+        static Brush PositionLineEndingBrush = new SolidColorBrush(Colors.DarkCyan);
+        static Brush PositionLineBrush3 = new SolidColorBrush(Colors.Red);
+        public enum LineType { StartingLine, EndingLine, ConnectingLine }
+        [Flags] public enum PointTypeFlag { Normal = 0, IsFirstPoint = 1, IsLastPoint = 2 }
 
         List<MapDataItem> MapData = new List<MapDataItem>();
-
+        DrawingState DS = new DrawingState();
+        int HighlightedMapDataItemIndex = -1;
+        Task FocusReporterTask;
+        CancellationTokenSource Frt_Cts = new CancellationTokenSource();
+        CancellationToken Frt_CT;
+        bool FirstCallToLoaded = true;
         private void SimpleMapControl_Loaded(object sender, RoutedEventArgs e)
         {
-            Canvas.SetLeft(uiMapItemCanvas, PADX);
-            Canvas.SetTop(uiMapItemCanvas, PADY);
+            Log($"SimpleMapControl: Loaded called: Random={RandomValue}");
+            // When a control is embedded in a tab control, it will be loaded and unloaded
+            if (!FirstCallToLoaded) return;
+            FirstCallToLoaded = false;
 
-            //OnAddFakePoints(null, null);
+            DS.Clear();
+            DS.ResetScale();
+            Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0);
+            Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0);
+            var ok = this.Focus(FocusState.Programmatic);
+            Log($"DBG: this.Focus return={ok}");
+            Frt_CT = Frt_Cts.Token;
+            FocusReporterTask = new Task(async () =>
+            {
+                int nfocuscalls = 0;
+                while (!Frt_CT.IsCancellationRequested)
+                {
+                    await Task.Delay(1000); // update every second
+                    UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () => {
+                        nfocuscalls++;
+                        var obj = FocusManager.GetFocusedElement(this.XamlRoot);
+                        var el = obj as FrameworkElement;
+                        if (obj == null)
+                        {
+                            UpdateFocusText($"No focussed element ({nfocuscalls})");
+                        }
+                        else if (el == null)
+                        {
+                            UpdateFocusText($"Object with focus is {obj.GetType().FullName} not FrameworkElement");
+                        }
+                        else
+                        {
+                            int nparent = 0;
+                            var originalElement = el;
+                            while (el != null && string.IsNullOrWhiteSpace(el.Name))
+                            {
+                                nparent++;
+                                el = el.Parent as FrameworkElement;
+                            }
+                            if (el != null)
+                            {
+                                UpdateFocusText($"Focus: name={el.Name} type={el.GetType().FullName} nparent={nparent} original={originalElement.GetType().FullName}");
+                            }
+                        }
+                    });
+
+                }
+            });
+            FocusReporterTask.Start();
+
+            OnAddFakePoints(null, null);
         }
+
+        /// <summary>
+        /// Can be called on any thread and will update only on UI thread.
+        /// </summary>
+        /// <param name="text"></param>
+        private void UpdateFocusText(string text)
+        {
+            UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () => { uiFocus.Text = text; });
+        }
+
+        #region UX_MANIPULATION
         private void OnMapCanvasSizeChanged(object sender, SizeChangedEventArgs e)
         {
             var rect = new RectangleGeometry();
             rect.Rect = new Rect(0, 0, uiMapCanvas.ActualWidth, uiMapCanvas.ActualHeight);
             uiMapCanvas.Clip = rect;
+
+            PositionuiPointInfoBorder();
+        }
+
+        private void PositionuiPointInfoBorder()
+        {
+            Canvas.SetLeft(uiPointInfoBorder, uiMapCanvas.ActualWidth - uiPointInfoBorder.ActualWidth);
+            Canvas.SetTop(uiPointInfoBorder, uiMapCanvas.ActualHeight - uiPointInfoBorder.ActualHeight);
         }
 
         int NPointReleasedSuppress = 0;
@@ -97,20 +203,22 @@ namespace WinUI3Controls
             {
                 // Where is the final point?
                 var touchPosition = e.Position; // "the" touch position which isn't obvious for pinchy gestures.
-                var startLat = (touchPosition.X - startLeft) / ZoomFactor;
-                var startLong = (touchPosition.Y - startTop) / ZoomFactor;
+                touchPosition = new Point(uiMapCanvas.ActualWidth / 2.0, uiMapCanvas.ActualHeight / 2.0); // always zoom around the center of the screen.
+                var startLat = (touchPosition.X - startLeft) / DS.ScaleFactor;
+                var startLong = (touchPosition.Y - startTop) / DS.ScaleFactor;
 
                 // Zooming
-                ZoomFactor *= newscale;
+                DS.ScaleFactor *= newscale;
 
-                var newStartLeft = touchPosition.X - (startLat * ZoomFactor);
-                var newStartTop = touchPosition.Y - (startLong * ZoomFactor);
+                var newStartLeft = touchPosition.X - (startLat * DS.ScaleFactor);
+                var newStartTop = touchPosition.Y - (startLong * DS.ScaleFactor);
 
-                UpdateZoom();
+                DoClear(); // Also does DS.Clear() but not DS.ResetScale() or remove mapdata points
+                var nsegment = RedrawAllLines(LogLevel.None);
                 Canvas.SetLeft(uiMapItemCanvas, newStartLeft);
                 Canvas.SetTop(uiMapItemCanvas, newStartTop);
 
-                Log($"Complete: scale={ZoomFactor:F2} delta={newscale:F2} lat={startLat:F2} start x={startLeft:F2} y={startTop:F2}");
+                Log($"Complete: scale={DS.ScaleFactor:F2} delta={newscale:F2} start lat={startLat:F2} x={startLeft:F2} newX={newStartLeft:F2} nsegment={nsegment}");
             }
             else
             {
@@ -119,7 +227,12 @@ namespace WinUI3Controls
                 // Panning
                 Canvas.SetLeft(uiMapItemCanvas, startLeft + dx);
                 Canvas.SetTop(uiMapItemCanvas, startTop + dy);
-                Log($"Complete: x={dx:F2} oldx={startLeft:F2} y={dy:F2} oldy={startTop:F2}");
+                Log($"Complete: pan x={dx:F2} oldx={startLeft:F2} y={dy:F2} oldy={startTop:F2}");
+                if (Math.Abs(dx) + Math.Abs(dy) < 2)
+                {
+                    // hardly panned at all; let's allow the next pointer released happen normally
+                    NPointReleasedSuppress--;
+                }
             }
         }
 
@@ -127,16 +240,43 @@ namespace WinUI3Controls
         {
             if (NPointReleasedSuppress <= 0)
             {
-                var startLeft = Canvas.GetLeft(uiMapItemCanvas);
-                var startTop = Canvas.GetTop(uiMapItemCanvas);
+                var touchPosition = e.GetCurrentPoint(uiMapPositionCanvas).Position;
 
-                var touchPosition = e.GetCurrentPoint(uiZoom).Position; // "the" touch position which isn't obvious for pinchy gestures.
+                // touchPosition.X matches the calculated value for moving the highlighted.
+                // X=DS.ScaleFactor * ((longitude - DS.StartingLongitude) * 60 * 10000),
+                // x/(DS.ScaleFactor* 60 * 10000) = longitude - DS.StartingLongitude
+                // x/(DS.ScaleFactor* 60 * 10000) + DS.StartingLongitude = longitude
 
-                var lat = (touchPosition.X - startLeft) / ZoomFactor;
-                Log($"Release: touch x={touchPosition.X:F2} start x={startLeft:F2} lat={lat:F2} ");
+                // y = DS.ScaleFactor * ((-(latitude - DS.StartingLatitude)) * 60 * 10000)
+                // y/(DS.ScaleFactor * 60 * 10000) = (-(latitude - DS.StartingLatitude))
+                // y/(DS.ScaleFactor * 60 * 10000) = -(latitude - DS.StartingLatitude)
+                // -y/(DS.ScaleFactor * 60 * 10000) = latitude - DS.StartingLatitude
+                // DS.StartingLatitude-y/(DS.ScaleFactor * 60 * 10000) = latitude
+
+
+                if (MapData.Count >= 1)
+                {
+
+                    var lon0 = touchPosition.X / (DS.ScaleFactor * 60 * 10000) + DS.StartingLongitude;
+                    var lat0 = -(touchPosition.Y / (DS.ScaleFactor * 60 * 10000)) + DS.StartingLatitude;
+                    int minIndex = 0;
+                    double minDistance = MapData[minIndex].Distance(lat0, lon0);
+                    for (int i = 1; i < MapData.Count; i++)
+                    {
+                        double d = MapData[i].Distance(lat0, lon0);
+                        if (d < minDistance)
+                        {
+                            minIndex = i;
+                            minDistance = d;
+                        }
+                    }
+                    MoveHighlight(minIndex);
+                    Log($"Release: closest={minIndex} touch x={touchPosition.X:F2} lon0={lon0}");
+                }
             }
             NPointReleasedSuppress--;
             if (NPointReleasedSuppress < 0) NPointReleasedSuppress = 0;
+            // this.Focus(FocusState.Programmatic);
         }
 
         private void OnManipulationStarting(object sender, Microsoft.UI.Xaml.Input.ManipulationStartingRoutedEventArgs e)
@@ -146,33 +286,141 @@ namespace WinUI3Controls
         private void OnManipulationStart(object sender, Microsoft.UI.Xaml.Input.ManipulationStartedRoutedEventArgs e)
         {
         }
-        public enum LogLevel {  Normal, None};
-        private double ZoomFactor { get; set; } = 1.0;
-        private double RegularLineThickness { get; } = 1;
-        private void UpdateZoom()
-        {
-            uiMapPositionCanvas.Children.Clear();
-            uiMapMarkerCanvas.Children.Clear();
-            uiCursorMostRecent.Points.Clear();
-            uiCursorStart.Points.Clear();
 
-            var nsegments = DrawLines(LogLevel.None);
-            Log($"UpdateZoom: nsegment={nsegments}");
+        private void OnKeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            int highlightdelta = 0;
+
+            switch (e.Key)
+            {
+                case Windows.System.VirtualKey.Left:
+                    highlightdelta = -1;
+                    break;
+                case Windows.System.VirtualKey.Right:
+                    highlightdelta = 1;
+                    break;
+                case (Windows.System.VirtualKey)190:
+                case Windows.System.VirtualKey.Decimal:
+                    // center around the highlighted item.
+                    if (HighlightedMapDataItemIndex >= 0)
+                    {
+                        var data = MapData[HighlightedMapDataItemIndex];
+                        var p = ToPoint(data);
+                        Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0 - p.X);
+                        Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0 - p.Y);
+                        Log($"DBG: center to highlighted {HighlightedMapDataItemIndex} left={p.X}");
+                    }
+                    break;
+            }
+
+            // TODO: reset when reset happens.
+            // Move the highlighted around a specific point.
+            if (highlightdelta != 0 && MapData.Count > 0)
+            {
+                if (HighlightedMapDataItemIndex < 0 && highlightdelta < 0)
+                {
+                    // Subtle UX here: if there's maps stuff on screen, press either left a bunch of times \
+                    // or right a bunch of times will highlight a bunch of points.
+                    // RIGHT will start a 0 and go higher. LEFT will start at the last entry and go lower.
+                    HighlightedMapDataItemIndex = MapData.Count - 1; 
+                }
+                else
+                {
+                    HighlightedMapDataItemIndex += highlightdelta;
+                }
+                MoveHighlight(HighlightedMapDataItemIndex);
+
+            }
+        }
+        private void MoveHighlight(int newIndex)
+        {
+            HighlightedMapDataItemIndex = newIndex;
+            if (HighlightedMapDataItemIndex >= MapData.Count)
+            {
+                HighlightedMapDataItemIndex = MapData.Count - 1;
+            }
+            if (HighlightedMapDataItemIndex < 0)
+            {
+                HighlightedMapDataItemIndex = 0;
+            }
+
+            var data = MapData[HighlightedMapDataItemIndex];
+            var p = ToPoint(data);
+            Log($"DBG: moving highlighted x={p.X} long0={data.Longitude.AsDecimalFromZero} index={HighlightedMapDataItemIndex}");
+
+            uiCursorHighlight.Visibility = Visibility.Visible;
+            Canvas.SetLeft(uiCursorHighlight, p.X - uiCursorHighlight.Width / 2.0);
+            Canvas.SetTop(uiCursorHighlight, p.Y - uiCursorHighlight.Height / 2.0);
+
+            uiPointInfo.Text = data.Detail;
+            //if (uiPointInfoBorder.Visibility == Visibility.Collapsed)
+            {
+                uiPointInfoBorder.Visibility = Visibility.Visible;
+                PositionuiPointInfoBorder();
+            }
+        }
+        void OnClear(object sender, RoutedEventArgs e)
+        {
+            DoClear();
+            MapData.Clear();
+            DS.ResetScale();
         }
 
-        private int DrawLines(LogLevel logLevel)
+        void OnRedraw(object sender, RoutedEventArgs e)
         {
-            DS.Clear();
+            DoClear(); // Also does DS.Clear() but not DS.ResetScale() and will not remove mapdata
+            DS.ResetScale();
+            int nsegments = RedrawAllLines(LogLevel.None);
+        }
 
+
+        void OnAddFakePoints(object sender, RoutedEventArgs e)
+        {
+            int nsegments = 0;
+            var lines = FakeNmea[DS.CurrFakeNmea % FakeNmea.Length].Split("\r\n");
+            foreach (var line in lines)
+            {
+                var gprc = new GPRMC_Data(line);
+                gprc.Latitude.LatitudeMinutesDecimal += (DS.CurrFakeNmea * 50);
+                nsegments += AddNmea(gprc, LogLevel.None);
+            }
+
+            // Boop the index so next time the button is pressed we get the next set of data.
+            Log($"Add fake points: nsegments={nsegments} from {DS.CurrFakeNmea}");
+            DS.CurrFakeNmea += 1;
+        }
+
+
+
+
+
+        #endregion
+
+        private int RedrawAllLines(LogLevel logLevel)
+        {
             int nstartsegments = 0;
             int nendsegments = 0;
             int i;
+
+            if (MapData.Count == 0) return 0; // nothing to redraw.
+
+            MapDataItem data;
+
+            // Set the StartingLatitude and StartingLongitude in a consistant way.
+            data = MapData[0];
+            DS.StartingLatitude = data.Latitude.AsDecimalFromZero; // Value is 0...180
+            DS.StartingLongitude = data.Longitude.AsDecimalFromZero; // Value is 0..360  
+            DS.IsFirstPointOfMap = false; // otherwise the first point that we set will be the starting point, which is wrong.
+
+            var nmapdataitem = 0;
             for (i = MapData.Count - 1; i >= 0 && nendsegments < MAX_ENDING_SEGMENTS; i--)
             {
-                var data = MapData[i];
+                data = MapData[i];
                 var pflag = PointTypeFlag.Normal;
                 if (i == MapData.Count - 1) pflag |= PointTypeFlag.IsLastPoint;
+                if (i == 0) pflag |= PointTypeFlag.IsFirstPoint;
                 nendsegments += DrawMapDataItem(data, LineType.EndingLine, pflag, logLevel);
+                nmapdataitem++;
                 if (nendsegments > MAX_ENDING_SEGMENTS) break;
             }
             var EarliestEndMapItemIndex = i; // TODO: off by one?
@@ -180,56 +428,39 @@ namespace WinUI3Controls
             DS.EarliestPointOfLastSegment = DS.LastPoint;
             for (i = 0; i<= EarliestEndMapItemIndex; i++)
             {
-                var data = MapData[i];
+                data = MapData[i];
                 var pflag = PointTypeFlag.Normal;
                 if (i == 0) pflag |= PointTypeFlag.IsFirstPoint;
                 nstartsegments += DrawMapDataItem(data, LineType.StartingLine, pflag, logLevel);
+                nmapdataitem++;
                 if (nstartsegments > MAX_STARTING_SEGMENTS) break;
             }
-            // Draw the connector (TODO: except when I should not)
-            DS.LastPoint = DS.EarliestPointOfLastSegment; // reset the "last point"
-            nstartsegments += DrawMapDataItem(MapData[i], LineType.ConnectingLine, PointTypeFlag.Normal, logLevel);
-            // TODO need the connector! and there's a weird jump between the earliest 'end' 
-            // brush and the start of the 'start' brushes.
+            // Draw the connector
+            if (nmapdataitem < MapData.Count)
+            {
+                DS.LastPoint = DS.EarliestPointOfLastSegment; // reset the "last point"
+                nstartsegments += DrawMapDataItem(MapData[i], LineType.ConnectingLine, PointTypeFlag.Normal, logLevel);
+            }
 
             return nendsegments + nstartsegments;
         }
 
-        const int MAX_STARTING_SEGMENTS = 5;
-        const int MAX_ENDING_SEGMENTS = 5;
 
-        private void InitZoom()
-        {
-            ZoomFactor = 1.0;
-        }
 
-        void OnClear(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Reinitializes the drawing entirely. When connected to a real GPS unit, will restart the position, clear the cursors, etc.
+        /// BUT will not reset the scale or remove MapData values
+        /// </summary>
+        void DoClear()
         {
+            DS.Clear(); // but do not reset the scale
+            Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0);
+            Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0);
+
             uiMapPositionCanvas.Children.Clear();
-            MapData.Clear();
-        }
-
-        void OnRedraw(object sender, RoutedEventArgs e)
-        {
-            uiMapPositionCanvas.Children.Clear();
-            int nsegments = DrawLines(LogLevel.None);
-        }
-
-
-        void OnAddFakePoints(object sender, RoutedEventArgs e)
-        {
-            int nsegments = 0;
-            var lines = FakeNmea[CurrFakeNmea % FakeNmea.Length].Split("\r\n");
-            foreach (var line in lines)
-            {
-                var gprc = new GPRMC_Data(line);
-                gprc.Latitude.LatitudeMinutesDecimal += (CurrFakeNmea * 50);
-                nsegments += AddNmea(gprc, LogLevel.None);
-            }
-
-            // Boop the index so next time the button is pressed we get the next set of data.
-            CurrFakeNmea += 1;
-            Log($"Add fake points: nsegments={nsegments}");
+            uiMapMarkerCanvas.Children.Clear();
+            uiCursorMostRecent.Points.Clear();
+            uiCursorStart.Points.Clear();
         }
 
         public int AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal)
@@ -285,7 +516,9 @@ namespace WinUI3Controls
             }
             return nsegments;
         }
-        public int DrawMapDataItem(MapDataItem data, LineType lineType, PointTypeFlag pflag, LogLevel logLevel)
+
+        #region DRAWING
+        private int DrawMapDataItem(MapDataItem data, LineType lineType, PointTypeFlag pflag, LogLevel logLevel)
         {
             var retval = DrawLatitudeAndLongitude(data, lineType, pflag, logLevel);
             return retval;
@@ -296,7 +529,8 @@ namespace WinUI3Controls
         {
             public DrawingState() 
             {
-                Clear(); 
+                Clear();
+                ScaleFactor = SCALEFACTOR_INIT;
             }
             public void Clear()
             {
@@ -304,7 +538,16 @@ namespace WinUI3Controls
                 StartingLongitude = double.MaxValue;
                 IsFirstPointOfMap = true;
                 IsFirstPointOfSegment = true;
+                CurrFakeNmea = 0;
             }
+            public void ResetScale()
+            {
+                ScaleFactor = SCALEFACTOR_INIT;
+            }
+
+            public double ScaleFactor = SCALEFACTOR_INIT;
+            public int CurrFakeNmea = 0;
+
 
             private DoubleCollection GetDash(LineType lineType)
             {
@@ -330,9 +573,9 @@ namespace WinUI3Controls
             {
                 switch (lineType)
                 {
-                    case LineType.StartingLine: return PositionLineBrush; // As of 2025-06-29, Green
+                    case LineType.StartingLine: return PositionLineStartingBrush; // As of 2025-06-29, Green
                     default:
-                    case LineType.EndingLine: return PositionLineBrush2;
+                    case LineType.EndingLine: return PositionLineEndingBrush;
                     case LineType.ConnectingLine: return PositionLineBrush3;
                 }
             }
@@ -370,12 +613,6 @@ namespace WinUI3Controls
             public bool IsFirstPointOfSegment = true;
 
         }
-        DrawingState DS = new DrawingState();
-
-        // Constants for the size and shape of the map area
-        const double RATIO_GOAL = 2.0; // E.g, 2.0 means twice as wide as it is high
-        const double PADX = 200;
-        const double PADY = PADX / RATIO_GOAL;
 
 
         /// <summary>
@@ -391,8 +628,8 @@ namespace WinUI3Controls
         private Point LatitudeLongitudeToPoint(double latitude, double longitude)
         {
             var p = new Point(
-                ZoomFactor * ((longitude - DS.StartingLongitude) * 60 * 10000),
-                ZoomFactor * ((-(latitude - DS.StartingLatitude)) * 60 * 10000)
+                DS.ScaleFactor * ((longitude - DS.StartingLongitude) * 60 * 10000),
+                DS.ScaleFactor * ((-(latitude - DS.StartingLatitude)) * 60 * 10000)
                 );
             return p;
         }
@@ -406,24 +643,25 @@ namespace WinUI3Controls
             return marker_size;
         }
 
-        Brush MarkerBrush = new SolidColorBrush(Colors.Red);
-        static Brush PositionLineBrush = new SolidColorBrush(Colors.DarkCyan);
-        static Brush PositionLineBrush2 = new SolidColorBrush(Colors.DarkGreen);
-        static Brush PositionLineBrush3 = new SolidColorBrush(Colors.Red);
-        public enum LineType {  StartingLine, EndingLine, ConnectingLine }
-        [Flags] public enum PointTypeFlag { Normal=0, IsFirstPoint=1, IsLastPoint=2 }
+        private Point ToPoint(MapDataItem data)
+        {
+            double latitude = data.Latitude.AsDecimalFromZero; // Value is 0...180
+            double longitude = data.Longitude.AsDecimalFromZero; // Value is 0..360    
+            var newp = LatitudeLongitudeToPoint(latitude, longitude);
+            return newp;
+
+        }
+
 
         /// <summary>
         /// Takes in a MapDataItem and plots it. Also uses StartingLatitude which might be double.MaxValue for the first point.
         /// </summary>
-        public int DrawLatitudeAndLongitude(MapDataItem data, LineType lineType, PointTypeFlag pflag, LogLevel logLevel)
+        private int DrawLatitudeAndLongitude(MapDataItem data, LineType lineType, PointTypeFlag pflag, LogLevel logLevel)
         {
             int retval = 0;
             var holdercanvas = uiMapCanvas;
-
-            double latitude = data.Latitude.AsDecimal + 90; // so it's 0...180
-            double longitude = data.Longitude.AsDecimal + 180; // so it's 0..360    
-
+            double latitude = data.Latitude.AsDecimalFromZero; // Value is 0...180
+            double longitude = data.Longitude.AsDecimalFromZero; // Value is 0..360    
 
             if (DS.IsFirstPointOfMap)  // Everything is relative to the first point
             {
@@ -504,7 +742,9 @@ namespace WinUI3Controls
             }
             return retval;
         }
+        #endregion
 
+#if NEVER_EVER_DEFINED
         class PointsData
         {
             public double MinX, MinY;
@@ -532,6 +772,7 @@ namespace WinUI3Controls
                 }
             }
         }
+#endif
 
         private void Log(string message)
         {
@@ -540,7 +781,6 @@ namespace WinUI3Controls
         }
 
 
-        private int CurrFakeNmea = 0;
         private string[] FakeNmea = new string[] {
 
             @"$GPRMC,184446.000,A,4700.6036,N,12200.8008,W,000.0,338.7,200625,,,A
@@ -605,7 +845,5 @@ $GPRMC,184522.000,A,4700.4020,N,12201.8033,W,001.2,306.5,200625,,,A
 $GPRMC,184523.000,A,4700.4022,N,12201.8037,W,000.0,306.5,200625,,,A",
 
         };
-
-
     }
 }

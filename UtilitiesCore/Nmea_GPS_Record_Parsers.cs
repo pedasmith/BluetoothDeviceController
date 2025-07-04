@@ -1225,6 +1225,7 @@ namespace Parsers.Nmea
         /// </summary>
         public double LatitudeMinutes { get { return LatitudeMinutesInteger + (double)LatitudeMinutesDecimal / 10_000.0; } }
         public double AsDecimal { get { return ConvertLatitudeLongitude.ConvertToDecimal(this); } }
+        public double AsDecimalFromZero {  get { return ConvertLatitudeLongitude.ConvertToDecimal(this) + 90.0; } }
 
         public enum NorthSouthType { North, South };
         public NorthSouthType LatitudeNorthSouth;
@@ -1282,7 +1283,8 @@ namespace Parsers.Nmea
 
         public int LongitudeDegrees, LongitudeMinutesInteger, LongitudeMinutesDecimal;
         public double LongitudeMinutes { get { return LongitudeMinutesInteger + (double)LongitudeMinutesDecimal / 10_000.0; } }
-        public double AsDecimal {  get { return ConvertLatitudeLongitude.ConvertToDecimal(this); } }
+        public double AsDecimal { get { return ConvertLatitudeLongitude.ConvertToDecimal(this); } }
+        public double AsDecimalFromZero { get { return ConvertLatitudeLongitude.ConvertToDecimal(this) + 180.0; } }
 
         public enum EastWestType { East, West };
         public EastWestType LongitudeEastWest;

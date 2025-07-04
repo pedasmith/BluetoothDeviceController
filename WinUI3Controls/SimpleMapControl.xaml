@@ -7,60 +7,66 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignWidth="400"  IsHitTestVisible="True" IsTabStop="True" IsTapEnabled="True" KeyUp="OnKeyUp">
 
-    <Grid>
+    <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <TextBlock>It's the map, it's the Map, it's the MAP</TextBlock>
-        <Border Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                BorderBrush="Magenta" BorderThickness="1"
-                    x:Name="uiZoom" Background="LightGray"
+        <Border x:Name="uiZoom" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                BorderBrush="Magenta" BorderThickness="1" Background="LightGray"
                 
-                  ManipulationMode="Scale,TranslateX,TranslateY"
+                ManipulationMode="Scale,TranslateX,TranslateY"
                 ManipulationStarting="OnManipulationStarting"
-                  ManipulationStarted="OnManipulationStart"
-                  ManipulationCompleted="OnManipulationComplete"  
+                ManipulationStarted="OnManipulationStart"
+                ManipulationCompleted="OnManipulationComplete"  
                 PointerReleased="OnPointerReleased"
                       >
 
 
-                <Canvas x:Name="uiMapCanvas"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SizeChanged="OnMapCanvasSizeChanged" >
-                    <Canvas x:Name="uiMapItemCanvas" HorizontalAlignment="Left" VerticalAlignment="Top" Width="1" Height="1">
-                        <Canvas x:Name="uiMapPositionCanvas" Width="1" Height="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                        <!--
-                        <Polyline x:Name="uiMapPositionPolyline"
-                          Points=""
-                          Stroke="Blue" StrokeThickness="1"
-                          Canvas.Left="0" Canvas.Top="0"
-                          />
-                        -->
+            <Canvas x:Name="uiMapCanvas"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SizeChanged="OnMapCanvasSizeChanged" >
+                <Canvas x:Name="uiMapItemCanvas" HorizontalAlignment="Left" VerticalAlignment="Top" Width="1" Height="1">
+                    <Canvas x:Name="uiMapPositionCanvas" Width="1" Height="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <Polyline x:Name="uiCursorMostRecent"
+                              Points=""
+                              Stroke="DarkCyan" StrokeThickness="2.5"
+                              Canvas.Left="0" Canvas.Top="0" Opacity=".8"
+                             />
 
-                        <Polyline x:Name="uiCursorMostRecent"
-                          Points=""
-                          Stroke="DarkCyan" StrokeThickness="2.5"
-                          Canvas.Left="0" Canvas.Top="0" Opacity=".8"
-                         />
-
-                        <Polyline x:Name="uiCursorStart"
-                          Points=""
-                          Stroke="DarkGreen" StrokeThickness="2.5"
-                          Canvas.Left="0" Canvas.Top="0" Opacity=".8"
-                         />
-
-                        <Canvas x:Name="uiMapMarkerCanvas" Width="100" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                    </Canvas> 
+                    <Polyline x:Name="uiCursorStart"
+                              Points=""
+                              Stroke="DarkGreen" StrokeThickness="2.5"
+                              Canvas.Left="0" Canvas.Top="0" Opacity=".8"
+                             />
+                    <Ellipse x:Name="uiCursorHighlight" Visibility="Collapsed"
+                                     Width="20" Height="20"
+                                     Stroke="DodgerBlue"
+                                     />
+                    <Canvas x:Name="uiMapMarkerCanvas" Width="100" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" />
                 </Canvas>
+                <Border x:Name="uiPointInfoBorder" BorderBrush="Gainsboro" Background="LightGoldenrodYellow"
+                            Width="400" Visibility="Collapsed" Padding="5">
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold" FontSize="16">Point Information</TextBlock>
+                        <TextBlock x:Name="uiPointInfo" SizeChanged="OnMapCanvasSizeChanged" />
+                    </StackPanel>
+                </Border>
+            </Canvas>
 
         </Border>
-        <StackPanel Orientation="Horizontal" Grid.Row="2">
-            <Button Content="Clear" Click="OnClear" />
-            <Button Content="Redraw" Click="OnRedraw" />
-            <Button Content="Add Fake" Click="OnAddFakePoints" />
-            <TextBlock x:Name="uiLog" MinWidth="200" />
+        <StackPanel Grid.Row="2">
+            <StackPanel Orientation="Horizontal" >
+                <Button Content="Clear" Click="OnClear" />
+                <Button Content="Redraw" Click="OnRedraw" />
+                <Button Content="Add Fake" Click="OnAddFakePoints" />
+                <TextBlock x:Name="uiFocus" MinWidth="200" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="uiLog" MinWidth="200" />
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

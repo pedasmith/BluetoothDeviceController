@@ -1,15 +1,33 @@
 ﻿
 # TODO list for the TestNmeaGpsParserWinUI3 app
 
+## Big TODO areas
+
+Connect the AdaFruit GPS via serial port (and write blog)
+Connect the AdaFruit GPS via Bluetooth (and write blog)
+
 ## Map, V1
 
-- DONE convert lat / long to Degrees Decimal (DD). 
-- 2025-06-28 Status: trivial map with lines is being prototyped. But the line-drawing code in XAML is weak: too often, a long line will be truncated. 
+2025-06-28 Status: trivial map with lines is being prototyped. But the line-drawing code in XAML is weak: too often, a long line will be truncated. 
 
-Work item : DONE 2025-06-29 clump points that are close together. Update the circle so that a "clumpier" area is bigger, but with a max size.
-Work item : always draw the first 1000? segements and the last 2000? segments (but be careful of the overlap). 
-Work item: Colors seem off for start / end
-Work item: doesn't set the starting point reliably (it assumes the first point is the reference point, but it's not.)
+Work item: focus is still wonky. On start, press arrows (works). click on map, then try arrows and they fail.
+Work item: when adding a bunch of points, at some point I need to transition to having start/end points via a redraw?
+
+DONE 2025-07-04: Select a point to "highlight" and show info about it. Arrow keys / space+Shift+space to go forward and back
+DONE 2025-07-03: Work item: add fake, pan, move to another tab, and then come back. The OnLoaded event triggers again!
+DONE 2025-07-03: Work item: Centering works, but the keyboard is weird because the focus doesn't stay put
+DONE 2025-07-02: Work item: clear doesn't clear the points or the cursors. User should be able to add fake, pan+zoom, clear, add fake and get the original back
+DONE 2025-07-02: Work item: add fake, zoom should result in the starting cursor being centered.
+DONE 2025-07-02: Work item: bug: do the fake, then zoom out. The start cursor vanishes!
+DONE 2025-07-02: Work item: always center relative to the center of the screen, not the touch point?
+DONE 2025-07-02: Work item: doesn't set the starting point reliably (it assumes the first point is the reference point, but it's not.)
+DONE 2025-07-02: Work item: center the first point exactly on screen (set top + left of the canvas)
+DONE 2025-07-02: Work item: move the constants etc to the to of the class
+DONE 2025-07-02: Work item : always draw the first 1000? segements and the last 2000? segments (but be careful of the overlap). 
+DONE 2025-07-01 Work item: Colors seem off for start / end
+DONE 2025-06-29 Work item : clump points that are close together. Update the circle so that a "clumpier" area is bigger, but with a max size.
+DONE convert lat / long to Degrees Decimal (DD). 
+
 
 ## Smaller to-do items
 
