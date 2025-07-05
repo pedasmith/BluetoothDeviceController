@@ -113,6 +113,9 @@ namespace WinUI3Controls
         private void SimpleMapControl_Loaded(object sender, RoutedEventArgs e)
         {
             Log($"SimpleMapControl: Loaded called: Random={RandomValue}");
+            var ok = this.Focus(FocusState.Programmatic);
+            Log($"DBG: this.Focus return={ok}");
+
             // When a control is embedded in a tab control, it will be loaded and unloaded
             if (!FirstCallToLoaded) return;
             FirstCallToLoaded = false;
@@ -121,8 +124,6 @@ namespace WinUI3Controls
             DS.ResetScale();
             Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0);
             Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0);
-            var ok = this.Focus(FocusState.Programmatic);
-            Log($"DBG: this.Focus return={ok}");
             Frt_CT = Frt_Cts.Token;
             FocusReporterTask = new Task(async () =>
             {
@@ -131,30 +132,41 @@ namespace WinUI3Controls
                 {
                     await Task.Delay(1000); // update every second
                     UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () => {
-                        nfocuscalls++;
-                        var obj = FocusManager.GetFocusedElement(this.XamlRoot);
-                        var el = obj as FrameworkElement;
-                        if (obj == null)
+                        try
                         {
-                            UpdateFocusText($"No focussed element ({nfocuscalls})");
-                        }
-                        else if (el == null)
-                        {
-                            UpdateFocusText($"Object with focus is {obj.GetType().FullName} not FrameworkElement");
-                        }
-                        else
-                        {
-                            int nparent = 0;
-                            var originalElement = el;
-                            while (el != null && string.IsNullOrWhiteSpace(el.Name))
+                            nfocuscalls++;
+                            var obj = FocusManager.GetFocusedElement(MainWindow.MainWindowWindow.Content.XamlRoot);
+                            var el = obj as FrameworkElement;
+                            if (obj == null)
                             {
-                                nparent++;
-                                el = el.Parent as FrameworkElement;
+                                UpdateFocusText($"No focussed element ({nfocuscalls})");
                             }
-                            if (el != null)
+                            else if (el == null)
                             {
-                                UpdateFocusText($"Focus: name={el.Name} type={el.GetType().FullName} nparent={nparent} original={originalElement.GetType().FullName}");
+                                UpdateFocusText($"Object with focus is {obj.GetType().FullName} not FrameworkElement ({nfocuscalls})  ");
                             }
+                            else
+                            {
+                                int nparent = 0;
+                                var originalElement = el;
+                                while (el != null && string.IsNullOrWhiteSpace(el.Name))
+                                {
+                                    nparent++;
+                                    el = el.Parent as FrameworkElement;
+                                }
+                                if (el != null)
+                                {
+                                    UpdateFocusText($"Focus: name={el.Name} type={el.GetType().FullName} nparent={nparent} original={originalElement.GetType().FullName} ({nfocuscalls})");
+                                }
+                                else
+                                {
+                                    UpdateFocusText($"Focus: null? name={el?.Name} type={el?.GetType().FullName} nparent={nparent} original={originalElement.GetType().FullName} ({nfocuscalls})");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            UpdateFocusText($"Focus: error: {ex.Message} ({nfocuscalls})");
                         }
                     });
 
@@ -238,6 +250,7 @@ namespace WinUI3Controls
 
         private void OnPointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
+            e.Handled = true;
             if (NPointReleasedSuppress <= 0)
             {
                 var touchPosition = e.GetCurrentPoint(uiMapPositionCanvas).Position;
