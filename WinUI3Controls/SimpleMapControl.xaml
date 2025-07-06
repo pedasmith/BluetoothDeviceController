@@ -26,7 +26,6 @@
                 PointerReleased="OnPointerReleased"
                       >
 
-
             <Canvas x:Name="uiMapCanvas"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SizeChanged="OnMapCanvasSizeChanged" >
                 <Canvas x:Name="uiMapItemCanvas" HorizontalAlignment="Left" VerticalAlignment="Top" Width="1" Height="1">
                     <Canvas x:Name="uiMapPositionCanvas" Width="1" Height="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
@@ -35,7 +34,6 @@
                               Stroke="DarkCyan" StrokeThickness="2.5"
                               Canvas.Left="0" Canvas.Top="0" Opacity=".8"
                              />
-
                     <Polyline x:Name="uiCursorStart"
                               Points=""
                               Stroke="DarkGreen" StrokeThickness="2.5"
@@ -61,7 +59,8 @@
             <StackPanel Orientation="Horizontal" >
                 <Button Content="Clear" Click="OnClear" />
                 <Button Content="Redraw" Click="OnRedraw" />
-                <Button Content="Add Fake" Click="OnAddFakePoints" />
+                <Button Content="CancelFocus" Click="OnCancelFocus" />
+                <Button Content="Add Sample" Click="OnAddSamplePoints" />
                 <TextBlock x:Name="uiFocus" MinWidth="200" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">

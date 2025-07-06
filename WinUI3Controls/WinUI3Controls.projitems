@@ -23,6 +23,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ConstantlyShowCurrentFocusTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GpsControl.xaml.cs">
       <DependentUpon>GpsControl.xaml</DependentUpon>
     </Compile>

@@ -6,13 +6,21 @@
 Connect the AdaFruit GPS via serial port (and write blog)
 Connect the AdaFruit GPS via Bluetooth (and write blog)
 
-## Map, V1
+## Map V1: Just plain lines, but with highlights, selection, and info.
 
 2025-06-28 Status: trivial map with lines is being prototyped. But the line-drawing code in XAML is weak: too often, a long line will be truncated. 
 
-Work item: focus is still wonky. On start, press arrows (works). click on map, then try arrows and they fail.
-Work item: when adding a bunch of points, at some point I need to transition to having start/end points via a redraw?
+Work item: highlight point that's grouped only shows one item
+Work item: ctrl-scroll should zoom
+Work item: add colors to app settings
 
+DONE 2025-08-06: Code cleanup: removed dead code, consistant logging, 
+DONE 2025-07-06: Work item: when adding a bunch of points, at some point I need to transition to having start/end points via a redraw? Turns out that 5k lines is fine, 10k is a bit laggy, and it just gets worse from there.
+DONE 2025-07-05: Work item: after scaling, the highlight circle is in the wrong position
+DONE 2025-07-06: Work item: add fake, clear, add fake: resulting map's point are all sized at the minimum size, not the correct size.
+DONE 2025-07-05: Work item: move the Focus code to a seperate file so I can write about it.
+DONE 2025-07-05: Work item: clear doesn't remove the point information or this highlight circle
+DONE 2025-07-04: Work item: focus is still wonky. On start, press arrows (works). click on map, then try arrows and they fail.
 DONE 2025-07-04: Select a point to "highlight" and show info about it. Arrow keys / space+Shift+space to go forward and back
 DONE 2025-07-03: Work item: add fake, pan, move to another tab, and then come back. The OnLoaded event triggers again!
 DONE 2025-07-03: Work item: Centering works, but the keyboard is weird because the focus doesn't stay put
