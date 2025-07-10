@@ -15,41 +15,28 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <TextBlock>It's the map, it's the Map, it's the MAP</TextBlock>
-        <Border x:Name="uiZoom" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                BorderBrush="Magenta" BorderThickness="1" Background="LightGray"
-                
+        <TextBlock Style="{StaticResource sMapTitle}">It's the map, it's the Map, it's the MAP</TextBlock>
+        <Border x:Name="uiZoom" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sMapBorder}"
                 ManipulationMode="Scale,TranslateX,TranslateY"
                 ManipulationStarting="OnManipulationStarting"
                 ManipulationStarted="OnManipulationStart"
                 ManipulationCompleted="OnManipulationComplete"  
                 PointerReleased="OnPointerReleased"
+                PointerWheelChanged="OnPointerWheelChange"
                       >
 
             <Canvas x:Name="uiMapCanvas"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SizeChanged="OnMapCanvasSizeChanged" >
                 <Canvas x:Name="uiMapItemCanvas" HorizontalAlignment="Left" VerticalAlignment="Top" Width="1" Height="1">
                     <Canvas x:Name="uiMapPositionCanvas" Width="1" Height="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                    <Polyline x:Name="uiCursorMostRecent"
-                              Points=""
-                              Stroke="DarkCyan" StrokeThickness="2.5"
-                              Canvas.Left="0" Canvas.Top="0" Opacity=".8"
-                             />
-                    <Polyline x:Name="uiCursorStart"
-                              Points=""
-                              Stroke="DarkGreen" StrokeThickness="2.5"
-                              Canvas.Left="0" Canvas.Top="0" Opacity=".8"
-                             />
-                    <Ellipse x:Name="uiCursorHighlight" Visibility="Collapsed"
-                                     Width="20" Height="20"
-                                     Stroke="DodgerBlue"
-                                     />
+                    <Polyline x:Name="uiCursorMostRecent" Style="{StaticResource sCursorMostRecent}" Points="" Canvas.Left="0" Canvas.Top="0" />
+                    <Polyline x:Name="uiCursorStart" Style="{StaticResource sCursorStart}" Points="" Canvas.Left="0" Canvas.Top="0" />
+                    <Ellipse x:Name="uiCursorHighlight" Visibility="Collapsed" Style="{StaticResource sCursorHighlight}" />
                     <Canvas x:Name="uiMapMarkerCanvas" Width="100" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" />
                 </Canvas>
-                <Border x:Name="uiPointInfoBorder" BorderBrush="Gainsboro" Background="LightGoldenrodYellow"
-                            Width="400" Visibility="Collapsed" Padding="5">
+                <Border x:Name="uiPointInfoBorder" Style="{StaticResource sPointInfoBorder}" Width="400" Visibility="Collapsed" >
                     <StackPanel>
-                        <TextBlock FontWeight="Bold" FontSize="16">Point Information</TextBlock>
-                        <TextBlock x:Name="uiPointInfo" SizeChanged="OnMapCanvasSizeChanged" />
+                        <TextBlock Style="{StaticResource sPointInfoTitle}">Point Information</TextBlock>
+                        <TextBlock x:Name="uiPointInfo" Style="{StaticResource sPointInfoText}" SizeChanged="OnMapCanvasSizeChanged" />
                     </StackPanel>
                 </Border>
             </Canvas>

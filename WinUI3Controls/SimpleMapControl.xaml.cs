@@ -190,6 +190,10 @@ namespace WinUI3Controls
         //      scale doesn't mean there must have been two points; scaling might be done differently in the future).
         // So: always disallow pointer released during a manipulation, and then disallow one after an end.
 
+        // Note: when the user just presses and releases with no panning or pinching, none of the manipulation
+        // events is triggered at all. Since I need to support panning, scaling (pinching) and selection (pointer released),
+        // I have to add interlocks and nonsense.
+
         private void OnManipulationStarting(object sender, Microsoft.UI.Xaml.Input.ManipulationStartingRoutedEventArgs e)
         {
         }
@@ -201,15 +205,16 @@ namespace WinUI3Controls
         }
         private void OnManipulationComplete(object sender, Microsoft.UI.Xaml.Input.ManipulationCompletedRoutedEventArgs e)
         {
+
             e.Handled = true;
             NPointReleasedSuppress++;
             InManipulation = false;
 
-            var newscale = e.Cumulative.Scale;
+            var newscaledelta = e.Cumulative.Scale;
             var startLeft = Canvas.GetLeft(uiMapItemCanvas);
             var startTop = Canvas.GetTop(uiMapItemCanvas);
 
-            if (newscale != 1.0)
+            if (newscaledelta != 1.0)
             {
                 // Where is the final point?
                 var touchPosition = e.Position; // "the" touch position which isn't obvious for pinchy gestures.
@@ -218,7 +223,7 @@ namespace WinUI3Controls
                 var startLong = (touchPosition.Y - startTop) / DS.ScaleFactor;
 
                 // Zooming
-                DS.ScaleFactor *= newscale;
+                DS.ScaleFactor *= newscaledelta;
 
                 var newStartLeft = touchPosition.X - (startLat * DS.ScaleFactor);
                 var newStartTop = touchPosition.Y - (startLong * DS.ScaleFactor);
@@ -228,7 +233,7 @@ namespace WinUI3Controls
                 Canvas.SetLeft(uiMapItemCanvas, newStartLeft);
                 Canvas.SetTop(uiMapItemCanvas, newStartTop);
                 DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex);
-                Log($"Manipulation Complete: scale={DS.ScaleFactor:F2} delta={newscale:F2} start lat={startLat:F2} x={startLeft:F2} newX={newStartLeft:F2} nsegment={nsegment}");
+                Log($"Manipulation Complete: scale={DS.ScaleFactor:F2} delta={newscaledelta:F2} start lat={startLat:F2} x={startLeft:F2} newX={newStartLeft:F2} nsegment={nsegment}");
             }
             else
             {
@@ -238,13 +243,45 @@ namespace WinUI3Controls
                 Canvas.SetLeft(uiMapItemCanvas, startLeft + dx);
                 Canvas.SetTop(uiMapItemCanvas, startTop + dy);
                 Log($"Manipulation Complete: pan x={dx:F2} oldx={startLeft:F2} y={dy:F2} oldy={startTop:F2}");
-                if (Math.Abs(dx) + Math.Abs(dy) < 2)
-                {
-                    // hardly panned at all; let's allow the next pointer released happen normally
-                    //NPointReleasedSuppress--;
-                }
             }
         }
+
+        private void OnPointerWheelChange(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            var point = e.GetCurrentPoint(uiMapPositionCanvas);
+            var mwd = point.Properties.MouseWheelDelta; // is, e.g., "120" for a single click
+            var keym = e.KeyModifiers;
+            if (!keym.HasFlag(Windows.System.VirtualKeyModifiers.Control))
+            {
+                return; // only zoom for ctrl-wheel
+            }
+            e.Handled = true;
+            var newscaledelta = (1.0 + (double)mwd * .005);
+            //Log($"DBG: mwd: {mwd} delta={newscaledelta} DS.ScaleFactor:{DS.ScaleFactor} new:{DS.ScaleFactor*newscaledelta}");
+            
+
+            var startLeft = Canvas.GetLeft(uiMapItemCanvas);
+            var startTop = Canvas.GetTop(uiMapItemCanvas);
+
+            // Where is the final point?
+            var touchPosition = new Point(uiMapCanvas.ActualWidth / 2.0, uiMapCanvas.ActualHeight / 2.0); // always zoom around the center of the screen.
+            var startLat = (touchPosition.X - startLeft) / DS.ScaleFactor;
+            var startLong = (touchPosition.Y - startTop) / DS.ScaleFactor;
+
+            // Zooming
+            DS.ScaleFactor *= newscaledelta;
+
+            var newStartLeft = touchPosition.X - (startLat * DS.ScaleFactor);
+            var newStartTop = touchPosition.Y - (startLong * DS.ScaleFactor);
+
+            DoClear(); // Also does DS.Clear() but not DS.ResetScale() or remove mapdata points
+            var nsegment = RedrawAllLines(LogLevel.None);
+            Canvas.SetLeft(uiMapItemCanvas, newStartLeft);
+            Canvas.SetTop(uiMapItemCanvas, newStartTop);
+            DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex);
+            Log($"Pointer Complete: mwd={mwd} scale={DS.ScaleFactor:F2} delta={newscaledelta:F2} start lat={startLat:F2} x={startLeft:F2} newX={newStartLeft:F2} nsegment={nsegment}");
+        }
+
 
         private void OnPointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
@@ -342,6 +379,7 @@ namespace WinUI3Controls
 
         private void DisplayHighlightByIndex(int newIndex)
         {
+            var ischanged = DS.HighlightedMapDataItemIndex != newIndex;
             DS.HighlightedMapDataItemIndex = newIndex;
             if (DS.HighlightedMapDataItemIndex >= MapData.Count)
             {
@@ -354,7 +392,10 @@ namespace WinUI3Controls
 
             var data = MapData[DS.HighlightedMapDataItemIndex];
             var p = ToPoint(data);
-            Log($"Highlight: setting highlighted x={p.X} long0={data.Longitude.AsDecimalFromZero} index={DS.HighlightedMapDataItemIndex}");
+            if (ischanged)
+            {
+                Log($"Highlight: setting highlighted x={p.X} long0={data.Longitude.AsDecimalFromZero} index={DS.HighlightedMapDataItemIndex}");
+            }
 
             uiCursorHighlight.Visibility = Visibility.Visible;
             Canvas.SetLeft(uiCursorHighlight, p.X - uiCursorHighlight.Width / 2.0);
@@ -854,5 +895,6 @@ $GPRMC,184522.000,A,4700.4020,N,12201.8033,W,001.2,306.5,200625,,,A
 $GPRMC,184523.000,A,4700.4022,N,12201.8037,W,000.0,306.5,200625,,,A",
 
         };
+
     }
 }

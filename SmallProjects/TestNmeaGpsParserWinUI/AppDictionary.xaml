@@ -8,4 +8,53 @@
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="24" />
     </Style>
+
+    <Style x:Key="sMapTitle" TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="24" />
+    </Style>
+
+    <Style x:Key="sMapBorder" TargetType="Border">
+        <Setter Property="BorderBrush" Value="Magenta" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Background" Value="LightGray" />
+    </Style>
+
+    <Style x:Key="sCursorHighlight" TargetType="Shape">
+        <Setter Property="Stroke" Value="DodgerBlue" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Width" Value="20" />
+    </Style>
+
+    <Style x:Key="sCursorStart" TargetType="Shape">
+        <Setter Property="Stroke" Value="DarkGreen" />
+        <Setter Property="StrokeThickness" Value="2.5" />
+        <Setter Property="Opacity" Value="0.8" />
+    </Style>
+    
+    <Style x:Key="sCursorMostRecent" TargetType="Shape">
+        <Setter Property="Stroke" Value="DarkCyan" />
+        <Setter Property="StrokeThickness" Value="2.5" />
+        <Setter Property="Opacity" Value="0.8" />
+    </Style>
+
+
+    <Style x:Key="sPointInfoBorder" TargetType="Border">
+        <Setter Property="BorderBrush" Value="Gainsboro" />
+        <Setter Property="BorderThickness" Value="10" />
+        <Setter Property="Background" Value="LightGoldenrodYellow" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="Margin" Value="4" />
+    </Style>
+
+    <Style x:Key="sPointInfoTitle" TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontFamily" Value="Comic Sans MS" />
+    </Style>
+    
+    <Style x:Key="sPointInfoText" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontFamily" Value="Lucida Calligraphy" />
+    </Style>
 </ResourceDictionary>
