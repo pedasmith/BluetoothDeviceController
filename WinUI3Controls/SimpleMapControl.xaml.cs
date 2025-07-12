@@ -25,21 +25,17 @@ namespace WinUI3Controls
     {
         public Nmea_Latitude_Fields Latitude;
         public Nmea_Longitude_Fields Longitude;
-        public string Summary;
-        public string Detail;
         /// <summary>
         /// List of all points involved with a group. A group might only have one point.
         /// </summary>
-        public List<Nmea_Data> GroupedPoints = new List<Nmea_Data>();
+        public List<Nmea_Data> GroupedNmea = new List<Nmea_Data>();
         public Ellipse Dot = null;
 
         public MapDataItem(GPRMC_Data nmea) 
         {
             Latitude = nmea.Latitude;
             Longitude = nmea.Longitude;
-            Summary = nmea.SummaryString;
-            Detail = nmea.DetailString;
-            GroupedPoints.Add(nmea);
+            GroupedNmea.Add(nmea);
         }
 
         /// <summary>
@@ -175,6 +171,12 @@ namespace WinUI3Controls
             PositionuiPointInfoBorder();
         }
 
+        private void OnPointInfoBorderSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            // Position the point info border in the bottom right corner of the map canvas.
+            PositionuiPointInfoBorder();
+        }
+
         private void PositionuiPointInfoBorder()
         {
             Canvas.SetLeft(uiPointInfoBorder, uiMapCanvas.ActualWidth - uiPointInfoBorder.ActualWidth);
@@ -232,7 +234,7 @@ namespace WinUI3Controls
                 var nsegment = RedrawAllLines(LogLevel.None);
                 Canvas.SetLeft(uiMapItemCanvas, newStartLeft);
                 Canvas.SetTop(uiMapItemCanvas, newStartTop);
-                DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex);
+                // ?? the highlighted item should not be updated here? DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex, DS.HighlightedMapDataItemGroupIndex);
                 Log($"Manipulation Complete: scale={DS.ScaleFactor:F2} delta={newscaledelta:F2} start lat={startLat:F2} x={startLeft:F2} newX={newStartLeft:F2} nsegment={nsegment}");
             }
             else
@@ -278,7 +280,7 @@ namespace WinUI3Controls
             var nsegment = RedrawAllLines(LogLevel.None);
             Canvas.SetLeft(uiMapItemCanvas, newStartLeft);
             Canvas.SetTop(uiMapItemCanvas, newStartTop);
-            DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex);
+            // the selected item isn't changed by this method! DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex, DS.HighlightedMapDataItemGroupIndex);
             Log($"Pointer Complete: mwd={mwd} scale={DS.ScaleFactor:F2} delta={newscaledelta:F2} start lat={startLat:F2} x={startLeft:F2} newX={newStartLeft:F2} nsegment={nsegment}");
         }
 
@@ -323,7 +325,7 @@ namespace WinUI3Controls
                             minDistance = d;
                         }
                     }
-                    DisplayHighlightByIndex(minIndex);
+                    DisplayHighlightByIndex(minIndex, 0);
                     Log($"Release: move highlight: closest={minIndex} touch x={touchPosition.X:F2} lon0={lon0}");
                 }
             }
@@ -332,22 +334,25 @@ namespace WinUI3Controls
         }
 
 
-
-        private void OnKeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        private void OnPointInfoMultiLeft(object sender, RoutedEventArgs e)
         {
-            int highlightdelta = 0;
+            DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex, DS.HighlightedMapDataItemGroupIndex-1);
+        }
+        private void OnPointInfoMultiRight(object sender, RoutedEventArgs e)
+        {
+            DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex, DS.HighlightedMapDataItemGroupIndex + 1);
+        }
 
-            switch (e.Key)
+
+        private void OnCharacter(UIElement sender, Microsoft.UI.Xaml.Input.CharacterReceivedRoutedEventArgs args)
+        {
+            switch (args.Character)
             {
-                case Windows.System.VirtualKey.Left:
-                    highlightdelta = -1;
+                default:
+                    Log($"Character: Character={args.Character}");
                     break;
-                case Windows.System.VirtualKey.Right:
-                    highlightdelta = 1;
-                    break;
-                case (Windows.System.VirtualKey)190:
-                case Windows.System.VirtualKey.Decimal:
-                    // center around the highlighted item.
+                case '.':
+                    Log($"Character: Character=DOT");
                     if (DS.HighlightedMapDataItemIndex >= 0)
                     {
                         var data = MapData[DS.HighlightedMapDataItemIndex];
@@ -357,55 +362,157 @@ namespace WinUI3Controls
                         Log($"KEY: '.' will set center to highlighted {DS.HighlightedMapDataItemIndex} left={p.X}");
                     }
                     break;
-            }
-
-            // Move the highlighted around a specific point.
-            if (highlightdelta != 0 && MapData.Count > 0)
-            {
-                if (DS.HighlightedMapDataItemIndex < 0 && highlightdelta < 0)
-                {
-                    // Subtle UX here: if there's maps stuff on screen, press either left a bunch of times 
-                    // or right a bunch of times will highlight a bunch of points.
-                    // RIGHT will start a 0 and go higher. LEFT will start at the last entry and go lower.
-                    DS.HighlightedMapDataItemIndex = MapData.Count - 1; 
-                }
-                else
-                {
-                    DS.HighlightedMapDataItemIndex += highlightdelta;
-                }
-                DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex);
+                case '<':
+                    Log($"Character: Character=LT");
+                    DisplayHighlightByIndexDelta(0, -1);
+                    break;
+                case '>':
+                    Log($"Character: Character=GT");
+                    DisplayHighlightByIndexDelta(0, 1);
+                    break;
             }
         }
 
-        private void DisplayHighlightByIndex(int newIndex)
+        private void OnKeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            switch (e.Key)
+            {
+                default:
+                    Log($"KEY: Key={e.Key}");
+                    e.Handled = false;
+                    break;
+                case Windows.System.VirtualKey.Left:
+                    DisplayHighlightByIndexDelta(-1, 0);
+                    e.Handled = true;
+                    break;
+                case Windows.System.VirtualKey.Right:
+                    DisplayHighlightByIndexDelta(1, 0);
+                    e.Handled = true;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// You can set either the indexDeta or the groupIndexDelta, but not both. And you can only set the
+        /// values to -1, 0, or 1.
+        /// </summary>
+        private void DisplayHighlightByIndexDelta(int indexDelta, int groupIndexDelta)
+        {
+            int index = DS.HighlightedMapDataItemIndex;
+            int groupIndex = DS.HighlightedMapDataItemGroupIndex;
+            if (index == -1)
+            {
+                // We're just initializing.
+                if (indexDelta < 0 || groupIndexDelta < 0)
+                {
+                    // If we're going backwards, then we need to start at the end.
+                    index = MapData.Count - 1;
+                    groupIndex = MapData[index].GroupedNmea.Count - 1; // wrap around to the last group.
+                }
+                else
+                {
+                    index = 0; // start at the first item.
+                    groupIndex = 0; // start at the first group.
+                }
+            }
+            else if (groupIndexDelta != 0)
+            {
+                groupIndex += groupIndexDelta;
+                if (groupIndex < 0)
+                {
+                    // we're going earlier and did an underflow. 
+                    index--;
+                    if (index < 0)
+                    {
+                        index = MapData.Count - 1; // wrap around to the end.
+                    }
+                    groupIndex = MapData[index].GroupedNmea.Count - 1; // wrap around to the last group.
+                }
+                else if (groupIndex >= MapData[index].GroupedNmea.Count)
+                {
+                    index++;
+                    if (index > MapData.Count - 1)
+                    {
+                        index = 0; // wrap around to the start.
+                    }
+                    groupIndex = 0; // wrap around to the first group.
+                }
+            }
+            else if (indexDelta != 0)
+            {
+                index += indexDelta;
+                if (index < 0)
+                {
+                    index = MapData.Count - 1;
+                    groupIndex = MapData[index].GroupedNmea.Count - 1; // wrap around to the last group.
+                }
+                else if (index >= MapData.Count)
+                {
+                    index = 0; // wrap around to the start.
+                    groupIndex = 0; // wrap around to the first group.
+                }
+            }
+            DisplayHighlightByIndex(index, groupIndex);
+        }
+
+        private void DisplayHighlightByIndex(int newIndex, int newGroupIndex)
         {
             var ischanged = DS.HighlightedMapDataItemIndex != newIndex;
-            DS.HighlightedMapDataItemIndex = newIndex;
-            if (DS.HighlightedMapDataItemIndex >= MapData.Count)
+
+            if (newIndex >= MapData.Count)
             {
-                DS.HighlightedMapDataItemIndex = MapData.Count - 1;
+                newIndex = MapData.Count - 1;
             }
-            if (DS.HighlightedMapDataItemIndex < 0)
+            if (newIndex < 0)
             {
-                DS.HighlightedMapDataItemIndex = 0;
+                newIndex = 0;
             }
 
-            var data = MapData[DS.HighlightedMapDataItemIndex];
+            var data = MapData[newIndex];
+
+            if (newGroupIndex >= data.GroupedNmea.Count)
+            {
+                newGroupIndex = data.GroupedNmea.Count - 1;
+            }
+            if (newGroupIndex < 0)
+            {
+                newGroupIndex = 0;
+            }
+            var nmea = data.GroupedNmea[newGroupIndex];
+
+            DS.HighlightedMapDataItemIndex = newIndex;
+            DS.HighlightedMapDataItemGroupIndex = newGroupIndex;
+
+
             var p = ToPoint(data);
             if (ischanged)
             {
                 Log($"Highlight: setting highlighted x={p.X} long0={data.Longitude.AsDecimalFromZero} index={DS.HighlightedMapDataItemIndex}");
             }
 
+            // Move the little circle highlight to be over the point.
             uiCursorHighlight.Visibility = Visibility.Visible;
             Canvas.SetLeft(uiCursorHighlight, p.X - uiCursorHighlight.Width / 2.0);
             Canvas.SetTop(uiCursorHighlight, p.Y - uiCursorHighlight.Height / 2.0);
 
-            uiPointInfo.Text = data.Detail;
+
+            // The whole point of this one method is to display this text :-)
+            uiPointInfo.Text = nmea.DetailString;
+
+            if (data.GroupedNmea.Count <= 1)
+            {
+                uiPointInfoMultiPanel.Visibility = Visibility.Collapsed;
+                DS.HighlightedMapDataItemGroupIndex = 0;
+            }
+            else
+            {
+                uiPointInfoMultiPanel.Visibility = Visibility.Visible;
+                uiPointInfoMultiIndex.Text = (DS.HighlightedMapDataItemGroupIndex + 1).ToString(); // Users prefer 1-based indexes.
+                uiPointMultiCount.Text = data.GroupedNmea.Count.ToString();
+            }
             if (uiPointInfoBorder.Visibility == Visibility.Collapsed)
             {
                 uiPointInfoBorder.Visibility = Visibility.Visible;
-                PositionuiPointInfoBorder();
             }
         }
         void OnClear(object sender, RoutedEventArgs e)
@@ -537,7 +644,7 @@ namespace WinUI3Controls
                         Log($"AddNmea: calculating new point distance={distance} (grouping distance is {GROUPING_DISTANCE})");
                         if (distance < GROUPING_DISTANCE)
                         {
-                            prev.GroupedPoints.Add(gprc); // and I'll just abandon the new MapDataItem
+                            prev.GroupedNmea.Add(gprc); // and I'll just abandon the new MapDataItem
                             var oldw = prev.Dot.Width;
                             var marker_size = CalculateMarkerSize(prev);
 
@@ -627,6 +734,7 @@ namespace WinUI3Controls
             /// </summary>
             public int CurrSampleNmea = 0;
             public int HighlightedMapDataItemIndex = -1;
+            public int HighlightedMapDataItemGroupIndex = 0; // Which item to display in the highlight panel.
 
 
             private DoubleCollection GetDash(LineType lineType)
@@ -717,7 +825,7 @@ namespace WinUI3Controls
 
         private double CalculateMarkerSize(MapDataItem data)
         {
-            var marker_size = MIN_MARKER_SIZE * data.GroupedPoints.Count;
+            var marker_size = MIN_MARKER_SIZE * data.GroupedNmea.Count;
             marker_size = Math.Min(marker_size, MAX_MARKER_SIZE);
             return marker_size;
         }

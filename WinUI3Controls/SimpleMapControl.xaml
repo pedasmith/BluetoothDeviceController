@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="400"  IsHitTestVisible="True" IsTabStop="True" IsTapEnabled="True" KeyUp="OnKeyUp">
+    d:DesignWidth="400"  IsHitTestVisible="True" IsTabStop="True" IsTapEnabled="True" KeyUp="OnKeyUp" CharacterReceived="OnCharacter">
 
     <Grid >
         <Grid.RowDefinitions>
@@ -33,10 +33,15 @@
                     <Ellipse x:Name="uiCursorHighlight" Visibility="Collapsed" Style="{StaticResource sCursorHighlight}" />
                     <Canvas x:Name="uiMapMarkerCanvas" Width="100" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" />
                 </Canvas>
-                <Border x:Name="uiPointInfoBorder" Style="{StaticResource sPointInfoBorder}" Width="400" Visibility="Collapsed" >
+                <Border x:Name="uiPointInfoBorder" Style="{StaticResource sPointInfoBorder}" Width="400" Visibility="Collapsed" SizeChanged="OnPointInfoBorderSizeChanged" >
                     <StackPanel>
                         <TextBlock Style="{StaticResource sPointInfoTitle}">Point Information</TextBlock>
                         <TextBlock x:Name="uiPointInfo" Style="{StaticResource sPointInfoText}" SizeChanged="OnMapCanvasSizeChanged" />
+                        <StackPanel x:Name="uiPointInfoMultiPanel" Orientation="Horizontal">
+                            <Button Content="&lt;" Click="OnPointInfoMultiLeft" />
+                            <Button Content=">" Click="OnPointInfoMultiRight" />
+                            <TextBlock><Run Text="Point number " /><Run x:Name="uiPointInfoMultiIndex" /><Run Text=" of " /><Run x:Name="uiPointMultiCount" /></TextBlock>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </Canvas>

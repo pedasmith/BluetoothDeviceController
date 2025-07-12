@@ -28,7 +28,6 @@
         <TabView Grid.Row="1" SelectedIndex="0" VerticalAlignment="Stretch">
             <TabViewItem Header="Map">
                 <local:SimpleMapControl x:Name="uiMap" />
-
             </TabViewItem>
             <TabViewItem Header="History">
                 <Grid>

@@ -6,14 +6,20 @@
 Connect the AdaFruit GPS via serial port (and write blog)
 Connect the AdaFruit GPS via Bluetooth (and write blog)
 
+
+## Map V2: Use https://leafletjs.com/
+
+https://leafletjs.com/ is a JavaScript library for interactive maps. It can be used with WinUI3 via WebView2, which allows you to embed web content in your app.
+
+
+
 ## Map V1: Just plain lines, but with highlights, selection, and info.
 
-2025-06-28 Status: trivial map with lines is being prototyped. But the line-drawing code in XAML is weak: too often, a long line will be truncated. 
 
-Work item: highlight point that's grouped only shows one item
-Work item: ctrl-scroll should zoom
-Work item: add colors to app settings
-
+DONE 2025-07-11: Work item: highlight point that's grouped only shows one item. Update: 2025-07-11 all works but need better keyboard manipulation. Should be able to just press an "arrow" to go left, left, left, left either by grouped or ungrouped items. 
+DONE 2025-07-10: Work item: add colors to app settings
+DONE 2025-07-10: 2025-06-28 Status: trivial map with lines is being prototyped. But the line-drawing code in XAML is weak: too often, a long line will be truncated. Status 2025-07-10: this is done enough; on to more map types
+DONE 2025-07-11: Work item: ctrl-scroll should zoom
 DONE 2025-08-06: Code cleanup: removed dead code, consistant logging, 
 DONE 2025-07-06: Work item: when adding a bunch of points, at some point I need to transition to having start/end points via a redraw? Turns out that 5k lines is fine, 10k is a bit laggy, and it just gets worse from there.
 DONE 2025-07-05: Work item: after scaling, the highlight circle is in the wrong position
