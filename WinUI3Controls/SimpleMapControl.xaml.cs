@@ -122,9 +122,6 @@ namespace WinUI3Controls
         static Brush PositionLineEndingBrush = new SolidColorBrush(Colors.DarkCyan);
         static Brush PositionLineBrush3 = new SolidColorBrush(Colors.Red);
 
-        // Set by the user (possibly indirectly)
-        int zzHighlightedMapDataItemIndex = -1;
-
         List<MapDataItem> MapData = new List<MapDataItem>();
         DrawingState DS = new DrawingState();
 

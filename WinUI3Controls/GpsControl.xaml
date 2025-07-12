@@ -27,7 +27,20 @@
         <TextBlock Grid.Row="0" Style="{StaticResource sTitle}">GPS control</TextBlock>
         <TabView Grid.Row="1" SelectedIndex="0" VerticalAlignment="Stretch">
             <TabViewItem Header="Map">
-                <local:SimpleMapControl x:Name="uiMap" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <ComboBox SelectionChanged="OnMapSelectionChange" >
+                            <ComboBoxItem Content="Simple" Tag="simpleV1" />
+                            <ComboBoxItem Content="Leaflet" Tag="leaflet" />
+                        </ComboBox>
+                    </StackPanel>
+                    <local:SimpleMapControl x:Name="uiSimpleMapV1" Grid.Row="1" Visibility="Collapsed" />
+                    <local:SimpleMapLeafletControl x:Name="uiSimpleMapLeaflet" Grid.Row="1" Visibility="Collapsed" />
+                </Grid>
             </TabViewItem>
             <TabViewItem Header="History">
                 <Grid>

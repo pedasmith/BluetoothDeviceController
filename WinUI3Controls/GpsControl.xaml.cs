@@ -9,9 +9,6 @@ using System.Collections.ObjectModel;
 using TestNmeaGpsParserWinUI;
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Foundation.Diagnostics;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -151,7 +148,7 @@ namespace WinUI3Controls
                     uiHeadingTrue.Text = $"{e.HeadingDegreesTrue}";
                     uiMagneticVariation.Text = $"{e.MagneticVariation}";
 
-                    uiMap.AddNmea(e);
+                    uiSimpleMapV1.AddNmea(e);
                 }
             });
         }
@@ -419,6 +416,26 @@ namespace WinUI3Controls
                     uiStatus.Text = status.ToString();
                 }
             });
+        }
+
+        private void OnMapSelectionChange(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1) return;
+
+            FrameworkElement visible = null;
+            FrameworkElement[] list = { uiSimpleMapV1, uiSimpleMapLeaflet };
+            var tag = (e.AddedItems[0] as FrameworkElement).Tag as string;
+            switch (tag)
+            {
+                default:
+                case "simpleV1": visible = uiSimpleMapV1; break;
+                case "leaflet": visible = uiSimpleMapLeaflet; break;
+            }
+            if (visible == null) return;
+            foreach (var item in list)
+            {
+                item.Visibility = item == visible ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
     }
 }
