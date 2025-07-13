@@ -6,11 +6,22 @@
 Connect the AdaFruit GPS via serial port (and write blog)
 Connect the AdaFruit GPS via Bluetooth (and write blog)
 
+## Issues with Visual Studio and WinUI3
+
+### No support for ms-appx
+
+See https://github.com/MicrosoftEdge/WebView2Feedback/issues/212
+See also: https://github.com/microsoft/microsoft-ui-xaml/issues/1967
+
+This restriction is not mentioned in https://learn.microsoft.com/en-us/microsoft-edge/webview2/get-started/winui
 
 ## Map V2: Use https://leafletjs.com/
 
 https://leafletjs.com/ is a JavaScript library for interactive maps. It can be used with WinUI3 via WebView2, which allows you to embed web content in your app.
 
+Work item: create sample data for all maps
+
+DONE 2025-07-12: First version of Leaflet lets me draw the demo map
 
 
 ## Map V1: Just plain lines, but with highlights, selection, and info.

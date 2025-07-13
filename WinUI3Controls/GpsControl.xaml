@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinUI3Controls"
     xmlns:summary="using:TestNmeaGpsParserWinUI"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -24,7 +25,14 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Style="{StaticResource sTitle}">GPS control</TextBlock>
+        <muxc:MenuBar Grid.Row="0">
+            <MenuBarItem Title="File">
+                <MenuFlyoutItem Text="Exit" Click="OnExitClick"/>
+            </MenuBarItem>
+            <MenuBarItem Title="Developer">
+                <MenuFlyoutItem Text="Add Sample Points" Click="OnMenuDeveloperAddSamplePoints"/>
+            </MenuBarItem>
+        </muxc:MenuBar>
         <TabView Grid.Row="1" SelectedIndex="0" VerticalAlignment="Stretch">
             <TabViewItem Header="Map">
                 <Grid>
@@ -33,7 +41,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <StackPanel>
-                        <ComboBox SelectionChanged="OnMapSelectionChange" >
+                        <ComboBox x:Name="uiMapSelectionComboBox" SelectionChanged="OnMapSelectionChange" >
                             <ComboBoxItem Content="Simple" Tag="simpleV1" />
                             <ComboBoxItem Content="Leaflet" Tag="leaflet" />
                         </ComboBox>

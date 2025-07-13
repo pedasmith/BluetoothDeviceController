@@ -52,7 +52,6 @@
                 <Button Content="Clear" Click="OnClear" />
                 <Button Content="Redraw" Click="OnRedraw" />
                 <Button Content="CancelFocus" Click="OnCancelFocus" />
-                <Button Content="Add Sample" Click="OnAddSamplePoints" />
                 <TextBlock x:Name="uiFocus" MinWidth="200" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">

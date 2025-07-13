@@ -5,10 +5,11 @@ using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.Threading.Tasks;
 using TestNmeaGpsParserWinUI;
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
+using static WinUI3Controls.SimpleMapControl;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -18,6 +19,11 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace WinUI3Controls
 {
+    public interface IDoGpsMap
+    {
+        Task<int> AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal);
+    }
+
     public sealed partial class GpsControl : UserControl, ITerminal
     {
         public ObservableCollection<NmeaMessageSummary> MessageHistory { get; } = new ObservableCollection<NmeaMessageSummary>();
@@ -26,6 +32,7 @@ namespace WinUI3Controls
         {
             this.InitializeComponent();
             this.DataContext = this;
+            this.Loaded += GpsControl_Loaded;
 
             NmeaParser.OnGpggaOk += NmeaParser_OnGpggaOk;
             NmeaParser.OnGpgllOk += NmeaParser_OnGpgllOk;
@@ -35,6 +42,17 @@ namespace WinUI3Controls
             NmeaParser.OnGpzdaOk += NmeaParser_OnGpzdaOk;
 
             NmeaParser.OnNmeaAll += NmeaParser_OnNmeaAll;
+        }
+
+        List<IDoGpsMap> AllMaps = new List<IDoGpsMap>();
+        private void GpsControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            AllMaps.Add(uiSimpleMapV1);
+            AllMaps.Add(uiSimpleMapLeaflet);
+
+
+            // Pick the "simple map"
+            uiMapSelectionComboBox.SelectedIndex = 1;
         }
 
         private string CurrHistoryNmeaName = "";
@@ -56,10 +74,9 @@ namespace WinUI3Controls
 
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
-                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
-                {
-                    uiNmeaCommands.Text += e.OriginalNmeaString + "\r\n";
-                }
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == true) return;
+
+                uiNmeaCommands.Text += e.OriginalNmeaString + "\r\n";
             });
 
 
@@ -92,14 +109,13 @@ namespace WinUI3Controls
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
-                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
-                {
-                    uiLatLongUpdateTime.Text = $"{e.Time}";
-                    uiLatitude.Text = $"{e.Latitude}";
-                    uiLongitude.Text = $"{e.Longitude}";
-                    
-                    uiUpdateSource.Text = $"{e.OpcodeString}";
-                }
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == true) return;
+
+                uiLatLongUpdateTime.Text = $"{e.Time}";
+                uiLatitude.Text = $"{e.Latitude}";
+                uiLongitude.Text = $"{e.Longitude}";
+
+                uiUpdateSource.Text = $"{e.OpcodeString}";
             });
         }
 
@@ -107,14 +123,13 @@ namespace WinUI3Controls
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
-                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
-                {
-                    uiMode.Text = $"{e.Mode}";
-                    uiLatLongUpdateTime.Text = $"{e.Time}";
-                    uiLatitude.Text = $"{e.Latitude}";
-                    uiLongitude.Text = $"{e.Longitude}";
-                    uiUpdateSource.Text = $"{e.OpcodeString}";
-                }
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == true) return;
+
+                uiMode.Text = $"{e.Mode}";
+                uiLatLongUpdateTime.Text = $"{e.Time}";
+                uiLatitude.Text = $"{e.Latitude}";
+                uiLongitude.Text = $"{e.Longitude}";
+                uiUpdateSource.Text = $"{e.OpcodeString}";
             });
         }
 
@@ -123,11 +138,10 @@ namespace WinUI3Controls
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
-                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
-                {
-                    uiChargingStatus.Text = e.ChargingStatus == GPPWR_Data.ChargingStatusType.NotCharging ? "Not charging" : "Charging";
-                    uiVoltage.Text = e.Voltage.ToString("F2");
-                }
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == true) return;
+
+                uiChargingStatus.Text = e.ChargingStatus == GPPWR_Data.ChargingStatusType.NotCharging ? "Not charging" : "Charging";
+                uiVoltage.Text = e.Voltage.ToString("F2");
             });
         }
 
@@ -135,20 +149,22 @@ namespace WinUI3Controls
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
-                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == true) return;
+
+                uiMode.Text = $"{e.Mode}";
+                uiLatLongUpdateDate.Text = $"{e.Date}";
+                uiLatLongUpdateTime.Text = $"{e.Time}";
+                uiLatitude.Text = $"{e.Latitude}";
+                uiLongitude.Text = $"{e.Longitude}";
+                uiUpdateSource.Text = $"{e.OpcodeString}";
+
+                uiVelocityKnots.Text = $"{e.VelocityKnots}";
+                uiHeadingTrue.Text = $"{e.HeadingDegreesTrue}";
+                uiMagneticVariation.Text = $"{e.MagneticVariation}";
+
+                foreach (var map in AllMaps)
                 {
-                    uiMode.Text = $"{e.Mode}";
-                    uiLatLongUpdateDate.Text = $"{e.Date}";
-                    uiLatLongUpdateTime.Text = $"{e.Time}";
-                    uiLatitude.Text = $"{e.Latitude}";
-                    uiLongitude.Text = $"{e.Longitude}";
-                    uiUpdateSource.Text = $"{e.OpcodeString}";
-
-                    uiVelocityKnots.Text = $"{e.VelocityKnots}";
-                    uiHeadingTrue.Text = $"{e.HeadingDegreesTrue}";
-                    uiMagneticVariation.Text = $"{e.MagneticVariation}";
-
-                    uiSimpleMapV1.AddNmea(e);
+                    map.AddNmea(e); 
                 }
             });
         }
@@ -160,16 +176,15 @@ namespace WinUI3Controls
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
-                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
-                {
-                    uiMode.Text = $"{e.Mode}";
-                    uiUpdateSource.Text = $"{e.OpcodeString}";
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == true) return;
 
-                    uiVelocityKnots.Text = $"{e.SpeedKnots}";
-                    uiVelocityKph.Text = $"{e.SpeedKph}";
-                    uiHeadingTrue.Text = $"{e.CourseTrue}";
-                    uiMagneticVariation.Text = $"{e.CourseMagnetic}";
-                }
+                uiMode.Text = $"{e.Mode}";
+                uiUpdateSource.Text = $"{e.OpcodeString}";
+
+                uiVelocityKnots.Text = $"{e.SpeedKnots}";
+                uiVelocityKph.Text = $"{e.SpeedKph}";
+                uiHeadingTrue.Text = $"{e.CourseTrue}";
+                uiMagneticVariation.Text = $"{e.CourseMagnetic}";
             });
         }
 
@@ -177,13 +192,12 @@ namespace WinUI3Controls
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
-                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
-                {
-                    uiLatLongUpdateTime.Text = $"{e.Time}";
-                    uiUpdateSource.Text = $"{e.OpcodeString}";
-                    uiLocalZoneHours.Text = $"{e.LocalZoneHours}";
-                    uiLocalZoneMinutes.Text = $"{e.LocalZoneMinutes}";
-                }
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == true) return;
+
+                uiLatLongUpdateTime.Text = $"{e.Time}";
+                uiUpdateSource.Text = $"{e.OpcodeString}";
+                uiLocalZoneHours.Text = $"{e.LocalZoneHours}";
+                uiLocalZoneMinutes.Text = $"{e.LocalZoneMinutes}";
             });
         }
 
@@ -192,10 +206,9 @@ namespace WinUI3Controls
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
-                if (MainWindow.MainWindowWindow.MainWindowIsClosed == false)
-                {
-                    uiLog.Text += message + "\n";
-                }
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == true) return;
+
+                uiLog.Text += message + "\n";
             });
         }
 
@@ -203,6 +216,8 @@ namespace WinUI3Controls
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed == true) return;
+
                 uiLog.Text = "";
             });
         }
@@ -437,5 +452,101 @@ namespace WinUI3Controls
                 item.Visibility = item == visible ? Visibility.Visible : Visibility.Collapsed;
             }
         }
+
+        private void OnExitClick(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Exit();
+        }
+        private async void OnMenuDeveloperAddSamplePoints(object sender, RoutedEventArgs e)
+        {
+            int nsegments = 0;
+            var lines = SampleNmea[CurrSettings.CurrSampleNmea % SampleNmea.Length].Split("\r\n");
+            foreach (var line in lines)
+            {
+                var gprc = new GPRMC_Data(line);
+                gprc.Latitude.LatitudeMinutesDecimal += (CurrSettings.CurrSampleNmea * 50);
+                foreach (var map in AllMaps)
+                {
+                    nsegments += await map.AddNmea(gprc, LogLevel.None);
+                }
+            }
+
+            // Boop the index so next time the button is pressed we get the next set of data.
+            Log($"Add sample points: nsegments={nsegments} from {CurrSettings.CurrSampleNmea}");
+            CurrSettings.CurrSampleNmea += 1;
+        }
+
+        class UserSettings
+        {
+            public int CurrSampleNmea{ get; set; } = 0; // Index into SampleNmea
+        }
+        UserSettings CurrSettings = new UserSettings();
+
+        private string[] SampleNmea = new string[] {
+            @"$GPRMC,184446.000,A,4321.6036,N,12345.4008,W,000.0,338.7,200625,,,A",
+
+            @"$GPRMC,184446.000,A,4321.6036,N,12345.4008,W,000.0,338.7,200625,,,A
+$GPRMC,184451.000,A,4321.6033,N,12345.4012,W,000.9,125.1,200625,,,A
+$GPRMC,184504.000,A,4321.6030,N,12345.4008,W,000.0,126.8,200625,,,A
+$GPRMC,184508.000,A,4321.6033,N,12345.4004,W,001.0,069.3,200625,,,A
+$GPRMC,184509.000,A,4321.6036,N,12345.4008,W,001.1,067.8,200625,,,A
+$GPRMC,184510.000,A,4321.6032,N,12345.4003,W,001.4,076.4,200625,,,A
+$GPRMC,184511.000,A,4321.6035,N,12345.4078,W,001.8,050.0,200625,,,A
+$GPRMC,184512.000,A,4321.6039,N,12345.4067,W,001.2,062.0,200625,,,A
+$GPRMC,184513.000,A,4321.6041,N,12345.4063,W,000.9,065.0,200625,,,A
+$GPRMC,184514.000,A,4321.6040,N,12345.4062,W,001.2,121.7,200625,,,A
+$GPRMC,184515.000,A,4321.6035,N,12345.4057,W,002.5,070.8,200625,,,A
+$GPRMC,184516.000,A,4321.6035,N,12345.4045,W,001.5,128.2,200625,,,A
+$GPRMC,184517.000,A,4321.6032,N,12345.4040,W,001.5,137.7,200625,,,A
+$GPRMC,184518.000,A,4321.6029,N,12345.4036,W,001.5,151.7,200625,,,A
+$GPRMC,184519.000,A,4321.6025,N,12345.4033,W,000.0,151.7,200625,,,A
+$GPRMC,184520.000,A,4321.6023,N,12345.4032,W,000.0,151.7,200625,,,A
+$GPRMC,184521.000,A,4321.6021,N,12345.4033,W,000.0,151.7,200625,,,A
+$GPRMC,184522.000,A,4321.6020,N,12345.4033,W,001.2,306.5,200625,,,A
+$GPRMC,184523.000,A,4321.6022,N,12345.4037,W,000.0,306.5,200625,,,A",
+
+            @"$GPRMC,184446.000,A,4321.4036,N,12345.4008,W,000.0,338.7,200625,,,A
+$GPRMC,184451.000,A,4321.4033,N,12345.4012,W,000.9,125.1,200625,,,A
+$GPRMC,184504.000,A,4321.4030,N,12345.4008,W,000.0,126.8,200625,,,A
+$GPRMC,184508.000,A,4321.4033,N,12345.4004,W,001.0,069.3,200625,,,A
+$GPRMC,184509.000,A,4321.4036,N,12345.4008,W,001.1,067.8,200625,,,A
+$GPRMC,184510.000,A,4321.4032,N,12345.4003,W,001.4,076.4,200625,,,A
+$GPRMC,184511.000,A,4321.4035,N,12345.4078,W,001.8,050.0,200625,,,A
+$GPRMC,184512.000,A,4321.4039,N,12345.4067,W,001.2,062.0,200625,,,A
+$GPRMC,184513.000,A,4321.4041,N,12345.4063,W,000.9,065.0,200625,,,A
+$GPRMC,184514.000,A,4321.4040,N,12345.4062,W,001.2,121.7,200625,,,A
+$GPRMC,184515.000,A,4321.4035,N,12345.4057,W,002.5,070.8,200625,,,A
+$GPRMC,184516.000,A,4321.4035,N,12345.4045,W,001.5,128.2,200625,,,A
+$GPRMC,184517.000,A,4321.4032,N,12345.4040,W,001.5,137.7,200625,,,A
+$GPRMC,184518.000,A,4321.4029,N,12345.4036,W,001.5,151.7,200625,,,A
+$GPRMC,184519.000,A,4321.4025,N,12345.4033,W,000.0,151.7,200625,,,A
+$GPRMC,184520.000,A,4321.4023,N,12345.4032,W,000.0,151.7,200625,,,A
+$GPRMC,184521.000,A,4321.4021,N,12345.4033,W,000.0,151.7,200625,,,A
+$GPRMC,184522.000,A,4321.4020,N,12345.4033,W,001.2,306.5,200625,,,A
+$GPRMC,184523.000,A,4321.4022,N,12345.4037,W,000.0,306.5,200625,,,A",
+
+            // Same figure, but to the left
+            @"$GPRMC,184446.000,A,4321.4036,N,12345.9008,W,000.0,338.7,200625,,,A
+$GPRMC,184451.000,A,4321.4033,N,12345.9012,W,000.9,125.1,200625,,,A
+$GPRMC,184504.000,A,4321.4030,N,12345.9008,W,000.0,126.8,200625,,,A
+$GPRMC,184508.000,A,4321.4033,N,12345.9004,W,001.0,069.3,200625,,,A
+$GPRMC,184509.000,A,4321.4036,N,12345.9008,W,001.1,067.8,200625,,,A
+$GPRMC,184510.000,A,4321.4032,N,12345.9003,W,001.4,076.4,200625,,,A
+$GPRMC,184511.000,A,4321.4035,N,12345.9078,W,001.8,050.0,200625,,,A
+$GPRMC,184512.000,A,4321.4039,N,12345.9067,W,001.2,062.0,200625,,,A
+$GPRMC,184513.000,A,4321.4041,N,12345.9063,W,000.9,065.0,200625,,,A
+$GPRMC,184514.000,A,4321.4040,N,12345.9062,W,001.2,121.7,200625,,,A
+$GPRMC,184515.000,A,4321.4035,N,12345.9057,W,002.5,070.8,200625,,,A
+$GPRMC,184516.000,A,4321.4035,N,12345.9045,W,001.5,128.2,200625,,,A
+$GPRMC,184517.000,A,4321.4032,N,12345.9040,W,001.5,137.7,200625,,,A
+$GPRMC,184518.000,A,4321.4029,N,12345.9036,W,001.5,151.7,200625,,,A
+$GPRMC,184519.000,A,4321.4025,N,12345.9033,W,000.0,151.7,200625,,,A
+$GPRMC,184520.000,A,4321.4023,N,12345.9032,W,000.0,151.7,200625,,,A
+$GPRMC,184521.000,A,4321.4021,N,12345.9033,W,000.0,151.7,200625,,,A
+$GPRMC,184522.000,A,4321.4020,N,12345.9033,W,001.2,306.5,200625,,,A
+$GPRMC,184523.000,A,4321.4022,N,12345.9037,W,000.0,306.5,200625,,,A",
+
+        };
+
     }
 }

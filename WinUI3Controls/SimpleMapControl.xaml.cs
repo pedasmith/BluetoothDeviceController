@@ -71,7 +71,7 @@ namespace WinUI3Controls
         }
     }
 
-    public sealed partial class SimpleMapControl : UserControl
+    public sealed partial class SimpleMapControl : UserControl, IDoGpsMap
     {
         Random R = new Random(); // I need a way to distinguish one map control from another. Would use the "address", but that's not a thing in C#.
         int RandomValue = 0;
@@ -147,8 +147,6 @@ namespace WinUI3Controls
             DS.ResetScale();
             Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0);
             Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0);
-
-            OnAddSamplePoints(null, null);
         }
 
         private void SimpleMapControl_Unloaded(object sender, RoutedEventArgs e)
@@ -517,7 +515,6 @@ namespace WinUI3Controls
             DoClear();
             MapData.Clear();
             DS.ResetScale();
-            DS.CurrSampleNmea = 0;
             Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0);
             Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0);
             uiPointInfoBorder.Visibility = Visibility.Collapsed;
@@ -531,21 +528,6 @@ namespace WinUI3Controls
         }
 
 
-        void OnAddSamplePoints(object sender, RoutedEventArgs e)
-        {
-            int nsegments = 0;
-            var lines = SampleNmea[DS.CurrSampleNmea % SampleNmea.Length].Split("\r\n");
-            foreach (var line in lines)
-            {
-                var gprc = new GPRMC_Data(line);
-                gprc.Latitude.LatitudeMinutesDecimal += (DS.CurrSampleNmea * 50);
-                nsegments += AddNmea(gprc, LogLevel.None);
-            }
-
-            // Boop the index so next time the button is pressed we get the next set of data.
-            Log($"Add sample points: nsegments={nsegments} (total={DS.NSegments}) from {DS.CurrSampleNmea}");
-            DS.CurrSampleNmea += 1;
-        }
 
 
         private void OnCancelFocus(object sender, RoutedEventArgs e)
@@ -625,7 +607,9 @@ namespace WinUI3Controls
         /// <summary>
         /// Add an NMEA GPRMS data item to the map.
         /// </summary>
-        public int AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal)
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task<int> AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             int nsegments = 0;
             switch (gprc.ParseStatus)
@@ -934,72 +918,5 @@ namespace WinUI3Controls
             uiLog.Text = message;
             System.Diagnostics.Debug.WriteLine(message);
         }
-
-
-        private string[] SampleNmea = new string[] {
-
-            @"$GPRMC,184446.000,A,4700.6036,N,12200.8008,W,000.0,338.7,200625,,,A
-$GPRMC,184451.000,A,4700.6033,N,12200.8012,W,000.9,125.1,200625,,,A
-$GPRMC,184504.000,A,4700.6030,N,12200.8008,W,000.0,126.8,200625,,,A
-$GPRMC,184508.000,A,4700.6033,N,12200.8004,W,001.0,069.3,200625,,,A
-$GPRMC,184509.000,A,4700.6036,N,12200.8008,W,001.1,067.8,200625,,,A
-$GPRMC,184510.000,A,4700.6032,N,12200.8003,W,001.4,076.4,200625,,,A
-$GPRMC,184511.000,A,4700.6035,N,12200.8078,W,001.8,050.0,200625,,,A
-$GPRMC,184512.000,A,4700.6039,N,12200.8067,W,001.2,062.0,200625,,,A
-$GPRMC,184513.000,A,4700.6041,N,12200.8063,W,000.9,065.0,200625,,,A
-$GPRMC,184514.000,A,4700.6040,N,12200.8062,W,001.2,121.7,200625,,,A
-$GPRMC,184515.000,A,4700.6035,N,12200.8057,W,002.5,070.8,200625,,,A
-$GPRMC,184516.000,A,4700.6035,N,12200.8045,W,001.5,128.2,200625,,,A
-$GPRMC,184517.000,A,4700.6032,N,12200.8040,W,001.5,137.7,200625,,,A
-$GPRMC,184518.000,A,4700.6029,N,12200.8036,W,001.5,151.7,200625,,,A
-$GPRMC,184519.000,A,4700.6025,N,12200.8033,W,000.0,151.7,200625,,,A
-$GPRMC,184520.000,A,4700.6023,N,12200.8032,W,000.0,151.7,200625,,,A
-$GPRMC,184521.000,A,4700.6021,N,12200.8033,W,000.0,151.7,200625,,,A
-$GPRMC,184522.000,A,4700.6020,N,12200.8033,W,001.2,306.5,200625,,,A
-$GPRMC,184523.000,A,4700.6022,N,12200.8037,W,000.0,306.5,200625,,,A",
-
-            @"$GPRMC,184446.000,A,4700.4036,N,12200.8008,W,000.0,338.7,200625,,,A
-$GPRMC,184451.000,A,4700.4033,N,12200.8012,W,000.9,125.1,200625,,,A
-$GPRMC,184504.000,A,4700.4030,N,12200.8008,W,000.0,126.8,200625,,,A
-$GPRMC,184508.000,A,4700.4033,N,12200.8004,W,001.0,069.3,200625,,,A
-$GPRMC,184509.000,A,4700.4036,N,12200.8008,W,001.1,067.8,200625,,,A
-$GPRMC,184510.000,A,4700.4032,N,12200.8003,W,001.4,076.4,200625,,,A
-$GPRMC,184511.000,A,4700.4035,N,12200.8078,W,001.8,050.0,200625,,,A
-$GPRMC,184512.000,A,4700.4039,N,12200.8067,W,001.2,062.0,200625,,,A
-$GPRMC,184513.000,A,4700.4041,N,12200.8063,W,000.9,065.0,200625,,,A
-$GPRMC,184514.000,A,4700.4040,N,12200.8062,W,001.2,121.7,200625,,,A
-$GPRMC,184515.000,A,4700.4035,N,12200.8057,W,002.5,070.8,200625,,,A
-$GPRMC,184516.000,A,4700.4035,N,12200.8045,W,001.5,128.2,200625,,,A
-$GPRMC,184517.000,A,4700.4032,N,12200.8040,W,001.5,137.7,200625,,,A
-$GPRMC,184518.000,A,4700.4029,N,12200.8036,W,001.5,151.7,200625,,,A
-$GPRMC,184519.000,A,4700.4025,N,12200.8033,W,000.0,151.7,200625,,,A
-$GPRMC,184520.000,A,4700.4023,N,12200.8032,W,000.0,151.7,200625,,,A
-$GPRMC,184521.000,A,4700.4021,N,12200.8033,W,000.0,151.7,200625,,,A
-$GPRMC,184522.000,A,4700.4020,N,12200.8033,W,001.2,306.5,200625,,,A
-$GPRMC,184523.000,A,4700.4022,N,12200.8037,W,000.0,306.5,200625,,,A",
-
-            // Same figure, but to the left
-            @"$GPRMC,184446.000,A,4700.4036,N,12201.8008,W,000.0,338.7,200625,,,A
-$GPRMC,184451.000,A,4700.4033,N,12201.8012,W,000.9,125.1,200625,,,A
-$GPRMC,184504.000,A,4700.4030,N,12201.8008,W,000.0,126.8,200625,,,A
-$GPRMC,184508.000,A,4700.4033,N,12201.8004,W,001.0,069.3,200625,,,A
-$GPRMC,184509.000,A,4700.4036,N,12201.8008,W,001.1,067.8,200625,,,A
-$GPRMC,184510.000,A,4700.4032,N,12201.8003,W,001.4,076.4,200625,,,A
-$GPRMC,184511.000,A,4700.4035,N,12201.8078,W,001.8,050.0,200625,,,A
-$GPRMC,184512.000,A,4700.4039,N,12201.8067,W,001.2,062.0,200625,,,A
-$GPRMC,184513.000,A,4700.4041,N,12201.8063,W,000.9,065.0,200625,,,A
-$GPRMC,184514.000,A,4700.4040,N,12201.8062,W,001.2,121.7,200625,,,A
-$GPRMC,184515.000,A,4700.4035,N,12201.8057,W,002.5,070.8,200625,,,A
-$GPRMC,184516.000,A,4700.4035,N,12201.8045,W,001.5,128.2,200625,,,A
-$GPRMC,184517.000,A,4700.4032,N,12201.8040,W,001.5,137.7,200625,,,A
-$GPRMC,184518.000,A,4700.4029,N,12201.8036,W,001.5,151.7,200625,,,A
-$GPRMC,184519.000,A,4700.4025,N,12201.8033,W,000.0,151.7,200625,,,A
-$GPRMC,184520.000,A,4700.4023,N,12201.8032,W,000.0,151.7,200625,,,A
-$GPRMC,184521.000,A,4700.4021,N,12201.8033,W,000.0,151.7,200625,,,A
-$GPRMC,184522.000,A,4700.4020,N,12201.8033,W,001.2,306.5,200625,,,A
-$GPRMC,184523.000,A,4700.4022,N,12201.8037,W,000.0,306.5,200625,,,A",
-
-        };
-
     }
 }
