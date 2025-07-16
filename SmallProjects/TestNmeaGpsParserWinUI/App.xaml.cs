@@ -26,6 +26,7 @@ namespace TestNmeaGpsParserWinUI
     /// </summary>
     public partial class App : Application
     {
+        public static UserPreferences UP = new UserPreferences();
         private Window? _window;
 
         /// <summary>
@@ -45,6 +46,8 @@ namespace TestNmeaGpsParserWinUI
         {
             _window = new MainWindow();
             _window.Activate();
+
+            UP.Save();   
         }
     }
 }

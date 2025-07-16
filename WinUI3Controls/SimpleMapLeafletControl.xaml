@@ -12,17 +12,21 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="3*" />
-            <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="100" />
         </Grid.RowDefinitions>
-        <WebView2 x:Name="uiWebView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
-            
-        </WebView2>
-        <ScrollView Grid.Row="1" VerticalAlignment="Stretch">
-            <TextBlock IsTextSelectionEnabled="True" x:Name="uiLog" />
-        </ScrollView>
+        <WebView2 x:Name="uiWebView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                  />
+        <TextBlock Grid.Row="1" FontSize="9">[Wordmark / name of logo] is a trademark of the OpenStreetMap Foundation, and is used with their permission. This product is not endorsed by or affiliated with the OpenStreetMap Foundation.</TextBlock>
+
         <StackPanel Grid.Row="2" Orientation="Horizontal">
             <Button Content="Via Host" Click="OnLoadWebViaHost" />
         </StackPanel>
+        
+        <ScrollView Grid.Row="3" VerticalAlignment="Stretch">
+            <TextBlock IsTextSelectionEnabled="True" x:Name="uiLog" />
+        </ScrollView>
+        
     </Grid>
 </UserControl>

@@ -266,6 +266,8 @@ namespace WinUI3Controls
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
             {
+                if (MainWindow.MainWindowWindow.MainWindowIsClosed) return;
+
                 bool handled = true;
                 switch (status)
                 {
