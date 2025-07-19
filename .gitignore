@@ -175,6 +175,12 @@ publish/
 *.pubxml
 *.publishproj
 
+# 2025-07-19: shipwreck software: WinUI Blank App (Packaged) requires the win-arm64.pubxml,
+# win-x64.pubxml and win-x86.pubxml files for the Release mode compile to work
+# BUT pubxml files can include secret information, so we should not just allow all
+# pubxml files to be added to GitHub.
+!win-*.pubxml
+
 # Microsoft Azure Web App publish settings. Comment the next line if you want to
 # checkin your Azure Web App publish settings, but sensitive information contained
 # in these scripts will be unencrypted

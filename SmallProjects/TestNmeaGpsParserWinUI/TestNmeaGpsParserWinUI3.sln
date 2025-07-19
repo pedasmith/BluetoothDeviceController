@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36310.24 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestNmeaGpsParserWinUI3", "TestNmeaGpsParserWinUI3.csproj", "{9D9EBB30-21C3-300C-016A-488E4EA721E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Debug|ARM64.Build.0 = Debug|ARM64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Debug|x64.ActiveCfg = Debug|x64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Debug|x64.Build.0 = Debug|x64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Debug|x64.Deploy.0 = Debug|x64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Debug|x86.ActiveCfg = Debug|x86
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Debug|x86.Build.0 = Debug|x86
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Debug|x86.Deploy.0 = Debug|x86
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Release|ARM64.ActiveCfg = Release|ARM64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Release|ARM64.Build.0 = Release|ARM64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Release|ARM64.Deploy.0 = Release|ARM64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Release|x64.ActiveCfg = Release|x64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Release|x64.Build.0 = Release|x64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Release|x64.Deploy.0 = Release|x64
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Release|x86.ActiveCfg = Release|x86
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Release|x86.Build.0 = Release|x86
+		{9D9EBB30-21C3-300C-016A-488E4EA721E8}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6AADA57C-7D99-4B3E-B1E0-EDDE5DB928F6}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\BluetoothProtocolsSerial\BluetoothProtocolsSerial.projitems*{9d9ebb30-21c3-300c-016a-488e4ea721e8}*SharedItemsImports = 5
+		..\..\UtilitiesCore\UtilitiesCore.projitems*{9d9ebb30-21c3-300c-016a-488e4ea721e8}*SharedItemsImports = 5
+		..\..\WinUI3Controls\WinUI3Controls.projitems*{9d9ebb30-21c3-300c-016a-488e4ea721e8}*SharedItemsImports = 5
+	EndGlobalSection
+EndGlobal
