@@ -9,6 +9,7 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="3*" />
@@ -21,12 +22,10 @@
         <TextBlock Grid.Row="1" FontSize="9">[Wordmark / name of logo] is a trademark of the OpenStreetMap Foundation, and is used with their permission. This product is not endorsed by or affiliated with the OpenStreetMap Foundation.</TextBlock>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Button Content="Via Host" Click="OnLoadWebViaHost" />
         </StackPanel>
         
         <ScrollView Grid.Row="3" VerticalAlignment="Stretch">
             <TextBlock IsTextSelectionEnabled="True" x:Name="uiLog" />
         </ScrollView>
-        
     </Grid>
 </UserControl>

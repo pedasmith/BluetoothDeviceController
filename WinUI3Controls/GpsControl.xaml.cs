@@ -22,6 +22,7 @@ namespace WinUI3Controls
     public interface IDoGpsMap
     {
         Task<int> AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal);
+        Task PrivacyUpdated();
     }
 
     public sealed partial class GpsControl : UserControl, ITerminal
@@ -47,8 +48,14 @@ namespace WinUI3Controls
         List<IDoGpsMap> AllMaps = new List<IDoGpsMap>();
         private void GpsControl_Loaded(object sender, RoutedEventArgs e)
         {
+            UserPreferences.LogTextBlock = uiLog;
+
+            // Testing the Save code
+            App.UP.Restore();
+
             AllMaps.Add(uiSimpleMapV1);
             AllMaps.Add(uiSimpleMapLeaflet);
+            uiSimpleMapLeaflet.UserMapPrivacyPreferences = App.UP.UserMapPrivacyPreferences;
 
 
             // Pick the "simple map"
@@ -104,7 +111,7 @@ namespace WinUI3Controls
             return summary;
         }
 
-
+        #region Nmea_Message
         private void NmeaParser_OnGpggaOk(object sender, GPGGA_Data e)
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
@@ -169,9 +176,6 @@ namespace WinUI3Controls
             });
         }
 
-
-
-
         private void NmeaParser_OnGpvtgOk(object sender, GPVTG_Data e)
         {
             UIThreadHelper.CallOnUIThread(MainWindow.MainWindowWindow, () =>
@@ -201,6 +205,7 @@ namespace WinUI3Controls
             });
         }
 
+        #endregion
 
         private void Log(string message)
         {
@@ -239,6 +244,40 @@ namespace WinUI3Controls
             dp.RequestedOperation = DataPackageOperation.Copy;
             dp.SetText(text);
             Clipboard.SetContent(dp);
+        }
+
+        bool PrivacyOptionsBeingInitialized = true;
+        private async void OnMenuFilePrivacyOptions(object sender, RoutedEventArgs e)
+        {
+            var start = App.UP.ToJson();
+            PrivacyOptionsBeingInitialized = true;
+            uiPrivacyOptionBlock3rdParty.IsChecked = App.UP.UserMapPrivacyPreferences.DisableAll3rdPartyServices;
+            uiPrivacyOptionAllowOpenStreetMaps.IsChecked = App.UP.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue;
+            PrivacyOptionsBeingInitialized = false;
+            var result = await uiSetPrivacyOptions.ShowAsync();
+            App.UP.Save();
+            var end = App.UP.ToJson();
+            if (start != end)
+            {
+                // There has been a critical update
+                foreach (var map in AllMaps)
+                {
+                    await map.PrivacyUpdated();
+                }
+            }
+        }
+
+        private void OnPrivacyCheckChange(object sender, RoutedEventArgs e)
+        {
+            if (PrivacyOptionsBeingInitialized) return;
+
+            App.UP.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue = uiPrivacyOptionAllowOpenStreetMaps.IsChecked ?? false;
+            App.UP.UserMapPrivacyPreferences.DisableAll3rdPartyServices = uiPrivacyOptionBlock3rdParty.IsChecked ?? false;
+            ;
+            if (!App.UP.UserMapPrivacyPreferences.UserHasPickedPrivacySettings)
+            {
+                App.UP.UserMapPrivacyPreferences.UserHasPickedPrivacySettings = true;
+            }
         }
 
         public void ReceivedData(string message)
@@ -286,7 +325,7 @@ namespace WinUI3Controls
                                 CtdHostName = "";
                                 CtdServiceName = "";
 
-                                LogClear();
+                                //LogClear();
                                 break;
                             default:
                                 handled = false;
@@ -459,6 +498,26 @@ namespace WinUI3Controls
         {
             Application.Current.Exit();
         }
+
+        private void OnMenuDeveloperSaveOptions(object sender, RoutedEventArgs e)
+        {
+            App.UP.Save();
+        }
+
+        /// <summary>
+        /// This method exists so that the compiler doesn't complain about the OnSendData event which is 
+        /// otherwise unused. The OnSendData is designed so that a user can send a message to the GPS unit. 
+        /// These are all customized to the particular chipset, and aren't always documented.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnMenuDeveloperSendData(object sender, RoutedEventArgs e)
+        {
+            var text = "#Fake NMea Command\r\n";
+            Log($"Sending: {text}");
+            OnSendData?.Invoke(this, text);
+        }
+
         private async void OnMenuDeveloperAddSamplePoints(object sender, RoutedEventArgs e)
         {
             int nsegments = 0;
@@ -549,6 +608,7 @@ $GPRMC,184522.000,A,4321.4020,N,12345.9033,W,001.2,306.5,200625,,,A
 $GPRMC,184523.000,A,4321.4022,N,12345.9037,W,000.0,306.5,200625,,,A",
 
         };
+
 
     }
 }

@@ -1,57 +1,99 @@
 ﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Windows.Foundation.Diagnostics;
+using WinUI3Controls;
+
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
 
 namespace TestNmeaGpsParserWinUI
 {
+    [JsonSourceGenerationOptions(WriteIndented = true)]
+    [JsonSerializable(typeof(UserPreferences))]
+    internal partial class SourceGenerationContext : JsonSerializerContext
+    {
+    }
+
+
     public class UserPreferences
     {
-        private bool DisableAll3rdPartyServices = true;
-        private bool _AllowOpenStreetMap = true;
-        public bool AllowOpenStreetMap
-        {
-            get
-            {
-                if (DisableAll3rdPartyServices) return false;
-                return AllowOpenStreetMap;
-            }
-            set
-            {
-                if (DisableAll3rdPartyServices) return;
-                _AllowOpenStreetMap = value;
-            }
-        }
+        public UserMapPrivacyPreferences UserMapPrivacyPreferences { get; set; } = new UserMapPrivacyPreferences();
 
         public string ToJson()
         {
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            // Old code used NewtonSoft, but that's no longer a viable technology thanks to the Trim options
+            // var json = Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            var json = System.Text.Json.JsonSerializer.Serialize(this, SourceGenerationContext.Default.UserPreferences);
             return json;
         }
 
-        public static void Log (string str)
+        public static TextBlock LogTextBlock { get; set; } = null;
+        public static TextBlock LogTextBlock2 { get; set; } = null;
+        public static void Log(string str)
         {
             System.Diagnostics.Debug.WriteLine(str);
+            if (LogTextBlock != null)
+            {
+                LogTextBlock.Text += str + Environment.NewLine;
+            }
+        }
+
+        const string PrivacySettings = "PrivacySettingsV26_1526";
+
+        public void Restore()
+        {
+            Log($"Json: json initial={ToJson()}");
+
+            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            Log($"Json: settings name={localSettings.Name}");
+            var settings = localSettings.Values[PrivacySettings] as string;
+            UserPreferences saved = null;
+            if (!string.IsNullOrEmpty(settings))
+            {
+                try
+                {
+                    saved = System.Text.Json.JsonSerializer.Deserialize<UserPreferences>(settings, SourceGenerationContext.Default.UserPreferences);
+                }
+                catch (Exception)
+                {
+                    saved = null;
+                }
+            }
+
+
+            if (saved == null)
+            {
+                // Set the defaults. Default is that all third parties are blocked (user must explicitly
+                // enable them because some people really need privacy), but once they unclick the one,
+                // in general all third party services are allowed.
+                this.UserMapPrivacyPreferences.UserHasPickedPrivacySettings = false;
+                this.UserMapPrivacyPreferences.UserHasPickedPrivacySettings = true;
+                this.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue = true;
+            }
+            else
+            {
+                this.UserMapPrivacyPreferences.UserHasPickedPrivacySettings = saved.UserMapPrivacyPreferences.UserHasPickedPrivacySettings;
+                this.UserMapPrivacyPreferences.DisableAll3rdPartyServices = saved.UserMapPrivacyPreferences.DisableAll3rdPartyServices;
+                this.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue = saved.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue;
+            }
         }
         public void Save()
         {
-            string _localApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string _defaultApplicationDataFolder = "Options";
-            string _defaultLocalSettingsFile = "SimpleGpsOptions.json";
-            var _applicationDataFolder = Path.Combine(_localApplicationData, _defaultApplicationDataFolder);
-            var _localsettingsFile = _defaultLocalSettingsFile;
-
-            Log($"Json: appdata={_localApplicationData}");
-            Log($"Json: folder={_applicationDataFolder}");
-            Log($"Json: json={ToJson()}");
+            var json = ToJson();
+            Log($"Json: Save json={json}");
 
             Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-            Log($"Json: settings={localSettings}");
-
+            Log($"Json: settings name={localSettings.Name}");
+            localSettings.Values[PrivacySettings] = json;
         }
     }
 }

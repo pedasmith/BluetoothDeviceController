@@ -55,7 +55,7 @@
                 <TextBlock x:Name="uiFocus" MinWidth="200" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <TextBlock x:Name="uiLog" MinWidth="200" />
+                <TextBlock x:Name="uiLogSMC" MinWidth="200" />
             </StackPanel>
         </StackPanel>
     </Grid>

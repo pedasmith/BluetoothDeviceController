@@ -27,10 +27,13 @@
 
         <muxc:MenuBar Grid.Row="0">
             <MenuBarItem Title="File">
+                <MenuFlyoutItem Text="Privacy Option" Click="OnMenuFilePrivacyOptions"/>
                 <MenuFlyoutItem Text="Exit" Click="OnExitClick"/>
             </MenuBarItem>
             <MenuBarItem Title="Developer">
                 <MenuFlyoutItem Text="Add Sample Points" Click="OnMenuDeveloperAddSamplePoints"/>
+                <MenuFlyoutItem Text="Save Options" Click="OnMenuDeveloperSaveOptions"/>
+                <MenuFlyoutItem Text="Send Data" Click="OnMenuDeveloperSendData"/>
             </MenuBarItem>
         </muxc:MenuBar>
         <TabView Grid.Row="1" SelectedIndex="0" VerticalAlignment="Stretch">
@@ -160,6 +163,18 @@
             </TextBlock>
             <TextBlock Grid.Column="2" x:Name="uiReadIcon" />
         </Grid>
+        <ContentDialog x:Name="uiSetPrivacyOptions" 
+                       Title="Set Privacy Options"
+                       PrimaryButtonText="Ok">
+            <ContentDialog.Content>
+                <StackPanel>
+                    <TextBlock>EXPLANATION!</TextBlock>
+                    <CheckBox x:Name="uiPrivacyOptionBlock3rdParty" Content="Block all 3rd party location access" Checked="OnPrivacyCheckChange" Unchecked="OnPrivacyCheckChange" />
+                    <NavigationViewItemSeparator />
+                    <CheckBox x:Name="uiPrivacyOptionAllowOpenStreetMaps" Content="Allow Open Street Maps location access" Checked="OnPrivacyCheckChange" Unchecked="OnPrivacyCheckChange" />
+                </StackPanel>
+            </ContentDialog.Content>
+        </ContentDialog>
 
     </Grid>
 </UserControl>

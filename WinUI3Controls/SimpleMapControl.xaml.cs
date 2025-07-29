@@ -915,8 +915,14 @@ namespace WinUI3Controls
 
         private void Log(string message)
         {
-            uiLog.Text = message;
+            uiLogSMC.Text = message;
             System.Diagnostics.Debug.WriteLine(message);
+        }
+
+        public async Task PrivacyUpdated()
+        {
+            await Task.Delay(0); // This is needed to make this method async, but it doesn't do anything.
+            return;
         }
     }
 }

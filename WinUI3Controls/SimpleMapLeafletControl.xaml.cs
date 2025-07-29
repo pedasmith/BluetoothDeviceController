@@ -23,7 +23,23 @@ namespace WinUI3Controls
 {
     public sealed partial class SimpleMapLeafletControl : UserControl, IDoGpsMap
     {
+        /// 
+        /// RootPath is what we would use if the ms-apps: scheme was actually supported.
+        /// Instead HostRootPath is needed because WebView2 doesn't support the clearly documented ms-appx: scheme that we were all
+        /// told to use to load local assets. ms-appx isn't supported because the WebView2 developers and PMs are idiots,
+        /// and don't mind that us developers have to waste hours of time researching why something doesn't
+        /// work instead of just documented it and making a better error message.
+        //String RootPath = "ms-appx:///Assets/SimpleMapLeaflet/SimpleMapLeaflet.html";
+        String RealMapHtml = "http://msappxreplacement/SimpleMapLeaflet.html";
+        String UserMustInitializePrivacyPage = "http://msappxreplacement/UserMustInitializePrivacy.html";
+        String LoadingMapPage = "http://msappxreplacement/LoadingMap.html";
+        String UserHasBlockedThisMapPage = "http://msappxreplacement/UserHasBlockedThisMap.html";
+        String UserHasBlockedAllMapsPage = "http://msappxreplacement/UserHasBlockedAllMaps.html";
+        String AssetLocation = "Assets/SimpleMapLeaflet";
+
         List<MapDataItem> MapData = new List<MapDataItem>();
+
+        public UserMapPrivacyPreferences UserMapPrivacyPreferences { get; set; } = null;
         public SimpleMapLeafletControl()
         {
             this.InitializeComponent();
@@ -39,6 +55,8 @@ namespace WinUI3Controls
             await InitializeWithLoadingPage();
         }
 
+
+
         private void UiWebView_WebMessageReceived(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs args)
         {
             Log($"DBG: Web message: {args.WebMessageAsJson}");
@@ -51,80 +69,55 @@ namespace WinUI3Controls
 
         private void UiWebView_NavigationStarting(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs args)
         {
-            Log($"DBG: Navigate startd: kind={args.NavigationKind} uri={args.Uri}");
+            Log($"DBG: Navigate started: kind={args.NavigationKind} uri={args.Uri}");
         }
 
-        String RootPath = "ms-appx:///Assets/SimpleMapLeaflet/SimpleMapLeaflet.html";
-        String HostRootPath = "http://msappxreplacement/SimpleMapLeaflet.html";
 
-        /// <summary>
-        /// Because WebView2 doesn't support the clearly documented ms-appx: scheme that we were all
-        /// told to use to load local assets. That's because the WebView2 developers and PMs are idiots,
-        /// and don't mind that us developers have to waste hours of time researching why something doesn't
-        /// work instead of just documented it and making a better error message.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void OnLoadWebViaHost(object sender, RoutedEventArgs e)
+
+        //This code should work, but because ms-appx: doesn't work, the loading fails. 
+        //var htmlFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(RootPath));
+        //var content = await FileIO.ReadTextAsync(htmlFile);
+
+        public async Task PrivacyUpdated()
         {
-            await uiWebView.EnsureCoreWebView2Async();
-            uiWebView.CoreWebView2.SetVirtualHostNameToFolderMapping("msappxreplacement", "Assets/SimpleMapLeaflet", Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow);
-
-            uiWebView.Source = new Uri(HostRootPath);
+            await InitializeWithLoadingPage();
         }
-
-#if NEVER_EVER_DEFINED
-        private async void OnLoadWebNavigate(object sender, RoutedEventArgs e)
-        {
-            await uiWebView.EnsureCoreWebView2Async();
-
-            var fileUri = new Uri(RootPath).AbsoluteUri;
-            uiWebView.CoreWebView2.Navigate(fileUri);
-        }
-
-        private async void OnLoadWebSource(object sender, RoutedEventArgs e)
-        {
-            await uiWebView.EnsureCoreWebView2Async();
-
-            var fileUri = new Uri(RootPath).AbsoluteUri;
-
-            //
-            //var htmlFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(path));
-            //var content = await FileIO.ReadTextAsync(htmlFile);
-            uiWebView.Source = new Uri(RootPath);
-        }
-
-        private async void OnLoadWebFromString(object sender, RoutedEventArgs e)
-        {
-            await uiWebView.EnsureCoreWebView2Async();
-
-            var htmlFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(RootPath));
-            var content = await FileIO.ReadTextAsync(htmlFile);
-            uiWebView.NavigateToString(content);
-        }
-        private async void OnLoadWebFromStringClear(object sender, RoutedEventArgs e)
-        {
-            await uiWebView.EnsureCoreWebView2Async();
-
-            var htmlFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(RootPath));
-            var content = await FileIO.ReadTextAsync(htmlFile);
-            uiWebView.NavigateToString("<b>This page intentionally left blank</b>");
-        }
-
-#endif
 
         private async Task InitializeWithLoadingPage()
         {
             await uiWebView.EnsureCoreWebView2Async();
+            uiWebView.CoreWebView2.SetVirtualHostNameToFolderMapping("msappxreplacement", AssetLocation, Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow);
 
-            var htmlFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(RootPath));
-            var content = await FileIO.ReadTextAsync(htmlFile);
-            uiWebView.NavigateToString("<marquee>...Loading map...</marquee>");
-
-            // Now load for realsies
-            uiWebView.CoreWebView2.SetVirtualHostNameToFolderMapping("msappxreplacement", "Assets/SimpleMapLeaflet", Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow);
-            uiWebView.Source = new Uri(HostRootPath);
+            if (UserMapPrivacyPreferences == null)
+            {
+                uiWebView.Source = new Uri(UserMustInitializePrivacyPage);
+            }
+            else if (!UserMapPrivacyPreferences.UserHasPickedPrivacySettings)
+            {
+                uiWebView.Source = new Uri(UserMustInitializePrivacyPage);
+            }
+            else if (UserMapPrivacyPreferences.AllowOpenStreetMapIsBlocked)
+            {
+                // User allows this page, but they have disallowed all maps.
+                uiWebView.Source = new Uri(UserHasBlockedAllMapsPage);
+            }
+            else if (UserMapPrivacyPreferences.DisableAll3rdPartyServices)
+            {
+                uiWebView.Source = new Uri(UserHasBlockedAllMapsPage);
+            }
+            else if (UserMapPrivacyPreferences.AllowOpenStreetMap)
+            {
+                uiWebView.Source = new Uri(LoadingMapPage);
+                await Task.Delay(1000); // Give the user a chance to see the loading page.
+                uiWebView.Source = new Uri(RealMapHtml);
+            }
+            else // This isn't really possible.
+            {
+                Log("Error: Leaflet: the UserMapPrivacyPreferences is not set up correctly. ");
+                uiWebView.Source = new Uri(UserHasBlockedThisMapPage);
+            }
         }
+
 
         private void Log(string message)
         {
@@ -170,5 +163,7 @@ namespace WinUI3Controls
             }
             return nsegments;
         }
+
+
     }
 }

@@ -46,8 +46,6 @@ namespace TestNmeaGpsParserWinUI
         {
             _window = new MainWindow();
             _window.Activate();
-
-            UP.Save();   
         }
     }
 }

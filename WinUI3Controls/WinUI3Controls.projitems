@@ -40,6 +40,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SimpleMapLeafletControl.xaml.cs">
       <DependentUpon>SimpleMapLeafletControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)UserMapPrivacyPreferences.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Assets\SimpleMapLeaflet\Header.png">
@@ -63,7 +64,19 @@
     <Content Include="$(MSBuildThisFileDirectory)Assets\SimpleMapLeaflet\leaflet-194\leaflet.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="$(MSBuildThisFileDirectory)Assets\SimpleMapLeaflet\LoadingMap.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="$(MSBuildThisFileDirectory)Assets\SimpleMapLeaflet\SimpleMapLeaflet.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)Assets\SimpleMapLeaflet\UserHasBlockedAllMaps.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)Assets\SimpleMapLeaflet\UserHasBlockedThisMap.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)Assets\SimpleMapLeaflet\UserMustInitializePrivacy.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
