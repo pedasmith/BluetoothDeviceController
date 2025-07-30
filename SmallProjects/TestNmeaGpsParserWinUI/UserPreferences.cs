@@ -73,16 +73,16 @@ namespace TestNmeaGpsParserWinUI
             if (saved == null)
             {
                 // Set the defaults. Default is that all third parties are blocked (user must explicitly
-                // enable them because some people really need privacy), but once they unclick the one,
+                // enable them because some people really need privacy), but once they click the general case,
                 // in general all third party services are allowed.
                 this.UserMapPrivacyPreferences.UserHasPickedPrivacySettings = false;
-                this.UserMapPrivacyPreferences.UserHasPickedPrivacySettings = true;
+                this.UserMapPrivacyPreferences.Allow3rdPartyServices = false;
                 this.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue = true;
             }
             else
             {
                 this.UserMapPrivacyPreferences.UserHasPickedPrivacySettings = saved.UserMapPrivacyPreferences.UserHasPickedPrivacySettings;
-                this.UserMapPrivacyPreferences.DisableAll3rdPartyServices = saved.UserMapPrivacyPreferences.DisableAll3rdPartyServices;
+                this.UserMapPrivacyPreferences.Allow3rdPartyServices = saved.UserMapPrivacyPreferences.Allow3rdPartyServices;
                 this.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue = saved.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue;
             }
         }

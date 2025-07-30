@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         <WebView2 x:Name="uiWebView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                   />
-        <TextBlock Grid.Row="1" FontSize="9">[Wordmark / name of logo] is a trademark of the OpenStreetMap Foundation, and is used with their permission. This product is not endorsed by or affiliated with the OpenStreetMap Foundation.</TextBlock>
+        <TextBlock Grid.Row="1" FontSize="9" TextWrapping="Wrap">OpenStreetMap is a trademark of the OpenStreetMap Foundation, and is used with their permission. This product is not endorsed by or affiliated with the OpenStreetMap Foundation.</TextBlock>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal">
         </StackPanel>

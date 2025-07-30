@@ -11,7 +11,7 @@ Take a look at https://www.reddit.com/r/IOT/comments/1lzgv0t/tired_of_janky_gps_
 
 ## Issues with Visual Studio and WinUI3
 
-Bug: Why can't I build in Release mode? Is it related to WinUI3? WebView2? NewtonSoft? 
+2025-07-25: Solved! Bug: Why can't I build in Release mode? Is it related to WinUI3? WebView2? NewtonSoft? 
 
 ### No support for ms-appx
 
@@ -24,7 +24,6 @@ This restriction is not mentioned in https://learn.microsoft.com/en-us/microsoft
 
 https://leafletjs.com/ is a JavaScript library for interactive maps. It can be used with WinUI3 via WebView2, which allows you to embed web content in your app.
 
-Work item: create user preferences including "don't use 3rd party maps". Includes hook to menu, save, restore
 Work item: add a clear button
 Work item: zoom to starting point
 Work item: add selection (call back to C#; do not try to track all points in JS)
@@ -33,9 +32,10 @@ Work item: show details about the selected point
 Work item: add start + end point
 Work item: keep screen on via menu (in developer?)
 Work item: when clicking a link, open a new window in a browser!
-Work item: verify open map usage policy; make sure that when I ship I'm still in compliance https://www.openstreetmap.org/
 
 
+DONE 2025-07-29: Work item: create user preferences including "don't use 3rd party maps". Includes hook to menu, save, restore
+DONE 2025-07-29: Work item: verify open map usage policy; make sure that when I ship I'm still in compliance https://www.openstreetmap.org/
 DONE 2025-07-14: uses full version 1.94 and it's in a seperate directory
 DONE 2025-07-13: Work item: create sample data for all maps
 DONE 2025-07-12: First version of Leaflet lets me draw the demo map

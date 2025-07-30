@@ -14,18 +14,31 @@ namespace WinUI3Controls
         public bool UserHasPickedPrivacySettings { get; set; } = false;
 
         /// <summary>
-        /// When true, all third party services are blocked. Defaults to true so that users are protected by default.
+        /// When false, all third party services are blocked. Defaults to false so that users are protected by default.
         /// </summary>
-        public bool DisableAll3rdPartyServices { get; set; } = true;
+        public bool Allow3rdPartyServices { get; set; } = false;
 
         public bool AllowOpenStreetMapUnderlyingValue { get; set; } = true;
+
+        /// <summary>
+        /// When true, all third party services are allowed based on underylying value
+        /// </summary>
+        [JsonIgnore]
+        public bool AllThirdPartyServicesAreAllowed
+        {
+            get
+            {
+                var retval = AllowOpenStreetMapUnderlyingValue;
+                return retval;
+            }
+        }
 
         [JsonIgnore] // value is calculated from DisableAll3rdPartyServices and AllowOpenStreetMapUnderlyingValue
         public bool AllowOpenStreetMap
         {
             get
             {
-                if (DisableAll3rdPartyServices) return false;
+                if (!Allow3rdPartyServices) return false;
                 return AllowOpenStreetMapUnderlyingValue;
             }
         }
@@ -38,7 +51,7 @@ namespace WinUI3Controls
         {
             get
             {
-                var retval = AllowOpenStreetMapUnderlyingValue && DisableAll3rdPartyServices;
+                var retval = AllowOpenStreetMapUnderlyingValue && !Allow3rdPartyServices;
                 return retval;
             }
         }

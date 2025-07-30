@@ -27,7 +27,7 @@
 
         <muxc:MenuBar Grid.Row="0">
             <MenuBarItem Title="File">
-                <MenuFlyoutItem Text="Privacy Option" Click="OnMenuFilePrivacyOptions"/>
+                <MenuFlyoutItem Text="Privacy Options ..." Click="OnMenuFilePrivacyOptions"/>
                 <MenuFlyoutItem Text="Exit" Click="OnExitClick"/>
             </MenuBarItem>
             <MenuBarItem Title="Developer">
@@ -168,13 +168,18 @@
                        PrimaryButtonText="Ok">
             <ContentDialog.Content>
                 <StackPanel>
-                    <TextBlock>EXPLANATION!</TextBlock>
-                    <CheckBox x:Name="uiPrivacyOptionBlock3rdParty" Content="Block all 3rd party location access" Checked="OnPrivacyCheckChange" Unchecked="OnPrivacyCheckChange" />
-                    <NavigationViewItemSeparator />
-                    <CheckBox x:Name="uiPrivacyOptionAllowOpenStreetMaps" Content="Allow Open Street Maps location access" Checked="OnPrivacyCheckChange" Unchecked="OnPrivacyCheckChange" />
+                    <TextBlock TextWrapping="Wrap">Want to use the nice maps? You must check the Allow 3rd party access checkbox.</TextBlock>
+                    <TextBlock TextWrapping="Wrap" x:Name="uiSetPrivacyOptionsWhatToDo"></TextBlock>
+                    <CheckBox x:Name="uiPrivacyOptionAllow3rdParty" Content="Allow 3rd party access" Checked="OnPrivacyCheckChange" Unchecked="OnPrivacyCheckChange" />
+                    
+                    <Expander Header="Select individual maps" x:Name="uiPrivacyOptionsIndividualExpander">
+                        <StackPanel>
+                            <CheckBox x:Name="uiPrivacyOptionAllowOpenStreetMaps" Content="Allow the OpenStreetMap map" Checked="OnPrivacyCheckChange" Unchecked="OnPrivacyCheckChange" />
+                            <HyperlinkButton Content="OpenStreetMap privacy policy" NavigateUri="https://osmfoundation.org/wiki/Privacy_Policy" />
+                        </StackPanel>
+                    </Expander>
                 </StackPanel>
             </ContentDialog.Content>
         </ContentDialog>
-
     </Grid>
 </UserControl>

@@ -250,10 +250,20 @@ namespace WinUI3Controls
         private async void OnMenuFilePrivacyOptions(object sender, RoutedEventArgs e)
         {
             var start = App.UP.ToJson();
+
             PrivacyOptionsBeingInitialized = true;
-            uiPrivacyOptionBlock3rdParty.IsChecked = App.UP.UserMapPrivacyPreferences.DisableAll3rdPartyServices;
+            uiPrivacyOptionAllow3rdParty.IsChecked = App.UP.UserMapPrivacyPreferences.Allow3rdPartyServices;
             uiPrivacyOptionAllowOpenStreetMaps.IsChecked = App.UP.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue;
+            uiPrivacyOptionsIndividualExpander.IsExpanded = !App.UP.UserMapPrivacyPreferences.AllThirdPartyServicesAreAllowed;
+            var whatToDo = "";
+            if (!App.UP.UserMapPrivacyPreferences.Allow3rdPartyServices) whatToDo = "You must check the checkbox to use any 3rd party maps";
+            else if (App.UP.UserMapPrivacyPreferences.AllThirdPartyServicesAreAllowed) whatToDo = "You are allowing all 3rd party maps";
+            else whatToDo = "You must allow at least one map if you want to use a 3rd party map";
+
+            uiSetPrivacyOptionsWhatToDo.Text = whatToDo;
             PrivacyOptionsBeingInitialized = false;
+
+
             var result = await uiSetPrivacyOptions.ShowAsync();
             App.UP.Save();
             var end = App.UP.ToJson();
@@ -272,7 +282,7 @@ namespace WinUI3Controls
             if (PrivacyOptionsBeingInitialized) return;
 
             App.UP.UserMapPrivacyPreferences.AllowOpenStreetMapUnderlyingValue = uiPrivacyOptionAllowOpenStreetMaps.IsChecked ?? false;
-            App.UP.UserMapPrivacyPreferences.DisableAll3rdPartyServices = uiPrivacyOptionBlock3rdParty.IsChecked ?? false;
+            App.UP.UserMapPrivacyPreferences.Allow3rdPartyServices = uiPrivacyOptionAllow3rdParty.IsChecked ?? false; // ?? false is never the case; it's always properly set.
             ;
             if (!App.UP.UserMapPrivacyPreferences.UserHasPickedPrivacySettings)
             {

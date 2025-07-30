@@ -11,8 +11,8 @@ In particular:
 And see also [this link](https://operations.osmfoundation.org/policies/) and critically [tile server usage](https://operations.osmfoundation.org/policies/tiles/)
 
 **Key requirements** for my app:
-- Verify I'm using the right URL
-- Display the license attribution (check)
+- Verify I'm using the right URL (done; should be automatically correct thanks to Leaflet)
+- Display the license attribution (done)
 
 ### [Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy)
 
@@ -28,12 +28,13 @@ ShipwreckSoftware apps that display maps to the user use third-party map service
 OpenStreetMap [Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy)
 
 ```
+This is now completed; see my new Shipwreck [blog post](https://shipwrecksoftware.wordpress.com/2025/07/29/updated-privacy-policy-for-maps/) and the [updated privacy policy](https://shipwrecksoftware.wordpress.com/2019/02/24/common-privacy-policy/)
 
 ### [Trademark](https://osmfoundation.org/wiki/Trademark_Policy). 
 
 **Summary**: I need to provide an attribution notice.
 
-Per 1.3.1 and 1.3.2, this app is an "unrelated organization or individual" (at least, as used by the Simple GPS App). I don't have a trademark license, and therefore have to be careful about using the OpenStreamMap logo (etc.) in the app. 
+Per 1.3.1 and 1.3.2, this app is an "unrelated organization or individual" (at least, as used by the Simple GPS App). I don't have a trademark license, and therefore have to be careful about using the OpenStreetMap logo (etc.) in the app. 
 
 Per 3.3, I can refer to OSM in a referential way. Perhaps a small blurb at the bottom of the Leaflet map is best. And per 3.3.5, I can use OSM for complying with the attribution requirements.
 

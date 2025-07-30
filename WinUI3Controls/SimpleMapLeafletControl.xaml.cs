@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Shapes;
 using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Utilities;
 using Windows.Foundation;
@@ -30,7 +31,7 @@ namespace WinUI3Controls
         /// and don't mind that us developers have to waste hours of time researching why something doesn't
         /// work instead of just documented it and making a better error message.
         //String RootPath = "ms-appx:///Assets/SimpleMapLeaflet/SimpleMapLeaflet.html";
-        String RealMapHtml = "http://msappxreplacement/SimpleMapLeaflet.html";
+        String RealMapHtml = "http://msappxreplacement/SimpleMapLeaflet.html"; // Site that reports browser info: "https://www.whatismybrowser.com/"; //
         String UserMustInitializePrivacyPage = "http://msappxreplacement/UserMustInitializePrivacy.html";
         String LoadingMapPage = "http://msappxreplacement/LoadingMap.html";
         String UserHasBlockedThisMapPage = "http://msappxreplacement/UserHasBlockedThisMap.html";
@@ -55,21 +56,45 @@ namespace WinUI3Controls
             await InitializeWithLoadingPage();
         }
 
+        private void CoreWebView2_WebResourceRequested(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebResourceRequestedEventArgs args)
+        {
+            TraceNavigation($"OSM: Navigate: web resource requested: {args.Request.Uri}");
+            var headers = args.Request.Headers;
+            foreach (var (key, value) in headers)
+            {
+                TraceNavigation($"    Navigate: web resource: header key={key} value={value}");
+            }
+        }
 
+        private void CoreWebView2_SourceChanged(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2SourceChangedEventArgs args)
+        {
+            TraceNavigation($"OSM: Navigate: source change: {args.IsNewDocument}");
+        }
+
+        private void CoreWebView2_ContentLoading(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2ContentLoadingEventArgs args)
+        {
+            TraceNavigation($"OSM: Navigate: content loading: {args.NavigationId}");
+        }
 
         private void UiWebView_WebMessageReceived(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs args)
         {
-            Log($"DBG: Web message: {args.WebMessageAsJson}");
+            Log($"OSM: Web message: {args.WebMessageAsJson}");
         }
 
         private void UiWebView_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
         {
-            Log($"DBG: Navigate complete: http={args.HttpStatusCode} succ={args.IsSuccess}");
+            TraceNavigation($"OSM: Navigate complete: http={args.HttpStatusCode} succ={args.IsSuccess}");
         }
 
         private void UiWebView_NavigationStarting(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs args)
         {
-            Log($"DBG: Navigate started: kind={args.NavigationKind} uri={args.Uri}");
+            TraceNavigation($"OSM: Navigate started: kind={args.NavigationKind} uri={args.Uri}");
+
+            var headers  = args.RequestHeaders;
+            foreach (var (key,value) in headers)
+            {
+                TraceNavigation($"    Navigate: header key={key} value={value}");
+            }
         }
 
 
@@ -87,6 +112,14 @@ namespace WinUI3Controls
         {
             await uiWebView.EnsureCoreWebView2Async();
             uiWebView.CoreWebView2.SetVirtualHostNameToFolderMapping("msappxreplacement", AssetLocation, Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow);
+            uiWebView.CoreWebView2.Settings.UserAgent = "SimpleGpsExplorer (ShipwreckSoftware; library=leaflet; control=WebView2)";
+            TraceNavigation($"OSM: Initialize: just set UserAgent get={uiWebView.CoreWebView2.Settings.UserAgent}");
+
+            // Can't set these until after the EnsureCoreWebView2Async() call.
+            uiWebView.CoreWebView2.SourceChanged += CoreWebView2_SourceChanged;
+            uiWebView.CoreWebView2.ContentLoading += CoreWebView2_ContentLoading;
+            uiWebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
+            uiWebView.CoreWebView2.AddWebResourceRequestedFilter("*", Microsoft.Web.WebView2.Core.CoreWebView2WebResourceContext.All, Microsoft.Web.WebView2.Core.CoreWebView2WebResourceRequestSourceKinds.All);
 
             if (UserMapPrivacyPreferences == null)
             {
@@ -101,14 +134,14 @@ namespace WinUI3Controls
                 // User allows this page, but they have disallowed all maps.
                 uiWebView.Source = new Uri(UserHasBlockedAllMapsPage);
             }
-            else if (UserMapPrivacyPreferences.DisableAll3rdPartyServices)
+            else if (!UserMapPrivacyPreferences.Allow3rdPartyServices)
             {
                 uiWebView.Source = new Uri(UserHasBlockedAllMapsPage);
             }
             else if (UserMapPrivacyPreferences.AllowOpenStreetMap)
             {
                 uiWebView.Source = new Uri(LoadingMapPage);
-                await Task.Delay(1000); // Give the user a chance to see the loading page.
+                await Task.Delay(2_000); // Give the user a chance to see the loading page.
                 uiWebView.Source = new Uri(RealMapHtml);
             }
             else // This isn't really possible.
@@ -119,7 +152,14 @@ namespace WinUI3Controls
         }
 
 
+
         private void Log(string message)
+        {
+            uiLog.Text = message;
+            System.Diagnostics.Debug.WriteLine(message);
+        }
+
+        private void TraceNavigation(string message)
         {
             uiLog.Text = message;
             System.Diagnostics.Debug.WriteLine(message);
@@ -140,12 +180,11 @@ namespace WinUI3Controls
                     {
                         // The 0.0001 is a ten-thousandth of a minute. But the distances
                         // are in DD, so I need something a good bit smaller.
-                        var prev = MapData[MapData.Count - 1];
-                        var distance = prev.Distance(data);
-                        Log($"AddNmea: calculating new point distance={distance} ");
+                        
+                        //var prev = MapData[MapData.Count - 1];
+                        //var distance = prev.Distance(data);
+                        //Log($"AddNmea: calculating new point distance={distance} ");
                         MapData.Add(data);
-
-                        // TODO: Update Drawing
                     }
                     else
                     {
@@ -156,14 +195,12 @@ namespace WinUI3Controls
                             await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
                         }
                     }
-                        break;
+                    break;
                 default:
                     Log($"Error: AddNmea: Sample point parse {gprc.ParseStatus} data {gprc.OriginalNmeaString}");
                     break;
             }
             return nsegments;
         }
-
-
     }
 }
