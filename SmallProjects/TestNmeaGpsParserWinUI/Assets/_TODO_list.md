@@ -13,7 +13,7 @@ Take a look at https://www.reddit.com/r/IOT/comments/1lzgv0t/tired_of_janky_gps_
 
 2025-07-25: Solved! Bug: Why can't I build in Release mode? Is it related to WinUI3? WebView2? NewtonSoft? 
 
-### No support for ms-appx
+### Complete: No support for ms-appx
 
 See https://github.com/MicrosoftEdge/WebView2Feedback/issues/212
 See also: https://github.com/microsoft/microsoft-ui-xaml/issues/1967
