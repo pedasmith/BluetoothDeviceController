@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TestNmeaGpsParserWinUI;
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.System.Display;
 using static WinUI3Controls.SimpleMapControl;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -44,8 +45,17 @@ namespace WinUI3Controls
 
             NmeaParser.OnNmeaAll += NmeaParser_OnNmeaAll;
         }
-
+        /// <summary>
+        /// The list of all maps is set up in the Loaded event. It's essentially a static list; it's not intended to be dynamic.
+        /// </summary>
         List<IDoGpsMap> AllMaps = new List<IDoGpsMap>();
+
+        /// <summary>
+        /// Global variable for handing the display request (i.e., to keep the display on while the app is running).
+        /// </summary>
+        DisplayRequest CurrDisplayRequest = null;
+        bool DisplayRequestActive = false;
+
         private void GpsControl_Loaded(object sender, RoutedEventArgs e)
         {
             UserPreferences.LogTextBlock = uiLog;
@@ -528,6 +538,41 @@ namespace WinUI3Controls
             OnSendData?.Invoke(this, text);
         }
 
+        private void OnMenuDeveloperScreenOn(object sender, RoutedEventArgs e)
+        {
+            var isActive = (sender as ToggleMenuFlyoutItem).IsChecked; // this will be the new state
+            if (isActive)
+            {
+                EnsureDisplayRequestActive();
+            }
+            else
+            {
+                EnsureDisplayRequestRelease();
+            }
+        }
+
+        private void EnsureDisplayRequestActive()
+        {
+            if (DisplayRequestActive) return;
+            if (CurrDisplayRequest == null)
+            {
+                CurrDisplayRequest = new DisplayRequest();
+            }
+            CurrDisplayRequest.RequestActive();
+            DisplayRequestActive = true;
+        }
+
+        private void EnsureDisplayRequestRelease()
+        {
+            if (!DisplayRequestActive) return;
+            if (CurrDisplayRequest == null)
+            {
+                CurrDisplayRequest = new DisplayRequest();
+            }
+            CurrDisplayRequest.RequestRelease();
+            DisplayRequestActive = false;
+        }
+
         private async void OnMenuDeveloperAddSamplePoints(object sender, RoutedEventArgs e)
         {
             int nsegments = 0;
@@ -618,7 +663,5 @@ $GPRMC,184522.000,A,4321.4020,N,12345.9033,W,001.2,306.5,200625,,,A
 $GPRMC,184523.000,A,4321.4022,N,12345.9037,W,000.0,306.5,200625,,,A",
 
         };
-
-
     }
 }

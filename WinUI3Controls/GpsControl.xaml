@@ -33,7 +33,8 @@
             <MenuBarItem Title="Developer">
                 <MenuFlyoutItem Text="Add Sample Points" Click="OnMenuDeveloperAddSamplePoints"/>
                 <MenuFlyoutItem Text="Save Options" Click="OnMenuDeveloperSaveOptions"/>
-                <MenuFlyoutItem Text="Send Data" Click="OnMenuDeveloperSendData"/>
+                <MenuFlyoutItem Text="Send Data (non-functional)" Click="OnMenuDeveloperSendData"/>
+                <ToggleMenuFlyoutItem Text="Keep screen on" IsChecked="False" Click="OnMenuDeveloperScreenOn"/>
             </MenuBarItem>
         </muxc:MenuBar>
         <TabView Grid.Row="1" SelectedIndex="0" VerticalAlignment="Stretch">

@@ -13,12 +13,7 @@ Take a look at https://www.reddit.com/r/IOT/comments/1lzgv0t/tired_of_janky_gps_
 
 2025-07-25: Solved! Bug: Why can't I build in Release mode? Is it related to WinUI3? WebView2? NewtonSoft? 
 
-### Complete: No support for ms-appx
 
-See https://github.com/MicrosoftEdge/WebView2Feedback/issues/212
-See also: https://github.com/microsoft/microsoft-ui-xaml/issues/1967
-
-This restriction is not mentioned in https://learn.microsoft.com/en-us/microsoft-edge/webview2/get-started/winui
 
 ## Map V2: Use https://leafletjs.com/
 
@@ -30,8 +25,9 @@ Work item: add selection (call back to C#; do not try to track all points in JS)
 Work item: show details about the selected point
 
 Work item: add start + end point
-Work item: keep screen on via menu (in developer?)
 Work item: when clicking a link, open a new window in a browser!
+
+DONE 2025-08-06: Work item: keep screen on via menu (in developer for now?)
 
 
 DONE 2025-07-29: Work item: create user preferences including "don't use 3rd party maps". Includes hook to menu, save, restore
@@ -74,6 +70,15 @@ DONE convert lat / long to Degrees Decimal (DD).
 ## Smaller to-do items
 
 2025-06-17 ABANDONED Support the Dual switch set either way. Result: it's a weird binary that I haven't cracked 
+
+### Complete: No support for ms-appx
+
+See https://github.com/MicrosoftEdge/WebView2Feedback/issues/212
+See also: https://github.com/microsoft/microsoft-ui-xaml/issues/1967
+
+This restriction is not mentioned in https://learn.microsoft.com/en-us/microsoft-edge/webview2/get-started/winui
+Blog post: https://sunriseprogrammer.blogspot.com/2025/08/weird-issues-in-webview2-winui3-using.html
+
 
 ### Completed
 
