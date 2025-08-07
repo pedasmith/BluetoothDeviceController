@@ -8,6 +8,8 @@ using Parsers.Nmea;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Utilities;
 using Windows.Foundation;
@@ -51,10 +53,12 @@ namespace WinUI3Controls
             this.Loaded += SimpleMapLeafletControl_Loaded;
         }
 
+
+
         private async void SimpleMapLeafletControl_Loaded(object sender, RoutedEventArgs e)
         {
             uiWebView.NavigationStarting += UiWebView_NavigationStarting;
-            // These calls are not needed, but might be useful for debugging.
+            // These event calls are not needed, but might be useful for debugging.
             //uiWebView.NavigationCompleted += UiWebView_NavigationCompleted;
             //uiWebView.WebMessageReceived += UiWebView_WebMessageReceived;
 
@@ -66,12 +70,18 @@ namespace WinUI3Controls
             TraceNavigation($"OSM: Initialize: just set UserAgent get={uiWebView.CoreWebView2.Settings.UserAgent}");
 
 
-            // Can't set these until after the EnsureCoreWebView2Async() call.
-            // These calls are not needed, but might be useful for debugging.
+            // Can't set these events until after the EnsureCoreWebView2Async() call.
+            // These event calls are not needed, but might be useful for debugging.
             //uiWebView.CoreWebView2.SourceChanged += CoreWebView2_SourceChanged;
             //uiWebView.CoreWebView2.ContentLoading += CoreWebView2_ContentLoading;
             //uiWebView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
             //uiWebView.CoreWebView2.AddWebResourceRequestedFilter("*", Microsoft.Web.WebView2.Core.CoreWebView2WebResourceContext.All, Microsoft.Web.WebView2.Core.CoreWebView2WebResourceRequestSourceKinds.All);
+
+            // Add in my event handling
+            // See https://github.com/MicrosoftEdge/WebView2Feedback/issues/457
+            // less useful: See https://learn.microsoft.com/en-us/microsoft-edge/webview2/how-to/communicate-btwn-web-native
+            // less useful: See https://learn.microsoft.com/en-us/microsoft-edge/webview2/how-to/hostobject?tabs=win32
+            uiWebView.WebMessageReceived += UiWebView_WebMessageReceived;
 
             await InitializeWithLoadingPage();
         }
@@ -97,9 +107,59 @@ namespace WinUI3Controls
             TraceNavigation($"OSM: Navigate: content loading: {args.NavigationId}");
         }
 
-        private void UiWebView_WebMessageReceived(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs args)
+        class WebEvent
         {
-            Log($"OSM: Web message: {args.WebMessageAsJson}");
+            public string eventName { get; set; }
+        }
+        class WebClickEvent: WebEvent
+        {
+            public double lat { get; set; }
+            public double lng { get; set; }
+        }
+
+        class WebKeyDownEvent: WebEvent
+        {
+            public string key { get; set; }
+        }
+        private async void UiWebView_WebMessageReceived(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs args)
+        {
+            var webevent = JsonSerializer.Deserialize<WebEvent>(args.WebMessageAsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            switch (webevent.eventName)
+            {
+                case "OnClick":
+                    var clickEvent = JsonSerializer.Deserialize<WebClickEvent>(args.WebMessageAsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    Log($"OSM: Web click event: lat={clickEvent.lat} lng={clickEvent.lng}");
+
+                    if (uiWebView.CoreWebView2 != null)
+                    {
+                        var closestIndex = MapDataItem.GetClosestIndex(MapData, clickEvent.lat, clickEvent.lng); 
+                        if (closestIndex >= 0)
+                        {
+                            var closest = MapData[closestIndex];
+                            string summary = closestIndex + " " + closest.SummaryString;
+                            string script = $"showPopup({closest.Latitude.AsDecimal}, {closest.Longitude.AsDecimal}, \"{summary}\");";
+                            // Log($"Leaflet: script={script}");
+                            await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
+                        }
+                        else
+                        {
+                            string summary = "Can't find the closet point";
+                            string script = $"showPopup({clickEvent.lat}, {clickEvent.lng}, \"{summary}\");";
+                            // Log($"Leaflet: script={script}");
+                            await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
+                        }
+                    }
+                    break;
+
+                case "OnKeyDown":
+                    var keyDownEvent = JsonSerializer.Deserialize<WebKeyDownEvent>(args.WebMessageAsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    Log($"OSM: Web key down event: key={keyDownEvent.key}");
+                    break;
+
+                default:
+                    Log($"OSM: Web event: Other type={webevent.eventName}");
+                    break;
+            }
         }
 
         private void UiWebView_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
@@ -109,23 +169,31 @@ namespace WinUI3Controls
 
         private void UiWebView_NavigationStarting(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs args)
         {
-            TraceNavigation($"OSM: Navigate started: kind={args.NavigationKind} uri={args.Uri}");
+            TraceNavigation($"OSM: Navigate started: kind={args.NavigationKind} uri={args.Uri} nheaders={args.RequestHeaders.Count()}");
 
             // Input URL: ms-appx:///SimpleMapLeaflet/SimpleMapLeaflet.html
             // Updated URL: http://msappxreplacement/SimpleMapLeaflet.html
             var originalUri = args.Uri;
+            var extraStr = "";
             if (originalUri.StartsWith("ms-appx:///"))
             {
                 var replacementUri = originalUri.Replace("ms-appx:///", "http://msappxreplacement/");
                 TraceNavigation($"OSM: Navigate: replacing original URI {originalUri} with {replacementUri}");
                 args.Cancel = true; // Cancel the original navigation.
                 sender.Source = new Uri(replacementUri);
+                extraStr = " (cancelling):"; // Note: this doesn't get actually displayed because ms-appx:// URLs seemingly have no headers.
             }
 
             var headers  = args.RequestHeaders;
             foreach (var (key,value) in headers)
             {
-                TraceNavigation($"    Navigate: header key={key} value={value}");
+                TraceNavigation($"    Navigate: {extraStr}header key={key} value={value}");
+                if (key == "User-Agent")
+                {
+                    // The correct user-agent can only be found in the WebResourceRequested event.
+                    // See https://sunriseprogrammer.blogspot.com/2025/07/wierd-issues-in-winui3-webview2-solving.html
+                    TraceNavigation($"    Navigate: Note: User-Agent values are reported as the default values at this point, not a correct values");
+                }
             }
         }
 
@@ -209,13 +277,22 @@ namespace WinUI3Controls
                         //var prev = MapData[MapData.Count - 1];
                         //var distance = prev.Distance(data);
                         //Log($"AddNmea: calculating new point distance={distance} ");
-                        MapData.Add(data);
+                        if (uiWebView.CoreWebView2 != null)
+                        {
+                            MapData.Add(data);
+
+                            string script = $"AddNmea({data.Latitude.AsDecimal}, {gprc.Longitude.AsDecimal}, '{gprc.SummaryString}')";
+                            Log($"Leaflet: script={script}");
+                            await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
+                        }
                     }
                     else
                     {
                         if (uiWebView.CoreWebView2 != null)
                         {
-                            string script = $"AddNmea({gprc.Latitude.AsDecimal}, {gprc.Longitude.AsDecimal}, '{gprc.SummaryString}')";
+                            MapData.Add(data);
+
+                            string script = $"AddNmea({data.Latitude.AsDecimal}, {gprc.Longitude.AsDecimal}, '{gprc.SummaryString}')";
                             Log($"Leaflet: script={script}");
                             await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
                         }

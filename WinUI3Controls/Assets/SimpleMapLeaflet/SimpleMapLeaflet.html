@@ -1,11 +1,12 @@
 ﻿<head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="initial-scale=1">
-	<link rel="stylesheet" href="leaflet-194/leaflet.css"  />
-	<script src="leaflet-194/leaflet.js" ></script>
+	<link rel="stylesheet" href="leaflet-194/leaflet.css" />
+	<script src="leaflet-194/leaflet.js"></script>
 
 	<title>OpenStreetMap GPS overlay with Leaflet</title>
 
+	<!--  Leaflet is from https://leafletjs.com/ -->
 	<style>
 		html, body {
 			height: 100%;
@@ -22,13 +23,15 @@
 <div id="htmluiNmeaMap" style="width: 100%; height: 100%;"></div>
 <script>
 
-	// 43.36011666666667, -123.76338833333334
-	const defaultOregon = [43.36011666666667, -123.76338833333334];
-	const defaultUSNO = [38.921473, -77.066946];
-    const map = L.map('htmluiNmeaMap').setView(defaultUSNO, 15);
+	const LocationOregon = [43.36011666666667, -123.76338833333334];
+	const LocationUSNO = [38.921473, -77.066946];
+	const defaultLocation = LocationUSNO;
+	const map = L.map('htmluiNmeaMap', {
+        keyboard: false, // arrow keys are for the point navigation https://leafletjs.com/reference.html#map-option
+		}).setView(defaultLocation, 15);
 
 	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 19,
+		maxZoom: 22, // not enough zooming: 19		too much zooming: 25
 		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	}).addTo(map);
 
@@ -50,20 +53,28 @@
 		[51.503, -0.06],
 		[51.51, -0.047]
 	]).addTo(map).bindPopup('I am a polygon.');
-
-
-	const popup = L.popup()
-		.setLatLng([51.513, -0.09])
-		.setContent('I am a standalone popup.')
-		.openOn(map);
 	*/
 
+	const popup = L.popup();
+
 	function onMapClick(e) {
-		popup
-			.setLatLng(e.latlng)
-			.setContent(`You clicked the map at ${e.latlng.toString()}`)
-			.openOn(map);
+		let msg = { "eventName": "OnClick", "lat": e.latlng.lat, "lng": e.latlng.lng };
+        window.chrome.webview.postMessage(msg);
 	}
+
+	function showPopup(lat, lng, summary) {
+		let latlng = L.latLng(lat, lng);
+        popup
+        	.setLatLng(latlng)
+        	.setContent(summary)
+        	.openOn(map);
+	}
+
+	// FYI: how to move the popup around
+    //popup
+    //	.setLatLng(e.latlng)
+    //	.setContent(`You clicked the map at ${e.latlng.toString()}`)
+	//	.openOn(map);
 
 	map.on('click', onMapClick);
 
@@ -81,6 +92,21 @@
         //    .bindPopup('<b>' + summary + '</b><br />I am a popup.').openPopup();
 
 	}
+
+    document.addEventListener('keydown', function (event) {
+        switch (event.key) {
+            case 'ArrowUp':
+            case 'ArrowDown':
+            case 'ArrowLeft':
+            case 'ArrowRight':
+                let msg = { "eventName": "OnKeyDown", "key": event.key};
+                window.chrome.webview.postMessage(msg);
+                break;
+            default:
+                console.log('Other key pressed');
+        }
+    });
+
 
 </script>
 

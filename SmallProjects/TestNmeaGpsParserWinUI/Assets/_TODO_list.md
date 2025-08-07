@@ -12,6 +12,7 @@ Take a look at https://www.reddit.com/r/IOT/comments/1lzgv0t/tired_of_janky_gps_
 ## Issues with Visual Studio and WinUI3
 
 2025-07-25: Solved! Bug: Why can't I build in Release mode? Is it related to WinUI3? WebView2? NewtonSoft? 
+2025-07-29: Solved: Setting UserAgent (user-agent). See https://sunriseprogrammer.blogspot.com/2025/07/wierd-issues-in-winui3-webview2-solving.html
 
 
 
@@ -21,14 +22,14 @@ https://leafletjs.com/ is a JavaScript library for interactive maps. It can be u
 
 Work item: add a clear button
 Work item: zoom to starting point
-Work item: add selection (call back to C#; do not try to track all points in JS)
-Work item: show details about the selected point
 
-Work item: add start + end point
-Work item: when clicking a link, open a new window in a browser!
+Work item: add start + end point (and do what?)
+Work item: when clicking a link, open a new window in a browser! (like the links for OSM)
+Work item: using arrow keys to navigate among the points
 
+DONE 2025-08-07: Work item: allow for zooming in a little more.
+DONE 2025-08-07: Work item: show details about the selected point
 DONE 2025-08-06: Work item: keep screen on via menu (in developer for now?)
-
 
 DONE 2025-07-29: Work item: create user preferences including "don't use 3rd party maps". Includes hook to menu, save, restore
 DONE 2025-07-29: Work item: verify open map usage policy; make sure that when I ship I'm still in compliance https://www.openstreetmap.org/
