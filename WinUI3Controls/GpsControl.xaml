@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinUI3Controls"
     xmlns:summary="using:TestNmeaGpsParserWinUI"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -25,18 +24,18 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <muxc:MenuBar Grid.Row="0">
-            <MenuBarItem Title="File">
+        <MenuBar x:Name="uiMenuBar" Grid.Row="0">
+            <MenuBarItem Title="File" AccessKey="F">
                 <MenuFlyoutItem Text="Privacy Options ..." Click="OnMenuFilePrivacyOptions"/>
-                <MenuFlyoutItem Text="Exit" Click="OnExitClick"/>
+                <MenuFlyoutItem AccessKey="X" Text="Exit" Click="OnExitClick"/>
             </MenuBarItem>
-            <MenuBarItem Title="Developer">
-                <MenuFlyoutItem Text="Add Sample Points" Click="OnMenuDeveloperAddSamplePoints"/>
+            <MenuBarItem Title="Developer" AccessKey="D">
+                <MenuFlyoutItem AccessKey="A" Text="Add Sample Points" Click="OnMenuDeveloperAddSamplePoints"/>
                 <MenuFlyoutItem Text="Save Options" Click="OnMenuDeveloperSaveOptions"/>
                 <MenuFlyoutItem Text="Send Data (non-functional)" Click="OnMenuDeveloperSendData"/>
                 <ToggleMenuFlyoutItem Text="Keep screen on" IsChecked="False" Click="OnMenuDeveloperScreenOn"/>
             </MenuBarItem>
-        </muxc:MenuBar>
+        </MenuBar>
         <TabView Grid.Row="1" SelectedIndex="0" VerticalAlignment="Stretch">
             <TabViewItem Header="Map">
                 <Grid>

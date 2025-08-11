@@ -22,7 +22,10 @@ namespace WinUI3Controls
 {
     public interface IDoGpsMap
     {
-        Task<int> AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal);
+        //Task AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal);
+        Task MapDataUpdatedGroup(MapDataItem prev, LogLevel logLevel = LogLevel.Normal);
+        Task MapDataAddedFirstItem(MapDataItem data, LogLevel logLevel = LogLevel.Normal);
+        Task MapDataAddedNewItem(MapDataItem data, LogLevel logLevel = LogLevel.Normal);
         Task PrivacyUpdated();
     }
 
@@ -63,10 +66,11 @@ namespace WinUI3Controls
             // Testing the Save code
             App.UP.Restore();
 
+            uiSimpleMapV1.MapData = MapData;
+            uiSimpleMapLeaflet.MapData = MapData;
             AllMaps.Add(uiSimpleMapV1);
             AllMaps.Add(uiSimpleMapLeaflet);
             uiSimpleMapLeaflet.UserMapPrivacyPreferences = App.UP.UserMapPrivacyPreferences;
-
 
             // Pick the "simple map"
             uiMapSelectionComboBox.SelectedIndex = 1;
@@ -179,10 +183,7 @@ namespace WinUI3Controls
                 uiHeadingTrue.Text = $"{e.HeadingDegreesTrue}";
                 uiMagneticVariation.Text = $"{e.MagneticVariation}";
 
-                foreach (var map in AllMaps)
-                {
-                    map.AddNmea(e); 
-                }
+                var task = AddNmeaCombined(e);
             });
         }
 
@@ -575,22 +576,73 @@ namespace WinUI3Controls
 
         private async void OnMenuDeveloperAddSamplePoints(object sender, RoutedEventArgs e)
         {
-            int nsegments = 0;
             var lines = SampleNmea[CurrSettings.CurrSampleNmea % SampleNmea.Length].Split("\r\n");
             foreach (var line in lines)
             {
                 var gprc = new GPRMC_Data(line);
                 gprc.Latitude.LatitudeMinutesDecimal += (CurrSettings.CurrSampleNmea * 50);
-                foreach (var map in AllMaps)
-                {
-                    nsegments += await map.AddNmea(gprc, LogLevel.None);
-                }
+                await AddNmeaCombined(gprc, LogLevel.None);
             }
 
             // Boop the index so next time the button is pressed we get the next set of data.
-            Log($"Add sample points: nsegments={nsegments} from {CurrSettings.CurrSampleNmea}");
+            Log($"Add sample points: {CurrSettings.CurrSampleNmea}");
             CurrSettings.CurrSampleNmea += 1;
         }
+
+        const double GROUPING_DISTANCE = 0.0005 / 60.0; // about 5*1.8 meters
+        List<MapDataItem> MapData = new List<MapDataItem>();
+        /// <summary>
+        /// Add an NMEA GPRMS data item to the map.
+        /// </summary>
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task AddNmeaCombined(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        {
+            switch (gprc.ParseStatus)
+            {
+                case Nmea_Gps_Parser.ParseResult.Ok:
+                    var data = new MapDataItem(gprc);
+                    if (MapData.Count >= 1)
+                    {
+                        // The 0.0001 is a ten-thousandth of a minute. But the distances
+                        // are in DD, so I need something a good bit smaller.
+                        var prev = MapData[MapData.Count - 1];
+                        var distance = prev.Distance(data);
+                        Log($"AddNmea: calculating new point distance={distance} (grouping distance is {GROUPING_DISTANCE})");
+                        if (distance < GROUPING_DISTANCE)
+                        {
+                            prev.GroupedNmea.Add(gprc); // and I'll just abandon the new MapDataItem
+                            foreach (var map in AllMaps)
+                            {
+                                await map.MapDataUpdatedGroup(prev, logLevel);
+                            }
+                        }
+                        else // new last point
+                        {
+                            MapData.Add(data);
+                            foreach (var map in AllMaps)
+                            {
+                                await map.MapDataAddedNewItem(data, logLevel);
+                            }
+
+                        }
+                    }
+                    else // is first point
+                    {
+                        MapData.Add(data);
+                        foreach (var map in AllMaps)
+                        {
+                            await map.MapDataAddedFirstItem(data, logLevel);
+                        }
+                    }
+                    break;
+                default:
+                    Log($"Error: AddNmea: Sample point parse {gprc.ParseStatus} data {gprc.OriginalNmeaString}");
+                    break;
+            }
+        }
+
+
 
         class UserSettings
         {

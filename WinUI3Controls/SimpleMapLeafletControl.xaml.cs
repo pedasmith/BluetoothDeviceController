@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Shapes;
@@ -15,6 +16,7 @@ using Utilities;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.System;
 using static WinUI3Controls.SimpleMapControl;
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -24,6 +26,9 @@ using static WinUI3Controls.SimpleMapControl;
 
 namespace WinUI3Controls
 {
+    /// <summary>
+    /// Leaflet is from https://leafletjs.com/
+    /// </summary>
     public sealed partial class SimpleMapLeafletControl : UserControl, IDoGpsMap
     {
         /// 
@@ -44,7 +49,7 @@ namespace WinUI3Controls
         String UserHasBlockedAllMapsPage = "ms-appx:///UserHasBlockedAllMaps.html";
         String AssetLocation = "Assets/SimpleMapLeaflet";
 
-        List<MapDataItem> MapData = new List<MapDataItem>();
+        public List<MapDataItem> MapData = null;
 
         public UserMapPrivacyPreferences UserMapPrivacyPreferences { get; set; } = null;
         public SimpleMapLeafletControl()
@@ -86,6 +91,8 @@ namespace WinUI3Controls
             await InitializeWithLoadingPage();
         }
 
+
+
         private void CoreWebView2_WebResourceRequested(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebResourceRequestedEventArgs args)
         {
             TraceNavigation($"OSM: Navigate: web resource requested: {args.Request.Uri}");
@@ -117,9 +124,13 @@ namespace WinUI3Controls
             public double lng { get; set; }
         }
 
-        class WebKeyDownEvent: WebEvent
+        class WebKeyDownEvent : WebEvent
         {
             public string key { get; set; }
+        }
+        class WebAltKeyDownEvent : WebEvent
+        {
+            public string key { get; set; } // "Alt" for the Alt key.
         }
         private async void UiWebView_WebMessageReceived(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs args)
         {
@@ -156,11 +167,24 @@ namespace WinUI3Controls
                     Log($"OSM: Web key down event: key={keyDownEvent.key}");
                     break;
 
+                case "OnAltKeyDown":
+                    var altKeyDownEvent = JsonSerializer.Deserialize<WebAltKeyDownEvent>(args.WebMessageAsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    Log($"OSM: Web alt key down event: key={altKeyDownEvent.key}");
+                    // This is a workaround for the WebView2 bug that doesn't allow Alt key events to be handled by the parent control.
+
+                    var parent = this.Parent as FrameworkElement;
+                    if (parent != null)
+                    {
+                        parent.Focus(FocusState.Programmatic); // shift the focus so that the next Alt key will be handled by the parent control.
+                    }
+                    break;
+
                 default:
                     Log($"OSM: Web event: Other type={webevent.eventName}");
                     break;
             }
         }
+
 
         private void UiWebView_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
         {
@@ -258,51 +282,35 @@ namespace WinUI3Controls
             System.Diagnostics.Debug.WriteLine(message);
         }
 
-        /// <summary>
-        /// Add an NMEA GPRMS data item to the map.
-        /// </summary>
-        public async Task<int> AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal)
+        public async Task MapDataUpdatedGroup(MapDataItem prev, LogLevel logLevel = LogLevel.Normal)
         {
-            int nsegments = 0;
-            switch (gprc.ParseStatus)
+            // TODO: handle groups!
+            if (uiWebView.CoreWebView2 != null)
             {
-                case Nmea_Gps_Parser.ParseResult.Ok:
-                    var data = new MapDataItem(gprc);
-
-                    if (MapData.Count >= 1)
-                    {
-                        // The 0.0001 is a ten-thousandth of a minute. But the distances
-                        // are in DD, so I need something a good bit smaller.
-                        
-                        //var prev = MapData[MapData.Count - 1];
-                        //var distance = prev.Distance(data);
-                        //Log($"AddNmea: calculating new point distance={distance} ");
-                        if (uiWebView.CoreWebView2 != null)
-                        {
-                            MapData.Add(data);
-
-                            string script = $"AddNmea({data.Latitude.AsDecimal}, {gprc.Longitude.AsDecimal}, '{gprc.SummaryString}')";
-                            Log($"Leaflet: script={script}");
-                            await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
-                        }
-                    }
-                    else
-                    {
-                        if (uiWebView.CoreWebView2 != null)
-                        {
-                            MapData.Add(data);
-
-                            string script = $"AddNmea({data.Latitude.AsDecimal}, {gprc.Longitude.AsDecimal}, '{gprc.SummaryString}')";
-                            Log($"Leaflet: script={script}");
-                            await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
-                        }
-                    }
-                    break;
-                default:
-                    Log($"Error: AddNmea: Sample point parse {gprc.ParseStatus} data {gprc.OriginalNmeaString}");
-                    break;
+                string script = $"AddNmeaUpdatedGroup({prev.Latitude.AsDecimal}, {prev.Longitude.AsDecimal}, '{prev.SummaryString}', {prev.GroupedNmea.Count})";
+                Log($"Leaflet: script={script}");
+                await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
             }
-            return nsegments;
+        }
+
+        public async Task MapDataAddedFirstItem(MapDataItem data, LogLevel logLevel = LogLevel.Normal)
+        {
+            if (uiWebView.CoreWebView2 != null)
+            {
+                string script = $"AddNmeaFirstItem({data.Latitude.AsDecimal}, {data.Longitude.AsDecimal}, '{data.SummaryString}', {data.GroupedNmea.Count})";
+                Log($"Leaflet: script={script}");
+                await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
+            }
+        }
+
+        public async Task MapDataAddedNewItem(MapDataItem data, LogLevel logLevel = LogLevel.Normal)
+        {
+            if (uiWebView.CoreWebView2 != null)
+            {
+                string script = $"AddNmeaNewItem({data.Latitude.AsDecimal}, {data.Longitude.AsDecimal}, '{data.SummaryString}', {data.GroupedNmea.Count})";
+                Log($"Leaflet: script={script}");
+                await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
+            }
         }
     }
 }

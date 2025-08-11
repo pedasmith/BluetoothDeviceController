@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TestNmeaGpsParserWinUI;
 using Windows.Foundation;
+using static WinUI3Controls.SimpleMapControl;
 
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -55,7 +56,6 @@ namespace WinUI3Controls
         const double MAX_SEGMENT_LENGTH = 100.0;
         const int MAX_SEGMENTS_PER_LINE = 100;
         const int MAX_SEGMENTS_HYSTERESIS = 2 * (MAX_STARTING_SEGMENTS + MAX_ENDING_SEGMENTS);
-        const double GROUPING_DISTANCE = 0.0005 / 60.0; // about 5*1.8 meters
         const double MIN_MARKER_SIZE = 3;
         const double MAX_MARKER_SIZE = 10;
         const double CURSOR_RADIUS = 4;
@@ -73,7 +73,7 @@ namespace WinUI3Controls
         static Brush PositionLineEndingBrush = new SolidColorBrush(Colors.DarkCyan);
         static Brush PositionLineBrush3 = new SolidColorBrush(Colors.Red);
 
-        List<MapDataItem> MapData = new List<MapDataItem>();
+        public List<MapDataItem> MapData = null;
         DrawingState DS = new DrawingState();
 
         // Used internally
@@ -339,7 +339,7 @@ namespace WinUI3Controls
         }
 
         /// <summary>
-        /// You can set either the indexDeta or the groupIndexDelta, but not both. And you can only set the
+        /// You can set either the indexDelta or the groupIndexDelta, but not both. And you can only set the
         /// values to -1, 0, or 1.
         /// </summary>
         private void DisplayHighlightByIndexDelta(int indexDelta, int groupIndexDelta)
@@ -463,6 +463,7 @@ namespace WinUI3Controls
         }
         void OnClear(object sender, RoutedEventArgs e)
         {
+            // TODO: these needs to be top-down, from the GpsControl
             DoClear();
             MapData.Clear();
             DS.ResetScale();
@@ -475,7 +476,7 @@ namespace WinUI3Controls
         void OnRedraw(object sender, RoutedEventArgs e)
         {
             DoClear(); // Also does DS.Clear() but not DS.ResetScale() and will not remove mapdata
-            int nsegments = RedrawAllLines(LogLevel.None);
+            RedrawAllLines(LogLevel.None);
         }
 
 
@@ -555,75 +556,49 @@ namespace WinUI3Controls
             uiCursorStart.Points.Clear();
         }
 
+
         /// <summary>
-        /// Add an NMEA GPRMS data item to the map.
+        /// Called when the given MapDataItem has been updated so that there' a new value for the marker size.
         /// </summary>
+        /// <param name="prev"></param>
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task<int> AddNmea(GPRMC_Data gprc, LogLevel logLevel = LogLevel.Normal)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+
+        public async Task MapDataUpdatedGroup(MapDataItem prev, LogLevel logLevel)
         {
-            int nsegments = 0;
-            switch (gprc.ParseStatus)
+            var oldw = prev.Dot.Width;
+            var marker_size = CalculateMarkerSize(prev);
+
+            // Update drawing
+            var delta = (marker_size - oldw) / 2.0;
+            if (delta > 0.0)
             {
-                case Nmea_Gps_Parser.ParseResult.Ok:
-                    var data = new MapDataItem(gprc);
-                    if (MapData.Count >= 1)
-                    {
-                        // The 0.0001 is a ten-thousandth of a minute. But the distances
-                        // are in DD, so I need something a good bit smaller.
-                        var prev = MapData[MapData.Count - 1];
-                        var distance = prev.Distance(data);
-                        Log($"AddNmea: calculating new point distance={distance} (grouping distance is {GROUPING_DISTANCE})");
-                        if (distance < GROUPING_DISTANCE)
-                        {
-                            prev.GroupedNmea.Add(gprc); // and I'll just abandon the new MapDataItem
-                            var oldw = prev.Dot.Width;
-                            var marker_size = CalculateMarkerSize(prev);
-
-                            // Update drawing
-                            var delta = (marker_size - oldw) / 2.0;
-                            if (delta > 0.0)
-                            {
-                                Log($"AddNmea: resize dot; move left from {Canvas.GetLeft(prev.Dot)} by {delta}");
-                                Canvas.SetLeft(prev.Dot, Canvas.GetLeft(prev.Dot) - delta);
-                                Canvas.SetTop(prev.Dot, Canvas.GetTop(prev.Dot) - delta);
-                                prev.Dot.Width = marker_size;
-                                prev.Dot.Height = marker_size;
-                            }
-                            else
-                            {
-                                Log($"Addnmea: do not resize dot. marker_size={marker_size} oldw={oldw}");
-                            }
-                        }
-                        else // new last point
-                        {
-                            MapData.Add(data);
-
-                            // Update drawing
-                            if (DS.NSegments > MAX_SEGMENTS_HYSTERESIS)
-                            {
-                                Log($"AddNmea: must redraw: nsegments={nsegments} DS.NSegments={DS.NSegments} HYS={MAX_SEGMENTS_HYSTERESIS}");
-                                DoClear(); // Also does DS.Clear() but not DS.ResetScale() and will not remove mapdata
-                                nsegments = RedrawAllLines(LogLevel.None);
-                            }
-                            nsegments += DrawMapDataItem(data, LineType.EndingLine, PointTypeFlag.IsLastPoint, logLevel);
-
-                        }
-                    }
-                    else // is first point
-                    {
-                        MapData.Add(data);
-
-                        // Update Drawing
-                        nsegments += DrawMapDataItem(data, LineType.EndingLine, PointTypeFlag.IsFirstPoint, logLevel);
-                    }
-                    break;
-                default:
-                    Log($"Error: AddNmea: Sample point parse {gprc.ParseStatus} data {gprc.OriginalNmeaString}");
-                    break;
+                Log($"AddNmea: resize dot; move left from {Canvas.GetLeft(prev.Dot)} by {delta}");
+                Canvas.SetLeft(prev.Dot, Canvas.GetLeft(prev.Dot) - delta);
+                Canvas.SetTop(prev.Dot, Canvas.GetTop(prev.Dot) - delta);
+                prev.Dot.Width = marker_size;
+                prev.Dot.Height = marker_size;
             }
-            return nsegments;
+            else
+            {
+                Log($"Addnmea: do not resize dot. marker_size={marker_size} oldw={oldw}");
+            }
         }
+
+        public async Task MapDataAddedFirstItem(MapDataItem data, LogLevel logLevel)
+        {
+            DrawMapDataItem(data, LineType.EndingLine, PointTypeFlag.IsFirstPoint, logLevel);
+        }
+        public async Task MapDataAddedNewItem(MapDataItem data, LogLevel logLevel)
+        {
+            if (DS.NSegments > MAX_SEGMENTS_HYSTERESIS)
+            {
+                Log($"AddNmea: must redraw:  DS.NSegments={DS.NSegments} HYS={MAX_SEGMENTS_HYSTERESIS}");
+                DoClear(); // Also does DS.Clear() but not DS.ResetScale() and will not remove mapdata
+                RedrawAllLines(LogLevel.None);
+            }
+            DrawMapDataItem(data, LineType.EndingLine, PointTypeFlag.IsLastPoint, logLevel);
+        }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         #region DRAWING
         private int DrawMapDataItem(MapDataItem data, LineType lineType, PointTypeFlag pflag, LogLevel logLevel)
@@ -824,7 +799,7 @@ namespace WinUI3Controls
             uiMapMarkerCanvas.Children.Add(marker);
             Canvas.SetLeft(marker, newp.X - marker_size / 2.0);
             Canvas.SetTop(marker, newp.Y - marker_size / 2.0);
-            data.Dot = marker;
+            data.Dot = marker; // Note that this is always the first time this is set, and it's always set to the min size
 
             // Move the cursor
             if (pflag.HasFlag(PointTypeFlag.IsLastPoint))

@@ -27,6 +27,12 @@ Work item: add start + end point (and do what?)
 Work item: when clicking a link, open a new window in a browser! (like the links for OSM)
 Work item: using arrow keys to navigate among the points
 
+Work item: unified MapData list - 
+    Leaflet groups marker size
+    Leaflet show group items
+    Leaflet arrow keys to navigate
+    Fix the ALT key problem (WebView2 swallows the ALT key so it can't be used for the Menus)
+
 DONE 2025-08-07: Work item: allow for zooming in a little more.
 DONE 2025-08-07: Work item: show details about the selected point
 DONE 2025-08-06: Work item: keep screen on via menu (in developer for now?)
