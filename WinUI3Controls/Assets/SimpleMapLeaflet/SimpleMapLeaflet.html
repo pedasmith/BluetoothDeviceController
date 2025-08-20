@@ -32,6 +32,10 @@
 	const MAX_MARKER_SIZE = 10;
 
     let LocationTrack;
+    let StartMarker; // is an l.Marker created at AddNmeaFirstItem
+    let MostRecentCircle = null; // TODO: track all the circles!
+    const popup = L.popup();
+
     let trackColor = 'red';
 
 	const map = L.map('htmluiNmeaMap', {
@@ -44,25 +48,6 @@
 	}).addTo(map);
 
 
-	/*
-	const marker = L.marker([51.5, -0.09]).addTo(map)
-		.bindPopup('<b>Hello world!</b><br />I am a popup.').openPopup();
-
-	const circle = L.circle([51.508, -0.11], {
-		color: 'red',
-		fillColor: '#f03',
-		fillOpacity: 0.5,
-		radius: 500
-	}).addTo(map).bindPopup('I am a circle.');
-
-	const polygon = L.polygon([
-		[51.509, -0.08],
-		[51.503, -0.06],
-		[51.51, -0.047]
-	]).addTo(map).bindPopup('I am a polygon.');
-	*/
-
-	const popup = L.popup();
 
 	function onMapClick(e) {
 		let msg = { "eventName": "OnClick", "lat": e.latlng.lat, "lng": e.latlng.lng };
@@ -96,7 +81,7 @@
 		let position = [latitude, longitude];
 
         map.setView(position, 17);
-        const marker = L.marker([latitude, longitude]).addTo(map)
+        StartMarker = L.marker([latitude, longitude]).addTo(map)
 			.bindPopup('<b>' + summary + '</b><br />Starting location').openPopup();
         LocationTrack = L.polyline([], { color: trackColor }).addTo(map);
 
@@ -111,7 +96,6 @@
         }).addTo(map).bindPopup('I am the first circle.');
 	}
 
-    let MostRecentCircle = null;
     function AddNmeaNewItem(latitude, longitude, summary, count) {
 		let position = [latitude, longitude];
 
@@ -129,6 +113,12 @@
     function AddNmeaUpdatedGroup(latitude, longitude, summary, count) {
 		let markerRadius = CalculateMarkerSize(count);
 		MostRecentCircle.setRadius = markerRadius;
+	}
+
+	// Called from the MapDataClear interface on the Leaflet.xaml.cs code
+	// Should remove the line, the dots, and the pop-ups
+	function MapDataClearJS() {
+
 	}
 
     document.addEventListener('keydown', function (event) {

@@ -49,7 +49,6 @@
         </Border>
         <StackPanel Grid.Row="2">
             <StackPanel Orientation="Horizontal" >
-                <Button Content="Clear" Click="OnClear" />
                 <Button Content="Redraw" Click="OnRedraw" />
                 <Button Content="CancelFocus" Click="OnCancelFocus" />
                 <TextBlock x:Name="uiFocus" MinWidth="200" />

@@ -29,8 +29,11 @@
                 <MenuFlyoutItem Text="Privacy Options ..." Click="OnMenuFilePrivacyOptions"/>
                 <MenuFlyoutItem AccessKey="X" Text="Exit" Click="OnExitClick"/>
             </MenuBarItem>
+            <MenuBarItem Title="Maps" AccessKey="M">
+                <MenuFlyoutItem AccessKey="C" Text="Clear points" Click="OnMenuMapClearPoints"/>
+            </MenuBarItem>
             <MenuBarItem Title="Developer" AccessKey="D">
-                <MenuFlyoutItem AccessKey="A" Text="Add Sample Points" Click="OnMenuDeveloperAddSamplePoints"/>
+                <MenuFlyoutItem AccessKey="A" Text="Add sample points" Click="OnMenuDeveloperAddSamplePoints"/>
                 <MenuFlyoutItem Text="Save Options" Click="OnMenuDeveloperSaveOptions"/>
                 <MenuFlyoutItem Text="Send Data (non-functional)" Click="OnMenuDeveloperSendData"/>
                 <ToggleMenuFlyoutItem Text="Keep screen on" IsChecked="False" Click="OnMenuDeveloperScreenOn"/>

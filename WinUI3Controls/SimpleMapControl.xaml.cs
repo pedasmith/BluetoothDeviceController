@@ -461,17 +461,6 @@ namespace WinUI3Controls
                 uiPointInfoBorder.Visibility = Visibility.Visible;
             }
         }
-        void OnClear(object sender, RoutedEventArgs e)
-        {
-            // TODO: these needs to be top-down, from the GpsControl
-            DoClear();
-            MapData.Clear();
-            DS.ResetScale();
-            Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0);
-            Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0);
-            uiPointInfoBorder.Visibility = Visibility.Collapsed;
-            uiCursorHighlight.Visibility = Visibility.Collapsed;
-        }
 
         void OnRedraw(object sender, RoutedEventArgs e)
         {
@@ -597,6 +586,18 @@ namespace WinUI3Controls
                 RedrawAllLines(LogLevel.None);
             }
             DrawMapDataItem(data, LineType.EndingLine, PointTypeFlag.IsLastPoint, logLevel);
+        }
+
+        public async Task MapDataClear(LogLevel logLevel = LogLevel.Normal)
+        {
+            // TODO: these needs to be top-down, from the GpsControl
+            DoClear();
+            MapData.Clear();
+            DS.ResetScale();
+            Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0);
+            Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0);
+            uiPointInfoBorder.Visibility = Visibility.Collapsed;
+            uiCursorHighlight.Visibility = Visibility.Collapsed;
         }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 

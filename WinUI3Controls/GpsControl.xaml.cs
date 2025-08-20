@@ -26,6 +26,11 @@ namespace WinUI3Controls
         Task MapDataUpdatedGroup(MapDataItem prev, LogLevel logLevel = LogLevel.Normal);
         Task MapDataAddedFirstItem(MapDataItem data, LogLevel logLevel = LogLevel.Normal);
         Task MapDataAddedNewItem(MapDataItem data, LogLevel logLevel = LogLevel.Normal);
+
+        /// <summary>
+        /// Clears the current line of GPS locations. There shouldn't be much "data", but 
+        /// </summary>
+        Task MapDataClear(LogLevel logLevel = LogLevel.Normal);
         Task PrivacyUpdated();
     }
 
@@ -520,6 +525,7 @@ namespace WinUI3Controls
             Application.Current.Exit();
         }
 
+
         private void OnMenuDeveloperSaveOptions(object sender, RoutedEventArgs e)
         {
             App.UP.Save();
@@ -642,6 +648,14 @@ namespace WinUI3Controls
             }
         }
 
+        private void OnMenuMapClearPoints(object sender, RoutedEventArgs e)
+        {
+            foreach (var map in AllMaps)
+            {
+                map.MapDataClear();
+            }
+        }
+
 
 
         class UserSettings
@@ -715,5 +729,6 @@ $GPRMC,184522.000,A,4321.4020,N,12345.9033,W,001.2,306.5,200625,,,A
 $GPRMC,184523.000,A,4321.4022,N,12345.9037,W,000.0,306.5,200625,,,A",
 
         };
+
     }
 }

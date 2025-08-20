@@ -17,6 +17,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.System;
+//using static System.Runtime.InteropServices.JavaScript.JSType;
 using static WinUI3Controls.SimpleMapControl;
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -311,6 +312,17 @@ namespace WinUI3Controls
                 Log($"Leaflet: script={script}");
                 await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
             }
+        }
+
+        public async Task MapDataClear(LogLevel logLevel = LogLevel.Normal)
+        {
+            if (uiWebView.CoreWebView2 != null)
+            {
+                string script = $"MapDataClearJS()";
+                Log($"Leaflet: script={script}");
+                await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
+            }
+
         }
     }
 }
