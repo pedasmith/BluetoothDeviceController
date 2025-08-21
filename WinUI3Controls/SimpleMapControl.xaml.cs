@@ -35,6 +35,7 @@ namespace WinUI3Controls
 
             this.Loaded += SimpleMapControl_Loaded;
             this.Unloaded += SimpleMapControl_Unloaded;
+            this.LayoutUpdated += SimpleMapControl_LayoutUpdated;
         }
 
 
@@ -83,7 +84,7 @@ namespace WinUI3Controls
         WinUI3Controls.ConstantlyShowCurrentFocusTask ConstantlyShowCurrentFocus; // Created in constructor; used in loaded/unloading
         private void SimpleMapControl_Loaded(object sender, RoutedEventArgs e)
         {
-            Log($"SimpleMapControl: Loaded called: Random={RandomValue}");
+            Log($"SimpleMapControl: Loaded called: Random={RandomValue} ActualWidth={uiMapCanvas.ActualWidth}");
             this.Focus(FocusState.Programmatic);
 
             UnloadingCts = new CancellationTokenSource();
@@ -104,6 +105,26 @@ namespace WinUI3Controls
         {
             Log($"SimpleMapControl: Unloaded called: Random={RandomValue}");
             UnloadingCts.Cancel();
+        }
+
+        int NLayoutUpdate = 0;
+        private void SimpleMapControl_LayoutUpdated(object sender, object e)
+        {
+            if (uiMapCanvas.ActualWidth == 0) return;
+            NLayoutUpdate++;
+            if (NLayoutUpdate > 1)
+            {
+                // Log($"SimpleMapControl: LayoutUpdated called: Random={RandomValue} NLayoutUpdate={NLayoutUpdate} ActualWidth={uiMapCanvas.ActualWidth}");
+                return;
+            }
+            if (MapData == null || MapData.Count == 0)
+            {
+                Log($"SimpleMapControl: LayoutUpdated called: Random={RandomValue} NLayoutUpdate={NLayoutUpdate} ActualWidth={uiMapCanvas.ActualWidth} but no MapData");
+                return;
+            }
+            var index = 0;
+            var data = MapData[index];
+            var p = CenterOnData(data);
         }
 
 
@@ -302,9 +323,7 @@ namespace WinUI3Controls
                     if (DS.HighlightedMapDataItemIndex >= 0)
                     {
                         var data = MapData[DS.HighlightedMapDataItemIndex];
-                        var p = ToPoint(data);
-                        Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0 - p.X);
-                        Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0 - p.Y);
+                        var p = CenterOnData(data);
                         Log($"KEY: '.' will set center to highlighted {DS.HighlightedMapDataItemIndex} left={p.X}");
                     }
                     break;
@@ -317,6 +336,15 @@ namespace WinUI3Controls
                     DisplayHighlightByIndexDelta(0, 1);
                     break;
             }
+        }
+
+        private Point CenterOnData(MapDataItem data)
+        {
+            var p = ToPoint(data);
+            Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0 - p.X);
+            Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0 - p.Y);
+            Log($"DBG: CenterOnData: {data.ToString} ActualWidth={uiMapCanvas.ActualWidth} p.X={p.X}");
+            return p;
         }
 
         private void OnKeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
@@ -576,6 +604,7 @@ namespace WinUI3Controls
         public async Task MapDataAddedFirstItem(MapDataItem data, LogLevel logLevel)
         {
             DrawMapDataItem(data, LineType.EndingLine, PointTypeFlag.IsFirstPoint, logLevel);
+            CenterOnData(data);
         }
         public async Task MapDataAddedNewItem(MapDataItem data, LogLevel logLevel)
         {

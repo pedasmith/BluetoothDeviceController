@@ -20,19 +20,15 @@ Take a look at https://www.reddit.com/r/IOT/comments/1lzgv0t/tired_of_janky_gps_
 
 https://leafletjs.com/ is a JavaScript library for interactive maps. It can be used with WinUI3 via WebView2, which allows you to embed web content in your app.
 
-Work item: add a clear button
+IP: Work item: add a clear button
 Work item: zoom to starting point
 
 Work item: add start + end point (and do what?)
 Work item: when clicking a link, open a new window in a browser! (like the links for OSM)
 Work item: using arrow keys to navigate among the points
 
-Work item: unified MapData list - 
-    Leaflet groups marker size
-    Leaflet show group items
-    Leaflet arrow keys to navigate
-    Fix the ALT key problem (WebView2 swallows the ALT key so it can't be used for the Menus)
 
+DONE 2025-08-15: Work item: unified MapData list: Leaflet groups marker size; show group items; arrow keys to navigate; Fix the ALT key problem (WebView2 swallows the ALT key so it can't be used for the Menus)
 DONE 2025-08-07: Work item: allow for zooming in a little more.
 DONE 2025-08-07: Work item: show details about the selected point
 DONE 2025-08-06: Work item: keep screen on via menu (in developer for now?)

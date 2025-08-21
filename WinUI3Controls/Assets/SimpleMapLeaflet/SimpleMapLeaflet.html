@@ -23,13 +23,13 @@
 <div id="htmluiNmeaMap" style="width: 100%; height: 100%;"></div>
 <script>
 
-	const LocationOregon = [43.36011666666667, -123.76338833333334];
-	const LocationUSNO = [38.921473, -77.066946];
-	const defaultLocation = LocationUSNO;
+    const LocationOregon = [43.36011666666667, -123.76338833333334];
+    const LocationUSNO = [38.921473, -77.066946];
+    const defaultLocation = LocationUSNO;
 
 
     const MIN_MARKER_SIZE = 3;
-	const MAX_MARKER_SIZE = 10;
+    const MAX_MARKER_SIZE = 10;
 
     let LocationTrack;
     let StartMarker; // is an l.Marker created at AddNmeaFirstItem
@@ -38,88 +38,86 @@
 
     let trackColor = 'red';
 
-	const map = L.map('htmluiNmeaMap', {
+    const map = L.map('htmluiNmeaMap', {
         keyboard: false, // arrow keys are for the point navigation https://leafletjs.com/reference.html#map-option
-		}).setView(defaultLocation, 15);
+    }).setView(defaultLocation, 15);
 
-	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 22, // not enough zooming: 19		too much zooming: 25
-		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-	}).addTo(map);
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 22, // not enough zooming: 19		too much zooming: 25
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
 
 
 
-	function onMapClick(e) {
-		let msg = { "eventName": "OnClick", "lat": e.latlng.lat, "lng": e.latlng.lng };
+    function onMapClick(e) {
+        let msg = { "eventName": "OnClick", "lat": e.latlng.lat, "lng": e.latlng.lng };
         window.chrome.webview.postMessage(msg);
-	}
+    }
 
-	function showPopup(lat, lng, summary) {
-		let latlng = L.latLng(lat, lng);
+    function showPopup(lat, lng, summary) {
+        let latlng = L.latLng(lat, lng);
         popup
-        	.setLatLng(latlng)
-        	.setContent(summary)
-        	.openOn(map);
-	}
+            .setLatLng(latlng)
+            .setContent(summary)
+            .openOn(map);
+    }
 
-	// FYI: how to move the popup around
+    // FYI: how to move the popup around
     //popup
     //	.setLatLng(e.latlng)
     //	.setContent(`You clicked the map at ${e.latlng.toString()}`)
-	//	.openOn(map);
+    //	.openOn(map);
 
-	map.on('click', onMapClick);
+    map.on('click', onMapClick);
 
-	function CalculateMarkerSize(count)
-    {
+    function CalculateMarkerSize(count) {
         let marker_size = MIN_MARKER_SIZE * count;
         marker_size = Math.min(marker_size, MAX_MARKER_SIZE);
         return marker_size;
     }
+    function AddMarker(position, count) {
+        let markerRadius = CalculateMarkerSize(count);
+        let marker = L.circleMarker(position, {
+            color: trackColor,
+            fillColor: trackColor,
+            fillOpacity: 0.5,
+            radius: markerRadius
+        }).addTo(map).bindPopup('I am a circle.'); // TODO: what should the popup say?
+        MostRecentCircle = marker;
+    }
 
-	function AddNmeaFirstItem(latitude, longitude, summary, count) {
-		let position = [latitude, longitude];
+    function AddNmeaFirstItem(latitude, longitude, summary, count) {
+        let position = [latitude, longitude];
 
         map.setView(position, 17);
         StartMarker = L.marker([latitude, longitude]).addTo(map)
-			.bindPopup('<b>' + summary + '</b><br />Starting location').openPopup();
+            .bindPopup('<b>' + summary + '</b><br />Starting location').openPopup();
         LocationTrack = L.polyline([], { color: trackColor }).addTo(map);
 
-		// Common
+        // Common
         LocationTrack.addLatLng(position);
-        let markerRadius = CalculateMarkerSize(count);
-        MostRecentCircle = L.circleMarker(position, {
-            color: trackColor,
-            fillColor: trackColor,
-            fillOpacity: 0.5,
-            radius: markerRadius
-        }).addTo(map).bindPopup('I am the first circle.');
-	}
+        AddMarker(position, count);
+    }
+
 
     function AddNmeaNewItem(latitude, longitude, summary, count) {
-		let position = [latitude, longitude];
+        let position = [latitude, longitude];
 
-		// Common
+        // Common
         LocationTrack.addLatLng(position);
-        let markerRadius = CalculateMarkerSize(count);
-        MostRecentCircle  = L.circleMarker(position, {
-            color: trackColor,
-            fillColor: trackColor,
-            fillOpacity: 0.5,
-            radius: markerRadius
-        }).addTo(map).bindPopup('I am a circle.');
+        AddMarker(position, count);
     }
 
     function AddNmeaUpdatedGroup(latitude, longitude, summary, count) {
-		let markerRadius = CalculateMarkerSize(count);
-		MostRecentCircle.setRadius = markerRadius;
-	}
+        let markerRadius = CalculateMarkerSize(count);
+        MostRecentCircle.setRadius = markerRadius;
+    }
 
-	// Called from the MapDataClear interface on the Leaflet.xaml.cs code
-	// Should remove the line, the dots, and the pop-ups
-	function MapDataClearJS() {
+    // Called from the MapDataClear interface on the Leaflet.xaml.cs code
+    // Should remove the line, the dots, and the pop-ups
+    function MapDataClearJS() {
 
-	}
+    }
 
     document.addEventListener('keydown', function (event) {
         switch (event.key) {
@@ -129,10 +127,10 @@
             case 'ArrowRight':
                 window.chrome.webview.postMessage({ "eventName": "OnKeyDown", "key": event.key });
                 break;
-			case 'Alt':
-				// Need to send this up
+            case 'Alt':
+                // Need to send this up
                 window.chrome.webview.postMessage({ "eventName": "OnAltKeyDown", "key": event.key });
-				break;
+                break;
             default:
                 console.log('Other key pressed: ' + event.key);
         }
