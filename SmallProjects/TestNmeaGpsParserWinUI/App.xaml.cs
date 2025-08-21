@@ -1,20 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using System.Runtime.InteropServices;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -38,6 +24,8 @@ namespace TestNmeaGpsParserWinUI
             InitializeComponent();
         }
 
+
+
         /// <summary>
         /// Invoked when the application is launched.
         /// </summary>
@@ -46,6 +34,68 @@ namespace TestNmeaGpsParserWinUI
         {
             _window = new MainWindow();
             _window.Activate();
+
+#if FAILED_ATTEMPT_TO_SETWINDOWSUBCLASS_TO_STOP_THE_ALT_KEY_FROM_BEEPING
+            // Fix the Alt key issue in WinUI 3
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(_window);
+            SetWindowSubclass(hWnd, _subclassProc, IntPtr.Zero, IntPtr.Zero);
+#endif
         }
+
+#if FAILED_ATTEMPT_TO_SETWINDOWSUBCLASS_TO_STOP_THE_ALT_KEY_FROM_BEEPING
+        // WM_SYSCHAR: https://learn.microsoft.com/en-us/windows/win32/menurc/wm-syschar
+        private const int WM_SYSCHAR = 0x0106;
+        private const int WM_MENUCHAR = 0x0120;
+
+        // Delegate for the subclass procedure
+        private delegate IntPtr SubclassProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, IntPtr dwRefData);
+
+        [DllImport("comctl32.dll", SetLastError = true)]
+        private static extern bool SetWindowSubclass(IntPtr hWnd, SubclassProc pfnSubclass, IntPtr uIdSubclass, IntPtr dwRefData);
+
+        [DllImport("comctl32.dll", SetLastError = true)]
+        private static extern bool RemoveWindowSubclass(IntPtr hWnd, SubclassProc pfnSubclass, IntPtr uIdSubclass);
+
+        [DllImport("comctl32.dll", SetLastError = true)]
+        private static extern IntPtr DefSubclassProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam);
+
+        private static SubclassProc _subclassProc = SubclassCallback;
+
+        private static IntPtr SubclassCallback(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, IntPtr dwRefData)
+        {
+            switch (uMsg)
+            {
+                case WM_SYSCHAR:
+                    return new IntPtr(0); // Example: returning 1 to indicate the character is handled
+                case WM_MENUCHAR:
+                    return new IntPtr(3); // Example: returning 1 to indicate the character is handled
+            }
+
+            // Call the default subclass procedure
+            return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+        }
+
+        // Investigation:
+        // https://learn.microsoft.com/en-us/answers/questions/1688262/how-to-not-play-default-beep-sound-when-pressing-a
+        // Web summary: Says to handle the WM_SYSCHAR. 
+        // Result: no effect.
+
+        // https://www.travelneil.com/wndproc-in-uwp.html
+        // Summary: gives advise on getting the HWND. 
+        // Result: not actually useful because WinUI3 isn't UWP.
+
+        // https://github.com/microsoft/microsoft-ui-xaml/issues/9074
+        // Summary: closed, won't fix
+
+        // https://github.com/microsoft/microsoft-ui-xaml/issues/4379
+        // Summary: bug reporting the beep
+        // Result: proposed solution doesn't work for me
+
+        // non-useful links
+        // https://github.com/microsoft/microsoft-ui-xaml/issues/6978
+        // Summary: wants ALT to open a menu directly; doesn't mention the beep
+
+#endif
+
     }
 }
