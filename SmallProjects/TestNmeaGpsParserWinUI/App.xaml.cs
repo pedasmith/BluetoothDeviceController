@@ -35,17 +35,16 @@ namespace TestNmeaGpsParserWinUI
             _window = new MainWindow();
             _window.Activate();
 
-//#if FAILED_ATTEMPT_TO_SETWINDOWSUBCLASS_TO_STOP_THE_ALT_KEY_FROM_BEEPING
-            // Fix the Alt key issue in WinUI 3
+            // Fix the Alt key issue in WinUI 3. See #region WORKAROUND_BUG_4379_ALT_KEY_BEEPS
             var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(_window);
             SetWindowSubclass(hWnd, _subclassProc, IntPtr.Zero, IntPtr.Zero);
-//#endif
+
         }
 
-        //#if FAILED_ATTEMPT_TO_SETWINDOWSUBCLASS_TO_STOP_THE_ALT_KEY_FROM_BEEPING
+        #region WORKAROUND_BUG_4379_ALT_KEY_BEEPS
         // WM_MENUCHAR: https://learn.microsoft.com/en-us/windows/win32/menurc/wm-menuchar
         // WM_SYSCHAR: https://learn.microsoft.com/en-us/windows/win32/menurc/wm-syschar
-        //private const int WM_SYSCHAR = 0x0106;
+        //private const int WM_SYSCHAR = 0x0106; // not needed for working workaround.
         private const int WM_MENUCHAR = 0x0120;
 
         public const int MNC_IGNORE = 0;
@@ -82,6 +81,10 @@ namespace TestNmeaGpsParserWinUI
         }
 
         // Investigation:
+        // https://github.com/microsoft/microsoft-ui-xaml/issues/4379
+        // Summary: bug reporting the beep; proposed solution is to return MNC_CLOSE<<16 for WM_MENUCHAR
+        // Result: proposed solution works like a champ!
+
         // https://learn.microsoft.com/en-us/answers/questions/1688262/how-to-not-play-default-beep-sound-when-pressing-a
         // Web summary: Says to handle the WM_SYSCHAR. 
         // Result: no effect.
@@ -93,15 +96,10 @@ namespace TestNmeaGpsParserWinUI
         // https://github.com/microsoft/microsoft-ui-xaml/issues/9074
         // Summary: closed, won't fix
 
-        // https://github.com/microsoft/microsoft-ui-xaml/issues/4379
-        // Summary: bug reporting the beep
-        // Result: proposed solution works like a champ!
-
         // non-useful links
         // https://github.com/microsoft/microsoft-ui-xaml/issues/6978
         // Summary: wants ALT to open a menu directly; doesn't mention the beep
 
-//#endif
-
+        #endregion
     }
 }
