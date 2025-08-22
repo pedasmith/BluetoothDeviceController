@@ -35,17 +35,23 @@ namespace TestNmeaGpsParserWinUI
             _window = new MainWindow();
             _window.Activate();
 
-#if FAILED_ATTEMPT_TO_SETWINDOWSUBCLASS_TO_STOP_THE_ALT_KEY_FROM_BEEPING
+//#if FAILED_ATTEMPT_TO_SETWINDOWSUBCLASS_TO_STOP_THE_ALT_KEY_FROM_BEEPING
             // Fix the Alt key issue in WinUI 3
             var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(_window);
             SetWindowSubclass(hWnd, _subclassProc, IntPtr.Zero, IntPtr.Zero);
-#endif
+//#endif
         }
 
-#if FAILED_ATTEMPT_TO_SETWINDOWSUBCLASS_TO_STOP_THE_ALT_KEY_FROM_BEEPING
+        //#if FAILED_ATTEMPT_TO_SETWINDOWSUBCLASS_TO_STOP_THE_ALT_KEY_FROM_BEEPING
+        // WM_MENUCHAR: https://learn.microsoft.com/en-us/windows/win32/menurc/wm-menuchar
         // WM_SYSCHAR: https://learn.microsoft.com/en-us/windows/win32/menurc/wm-syschar
-        private const int WM_SYSCHAR = 0x0106;
+        //private const int WM_SYSCHAR = 0x0106;
         private const int WM_MENUCHAR = 0x0120;
+
+        public const int MNC_IGNORE = 0;
+        public const int MNC_CLOSE = 1;
+        public const int MNC_EXECUTE = 2;
+        public const int MNC_SELECT = 3;
 
         // Delegate for the subclass procedure
         private delegate IntPtr SubclassProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, IntPtr dwRefData);
@@ -65,10 +71,10 @@ namespace TestNmeaGpsParserWinUI
         {
             switch (uMsg)
             {
-                case WM_SYSCHAR:
-                    return new IntPtr(0); // Example: returning 1 to indicate the character is handled
+                //case WM_SYSCHAR:
+                //    return new IntPtr(0); // Example: returning 1 to indicate the character is handled
                 case WM_MENUCHAR:
-                    return new IntPtr(3); // Example: returning 1 to indicate the character is handled
+                    return new IntPtr(MNC_CLOSE<<16); // Example: returning 1 to indicate the character is handled
             }
 
             // Call the default subclass procedure
@@ -89,13 +95,13 @@ namespace TestNmeaGpsParserWinUI
 
         // https://github.com/microsoft/microsoft-ui-xaml/issues/4379
         // Summary: bug reporting the beep
-        // Result: proposed solution doesn't work for me
+        // Result: proposed solution works like a champ!
 
         // non-useful links
         // https://github.com/microsoft/microsoft-ui-xaml/issues/6978
         // Summary: wants ALT to open a menu directly; doesn't mention the beep
 
-#endif
+//#endif
 
     }
 }
