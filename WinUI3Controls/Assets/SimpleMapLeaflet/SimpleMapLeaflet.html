@@ -31,10 +31,11 @@
     const MIN_MARKER_SIZE = 3;
     const MAX_MARKER_SIZE = 10;
 
-    let LocationTrack;
-    let StartMarker; // is an l.Marker created at AddNmeaFirstItem
-    let MostRecentCircle = null; // TODO: track all the circles!
-    const popup = L.popup();
+    let LocationTrack; // polyline created in NmeaAddFirstItem https://leafletjs.com/reference.html#polyline
+    let StartMarker; // is an l.marker created at AddNmeaFirstItem https://leafletjs.com/reference.html#marker
+    let MostRecentCircle = null; 
+    let AllCircles = []; // track all the circles.
+    const MarkerPopup = L.popup(); // https://leafletjs.com/reference.html#popup
 
     let trackColor = 'red';
 
@@ -54,16 +55,18 @@
         window.chrome.webview.postMessage(msg);
     }
 
-    function showPopup(lat, lng, summary) {
+    // Called from the Leaflet.xaml.cs code
+    function showMarkerPopup(lat, lng, summary) {
+        // MarkerPopup is a l.popup
         let latlng = L.latLng(lat, lng);
-        popup
+        MarkerPopup
             .setLatLng(latlng)
             .setContent(summary)
             .openOn(map);
     }
 
     // FYI: how to move the popup around
-    //popup
+    //MarkerPopup
     //	.setLatLng(e.latlng)
     //	.setContent(`You clicked the map at ${e.latlng.toString()}`)
     //	.openOn(map);
@@ -75,6 +78,7 @@
         marker_size = Math.min(marker_size, MAX_MARKER_SIZE);
         return marker_size;
     }
+
     function AddMarker(position, count) {
         let markerRadius = CalculateMarkerSize(count);
         let marker = L.circleMarker(position, {
@@ -84,12 +88,14 @@
             radius: markerRadius
         }).addTo(map).bindPopup('I am a circle.'); // TODO: what should the popup say?
         MostRecentCircle = marker;
+        AllCircles.push(marker);
     }
 
     function AddNmeaFirstItem(latitude, longitude, summary, count) {
         let position = [latitude, longitude];
 
-        map.setView(position, 17);
+        map.setView(position, 17); // 17 is the zoom level. TODO: make this a const or UX parameter somewhere?
+        // marker docs: https://leafletjs.com/reference.html#marker
         StartMarker = L.marker([latitude, longitude]).addTo(map)
             .bindPopup('<b>' + summary + '</b><br />Starting location').openPopup();
         LocationTrack = L.polyline([], { color: trackColor }).addTo(map);
@@ -116,8 +122,24 @@
     // Called from the MapDataClear interface on the Leaflet.xaml.cs code
     // Should remove the line, the dots, and the pop-ups
     function MapDataClearJS() {
+        // Things to clear: LocationTrack, StartMarker, MostRecentCircle (actually, all circles)
+        LocationTrack.remove();
+        LocationTrack = null;
 
+        map.closePopup(); // close MarkerPopup
+        // don't set to null; it's only made once and stays around forever.
+
+        StartMarker.remove();
+        StartMarker = null; // will be recreated on the next AddNmeaFirstItem call
+
+        AllCircles.forEach((circle) => { circle.remove(); });
+        AllCircles = []; // reset the array
     }
+
+
+    // How to zoom:
+    // zoom the map to the polyline
+    //map.fitBounds(polyline.getBounds());
 
     document.addEventListener('keydown', function (event) {
         switch (event.key) {

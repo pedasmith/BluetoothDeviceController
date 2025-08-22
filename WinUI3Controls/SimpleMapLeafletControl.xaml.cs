@@ -149,14 +149,14 @@ namespace WinUI3Controls
                         {
                             var closest = MapData[closestIndex];
                             string summary = closestIndex + " " + closest.SummaryString;
-                            string script = $"showPopup({closest.Latitude.AsDecimal}, {closest.Longitude.AsDecimal}, \"{summary}\");";
+                            string script = $"showMarkerPopup({closest.Latitude.AsDecimal}, {closest.Longitude.AsDecimal}, \"{summary}\");";
                             // Log($"Leaflet: script={script}");
                             await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
                         }
                         else
                         {
                             string summary = "Can't find the closet point";
-                            string script = $"showPopup({clickEvent.lat}, {clickEvent.lng}, \"{summary}\");";
+                            string script = $"showMarkerPopup({clickEvent.lat}, {clickEvent.lng}, \"{summary}\");";
                             // Log($"Leaflet: script={script}");
                             await uiWebView.CoreWebView2.ExecuteScriptAsync(script);
                         }
