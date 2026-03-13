@@ -1,0 +1,173 @@
+﻿<Page
+    x:Class="BluetoothDeviceController.SpecialtyPages.SensyOne_S1ProMultiSensePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothDeviceController.SpecialtyPages"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+
+    xmlns:charts="using:BluetoothDeviceController.Charts"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="60" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,0,0" />
+        </Style>
+        <Style TargetType="Slider">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="FontFamily" Value="Segoe UI,Segoe MDL2 Assets" />
+            <Setter Property="Margin" Value="10,5,10,0" />
+        </Style>
+        <Style TargetType="Line">
+            <Setter Property="Margin" Value="0,15,0,0" />
+            <Setter Property="Stroke" Value="ForestGreen" />
+        </Style>
+        <Style x:Key="TitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30" />
+        </Style>
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+        <Style x:Key="HeaderStyleExpander" TargetType="controls:Expander">
+            <Setter Property="MinWidth" Value="550" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="SubheaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+        <Style x:Key="AboutStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="ChacteristicListStyle" TargetType="StackPanel">
+            <Setter Property="Background" Value="WhiteSmoke" />
+            <Setter Property="Margin" Value="18,0,0,0" />
+        </Style>
+        <Style x:Key="HEXStyle" TargetType="TextBox">
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="5,0,0,0" />
+        </Style>
+        <Style x:Key="TableStyle" TargetType="controls:DataGrid">
+            <Setter Property = "Background" Value="BlanchedAlmond" />
+            <Setter Property = "FontSize" Value="12" />
+            <Setter Property = "Height" Value="200" />
+            <Setter Property = "HorizontalAlignment" Value="Center" />
+            <Setter Property = "Width" Value="500" />
+        </Style>
+    </Page.Resources>
+
+    <StackPanel>
+        <Grid MaxWidth="550" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Style="{StaticResource TitleStyle}">HLK-LD2450_ device</TextBlock>
+                <TextBlock Style="{StaticResource AboutStyle}">
+                    The Sensy-One S1 Pro Multi Sense is an open-source presence and environmental sensor, built from the ground up with Home Assistant in mind
+                </TextBlock>
+            </StackPanel>
+            <controls:ImageEx Grid.Column="1" Style="{StaticResource ImageStyle}"  Source="/Assets/DevicePictures/SensyOne_S1ProMultiSense.PNG" />
+        </Grid>
+        <ProgressRing x:Name="uiProgress" />
+        <TextBlock x:Name="uiStatus" />
+
+        <!-- Xaml.Service.List for Radar -->
+        <controls:Expander Header="Radar" IsExpanded="true" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+                <TextBlock Style="{StaticResource SubheaderStyle}">RadarControl</TextBlock>
+                <GridView>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="False" x:Name="RadarControl_Unknown10" Text="*" Header="Unknown10" Style="{StaticResource HEXStyle}"/>
+                    <Button Content="Write" Click="OnWriteRadarControl" />
+                </GridView>
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">RadarData</TextBlock>
+                <GridView>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Opcode" Text="*" Header="Opcode" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_NElements" Text="*" Header="NElements" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_X1cm" Text="*" Header="X1cm" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Y1cm" Text="*" Header="Y1cm" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Speed1" Text="*" Header="Speed1" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Unused1" Text="*" Header="Unused1" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_X2cm" Text="*" Header="X2cm" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Y2cm" Text="*" Header="Y2cm" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Speed2" Text="*" Header="Speed2" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Unused2" Text="*" Header="Unused2" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_X3cm" Text="*" Header="X3cm" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Y3cm" Text="*" Header="Y3cm" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Speed3" Text="*" Header="Speed3" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_Unused3" Text="*" Header="Unused3" Style="{StaticResource HEXStyle}"/>
+                    <TextBox IsReadOnly="True" x:Name="RadarData_End55CC" Text="*" Header="End55CC" Style="{StaticResource HEXStyle}"/>
+                    <Button Content="Notify" Click="OnNotifyRadarData" />
+                </GridView>
+
+
+            </StackPanel>
+        </controls:Expander>
+        <!-- Xaml.Service.List for Common Configuration -->
+        <controls:Expander Header="Common Configuration" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+                <TextBlock Style="{StaticResource SubheaderStyle}">Device Name</TextBlock>
+                <GridView>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="False" x:Name="Device_Name_Device_Name" Text="*" Header="Device Name" Style="{StaticResource HEXStyle}"/>
+                    <Button Content="Write" Click="OnWriteDevice_Name" />
+                    <Button Content="Read" Click="OnReadDevice_Name" />
+                </GridView>
+
+
+            </StackPanel>
+        </controls:Expander>
+        <!-- Xaml.Service.List for Unknown2 -->
+        <controls:Expander Header="Unknown2" IsExpanded="false" Style="{StaticResource HeaderStyleExpander}">
+            <StackPanel Style="{StaticResource ChacteristicListStyle}">
+                <TextBlock Style="{StaticResource SubheaderStyle}">Unknown20</TextBlock>
+                <GridView>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="False" x:Name="Unknown20_Unknown20" Text="*" Header="Unknown20" Style="{StaticResource HEXStyle}"/>
+                    <Button Content="Write" Click="OnWriteUnknown20" />
+                </GridView>
+
+                <TextBlock Style="{StaticResource SubheaderStyle}">Unknown21</TextBlock>
+                <GridView>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <TextBox IsReadOnly="True" x:Name="Unknown21_Unknown21" Text="*" Header="Unknown21" Style="{StaticResource HEXStyle}"/>
+                    <Button Content="Notify" Click="OnNotifyUnknown21" />
+                </GridView>
+
+
+            </StackPanel>
+        </controls:Expander>
+
+        <Button Content="REREAD" Click="OnRereadDevice" />
+    </StackPanel>
+</Page>

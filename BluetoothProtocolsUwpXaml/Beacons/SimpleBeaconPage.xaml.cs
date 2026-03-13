@@ -40,7 +40,14 @@ namespace BluetoothDeviceController.Beacons
         public SimpleBeaconPage()
         {
             TheSimpleBeaconPage = this;
-            this.InitializeComponent();
+            try
+            {
+                this.InitializeComponent();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception in SimpleBeaconPage constructor: {ex.Message}");
+            }
             this.DataContext = this;
             this.Loaded += SimpleBeaconPage_Loaded;
         }

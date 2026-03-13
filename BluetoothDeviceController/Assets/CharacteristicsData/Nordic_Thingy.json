@@ -7,6 +7,17 @@
       "Links": [
         "https://nordicsemiconductor.github.io/Nordic-Thingy52-FW/documentation/firmware_architecture.html#fw_arch_ble_services"
       ],
+      "Advertisements": [
+        {
+          "RawAdvertisementLine1": "EB:5B:77:8A:84:4D\t14:49:07.9\t-61\tIsScannable\t\tThingy",
+          "RawadvertisementLine2": "LE General Discoverable Mode+BR/EDR Not Supported",
+          "RawAdvertisementLine3": "Service UUIDs (incomplete)EF680100-9B35-4933-9B10-52FFA9740042",
+          "RawResponseLine1": "EB:5B:77:8A:84:4D\t14:49:07.9\t-61\tScanResponse",
+          "RawResponseLine2": "Manufacturer: Nordic Semiconductor ASA: 1D EA C1 6D",
+
+          "MustMatchManufacturerName": "Nordic Semiconductor ASA"
+        }
+      ],
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

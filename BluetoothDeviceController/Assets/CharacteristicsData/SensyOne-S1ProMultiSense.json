@@ -1,0 +1,79 @@
+{
+  "AllDevices": [
+    {
+      "Name": "HLK-LD2450_",
+      "ClassName":"SensyOne_S1ProMultiSense",
+      "Description": "The Sensy-One S1 Pro Multi Sense is an open-source presence and environmental sensor, built from the ground up with Home Assistant in mind",
+      "Links": [
+          "https://sensy-one.com/products/s1-pro-multi-sense"
+      ],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "Name: HLK-LD2450_B41F",
+                "HLK-LD2450_B41F"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+          "Name": "Radar",
+          "Priority":50,
+          "Characteristics": [
+            {
+              "UUID": "0000fff2-0000-1000-8000-00805f9b34fb",
+              "Name": "RadarControl",
+              "Type": "BYTES|HEX|Unknown10",
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":WriteWithoutResponse:WrWw:"
+            },
+            {
+              "UUID": "0000fff1-0000-1000-8000-00805f9b34fb",
+              "Name": "RadarData",
+              "Type": "U16|HEX|Opcode U16|DEC|NElements I16^10_/|FIXED|X1cm|cm I16^10_/|FIXED|Y1cm|cm I16|DEC|Speed1 I16|HEX|Unused1 I16^10_/|FIXED|X2cm|cm I16^10_/|FIXED|Y2cm|cm I16|DEC|Speed2 I16|HEX|Unused2 I16^10_/|FIXED|X3cm|cm I16^10_/|FIXED|Y3cm|cm I16|DEC|Speed3 I16|HEX|Unused3 U16|HEX|End55CC",
+              "IsNotify": true,
+              "Verbs": ":Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "AA FF 03 00 4E 01 7C 81 00 00 68 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 55 CC",
+                "AA FF 03 00 7F 01 FD 81 00 00 68 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 55 CC"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000ae00-0000-1000-8000-00805f9b34fb",
+          "Name": "Unknown2",
+          "Characteristics": [
+            {
+              "UUID": "0000ae01-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown20",
+              "Type": "BYTES|HEX|Unknown20",
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":WriteWithoutResponse:WrWw:"
+            },
+            {
+              "UUID": "0000ae02-0000-1000-8000-00805f9b34fb",
+              "Name": "Unknown21",
+              "Type": "BYTES|HEX|Unknown21",
+              "IsNotify": true,
+              "Verbs": ":Notify:RdInNo:InNo:"
+            }
+          ]
+        }
+      ],
+      "Details": "Id:BluetoothLE#BluetoothLE8c:1d:55:0c:5b:4b-a1:04:28:f0:b4:1f\nCanPair:True IsPaired:False"
+    }
+  ]
+}

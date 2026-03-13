@@ -101,6 +101,7 @@ namespace BluetoothDeviceController
 
         /// <summary>
         /// Converts a list of possible Bluetooth names into a page to display
+        /// ADD: Add new devices to this list
         /// </summary>
         List<Specialization> Specializations = new List<Specialization>()
         {
@@ -136,6 +137,7 @@ namespace BluetoothDeviceController
             new Specialization (typeof(SpecialtyPages.PokitProMeterPage), new string[] { "PokitPro" }, DATA, "Pokit Pro multimeter", "Pokit Pro multimeter and digital oscilloscope"),
             new Specialization (typeof(SpecialtyPages.ThermoPro_TP357Page), new string[] { "TP357" }, THERMOMETER, "ThermoPro temperature and humidity", "ThermoPro thermometer and hygrometer"),
             new Specialization (typeof(SpecialtyPages.CozyTime_CT01Page), new string[] { "CT01" }, THERMOMETER, "CozyTime temperature and humidity", "CozyTime thermometer and hygrometer"),
+            new Specialization (typeof(SpecialtyPages.SensyOne_S1ProMultiSensePage), new string[] { "HLK-LD2450" }, DATA, "Sensy-One S1 Pro", "Sensy-One data"),
 
             // Health Sensors
             new Specialization (typeof(SpecialtyPages.Samico_BloodPressure_BG512Page), new string[] { "Samico BP" }, HEALTH, "Pyle / Samico", "Blood pressure cuff"),

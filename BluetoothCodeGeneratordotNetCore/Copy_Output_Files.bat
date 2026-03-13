@@ -7,7 +7,8 @@ REM set REPODIR=%UserProfile%\source\repos
 
 set REPODIR=%CD%\..
 set JSONDIR=%REPODIR%\BluetoothDeviceController\Assets\CharacteristicsData
-set BIN= ".\bin\Debug\net6.0-windows10.0.19041.0\BluetoothCodeGeneratordotNetCore"
+REM set BIN= ".\bin\Debug\net6.0-windows10.0.19041.0\BluetoothCodeGeneratordotNetCore"
+set BIN= ".\bin\Debug\net10.0-windows10.0.19041.0\BluetoothCodeGeneratordotNetCore"
 if not exist output mkdir output
 
 REM
