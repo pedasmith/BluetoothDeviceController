@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>6d3e69bf-b6ce-44e5-b09d-437cb22799a0</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>BluetoothConversions</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothAppearance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothCharacteristic.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothCompanyIdentifier.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothServiceUuid16Bit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothUnit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Device.cs" />
+  </ItemGroup>
+</Project>

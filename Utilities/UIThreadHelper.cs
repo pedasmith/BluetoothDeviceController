@@ -1,17 +1,33 @@
-﻿using System;
+﻿using Microsoft.UI.Dispatching;
+using System;
+using System.Runtime.CompilerServices;
+
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
 
 namespace Utilities
 {
     static class UIThreadHelper
     {
+        public static DispatcherQueue DQueue = null;
+
         /// <summary>
         /// Returns TRUE iff the current thread is the UI thread
         /// </summary>
         /// <returns></returns>
         public static bool IsOnUIThread()
         {
-            var dispather = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
-            var retval = dispather.HasThreadAccess;
+            bool retval = false;
+            if (DQueue != null)
+            {
+                retval = DQueue.HasThreadAccess;
+            }
+            else
+            {
+                var dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
+                retval = dispatcher.HasThreadAccess;
+            }
             return retval;
         }
 
@@ -28,8 +44,24 @@ namespace Utilities
             }
             else
             {
-                var dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
-                var task = dispatcher.TryRunAsync(priority, () => { f(); });
+                if (DQueue != null)
+                {
+                    var prioritydqueue = DispatcherQueuePriority.Low;
+                    switch (priority)
+                    {
+                        case Windows.UI.Core.CoreDispatcherPriority.Idle: prioritydqueue = DispatcherQueuePriority.Low; break;
+                        default:
+                        case Windows.UI.Core.CoreDispatcherPriority.Low: prioritydqueue = DispatcherQueuePriority.Low; break;
+                        case Windows.UI.Core.CoreDispatcherPriority.Normal: prioritydqueue = DispatcherQueuePriority.Normal; break;
+                        case Windows.UI.Core.CoreDispatcherPriority.High: prioritydqueue = DispatcherQueuePriority.High; break;
+                    }
+                    var task = DQueue.TryEnqueue(prioritydqueue, () => { f(); });
+                }
+                else
+                {
+                    var dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
+                    var task = dispatcher.TryRunAsync(priority, () => { f(); });
+                }
             }
         }
     }

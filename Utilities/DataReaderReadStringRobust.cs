@@ -4,6 +4,10 @@ using System.Text;
 using Windows.Foundation.Diagnostics;
 using Windows.Storage.Streams;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
 namespace Utilities
 {
     class DataReaderReadStringRobust

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "BluetoothWinUI3 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "BluetoothWinUI3 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "BluetoothYamlToCSharpSwitch": {
+      "commandName": "Project",
+      "commandLineArgs": "--type updatefile --file \"..\\..\\BluetoothConversions\\BluetoothCompanyIdentifier.cs\" --updatewith file > output\\BluetoothCompanyIdentifier.cs",
+      "workingDirectory": "C:\\Users\\toomr\\source\\repos\\pedasmith\\BluetoothDeviceController\\SmallProjects\\BluetoothYamlToCSharpSwitch"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>14c1a8ad-77f9-468d-96e8-49a72424f613</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>BluetoothProtocolsBeacons</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Apple_IBeacon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothAddress.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Eddystone.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Ruuvi_Tag.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Ruuvi_Tag_v1_Helper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SensorDataRecord.cs" />
+  </ItemGroup>
+</Project>

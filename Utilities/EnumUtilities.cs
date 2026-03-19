@@ -6,6 +6,10 @@ using System.Runtime.CompilerServices;
 
 using Windows.UI.Xaml.Data;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
 #if NETCOREAPP
 using System.Runtime.InteropServices;
 using Windows.Foundation;

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.2.32602.215
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11605.296 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothDeviceController", "BluetoothDeviceController\BluetoothDeviceController.csproj", "{F60B4B0B-5303-49BE-AD26-666746D5FB28}"
 EndProject
@@ -52,6 +52,8 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BluetoothProtocolsSerial", "BluetoothProtocolsSerial\BluetoothProtocolsSerial.shproj", "{58D9DE04-9A31-4349-8110-F6691E00F595}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinUI3Controls", "WinUI3Controls\WinUI3Controls.shproj", "{280D3FEF-7B49-4CD9-90D0-4C195632C715}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HtmlBluetoothSpecialtyViewer", "SmallProjects\HtmlBluetoothSpecialtyViewer\HtmlBluetoothSpecialtyViewer.shproj", "{A97ADE1B-F940-4E51-A549-C741F92043C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -371,6 +373,7 @@ Global
 		{5B3A0828-CFB8-4ED9-97EC-13502CA517B9} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
 		{726FADA0-9999-4EBE-A86E-276D505569D7} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
 		{80D24C57-0376-4ADE-A6E9-9AA8625EDBF8} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
+		{A97ADE1B-F940-4E51-A549-C741F92043C6} = {C4C90D53-D7D6-4FE3-A602-908959FCA9F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62DCA7A6-8C59-4330-98B9-0EF91B6BAD39}
@@ -398,6 +401,7 @@ Global
 		UtilitiesCore\UtilitiesCore.projitems*{8bf746aa-a6ed-4721-b52f-7ad047b25bc0}*SharedItemsImports = 13
 		SearchControllers\SearchControllers.projitems*{96d6ea94-d8fb-45a0-94e2-7173d5d300be}*SharedItemsImports = 13
 		BluetoothProtocolsUwpXaml\BluetoothProtocolsUwpXaml.projitems*{a2e9e462-e4bf-4bf6-81ec-7529b830456b}*SharedItemsImports = 13
+		SmallProjects\HtmlBluetoothSpecialtyViewer\HtmlBluetoothSpecialtyViewer.projitems*{a97ade1b-f940-4e51-a549-c741f92043c6}*SharedItemsImports = 13
 		SmallProjects\SampleServerXaml\SampleServerXaml.projitems*{aa5d4b4a-78ee-444e-8f0e-ceb00fdc4716}*SharedItemsImports = 13
 		BCBasicShared\BCBasicShared.projitems*{ae674666-cb37-46ff-9837-6679aae3535d}*SharedItemsImports = 13
 		BluetoothProtocolsDevices\BluetoothProtocolsDevices.projitems*{cbadbede-6d24-4e8f-b8ae-6c5864aeb1c4}*SharedItemsImports = 4

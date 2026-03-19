@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="../BCBasicShared/BCBasicShared.shproj" Id="ae674666-cb37-46ff-9837-6679aae3535d" />
+  <Project Path="../BluetoothConversions/BluetoothConversions.shproj" Id="6d3e69bf-b6ce-44e5-b09d-437cb22799a0" />
+  <Project Path="../BluetoothProtocolsAdvertisements/BluetoothProtocolsAdvertisements.shproj" Id="13488f3f-f344-468a-b963-d3022348cb07" />
+  <Project Path="../BluetoothProtocolsBeacons/BluetoothProtocolsBeacons.shproj" Id="14c1a8ad-77f9-468d-96e8-49a72424f613" />
+  <Project Path="../IotNumberFormats/IotNumberFormats.shproj" Id="6e9bdf2e-3372-406f-9124-0d498a5009ba" />
+  <Project Path="../SmallProjects/BluetoothYamlToCSharpSwitch/BluetoothYamlToCSharpSwitch.csproj" Id="1dfd1d28-7d1f-43c8-b701-53e0c587300b" />
+  <Project Path="../Utilities/Utilities.shproj" Id="e6b108c1-0e7e-4124-9b33-9b71570ddfad" />
+  <Project Path="BluetoothWinUI3.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Deploy />
+  </Project>
+</Solution>
