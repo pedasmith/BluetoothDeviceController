@@ -7,9 +7,19 @@ using SharpYaml;
 using System.Globalization;
 using System.Net.Sockets;
 using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace BluetoothYamlToCSharpSwitch
 {
+    public static class StringExtensions
+    {
+        public static string RemoveQuotes(this string s)
+        {
+            if (string.IsNullOrEmpty(s)) return s;
+            s = s.Replace("\"", "'");
+            return s;
+        }
+    }
     internal class Program
     {
         const string VERSION = "12:41";
@@ -28,20 +38,11 @@ namespace BluetoothYamlToCSharpSwitch
             public string id { get; set; }
             public override string ToString()
             {
-                return $"case {value}: return \"{name}\"; // {id}";
+                return $"case {value}: return \"{name.RemoveQuotes}\"; // {id}";
             }
 
         }
 
-        interface Root
-        {
-            public List<NameValue> values { get; }
-        }
-        class BTUnitRoot : Root
-        {
-            public List<NameValue> values {  get { return uuids.Cast<NameValue>().ToList();  } }
-            public List<BTUnit> uuids { get; set; } = new List<BTUnit>();
-        }
 
         class BTValueName : NameValue
         {
@@ -53,16 +54,34 @@ namespace BluetoothYamlToCSharpSwitch
                 string noleading = value;
                 if (noleading.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) noleading = noleading.Substring(2);
                 var ishex = uint.TryParse(noleading, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out asdecimal);
-                return $"case {value}: /* {asdecimal} */ return \"{name}\";";
+                return $"case {value}: /* {asdecimal} */ return \"{name.RemoveQuotes()}\";";
             }
         }
 
+        interface Root
+        {
+            public List<NameValue> values { get; }
+        }
+        class BTuuids_Root : Root
+        {
+            public List<NameValue> values {  get { return uuids.Cast<NameValue>().ToList();  } }
+            public List<BTUnit> uuids { get; set; } = new List<BTUnit>();
+        }
 
-        class BTCompanyIdentifiers : Root
+        class BTad_types_Root : Root
+        {
+            public List<NameValue> values { get { return ad_types.Cast<NameValue>().ToList(); } }
+            public List<BTUnit> ad_types { get; set; } = new List<BTUnit>();
+        }
+
+
+        class BTcompany_identifiers_Root : Root
         {
             public List<NameValue> values { get { return company_identifiers.Cast<NameValue>().ToList(); } }
             public List<BTValueName> company_identifiers { get; set; } = new List<BTValueName>();
         }
+
+
 
         class UserOptions
         {
@@ -156,10 +175,13 @@ namespace BluetoothYamlToCSharpSwitch
 
         static List<NameValue> GetYamlList(string yaml)
         {
-            var units = YamlSerializer.Deserialize<BTUnitRoot>(yaml);
+            var units = YamlSerializer.Deserialize<BTuuids_Root>(yaml);
             if (units != null && units.values != null && units.values.Count > 0) return units.values;
 
-            var company_identifiers = YamlSerializer.Deserialize<BTCompanyIdentifiers>(yaml);
+            var ad_types = YamlSerializer.Deserialize<BTad_types_Root>(yaml);
+            if (ad_types != null && ad_types.values != null && ad_types.values.Count > 0) return ad_types.values;
+
+            var company_identifiers = YamlSerializer.Deserialize<BTcompany_identifiers_Root>(yaml);
             if (company_identifiers != null && company_identifiers.values != null && company_identifiers.values.Count > 0) return company_identifiers.values;
 
             return null;
@@ -233,11 +255,22 @@ namespace BluetoothYamlToCSharpSwitch
                             }
                             // units = YamlSerializer.Deserialize<BTUnitRoot>(yaml);
                             list = GetYamlList(yaml);
+                            if (list == null)
+                            {
+                                Console.Error.WriteLine($"Error: the YAML file {fname} for {options.Filename} had no values");
+                                Environment.Exit(1);
+                            }
                         }
                         else if (line.StartsWith("// startupdatefile:"))
                         {
                             results.Add(rawline);
                             // Dump them all in!
+
+                            if (list == null)
+                            {
+                                Console.Error.WriteLine($"Error: no list of values to substitute in for {options.Filename}");
+                                Environment.Exit(1);
+                            }
                             foreach (var item in list)
                             {
                                 results.Add($"\t\t\t\t{item}");

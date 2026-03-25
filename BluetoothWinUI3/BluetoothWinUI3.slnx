@@ -8,6 +8,7 @@
   <Project Path="../BluetoothConversions/BluetoothConversions.shproj" Id="6d3e69bf-b6ce-44e5-b09d-437cb22799a0" />
   <Project Path="../BluetoothProtocolsAdvertisements/BluetoothProtocolsAdvertisements.shproj" Id="13488f3f-f344-468a-b963-d3022348cb07" />
   <Project Path="../BluetoothProtocolsBeacons/BluetoothProtocolsBeacons.shproj" Id="14c1a8ad-77f9-468d-96e8-49a72424f613" />
+  <Project Path="../BluetoothProtocolsDevices/BluetoothProtocolsDevices.shproj" Id="12d89dd7-fddf-43af-810e-a340bcf5f79f" />
   <Project Path="../IotNumberFormats/IotNumberFormats.shproj" Id="6e9bdf2e-3372-406f-9124-0d498a5009ba" />
   <Project Path="../SmallProjects/BluetoothYamlToCSharpSwitch/BluetoothYamlToCSharpSwitch.csproj" Id="1dfd1d28-7d1f-43c8-b701-53e0c587300b" />
   <Project Path="../Utilities/Utilities.shproj" Id="e6b108c1-0e7e-4124-9b33-9b71570ddfad" />

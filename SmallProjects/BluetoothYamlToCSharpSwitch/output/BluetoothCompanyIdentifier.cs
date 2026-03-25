@@ -1,5 +1,5 @@
-using BluetoothDeviceController.Beacons;
-using BluetoothDeviceController;
+//using BluetoothDeviceController.Beacons;
+//using BluetoothDeviceController;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 using Utilities;
-using BluetoothProtocols.Beacons;
+using BluetoothProtocols;
 
 
 #if NET8_0_OR_GREATER
@@ -1102,7 +1102,7 @@ namespace BluetoothConversions
 				case 0x0C0B: /* 3083 */ return "aconno GmbH";
 				case 0x0C0A: /* 3082 */ return "Automated Pet Care Products, LLC";
 				case 0x0C09: /* 3081 */ return "Senic Inc.";
-				case 0x0C08: /* 3080 */ return "limited liability company "Red"";
+				case 0x0C08: /* 3080 */ return "limited liability company 'Red'";
 				case 0x0C07: /* 3079 */ return "CONSTRUKTS, INC.";
 				case 0x0C06: /* 3078 */ return "LED Smart Inc.";
 				case 0x0C05: /* 3077 */ return "Montage Connect, Inc.";
@@ -1733,7 +1733,7 @@ namespace BluetoothConversions
 				case 0x0975: /* 2421 */ return "BlueIOT(Beijing) Technology Co.,Ltd";
 				case 0x0974: /* 2420 */ return "ABEYE";
 				case 0x0973: /* 2419 */ return "Popit Oy";
-				case 0x0972: /* 2418 */ return "Closed Joint Stock Company "Zavod Flometr" ("Zavod Flometr" CJSC)";
+				case 0x0972: /* 2418 */ return "Closed Joint Stock Company 'Zavod Flometr' ('Zavod Flometr' CJSC)";
 				case 0x0971: /* 2417 */ return "GA";
 				case 0x0970: /* 2416 */ return "IBA Dosimetry GmbH";
 				case 0x096F: /* 2415 */ return "Lund Motion Products, Inc.";
@@ -1767,7 +1767,7 @@ namespace BluetoothConversions
 				case 0x0952: /* 2386 */ return "Apptricity Corporation";
 				case 0x0951: /* 2385 */ return "PPRS";
 				case 0x0950: /* 2384 */ return "Capetech";
-				case 0x094F: /* 2383 */ return "Limited Liability Company "Mikrotikls"";
+				case 0x094F: /* 2383 */ return "Limited Liability Company 'Mikrotikls'";
 				case 0x094E: /* 2382 */ return "PassiveBolt, Inc.";
 				case 0x094D: /* 2381 */ return "tkLABS INC.";
 				case 0x094C: /* 2380 */ return "GimmiSys GmbH";
@@ -1943,7 +1943,7 @@ namespace BluetoothConversions
 				case 0x089D: /* 2205 */ return "J-J.A.D.E. Enterprise LLC";
 				case 0x089C: /* 2204 */ return "Embedded Devices Co. Company";
 				case 0x089B: /* 2203 */ return "Saucon Technologies";
-				case 0x089A: /* 2202 */ return "Private limited company "Teltonika"";
+				case 0x089A: /* 2202 */ return "Private limited company 'Teltonika'";
 				case 0x0899: /* 2201 */ return "SFS unimarket AG";
 				case 0x0898: /* 2200 */ return "Sensibo, Inc.";
 				case 0x0897: /* 2199 */ return "Current Lighting Solutions LLC";
@@ -2338,7 +2338,7 @@ namespace BluetoothConversions
 				case 0x0705: /* 1797 */ return "AB Electrolux";
 				case 0x0704: /* 1796 */ return "JBX Designs Inc.";
 				case 0x0703: /* 1795 */ return "Beijing Jingdong Century Trading Co., Ltd.";
-				case 0x0702: /* 1794 */ return "Akciju sabiedriba "SAF TEHNIKA"";
+				case 0x0702: /* 1794 */ return "Akciju sabiedriba 'SAF TEHNIKA'";
 				case 0x0701: /* 1793 */ return "PAFERS TECH";
 				case 0x0700: /* 1792 */ return "TraqFreq LLC";
 				case 0x06FF: /* 1791 */ return "Redpine Signals Inc";
@@ -3186,7 +3186,7 @@ namespace BluetoothConversions
 				case 0x0383: /* 899 */ return "Kronos Incorporated";
 				case 0x0382: /* 898 */ return "Precision Outcomes Ltd";
 				case 0x0381: /* 897 */ return "Sharp Corporation";
-				case 0x0380: /* 896 */ return "LLC "MEGA-F service"";
+				case 0x0380: /* 896 */ return "LLC 'MEGA-F service'";
 				case 0x037F: /* 895 */ return "Soci‚t‚ des Produits Nestl‚ S.A.";
 				case 0x037E: /* 894 */ return "lulabytes S.L.";
 				case 0x037D: /* 893 */ return "MICRODIA Ltd.";
@@ -4097,7 +4097,6 @@ namespace BluetoothConversions
                             manufacturerType = CommonManufacturerType.Apple10;
                         }
                         break;
-
                     case 0x0499: // Ruuvi
                         manufacturerType = CommonManufacturerType.Ruuvi;
                         var ruuviTag = Ruuvi_Tag.Parse(section, txPower);
@@ -4154,6 +4153,8 @@ namespace BluetoothConversions
                             }
                         }
                         break;
+
+#if ADD_GOVEE_SENSOR
                     case 0xEC88: // Govee device advertisement scan response is for manufacturer 0xEC88
                         if (parseAs == CommonManufacturerType.Govee)
                         {
@@ -4175,6 +4176,7 @@ namespace BluetoothConversions
                             System.Diagnostics.Debug.WriteLine($"NOTE: saw company {companyId:X4}={companyName} (Govee?)");
                         }
                         break;
+#endif
                     default:
                         System.Diagnostics.Debug.WriteLine($"NOTE: Manufacturer data: saw company {companyId:X4}={companyName}");
                         break ;

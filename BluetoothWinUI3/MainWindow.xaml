@@ -19,6 +19,10 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+        
+        <!-- All of the known devices -->
+        <ListView Grid.Row="1" x:Name="uiKnownDevices">
+        </ListView>
 
         <!-- Status row -->
         <StackPanel Grid.Row="2">
@@ -34,6 +38,8 @@
                 <StackPanel Orientation="Horizontal">
                     <Button Content="Start" Click="OnAdvertisementStart" />
                     <Button Content="Stop" Click="OnAdvertisementStop" />
+                    <Button Content="Copy" Click="OnAdvertisementCopy" />
+                    <Button Content="Copy Unique" Click="OnAdvertisementCopyUnique" />
                     <TextBlock>N=</TextBlock>
                     <TextBlock x:Name="uiAdvertCount" />
                     <TextBlock>  | RAW=</TextBlock>

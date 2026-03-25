@@ -10,13 +10,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using Utilities;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
+
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
 
 namespace BluetoothWinUI3
 {
@@ -34,13 +40,39 @@ namespace BluetoothWinUI3
             InitializeComponent();
         }
 
+
+        StringBuilder AllAdvertisements = new StringBuilder();
+        Dictionary<string, string> UniqueAdvertisements = new Dictionary<string, string>();
+
+        UserControl ThingyControl = null;
         private void AdvertisementWatcher_WatcherEvent(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)
         {
+            // A little bit of logging and storing stuff for debugging
             NAdvertisements++;
+            AllAdvertisements.AppendLine($"{NAdvertisements}, " + e.ToStringFull());
+            var CanCompare = BluetoothWatcher.AdvertismentWatcher.WatcherData.AdvertisementStringFormat.CanCompare;
+            UniqueAdvertisements[e.ToStringFull(CanCompare)] = e.ToStringFull();
+
+
+            // Update the UI as needed
             UIThreadHelper.CallOnUIThread(() =>
             {
                 uiAdvertCount.Text = NAdvertisements.ToString();
                 uiAdvertRaw.Text = e.ToString();
+
+
+
+                // If this is a new advert, see if it's a known type
+                var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
+                if (supportedDevice != null)
+                {
+                    if (ThingyControl == null)
+                    {
+                        ThingyControl = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
+                        ThingyControl.DataContext = e;
+                        uiKnownDevices.Items.Add(ThingyControl);
+                    }
+                }
             });
         }
 
@@ -52,5 +84,29 @@ namespace BluetoothWinUI3
         {
             AdvertisementWatcher.Stop();
         }
+
+        private void OnAdvertisementCopy(object sender, RoutedEventArgs e)
+        {
+            DataPackage dataPackage = new DataPackage();
+            var header = "N," + BluetoothWatcher.AdvertismentWatcher.WatcherData.ToHeaderString() + "\n";
+            dataPackage.SetText(header + AllAdvertisements.ToString());
+            dataPackage.Properties.Title = "Bluetooth Advertisement Data";
+            Clipboard.SetContent(dataPackage);
+        }
+        private void OnAdvertisementCopyUnique(object sender, RoutedEventArgs e)
+        {
+            var sb = new StringBuilder();
+            foreach (var item in UniqueAdvertisements.Values)
+            {
+                sb.AppendLine(item);
+            }
+
+            DataPackage dataPackage = new DataPackage();
+            var header = "N," + BluetoothWatcher.AdvertismentWatcher.WatcherData.ToHeaderString() + "\n";
+            dataPackage.SetText(header + sb.ToString());
+            dataPackage.Properties.Title = "Bluetooth Advertisement Data";
+            Clipboard.SetContent(dataPackage);
+        }
+
     }
 }

@@ -49,7 +49,7 @@ namespace BluetoothWinUI3
         static int TestAll()
         {
             int nerror = 0;
-            nerror += Utilities.Stringutilities.TestStarMatch();
+            nerror += Utilities.StringUtilities.TestStarMatch();
             return nerror;
         }
 

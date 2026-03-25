@@ -9,6 +9,7 @@
     <Import_RootNamespace>BluetoothConversions</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Ad_types.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothAppearance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothCharacteristic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothCompanyIdentifier.cs" />

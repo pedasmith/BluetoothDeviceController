@@ -8,7 +8,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BluetoothWinUI3.Utilities
 {
-    internal static class Stringutilities
+    public static class StringUtilities
     {
         private static void Log(string str)
         {
@@ -35,7 +35,7 @@ namespace BluetoothWinUI3.Utilities
             // TODO: test more corner cases, such as multiple stars, stars at the beginning or end, etc.
             return nerror;
         }
-        static bool StarMatch(this string str, string pattern, StringComparison compare = StringComparison.OrdinalIgnoreCase)
+        public static bool StarMatch(this string str, string pattern, StringComparison compare = StringComparison.OrdinalIgnoreCase)
         {
             if (pattern == "*")
             {
