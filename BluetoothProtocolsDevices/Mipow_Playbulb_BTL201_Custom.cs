@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using enumUtilities;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
 namespace BluetoothProtocols
 {
     public class MipowPlaybulbModesConverter : EnumValueConverter<Mipow_Playbulb_BTL201_Custom.Modes> { }

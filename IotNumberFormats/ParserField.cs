@@ -10,8 +10,10 @@ namespace IotNumberFormats
 {
 
     /// <summary>
-    /// Class to perfectly parse the one field binary value descriptor strings.
-    /// Simple example: "U8 U8" "U8|DEC|Temp|C U8|HEX|Mode"
+    /// Class to perfectly parse the one field binary value descriptor strings. This is used by ParserFieldList where
+    /// the entire include is a series of fields seperated by a space.
+    /// 
+    /// Simple example: "U8 U8" "U8|DEC|Temp|C U8|HEX|Mode" (these are example of ParserFieldList, BTW)
     /// Complex example: "Q12Q4^_125_/|FIXED|Pressure|mbar"
     /// ODE example: ODE^Temp|U8|DEC|Temp|C
     /// Default example: "U8|HEX|Mode||FF"

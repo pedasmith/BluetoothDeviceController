@@ -7,8 +7,6 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Storage.Streams;
-using BluetoothDeviceController.Names;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -24,8 +22,7 @@ namespace BluetoothProtocols
     public  class Nordic_Thingy : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-    // Link: https://nordicsemiconductor.github.io/Nordic-Thingy52-FW/documentation/firmware_architecture.html#fw_arch_ble_services
-
+        // Link: https://nordicsemiconductor.github.io/Nordic-Thingy52-FW/documentation/firmware_architecture.html#fw_arch_ble_services
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();
@@ -36,6 +33,7 @@ namespace BluetoothProtocols
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+#if NEVER_EVER_DEFINED
         Guid[] ServiceGuids = new Guid[] {
            Guid.Parse("EF680200-9B35-4933-9B10-52FFA9740042"),
            Guid.Parse("EF680400-9B35-4933-9B10-52FFA9740042"),
@@ -3178,7 +3176,7 @@ namespace BluetoothProtocols
             }
         }
 
-
+#endif
 
 
 

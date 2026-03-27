@@ -1,3 +1,4 @@
+using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -69,8 +70,11 @@ namespace BluetoothWinUI3
                     if (ThingyControl == null)
                     {
                         ThingyControl = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
-                        ThingyControl.DataContext = e;
                         uiKnownDevices.Items.Add(ThingyControl);
+
+                        var known = new KnownDevice(e, ThingyControl, supportedDevice);
+                        KnownDevices.Devices.Add(known);
+                        ThingyControl.DataContext = known;
                     }
                 }
             });

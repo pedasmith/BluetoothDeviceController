@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using IotNumberFormats;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -50,6 +51,7 @@ namespace BluetoothWinUI3
         {
             int nerror = 0;
             nerror += Utilities.StringUtilities.TestStarMatch();
+            nerror += ValueToStringTest.Test();
             return nerror;
         }
 

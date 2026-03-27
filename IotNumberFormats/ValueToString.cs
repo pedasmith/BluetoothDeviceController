@@ -1,9 +1,14 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml.Input;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.Cryptography;
 using System.Text;
+using System.Xml.Linq;
 using Utilities;
+using Windows.Foundation.Diagnostics;
+using Windows.Security.Cryptography;
 using Windows.Storage.Streams;
 using static Utilities.DataReaderReadStringRobust;
 
@@ -48,6 +53,16 @@ namespace IotNumberFormats
                 ErrorString = error,
             };
         }
+        public static ValueParserResult CreateOk(string str)
+        {
+            return new ValueParserResult()
+            {
+                Result = ResultValues.Ok,
+                UserString = str,
+            };
+        }
+
+#if NEVER_EVER_DEFINED
         public static ValueParserResult CreateOk(string str, BCBasic.BCValueList valueList = null)
         {
             return new ValueParserResult()
@@ -57,6 +72,8 @@ namespace IotNumberFormats
                 ValueList = valueList,
             };
         }
+
+#endif
         public enum ResultValues {  Ok, Error };
         public ResultValues Result = ResultValues.Ok;
         /// <summary>
@@ -72,15 +89,450 @@ namespace IotNumberFormats
         /// Either the error string or the user string depending on whether there was an error or not.
         /// </summary>
         public string AsString {  get { if (ErrorString == "") return UserString; return ErrorString; } }
+
+
+#if NEVER_EVER_DEFINED
         //NOTE: can also add in e.g. 
         /// <summary>
         /// List of name/value pairs in BC BASIC format (strings/doubles)
         /// </summary>
         public BCBasic.BCValueList ValueList = new BCBasic.BCValueList();
+#endif
     }
 
-    public static class ValueParser
+    public class ValueParser
     {
+        ParserFieldList Commands;
+        int NextCommandIndex = 0;
+        DataReader CurrDR;
+        string OriginalCommandString;
+        public void Initialize(byte[] data, string commands)
+        {
+            // Old way: IBuffer buffer = CryptographicBuffer.CreateFromByteArray(data);
+            CurrDR = DataReader.FromBuffer(data.AsBuffer());
+            CurrDR.ByteOrder = ByteOrder.LittleEndian; // default to little endian because it's common for Bluetooth.
+
+            OriginalCommandString = commands;
+            Commands = ParserFieldList.ParseLine(commands);
+            NextCommandIndex = 0;
+
+            returnsb = new StringBuilder(); // will be the entire string to return from a Parse() //TODO: is ugly and old looking
+        }
+
+        public bool AtEnd()
+        {
+            return NextCommandIndex >= Commands.Fields.Count;
+        }
+
+        double CurrDoubleValue = 0;
+
+        //TODO: rename as needed
+
+        /// <summary>
+        /// stritem is the string value of a single field being handled.
+        /// </summary>
+        string stritem = "";
+        double dvalue = double.NaN;
+        byte[] byteArrayItem = null;
+        List<double> dvalues = null;
+        string readcmd = "U8";
+        char readindicator = 'U';
+        string displayFormat = "";
+        string displayFormatSecondary = "";
+
+        string name = "";
+        string units = "";
+        ResultState resultState;
+        int defaultIndex;
+
+        /// <summary>
+        /// returnsb is the entire return value of all fields (e.g., is the concatenation of stritem with spaces)
+        /// </summary>
+        StringBuilder returnsb;
+
+        bool isOptional = false; // once we see OOPT, the rest of the fields are optional, meaning that if we run out of data, we just return what we have instead of an error.
+        ValueParserResult CurrError;
+
+
+        /// <summary>
+        /// Handles the current field (so call this after calling GetNext). Will set all of the state variables like stritem.
+        /// </summary>
+        /// <returns>false when something terrible has happened. CurrError will be set.</returns>
+        public bool GetNext()
+        {
+            var dr = CurrDR; // TODO: replace!
+            string logstr = "";
+
+            ParserField command = MoveToNext();
+            while (command.ByteFormatPrimary.StartsWith("O"))
+            {
+                // TODO: handle optional fields.
+                // Handle all of the optional commands until we get to a real field.
+                command = MoveToNext();
+            }
+
+            try
+            {
+                switch (readindicator)
+                {
+                    case 'I':
+                        if (dr.UnconsumedBufferLength == 0)
+                        {
+                            if (isOptional)
+                            {
+                                dvalue = double.NaN;
+                                stritem = "";
+                                break;
+                            }
+                            else
+                            {
+                                CurrError = ValueParserResult.CreateError(logstr, $"Missing data with {readcmd} field {defaultIndex + 1}");
+                                return false;
+                            }
+                        }
+                        switch (readcmd)
+                        {
+                            case "I8":
+                            case "I16":
+                            case "I24":
+                            case "I32":
+                                {
+                                    string floatFormat = "F2";
+                                    string intFormat = "X6";
+                                    switch (readcmd)
+                                    {
+                                        case "I8":
+                                            {
+                                                var value = (sbyte)dr.ReadByte();
+                                                dvalue = (double)value;
+                                            }
+                                            break;
+                                        case "I16":
+                                            {
+                                                var value = dr.ReadInt16();
+                                                dvalue = (double)value;
+                                            }
+                                            break;
+                                        case "I24":
+                                            {
+                                                var b0 = dr.ReadByte();
+                                                var b1 = dr.ReadByte();
+                                                var b2 = dr.ReadByte();
+                                                var msb = (sbyte)(dr.ByteOrder == ByteOrder.BigEndian ? b0 : b2);
+                                                var lsb = dr.ByteOrder == ByteOrder.BigEndian ? b2 : b0;
+                                                int value = (int)(msb << 16) + (b1 << 8) + (lsb);
+                                                dvalue = (double)value;
+                                            }
+                                            break;
+                                        case "I32":
+                                            {
+                                                var value = dr.ReadInt32();
+                                                dvalue = (double)value;
+                                                intFormat = "X8";
+                                            }
+                                            break;
+                                    }
+                                    string calculateCommand = command.Get(0, 1); // e.g. for I24^100_/ for TI 1350 barometer values
+                                    if (!string.IsNullOrEmpty(calculateCommand))
+                                    {
+                                        dvalue = ValueCalculate.Calculate(calculateCommand, dvalue).D;
+                                        if (double.IsNaN(dvalue))
+                                        {
+                                            CurrError = ValueParserResult.CreateError(logstr, $"Calculation failed for {calculateCommand} in {readcmd}");
+                                            return false;
+                                        }
+                                        else
+                                        {
+                                            // Everything worked and got a value
+                                            stritem = DoubleToString(dvalue, displayFormat, displayFormatSecondary);
+                                            if (stritem == null)
+                                            {
+                                                CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
+                                                return false;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (displayFormat == "") displayFormat = "HEX";
+                                        stritem = DoubleToString(dvalue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
+                                        if (stritem == null)
+                                        {
+                                            CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
+                                            return false;
+                                        }
+                                    }
+
+                                }
+                                break;
+
+                            case "I16S": // Array of I16
+                                {
+                                    if (displayFormat == "") displayFormat = "HEX";
+                                    string floatFormat = "F2";
+                                    string intFormat = "X6";
+
+                                    resultState = ResultState.IsDoubleArray;
+                                    dvalues = new List<double>();
+                                    while (dr.UnconsumedBufferLength >= 2)
+                                    {
+                                        dvalue = dr.ReadInt16();
+                                        dvalues.Add(dvalue);
+
+                                        var intstr = DoubleToString(dvalue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
+                                        if (intstr == null)
+                                        {
+                                            CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
+                                            return false;
+                                        }
+
+                                        if (stritem != "") stritem += " ";
+                                        stritem += intstr;
+                                    } // end while loop
+                                }
+                                break;
+
+
+                            default:
+                                CurrError = ValueParserResult.CreateError(logstr, $"Integer command unrecognized; should be I8/16/24/32 not {readcmd}");
+                                return false;
+                        }
+                        break;
+                    case 'U':
+                        if (dr.UnconsumedBufferLength == 0)
+                        {
+                            if (isOptional)
+                            {
+                                dvalue = double.NaN;
+                                stritem = "";
+                                break;
+                            }
+                            else
+                            {
+                                CurrError = ValueParserResult.CreateError(logstr, $"Missing data with {readcmd} field {defaultIndex + 1}");
+                                return false;
+                            }
+                        }
+                        switch (readcmd)
+                        {
+                            case "U8":
+                            case "U16":
+                            case "U24":
+                            case "U32":
+                                string xfmt = "X2";
+                                switch (readcmd)
+                                {
+                                    case "U8":
+                                        {
+                                            var value = dr.ReadByte();
+                                            dvalue = (double)value;
+                                            xfmt = "X2";
+                                        }
+                                        break;
+                                    case "U16":
+                                        {
+                                            var value = dr.ReadUInt16();
+                                            dvalue = (double)value;
+                                            xfmt = "X4";
+                                        }
+                                        break;
+                                    case "U24":
+                                        {
+                                            var b0 = dr.ReadByte();
+                                            var b1 = dr.ReadByte();
+                                            var b2 = dr.ReadByte();
+                                            var msb = (byte)(dr.ByteOrder == ByteOrder.BigEndian ? b0 : b2);
+                                            var lsb = dr.ByteOrder == ByteOrder.BigEndian ? b2 : b0;
+                                            int value = (int)(msb << 16) + (b1 << 8) + (lsb);
+                                            dvalue = (double)value;
+                                        }
+                                        break;
+                                    case "U32":
+                                        {
+                                            var value = dr.ReadUInt32();
+                                            dvalue = (double)value;
+                                            xfmt = "X8";
+                                        }
+                                        break;
+                                }
+                                string calculateCommand = command.Get(0, 1); // e.g. for I24^100_/ for TI 1350 barometer values
+                                if (!string.IsNullOrEmpty(calculateCommand))
+                                {
+                                    dvalue = ValueCalculate.Calculate(calculateCommand, dvalue).D;
+                                    if (double.IsNaN(dvalue))
+                                    {
+                                        CurrError = ValueParserResult.CreateError(logstr, $"Calculation failed for {calculateCommand} in {readcmd}");
+                                        return false;
+                                    }
+                                    else
+                                    {
+                                        stritem = DoubleToString(dvalue, displayFormat, displayFormatSecondary);
+                                        if (stritem == null)
+                                        {
+                                            CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
+                                            return false;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (displayFormat == "") displayFormat = "HEX";
+                                    stritem = DoubleToString(dvalue, displayFormat, displayFormatSecondary, "F2", xfmt);
+                                    if (stritem == null)
+                                    {
+                                        CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized;\nshould be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
+                                        return false;
+                                    }
+                                }
+                                break;
+                            default:
+                                CurrError = ValueParserResult.CreateError(logstr, $"UInteger command unrecognized;\nshould be U8/U16/U24/U32 not {readcmd}");
+                                return false;
+                        }
+                        break;
+                    default:
+                        if (readcmd != readcmd.ToUpper())
+                        {
+                            Log("ERROR: readcmd {readcmd} but should be uppercase");
+                        }
+                        int skip = command.MaxBytesRemaining;
+                        if (skip == -1)
+                        {
+                            skip = 0;
+                        }
+                        else if (skip <= -2)
+                        {
+                            CurrError = ValueParserResult.CreateError(logstr, $"Unable to get MaxBytesRemaining for {readcmd}");
+                            return false;
+                        }
+                        switch (readcmd.ToUpper()) //NOTE: should be all-uppercase; any lowercase is wrong
+                        {
+                            case "STRING":
+                                {
+                                    ReadStatus readStatus;
+                                    (stritem, readStatus) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength - (uint)skip);
+                                    switch (readStatus)
+                                    {
+                                        case ReadStatus.OK:
+                                            switch (displayFormat)
+                                            {
+                                                case "":
+                                                case "ASCII":
+                                                    stritem = EscapeString(stritem, displayFormatSecondary);
+                                                    break;
+                                                case "Eddystone":
+                                                    stritem = BluetoothProtocols.EddystoneUtilities.EddystoneUrlToString(stritem);
+                                                    break;
+                                                default:
+                                                    CurrError = ValueParserResult.CreateError(logstr, $"Unknown string format type {displayFormat}");
+                                                    return false;
+                                            }
+                                            break;
+                                        case ReadStatus.Hex:
+                                            break;
+                                    }
+
+                                    resultState = ResultState.IsString;
+                                }
+                                break;
+                            case "BYTES":
+                                {
+                                    //You might want bytes, but this methods is explicitly generating a string.
+                                    if (dr.UnconsumedBufferLength == 0)
+                                    {
+                                        stritem = "(no bytes)";
+                                        resultState = ResultState.IsString;
+                                    }
+                                    else
+                                    {
+                                        IBuffer buffer = dr.ReadBuffer(dr.UnconsumedBufferLength - (uint)skip);
+                                        byteArrayItem = buffer.ToArray();
+                                        var format = "X2";
+                                        switch (displayFormat)
+                                        {
+                                            case "DEC": format = ""; break;
+                                            default:
+                                            case "HEX": format = "X2"; break;
+                                        }
+                                        for (uint ii = 0; ii < byteArrayItem.Length; ii++)
+                                        {
+                                            if (ii != 0) stritem += " ";
+                                            stritem += byteArrayItem[ii].ToString(format);
+                                        }
+                                        resultState = ResultState.IsBytes;
+                                    }
+                                }
+                                break;
+                            default:
+                                CurrError = ValueParserResult.CreateError(logstr, $"Other command unrecognized; should be STRING or BYTES {readcmd}");
+                                return false;
+                        }
+                        break;
+
+                }
+            }
+            catch (Exception e)
+            {
+                stritem = $"EXCEPTION reading data {e} index {defaultIndex} command {command} len {CurrDR.UnconsumedBufferLength}";
+                CurrError = ValueParserResult.CreateError(returnsb + stritem, stritem);
+                return false;
+            }
+
+            if (returnsb.Length > 0) returnsb.Append(" ");
+            returnsb.Append(stritem);
+
+            return true; // everything worked.
+        }
+
+        /// <summary>
+        /// Moves to the next ParserField in the Commands, updating all the name fields, etc.
+        /// </summary>
+        /// <returns></returns>
+        private ParserField MoveToNext()
+        {
+            defaultIndex = NextCommandIndex;
+            var command = Commands.Fields[NextCommandIndex++];
+
+            stritem = "";
+            byteArrayItem = null;
+
+            readcmd = command.ByteFormatPrimary;
+            readindicator = readcmd[0];
+            displayFormat = command.DisplayFormatPrimary;
+            displayFormatSecondary = command.Get(1, 1);
+
+            name = command.NamePrimary;
+            if (string.IsNullOrEmpty(name)) name = $"param{defaultIndex}";
+            units = command.UnitsPrimary;
+
+            resultState = ResultState.IsDouble; // the most common result
+            dvalue = double.NaN;
+            dvalues = null;
+
+            return command;
+        }
+
+        public static ValueParserResult Parse(byte[] data, string commands)
+        {
+            var vr = new ValueParser();
+            vr.Initialize(data, commands);
+
+            while (!vr.AtEnd())
+            {
+                var isOK = vr.GetNext();
+                if (!isOK)
+                {
+                    return vr.CurrError;
+                }
+                // returnsb is updated by GetNext.
+
+            }
+
+            var retval = ValueParserResult.CreateOk(vr.returnsb.ToString());
+            return retval;
+        }
+
+#if NEVER_EVER_DEFINED
         /// <summary>
         /// Given a byte buffer of data and a string of decode commands (like "U8|DEC I8|HEX") produce a string representation of the byte buffer
         /// </summary>
@@ -100,6 +552,7 @@ namespace IotNumberFormats
             dr.ByteOrder = ByteOrder.LittleEndian; // default to little endian because it's common for bluetooth/
             return ConvertHelper(dr, decodeCommandsPFL, decodeCommandsPFL.ToString());
         }
+#endif
         enum ResultState { NoResult, IsString, IsDouble, IsDoubleArray, IsBytes };
 
         private static string DoubleToString(double dvalue, string displayFormat, string displayFormatSecondary, string fixedFormat="F2", string hexFormat="X6", string decFormat="D")
@@ -127,6 +580,9 @@ namespace IotNumberFormats
             return null; // null means we couldn't do the conversion
         }
 
+
+
+#if NEVER_EVER_DEFINED
         /// <summary>
         /// Returns a ValueParserResult: a string and a ValueList of the result
         /// </summary>
@@ -166,7 +622,7 @@ namespace IotNumberFormats
         /// <param name="isOptional"></param>
         /// <param name="command"></param>
         /// <returns>On error, returns a ValueParserResult with the error; otherwise returns null</returns>
-        private static ValueParserResult ConvertHelperOne(StringBuilder returnsb, BCBasic.BCValueList valueList, DataReader dr, ParserFieldList vps, string logstr, int defaultIndex, ref bool isOptional, ParserField command)
+        private static ValueParserResult ConvertHelperOne(StringBuilder returnsb, BCBasic.BCValueList valueList, DataReader dr, ParserFieldList vps, string logstr, instrigt defaultIndex, ref bool isOptional, ParserField command)
         {
             var stritem = "";
             byte[] byteArrayItem = null;
@@ -828,7 +1284,7 @@ namespace IotNumberFormats
             return str;
         }
 
-
+#endif
         private static string EscapeString(string rawstr, string displayFormatSecondary) // displayFormatSecondary is either "" or LONG
         {
             rawstr = rawstr.Replace("\\", "\\\\"); // escape all back-slashes
@@ -852,6 +1308,8 @@ namespace IotNumberFormats
             return rawstr;
         }
 
+
+
         public static string UnescapeString (string rawstr)
         {
             var retval = rawstr;
@@ -860,47 +1318,6 @@ namespace IotNumberFormats
             return retval;
         }
 
-        public static ValueParserResult ConvertToBuffer (this string value, string type)
-        {
-            var Retval = new ValueParserResult();
-            Retval.ByteResult = new List<byte>() { Capacity = (value.Length + 1) / 3 }; // most likely size
-            type = type.ToUpper();
-            switch (type)
-            {
-                case "ASCII":
-                    foreach (var ch in value)
-                    {
-                        Retval.ByteResult.Add((byte)(ch & 0xFF)); //just whack them.
-                    }
-                    break;
-                case "DEC":
-                case "HEX":
-                    var items = value.Split(" ");
-                    foreach (var item in items)
-                    {
-                        byte b = 0;
-                        bool converted;
-
-                        var specifier = System.Globalization.NumberStyles.None;
-                        if (type == "HEX")
-                        {
-                            specifier = System.Globalization.NumberStyles.AllowHexSpecifier;
-                        }
-                        converted = byte.TryParse(item, specifier, null, out b);
-                        if (converted)
-                        {
-                            Retval.ByteResult.Add(b);
-                        }
-                        else
-                        {
-                            Retval.Result = ValueParserResult.ResultValues.Error;
-                            Retval.ErrorString += $"Item {item} could not be converted as {type}\n";
-                        }
-                    }
-                    break;
-            }
-            return Retval;
-        }
 
         private static void Log(string message)
         {

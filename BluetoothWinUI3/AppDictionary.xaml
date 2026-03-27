@@ -15,10 +15,14 @@
         <Setter Property="Height" Value="400" />
         <Setter Property="Width" Value="400" />
     </Style>
-    
+
     <Style x:Key="sDeviceTitle" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="24" />
+    </Style>
+    <Style x:Key="sDeviceMinorText" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="10" />
     </Style>
 
 </ResourceDictionary>

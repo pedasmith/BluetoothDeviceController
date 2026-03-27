@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothDeviceController.BleEditor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -68,7 +69,7 @@ namespace IotNumberFormats
         {
             int NError=0;
             var valueb = Hex(value);
-            var actualResult = ValueParser.Parse(valueb.AsBuffer(), commands);
+            var actualResult = ValueParser.Parse(valueb, commands);
             if (actualResult.Result != ValueParserResult.ResultValues.Ok)
             {
                 Log($"ERROR: ValueToStringTest:TestOk ({commands}, {value}) failed to parse at all; expected OK");
@@ -93,7 +94,7 @@ namespace IotNumberFormats
 
         private static byte[] Hex(string value)
         {
-            var result = ValueParser.ConvertToBuffer(value, "HEX");
+            var result = ValueParserHelpers.ConvertToBuffer(value, "HEX");
             if (result.Result != ValueParserResult.ResultValues.Ok)
             {
                 Log($"ERROR: ValueToStringTest ({value}) failed to parse");

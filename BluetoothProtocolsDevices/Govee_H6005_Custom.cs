@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using BluetoothProtocols;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
 namespace BluetoothProtocols
 {
     public partial class Govee_H6005 : Light

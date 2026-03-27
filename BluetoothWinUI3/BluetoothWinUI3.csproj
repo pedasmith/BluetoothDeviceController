@@ -91,5 +91,5 @@
   <Import Project="..\Utilities\Utilities.projitems" Label="Shared" />
   <Import Project="..\BluetoothProtocolsAdvertisements\BluetoothProtocolsAdvertisements.projitems" Label="Shared" />
   <Import Project="..\IotNumberFormats\IotNumberFormats.projitems" Label="Shared" />
-  <Import Project="..\BCBasicShared\BCBasicShared.projitems" Label="Shared" />
+  <Import Project="..\BluetoothProtocolsDevicesCore\BluetoothProtocolsDevicesCore.projitems" Label="Shared" />
 </Project>

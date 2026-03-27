@@ -10,6 +10,9 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 using BluetoothDeviceController.Names;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
 
 namespace BluetoothProtocols
 {

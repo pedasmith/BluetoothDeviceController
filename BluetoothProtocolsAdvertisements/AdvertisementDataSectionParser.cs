@@ -212,7 +212,7 @@ namespace BluetoothProtocols
                             str = $"{hexPrefix}section {dtv.ToString()} data={servicedatastr.AsString}\n";
                         }
 #else
-                        var servicedatastr = IotNumberFormats.ValueParser.Parse(section.Data, "U16|HEX BYTES|HEX");
+                        var servicedatastr = IotNumberFormats.ValueParser.Parse(section.Data.ToArray(), "U16|HEX BYTES|HEX");
                         str = $"{hexPrefix}section {dtv.ToString()} data={servicedatastr.AsString}\n";
 #endif
                         break;
@@ -225,7 +225,7 @@ namespace BluetoothProtocols
             }
             if (printAsHex)
             {
-                var hexstr = IotNumberFormats.ValueParser.Parse(section.Data, "BYTES|HEX");
+                var hexstr = IotNumberFormats.ValueParser.Parse(section.Data.ToArray(), "BYTES|HEX");
                 str = $"{hexPrefix}section {dtv.ToString()} data={hexstr.AsString}\n";
             }
             if (!string.IsNullOrWhiteSpace(str)) str = indent + str;

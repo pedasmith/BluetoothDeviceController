@@ -15,9 +15,11 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Nordic Thingy 52" Style="{StaticResource sDeviceTitle}"/>
-            <local:BTConnectionControl Grid.Row="2" />
+            <TextBlock Grid.Row="2" Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
+            <local:BTConnectionControl Grid.Row="3" />
         </Grid>
     </Border>
 </UserControl>
