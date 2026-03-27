@@ -196,6 +196,34 @@ namespace IotNumberFormats
                 // when we're reading a new device with no specialization or JSON.
             }
             int retval = -2; // failure
+            switch (byteFormatPrimary)
+            {
+                case "I16S":
+                case "F32S":
+                case "BYTES":
+                case "STRING":
+                    retval = -1;
+                    break;
+                default:
+                    switch (byteFormatPrimary[0])
+                    {
+                        case 'F':
+                        case 'I':
+                        case 'U':
+                            int len;
+                            if (Int32.TryParse(byteFormatPrimary.Substring(1), out len))
+                            {
+                                retval = len / 8;
+                            }
+                            break;
+                        case 'O': // All the optional values are zero long
+                            retval = 0;
+                            break;
+                    }
+                    break;
+            }
+#if NEVER_EVER_DEFINED
+// old code removed when I switched to having a specific list of types that are -1 (arb. length)
             switch (byteFormatPrimary[0])
             {
                 case 'F':
@@ -217,6 +245,7 @@ namespace IotNumberFormats
                     }
                     break;
             }
+#endif
             return retval;
         }
 
