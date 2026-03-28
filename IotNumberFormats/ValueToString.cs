@@ -433,6 +433,34 @@ namespace IotNumberFormats
                                 return false;
                         }
                         break;
+                    case 'Q':
+                        if (dr.UnconsumedBufferLength == 0)
+                        {
+                            if (isOptional)
+                            {
+                                dvalue = double.NaN;
+                                stritem = "";
+                                break;
+                            }
+                            else
+                            {
+                                CurrError = ValueParserResult.CreateError(logstr, $"Missing data with {readcmd} field {defaultIndex + 1}");
+                                return false;
+                            }
+                        }
+                        // e.g. Q12Q4.Fixed
+                        {
+                            var subtypes = readcmd.Split(new char[] { 'Q' });
+                            if (subtypes.Length != 3) // Actually 2, but first is blank
+                            {
+                                CurrError = ValueParserResult.CreateError(logstr, $"Q command unrecognized; wrong number of Qs {readcmd}");
+                                return false;
+                            }
+                            stritem = FixedQuotientHelper(dr, subtypes[1], subtypes[2], displayFormat, out dvalue);
+                            //NOTE: fail on failure
+                        }
+                        break;
+
                     case 'U':
                         if (dr.UnconsumedBufferLength == 0)
                         {
@@ -526,6 +554,33 @@ namespace IotNumberFormats
                                 return false;
                         }
                         break;
+                    case '/':
+                        // e.g. /U8/I16|Fixed
+                        if (dr.UnconsumedBufferLength == 0)
+                        {
+                            if (isOptional)
+                            {
+                                dvalue = double.NaN;
+                                stritem = "";
+                                break;
+                            }
+                            else
+                            {
+                                CurrError = ValueParserResult.CreateError(logstr, $"Missing data with {readcmd} field {defaultIndex + 1}");
+                                return false;
+                            }
+                        }
+                        {
+                            var subtypes = readcmd.Split(new char[] { '/' });
+                            if (subtypes.Length != 3) // Actually 2, but first is blank
+                            {
+                                CurrError = ValueParserResult.CreateError(logstr, $"/ command unrecognized; wrong number of slashes {readcmd}");
+                                return false;
+                            }
+                            stritem = FixedFractionHelper(dr, subtypes[1], subtypes[2], displayFormat, out dvalue);
+                            // NOTE: fail on failure
+                        }
+                        break;
                     default:
                         {
                             if (readcmd != readcmd.ToUpper())
@@ -616,7 +671,7 @@ namespace IotNumberFormats
                 return false;
             }
 
-            if (returnsb.Length > 0) returnsb.Append(" ");
+            if (returnsb.Length > 0 && stritem.Length > 0) returnsb.Append(" "); // Bug fixed 2026-03-27: nothing to add means no space
             returnsb.Append(stritem);
 
             return true; // everything worked.
@@ -719,6 +774,156 @@ namespace IotNumberFormats
         }
 
 
+        // TODO: must update to set the dvalue and whatnot just like FixedQuotientHelper does. 
+        /// <summary>
+        /// Handles /I16/U8.FIXED type requests. The I16 is the integer part and the U8 is the fraction. The fraction for U and I is binary and for P types is decimal (e.g. P8 is an out-of-100 portion)
+        /// </summary>
+        /// <param name="dr"></param>
+        /// <param name="integralType"></param>
+        /// <param name="fractionType"></param>
+        /// <param name="presentation"></param>
+        /// <returns></returns>
+        private static string FixedFractionHelper(DataReader dr, string integralType, string fractionType, string presentation, out double dvalue)
+        {
+            string stritem;
+            var integral = ReadValue(dr, integralType);
+            var fraction = ReadValue(dr, fractionType);
+            var denominator = 1.0;
+            switch (fractionType)
+            {
+                case "I8":
+                case "U8":
+                    denominator = 1 << 8;
+                    break;
+                case "P8":
+                    denominator = 100;
+                    break;
+                case "I16":
+                case "U16":
+                    denominator = 1 << 16;
+                    break;
+                case "P16":
+                    denominator = 10000; //  1 << 16;
+                    break;
+                case "I32":
+                case "U32":
+                    denominator = 1 << 32;
+                    break;
+                case "P32":
+                    denominator = 1000000; //  1 << 32;
+                    break;
+
+            }
+            switch (presentation)
+            {
+                default: // NOTE: error!
+                case "FIXED":
+                    if (fraction > denominator)
+                    {
+                        ; //TODO: failure
+                    }
+                    dvalue = integral + (fraction / denominator);
+                    stritem = dvalue.ToString();
+                    break;
+                    // NOTE: need to add a failure path pretty much everywhere.
+            }
+            return stritem;
+        }
+
+        // Command is e.g. U8 or I32 or P8
+        private static double ReadValue(DataReader dr, string command)
+        {
+            double Retval = Double.NaN;
+            switch (command)
+            {
+                case "I8":
+                    Retval = (sbyte)dr.ReadByte();
+                    break;
+                case "I16":
+                    Retval = dr.ReadInt16();
+                    break;
+                case "I32":
+                    Retval = dr.ReadInt32();
+                    break;
+
+                case "P8":
+                    Retval = (sbyte)dr.ReadByte();
+                    break;
+                case "P16":
+                    Retval = dr.ReadInt16();
+                    break;
+                case "P32":
+                    Retval = dr.ReadInt32();
+                    break;
+
+                case "U8":
+                    Retval = dr.ReadByte();
+                    break;
+                case "U16":
+                    Retval = dr.ReadUInt16();
+                    break;
+                case "U32":
+                    Retval = dr.ReadUInt32();
+                    break;
+            }
+            return Retval;
+        }
+
+        public static string ZZZConvertToStringHex(IBuffer buffer)
+        {
+            var str = "";
+            for (uint i = 0; i < buffer.Length; i++)
+            {
+                if (str != "") str += " ";
+                str += $"{buffer.GetByte(i):X2}";
+            }
+            return str;
+        }
+
+
+        // TODO: must update to set the dvalue and whatnot just like FixedFractionHelper does.
+        private string FixedQuotientHelper(DataReader dr, string integralType, string fractionType, string presentation, out double dvalue)
+        {
+            dvalue = double.NaN;
+            string stritem;
+            var integralBits = Int32.Parse(integralType);
+            var fractionBits = Int32.Parse(fractionType);
+            var nbits = integralBits + fractionBits;
+            Int32 rawValue = 0;
+            switch (nbits)
+            {
+                default:
+                    return $"ERROR: incorrect Qbit encoding {integralType}Q{fractionType}";
+                case 8: rawValue = (sbyte)dr.ReadByte(); break;
+                case 16: rawValue = dr.ReadInt16(); break;
+                case 32: rawValue = dr.ReadInt32(); break;
+            }
+            string idealFormat = "N";
+            // How many bits of precision?
+            // 3--> 1 chars
+            // 4-->2 chars
+            var maxSize = 1 << fractionBits; // e.g. 10-->1024
+            var displaybits = Math.Ceiling(Math.Log10(maxSize));
+            idealFormat = $"N{displaybits}";
+
+            // An example: we get a number in 12Q4 format.
+            // That means that the top 12 bits are the integer part
+            // and the bottom 4 are the fractional part.
+            // This is actually a simple calculation!
+            // The divideBy is 1<<4 (remember that 1<<0==1, 1<<1==2, 1<<2==4 1<<3=8 1<<4==16)
+            double divideBy = (double)(1 << fractionBits);
+            dvalue = ((double)rawValue) / divideBy;
+
+            switch (presentation)
+            {
+                default: // TODO: error!
+                case "FIXED":
+                    stritem = dvalue.ToString(idealFormat);
+                    break;
+                    // TODO: need to add a failure path pretty much everywhere.
+            }
+            return stritem;
+        }
 
 #if NEVER_EVER_DEFINED
         /// <summary>
@@ -1313,114 +1518,6 @@ namespace IotNumberFormats
             return Retval;
         }
 
-
-        /// <summary>
-        /// Handles /I16/U8.FIXED type requests. The I16 is the integer part and the U8 is the fraction. The fraction for U and I is binary and for P types is decimal (e.g. P8 is an out-of-100 portion)
-        /// </summary>
-        /// <param name="dr"></param>
-        /// <param name="integralType"></param>
-        /// <param name="fractionType"></param>
-        /// <param name="presentation"></param>
-        /// <returns></returns>
-        private static string FixedFractionHelper(DataReader dr, string integralType, string fractionType, string presentation, out double dvalue)
-        {
-            string stritem;
-            var integral = ReadValue(dr, integralType);
-            var fraction = ReadValue(dr, fractionType);
-            var denominator = 1.0;
-            switch (fractionType)
-            {
-                case "I8":
-                case "U8":
-                    denominator = 1 << 8;
-                    break;
-                case "P8":
-                    denominator = 100;
-                    break;
-                case "I16":
-                case "U16":
-                    denominator = 1 << 16;
-                    break;
-                case "P16":
-                    denominator = 10000; //  1 << 16;
-                    break;
-                case "I32":
-                case "U32":
-                    denominator = 1 << 32;
-                    break;
-                case "P32":
-                    denominator = 1000000; //  1 << 32;
-                    break;
-
-            }
-            switch (presentation)
-            {
-                default: // NOTE: error!
-                case "FIXED":
-                    if (fraction > denominator)
-                    {
-                        ; //TODO: failure
-                    }
-                    dvalue = integral + (fraction / denominator);
-                    stritem = dvalue.ToString();
-                    break;
-                    // NOTE: need to add a failure path pretty much everywhere.
-            }
-            return stritem;
-        }
-        private static string FixedQuotientHelper(DataReader dr, string integralType, string fractionType, string presentation, out double dvalue)
-        {
-            dvalue = double.NaN;
-            string stritem;
-            var integralBits = Int32.Parse(integralType);
-            var fractionBits = Int32.Parse(fractionType);
-            var nbits = integralBits + fractionBits;
-            Int32 rawValue = 0;
-            switch (nbits)
-            {
-                default:
-                    return $"ERROR: incorrect Qbit encoding {integralType}Q{fractionType}";
-                case 8: rawValue = (sbyte)dr.ReadByte(); break;
-                case 16: rawValue = dr.ReadInt16(); break;
-                case 32: rawValue = dr.ReadInt32(); break;
-            }
-            string idealFormat = "N";
-            // How many bits of precision?
-            // 3--> 1 chars
-            // 4-->2 chars
-            var maxSize = 1<<fractionBits; // e.g. 10-->1024
-            var displaybits = Math.Ceiling(Math.Log10(maxSize));
-            idealFormat = $"N{displaybits}";
-
-            // An example: we get a number in 12Q4 format.
-            // That means that the top 12 bits are the integer part
-            // and the bottom 4 are the fractional part.
-            // This is actually a simple calculation!
-            // The divideBy is 1<<4 (remember that 1<<0==1, 1<<1==2, 1<<2==4 1<<3=8 1<<4==16)
-            double divideBy = (double)(1 << fractionBits);
-            dvalue = ((double)rawValue) / divideBy;
-
-            switch (presentation)
-            {
-                default: // TODO: error!
-                case "FIXED":
-                    stritem = dvalue.ToString(idealFormat);
-                    break;
-                    // TODO: need to add a failure path pretty much everywhere.
-            }
-            return stritem;
-        }
-
-        public static string ConvertToStringHex(IBuffer buffer)
-        {
-            var str = "";
-            for (uint i = 0; i < buffer.Length; i++)
-            {
-                if (str != "") str += " ";
-                str += $"{buffer.GetByte(i):X2}";
-            }
-            return str;
-        }
 
 #endif
         private static string EscapeString(string rawstr, string displayFormatSecondary) // displayFormatSecondary is either "" or LONG

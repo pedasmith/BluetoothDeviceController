@@ -38,19 +38,27 @@ namespace IotNumberFormats
             NError += TestOk("I8 I16S I8 I8 I8", "01 02 03 04 05 06 07 08 09 0A", "01 0302 0504 0706 08 09 0A");
             NError += TestOk("U8 U16 U24 U32", "01 02 03 04 05 06 07 08 09 0A", "01 0302 060504 0A090807");
             // Explicitly do not test e.g., a I16 with X4 format when the value is negative; it fails in weird ways.
-            NError += TestOk("U16 OEL U16 OEB U16", "01 02 03 04 05 06", "0201 0403 0506"); // default is little endian for BT
+            NError += TestOk("U16 OEL U16 OEB U16", "01 02 03 04 05 06", "0201 0403 0506"); // Testing OEL OEB default is little endian for BT
 
-            NError += TestOk("F32 F64", "00 00 46 41 C3 F5 28 5C 8F 42 34 40", "12.375 20.260");
-            NError += TestOk("F32S I32", "00 00 46 41 00 00 46 41 50 51 52 53", "12.375 12.375 53525150");
+            NError += TestOk("F32 F64", "00 00 46 41 C3 F5 28 5C 8F 42 34 40", "12.375 20.260"); // Testing F32 F64
+            NError += TestOk("F32S I32", "00 00 46 41 00 00 46 41 50 51 52 53", "12.375 12.375 53525150"); // Testing F32S
+
+            NError += TestOk("U8 U8 OOPT U8", "01 02 03", "01 02 03"); // Testing OOPT
+            NError += TestOk("U8 U8 OOPT U8", "01 02", "01 02"); // Testing OOPT
+
+            NError += TestOk("Q8Q8", "80 01", "1.500"); // Testing Q
+            NError += TestOk("Q12Q4", "04 01", "16.25"); // Testing Q
+
+            NError += TestOk("/I8/P8", "07 40", "7.64"); // Testing /_P  . Unlike the Q types, the two value are read one after the other
 
             // TESTS: 
             // I8 I16 I16S I24 I32 U8 U16 U24 U32
             // F32 F32S F64 
-            // MISSING*** Q /
+            // Q /
             // STRING BYTES
-            // MISSING*** ODE ODR XR
             // OEL OEB
-            // MISSING*** OOPT
+            // OOPT
+            // MISSING*** ODE ODR XR
 
 
             return NError;
