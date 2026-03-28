@@ -61,6 +61,8 @@ namespace IotNumberFormats
             // MISSING*** ODE ODR XR
 
 
+
+            NError += TestOkTwice("U16 U8", "01 02 03", "0201 03", "11 12 13", "1211 13");
             return NError;
         }
 
@@ -109,6 +111,42 @@ namespace IotNumberFormats
                 if (actualResult.AsString != expected)
                 {
                     Log($"ERROR: ValueToStringTest:TestOk ({commands}, {value}) actual is {actualResult.AsString} expected {expected}");
+                    NError++;
+                }
+            }
+            return NError;
+        }
+
+        private static int TestOkTwice(string commands, string value1, string expected1, string value2, string expected2)
+        {
+            int NError = 0;
+            var vr = new ValueParser();
+            vr.Initialize(commands);
+            var actualResult = vr.Parse(Hex(value1));
+            if (actualResult.Result != ValueParserResult.ResultValues.Ok)
+            {
+                Log($"ERROR: ValueToStringTest:TestOk ({commands}, {value1}) failed to parse at all; expected OK");
+                NError++;
+            }
+            else
+            {
+                if (actualResult.AsString != expected1)
+                {
+                    Log($"ERROR: ValueToStringTest:TestOk ({commands}, {value1}) actual is {actualResult.AsString} expected {expected1}");
+                    NError++;
+                }
+            }
+            actualResult = vr.Parse(Hex(value2));
+            if (actualResult.Result != ValueParserResult.ResultValues.Ok)
+            {
+                Log($"ERROR: ValueToStringTest:TestOk ({commands}, {value2}) failed to parse at all; expected OK");
+                NError++;
+            }
+            else
+            {
+                if (actualResult.AsString != expected2)
+                {
+                    Log($"ERROR: ValueToStringTest:TestOk ({commands}, {value2}) actual is {actualResult.AsString} expected {expected2}");
                     NError++;
                 }
             }

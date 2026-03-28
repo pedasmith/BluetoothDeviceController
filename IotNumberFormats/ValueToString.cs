@@ -3,13 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Security.Cryptography;
 using System.Text;
-using System.Xml.Linq;
 using Utilities;
-using Windows.Foundation.Diagnostics;
-using Windows.Security.Authentication.Web.Core;
-using Windows.Security.Cryptography;
 using Windows.Storage.Streams;
 using static Utilities.DataReaderReadStringRobust;
 
@@ -107,14 +102,22 @@ namespace IotNumberFormats
         int NextCommandIndex = 0;
         DataReader CurrDR;
         string OriginalCommandString;
-        public void Initialize(byte[] data, string commands)
+
+        /// <summary>
+        /// You can initialize a single time by passing in the commands ("U8 U8") and then call Initialize with the specific data many times.
+        /// </summary>
+        /// <param name="commands"></param>
+        public void Initialize(string commands)
+        {
+            OriginalCommandString = commands;
+            Commands = ParserFieldList.ParseLine(commands);
+        }
+
+        public void Initialize(byte[] data)
         {
             // Old way: IBuffer buffer = CryptographicBuffer.CreateFromByteArray(data);
             CurrDR = DataReader.FromBuffer(data.AsBuffer());
             CurrDR.ByteOrder = ByteOrder.LittleEndian; // default to little endian because it's common for Bluetooth.
-
-            OriginalCommandString = commands;
-            Commands = ParserFieldList.ParseLine(commands);
             NextCommandIndex = 0;
 
             returnsb = new StringBuilder(); // will be the entire string to return from a Parse() //TODO: is ugly and old looking
@@ -156,7 +159,7 @@ namespace IotNumberFormats
 
 
         /// <summary>
-        /// Handles the current field (so call this after calling GetNext). Will set all of the state variables like stritem.
+        /// Enormous method that handles the current field (so call this after calling GetNext). Will set all of the state variables like stritem.
         /// </summary>
         /// <returns>false when something terrible has happened. CurrError will be set.</returns>
         public bool GetNext()
@@ -705,23 +708,41 @@ namespace IotNumberFormats
             return command;
         }
 
+
+        /// <summary>
+        /// Does a parse like the old 2020 code. You give it data + commands and it does the whole parsing.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="commands"></param>
+        /// <returns></returns>
         public static ValueParserResult Parse(byte[] data, string commands)
         {
             var vr = new ValueParser();
-            vr.Initialize(data, commands);
+            vr.Initialize(commands);
+            var retval = vr.Parse(data);
+            return retval;
+        }
 
-            while (!vr.AtEnd())
+        /// <summary>
+        /// Must have already been initialized with commands (like "U8 U8")
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public ValueParserResult Parse(byte[] data)
+        {
+            Initialize(data);
+
+            while (!AtEnd())
             {
-                var isOK = vr.GetNext();
+                var isOK = GetNext();
                 if (!isOK)
                 {
-                    return vr.CurrError;
+                    return CurrError;
                 }
                 // returnsb is updated by GetNext.
-
             }
 
-            var retval = ValueParserResult.CreateOk(vr.returnsb.ToString());
+            var retval = ValueParserResult.CreateOk(returnsb.ToString());
             return retval;
         }
 
