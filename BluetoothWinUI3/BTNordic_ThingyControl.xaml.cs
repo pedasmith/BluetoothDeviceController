@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Utilities;
+using Windows.Devices.Bluetooth;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -34,7 +36,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl
     }
 
     KnownDevice kd = null;
-    private void BTNordic_ThingyControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
         // Will be a KnownDevice
         kd = args.NewValue as KnownDevice;
@@ -43,5 +45,28 @@ public sealed partial class BTNordic_ThingyControl : UserControl
         uiAddress.Text = BluetoothAddress.AsString(kd.Advertisement.Addr);
 
         Device = new Nordic_Thingy();
+
+        Device.ble = await BluetoothLEDevice.FromBluetoothAddressAsync(kd.Advertisement.Addr);
+        Device.PropertyChanged += Device_PropertyChanged;
+        await Device.NotifyTemperature_cAsync();
+    }
+
+    private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        UIThreadHelper.CallOnUIThread(() =>
+        {
+            UpdateUI(e.PropertyName);
+        });
+    }
+
+    private void UpdateUI(string name)
+    {
+        switch (name) // from e.PropertyName when the Device does a PropertyChanged.
+        {
+            case "Temperature_c":
+                uiTemperature_c.Text = Device.Temperature_c.ToString("0.0") + " °C";
+                break;
+        }
+
     }
 }

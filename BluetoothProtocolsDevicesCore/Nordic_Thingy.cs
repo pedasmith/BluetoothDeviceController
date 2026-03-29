@@ -1,4 +1,5 @@
 ﻿//From template: Protocol_Body v2022-07-02 9:54
+using BluetoothConversions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,6 +34,124 @@ namespace BluetoothProtocols
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        /// <summary>
+        /// Delegate for all Notify events
+        /// </summary>
+        /// <param name="data"></param>
+        public delegate void BluetoothDataEvent(IotNumberFormats.ValueParserResult data);
+
+        private double _Temperature_c = 0.0;
+        private bool _Temperature_c_set = false;
+        public double Temperature_c
+        {
+            get { return _Temperature_c; }
+            internal set { if (_Temperature_c_set && value == _Temperature_c) return; _Temperature_c = value; _Temperature_c_set = true; OnPropertyChanged(); }
+        }
+
+        Guid Service_Environment_Guid = Guid.Parse("EF680200-9B35-4933-9B10-52FFA9740042");
+        GattDeviceService Service_Environment = null;
+
+        Guid Characteristic_Temperature_c_Guid = Guid.Parse("EF680201-9B35-4933-9B10-52FFA9740042");
+        GattCharacteristic Characteristic_Temperature_c = null;
+        /// <summary>
+        /// Event for notifications; Temperature_cEvent += _my function_
+        /// </summary>
+        public event BluetoothDataEvent ZZZTemperature_cEvent = null;
+
+
+        /// <summary>
+        /// We only want to set the internal callback once, and never need to remove it.
+        /// </summary>
+
+        private bool NotifyTemperature_c_ValueChanged_Set = false;
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+
+        public async Task<bool> NotifyTemperature_cAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            if (Characteristic_Temperature_c == null)
+            {
+                if (ble == null) return false;
+                if (Service_Environment == null)
+                {
+                    var serviceStatus = await ble.GetGattServicesForUuidAsync(Service_Environment_Guid);
+                    if (serviceStatus.Status != GattCommunicationStatus.Success)
+                    {
+                        Status.ReportStatus($"Unable to get service Environment", serviceStatus);
+                        return false;
+                    }
+                    if (serviceStatus.Services.Count != 1)
+                    {
+                        Status.ReportStatus($"Unable to get valid service count ({serviceStatus.Services.Count}) for Environment", serviceStatus);
+                        return false;
+                    }
+                    Service_Environment = serviceStatus.Services[0];
+                }
+                var service = Service_Environment;
+                var characteristicsStatus = await service.GetCharacteristicsForUuidAsync(Characteristic_Temperature_c_Guid);
+                if (characteristicsStatus.Status != GattCommunicationStatus.Success)
+                {
+                    Status.ReportStatus($"unable to get characteristic for Temperature_c", characteristicsStatus);
+                    return false;
+                }
+                if (characteristicsStatus.Characteristics.Count == 0)
+                {
+                    Status.ReportStatus($"unable to get any characteristics for Temperature_c", characteristicsStatus);
+                    return false;
+                }
+                else if (characteristicsStatus.Characteristics.Count != 1)
+                {
+                    Status.ReportStatus($"unable to get correct characteristics count ({characteristicsStatus.Characteristics.Count}) for Temperature_c", characteristicsStatus);
+                    return false;
+                }
+                Characteristic_Temperature_c = characteristicsStatus.Characteristics[0];
+
+            }
+
+            // IP! if (!await EnsureCharacteristicAsync(CharacteristicsEnum.Temperature_c_Environment_enum)) return false;
+            var ch = Characteristic_Temperature_c;
+            if (ch == null)
+            {
+                return false;
+            }
+            GattCommunicationStatus result = GattCommunicationStatus.ProtocolError;
+            try
+            {
+                result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+                if (!NotifyTemperature_c_ValueChanged_Set)
+                {
+                    // Only set the event callback once
+                    NotifyTemperature_c_ValueChanged_Set = true;
+                    ch.ValueChanged += NotifyTemperature_cCallback;
+                }
+
+            }
+            catch (Exception e)
+            {
+                Status.ReportStatus($"NotifyTemperature_c: {e.Message}", result);
+                return false;
+            }
+            Status.ReportStatus($"NotifyTemperature_c: set notification", result);
+
+            return true;
+        }
+
+        private void NotifyTemperature_cCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var datameaning = "/I8/P8|FIXED|Temperature|C";
+            var vr = new IotNumberFormats.ValueParser();
+            vr.Initialize(datameaning);
+            vr.Initialize(args.CharacteristicValue.ToArray());
+
+            // Now pull the data out
+            Temperature_c = vr.GetNextDouble(); // There's only one value
+        }
+
 #if NEVER_EVER_DEFINED
         Guid[] ServiceGuids = new Guid[] {
            Guid.Parse("EF680200-9B35-4933-9B10-52FFA9740042"),

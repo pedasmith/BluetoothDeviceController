@@ -55,7 +55,7 @@ namespace BluetoothWinUI3
             UniqueAdvertisements[e.ToStringFull(CanCompare)] = e.ToStringFull();
 
 
-            // Update the UI as needed
+            // Update the UI as needed and create the next device
             UIThreadHelper.CallOnUIThread(() =>
             {
                 uiAdvertCount.Text = NAdvertisements.ToString();
@@ -67,6 +67,8 @@ namespace BluetoothWinUI3
                 var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
                 if (supportedDevice != null)
                 {
+                    // TODO: see if it's a known device AKA we already made the control.
+                    // For now, we just support a single Thingy, so all those complications are short-circuited.
                     if (ThingyControl == null)
                     {
                         ThingyControl = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;

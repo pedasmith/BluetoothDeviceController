@@ -20,6 +20,11 @@
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="24" />
     </Style>
+    <Style x:Key="sDevicePrimaryText" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Foreground" Value="DarkCyan" />
+    </Style>
     <Style x:Key="sDeviceMinorText" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="FontSize" Value="10" />

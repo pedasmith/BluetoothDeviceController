@@ -157,6 +157,11 @@ namespace IotNumberFormats
         bool isOptional = false; // once we see OOPT, the rest of the fields are optional, meaning that if we run out of data, we just return what we have instead of an error.
         ValueParserResult CurrError;
 
+        public double GetNextDouble()
+        {
+            GetNext();
+            return dvalue;
+        }
 
         /// <summary>
         /// Enormous method that handles the current field (so call this after calling GetNext). Will set all of the state variables like stritem.
