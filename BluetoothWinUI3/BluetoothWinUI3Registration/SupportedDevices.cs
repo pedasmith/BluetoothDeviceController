@@ -1,12 +1,12 @@
-﻿using System;
+﻿using BluetoothWatcher.AdvertismentWatcher;
+using BluetoothWinUI3.Utilities;
+using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BluetoothWinUI3.Utilities;
-using Microsoft.UI.Xaml.Controls;
-
-using BluetoothWatcher.AdvertismentWatcher;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -21,12 +21,14 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
 
     public class SupportedDevice
     {
-        public SupportedDevice(string match, Type factory)
+        public SupportedDevice(string match, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type factory)
         {
             MatchingName = match;
             FactoryInterface = factory;
         }
         public string MatchingName { get; set; } = "Thingy*"; // For example 
+
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
         public Type FactoryInterface { get; set; } = null;
         public bool Matches(WatcherData advertisement)
         {

@@ -20,6 +20,20 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         
+        <!-- Title and menu -->
+        <MenuBar Grid.Row="0">
+            <MenuBarItem Title="File">
+                <MenuFlyoutItem Text="Exit" Click="OnFileExit"/>
+            </MenuBarItem>
+            <MenuBarItem Title="Debug" x:Name="uiMenuDebug">
+                <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices"/>
+                <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices"/>
+            </MenuBarItem>
+            <MenuBarItem Title="Help">
+                <MenuFlyoutItem Text="About" Click="OnHelpAbout"/>
+            </MenuBarItem>
+        </MenuBar>
+
         <!-- All of the known devices -->
         <ListView Grid.Row="1" x:Name="uiKnownDevices">
         </ListView>

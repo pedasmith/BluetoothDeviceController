@@ -126,5 +126,26 @@ namespace BluetoothWinUI3
             Clipboard.SetContent(dataPackage);
         }
 
+        private void OnFileExit(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OnHelpAbout(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OnDebugLoadDevices(object sender, RoutedEventArgs e)
+        {
+            AllSaveData.Restore();
+
+        }
+
+        private void OnDebugSaveDevices(object sender, RoutedEventArgs e)
+        {
+            AllSaveData.Save();
+
+        }
     }
 }
