@@ -6,25 +6,42 @@
 
     <Style x:Key="sAllFonts" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="Candara" />
+        <Setter Property="Foreground" Value="DarkCyan" />
     </Style>
 
 
     <Style x:Key="sDeviceBorder" TargetType="Border">
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="BorderBrush" Value="Gray" />
-        <Setter Property="Height" Value="400" />
-        <Setter Property="Width" Value="400" />
+        <Setter Property="Background" Value="LightBlue" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="CornerRadius" Value="10,10,10,10" />
+        <Setter Property="Height" Value="380" />
+        <Setter Property="Width" Value="380" />
     </Style>
 
+    <!-- example: Thingy 52 -->
     <Style x:Key="sDeviceTitle" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="FontSize" Value="24" />
-    </Style>
-    <Style x:Key="sDevicePrimaryText" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
-        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="18" />
-        <Setter Property="Foreground" Value="DarkCyan" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
     </Style>
+    <!-- example: "temperature" -->
+    <Style x:Key="sDevicePrimaryTitle" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="10,0,10,0" />
+    </Style>
+    <!-- Example: 24.2C -->
+    <Style x:Key="sDevicePrimaryData" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="36" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="10,0,10,0" />
+    </Style>
+    <!-- Example: BT address -->
     <Style x:Key="sDeviceMinorText" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="FontSize" Value="10" />

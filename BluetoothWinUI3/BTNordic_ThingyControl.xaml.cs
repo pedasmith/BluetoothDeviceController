@@ -49,13 +49,20 @@ public sealed partial class BTNordic_ThingyControl : UserControl
         Device.ble = await BluetoothLEDevice.FromBluetoothAddressAsync(kd.Advertisement.Addr);
         Device.PropertyChanged += Device_PropertyChanged;
         await Device.NotifyTemperature_cAsync();
+        await Device.NotifyPressure_hpaAsync();
+        await Device.NotifyHumidityAsync();
+        await Device.NotifyTVOCAsync(); // both TVOC and eCOS
+        await Device.NotifyColorAsync();
     }
 
     private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         UIThreadHelper.CallOnUIThread(() =>
         {
-            UpdateUI(e.PropertyName);
+            if (this.IsLoaded) // Won't be loaded when we exit the app!
+            {
+                UpdateUI(e.PropertyName);
+            }
         });
     }
 
@@ -65,6 +72,22 @@ public sealed partial class BTNordic_ThingyControl : UserControl
         {
             case "Temperature_c":
                 uiTemperature_c.Text = Device.Temperature_c.ToString("0.0") + " °C";
+                break;
+            case "Pressure_hpa":
+                uiPressure_hpa.Text = Device.Pressure_hpa.ToString("0.0");
+                break;
+            case "Humidity":
+                uiHumidity.Text = Device.Humidity.ToString("0.0") + "%";
+                break;
+            case "TVOC": // sets both TVOC and eCOS
+                uieCOS.Text = Device.eCOS.ToString("0.0");
+                uiTVOC.Text = Device.TVOC.ToString("0.0");
+                break;
+            case "Color":
+                {
+                    var RGB = new SolidColorBrush(Windows.UI.Color.FromArgb(255, (byte)Device.Red, (byte)Device.Green, (byte)Device.Blue));
+                    uiColor.Background = RGB; //TODO: and the 'clear' value?
+                }
                 break;
         }
 

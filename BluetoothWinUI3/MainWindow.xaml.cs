@@ -27,6 +27,11 @@ using Windows.Foundation.Collections;
 
 namespace BluetoothWinUI3
 {
+    public class UserPreferences
+    {
+        bool AutostartAdvertisementWatcher { get; set; } = true;
+    }
+
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -34,13 +39,20 @@ namespace BluetoothWinUI3
     {
         BluetoothWatcher.AdvertismentWatcher.AdvertisementWatcher AdvertisementWatcher = new BluetoothWatcher.AdvertismentWatcher.AdvertisementWatcher();
         int NAdvertisements = 0;
+        UserPreferences CurrUserPrefs = new UserPreferences();
         public MainWindow()
         {
+
             UIThreadHelper.DQueue = this.DispatcherQueue;
             AdvertisementWatcher.WatcherEvent += AdvertisementWatcher_WatcherEvent;
             InitializeComponent();
+            this.Activated += MainWindow_Activated;
         }
 
+        private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
+        {
+            AdvertisementWatcher.Start();
+        }
 
         StringBuilder AllAdvertisements = new StringBuilder();
         Dictionary<string, string> UniqueAdvertisements = new Dictionary<string, string>();

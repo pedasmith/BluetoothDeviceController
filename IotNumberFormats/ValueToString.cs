@@ -103,6 +103,20 @@ namespace IotNumberFormats
         DataReader CurrDR;
         string OriginalCommandString;
 
+        public ValueParser()
+        {
+
+        }
+        /// <summary>
+        /// Constructor that takes in a list of commands (e.g., "U8 U8") and calls Initialize(). Once this is done, just call Initialize() with the specific data and then call GetNextDouble() as needed to pull data out.
+        /// </summary>
+        /// <param name="commands"></param>
+        public ValueParser(string commands)
+        {
+            Initialize(commands);
+        }
+
+
         /// <summary>
         /// You can initialize a single time by passing in the commands ("U8 U8") and then call Initialize with the specific data many times.
         /// </summary>
