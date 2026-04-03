@@ -17,6 +17,7 @@ namespace BluetoothWinUI3
     {
         public static List<SaveData> AllDevices = new List<SaveData>();
 #if NEVER_EVER_DEFINED
+        // Only needed to help kick-start the save/load code. Can be deleted later on.
         {
             new SaveData()
             {
@@ -30,19 +31,13 @@ namespace BluetoothWinUI3
             },
         };
 #endif
-        static JsonSerializerOptions options = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            TypeInfoResolver = SaveDataContext.Default,
-        };
-        static JsonSerializerContext JsonContext = SaveDataContext.Default;
         public static void Save()
         {
             string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
             Directory.CreateDirectory(folderPath);
             string filePath = Path.Combine(folderPath, "AllDeviceData.json");
 
-            var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), JsonContext);  //<List<SaveData>>((AllDevices, options);
+            var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
             File.WriteAllText(filePath, json);
         }
 
@@ -55,8 +50,7 @@ namespace BluetoothWinUI3
             if (File.Exists(filePath))
             {
                 var json = File.ReadAllText(filePath);
-                Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-                var list = (List<SaveData>)System.Text.Json.JsonSerializer.Deserialize(stream, typeof(List<SaveData>), JsonContext);
+                var list = (List<SaveData>)System.Text.Json.JsonSerializer.Deserialize(json, typeof(List<SaveData>), SaveDataContext.Default);
                 AllDevices = list ?? new List<SaveData>();
             }
         }
@@ -103,7 +97,7 @@ namespace BluetoothWinUI3
 
     // JsonSerializableAttribute
 
-
+    // See https://sunriseprogrammer.blogspot.com/2026/04/il2104-il2026-trim-and-json-with-winui3.html
     // See https://stackoverflow.com/questions/70825664/how-to-implement-system-text-json-source-generator-with-a-generic-class
     [JsonSourceGenerationOptions(WriteIndented = true)]
     [JsonSerializable(typeof(List<SaveData>), TypeInfoPropertyName = "ListSaveDataWithPropertyName")]
