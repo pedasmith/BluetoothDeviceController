@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Threading.Tasks;
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
@@ -57,7 +58,6 @@ namespace BluetoothWinUI3
         StringBuilder AllAdvertisements = new StringBuilder();
         Dictionary<string, string> UniqueAdvertisements = new Dictionary<string, string>();
 
-        UserControl ThingyControl = null;
         private void AdvertisementWatcher_WatcherEvent(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)
         {
             // A little bit of logging and storing stuff for debugging
@@ -79,17 +79,50 @@ namespace BluetoothWinUI3
                 var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
                 if (supportedDevice != null)
                 {
+                    var known = KnownDevices.Get(e);
+                    if (known == null)
+                    {
+                        var addBlanks = uiKnownDevices.Items.Count == 0;
+                        if (addBlanks)
+                        {
+                            var ct = new BTBlank_BlankControl();
+                            uiKnownDevices.Items.Add(ct);
+                        }
+
+                        var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
+
+                        uiKnownDevices.Items.Add(control);
+                        known = KnownDevices.Add(e, control, supportedDevice);
+                        control.DataContext = known;
+
+                        if (addBlanks)
+                        {
+                            var ct = new BTBlank_BlankControl();
+                            uiKnownDevices.Items.Add(ct);
+                        }
+                    }
+
+#if NEVER_EVER_DEFINED
                     // TODO: see if it's a known device AKA we already made the control.
                     // For now, we just support a single Thingy, so all those complications are short-circuited.
                     if (ThingyControl == null)
                     {
-                        ThingyControl = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
-                        uiKnownDevices.Items.Add(ThingyControl);
-
-                        var known = new KnownDevice(e, ThingyControl, supportedDevice);
-                        KnownDevices.Devices.Add(known);
+                        var addBlanks = uiKnownDevices.Items.Count == 0;
+                        if (addBlanks)
+                        {
+                            var ct = new BTBlank_BlankControl();
+                            uiKnownDevices.Items.Add(ct);
+                        }
                         ThingyControl.DataContext = known;
+
+                        if (addBlanks)
+                        {
+                            var ct = new BTBlank_BlankControl();
+                            uiKnownDevices.Items.Add(ct);
+                        }
+
                     }
+#endif
                 }
             });
         }
@@ -128,12 +161,12 @@ namespace BluetoothWinUI3
 
         private void OnFileExit(object sender, RoutedEventArgs e)
         {
-
+            Application.Current.Exit();
         }
 
         private void OnHelpAbout(object sender, RoutedEventArgs e)
         {
-
+            // TODO: make this work
         }
 
         private void OnDebugLoadDevices(object sender, RoutedEventArgs e)
@@ -145,7 +178,75 @@ namespace BluetoothWinUI3
         private void OnDebugSaveDevices(object sender, RoutedEventArgs e)
         {
             AllSaveData.Save();
+        }
 
+        /// <summary>
+        /// The main way we show notices to the user. This is a little method so that it can be changed when we change
+        /// how notices are shown. It's only for things that the user must acknowlege but they don't have to do anything.
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="notice"></param>
+        /// <returns></returns>
+        private async Task ShowNotice(string title, string notice)
+        {
+            var dialog = new ContentDialog()
+            {
+                XamlRoot = rootPanel.XamlRoot,
+                Title = title,
+                Content = notice,
+                CloseButtonText = "OK",
+            };
+            await dialog.ShowAsync();
+        }
+
+        private async void OnBTRename(object sender, RoutedEventArgs e)
+        {
+            // TODO: notice how much boilerplate there is here. Simplify it when I make the next change.
+
+            var selected = uiKnownDevices.SelectedItem as IDeviceControl;
+            if (selected == null && uiKnownDevices.Items.Count == 1)
+            {
+                // If there is only one device, we can be nice and just rename that one without forcing the user to select it first.
+                uiKnownDevices.SelectedIndex = 0;
+                selected = uiKnownDevices.Items[0] as IDeviceControl;
+            }
+            if (selected == null)
+            {
+                await ShowNotice("No device selected", "You must select a device to rename it");
+                return;
+            }
+            var knownDevice = selected.GetKnownDevice();
+            if (knownDevice == null)
+            {
+                await ShowNotice("Can't rename that device", "This device cannot be renamed");
+                return;
+            }
+            if (knownDevice.Id == "")
+            {
+                await ShowNotice("Can't rename that device", "This device cannot be renamed; it has no Windows device ID");
+                return;
+            }
+
+            // Get the SaveDevice based on the ID
+            var saveData = AllSaveData.FindWithId(knownDevice.Id);
+            if (saveData == null)
+            {
+                // Must create a new SaveData.
+                saveData = new SaveData(knownDevice);
+                AllSaveData.Insert(saveData);
+                AllSaveData.Save(); // quick update
+            }
+
+
+            var dlg = uiDialogRenameDevice;
+            uiDialogRenameDeviceName.Text = saveData.GetUserName();
+            var result = await dlg.ShowAsync();
+
+            string newname = uiDialogRenameDeviceName.Text;
+            saveData.SetUserName(newname);
+            AllSaveData.Save();
+            ;
+            selected.UpdateUX(saveData);
         }
     }
 }

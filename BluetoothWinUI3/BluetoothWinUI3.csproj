@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="AppDictionary.xaml" />
+    <None Remove="BTBlank_BlankControl.xaml" />
     <None Remove="BTNordic_ThingyControl.xaml" />
     <None Remove="TestUserControl.xaml" />
   </ItemGroup>
@@ -49,6 +50,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260209005" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="BTBlank_BlankControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="BTNordic_ThingyControl.xaml">

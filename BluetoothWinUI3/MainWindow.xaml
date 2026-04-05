@@ -13,7 +13,8 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid>
+    <Grid x:Name="rootPanel">
+        <!-- WEIRD: See https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.contentdialog?view=windows-app-sdk-1.8 for why the rootPanel needs to be named that way -->
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -22,21 +23,24 @@
         
         <!-- Title and menu -->
         <MenuBar Grid.Row="0">
-            <MenuBarItem Title="File">
-                <MenuFlyoutItem Text="Exit" Click="OnFileExit"/>
+            <MenuBarItem Title="File" AccessKey="F">
+                <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
             </MenuBarItem>
-            <MenuBarItem Title="Debug" x:Name="uiMenuDebug">
-                <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices"/>
-                <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices"/>
+            <MenuBarItem Title="Bluetooth Device" AccessKey="B">
+                <MenuFlyoutItem Text="Rename" Click="OnBTRename" AccessKey="R" />
             </MenuBarItem>
-            <MenuBarItem Title="Help">
-                <MenuFlyoutItem Text="About" Click="OnHelpAbout"/>
+            <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
+                <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
+                <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
+            </MenuBarItem>
+            <MenuBarItem Title="Help" AccessKey="H">
+                <MenuFlyoutItem Text="About" Click="OnHelpAbout" AccessKey="a" />
             </MenuBarItem>
         </MenuBar>
 
         <!-- All of the known devices -->
-        <ListView Grid.Row="1" x:Name="uiKnownDevices">
-        </ListView>
+        <GridView Grid.Row="1" x:Name="uiKnownDevices" SelectionMode="Single">
+        </GridView>
 
         <!-- Status row -->
         <StackPanel Grid.Row="2">
@@ -62,6 +66,10 @@
             </Grid>
             
         </StackPanel>
+        <ContentDialog x:Name="uiDialogRenameDevice" Title="Rename Device"
+                       PrimaryButtonText="Ok" IsPrimaryButtonEnabled="True">
+            <TextBox x:Name="uiDialogRenameDeviceName" />
+        </ContentDialog>
 
     </Grid>
 </Window>

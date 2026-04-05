@@ -17,7 +17,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="Nordic Thingy 52" Style="{StaticResource sDeviceTitle}"/>
+            <TextBlock x:Name="uiDeviceName" Grid.Row="0" Text="Nordic Thingy 52" Style="{StaticResource sDeviceTitle}"/>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />

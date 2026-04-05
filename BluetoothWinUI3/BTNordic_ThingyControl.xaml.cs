@@ -26,9 +26,30 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTNordic_ThingyControl : UserControl
+public interface IDeviceControl
 {
+    /// <summary>
+    /// Returns the KnownDevice associated with the device
+    /// </summary>
+    /// <returns></returns>
+    KnownDevice GetKnownDevice();
+
+    /// <summary>
+    /// updates the device control user interface base on the user preferences in SaveData.
+    /// As of 2026-04-05 this includes just the name
+    /// </summary>
+    /// <param name="saveData"></param>
+    void UpdateUX(SaveData saveData);
+
+}
+
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
+{
+    /// <summary>
+    /// Used for logging only
+    /// </summary>
+    private string InternalDeviceType = "Nordic_Thingy";
     Nordic_Thingy Device;
     public BTNordic_ThingyControl()
     {
@@ -36,24 +57,74 @@ public sealed partial class BTNordic_ThingyControl : UserControl
         this.DataContextChanged += BTNordic_ThingyControl_DataContextChanged;
     }
 
-    KnownDevice kd = null;
+    KnownDevice KnownDeviceFromDataContext { get { return DataContext as KnownDevice; } }
+    public KnownDevice GetKnownDevice()
+    {
+        return DataContext as KnownDevice;
+    }
+
+    /// <summary>
+    /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
+    /// trigger looking up the SaveData and change more things. And it will actually connect to the device.
+    /// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
+    /// used by other bits of the system.
+    /// </summary>
     private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
-        // Will be a KnownDevice
-        kd = args.NewValue as KnownDevice;
-        if (kd == null) return;
+        // FYI: by the time this method is called, the DataContext is already set
 
-        uiAddress.Text = BluetoothAddress.AsString(kd.Advertisement.Addr);
+        if (args.NewValue == null) return; // just bogus; ignore.
+
+        // Must have been set as a KnownDevice; otherwise we're in a very weird state.
+        if (KnownDeviceFromDataContext == null)
+        {
+            Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {args.NewValue.GetType()}");
+            return;
+        }
+
+        uiAddress.Text = BluetoothAddress.AsString(KnownDeviceFromDataContext.Advertisement.Addr);
 
         Device = new Nordic_Thingy();
 
-        Device.ble = await BluetoothLEDevice.FromBluetoothAddressAsync(kd.Advertisement.Addr);
+        Device.ble = await BluetoothLEDevice.FromBluetoothAddressAsync(KnownDeviceFromDataContext.Advertisement.Addr);
+        if (Device.ble == null)
+        {
+            Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(KnownDeviceFromDataContext.Advertisement.Addr)}");
+            return;
+        }
+        // It's critical to set these!
+        KnownDeviceFromDataContext.Id = Device.ble.DeviceId ?? ""; // never null :-)
+        KnownDeviceFromDataContext.BTLEDevice = Device.ble;
+
+
+        var saveData = AllSaveData.FindWithId(KnownDeviceFromDataContext.Id);
+        if (saveData != null)
+        {
+            UpdateUX(saveData);
+        }
+
+
         Device.PropertyChanged += Device_PropertyChanged;
         await Device.NotifyTemperature_cAsync();
         await Device.NotifyPressure_hpaAsync();
         await Device.NotifyHumidityAsync();
         await Device.NotifyTVOCAsync(); // both TVOC and eCOS
         await Device.NotifyColorAsync();
+    }
+
+    public void UpdateUX(SaveData saveData)
+    {
+        if (saveData != null)
+        {
+            var name = saveData.GetUserName();
+            uiDeviceName.Text = name;
+        }
+    }
+
+    private void Log(string str)
+    {
+        System.Diagnostics.Debug.WriteLine(str);
+        Console.WriteLine(str);
     }
 
     private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
