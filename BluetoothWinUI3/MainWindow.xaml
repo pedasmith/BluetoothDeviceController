@@ -24,6 +24,7 @@
         <!-- Title and menu -->
         <MenuBar Grid.Row="0">
             <MenuBarItem Title="File" AccessKey="F">
+                <ToggleMenuFlyoutItem Text="Keep Screen On" Click="OnFileKeepScreenOn" AccessKey="k" />
                 <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
             </MenuBarItem>
             <MenuBarItem Title="Bluetooth Device" AccessKey="B">
@@ -56,8 +57,9 @@
                 <StackPanel Orientation="Horizontal">
                     <Button Content="Start" Click="OnAdvertisementStart" />
                     <Button Content="Stop" Click="OnAdvertisementStop" />
-                    <Button Content="Copy" Click="OnAdvertisementCopy" />
+                    <Button Content="Copy All" Click="OnAdvertisementCopy" />
                     <Button Content="Copy Unique" Click="OnAdvertisementCopyUnique" />
+                    <Button Content="Copy Addresses" Click="OnAdvertisementCopyUniqueAddresses" />
                     <TextBlock>N=</TextBlock>
                     <TextBlock x:Name="uiAdvertCount" />
                     <TextBlock>  | RAW=</TextBlock>

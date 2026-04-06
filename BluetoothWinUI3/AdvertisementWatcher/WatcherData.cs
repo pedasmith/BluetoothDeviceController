@@ -70,9 +70,15 @@ namespace BluetoothWatcher.AdvertismentWatcher
         public ulong Addr {  get { return OriginalArgs?.BluetoothAddress ?? 0; } }
         public BluetoothLEAdvertisementReceivedEventArgs OriginalArgs { get; set; }
 
-        public enum AdvertisementStringFormat { Full, CanCompare };
+        public enum AdvertisementStringFormat { Full, CanCompare, AddressOnly };
         public string ToStringFull(AdvertisementStringFormat format = AdvertisementStringFormat.Full)
         {
+            if (format == AdvertisementStringFormat.AddressOnly)
+            {
+                // Super quick return!
+                return BluetoothAddress.AsString(Addr);
+            }
+
             var ts = (format == AdvertisementStringFormat.Full) ? OriginalArgs.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.ff") : "NoTimeStamp";
             var power = (format == AdvertisementStringFormat.Full)
                 ? $"{OriginalArgs.RawSignalStrengthInDBm},{OriginalArgs.TransmitPowerLevelInDBm}" : ",";

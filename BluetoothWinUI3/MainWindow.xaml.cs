@@ -18,6 +18,7 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.System.Display;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -50,21 +51,45 @@ namespace BluetoothWinUI3
             this.Activated += MainWindow_Activated;
         }
 
+
+
         private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
         {
             AdvertisementWatcher.Start();
         }
 
+        /// <summary>
+        /// The main way we show notices to the user. This is a little method so that it can be changed when we change
+        /// how notices are shown. It's only for things that the user must acknowlege but they don't have to do anything.
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="notice"></param>
+        /// <returns></returns>
+        private async Task ShowNotice(string title, string notice)
+        {
+            var dialog = new ContentDialog()
+            {
+                XamlRoot = rootPanel.XamlRoot,
+                Title = title,
+                Content = notice,
+                CloseButtonText = "OK",
+            };
+            await dialog.ShowAsync();
+        }
+
         StringBuilder AllAdvertisements = new StringBuilder();
         Dictionary<string, string> UniqueAdvertisements = new Dictionary<string, string>();
+        Dictionary<string, string> UniqueBTAddresses = new Dictionary<string, string>();
 
         private void AdvertisementWatcher_WatcherEvent(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)
         {
             // A little bit of logging and storing stuff for debugging
             NAdvertisements++;
             AllAdvertisements.AppendLine($"{NAdvertisements}, " + e.ToStringFull());
-            var CanCompare = BluetoothWatcher.AdvertismentWatcher.WatcherData.AdvertisementStringFormat.CanCompare;
-            UniqueAdvertisements[e.ToStringFull(CanCompare)] = e.ToStringFull();
+            var fmt = BluetoothWatcher.AdvertismentWatcher.WatcherData.AdvertisementStringFormat.CanCompare;
+            UniqueAdvertisements[e.ToStringFull(fmt)] = e.ToStringFull();
+            fmt = BluetoothWatcher.AdvertismentWatcher.WatcherData.AdvertisementStringFormat.AddressOnly;
+            UniqueBTAddresses[e.ToStringFull(fmt)] = e.ToStringFull();
 
 
             // Update the UI as needed and create the next device
@@ -82,47 +107,12 @@ namespace BluetoothWinUI3
                     var known = KnownDevices.Get(e);
                     if (known == null)
                     {
-                        var addBlanks = uiKnownDevices.Items.Count == 0;
-                        if (addBlanks)
-                        {
-                            var ct = new BTBlank_BlankControl();
-                            uiKnownDevices.Items.Add(ct);
-                        }
-
                         var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
 
                         uiKnownDevices.Items.Add(control);
                         known = KnownDevices.Add(e, control, supportedDevice);
                         control.DataContext = known;
-
-                        if (addBlanks)
-                        {
-                            var ct = new BTBlank_BlankControl();
-                            uiKnownDevices.Items.Add(ct);
-                        }
                     }
-
-#if NEVER_EVER_DEFINED
-                    // TODO: see if it's a known device AKA we already made the control.
-                    // For now, we just support a single Thingy, so all those complications are short-circuited.
-                    if (ThingyControl == null)
-                    {
-                        var addBlanks = uiKnownDevices.Items.Count == 0;
-                        if (addBlanks)
-                        {
-                            var ct = new BTBlank_BlankControl();
-                            uiKnownDevices.Items.Add(ct);
-                        }
-                        ThingyControl.DataContext = known;
-
-                        if (addBlanks)
-                        {
-                            var ct = new BTBlank_BlankControl();
-                            uiKnownDevices.Items.Add(ct);
-                        }
-
-                    }
-#endif
                 }
             });
         }
@@ -158,7 +148,20 @@ namespace BluetoothWinUI3
             dataPackage.Properties.Title = "Bluetooth Advertisement Data";
             Clipboard.SetContent(dataPackage);
         }
+        private void OnAdvertisementCopyUniqueAddresses(object sender, RoutedEventArgs e)
+        {
+            var sb = new StringBuilder();
+            foreach (var item in UniqueBTAddresses.Values)
+            {
+                sb.AppendLine(item);
+            }
 
+            DataPackage dataPackage = new DataPackage();
+            var header = "N," + BluetoothWatcher.AdvertismentWatcher.WatcherData.ToHeaderString() + "\n";
+            dataPackage.SetText(header + sb.ToString());
+            dataPackage.Properties.Title = "Bluetooth Advertisement Data";
+            Clipboard.SetContent(dataPackage);
+        }
         private void OnFileExit(object sender, RoutedEventArgs e)
         {
             Application.Current.Exit();
@@ -180,24 +183,7 @@ namespace BluetoothWinUI3
             AllSaveData.Save();
         }
 
-        /// <summary>
-        /// The main way we show notices to the user. This is a little method so that it can be changed when we change
-        /// how notices are shown. It's only for things that the user must acknowlege but they don't have to do anything.
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="notice"></param>
-        /// <returns></returns>
-        private async Task ShowNotice(string title, string notice)
-        {
-            var dialog = new ContentDialog()
-            {
-                XamlRoot = rootPanel.XamlRoot,
-                Title = title,
-                Content = notice,
-                CloseButtonText = "OK",
-            };
-            await dialog.ShowAsync();
-        }
+
 
         private async void OnBTRename(object sender, RoutedEventArgs e)
         {
@@ -247,6 +233,43 @@ namespace BluetoothWinUI3
             AllSaveData.Save();
             ;
             selected.UpdateUX(saveData);
+        }
+
+        // Keep screen on so that we constantly monitor devices
+        // https://learn.microsoft.com/en-us/uwp/api/windows.system.display.displayrequest?view=winrt-28000
+        DisplayRequest g_DisplayRequest = null;
+        private async void OnFileKeepScreenOn(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (g_DisplayRequest == null)
+                {
+                    g_DisplayRequest = new DisplayRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowNotice("Unable to start", $"Unable to create the DisplayRequest to keep the screen on. Reason={ex.Message}");
+            }
+            if (g_DisplayRequest == null) return; // just give up
+
+            try
+            {
+                // This call activates a display-required request. If successful,  
+                // the screen is guaranteed not to turn off automatically due to user inactivity. 
+                if ((sender as ToggleButton)?.IsChecked ?? true)
+                {
+                    g_DisplayRequest.RequestActive();
+                }
+                else
+                {
+                    g_DisplayRequest.RequestRelease();
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowNotice ("Unable to request", $"Error: {ex.Message}");
+            }
         }
     }
 }
