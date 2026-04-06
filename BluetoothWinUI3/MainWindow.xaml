@@ -14,7 +14,7 @@
     </Window.SystemBackdrop>
 
     <Grid x:Name="rootPanel">
-        <!-- WEIRD: See https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.contentdialog?view=windows-app-sdk-1.8 for why the rootPanel needs to be named that way -->
+        <!-- WEIRD: "rootPanel". See https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.contentdialog?view=windows-app-sdk-1.8 for why the rootPanel needs to be named that way -->
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -31,6 +31,7 @@
                 <MenuFlyoutItem Text="Rename" Click="OnBTRename" AccessKey="R" />
             </MenuBarItem>
             <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
+                <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="D" />
                 <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
                 <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
             </MenuBarItem>

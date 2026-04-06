@@ -271,5 +271,19 @@ namespace BluetoothWinUI3
                 await ShowNotice ("Unable to request", $"Error: {ex.Message}");
             }
         }
+
+        private void OnDebugDarkTheme(object sender, RoutedEventArgs e)
+        {
+            if (this.Content.XamlRoot == null) return;// Replacement for IsLoaded per https://stackoverflow.com/questions/71181437/winui-3-1-0-window-ready-event
+            var isChecked = (sender as ToggleMenuFlyoutItem)?.IsChecked;
+            var theme = ElementTheme.Light; // Light is the best theme :-)
+            if (!isChecked.HasValue)
+            {
+                theme = ElementTheme.Default;
+            }
+            else theme = isChecked.Value ? ElementTheme.Dark : ElementTheme.Light;
+            rootPanel.RequestedTheme = theme;
+
+        }
     }
 }

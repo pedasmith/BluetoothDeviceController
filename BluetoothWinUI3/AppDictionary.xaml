@@ -4,16 +4,31 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BluetoothWinUI3">
 
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="sAllFonts_Foreground" Color="#FF5555FF" />
+            <SolidColorBrush x:Key="sDeviceBorder_BorderBrush" Color="DarkGray" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background" Color="#FF221155" />
+
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="sAllFonts_Foreground" Color="DarkCyan" />
+            <SolidColorBrush x:Key="sDeviceBorder_BorderBrush" Color="Gray" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background" Color="LightBlue" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+
     <Style x:Key="sAllFonts" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="Candara" />
-        <Setter Property="Foreground" Value="DarkCyan" />
+        <Setter Property="Foreground" Value="{ThemeResource sAllFonts_Foreground}" />
     </Style>
 
 
     <Style x:Key="sDeviceBorder" TargetType="Border">
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="BorderBrush" Value="Gray" />
-        <Setter Property="Background" Value="LightBlue" />
+        <Setter Property="BorderBrush" Value="{ThemeResource sDeviceBorder_BorderBrush}" />
+        <Setter Property="Background" Value="{ThemeResource sDeviceBorder_Background}" />
         <Setter Property="Margin" Value="4" />
         <Setter Property="Padding" Value="4" />
         <Setter Property="CornerRadius" Value="10,10,10,10" />
