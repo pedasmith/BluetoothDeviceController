@@ -1,10 +1,15 @@
 ﻿using BluetoothWinUI3.BluetoothWinUI3Registration;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Windows.Networking.NetworkOperators;
+using Windows.UI;
 using static System.Net.Mime.MediaTypeNames;
 
 
@@ -59,8 +64,15 @@ namespace BluetoothWinUI3
             if (File.Exists(filePath))
             {
                 var json = File.ReadAllText(filePath);
-                var list = (List<SaveData>)System.Text.Json.JsonSerializer.Deserialize(json, typeof(List<SaveData>), SaveDataContext.Default);
-                AllDevices = list ?? new List<SaveData>();
+                try
+                {
+                    var list = (List<SaveData>)System.Text.Json.JsonSerializer.Deserialize(json, typeof(List<SaveData>), SaveDataContext.Default);
+                    AllDevices = list ?? new List<SaveData>();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: Unable to parse JSON file {filePath}. Message:{ex.Message}");
+                }
             }
         }
 
@@ -119,6 +131,22 @@ namespace BluetoothWinUI3
         }
 
         /// <summary>
+        /// Gets the correct colors (which can be updated). The theme should be Application.Current.RequestedTheme
+        /// </summary>
+        /// <param name="theme"></param>
+        /// <returns></returns>
+        public DeviceColors GetDeviceColors(ApplicationTheme theme)
+        {
+            //var theme = Application.Current.RequestedTheme;
+            switch (theme)
+            {
+                case ApplicationTheme.Dark:
+                    return Preferences.DarkColors;
+            }
+            return Preferences.LightColors;
+        }
+
+        /// <summary>
         /// Returns the best name: prefers the user-set name, otherwise the device name or the advertisement name.
         /// </summary>
         /// <returns></returns>
@@ -159,11 +187,117 @@ namespace BluetoothWinUI3
         /// </summary>
         public string DeviceId { get; set; }
     }
+    public class DeviceColors
+    {
+        public static ulong ColorIsDefault = 0xFF000000_000000; // not a valid ARGB color! Those are only 32 bits!
+        public ulong TextColor { get; set; } = ColorIsDefault;
+        public ulong BackgroundColor { get; set; } = ColorIsDefault;
+
+        public void Set(string tagName, ulong color)
+        {
+            switch (tagName)
+            {
+                case "BackgroundColor": BackgroundColor = color; break;
+                case "TextColor": TextColor = color; break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Helpful converter class has SolidColorBrush equivilents of the colors in DeviceColors
+    /// and a simple constructor.
+    /// </summary>
+    public class DeviceColorBrushes
+    {
+        public DeviceColorBrushes(DeviceColors colors)
+        {
+            TextColorBrush = GetBrush(colors.TextColor);
+            BackgroundColorBrush = GetBrush(colors.BackgroundColor);
+        }
+        public SolidColorBrush TextColorBrush;
+        public SolidColorBrush BackgroundColorBrush;
+
+
+        public SolidColorBrush Get(string tagName)
+        {
+            switch (tagName)
+            {
+                case "BackgroundColor": return BackgroundColorBrush;
+                case "TextColor": return TextColorBrush;
+            }
+            return null;
+        }
+
+
+
+        private static Color ConvertIgnoreA(ulong color)
+        {
+            Color retval = new Color()
+            {
+                A = 0xFF, // ignore the A value completely: (byte)((color >> 24) & 0xff),
+                R = (byte)((color >> 16) & 0xff),
+                G = (byte)((color >>  8) & 0xff),
+                B = (byte)((color >>  0) & 0xff),
+            };
+            return retval;
+        }
+
+        public static ulong ConvertBackIgnoreA(Color color)
+        {
+            byte a = 0xFF; // would be color.A, but that's set to 0???
+            ulong retval = ((ulong)a << 24) | ((ulong)color.R << 16) | ((ulong)color.G << 8) | ((ulong)color.B << 0);
+            return retval;
+        }
+
+        /// <summary>
+        /// Given a SaveData type color
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static SolidColorBrush GetBrush(ulong color)
+        {
+            if (color == DeviceColors.ColorIsDefault) return default;
+            return new SolidColorBrush(ConvertIgnoreA(color));
+        }
+
+        /// <summary>
+        /// Recursively sets the Foreground color for all TextBlocks inside a parent container.
+        /// This is a bridge between what all of the device controls need, XAML-wise, and the 
+        /// SaveData which is kept XAML-free.
+        /// </summary>
+        /// 
+
+        public static void SetUxColors(UIElement root, DeviceColorBrushes brushes)
+        {
+            if (root is TextBlock tb)
+            {
+                if (brushes.TextColorBrush != null) tb.Foreground = brushes.TextColorBrush;
+            }
+            else if (root is Border border)
+            {
+                if (brushes.BackgroundColorBrush != null) border.Background = brushes.BackgroundColorBrush;
+                SetUxColors(border.Child, brushes);
+            }
+            else if (root is Panel parent)
+            {
+                foreach (var child in parent.Children) 
+                {
+                    SetUxColors(child, brushes);
+                }
+            }
+            else if (root is ContentControl cc && cc.Content is UIElement contentElement)
+            {
+                SetUxColors(contentElement, brushes);
+            }
+        }
+    }
 
     public class KnownDeviceUserPreferences
     {
         public string UserName { get; set; } = ""; // will depend on the DeviceIdentification, but could be set by the user to something more memorable
-//#if NEVER_EVER_DEFINED
+        public DeviceColors DarkColors { get; set; } = new DeviceColors();
+        public DeviceColors LightColors { get; set; } = new DeviceColors();
+        //#if NEVER_EVER_DEFINED
         public enum DisplayHighlight { Normal, Highlight, Dim };
         DisplayHighlight HighlightPreference { get; set; } = DisplayHighlight.Normal;
 //#endif

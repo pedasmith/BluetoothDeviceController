@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     >
 
-    <Border Style="{StaticResource sDeviceBorder}">
+    <Border Style="{StaticResource sDeviceBorder}" x:Name="rootPanel">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />

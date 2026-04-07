@@ -29,6 +29,8 @@
             </MenuBarItem>
             <MenuBarItem Title="Bluetooth Device" AccessKey="B">
                 <MenuFlyoutItem Text="Rename" Click="OnBTRename" AccessKey="R" />
+                <MenuFlyoutItem Text="Background Color" Click="OnBTColor" Tag="BackgroundColor" AccessKey="T" />
+                <MenuFlyoutItem Text="Text Color" Click="OnBTColor" Tag="TextColor" AccessKey="T" />
             </MenuBarItem>
             <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
                 <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="D" />
@@ -73,6 +75,6 @@
                        PrimaryButtonText="Ok" IsPrimaryButtonEnabled="True">
             <TextBox x:Name="uiDialogRenameDeviceName" />
         </ContentDialog>
-
+        
     </Grid>
 </Window>

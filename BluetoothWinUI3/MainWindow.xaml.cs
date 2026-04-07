@@ -1,4 +1,5 @@
 using BluetoothWinUI3.BluetoothWinUI3Registration;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -183,12 +184,8 @@ namespace BluetoothWinUI3
             AllSaveData.Save();
         }
 
-
-
-        private async void OnBTRename(object sender, RoutedEventArgs e)
+        private async Task<IDeviceControl> GetBTSelectedAsync(string verb)
         {
-            // TODO: notice how much boilerplate there is here. Simplify it when I make the next change.
-
             var selected = uiKnownDevices.SelectedItem as IDeviceControl;
             if (selected == null && uiKnownDevices.Items.Count == 1)
             {
@@ -198,22 +195,30 @@ namespace BluetoothWinUI3
             }
             if (selected == null)
             {
-                await ShowNotice("No device selected", "You must select a device to rename it");
-                return;
+                await ShowNotice("No device selected", $"You must select a device to {verb} it");
+                return null;
             }
+            return selected;
+        }
+
+        private async Task<KnownDevice> GetKnownDevice(IDeviceControl selected, string verb)
+        {
             var knownDevice = selected.GetKnownDevice();
             if (knownDevice == null)
             {
-                await ShowNotice("Can't rename that device", "This device cannot be renamed");
-                return;
+                await ShowNotice($"Can't ${verb} that device", "You cannot {verb} this device");
+                return null;
             }
             if (knownDevice.Id == "")
             {
-                await ShowNotice("Can't rename that device", "This device cannot be renamed; it has no Windows device ID");
-                return;
+                await ShowNotice($"Can't {verb} that device", $"You cannot {verb} the selected device. it has no Windows device ID");
+                return null;
             }
+            return knownDevice;
+        }
 
-            // Get the SaveDevice based on the ID
+        private SaveData GetOrCreateSaveData(KnownDevice knownDevice)
+        {
             var saveData = AllSaveData.FindWithId(knownDevice.Id);
             if (saveData == null)
             {
@@ -222,6 +227,62 @@ namespace BluetoothWinUI3
                 AllSaveData.Insert(saveData);
                 AllSaveData.Save(); // quick update
             }
+            return saveData;
+        }
+
+        private async void OnBTColor(object sender, RoutedEventArgs e)
+        {
+            var senderMenu = sender as MenuFlyoutItem;
+            var tag = senderMenu?.Tag as string; // BackgroundColor or TextColor
+            if (tag == null) return;
+
+            string verb = "rename";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
+            var knownDevice = await GetKnownDevice(selected, verb);
+            if (knownDevice == null) return;
+            var saveData = GetOrCreateSaveData(knownDevice);
+
+            var colorsSave = saveData.GetDeviceColors(Application.Current.RequestedTheme);
+            var colors = new DeviceColorBrushes(colorsSave);
+            Windows.UI.Color color = colors.Get(tag)?.Color ?? Colors.Gray;
+
+            var colorPicker = new ColorPicker
+            {
+                IsAlphaEnabled = false, // Allow transparency
+                IsColorChannelTextInputVisible = true,
+                IsHexInputVisible = true,
+                Color = color,
+            };
+            var dialog = new ContentDialog
+            {
+                Title = "Select a Color",
+                PrimaryButtonText = "OK",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = colorPicker,
+                XamlRoot = this.Content.XamlRoot // Required in WinUI 3
+            };
+            var result = await dialog.ShowAsync();
+            if (result != ContentDialogResult.Primary) return;
+            
+            var newcolor = DeviceColorBrushes.ConvertBackIgnoreA (colorPicker.Color);
+
+            // Save it and update colors!
+            colorsSave.Set(tag, newcolor);
+            AllSaveData.Save();
+            selected.UpdateUX(saveData);
+        }
+
+        private async void OnBTRename(object sender, RoutedEventArgs e)
+        {
+            // TODO: notice how much boilerplate there is here. Simplify it when I make the next change.
+            string verb = "rename";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
+            var knownDevice = await GetKnownDevice(selected, verb);
+            if (knownDevice == null) return;
+            var saveData = GetOrCreateSaveData(knownDevice);
 
 
             var dlg = uiDialogRenameDevice;
@@ -285,5 +346,6 @@ namespace BluetoothWinUI3
             rootPanel.RequestedTheme = theme;
 
         }
+
     }
 }

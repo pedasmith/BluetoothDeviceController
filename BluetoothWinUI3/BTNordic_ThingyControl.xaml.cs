@@ -1,5 +1,6 @@
 using BluetoothProtocols;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -15,6 +16,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Utilities;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -63,13 +65,26 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         return DataContext as KnownDevice;
     }
 
-    /// <summary>
-    /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
-    /// trigger looking up the SaveData and change more things. And it will actually connect to the device.
-    /// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
-    /// used by other bits of the system.
-    /// </summary>
-    private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+
+
+
+
+    
+
+
+
+
+
+
+
+
+/// <summary>
+/// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
+/// trigger looking up the SaveData and change more things. And it will actually connect to the device.
+/// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
+/// used by other bits of the system.
+/// </summary>
+private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
         // FYI: by the time this method is called, the DataContext is already set
 
@@ -118,6 +133,28 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             var name = saveData.GetUserName();
             uiDeviceName.Text = name;
+
+            var theme = Application.Current.RequestedTheme;
+            var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
+            var brushes = new DeviceColorBrushes(colors);
+            DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
+#if NEVER_EVER_DEFINED
+            // Copilot claimed that just setting the resources would set all of the colors. That's not actually
+            // true and the second time I asked, I got very different code. That code, which works, is now
+            // in the DeviceColorBrushes class.
+            if (colors.TextColor != DeviceColors.ColorIsDefault)
+            {
+                this.rootPanel.Resources["TextBlockForeground"] = colors.TextColor;
+            }
+            if (colors.BackgroundColor != DeviceColors.ColorIsDefault) // TODO: make ARGB? Correct background color?
+            {
+                this.rootPanel.Resources["BorderBackground"] = colors.BackgroundColor;
+            }
+            //TODO; just for debugging
+            // Copilot swore this would work. But it doesn't. Asking differently gets the alternative version
+            //this.rootPanel.Resources["TextBlockForeground"] = new SolidColorBrush(Colors.Yellow);
+            SetTextBlockForeground(this.rootPanel, new SolidColorBrush(Colors.Yellow));
+#endif
         }
     }
 
