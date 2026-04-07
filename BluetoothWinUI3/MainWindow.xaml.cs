@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
@@ -32,7 +33,53 @@ namespace BluetoothWinUI3
 {
     public class UserPreferences
     {
-        bool AutostartAdvertisementWatcher { get; set; } = true;
+        public bool AutostartAdvertisementWatcher { get; set; } = true;
+
+        public static UserPreferences Restore()
+        {
+            string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
+            Directory.CreateDirectory(folderPath);
+            string filePath = Path.Combine(folderPath, "UserPreferences.preferences");
+
+            if (File.Exists(filePath))
+            {
+                var json = File.ReadAllText(filePath);
+                try
+                {
+                    var retval = (UserPreferences)System.Text.Json.JsonSerializer.Deserialize(json, typeof(UserPreferences), UserPreferencesContext.Default);
+                    return retval;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: Unable to parse JSON file {filePath}. Message:{ex.Message}");
+                }
+            }
+            return new UserPreferences();// return a default value.
+        }
+
+        /// <summary>
+        /// Saves the UserPreferences into a .preferences JSON file. This will be tucked into the Documents/BluetoothDevices 
+        /// folder in a file called UserPreferences.devices. It's restored with a call to Restore() which is done automatically
+        /// in MainWindow
+        /// </summary>
+        public void Save()
+        {
+            string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
+            Directory.CreateDirectory(folderPath);
+            string filePath = Path.Combine(folderPath, "UserPreferences.preferences");
+
+            var json = System.Text.Json.JsonSerializer.Serialize(this, typeof(UserPreferences), UserPreferencesContext.Default);
+            File.WriteAllText(filePath, json);
+        }
+    }
+
+    // See https://sunriseprogrammer.blogspot.com/2026/04/il2104-il2026-trim-and-json-with-winui3.html
+    // See https://stackoverflow.com/questions/70825664/how-to-implement-system-text-json-source-generator-with-a-generic-class
+    [JsonSourceGenerationOptions(WriteIndented = true)]
+    [JsonSerializable(typeof(UserPreferences), TypeInfoPropertyName = "UserPreferencesWithPropertyName")]
+    internal partial class UserPreferencesContext : JsonSerializerContext
+    {
+
     }
 
     /// <summary>
@@ -45,18 +92,25 @@ namespace BluetoothWinUI3
         UserPreferences CurrUserPrefs = new UserPreferences();
         public MainWindow()
         {
-
+            CurrUserPrefs = UserPreferences.Restore();
             UIThreadHelper.DQueue = this.DispatcherQueue;
             AdvertisementWatcher.WatcherEvent += AdvertisementWatcher_WatcherEvent;
             InitializeComponent();
             this.Activated += MainWindow_Activated;
+            this.Closed += MainWindow_Closed;
         }
 
-
+        private void MainWindow_Closed(object sender, WindowEventArgs args)
+        {
+            CurrUserPrefs.Save();
+        }
 
         private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
         {
-            AdvertisementWatcher.Start();
+            if (CurrUserPrefs.AutostartAdvertisementWatcher)
+            {
+                AdvertisementWatcher.Start();
+            }
         }
 
         /// <summary>
