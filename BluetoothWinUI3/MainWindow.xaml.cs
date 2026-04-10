@@ -91,7 +91,8 @@ namespace BluetoothWinUI3
             UIThreadHelper.DQueue = this.DispatcherQueue;
             AdvertisementWatcher.WatcherEvent += AdvertisementWatcher_WatcherEvent;
             InitializeComponent();
-            this.Activated += MainWindow_Activated;
+            // Activated is completely the wrong thing! this.Activated += MainWindow_Activated;
+            rootPanel.Loaded += MainWindow_Loaded; // but it works for now. TODO: find a better way to trigger the autostart of the watcher after the window is ready.
             this.Closed += MainWindow_Closed;
         }
 
@@ -100,13 +101,37 @@ namespace BluetoothWinUI3
             CurrUserPrefs.Save();
         }
 
-        private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
+        private void MainWindow_Loaded(object sender, RoutedEventArgs args)
         {
+            SetUxFromUserPreferences();
             if (CurrUserPrefs.AutostartAdvertisementWatcher)
             {
                 AdvertisementWatcher.Start();
             }
         }
+
+        private void SetUxFromUserPreferences()
+        {
+            switch (CurrUserPrefs.Pressure)
+            {
+                case Pressure.PressureUnit.mmHg_Torr: uiPreferencesmmHg.IsChecked = true; break;
+                case Pressure.PressureUnit.inHg: uiPreferencesinHg.IsChecked = true; break;
+                case Pressure.PressureUnit.hectoPascal_milliBar: uiPreferencesmbar_hpa.IsChecked = true; break;
+                case Pressure.PressureUnit.kiloPascal: uiPreferenceskiloPascal.IsChecked = true; break;
+                case Pressure.PressureUnit.Pascal: uiPreferencesPascal.IsChecked = true; break;
+                case Pressure.PressureUnit.PSI: uiPreferencesPSI.IsChecked = true; break;
+                case Pressure.PressureUnit.Atmosphere: uiPreferencesAtmosphere.IsChecked = true; break;
+            }
+            switch (CurrUserPrefs.Temperature)
+            {
+                case Temperature.TemperatureUnit.Celcius: uiPreferencesCelcius.IsChecked = true; break;
+                case Temperature.TemperatureUnit.Fahrenheit: uiPreferencesFahrenheit.IsChecked = true; break;
+                case Temperature.TemperatureUnit.Kelvin: uiPreferencesKelvin.IsChecked = true; break;
+                case Temperature.TemperatureUnit.Rankine: uiPreferencesRankine.IsChecked = true; break;
+                case Temperature.TemperatureUnit.Réaumur: uiPreferencesRéaumur.IsChecked = true; break;
+            }
+        }
+
 
         /// <summary>
         /// The main way we show notices to the user. This is a little method so that it can be changed when we change
@@ -454,15 +479,13 @@ namespace BluetoothWinUI3
             if (tag == null) return;
             switch (tag)
             {
-                case "Celcius":
-                    CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Celcius;
-                    UpdateAllDeviceUserPreferences();
-                    break;
-                case "Fahrenheit":
-                    CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Fahrenheit;
-                    UpdateAllDeviceUserPreferences();
-                    break;
+                case "Celcius": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Celcius; break;
+                case "Fahrenheit": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Fahrenheit; break;
+                case "Kelvin": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Kelvin; break;
+                case "Rankine": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Rankine; break;
+                case "Réaumur": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Réaumur; break;
             }
+            UpdateAllDeviceUserPreferences();
         }
 
 

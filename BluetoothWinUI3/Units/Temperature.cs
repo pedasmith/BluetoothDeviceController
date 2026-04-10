@@ -5,7 +5,7 @@ namespace BluetoothWatcher.Units
 {
     public class Temperature
     {
-        public enum TemperatureUnit { Celcius, Fahrenheit, Réaumur, Kelvin }; // TODO: Réaumur and Kelvin
+        public enum TemperatureUnit { Celcius, Fahrenheit, Kelvin, Rankine, Réaumur }; 
         public static double Convert (double value, TemperatureUnit from, TemperatureUnit to)
         {
             if (from == to) return value;
@@ -17,6 +17,9 @@ namespace BluetoothWatcher.Units
                     break;
                 case TemperatureUnit.Kelvin:
                     valueC = value - 273.15;
+                    break;
+                case TemperatureUnit.Rankine:
+                    valueC = (value - 491.67) * 5 / 9;
                     break;
                 case TemperatureUnit.Réaumur:
                     valueC = value *1.25;
@@ -31,6 +34,8 @@ namespace BluetoothWatcher.Units
                     return (valueC * 9 / 5) + 32;
                 case TemperatureUnit.Kelvin:
                     return valueC + 273.15;
+                case TemperatureUnit.Rankine:
+                    return (valueC * 9 / 5) + 491.67;
                 case TemperatureUnit.Réaumur:
                     return value / 1.25;
             }
@@ -46,12 +51,18 @@ namespace BluetoothWatcher.Units
 
         public static string AsString (double value, TemperatureUnit units)
         {
-            switch(units)
+            switch (units)
             {
                 case TemperatureUnit.Celcius:
                     return $"{value:F2} °C";
                 case TemperatureUnit.Fahrenheit:
                     return $"{value:F2} °F";
+                case TemperatureUnit.Kelvin:
+                    return $"{value:F2} °K";
+                case TemperatureUnit.Rankine:
+                    return $"{value:F2} °R";
+                case TemperatureUnit.Réaumur:
+                    return $"{value:F2} °Ré";
             }
             return value.ToString();
         }
@@ -60,7 +71,7 @@ namespace BluetoothWatcher.Units
         {
             int nerror = 0;
             double actualValue = Convert(value, from, to);
-            if (!DoubleApprox.Approx (actualValue, expectedValue))
+            if (!DoubleApprox.Approx (actualValue, expectedValue, 0.0000001))
             {
                 System.Diagnostics.Debug.WriteLine ($"ERROR: ({value}, {from}, {to}) expected {expectedValue} actual={actualValue}");
                 nerror++;
@@ -92,6 +103,7 @@ namespace BluetoothWatcher.Units
             nerror += TestOne(212, TemperatureUnit.Fahrenheit, TemperatureUnit.Celcius, 100);
             nerror += TestOne(90, TemperatureUnit.Kelvin, TemperatureUnit.Celcius, -183.15);
             nerror += TestOne(90, TemperatureUnit.Réaumur, TemperatureUnit.Celcius, 112.5);
+            nerror += TestOne(459.67, TemperatureUnit.Rankine, TemperatureUnit.Celcius, -17.77777777778);
             nerror += TestBackAndForth(100);
             nerror += TestBackAndForth(0);
             return nerror;
