@@ -1,25 +1,18 @@
 using BluetoothWinUI3.BluetoothWinUI3Registration;
+using BluetoothWatcher.Units;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.System.Display;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -33,6 +26,8 @@ namespace BluetoothWinUI3
 {
     public class UserPreferences
     {
+        public Pressure.PressureUnit Pressure { get; set; } = BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar;
+        public Temperature.TemperatureUnit Temperature { get; set; } = BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius;
         public bool AutostartAdvertisementWatcher { get; set; } = true;
 
         public static UserPreferences Restore()
@@ -167,6 +162,8 @@ namespace BluetoothWinUI3
                         uiKnownDevices.Items.Add(control);
                         known = KnownDevices.Add(e, control, supportedDevice);
                         control.DataContext = known;
+                        var userControl = control as IDeviceControl;
+                        userControl?.UpdateUX(CurrUserPrefs);
                     }
                 }
             });
@@ -400,6 +397,74 @@ namespace BluetoothWinUI3
             rootPanel.RequestedTheme = theme;
 
         }
+
+        private void UpdateAllDeviceUserPreferences()
+        {
+            foreach (var item in uiKnownDevices.Items)
+            {
+                var device = item as IDeviceControl;
+                if (device == null) continue;
+                device.UpdateUX(CurrUserPrefs);
+            }
+        }
+
+        private void OnPreferencesPressure(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            if (tag == null) return;
+            switch (tag)
+            {
+                case "mmHg":
+                    CurrUserPrefs.Pressure = Pressure.PressureUnit.mmHg_Torr;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+                case "inHg":
+                    CurrUserPrefs.Pressure = Pressure.PressureUnit.inHg;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+                case "mbar_hpa": // same as hPa
+                    CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+                case "kiloPascal":
+                    CurrUserPrefs.Pressure = Pressure.PressureUnit.kiloPascal;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+                case "Pascal":
+                    CurrUserPrefs.Pressure = Pressure.PressureUnit.Pascal;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+                case "PSI":
+                    CurrUserPrefs.Pressure = Pressure.PressureUnit.PSI;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+                case "Atmosphere":
+                    CurrUserPrefs.Pressure = Pressure.PressureUnit.Atmosphere;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+                default:
+                    CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+            }
+        }
+        private void OnPreferencesTemperature(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            if (tag == null) return;
+            switch (tag)
+            {
+                case "Celcius":
+                    CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Celcius;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+                case "Fahrenheit":
+                    CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Fahrenheit;
+                    UpdateAllDeviceUserPreferences();
+                    break;
+            }
+        }
+
 
     }
 }

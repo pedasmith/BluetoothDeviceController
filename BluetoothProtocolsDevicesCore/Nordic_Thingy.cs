@@ -154,8 +154,24 @@ namespace BluetoothProtocols
             return true;
         }
 
+        /// <summary>
+        /// Data from all of the characteristics in the Environment Service
+        /// </summary>
+        public class Environment_Data
+        {
+            public double Temperature_c { get; set; }
+            public double Pressure_hpa { get; set; }
+            public double Humidity { get; set; }
+            public double TVOC { get; set; }
+            public double eCOS { get; set; }
+            public double Red { get; set; }
+            public double Green { get; set; }
+            public double Blue { get; set; }
+            public double Clear { get; set; }
 
-        public double Temperature_c { get; set; }
+        }
+        public Environment_Data CurrEnvironment_Data { get; set; } = new Environment_Data();
+
 
         /// <summary>
         /// Sets up the notifications; 
@@ -173,11 +189,11 @@ namespace BluetoothProtocols
         private void NotifyTemperature_cCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Environment_Temperature_c_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I8/P8|FIXED|Temperature|C");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I8/P8|FIXED|Temperature|C"); // TODO: should be done ahead of time!
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            Temperature_c = vr.GetNextDouble();
+            CurrEnvironment_Data.Temperature_c = vr.GetNextDouble();
             OnPropertyChanged("Temperature_c");
         }
 
@@ -192,7 +208,6 @@ namespace BluetoothProtocols
 
 
 
-        public double Pressure_hpa { get; set; }
 
         /// <summary>
         /// Sets up the notifications; 
@@ -215,13 +230,12 @@ namespace BluetoothProtocols
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            Pressure_hpa = vr.GetNextDouble();
+            CurrEnvironment_Data.Pressure_hpa = vr.GetNextDouble();
             OnPropertyChanged("Pressure_hpa");
         }
 
 
 
-        public double Humidity { get; set; }
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -243,15 +257,13 @@ namespace BluetoothProtocols
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            Humidity = vr.GetNextDouble();
+            CurrEnvironment_Data.Humidity = vr.GetNextDouble();
             OnPropertyChanged("Humidity");
         }
 
 
         // TVOC is eCOS + TVOC+ 
 
-        public double TVOC { get; set; }
-        public double eCOS { get; set; }
 
         /// <summary>
         /// Sets up the notifications; 
@@ -273,8 +285,8 @@ namespace BluetoothProtocols
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            eCOS = vr.GetNextDouble(); 
-            TVOC = vr.GetNextDouble();
+            CurrEnvironment_Data.eCOS = vr.GetNextDouble();
+            CurrEnvironment_Data.TVOC = vr.GetNextDouble();
             OnPropertyChanged("TVOC"); // name of the characteristic, not the individual fields.
         }
 
@@ -284,10 +296,7 @@ namespace BluetoothProtocols
 
         // Color is RGB+Clear
 
-        public double Red { get; set; }
-        public double Green { get; set; }
-        public double Blue { get; set; }
-        public double Clear { get; set; }
+
 
         /// <summary>
         /// Sets up the notifications; 
@@ -309,10 +318,10 @@ namespace BluetoothProtocols
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            Red = vr.GetNextDouble();
-            Green = vr.GetNextDouble();
-            Blue = vr.GetNextDouble();
-            Clear = vr.GetNextDouble();
+            CurrEnvironment_Data.Red = vr.GetNextDouble();
+            CurrEnvironment_Data.Green = vr.GetNextDouble();
+            CurrEnvironment_Data.Blue = vr.GetNextDouble();
+            CurrEnvironment_Data.Clear = vr.GetNextDouble();
             OnPropertyChanged("Color"); // name of the characteristic, not the individual fields.
         }
 

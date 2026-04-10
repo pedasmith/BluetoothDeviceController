@@ -32,6 +32,23 @@
                 <MenuFlyoutItem Text="Background Color" Click="OnBTColor" Tag="BackgroundColor" AccessKey="T" />
                 <MenuFlyoutItem Text="Text Color" Click="OnBTColor" Tag="TextColor" AccessKey="T" />
             </MenuBarItem>
+            <MenuBarItem Title="Preferences" AccessKey="P">
+                <MenuFlyoutSubItem Text="Temperature Units">
+                    <RadioMenuFlyoutItem Text="Celcius" Click="OnPreferencesTemperature" Tag="Celcius"/>
+                    <RadioMenuFlyoutItem Text="Fahrenheit" Click="OnPreferencesTemperature" Tag="Fahrenheit" />
+                    <RadioMenuFlyoutItem Text="Kelvin" Click="OnPreferencesTemperature" Tag="Kelvin"/>
+                    <RadioMenuFlyoutItem Text="Réaumur" Click="OnPreferencesTemperature" Tag="Réaumur"/>
+                </MenuFlyoutSubItem>
+                <MenuFlyoutSubItem Text="Pressure Units">
+                    <RadioMenuFlyoutItem Text="MM of Mercury" Click="OnPreferencesPressure" Tag="mmHg" />
+                    <RadioMenuFlyoutItem Text="Inches of Mercury" Click="OnPreferencesPressure" Tag="inHg" />
+                    <RadioMenuFlyoutItem Text="Millibar (hPa)" Click="OnPreferencesPressure" Tag="mbar_hpa" />
+                    <RadioMenuFlyoutItem Text="KiloPascal" Click="OnPreferencesPressure" Tag="kiloPascal" />
+                    <RadioMenuFlyoutItem Text="Pascal" Click="OnPreferencesPressure" Tag="Pascal" />
+                    <RadioMenuFlyoutItem Text="PSI" Click="OnPreferencesPressure" Tag="PSI" />
+                    <RadioMenuFlyoutItem Text="Atmospheres" Click="OnPreferencesPressure" Tag="Atmosphere" />
+                </MenuFlyoutSubItem>
+            </MenuBarItem>
             <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
                 <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="D" />
                 <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />

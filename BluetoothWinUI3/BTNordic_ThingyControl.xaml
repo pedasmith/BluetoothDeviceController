@@ -26,15 +26,15 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0" HorizontalAlignment="Center">
+                <Grid Grid.Row="0" HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" MinWidth="120" />
-                        <ColumnDefinition Width="auto" MinWidth="120" />
-                        <ColumnDefinition Width="auto" MinWidth="120" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}"><Run>Temperature</Run></TextBlock>
                     <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource sDevicePrimaryTitle}"><Run>Pressure</Run></TextBlock>
@@ -43,15 +43,15 @@
                     <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPressure_hpa"/></TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
                 </Grid>
-                <Grid Grid.Row="1" Margin="0,20,0,0" HorizontalAlignment="Center">
+                <Grid Grid.Row="1" Margin="0,20,0,0" HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"  />
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" MinWidth="120"  />
-                        <ColumnDefinition Width="auto" MinWidth="120" />
-                        <ColumnDefinition Width="auto" MinWidth="120" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}"><Run>eCOS</Run></TextBlock>
                     <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource sDevicePrimaryTitle}"><Run>TVOC</Run></TextBlock>

@@ -38,6 +38,8 @@ namespace BluetoothWinUI3
             int nerror = 0;
             nerror += Utilities.StringUtilities.TestStarMatch();
             nerror += ValueToStringTest.Test();
+            nerror += BluetoothWatcher.Units.Temperature.Test();
+            nerror += BluetoothWatcher.Units.Pressure.Test();
             return nerror;
         }
 

@@ -43,6 +43,8 @@ public interface IDeviceControl
     /// <param name="saveData"></param>
     void UpdateUX(SaveData saveData);
 
+    void UpdateUX(UserPreferences userprefs);
+
 }
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -138,25 +140,17 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
             var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
             var brushes = new DeviceColorBrushes(colors);
             DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
-#if NEVER_EVER_DEFINED
-            // Copilot claimed that just setting the resources would set all of the colors. That's not actually
-            // true and the second time I asked, I got very different code. That code, which works, is now
-            // in the DeviceColorBrushes class.
-            if (colors.TextColor != DeviceColors.ColorIsDefault)
-            {
-                this.rootPanel.Resources["TextBlockForeground"] = colors.TextColor;
-            }
-            if (colors.BackgroundColor != DeviceColors.ColorIsDefault) // TODO: make ARGB? Correct background color?
-            {
-                this.rootPanel.Resources["BorderBackground"] = colors.BackgroundColor;
-            }
-            //TODO; just for debugging
-            // Copilot swore this would work. But it doesn't. Asking differently gets the alternative version
-            //this.rootPanel.Resources["TextBlockForeground"] = new SolidColorBrush(Colors.Yellow);
-            SetTextBlockForeground(this.rootPanel, new SolidColorBrush(Colors.Yellow));
-#endif
         }
     }
+
+    public void UpdateUX(UserPreferences userprefs)
+    {
+        CurrUserPrefs = userprefs;
+        UpdateUI(""); // all of them. // TODO: I really made both an UpdateUI and an UpdateUX? Wrrong, bucko!
+    }
+
+    UserPreferences CurrUserPrefs { get; set; } = null;
+
 
     private void Log(string str)
     {
@@ -175,22 +169,53 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
         });
     }
 
+    Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
     private void UpdateUI(string name)
     {
-        switch (name) // from e.PropertyName when the Device does a PropertyChanged.
+        CurrEnvironment_Data = Device.CurrEnvironment_Data;
+        if (CurrEnvironment_Data == null) return; // Might not be set yet?
+
+        // from e.PropertyName when the Device does a PropertyChanged.
+
+        if (name == "Temperature_c" || name == "")
+        {
+            uiTemperature_c.Text = BluetoothWatcher.Units.Temperature.ConvertToString(CurrEnvironment_Data.Temperature_c, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
+
+            //.ToString("0.0") + " °C";
+        }
+        if (name == "Pressure_hpa" || name == "")
+        {
+            uiPressure_hpa.Text = BluetoothWatcher.Units.Pressure.ConvertToString(CurrEnvironment_Data.Pressure_hpa, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
+        }
+        if (name == "Humidity" || name == "")
+        {
+            uiHumidity.Text = CurrEnvironment_Data.Humidity.ToString("0.0") + "%";
+        }
+        if (name == "TVOC`" || name == "")
+        {
+            uieCOS.Text = CurrEnvironment_Data.eCOS.ToString("0.0");
+            uiTVOC.Text = CurrEnvironment_Data.TVOC.ToString("0.0");
+        }
+        if (name == "Color" || name == "")
+        {
+            var RGB = new SolidColorBrush(Windows.UI.Color.FromArgb(255, (byte)CurrEnvironment_Data.Red, (byte)CurrEnvironment_Data.Green, (byte)CurrEnvironment_Data.Blue));
+            uiColor.Background = RGB; //TODO: and the 'clear' value?
+        }
+
+#if NEVER_EVER_DEFINED
+        switch (name) 
         {
             case "Temperature_c":
-                uiTemperature_c.Text = Device.Temperature_c.ToString("0.0") + " °C";
                 break;
             case "Pressure_hpa":
-                uiPressure_hpa.Text = Device.Pressure_hpa.ToString("0.0");
+                uiPressure_hpa.Text = CurrEnvironment_Data.Pressure_hpa.ToString("0.0");
                 break;
             case "Humidity":
-                uiHumidity.Text = Device.Humidity.ToString("0.0") + "%";
+                uiHumidity.Text = CurrEnvironment_Data.Humidity.ToString("0.0") + "%";
                 break;
             case "TVOC": // sets both TVOC and eCOS
-                uieCOS.Text = Device.eCOS.ToString("0.0");
-                uiTVOC.Text = Device.TVOC.ToString("0.0");
+                uieCOS.Text = CurrEnvironment_Data.eCOS.ToString("0.0");
+                uiTVOC.Text = CurrEnvironment_Data.TVOC.ToString("0.0");
                 break;
             case "Color":
                 {
@@ -199,6 +224,6 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
                 }
                 break;
         }
-
+#endif
     }
 }
