@@ -301,10 +301,10 @@ namespace BluetoothWinUI3
         public string UserName { get; set; } = ""; // will depend on the DeviceIdentification, but could be set by the user to something more memorable
         public DeviceColors DarkColors { get; set; } = new DeviceColors();
         public DeviceColors LightColors { get; set; } = new DeviceColors();
-        //#if NEVER_EVER_DEFINED
+#if NEVER_EVER_DEFINED
         public enum DisplayHighlight { Normal, Highlight, Dim };
         DisplayHighlight HighlightPreference { get; set; } = DisplayHighlight.Normal;
-//#endif
+#endif
 
     }
 
