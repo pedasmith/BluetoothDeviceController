@@ -13,11 +13,15 @@
             <ColumnDefinition Width="25" />
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="30" />
+            <ColumnDefinition Width="50" />
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Column="0" x:Name="uiIcon"/>
         <Button Grid.Column="1" Content="Connect" Click="OnConnect" />
         <TextBlock Grid.Column="2" x:Name="uiStatus" />
+        <TextBlock Grid.Column="3" x:Name="uiBatteryLevelIcon" Style="{StaticResource sDeviceDataIcon}" />
+        <TextBlock Grid.Column="4" x:Name="uiBatteryLevelPercent" Style="{StaticResource sDeviceData}" />
 
     </Grid>
 </UserControl>

@@ -1,24 +1,12 @@
 using BluetoothProtocols;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
-using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Utilities;
 using Windows.Devices.Bluetooth;
-using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -122,11 +110,13 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
 
 
         Device.PropertyChanged += Device_PropertyChanged;
+        await Device.NotifyBatteryLevelAsync();
         await Device.NotifyTemperature_cAsync();
         await Device.NotifyPressure_hpaAsync();
         await Device.NotifyHumidityAsync();
         await Device.NotifyTVOCAsync(); // both TVOC and eCOS
         await Device.NotifyColorAsync();
+        await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
     }
 
     public void UpdateUX(SaveData saveData)
@@ -170,36 +160,48 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
     }
 
     Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
+    Nordic_Thingy.Battery_Data CurrBattery_Data = null;
     private void UpdateUI(string name)
     {
+        CurrBattery_Data = Device.CurrBattery_Data;
         CurrEnvironment_Data = Device.CurrEnvironment_Data;
-        if (CurrEnvironment_Data == null) return; // Might not be set yet?
 
         // from e.PropertyName when the Device does a PropertyChanged.
 
-        if (name == "Temperature_c" || name == "")
+        if (CurrBattery_Data != null)
         {
-            uiTemperature_c.Text = BluetoothWatcher.Units.Temperature.ConvertToString(CurrEnvironment_Data.Temperature_c, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
+            if (name == "BatteryLevel" || name == "")
+            {
+                uiBTConnectionControl.SetBatteryLevel(CurrBattery_Data.BatteryLevel);
+            }
+        }
 
-            //.ToString("0.0") + " °C";
-        }
-        if (name == "Pressure_hpa" || name == "")
+        if (CurrEnvironment_Data != null)
         {
-            uiPressure_hpa.Text = BluetoothWatcher.Units.Pressure.ConvertToString(CurrEnvironment_Data.Pressure_hpa, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
-        }
-        if (name == "Humidity" || name == "")
-        {
-            uiHumidity.Text = CurrEnvironment_Data.Humidity.ToString("0.0") + "%";
-        }
-        if (name == "TVOC`" || name == "")
-        {
-            uieCOS.Text = CurrEnvironment_Data.eCOS.ToString("0.0");
-            uiTVOC.Text = CurrEnvironment_Data.TVOC.ToString("0.0");
-        }
-        if (name == "Color" || name == "")
-        {
-            var RGB = new SolidColorBrush(Windows.UI.Color.FromArgb(255, (byte)CurrEnvironment_Data.Red, (byte)CurrEnvironment_Data.Green, (byte)CurrEnvironment_Data.Blue));
-            uiColor.Background = RGB; //TODO: and the 'clear' value?
+            if (name == "Temperature_c" || name == "")
+            {
+                uiTemperature_c.Text = BluetoothWatcher.Units.Temperature.ConvertToString(CurrEnvironment_Data.Temperature_c, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
+
+                //.ToString("0.0") + " °C";
+            }
+            if (name == "Pressure_hpa" || name == "")
+            {
+                uiPressure_hpa.Text = BluetoothWatcher.Units.Pressure.ConvertToString(CurrEnvironment_Data.Pressure_hpa, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
+            }
+            if (name == "Humidity" || name == "")
+            {
+                uiHumidity.Text = CurrEnvironment_Data.Humidity.ToString("0.0") + "%";
+            }
+            if (name == "TVOC" || name == "")
+            {
+                uieCOS.Text = CurrEnvironment_Data.eCOS.ToString("0.0");
+                uiTVOC.Text = CurrEnvironment_Data.TVOC.ToString("0.0");
+            }
+            if (name == "Color" || name == "")
+            {
+                var RGB = new SolidColorBrush(Windows.UI.Color.FromArgb(255, (byte)CurrEnvironment_Data.Red, (byte)CurrEnvironment_Data.Green, (byte)CurrEnvironment_Data.Blue));
+                uiColor.Background = RGB; //TODO: and the 'clear' value?
+            }
         }
 
 #if NEVER_EVER_DEFINED

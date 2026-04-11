@@ -14,7 +14,7 @@
           "RawAdvertisementLine3": "Service UUIDs (incomplete)EF680100-9B35-4933-9B10-52FFA9740042",
           "RawResponseLine1": "EB:5B:77:8A:84:4D\t14:49:07.9\t-61\tScanResponse",
           "RawResponseLine2": "Manufacturer: Nordic Semiconductor ASA: 1D EA C1 6D",
-          "ExampleAdvertisement":"2026-03-24 13:57:51.16,EB:5B:77:8A:84:4D,Thingy,Random,ConnectableUndirected,Connectable,-55,,3,Flags (0x01)=0x06,Incomplete List of 128-bit Service or Service Class UUIDs (0x06)=0x42 0x00 0x74 0xA9 0xFF 0x52 0x10 0x9B 0x33 0x49 0x35 0x9B 0x00 0x01 0x68 0xEF,Complete Local Name (0x09)=0x54 0x68 0x69 0x6E 0x67 0x79"
+          "ExampleAdvertisement":"2026-03-24 13:57:51.16,EB:5B:77:8A:84:4D,Thingy,Random,ConnectableUndirected,Connectable,-55,,3,Flags (0x01)=0x06,Incomplete List of 128-bit Service or Service Class UUIDs (0x06)=0x42 0x00 0x74 0xA9 0xFF 0x52 0x10 0x9B 0x33 0x49 0x35 0x9B 0x00 0x01 0x68 0xEF,Complete Local Name (0x09)=0x54 0x68 0x69 0x6E 0x67 0x79",
 
 
           "MustMatchManufacturerName": "Nordic Semiconductor ASA"

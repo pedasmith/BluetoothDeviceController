@@ -20,7 +20,7 @@
 
 
     <Style x:Key="sAllFonts" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Candara" />
+        <Setter Property="FontFamily" Value="Candara,Segoe Fluent Icons,Segoe MDL2 Assets" />
         <Setter Property="Foreground" Value="{ThemeResource sAllFonts_Foreground}" />
         <Setter Property="IsTextSelectionEnabled" Value="True" />
     </Style>
@@ -52,8 +52,18 @@
     <!-- Example: 24.2C -->
     <Style x:Key="sDevicePrimaryData" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontSize" Value="26" />
         <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+    <!-- Example: Battery percentage -->
+    <Style x:Key="sDeviceData" TargetType="TextBlock" BasedOn="{StaticResource sDevicePrimaryData}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="18" />
+    </Style>
+    <!-- Example: Battery percentage icon picture of little battery -->
+    <Style x:Key="sDeviceDataIcon" TargetType="TextBlock" BasedOn="{StaticResource sDevicePrimaryData}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="28" />
     </Style>
     <!-- Example: BT address -->
     <Style x:Key="sDeviceMinorText" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">

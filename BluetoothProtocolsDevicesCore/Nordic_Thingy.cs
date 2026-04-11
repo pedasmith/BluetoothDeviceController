@@ -1,13 +1,16 @@
 ﻿//From template: Protocol_Body v2022-07-02 9:54
 using BluetoothConversions;
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Storage.Streams;
 using Windows.UI.WebUI;
 
 #if NET8_0_OR_GREATER
@@ -38,26 +41,30 @@ namespace BluetoothProtocols
 
         enum ServiceIndex
         {
-            Environment_index = 0,
+            Battery_index = 0,
+            Environment_index = 1,
         }
         enum CharacteristicIndex
         {
-            Environment_Temperature_c_index = 0,
-            Environment_Pressure_hpa_index = 1,
-            Environment_Humidity_index = 2,
-            Environment_TVOC_index = 3,
-            Environment_Color_index = 4,
+            Battery_BatteryLevel_index = 0,
+            Environment_Temperature_c_index = 1,
+            Environment_Pressure_hpa_index = 2,
+            Environment_Humidity_index = 3,
+            Environment_TVOC_index = 4,
+            Environment_Color_index = 5,
         }
 
         List<Guid> Service_Guids = new List<Guid>()
         {
-            Guid.Parse("EF680200-9B35-4933-9B10-52FFA9740042") // Environment
+           Guid.Parse("0000180f-0000-1000-8000-00805f9b34fb"), // Battery
+            Guid.Parse("EF680200-9B35-4933-9B10-52FFA9740042"), // Environment
         };
 
-        List<GattDeviceService> Services = new List<GattDeviceService>(1) { null };
+        List<GattDeviceService> Services = new List<GattDeviceService>(2) { null, null, };
 
         List<Guid> Characteristic_Guids = new List<Guid>()
         {
+            Guid.Parse("00002a19-0000-1000-8000-00805f9b34fb"), // Battery_BatteryLevel is "I8|DEC|BatteryLevel|%"
             Guid.Parse("EF680201-9B35-4933-9B10-52FFA9740042"), // Environment_Temperature_c
             Guid.Parse("EF680202-9B35-4933-9B10-52FFA9740042"), // Environment_Pressure_hpa
             Guid.Parse("EF680203-9B35-4933-9B10-52FFA9740042"), // Environment_Humidity
@@ -65,11 +72,10 @@ namespace BluetoothProtocols
             Guid.Parse("EF680205-9B35-4933-9B10-52FFA9740042"), // Environment_Color
         };
 
-        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>(1) { null, null, null, null, null };
-        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, };
-        private List<bool> Characteristic_Value_set = new List<bool> { false, false, false, false, false, };
+        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, };
+        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, };
 
-        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() { null, null, null, null, null, };
+        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() { null, null, null, null, null, null, };
 
         /// <summary>
         /// Delegate for all Notify events
@@ -78,7 +84,7 @@ namespace BluetoothProtocols
         public delegate void BluetoothDataEvent(IotNumberFormats.ValueParserResult data);
 
 
-        private async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, CharacteristicIndex characteristicIndex)
+        private async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
         {
             if (Characteristics[(int)characteristicIndex] == null)
             {
@@ -88,12 +94,12 @@ namespace BluetoothProtocols
                     var serviceStatus = await ble.GetGattServicesForUuidAsync(Service_Guids[(int)serviceIndex]);
                     if (serviceStatus.Status != GattCommunicationStatus.Success)
                     {
-                        Status.ReportStatus($"Unable to get service Environment", serviceStatus);
+                        Status.ReportStatus($"Unable to get service {serviceName}", serviceStatus);
                         return false;
                     }
                     if (serviceStatus.Services.Count != 1)
                     {
-                        Status.ReportStatus($"Unable to get valid service count ({serviceStatus.Services.Count}) for Environment", serviceStatus);
+                        Status.ReportStatus($"Unable to get valid service count ({serviceStatus.Services.Count}) for {serviceName}", serviceStatus);
                         return false;
                     }
                     Services[(int)serviceIndex] = serviceStatus.Services[0];
@@ -102,17 +108,17 @@ namespace BluetoothProtocols
                 var characteristicsStatus = await service.GetCharacteristicsForUuidAsync(Characteristic_Guids[(int)characteristicIndex]);
                 if (characteristicsStatus.Status != GattCommunicationStatus.Success)
                 {
-                    Status.ReportStatus($"unable to get characteristic for Temperature_c", characteristicsStatus);
+                    Status.ReportStatus($"unable to get characteristic for {characteristicName}", characteristicsStatus);
                     return false;
                 }
                 if (characteristicsStatus.Characteristics.Count == 0)
                 {
-                    Status.ReportStatus($"unable to get any characteristics for Temperature_c", characteristicsStatus);
+                    Status.ReportStatus($"unable to get any characteristics for {characteristicName}", characteristicsStatus);
                     return false;
                 }
                 else if (characteristicsStatus.Characteristics.Count != 1)
                 {
-                    Status.ReportStatus($"unable to get correct characteristics count ({characteristicsStatus.Characteristics.Count}) for Temperature_c", characteristicsStatus);
+                    Status.ReportStatus($"unable to get correct characteristics count ({characteristicsStatus.Characteristics.Count}) for {characteristicName}", characteristicsStatus);
                     return false;
                 }
                 Characteristics[(int)characteristicIndex] = characteristicsStatus.Characteristics[0];
@@ -121,12 +127,46 @@ namespace BluetoothProtocols
         }
 
 
+        /// <summary>
+        /// Generic read method; takes in a cache mode which defaults to uncached.
+        /// Calls ReportStatus on either sucess or failure
+        /// </summary>
+        /// <param name="characteristicIndex">Index number of the characteristic</param>
+        /// <param name="method" >Name of the actual method; is just used for logging</param>
+        /// <param name="cacheMode" >Type of caching</param>
+        /// <returns></returns>
+        private async Task<IBuffer> ReadAsync(GattCharacteristic ch, string method, BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            GattReadResult readResult;
+            IBuffer buffer = null;
+            try
+            {
+                readResult = await ch.ReadValueAsync(cacheMode);
+                if (readResult.Status == GattCommunicationStatus.Success)
+                {
+                    buffer = readResult.Value;
+                }
+                else
+                {
+                    // NOTE: reset the characteristics array?
+                }
+                Status.ReportStatus(method, readResult.Status);
+            }
+            catch (Exception)
+            {
+                Status.ReportStatus(method, GattCommunicationStatus.Unreachable);
+                // NOTE: reset the characteristics array?
+            }
+            return buffer;
+        }
+
+
         private async Task<bool> SetupNotifyAsync(string name, 
-            ServiceIndex serviceIndex, CharacteristicIndex index, 
+            ServiceIndex serviceIndex, string serviceName, CharacteristicIndex index, 
             Windows.Foundation.TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> callback,
             GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            await Ensure_Characteristic_Async(serviceIndex, index);
+            await Ensure_Characteristic_Async(serviceIndex, serviceName, index, name);
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
@@ -152,6 +192,73 @@ namespace BluetoothProtocols
             Status.ReportStatus($"Notify{name}: set notification", result);
 
             return true;
+        }
+
+        //
+        //
+        // Start of the service + characteristic
+        //
+        //
+
+        /// <summary>
+        /// Data from all of the characteristics in the Battery Service; currently just BatteryLevel
+        /// </summary>
+        public class Battery_Data
+        {
+            public double BatteryLevel { get; set; }
+        }
+        public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
+
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyBatteryLevelAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("BatteryLevel", ServiceIndex.Battery_index, "Battery", CharacteristicIndex.Battery_BatteryLevel_index, NotifyBatteryLevelCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyBatteryLevelCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Battery_BatteryLevel_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
+            OnPropertyChanged("BatteryLevel");
+        }
+
+
+        /// <summary>
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Battery_Data> ReadBatteryLevel(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Battery_BatteryLevel_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Battery_index, "Battery", index, "Battery_Level");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "BatteryLevel", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
+            OnPropertyChanged("BatteryLevel"); // TODO: really do the property changed?
+            return CurrBattery_Data;
         }
 
         /// <summary>
@@ -182,7 +289,7 @@ namespace BluetoothProtocols
         /// 
         public async Task<bool> NotifyTemperature_cAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("Temperature_c", ServiceIndex.Environment_index, CharacteristicIndex.Environment_Temperature_c_index, NotifyTemperature_cCallback, notifyType);
+            var retval = await SetupNotifyAsync("Temperature_c", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Temperature_c_index, NotifyTemperature_cCallback, notifyType);
             return retval;
         }
 
@@ -218,7 +325,7 @@ namespace BluetoothProtocols
         /// 
         public async Task<bool> NotifyPressure_hpaAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("Pressure_hpa", ServiceIndex.Environment_index, CharacteristicIndex.Environment_Pressure_hpa_index, NotifyPressure_hpaCallback, notifyType);
+            var retval = await SetupNotifyAsync("Pressure_hpa", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Pressure_hpa_index, NotifyPressure_hpaCallback, notifyType);
             return retval;
         }
 
@@ -246,7 +353,7 @@ namespace BluetoothProtocols
         public async Task<bool> NotifyHumidityAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
             if (ble == null) return false; // too early to calll this 
-            var retval = await SetupNotifyAsync("Humidity", ServiceIndex.Environment_index, CharacteristicIndex.Environment_Humidity_index, NotifyHumidityCallback, notifyType);
+            var retval = await SetupNotifyAsync("Humidity", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Humidity_index, NotifyHumidityCallback, notifyType);
             return retval;
         }
 
@@ -274,7 +381,7 @@ namespace BluetoothProtocols
         /// 
         public async Task<bool> NotifyTVOCAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("TVOC", ServiceIndex.Environment_index, CharacteristicIndex.Environment_TVOC_index, NotifyTVOCCallback, notifyType);
+            var retval = await SetupNotifyAsync("TVOC", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_TVOC_index, NotifyTVOCCallback, notifyType);
             return retval;
         }
 
@@ -307,7 +414,7 @@ namespace BluetoothProtocols
         /// 
         public async Task<bool> NotifyColorAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("Color", ServiceIndex.Environment_index, CharacteristicIndex.Environment_Color_index, NotifyColorCallback, notifyType);
+            var retval = await SetupNotifyAsync("Color", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Color_index, NotifyColorCallback, notifyType);
             return retval;
         }
 

@@ -285,9 +285,13 @@ namespace BluetoothWinUI3
                     SetUxColors(child, brushes);
                 }
             }
-            else if (root is ContentControl cc && cc.Content is UIElement contentElement)
+            else if (root is ContentControl cc && cc.Content is UIElement ccContent)
             {
-                SetUxColors(contentElement, brushes);
+                SetUxColors(ccContent, brushes);
+            }
+            else if (root is UserControl uc && uc.Content is UIElement ucContent)
+            {
+                SetUxColors(ucContent, brushes);
             }
         }
     }

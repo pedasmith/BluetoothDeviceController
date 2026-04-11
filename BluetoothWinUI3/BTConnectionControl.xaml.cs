@@ -62,6 +62,17 @@ namespace BluetoothWinUI3
             }
         }
 
+        /// <summary>
+        /// level is a percentage from 0 to 100 (inclusive).
+        /// </summary>
+        /// <param name="level"></param>
+        public void SetBatteryLevel(double level)
+        {
+            var icon = BluetoothWinUI3.Units.BatteryLevelIcon.Icon(level);
+            uiBatteryLevelIcon.Text = icon;
+            uiBatteryLevelPercent.Text = $"{level}%";
+        }
+
         private void UpdateIcon()
         {
             switch (CurrState)
