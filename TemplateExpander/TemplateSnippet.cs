@@ -28,7 +28,8 @@ namespace TemplateExpander
                 // The Markdown parser is a little wierd. It starts the code with the first line
                 // after the back-ticks, and doesn't include the \n before the last set of back-ticks.
                 // So "trim" is the default and I have to add a \n as needed.
-                if (OptionTrim) return Code;
+                if (OptionTrim == OptionTrimOption.TrimCR) return Code;
+                if (OptionTrim == OptionTrimOption.TrimEndCR) return Code + "\r\n";
                 return Code + "\r\n";
             }
         }
@@ -56,7 +57,9 @@ namespace TemplateExpander
         public string OptionDirName { get; internal set; } = "";
         public string OptionIf { get; internal set; }
         public string OptionElse { get; internal set; } = null; // null means not set; blank ("") means replace with nothing
-        public bool OptionTrim { get; internal set; } = false;
+
+        public enum OptionTrimOption {  NoTrim, TrimCR, TrimEndCR, }
+        public OptionTrimOption OptionTrim { get; internal set; } = OptionTrimOption.NoTrim;
         public bool OptionTrimWrap { get; internal set; } = false;
         public bool OptionTrimListSubZero { get; internal set; } = false;
         public enum TypeOfExpansion {  Normal, List};
@@ -303,13 +306,16 @@ namespace TemplateExpander
                             switch (opts[1])
                             {
                                 case "true":
-                                    retval.OptionTrim = true;
+                                    retval.OptionTrim = OptionTrimOption.TrimCR;
                                     break;
                                 case "false":
-                                    retval.OptionTrim = false;
+                                    retval.OptionTrim = OptionTrimOption.NoTrim;
+                                    break;
+                                case "endCR":
+                                    retval.OptionTrim = OptionTrimOption.TrimEndCR;
                                     break;
                                 default:
-                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be true or false\n";
+                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be true or false or endCR\n";
                                     break;
                             }
                             break;

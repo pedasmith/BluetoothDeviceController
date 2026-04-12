@@ -123,8 +123,9 @@ namespace TemplateExpander
             var expand = "";
 
             var data = macros.Children[source];
+            bool isLast = sourceIndex == sourceList.Length - 1;
             // Not at the bottom; must keep going deeper (and will return from this code block)
-            if (sourceIndex < (sourceList.Length - 1))
+            if (!isLast)
             {
                 foreach (var item in data.Children)
                 {
@@ -133,6 +134,12 @@ namespace TemplateExpander
                     expand += itemExpand;
                 }
                 // If the non-bottom items have no expansion, that's neither an error nor wrapped.
+
+                // Remove the last CRLF when Trim=endCR
+                if (template.OptionTrim == TemplateSnippet.OptionTrimOption.TrimEndCR)
+                {
+                    expand = expand.TrimEnd(['\r', '\n']);
+                }
                 return expand;
             }
 

@@ -1,4 +1,8 @@
-﻿using Microsoft.UI.Dispatching;
+﻿#if !NO_UX
+// The NO_UX is required so that the BluetoothCodeGeneratordotNetCore will compile with VS 2022
+// Otherwise is just complains that it can't find the Microsoft.UI.Dispatching namespace.
+
+using Microsoft.UI.Dispatching;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -66,3 +70,4 @@ namespace Utilities
         }
     }
 }
+#endif

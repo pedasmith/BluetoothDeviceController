@@ -181,6 +181,7 @@ namespace BluetoothCodeGenerator
             service.Macros.Add("Name.dotNet", btService.Name.DotNetSafe()); // [[SERVICENAME]]
             service.Macros.Add("ServiceName", btService.Name); // Preferred name to "Name"
             service.Macros.Add("SERVICENAME", btService.Name.DotNetSafe()); // BAD: [[SERVICENAME]] in TI 1350 and 2541 for NOTIFYCONFIGURE
+            service.Macros.Add("ServiceName.dotNet", btService.Name.DotNetSafe()); // BAD: [[SERVICENAME]] in TI 1350 and 2541 for NOTIFYCONFIGURE
             service.Macros.Add("ServiceIsExpanded", (btService.Priority >= 10) ? "true" : "false");
             service.Macros.Add("ServiceDescription", btService.Description);
             service.Macros.Add("UUID", btService.UUID);
