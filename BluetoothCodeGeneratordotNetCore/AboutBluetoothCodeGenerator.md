@@ -133,7 +133,7 @@ length\>|Length of left-hand macro is greater-than right hand value
 Says where to place the result of expanding a Type=list expansion
 
 
-### Trim=true|false (d=false) says whether to trim the CR off of the template
+### Trim=true|false|endCR (d=false) says whether to trim the CR off of the template
 
 Sometimes the template expansion should include the CR at the and of the code block, and sometimes not. Use the Trim option to set the way you need it. The default is **false**, so it's often only applied when you need a Trim=true. 
 
@@ -151,3 +151,10 @@ COUNT|Current list element index (starting at 0)
 Child.Count|Current list element for just the bottom level of expansion
 
 If there's an If expression and it's false, the counts will not be incremented. 
+
+
+Helpful SOURCE values
+SOURCE|Notes
+-----|-----|
+Services|All services
+Services/DataGroups|

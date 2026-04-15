@@ -2,7 +2,7 @@
   "profiles": {
     "BluetoothCodeGeneratordotNetCore": {
       "commandName": "Project",
-      "commandLineArgs": " -inputJsonFile \"bin\\Nordic_Thingy_mini.json\" -inputTemplates Templates -output output\r\n",
+      "commandLineArgs": " -inputJsonFile \"bin\\Nordic_Thingy_mini.json\" -inputTemplates JunkTemplates -output output\r\n",
       "workingDirectory": "C:\\Users\\toomr\\source\\repos\\pedasmith\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore",
       "remoteDebugEnabled": true
     }

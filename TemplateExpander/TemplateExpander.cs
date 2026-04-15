@@ -12,6 +12,10 @@ namespace TemplateExpander
         /// </summary>
         public static string ExpandMacroAll(string text, TemplateSnippet macros)
         {
+            if (text.Contains ("TRACK:"))
+            {
+                ; // Handy place for a debugger
+            }
             var retval = text;
             int startIndex = 0;
             int nloop = 0;
@@ -135,11 +139,6 @@ namespace TemplateExpander
                 }
                 // If the non-bottom items have no expansion, that's neither an error nor wrapped.
 
-                // Remove the last CRLF when Trim=endCR
-                if (template.OptionTrim == TemplateSnippet.OptionTrimOption.TrimEndCR)
-                {
-                    expand = expand.TrimEnd(['\r', '\n']);
-                }
                 return expand;
             }
 
@@ -166,10 +165,13 @@ namespace TemplateExpander
                 foreach (var item in data.Children)
                 {
                     var childMacros = item.Value;
-                    childMacros.AddMacro("COUNT", count.ToString());
+                    childMacros.AddMacro("Count", count.ToString());
                     childMacros.AddMacro("Count.Child", childCount.ToString());
-                    childMacros.AddMacro("COUNTALL", countAll.ToString());
+                    childMacros.AddMacro("CountAll", countAll.ToString());
                     childMacros.AddMacro("CountAll.Child", childCountAll.ToString());
+
+                    childMacros.AddMacro("COUNT", count.ToString());
+                    childMacros.AddMacro("COUNTALL", countAll.ToString());
                     bool matchesIf = true;
 
                     var itemExpand = Expander.ExpandMacroAll(itemTemplate, childMacros);
@@ -258,6 +260,10 @@ namespace TemplateExpander
             // If this is a ListOutput=parent expansion, then add the expansion to the macro here.
             if (template.OptionListOutput == TemplateSnippet.TypeOfListOutput.Parent)
             {
+                if (template.OptionTrim == TemplateSnippet.OptionTrimOption.TrimEndCR)
+                {
+                    expand = expand.TrimEnd(['\r', '\n', ' ']);
+                }
                 macros.AddMacro(template.Name, expand);
                 expand = ""; // reset it
             }
@@ -342,6 +348,10 @@ namespace TemplateExpander
                             var countAll = 0;
                             expand = ExpandListRecursive(sourceList, 0, child, macros, ref count, ref countAll);
 
+                            if (child.OptionTrim == TemplateSnippet.OptionTrimOption.TrimEndCR)
+                            {
+                                expand = expand.TrimEnd(['\r', '\n', ' ']);
+                            }
                             if (!string.IsNullOrEmpty(child.OptionIf) && child.OptionListOutput == TemplateSnippet.TypeOfListOutput.Parent)
                             {
                                 var exp = TemplateExpression.Parse(child.OptionIf);

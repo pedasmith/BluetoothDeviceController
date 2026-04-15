@@ -1,4 +1,5 @@
-﻿//From template: Protocol_Body v2022-07-02 9:54
+﻿//From template: Protocol_Core_Body v2026-04-11 9:54
+//From template: Protocol_Body v2022-07-02 9:54
 using System;
 using System.Collections.Generic;
 using System.ComponentModel; // Needed for INotifyPropertyChanged
@@ -17,10 +18,10 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2022-12-08::04:46
+    /// This class was automatically generated 2026-04-14::19:48
     /// </summary>
 
-    public  class Nordic_Thingy : INotifyPropertyChanged
+    public class Nordic_Thingy : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
         // Link: https://nordicsemiconductor.github.io/Nordic-Thingy52-FW/documentation/firmware_architecture.html#fw_arch_ble_services
@@ -30,55 +31,87 @@ namespace BluetoothProtocols
 
         // For the INotifyPropertyChanged values
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        /* Service and Characteristics summary for the device Thingy
+
+        Environment service Guid=ef680200-9b35-4933-9b10-52ffa9740042
+            Temperature (c) characteristic has Temperature (double-->double)  Guid=ef680201-9b35-4933-9b10-52ffa9740042 Data=Environment_Data
+            Pressure (hpa) characteristic has Pressure (double-->double)  Guid=ef680202-9b35-4933-9b10-52ffa9740042 Data=Environment_Data
+            Humidity (%) characteristic has Humidity (Byte-->double)  Guid=ef680203-9b35-4933-9b10-52ffa9740042 Data=Environment_Data
+            Air Quality eCOS TVOC characteristic has eCOS (UInt16-->double) TVOC (UInt16-->double)  Guid=ef680204-9b35-4933-9b10-52ffa9740042 Data=Environment_Data
+            Color RGB+Clear characteristic has Red (UInt16-->double) Green (UInt16-->double) Blue (UInt16-->double) Clear (UInt16-->double)  Guid=ef680205-9b35-4933-9b10-52ffa9740042 Data=Environment_Data
+            Environment Configuration characteristic has TempInterval (UInt16-->double) PressureInterval (UInt16-->double) HumidityInterval (UInt16-->double) ColorInterval (UInt16-->double) GasMode (Byte-->double) RedCalibration (Byte-->double) GreenCalibration (Byte-->double) BlueCalibration (Byte-->double)  Guid=ef680206-9b35-4933-9b10-52ffa9740042 Data=EnvironmentConfiguration
+
+        Battery service Guid=180f
+            BatteryLevel characteristic has BatteryLevel (SByte-->double)  Guid=2a19 Data=Battery_Data
+        */
+
+        /// <summary>
+        /// Enumeration of all services
+        /// </summary>
         enum ServiceIndex
         {
-            Battery_index = 0,
-            Environment_index = 1,
+            Environment_index = 0,
+            Battery_index = 1,
         }
+
+        /// <summary>
+        /// Enumeration of all characteristics in all of the services.
+        /// </summary>
         enum CharacteristicIndex
         {
-            Battery_BatteryLevel_index = 0,
-            Environment_Temperature_c_index = 1,
-            Environment_Pressure_hpa_index = 2,
-            Environment_Humidity_index = 3,
-            Environment_TVOC_index = 4,
-            Environment_Color_index = 5,
+            Environment_Temperature_c_index = 0,     // GUID EF680201-9B35-4933-9B10-52FFA9740042
+            Environment_Pressure_hpa_index = 1,     // GUID EF680202-9B35-4933-9B10-52FFA9740042
+            Environment_Humidity_index = 2,     // GUID EF680203-9B35-4933-9B10-52FFA9740042
+            Environment_Air_Quality_eCOS_TVOC_index = 3,     // GUID EF680204-9B35-4933-9B10-52FFA9740042
+            Environment_Color_RGB_Clear_index = 4,     // GUID EF680205-9B35-4933-9B10-52FFA9740042
+            Environment_Environment_Configuration_index = 5,     // GUID EF680206-9B35-4933-9B10-52FFA9740042
+            Battery_BatteryLevel_index = 6,     // GUID 00002a19-0000-1000-8000-00805f9b34fb
         }
 
+        /// <summary>
+        /// List of the guids supported by the device. 
+        /// </summary>
         List<Guid> Service_Guids = new List<Guid>()
         {
-            Guid.Parse("0000180f-0000-1000-8000-00805f9b34fb"), // Battery
-            Guid.Parse("EF680200-9B35-4933-9B10-52FFA9740042"), // Environment
+            Guid.Parse("EF680200-9B35-4933-9B10-52FFA9740042"), // #0 is Environment
+            Guid.Parse("0000180f-0000-1000-8000-00805f9b34fb"), // #1 is Battery
         };
 
-        List<GattDeviceService> Services = new List<GattDeviceService>(2) { null, null, };
+        /// <summary>
+        /// Active list of services. Will be filled in as the services are connected. Starts off as null.
+        /// </summary>
+        List<GattDeviceService> Services = new List<GattDeviceService>() { null, null, };
 
+        /// <summary>
+        /// List of the Characteristic GUIDS for all of the characteristics for all of the services.
+        /// Is indexed by the CharacteristicIndex enum. 
+        /// </summary>
         List<Guid> Characteristic_Guids = new List<Guid>()
         {
-            Guid.Parse("00002a19-0000-1000-8000-00805f9b34fb"), // Battery_BatteryLevel is "I8|DEC|BatteryLevel|%"
-            Guid.Parse("EF680201-9B35-4933-9B10-52FFA9740042"), // Environment_Temperature_c
-            Guid.Parse("EF680202-9B35-4933-9B10-52FFA9740042"), // Environment_Pressure_hpa
-            Guid.Parse("EF680203-9B35-4933-9B10-52FFA9740042"), // Environment_Humidity
-            Guid.Parse("EF680204-9B35-4933-9B10-52FFA9740042"), // Environment_TVOC
-            Guid.Parse("EF680205-9B35-4933-9B10-52FFA9740042"), // Environment_Color
+            Guid.Parse("EF680201-9B35-4933-9B10-52FFA9740042"), // #0 is Environment Temperature (c)
+            Guid.Parse("EF680202-9B35-4933-9B10-52FFA9740042"), // #1 is Environment Pressure (hpa)
+            Guid.Parse("EF680203-9B35-4933-9B10-52FFA9740042"), // #2 is Environment Humidity (%)
+            Guid.Parse("EF680204-9B35-4933-9B10-52FFA9740042"), // #3 is Environment Air Quality eCOS TVOC
+            Guid.Parse("EF680205-9B35-4933-9B10-52FFA9740042"), // #4 is Environment Color RGB+Clear
+            Guid.Parse("EF680206-9B35-4933-9B10-52FFA9740042"), // #5 is Environment Environment Configuration
+            Guid.Parse("00002a19-0000-1000-8000-00805f9b34fb"), // #6 is Battery BatteryLevel
         };
 
-        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, };
-        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, };
+        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, };
+        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false, };
+        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() { null, null, null, null, null, null, null, };
 
-        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() { null, null, null, null, null, null, };
 
         /// <summary>
         /// Delegate for all Notify events
         /// </summary>
         /// <param name="data"></param>
         public delegate void BluetoothDataEvent(IotNumberFormats.ValueParserResult data);
-
 
         private async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
         {
@@ -157,8 +190,8 @@ namespace BluetoothProtocols
         }
 
 
-        private async Task<bool> SetupNotifyAsync(string name, 
-            ServiceIndex serviceIndex, string serviceName, CharacteristicIndex index, 
+        private async Task<bool> SetupNotifyAsync(string name,
+            ServiceIndex serviceIndex, string serviceName, CharacteristicIndex index,
             Windows.Foundation.TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> callback,
             GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
@@ -196,16 +229,370 @@ namespace BluetoothProtocols
         //
         //
 
-        #region Service_Battery
+
+        //
+        // All services / characteristics and data structures
+        //
+
+
+        #region Service_Environment
+        // Service Environment 
         /// <summary>
-        /// Data from all of the characteristics in the Battery Service; currently just BatteryLevel
+        /// Data from all of the characteristics in the Environment Service
+        /// </summary>
+        public class Environment_Data
+        {
+            public double Temperature; // From Environment and Temperature (c)
+            public double Pressure; // From Environment and Pressure (hpa)
+            public double Humidity; // From Environment and Humidity (%)
+            public double eCOS; // From Environment and Air Quality eCOS TVOC
+            public double TVOC; // From Environment and Air Quality eCOS TVOC
+            public double Red; // From Environment and Color RGB+Clear
+            public double Green; // From Environment and Color RGB+Clear
+            public double Blue; // From Environment and Color RGB+Clear
+            public double Clear; // From Environment and Color RGB+Clear
+            public double TempInterval; // From Environment and Environment Configuration
+            public double PressureInterval; // From Environment and Environment Configuration
+            public double HumidityInterval; // From Environment and Environment Configuration
+            public double ColorInterval; // From Environment and Environment Configuration
+            public double GasMode; // From Environment and Environment Configuration
+            public double RedCalibration; // From Environment and Environment Configuration
+            public double GreenCalibration; // From Environment and Environment Configuration
+            public double BlueCalibration; // From Environment and Environment Configuration
+        }
+        public Environment_Data CurrEnvironment_Data { get; set; } = new Environment_Data();
+
+        // Per-characteristics methods for Environment Temperature_c
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyTemperature_cAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Temperature_c", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Temperature_c_index, NotifyTemperature_cCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyTemperature_cCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Environment_Temperature_c_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I8/P8|FIXED|Temperature|C"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.Temperature = vr.GetNextDouble();
+            OnPropertyChanged("Temperature_c");
+        }
+        // Per-characteristics methods for Environment Pressure_hpa
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyPressure_hpaAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Pressure_hpa", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Pressure_hpa_index, NotifyPressure_hpaCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyPressure_hpaCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Environment_Pressure_hpa_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I32/P8|FIXED|Pressure|hPA"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.Pressure = vr.GetNextDouble();
+            OnPropertyChanged("Pressure_hpa");
+        }
+        // Per-characteristics methods for Environment Humidity
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyHumidityAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Humidity", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Humidity_index, NotifyHumidityCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyHumidityCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Environment_Humidity_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|Humidity|%"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.Humidity = vr.GetNextDouble();
+            OnPropertyChanged("Humidity");
+        }
+        // Per-characteristics methods for Environment Air_Quality_eCOS_TVOC
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyAir_Quality_eCOS_TVOCAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Air_Quality_eCOS_TVOC", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Air_Quality_eCOS_TVOC_index, NotifyAir_Quality_eCOS_TVOCCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyAir_Quality_eCOS_TVOCCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Environment_Air_Quality_eCOS_TVOC_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.eCOS = vr.GetNextDouble();
+            CurrEnvironment_Data.TVOC = vr.GetNextDouble();
+            OnPropertyChanged("Air_Quality_eCOS_TVOC");
+        }
+        // Per-characteristics methods for Environment Color_RGB_Clear
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyColor_RGB_ClearAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Color_RGB_Clear", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Color_RGB_Clear_index, NotifyColor_RGB_ClearCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyColor_RGB_ClearCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Environment_Color_RGB_Clear_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.Red = vr.GetNextDouble();
+            CurrEnvironment_Data.Green = vr.GetNextDouble();
+            CurrEnvironment_Data.Blue = vr.GetNextDouble();
+            CurrEnvironment_Data.Clear = vr.GetNextDouble();
+            OnPropertyChanged("Color_RGB_Clear");
+        }
+        // Per-characteristics methods for Environment Environment_Configuration
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyEnvironment_ConfigurationAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Environment_Configuration", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Environment_Configuration_index, NotifyEnvironment_ConfigurationCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyEnvironment_ConfigurationCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Environment_Environment_Configuration_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|TempInterval|ms U16|DEC|PressureInterval|ms U16|DEC|HumidityInterval|ms U16|DEC|ColorInterval|ms U8|DEC|GasMode U8|DEC|RedCalibration U8|DEC|GreenCalibration U8|DEC|BlueCalibration"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.TempInterval = vr.GetNextDouble();
+            CurrEnvironment_Data.PressureInterval = vr.GetNextDouble();
+            CurrEnvironment_Data.HumidityInterval = vr.GetNextDouble();
+            CurrEnvironment_Data.ColorInterval = vr.GetNextDouble();
+            CurrEnvironment_Data.GasMode = vr.GetNextDouble();
+            CurrEnvironment_Data.RedCalibration = vr.GetNextDouble();
+            CurrEnvironment_Data.GreenCalibration = vr.GetNextDouble();
+            CurrEnvironment_Data.BlueCalibration = vr.GetNextDouble();
+            OnPropertyChanged("Environment_Configuration");
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Environment_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Environment_Data> ReadTemperature_c(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Environment_Temperature_c_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "Temperature (c)");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Temperature (c)", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("/I8/P8|FIXED|Temperature|C"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrEnvironment_Data.Temperature = vr.GetNextDouble();
+            OnPropertyChanged("Temperature_c");
+            return CurrEnvironment_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Environment_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Environment_Data> ReadPressure_hpa(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Environment_Pressure_hpa_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "Pressure (hpa)");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Pressure (hpa)", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("/I32/P8|FIXED|Pressure|hPA"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrEnvironment_Data.Pressure = vr.GetNextDouble();
+            OnPropertyChanged("Pressure_hpa");
+            return CurrEnvironment_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Environment_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Environment_Data> ReadHumidity(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Environment_Humidity_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "Humidity (%)");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Humidity (%)", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|Humidity|%"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrEnvironment_Data.Humidity = vr.GetNextDouble();
+            OnPropertyChanged("Humidity");
+            return CurrEnvironment_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Environment_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Environment_Data> ReadAir_Quality_eCOS_TVOC(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Environment_Air_Quality_eCOS_TVOC_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "Air Quality eCOS TVOC");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Air Quality eCOS TVOC", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrEnvironment_Data.eCOS = vr.GetNextDouble();
+            CurrEnvironment_Data.TVOC = vr.GetNextDouble();
+            OnPropertyChanged("Air_Quality_eCOS_TVOC");
+            return CurrEnvironment_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Environment_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Environment_Data> ReadColor_RGB_Clear(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Environment_Color_RGB_Clear_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "Color RGB+Clear");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Color RGB+Clear", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrEnvironment_Data.Red = vr.GetNextDouble();
+            CurrEnvironment_Data.Green = vr.GetNextDouble();
+            CurrEnvironment_Data.Blue = vr.GetNextDouble();
+            CurrEnvironment_Data.Clear = vr.GetNextDouble();
+            OnPropertyChanged("Color_RGB_Clear");
+            return CurrEnvironment_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Environment_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Environment_Data> ReadEnvironment_Configuration(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Environment_Environment_Configuration_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "Environment Configuration");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Environment Configuration", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|TempInterval|ms U16|DEC|PressureInterval|ms U16|DEC|HumidityInterval|ms U16|DEC|ColorInterval|ms U8|DEC|GasMode U8|DEC|RedCalibration U8|DEC|GreenCalibration U8|DEC|BlueCalibration"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrEnvironment_Data.TempInterval = vr.GetNextDouble();
+            CurrEnvironment_Data.PressureInterval = vr.GetNextDouble();
+            CurrEnvironment_Data.HumidityInterval = vr.GetNextDouble();
+            CurrEnvironment_Data.ColorInterval = vr.GetNextDouble();
+            CurrEnvironment_Data.GasMode = vr.GetNextDouble();
+            CurrEnvironment_Data.RedCalibration = vr.GetNextDouble();
+            CurrEnvironment_Data.GreenCalibration = vr.GetNextDouble();
+            CurrEnvironment_Data.BlueCalibration = vr.GetNextDouble();
+            OnPropertyChanged("Environment_Configuration");
+            return CurrEnvironment_Data;
+        }
+        #endregion
+
+        //
+        #region Service_Battery
+        // Service Battery 
+        /// <summary>
+        /// Data from all of the characteristics in the Battery Service
         /// </summary>
         public class Battery_Data
         {
-            public double BatteryLevel { get; set; }
+            public double BatteryLevel; // From Battery and BatteryLevel
         }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
 
+        // Per-characteristics methods for Battery BatteryLevel
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -229,17 +616,14 @@ namespace BluetoothProtocols
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
             OnPropertyChanged("BatteryLevel");
         }
-
-
-        /// <summary>
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        /// <returns>Battery_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
         public async Task<Battery_Data> ReadBatteryLevel(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             var index = CharacteristicIndex.Battery_BatteryLevel_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Battery_index, "Battery", index, "Battery_Level");
+            await Ensure_Characteristic_Async(ServiceIndex.Battery_index, "Battery", index, "BatteryLevel");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
@@ -249,190 +633,19 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "BatteryLevel", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%"); // TODO: should be done ahead of time!
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
-            OnPropertyChanged("BatteryLevel"); // TODO: really do the property changed?
+            OnPropertyChanged("BatteryLevel");
             return CurrBattery_Data;
         }
         #endregion
 
-        #region Service_Environment
-        /// <summary>
-        /// Data from all of the characteristics in the Environment Service
-        /// </summary>
-        public class Environment_Data
-        {
-            public double Temperature_c { get; set; }
-            public double Pressure_hpa { get; set; }
-            public double Humidity { get; set; }
-            public double TVOC { get; set; }
-            public double eCOS { get; set; }
-            public double Red { get; set; }
-            public double Green { get; set; }
-            public double Blue { get; set; }
-            public double Clear { get; set; }
-
-        }
-        public Environment_Data CurrEnvironment_Data { get; set; } = new Environment_Data();
+        //
 
 
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-        /// 
-        public async Task<bool> NotifyTemperature_cAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            var retval = await SetupNotifyAsync("Temperature_c", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Temperature_c_index, NotifyTemperature_cCallback, notifyType);
-            return retval;
-        }
-
-        private void NotifyTemperature_cCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
-        {
-            var index = (int)CharacteristicIndex.Environment_Temperature_c_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I8/P8|FIXED|Temperature|C"); // TODO: should be done ahead of time!
-            var vr = ValueParsers[index];
-
-            vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrEnvironment_Data.Temperature_c = vr.GetNextDouble();
-            OnPropertyChanged("Temperature_c");
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-        /// 
-        public async Task<bool> NotifyPressure_hpaAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            var retval = await SetupNotifyAsync("Pressure_hpa", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Pressure_hpa_index, NotifyPressure_hpaCallback, notifyType);
-            return retval;
-        }
-
-
-        private void NotifyPressure_hpaCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
-        {
-            var index = (int)CharacteristicIndex.Environment_Pressure_hpa_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I32/P8|FIXED|Pressure|hPA");
-            var vr = ValueParsers[index];
-
-            vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrEnvironment_Data.Pressure_hpa = vr.GetNextDouble();
-            OnPropertyChanged("Pressure_hpa");
-        }
-
-
-
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-        /// 
-        public async Task<bool> NotifyHumidityAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            if (ble == null) return false; // too early to calll this 
-            var retval = await SetupNotifyAsync("Humidity", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Humidity_index, NotifyHumidityCallback, notifyType);
-            return retval;
-        }
-
-        private void NotifyHumidityCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
-        {
-            var index = (int)CharacteristicIndex.Environment_Humidity_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|Humidity|%");
-            var vr = ValueParsers[index];
-
-            vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrEnvironment_Data.Humidity = vr.GetNextDouble();
-            OnPropertyChanged("Humidity");
-        }
-
-
-        // TVOC is eCOS + TVOC+ 
-
-
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-        /// 
-        public async Task<bool> NotifyTVOCAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            var retval = await SetupNotifyAsync("TVOC", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_TVOC_index, NotifyTVOCCallback, notifyType);
-            return retval;
-        }
-
-        private void NotifyTVOCCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
-        {
-            var index = (int)CharacteristicIndex.Environment_TVOC_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb");
-            var vr = ValueParsers[index];
-
-            vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrEnvironment_Data.eCOS = vr.GetNextDouble();
-            CurrEnvironment_Data.TVOC = vr.GetNextDouble();
-            OnPropertyChanged("TVOC"); // name of the characteristic, not the individual fields.
-        }
-
-
-
-
-
-        // Color is RGB+Clear
-
-
-
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-        /// 
-        public async Task<bool> NotifyColorAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            var retval = await SetupNotifyAsync("Color", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Color_index, NotifyColorCallback, notifyType);
-            return retval;
-        }
-
-        private void NotifyColorCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
-        {
-            var index = (int)CharacteristicIndex.Environment_Color_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear");
-            var vr = ValueParsers[index];
-
-            vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrEnvironment_Data.Red = vr.GetNextDouble();
-            CurrEnvironment_Data.Green = vr.GetNextDouble();
-            CurrEnvironment_Data.Blue = vr.GetNextDouble();
-            CurrEnvironment_Data.Clear = vr.GetNextDouble();
-            OnPropertyChanged("Color"); // name of the characteristic, not the individual fields.
-        }
-
-
-
-        #endregion
+        // Long obsolete! [[zzMETHOD+LIST]]
     }
 }

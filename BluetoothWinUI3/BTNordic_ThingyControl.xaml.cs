@@ -114,8 +114,8 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
         await Device.NotifyTemperature_cAsync();
         await Device.NotifyPressure_hpaAsync();
         await Device.NotifyHumidityAsync();
-        await Device.NotifyTVOCAsync(); // both TVOC and eCOS
-        await Device.NotifyColorAsync();
+        await Device.NotifyAir_Quality_eCOS_TVOCAsync(); // both TVOC and eCOS
+        await Device.NotifyColor_RGB_ClearAsync();
         await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
     }
 
@@ -180,13 +180,13 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
         {
             if (name == "Temperature_c" || name == "")
             {
-                uiTemperature_c.Text = BluetoothWatcher.Units.Temperature.ConvertToString(CurrEnvironment_Data.Temperature_c, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
+                uiTemperature_c.Text = BluetoothWatcher.Units.Temperature.ConvertToString(CurrEnvironment_Data.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
 
                 //.ToString("0.0") + " °C";
             }
             if (name == "Pressure_hpa" || name == "")
             {
-                uiPressure_hpa.Text = BluetoothWatcher.Units.Pressure.ConvertToString(CurrEnvironment_Data.Pressure_hpa, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
+                uiPressure_hpa.Text = BluetoothWatcher.Units.Pressure.ConvertToString(CurrEnvironment_Data.Pressure, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
             }
             if (name == "Humidity" || name == "")
             {

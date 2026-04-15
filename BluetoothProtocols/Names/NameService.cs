@@ -95,6 +95,22 @@ namespace BluetoothDeviceController.Names
 
         public IList<NameCharacteristic> Characteristics { get; } = new List<NameCharacteristic>();
 
+
+        public IList<string> DataGroupNames
+        {
+            get
+            {
+                var retval = new List<string>();
+                foreach (var characteristic in Characteristics)
+                {
+                    if (!string.IsNullOrEmpty(characteristic.DataGroupName) && !retval.Contains(characteristic.DataGroupName))
+                    {
+                        retval.Add(characteristic.DataGroupName);
+                    }
+                }   
+                return retval;
+            }
+        }
         public override string ToString()
         {
             return $"{Name}:{UUID}";

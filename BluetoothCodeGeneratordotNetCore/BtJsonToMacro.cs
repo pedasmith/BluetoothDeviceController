@@ -185,6 +185,7 @@ namespace BluetoothCodeGenerator
             service.Macros.Add("ServiceIsExpanded", (btService.Priority >= 10) ? "true" : "false");
             service.Macros.Add("ServiceDescription", btService.Description);
             service.Macros.Add("UUID", btService.UUID);
+            service.Macros.Add("Uuid", btService.UUID);
             service.Macros.Add("UuidShort", btService.UUID.AsShortestUuid());
 
             var chs = new TemplateSnippet("Characteristics");
@@ -194,6 +195,11 @@ namespace BluetoothCodeGenerator
             {
                 if (btCharacteristic.Suppress) continue;
 
+                if (string.IsNullOrEmpty(btCharacteristic.DataGroupName))
+                {
+                    btCharacteristic.DataGroupName = btService.Name + "_Data";
+                }
+
                 var ch = new TemplateSnippet(btCharacteristic.Name);
                 ch.Macros.Add("UUID", btCharacteristic.UUID);
                 ch.Macros.Add("UuidShort", btCharacteristic.UUID.AsShortestUuid());
@@ -202,12 +208,15 @@ namespace BluetoothCodeGenerator
                 ch.Macros.Add("CharacteristicName.dotNet", btCharacteristic.Name.DotNetSafe());
                 ch.Macros.Add("Name.dotNet", btCharacteristic.Name.DotNetSafe());
                 ch.Macros.Add("CharacteristicDescription", btCharacteristic.Description);
+                ch.Macros.Add("DataGroupName", btCharacteristic.DataGroupName);
+                ch.Macros.Add("DataGroupName.dotNet", btCharacteristic.DataGroupName.DotNetSafe());
 
-                ch.Macros.Add("Type", btCharacteristic.Type);
-                ch.Macros.Add("CHARACTERISTICTYPE", btCharacteristic.Type);
+                ch.Macros.Add("Type", btCharacteristic.Type); // is the e.g. "U8 U8"
+                ch.Macros.Add("CharacteristicType", btCharacteristic.Type);
                 ch.Macros.Add("Verbs", btCharacteristic.Verbs);
                 ch.Macros.Add("TableType", btCharacteristic.UI?.tableType ?? "");
                 ch.Macros.Add("AutoNotify", btCharacteristic.AutoNotify ? "true" : "false");
+                ch.Macros.Add("CHARACTERISTICTYPE", btCharacteristic.Type);
                 ch.Macros.Add("UICHARTCOMMAND", btCharacteristic.UI?.chartCommand ?? "");
 
                 var UI_AsCSharp = btCharacteristic.UI?.AsCSharpString() ?? "";
@@ -295,6 +304,7 @@ namespace BluetoothCodeGenerator
                     else if (param.Max <= 255) variableType = $"{sbytestr}byte";
                     else if (param.Max <= 65535) variableType = $"{sintstr}short";
                     else variableType = $"{sintstr}int";
+                    paramts.AddMacro("VariableType", variableType);
                     paramts.AddMacro("VARIABLETYPE", variableType);
 
 
@@ -516,6 +526,10 @@ namespace BluetoothCodeGenerator
                     TemplateSnippet.AddMacroList(prlist, "DataName", dataname);
                     TemplateSnippet.AddMacroList(prlist, "DataName.dotNet", dataname.DotNetSafe());
                     TemplateSnippet.AddMacroList(prlist, "DATANAMEUSER", dataname.Replace("_", " "));
+
+                    TemplateSnippet.AddMacroList(prlist, "VariableType", ByteFormatToCSharp(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "VariableTypeParam", ByteFormatToCSharpParam(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "VariableTypeDS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
 
                     TemplateSnippet.AddMacroList(prlist, "VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));

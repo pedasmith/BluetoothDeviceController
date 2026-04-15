@@ -1,7 +1,7 @@
 ﻿# ProtocolCore FileName=[[CLASSNAME]].cs DirName=BluetoothProtocolsDevicesCore SuppressFile=:SuppressCSharpProtocol:
 
 ```
-//From template: Protocol_Core_Body v2026-04-`` 9:54
+//From template: Protocol_Core_Body v2026-04-11 9:54
 //From template: Protocol_Body v2022-07-02 9:54
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ namespace BluetoothProtocols
     public [[CLASSMODIFIERS]] class [[CLASSNAME]] : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-[[LINKS]]
+[[Links]]
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();
@@ -39,12 +39,17 @@ namespace BluetoothProtocols
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        /* Service and Characteristics summary for the device [[DeviceName]]
+
+[[ServiceSummary]]
+        */
+
         /// <summary>
         /// Enumeration of all services
         /// </summary>
         enum ServiceIndex
         {
-[[SERVICE+INDEX+LIST]]
+[[ServiceIndexList]]
         }
 
         /// <summary>
@@ -52,7 +57,7 @@ namespace BluetoothProtocols
         /// </summary>
         enum CharacteristicIndex
         {
-[[CHARACTERISTIC+INDEX+LIST]]
+[[CharacteristicIndexList]]
         }
 
         /// <summary>
@@ -60,7 +65,7 @@ namespace BluetoothProtocols
         /// </summary>
         List<Guid> Service_Guids = new List<Guid>()
         {
-[[SERVICE+GUIDS+LIST]]
+[[ServiceGuidsList]]
         };
 
         /// <summary>
@@ -74,7 +79,7 @@ namespace BluetoothProtocols
         /// </summary>
         List<Guid> Characteristic_Guids = new List<Guid>()
         {
-[[CHARACTERISTIC+GUID+LIST]]
+[[CharacteristicGuidsList]]
         };
 
         List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { [[CHARACTERISTICS+NULL+LIST]] };
@@ -205,44 +210,40 @@ namespace BluetoothProtocols
         //
 
 
-        /* Service and Characteristics summary for the device [[DeviceName]]
-[[SERVICE+SUMMARY]]
-        */
-
         //
         // All services / characteristics and data structures
         //
 
 
-[[SERVICE+READ+WRITE]]
+[[SERVICE+READ+WRITE+NOTIFY]]
 
-[[zzMETHOD+LIST]]
+// Long obsolete! [[zzMETHOD+LIST]]
     }
 }
 ```
 
-## LINKS Type=list Source=LINKS CodeListZero="        // No links for this device"
+## Links Type=list Source=LINKS CodeListZero="        // No links for this device" Trim=endCR
 
 ```
-    // Link: [[TEXT]]
+        // Link: [[TEXT]]
 ```
 
-## SERVICE+INDEX+LIST Type=list Source=Services Trim=endCR Code="            [[Name]]_index = [[Count.Child]]," 
+## ServiceIndexList Type=list Source=Services Trim=endCR Code="            [[Name]]_index = [[Count.Child]]," 
 
-## SERVICE+GUIDS+LIST Type=list Source=Services Trim=endCR  
+## ServiceGuidsList Type=list Source=Services Trim=endCR  
 
 ```
             Guid.Parse("[[UUID]]"), // #[[Count.Child]] is [[Name]]
 ```
 ## SERVICES+NULL+LIST Type=list Source=Services Trim=true Code="null, " 
 
-## CHARACTERISTIC+INDEX+LIST Type=list Source=Services/Characteristics Trim=endCR 
+## CharacteristicIndexList Type=list Source=Services/Characteristics 
 
 ```
             [[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index = [[COUNTALL]],     // GUID [[UUID]]
 ```
 
-## CHARACTERISTIC+GUID+LIST Type=list Source=Services/Characteristics Trim=endCR
+## CharacteristicGuidsList Type=list Source=Services/Characteristics Trim=false
 ```
             Guid.Parse("[[UUID]]"), // #[[COUNTALL]] is [[ServiceName]] [[Name]]
 ```
@@ -252,40 +253,124 @@ namespace BluetoothProtocols
 ## CHARACTERISTICS+FALSE+LIST Type=list Source=Services/Characteristics Trim=true Code="false, " 
 
 
-## SERVICE+SUMMARY Type=list Source=Services CodeListSubZero="" Trim=false
+## ServiceSummary Type=list Source=Services CodeListSubZero="" Trim=endCR
+
+```
+        [[Name]] service Guid=[[UuidShort]]
+[[CharacteristicSummary]]
+```
+## CharacteristicSummary Type=list ListOutput=parent Source=Services/Characteristics CodeListSubZero="" Trim=false
+```
+            [[Name]] characteristic has [[PropertySummary]] Guid=[[UuidShort]] Data=[[DataGroupName.dotNet]]
+```
+
+## PropertySummary Type=list ListOutput=parent Trim=false Source=Services/Characteristics/Properties  CodeListSubZero="" Trim=true
+```
+[[DataName.dotNet]] ([[VariableType]]-->[[VariableTypeDS]]) 
+```
+## SERVICE+READ+WRITE+NOTIFY Type=list Source=Services CodeListSubZero="" Trim=false
 
 
 ```
-        [[Name]] service Guid=[[UUID]]
-[[CHARACTERISTIC+SUMMARY]]
+        #region Service_[[ServiceName.dotNet]]
+        // Service [[Name]] 
+        /// <summary>
+        /// Data from all of the characteristics in the [[ServiceName]] Service
+        /// </summary>
+        public class [[ServiceName.dotNet]]_Data
+        {
+[[CHARACTERISTIC+DATA+FIELDS]]
+        }
+        public [[ServiceName.dotNet]]_Data Curr[[ServiceName.dotNet]]_Data { get; set; } = new [[ServiceName.dotNet]]_Data();
 
-
-```
-## CHARACTERISTIC+SUMMARY Type=list ListOutput=parent Source=Services/Characteristics CodeListSubZero="" Trim=false
-```
-            [[Name]] characteristic has [[PROPERTY+SUMMARY]] Guid=[[UUID]] 
-```
-
-## PROPERTY+SUMMARY Type=list ListOutput=parent Trim=false Source=Services/Characteristics/Properties  CodeListSubZero="" Trim=true
-```
-[[DataName.dotNet]] ([[VARIABLETYPE]]-->[[VARIABLETYPE+DS]]) 
-```
-## SERVICE+READ+WRITE Type=list ListOutput=parent Source=Services CodeListSubZero="" Trim=false
-
-
-```
-        // [[Name]] service
-        #region Service_[[Name.dotNet]]
-[[CHARACTERISTIC+READ+WRITE]]
+[[CHARACTERISTIC+METHOD+NOTIFY]]
+[[CHARACTERISTIC+METHOD+READ]]
         #endregion
 
 //
 ```
 
-## CHARACTERISTIC+READ+WRITE Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics CodeListSubZero=""
+## CHARACTERISTIC+DATA+FIELDS Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics CodeListSubZero=""
+```
+[[CHARACTERISTIC+PROPERTY+DATA+FIELDS]]
+```
+
+
+## CHARACTERISTIC+PROPERTY+DATA+FIELDS Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics/Properties CodeListSubZero=""
+```
+            public [[VARIABLETYPE+DS]] [[DataName.dotNet]];
+```
+
+
+## CHARACTERISTIC+METHOD+NOTIFY Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics CodeListSubZero=""
 
 ```
-        // method.list for [[ServiceName.dotNet]] [[CharacteristicName.dotNet]]
+        // Per-characteristics methods for [[ServiceName.dotNet]] [[CharacteristicName.dotNet]]
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> Notify[[CharacteristicName.dotNet]]Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("[[CharacteristicName.dotNet]]", ServiceIndex.[[ServiceName.dotNet]]_index, "[[ServiceName]]", CharacteristicIndex.[[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index, Notify[[CharacteristicName.dotNet]]Callback, notifyType);
+            return retval;
+        }
+
+        private void Notify[[CharacteristicName.dotNet]]Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.[[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("[[Type]]"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+[[CHARACTERISTIC+PROPERTY+READ+FIELD]]
+            OnPropertyChanged("[[CharacteristicName.dotNet]]");
+        }
+
+```
+
+## CHARACTERISTIC+METHOD+READ Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics CodeListSubZero=""
+
+The read method for each characteristic.
+
+```
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>[[ServiceName.dotNet]]_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<[[ServiceName.dotNet]]_Data> Read[[CharacteristicName.dotNet]](BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.[[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index;
+            await Ensure_Characteristic_Async(ServiceIndex.[[ServiceName.dotNet]]_index, "[[ServiceName]]", index, "[[CharacteristicName]]");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "[[CharacteristicName]]", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("[[Type]]"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+[[CHARACTERISTIC+PROPERTY+READ+FIELD]]
+            OnPropertyChanged("[[CharacteristicName.dotNet]]");
+            return Curr[[ServiceName.dotNet]]_Data;
+        }
+```
+
+
+## CHARACTERISTIC+PROPERTY+READ+FIELD Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics/Properties
+
+TODO: the numeric values are all handled correctly (turned into bytes). But what about 
+
+```
+            Curr[[ServiceName.dotNet]]_Data.[[DataName.dotNet]] = vr.GetNextDouble();
 ```
 
 ## METHOD+LIST Type=list Source=Services/Characteristics CodeListSubZero="// No methods for [[Name]]"
