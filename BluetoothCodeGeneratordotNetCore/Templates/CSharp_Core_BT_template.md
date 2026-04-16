@@ -1,7 +1,7 @@
 ﻿# ProtocolCore FileName=[[CLASSNAME]].cs DirName=BluetoothProtocolsDevicesCore SuppressFile=:SuppressCSharpProtocol:
 
 ```
-//From template: Protocol_Core_Body v2026-04-11 9:54
+//From template: Protocol_Core_Body v2026-04-16 15:43
 //From template: Protocol_Body v2022-07-02 9:54
 using System;
 using System.Collections.Generic;
@@ -215,7 +215,7 @@ namespace BluetoothProtocols
         //
 
 
-[[SERVICE+READ+WRITE+NOTIFY]]
+[[ServicesReadWriteNotify]]
 
 // Long obsolete! [[zzMETHOD+LIST]]
     }
@@ -237,13 +237,13 @@ namespace BluetoothProtocols
 ```
 ## SERVICES+NULL+LIST Type=list Source=Services Trim=true Code="null, " 
 
-## CharacteristicIndexList Type=list Source=Services/Characteristics 
+## CharacteristicIndexList Type=list Source=Services/Characteristics Trim=endCR
 
 ```
             [[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index = [[COUNTALL]],     // GUID [[UUID]]
 ```
 
-## CharacteristicGuidsList Type=list Source=Services/Characteristics Trim=false
+## CharacteristicGuidsList Type=list Source=Services/Characteristics Trim=endCR
 ```
             Guid.Parse("[[UUID]]"), // #[[COUNTALL]] is [[ServiceName]] [[Name]]
 ```
@@ -255,54 +255,85 @@ namespace BluetoothProtocols
 
 ## ServiceSummary Type=list Source=Services CodeListSubZero="" Trim=endCR
 
+The ServiceSummary is a simple user-readable summary of the device services and characteristics.
+It's placed into the protocol CS file so that there's a short summary of all services and
+characteristics which is easily found in a GitHub search of the generated code.
+
 ```
         [[Name]] service Guid=[[UuidShort]]
+[[DataGroupSummary]]
+```
+
+## DataGroupSummary Type=list ListOutput=parent Source=Services/DataGroups CodeListSubZero="" Trim=false
+
+```
+            [[DataGroupName]] (DataGroup record)
 [[CharacteristicSummary]]
 ```
-## CharacteristicSummary Type=list ListOutput=parent Source=Services/Characteristics CodeListSubZero="" Trim=false
+## CharacteristicSummary Type=list ListOutput=parent Source=Services/DataGroups/Characteristics CodeListSubZero="" Trim=false
+```
+                [[Name]] characteristic has [[PropertySummary]] Guid=[[UuidShort]]
+```
+
+## PropertySummary Type=list ListOutput=parent Trim=false Source=Services/DataGroups/Characteristics/Properties  CodeListSubZero="" Trim=true
+```
+[[DataName.dotNet]] ([[VariableType]]-->[[VariableTypeDS]]) 
+```
+
+
+## ZZCharacteristicSummary Type=list ListOutput=parent Source=Services/Characteristics CodeListSubZero="" Trim=false
 ```
             [[Name]] characteristic has [[PropertySummary]] Guid=[[UuidShort]] Data=[[DataGroupName.dotNet]]
 ```
 
-## PropertySummary Type=list ListOutput=parent Trim=false Source=Services/Characteristics/Properties  CodeListSubZero="" Trim=true
+## ZZPropertySummary Type=list ListOutput=parent Trim=false Source=Services/Characteristics/Properties  CodeListSubZero="" Trim=true
 ```
 [[DataName.dotNet]] ([[VariableType]]-->[[VariableTypeDS]]) 
 ```
-## SERVICE+READ+WRITE+NOTIFY Type=list Source=Services CodeListSubZero="" Trim=false
+## ServicesReadWriteNotify Type=list Source=Services CodeListSubZero="" Trim=false
 
+This is the primary section of the code. 
 
 ```
         #region Service_[[ServiceName.dotNet]]
+        [[ServiceDataGroups]]
+
+        #endregion
+//
+```
+
+## ServiceDataGroups Type=list ListOutput=parent Source=Services/DataGroups CodeListSubZero="" Trim=endCR
+```
         // Service [[Name]] 
         /// <summary>
         /// Data from all of the characteristics in the [[ServiceName]] Service
         /// </summary>
-        public class [[ServiceName.dotNet]]_Data
+        public class [[DataGroupName.dotNet]]
         {
-[[CHARACTERISTIC+DATA+FIELDS]]
+[[CharacteristicDataFields]]
         }
-        public [[ServiceName.dotNet]]_Data Curr[[ServiceName.dotNet]]_Data { get; set; } = new [[ServiceName.dotNet]]_Data();
+        public [[DataGroupName.dotNet]] Curr[[DataGroupName.dotNet]] { get; set; } = new [[DataGroupName.dotNet]]();
 
 [[CHARACTERISTIC+METHOD+NOTIFY]]
 [[CHARACTERISTIC+METHOD+READ]]
-        #endregion
 
-//
-```
-
-## CHARACTERISTIC+DATA+FIELDS Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics CodeListSubZero=""
-```
-[[CHARACTERISTIC+PROPERTY+DATA+FIELDS]]
 ```
 
 
-## CHARACTERISTIC+PROPERTY+DATA+FIELDS Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics/Properties CodeListSubZero=""
+## CharacteristicDataFields Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
 ```
-            public [[VARIABLETYPE+DS]] [[DataName.dotNet]];
+[[CharacteristicPropertyDataFields]]
 ```
 
 
-## CHARACTERISTIC+METHOD+NOTIFY Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics CodeListSubZero=""
+## CharacteristicPropertyDataFields Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
+
+```
+            public [[VARIABLETYPE+DS]] [[DataName.dotNet]]; // From [[ServiceName]] and [[CharacteristicName]]
+```
+
+
+## CHARACTERISTIC+METHOD+NOTIFY Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
 
 ```
         // Per-characteristics methods for [[ServiceName.dotNet]] [[CharacteristicName.dotNet]]
@@ -332,7 +363,7 @@ namespace BluetoothProtocols
 
 ```
 
-## CHARACTERISTIC+METHOD+READ Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics CodeListSubZero=""
+## CHARACTERISTIC+METHOD+READ Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
 
 The read method for each characteristic.
 
@@ -340,8 +371,8 @@ The read method for each characteristic.
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>[[ServiceName.dotNet]]_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<[[ServiceName.dotNet]]_Data> Read[[CharacteristicName.dotNet]](BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>[[DataGroupName.dotNet]] of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<[[DataGroupName.dotNet]]> Read[[CharacteristicName.dotNet]](BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             var index = CharacteristicIndex.[[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index;
             await Ensure_Characteristic_Async(ServiceIndex.[[ServiceName.dotNet]]_index, "[[ServiceName]]", index, "[[CharacteristicName]]");
@@ -360,17 +391,17 @@ The read method for each characteristic.
             vr.Initialize(result.ToArray());
 [[CHARACTERISTIC+PROPERTY+READ+FIELD]]
             OnPropertyChanged("[[CharacteristicName.dotNet]]");
-            return Curr[[ServiceName.dotNet]]_Data;
+            return Curr[[DataGroupName.dotNet]];
         }
 ```
 
 
-## CHARACTERISTIC+PROPERTY+READ+FIELD Type=list ListOutput=parent Trim=endCR Source=Services/Characteristics/Properties
+## CHARACTERISTIC+PROPERTY+READ+FIELD Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties
 
 TODO: the numeric values are all handled correctly (turned into bytes). But what about 
 
 ```
-            Curr[[ServiceName.dotNet]]_Data.[[DataName.dotNet]] = vr.GetNextDouble();
+            Curr[[DataGroupName.dotNet]].[[DataName.dotNet]] = vr.GetNextDouble();
 ```
 
 ## METHOD+LIST Type=list Source=Services/Characteristics CodeListSubZero="// No methods for [[Name]]"

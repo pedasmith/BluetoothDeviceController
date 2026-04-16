@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using TemplateExpander;
 using BluetoothProtocols.IotNumberFormats;
+using Windows.UI.WebUI;
 
 namespace BluetoothCodeGenerator
 {
@@ -174,6 +175,66 @@ namespace BluetoothCodeGenerator
             return $"double";
         }
 
+        private static void CharacteristicToTemplateSnippet(NameCharacteristic btCharacteristic, TemplateSnippet chs, TemplateSnippet ch)
+        {
+            ch.Macros.Add("UUID", btCharacteristic.UUID);
+            ch.Macros.Add("UuidShort", btCharacteristic.UUID.AsShortestUuid());
+            ch.Macros.Add("Name", btCharacteristic.Name);
+            ch.Macros.Add("CharacteristicName", btCharacteristic.Name);
+            ch.Macros.Add("CharacteristicName.dotNet", btCharacteristic.Name.DotNetSafe());
+            ch.Macros.Add("Name.dotNet", btCharacteristic.Name.DotNetSafe());
+            ch.Macros.Add("CharacteristicDescription", btCharacteristic.Description);
+            ch.Macros.Add("DataGroupName", btCharacteristic.DataGroupName);
+            ch.Macros.Add("DataGroupName.dotNet", btCharacteristic.DataGroupName.DotNetSafe());
+
+            ch.Macros.Add("Type", btCharacteristic.Type); // is the e.g. "U8 U8"
+            ch.Macros.Add("CharacteristicType", btCharacteristic.Type);
+            ch.Macros.Add("Verbs", btCharacteristic.Verbs);
+            ch.Macros.Add("TableType", btCharacteristic.UI?.tableType ?? "");
+            ch.Macros.Add("AutoNotify", btCharacteristic.AutoNotify ? "true" : "false");
+            ch.Macros.Add("CHARACTERISTICTYPE", btCharacteristic.Type);
+            ch.Macros.Add("UICHARTCOMMAND", btCharacteristic.UI?.chartCommand ?? "");
+
+            var UI_AsCSharp = btCharacteristic.UI?.AsCSharpString() ?? "";
+            ch.Macros.Add("UISPECS", UI_AsCSharp);
+            if (btCharacteristic.UI != null)
+            {
+                ch.Macros.Add("UI.ExpandChart", btCharacteristic.UI.Expand ? "true" : "false");
+                ch.Macros.Add("UI.TitleSuffix", btCharacteristic.UI.TitleSuffix);
+            }
+
+            if (UI_AsCSharp.Contains("[[CHARACTERISTICNAME]]"))
+            {
+                // Just a little bit of weirdness here :-)
+                ch.Macros.Add("CHARACTERISTICNAME", btCharacteristic.Name.DotNetSafe());
+            }
+            ch.Macros.Add("READCONVERT", btCharacteristic.ReadConvert ?? "");
+            ch.Macros.Add("NOTIFYCONVERT", btCharacteristic.NotifyConvert ?? "");
+            ch.Macros.Add("NOTIFYCONFIGURE", btCharacteristic.NotifyConfigure ?? "");
+
+            var isReadOnly = true;
+
+            // For devices with both Write and WriteWithoutResponse, I prefer
+            // using plain WriteWithoutResponse because it's faster.
+            // Only set the macro for writable ones.
+            if (btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse)
+            {
+                ch.Macros.Add("WRITEMODE", btCharacteristic.IsWriteWithoutResponse
+                    ? "GattWriteOption.WriteWithoutResponse"
+                    : "GattWriteOption.WriteWithResponse");
+                isReadOnly = false;
+            }
+
+            chs.AddChildViaMacro(ch); // uses the UUID to add correctly
+            ch.Macros.Add("IS+READ+ONLY", isReadOnly ? "True" : "False");
+            AddVerbButtons(ch, btCharacteristic);
+
+            AddButtonUIAndEnum(ch, btCharacteristic);
+            AddUIList(ch, btCharacteristic);
+            AddPropertiesPerCharacteristic(ch, btCharacteristic, isReadOnly);
+            AddCommands(ch, btCharacteristic);
+        }
+
         private static TemplateSnippet ServiceToTemplateSnippet(NameService btService)
         {
             var service = new TemplateSnippet(btService.Name);
@@ -188,8 +249,12 @@ namespace BluetoothCodeGenerator
             service.Macros.Add("Uuid", btService.UUID);
             service.Macros.Add("UuidShort", btService.UUID.AsShortestUuid());
 
-            var chs = new TemplateSnippet("Characteristics");
+            var chs = new TemplateSnippet("Characteristics"); // Addding Services/Characteristics
             service.AddChild("Characteristics", chs);
+
+            var dgs = new TemplateSnippet("DataGroups"); // Adding Services/DataGroups
+            service.AddChild("DataGroups", dgs);
+            var dataGroups = new Dictionary<string, TemplateSnippet>();
 
             foreach (var btCharacteristic in btService.Characteristics)
             {
@@ -199,64 +264,30 @@ namespace BluetoothCodeGenerator
                 {
                     btCharacteristic.DataGroupName = btService.Name + "_Data";
                 }
+                var dgn = btCharacteristic.DataGroupName;
+                TemplateSnippet dgss = null;
+                TemplateSnippet dgchs = null;
+                if (!dataGroups.ContainsKey(dgn))
+                {
+                    dgss = new TemplateSnippet(dgn);
+                    dgs.AddChild(dgn, dgss);
+                    dataGroups[dgn] = dgss;
+                    dgss.Macros.Add("DataGroupName", dgn);
+                    dgss.Macros.Add("DataGroupName.dotNet", dgn.DotNetSafe());
+
+                    dgchs = new TemplateSnippet("Characteristics"); // Adding Services/DataGroups/Characteristics
+                    dgss.AddChild("Characteristics", dgchs);
+                }
+                dgss = dataGroups[dgn];
+                dgchs = dgss.Children["Characteristics"];
 
                 var ch = new TemplateSnippet(btCharacteristic.Name);
-                ch.Macros.Add("UUID", btCharacteristic.UUID);
-                ch.Macros.Add("UuidShort", btCharacteristic.UUID.AsShortestUuid());
-                ch.Macros.Add("Name", btCharacteristic.Name);
-                ch.Macros.Add("CharacteristicName", btCharacteristic.Name);
-                ch.Macros.Add("CharacteristicName.dotNet", btCharacteristic.Name.DotNetSafe());
-                ch.Macros.Add("Name.dotNet", btCharacteristic.Name.DotNetSafe());
-                ch.Macros.Add("CharacteristicDescription", btCharacteristic.Description);
-                ch.Macros.Add("DataGroupName", btCharacteristic.DataGroupName);
-                ch.Macros.Add("DataGroupName.dotNet", btCharacteristic.DataGroupName.DotNetSafe());
+                CharacteristicToTemplateSnippet(btCharacteristic, chs, ch); // Add to service/Characteristics
 
-                ch.Macros.Add("Type", btCharacteristic.Type); // is the e.g. "U8 U8"
-                ch.Macros.Add("CharacteristicType", btCharacteristic.Type);
-                ch.Macros.Add("Verbs", btCharacteristic.Verbs);
-                ch.Macros.Add("TableType", btCharacteristic.UI?.tableType ?? "");
-                ch.Macros.Add("AutoNotify", btCharacteristic.AutoNotify ? "true" : "false");
-                ch.Macros.Add("CHARACTERISTICTYPE", btCharacteristic.Type);
-                ch.Macros.Add("UICHARTCOMMAND", btCharacteristic.UI?.chartCommand ?? "");
-
-                var UI_AsCSharp = btCharacteristic.UI?.AsCSharpString() ?? "";
-                ch.Macros.Add("UISPECS", UI_AsCSharp);
-                if (btCharacteristic.UI != null)
-                {
-                    ch.Macros.Add("UI.ExpandChart", btCharacteristic.UI.Expand ? "true" : "false");
-                    ch.Macros.Add("UI.TitleSuffix", btCharacteristic.UI.TitleSuffix);
-                }
-
-                if (UI_AsCSharp.Contains ("[[CHARACTERISTICNAME]]"))
-                {
-                    // Just a little bit of weirdness here :-)
-                    ch.Macros.Add("CHARACTERISTICNAME", btCharacteristic.Name.DotNetSafe());
-                }
-                ch.Macros.Add("READCONVERT", btCharacteristic.ReadConvert ?? "");
-                ch.Macros.Add("NOTIFYCONVERT", btCharacteristic.NotifyConvert ?? "");
-                ch.Macros.Add("NOTIFYCONFIGURE", btCharacteristic.NotifyConfigure ?? "");
-
-                var isReadOnly = true;
-
-                // For devices with both Write and WriteWithoutResponse, I prefer
-                // using plain WriteWithoutResponse because it's faster.
-                // Only set the macro for writable ones.
-                if (btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse)
-                {
-                    ch.Macros.Add("WRITEMODE", btCharacteristic.IsWriteWithoutResponse
-                        ? "GattWriteOption.WriteWithoutResponse"
-                        : "GattWriteOption.WriteWithResponse");
-                    isReadOnly = false;
-                }
-
-                chs.AddChildViaMacro(ch); // uses the UUID to add correctly
-                ch.Macros.Add("IS+READ+ONLY", isReadOnly ? "True" : "False");
-                AddVerbButtons(ch, btCharacteristic);
-
-                AddButtonUIAndEnum(ch, btCharacteristic);
-                AddUIList(ch, btCharacteristic);
-                AddPropertiesPerCharacteristic(ch, btCharacteristic, isReadOnly);
-                AddCommands(ch, btCharacteristic);
+                // Make a copy of it. Arguably I could do a deep copy. And maybe a shallow copy, but
+                // I think they get modified...
+                ch = new TemplateSnippet(btCharacteristic.Name);
+                CharacteristicToTemplateSnippet(btCharacteristic, dgchs, ch); // Add to service/DataGroups/Characteristics
             }
             return service;
         }
