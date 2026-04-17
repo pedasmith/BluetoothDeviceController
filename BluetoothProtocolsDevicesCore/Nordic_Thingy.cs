@@ -1,4 +1,4 @@
-﻿//From template: Protocol_Core_Body v2026-04-16 12:06
+﻿//From template: Protocol_Core_Body v2026-04-17 11:43
 //From template: Protocol_Body v2022-07-02 9:54
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-04-16::15:37
+    /// This class was automatically generated 2026-04-17::11:54
     /// </summary>
 
     public class Nordic_Thingy : INotifyPropertyChanged
@@ -31,7 +31,7 @@ namespace BluetoothProtocols
 
         // For the INotifyPropertyChanged values
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -44,6 +44,8 @@ namespace BluetoothProtocols
                 Pressure (hpa) characteristic has Pressure (double-->double)  Guid=ef680202-9b35-4933-9b10-52ffa9740042
                 Humidity (%) characteristic has Humidity (Byte-->double)  Guid=ef680203-9b35-4933-9b10-52ffa9740042
                 Air Quality eCOS TVOC characteristic has eCOS (UInt16-->double) TVOC (UInt16-->double)  Guid=ef680204-9b35-4933-9b10-52ffa9740042
+
+            EnvironmentColor_Data (DataGroup record)
                 Color RGB+Clear characteristic has Red (UInt16-->double) Green (UInt16-->double) Blue (UInt16-->double) Clear (UInt16-->double)  Guid=ef680205-9b35-4933-9b10-52ffa9740042
 
             EnvironmentConfiguration_Data (DataGroup record)
@@ -54,6 +56,15 @@ namespace BluetoothProtocols
             Battery_Data (DataGroup record)
                 BatteryLevel characteristic has BatteryLevel (SByte-->double)  Guid=2a19
         */
+
+        public const string Temperature_cPropertyChangedName = "Temperature_c";
+        public const string Pressure_hpaPropertyChangedName = "Pressure_hpa";
+        public const string HumidityPropertyChangedName = "Humidity";
+        public const string Air_Quality_eCOS_TVOCPropertyChangedName = "Air_Quality_eCOS_TVOC";
+        public const string Color_RGB_ClearPropertyChangedName = "Color_RGB_Clear";
+        public const string Environment_ConfigurationPropertyChangedName = "Environment_Configuration";
+        public const string BatteryLevelPropertyChangedName = "BatteryLevel";
+
 
         /// <summary>
         /// Enumeration of all services
@@ -113,7 +124,8 @@ namespace BluetoothProtocols
 
 
         /// <summary>
-        /// Delegate for all Notify events
+        /// Delegate for all Notify events. this is specific to this device (the indexes are all for this device only)
+        /// but otherwise is generic.
         /// </summary>
         /// <param name="data"></param>
         public delegate void BluetoothDataEvent(IotNumberFormats.ValueParserResult data);
@@ -252,10 +264,6 @@ namespace BluetoothProtocols
             public double Humidity; // From Environment and Humidity (%)
             public double eCOS; // From Environment and Air Quality eCOS TVOC
             public double TVOC; // From Environment and Air Quality eCOS TVOC
-            public double Red; // From Environment and Color RGB+Clear
-            public double Green; // From Environment and Color RGB+Clear
-            public double Blue; // From Environment and Color RGB+Clear
-            public double Clear; // From Environment and Color RGB+Clear
         }
         public Environment_Data CurrEnvironment_Data { get; set; } = new Environment_Data();
 
@@ -281,7 +289,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrEnvironment_Data.Temperature = vr.GetNextDouble();
-            OnPropertyChanged("Temperature_c");
+            OnPropertyChanged(Temperature_cPropertyChangedName); // "Temperature_c"
         }
         // Per-characteristics methods for Environment Pressure_hpa
         /// <summary>
@@ -305,7 +313,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrEnvironment_Data.Pressure = vr.GetNextDouble();
-            OnPropertyChanged("Pressure_hpa");
+            OnPropertyChanged(Pressure_hpaPropertyChangedName); // "Pressure_hpa"
         }
         // Per-characteristics methods for Environment Humidity
         /// <summary>
@@ -329,7 +337,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrEnvironment_Data.Humidity = vr.GetNextDouble();
-            OnPropertyChanged("Humidity");
+            OnPropertyChanged(HumidityPropertyChangedName); // "Humidity"
         }
         // Per-characteristics methods for Environment Air_Quality_eCOS_TVOC
         /// <summary>
@@ -354,34 +362,7 @@ namespace BluetoothProtocols
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrEnvironment_Data.eCOS = vr.GetNextDouble();
             CurrEnvironment_Data.TVOC = vr.GetNextDouble();
-            OnPropertyChanged("Air_Quality_eCOS_TVOC");
-        }
-        // Per-characteristics methods for Environment Color_RGB_Clear
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-        /// 
-        public async Task<bool> NotifyColor_RGB_ClearAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            var retval = await SetupNotifyAsync("Color_RGB_Clear", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Color_RGB_Clear_index, NotifyColor_RGB_ClearCallback, notifyType);
-            return retval;
-        }
-
-        private void NotifyColor_RGB_ClearCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
-        {
-            var index = (int)CharacteristicIndex.Environment_Color_RGB_Clear_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear"); // TODO: should be done ahead of time!
-            var vr = ValueParsers[index];
-
-            vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrEnvironment_Data.Red = vr.GetNextDouble();
-            CurrEnvironment_Data.Green = vr.GetNextDouble();
-            CurrEnvironment_Data.Blue = vr.GetNextDouble();
-            CurrEnvironment_Data.Clear = vr.GetNextDouble();
-            OnPropertyChanged("Color_RGB_Clear");
+            OnPropertyChanged(Air_Quality_eCOS_TVOCPropertyChangedName); // "Air_Quality_eCOS_TVOC"
         }
         /// Reads data
         /// </summary>
@@ -405,7 +386,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrEnvironment_Data.Temperature = vr.GetNextDouble();
-            OnPropertyChanged("Temperature_c");
+            OnPropertyChanged(Temperature_cPropertyChangedName); // "Temperature_c"
             return CurrEnvironment_Data;
         }
         /// Reads data
@@ -430,7 +411,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrEnvironment_Data.Pressure = vr.GetNextDouble();
-            OnPropertyChanged("Pressure_hpa");
+            OnPropertyChanged(Pressure_hpaPropertyChangedName); // "Pressure_hpa"
             return CurrEnvironment_Data;
         }
         /// Reads data
@@ -455,7 +436,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrEnvironment_Data.Humidity = vr.GetNextDouble();
-            OnPropertyChanged("Humidity");
+            OnPropertyChanged(HumidityPropertyChangedName); // "Humidity"
             return CurrEnvironment_Data;
         }
         /// Reads data
@@ -481,14 +462,54 @@ namespace BluetoothProtocols
             vr.Initialize(result.ToArray());
             CurrEnvironment_Data.eCOS = vr.GetNextDouble();
             CurrEnvironment_Data.TVOC = vr.GetNextDouble();
-            OnPropertyChanged("Air_Quality_eCOS_TVOC");
+            OnPropertyChanged(Air_Quality_eCOS_TVOCPropertyChangedName); // "Air_Quality_eCOS_TVOC"
             return CurrEnvironment_Data;
+        }
+        // Service Environment 
+        /// <summary>
+        /// Data from all of the characteristics in the Environment Service
+        /// </summary>
+        public class EnvironmentColor_Data
+        {
+            public double Red; // From Environment and Color RGB+Clear
+            public double Green; // From Environment and Color RGB+Clear
+            public double Blue; // From Environment and Color RGB+Clear
+            public double Clear; // From Environment and Color RGB+Clear
+        }
+        public EnvironmentColor_Data CurrEnvironmentColor_Data { get; set; } = new EnvironmentColor_Data();
+
+        // Per-characteristics methods for Environment Color_RGB_Clear
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyColor_RGB_ClearAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Color_RGB_Clear", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_Color_RGB_Clear_index, NotifyColor_RGB_ClearCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyColor_RGB_ClearCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Environment_Color_RGB_Clear_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear"); // TODO: should be done ahead of time!
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironmentColor_Data.Red = vr.GetNextDouble();
+            CurrEnvironmentColor_Data.Green = vr.GetNextDouble();
+            CurrEnvironmentColor_Data.Blue = vr.GetNextDouble();
+            CurrEnvironmentColor_Data.Clear = vr.GetNextDouble();
+            OnPropertyChanged(Color_RGB_ClearPropertyChangedName); // "Color_RGB_Clear"
         }
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Environment_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Environment_Data> ReadColor_RGB_Clear(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>EnvironmentColor_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<EnvironmentColor_Data> ReadColor_RGB_Clear(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             var index = CharacteristicIndex.Environment_Color_RGB_Clear_index;
             await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "Color RGB+Clear");
@@ -505,12 +526,12 @@ namespace BluetoothProtocols
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrEnvironment_Data.Red = vr.GetNextDouble();
-            CurrEnvironment_Data.Green = vr.GetNextDouble();
-            CurrEnvironment_Data.Blue = vr.GetNextDouble();
-            CurrEnvironment_Data.Clear = vr.GetNextDouble();
-            OnPropertyChanged("Color_RGB_Clear");
-            return CurrEnvironment_Data;
+            CurrEnvironmentColor_Data.Red = vr.GetNextDouble();
+            CurrEnvironmentColor_Data.Green = vr.GetNextDouble();
+            CurrEnvironmentColor_Data.Blue = vr.GetNextDouble();
+            CurrEnvironmentColor_Data.Clear = vr.GetNextDouble();
+            OnPropertyChanged(Color_RGB_ClearPropertyChangedName); // "Color_RGB_Clear"
+            return CurrEnvironmentColor_Data;
         }
         // Service Environment 
         /// <summary>
@@ -558,7 +579,7 @@ namespace BluetoothProtocols
             CurrEnvironmentConfiguration_Data.RedCalibration = vr.GetNextDouble();
             CurrEnvironmentConfiguration_Data.GreenCalibration = vr.GetNextDouble();
             CurrEnvironmentConfiguration_Data.BlueCalibration = vr.GetNextDouble();
-            OnPropertyChanged("Environment_Configuration");
+            OnPropertyChanged(Environment_ConfigurationPropertyChangedName); // "Environment_Configuration"
         }
         /// Reads data
         /// </summary>
@@ -589,7 +610,7 @@ namespace BluetoothProtocols
             CurrEnvironmentConfiguration_Data.RedCalibration = vr.GetNextDouble();
             CurrEnvironmentConfiguration_Data.GreenCalibration = vr.GetNextDouble();
             CurrEnvironmentConfiguration_Data.BlueCalibration = vr.GetNextDouble();
-            OnPropertyChanged("Environment_Configuration");
+            OnPropertyChanged(Environment_ConfigurationPropertyChangedName); // "Environment_Configuration"
             return CurrEnvironmentConfiguration_Data;
         }
 
@@ -628,7 +649,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
-            OnPropertyChanged("BatteryLevel");
+            OnPropertyChanged(BatteryLevelPropertyChangedName); // "BatteryLevel"
         }
         /// Reads data
         /// </summary>
@@ -652,7 +673,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
-            OnPropertyChanged("BatteryLevel");
+            OnPropertyChanged(BatteryLevelPropertyChangedName); // "BatteryLevel"
             return CurrBattery_Data;
         }
 

@@ -4,7 +4,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using Utilities;
 using Windows.Devices.Bluetooth;
 
@@ -161,12 +163,34 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
 
     Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
     Nordic_Thingy.Battery_Data CurrBattery_Data = null;
+    Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
+
+    Dictionary<string, int> NPropertyChanges = new Dictionary<string, int>();
+    //List<string> Sparkles = new List<string>() { "\u00A0", "*" }; // ✨", "💫", "🌟", "⚡", "🔥", "💥" };
+    List<string> Sparkles = new List<string>() { "╺", "╼", "╾", "╸", "╾", "╼" }; 
     private void UpdateUI(string name)
     {
         CurrBattery_Data = Device.CurrBattery_Data;
         CurrEnvironment_Data = Device.CurrEnvironment_Data;
+        CurrEnvironmentColor_Data = Device.CurrEnvironmentColor_Data;
 
         // from e.PropertyName when the Device does a PropertyChanged.
+        if (name != "")
+        {
+            NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
+            switch (name)
+            {
+                case "": break;
+                case Nordic_Thingy.Temperature_cPropertyChangedName: uiTemperature_cChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
+                case Nordic_Thingy.Pressure_hpaPropertyChangedName: uiPressure_hpaChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
+                case Nordic_Thingy.HumidityPropertyChangedName: uiHumidityChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
+                case Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName:
+                    uieCOSChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+                    uiTVOCChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+                    break;
+                case Nordic_Thingy.Color_RGB_ClearPropertyChangedName: uiColorChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
+            }
+        }
 
         if (CurrBattery_Data != null)
         {
@@ -178,28 +202,26 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
 
         if (CurrEnvironment_Data != null)
         {
-            if (name == "Temperature_c" || name == "")
+            if (name == Nordic_Thingy.Temperature_cPropertyChangedName || name == "")
             {
                 uiTemperature_c.Text = BluetoothWatcher.Units.Temperature.ConvertToString(CurrEnvironment_Data.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
-
-                //.ToString("0.0") + " °C";
             }
-            if (name == "Pressure_hpa" || name == "")
+            if (name == Nordic_Thingy.Pressure_hpaPropertyChangedName || name == "")
             {
                 uiPressure_hpa.Text = BluetoothWatcher.Units.Pressure.ConvertToString(CurrEnvironment_Data.Pressure, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
             }
-            if (name == "Humidity" || name == "")
+            if (name == Nordic_Thingy.HumidityPropertyChangedName || name == "")
             {
                 uiHumidity.Text = CurrEnvironment_Data.Humidity.ToString("0.0") + "%";
             }
-            if (name == "TVOC" || name == "")
+            if (name == Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName || name == "")
             {
                 uieCOS.Text = CurrEnvironment_Data.eCOS.ToString("0.0");
                 uiTVOC.Text = CurrEnvironment_Data.TVOC.ToString("0.0");
             }
-            if (name == "Color" || name == "")
+            if (name == Nordic_Thingy.Color_RGB_ClearPropertyChangedName || name == "")
             {
-                var RGB = new SolidColorBrush(Windows.UI.Color.FromArgb(255, (byte)CurrEnvironment_Data.Red, (byte)CurrEnvironment_Data.Green, (byte)CurrEnvironment_Data.Blue));
+                var RGB = new SolidColorBrush(Windows.UI.Color.FromArgb(255, (byte)CurrEnvironmentColor_Data.Red, (byte)CurrEnvironmentColor_Data.Green, (byte)CurrEnvironmentColor_Data.Blue));
                 uiColor.Background = RGB; //TODO: and the 'clear' value?
             }
         }

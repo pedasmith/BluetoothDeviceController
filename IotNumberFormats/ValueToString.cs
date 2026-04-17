@@ -142,7 +142,7 @@ namespace IotNumberFormats
             return NextCommandIndex >= Commands.Fields.Count;
         }
 
-        double CurrDoubleValue = 0;
+        // TODO: update as needed double CurrDoubleValue = 0;
 
         //TODO: rename as needed
 
@@ -160,7 +160,17 @@ namespace IotNumberFormats
 
         string name = "";
         string units = "";
+        // TODO: update as needed
         ResultState resultState;
+        /// <summary>
+        /// Exists only so that the compiler won't endlessly complain about resultState :-)
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckResultState()
+        {
+            bool retval = resultState == ResultState.NoResult;
+            return retval;
+        }
         int defaultIndex;
 
         /// <summary>

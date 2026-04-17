@@ -36,9 +36,15 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}"><Run>Temperature</Run></TextBlock>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource sDevicePrimaryTitle}"><Run>Pressure</Run></TextBlock>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource sDevicePrimaryTitle}"><Run>Humidity</Run></TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Temperature</Run><Run Text="&#160;"/><Run x:Name="uiTemperature_cChange" Text="┄"/>
+                    </TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Pressure</Run><Run Text="&#160;"/><Run x:Name="uiPressure_hpaChange" Text="┄"/>
+                    </TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Humidity</Run><Run Text="&#160;"/><Run x:Name="uiHumidityChange" Text="┄"/>
+                    </TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTemperature_c"/></TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPressure_hpa"/></TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
@@ -53,9 +59,15 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}"><Run>eCOS</Run></TextBlock>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource sDevicePrimaryTitle}"><Run>TVOC</Run></TextBlock>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource sDevicePrimaryTitle}"><Run>Color</Run></TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>eCOS</Run><Run Text=" "/><Run x:Name="uieCOSChange" Text=" "/>
+                    </TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>TVOC</Run><Run Text=" "/><Run x:Name="uiTVOCChange" Text=" "/>
+                    </TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Color</Run><Run Text=" "/><Run x:Name="uiColorChange" Text=" "/>
+                    </TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uieCOS"/></TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTVOC"/></TextBlock>
                     <Border Grid.Row="1" Grid.Column="2" Height="30" Width="90" x:Name="uiColor" Background="White" />

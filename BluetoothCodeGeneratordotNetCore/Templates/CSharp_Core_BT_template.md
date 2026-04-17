@@ -1,7 +1,7 @@
 ﻿# ProtocolCore FileName=[[CLASSNAME]].cs DirName=BluetoothProtocolsDevicesCore SuppressFile=:SuppressCSharpProtocol:
 
 ```
-//From template: Protocol_Core_Body v2026-04-16 15:43
+//From template: Protocol_Core_Body v2026-04-17 11:43
 //From template: Protocol_Body v2022-07-02 9:54
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ namespace BluetoothProtocols
 
         // For the INotifyPropertyChanged values
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -43,6 +43,8 @@ namespace BluetoothProtocols
 
 [[ServiceSummary]]
         */
+
+[[CharacteristicOnPropertyChangedNames]]
 
         /// <summary>
         /// Enumeration of all services
@@ -71,7 +73,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Active list of services. Will be filled in as the services are connected. Starts off as null.
         /// </summary>
-        List<GattDeviceService> Services = new List<GattDeviceService>() { [[SERVICES+NULL+LIST]]};
+        List<GattDeviceService> Services = new List<GattDeviceService>() { [[ServicesNullList]]};
 
         /// <summary>
         /// List of the Characteristic GUIDS for all of the characteristics for all of the services.
@@ -82,13 +84,14 @@ namespace BluetoothProtocols
 [[CharacteristicGuidsList]]
         };
 
-        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { [[CHARACTERISTICS+NULL+LIST]] };
-        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { [[CHARACTERISTICS+FALSE+LIST]] };
-        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  [[CHARACTERISTICS+NULL+LIST]] };
+        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { [[CharacteristicsNullList]] };
+        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { [[CharacteristicsFalseList]] };
+        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  [[CharacteristicsNullList]] };
 
 
         /// <summary>
-        /// Delegate for all Notify events
+        /// Delegate for all Notify events. this is specific to this device (the indexes are all for this device only)
+        /// but otherwise is generic.
         /// </summary>
         /// <param name="data"></param>
         public delegate void BluetoothDataEvent(IotNumberFormats.ValueParserResult data);
@@ -228,6 +231,19 @@ namespace BluetoothProtocols
         // Link: [[TEXT]]
 ```
 
+## CharacteristicOnPropertyChangedNames Type=list Source=Services/Characteristics CodeListSubZero="" CodeListZero="        // No properties for any characteristics" 
+
+This device wrapper communicated to the XAML UX layer via the OnPropertyChanged events. Those events take strings. 
+Instead of just embedding the strings (which is error-prone, especially if they change), generate public string constants.
+
+Original: OnPropertyChanged("[[CharacteristicName.dotNet]]");
+
+
+```
+        public const string [[CharacteristicName.dotNet]]PropertyChangedName = "[[CharacteristicName.dotNet]]";
+```
+
+
 ## ServiceIndexList Type=list Source=Services Trim=endCR Code="            [[Name]]_index = [[Count.Child]]," 
 
 ## ServiceGuidsList Type=list Source=Services Trim=endCR  
@@ -235,7 +251,7 @@ namespace BluetoothProtocols
 ```
             Guid.Parse("[[UUID]]"), // #[[Count.Child]] is [[Name]]
 ```
-## SERVICES+NULL+LIST Type=list Source=Services Trim=true Code="null, " 
+## ServicesNullList Type=list Source=Services Trim=true Code="null, " 
 
 ## CharacteristicIndexList Type=list Source=Services/Characteristics Trim=endCR
 
@@ -248,9 +264,9 @@ namespace BluetoothProtocols
             Guid.Parse("[[UUID]]"), // #[[COUNTALL]] is [[ServiceName]] [[Name]]
 ```
 
-## CHARACTERISTICS+NULL+LIST Type=list Source=Services/Characteristics Trim=true Code="null, " 
+## CharacteristicsNullList Type=list Source=Services/Characteristics Trim=true Code="null, " 
 
-## CHARACTERISTICS+FALSE+LIST Type=list Source=Services/Characteristics Trim=true Code="false, " 
+## CharacteristicsFalseList Type=list Source=Services/Characteristics Trim=true Code="false, " 
 
 
 ## ServiceSummary Type=list Source=Services CodeListSubZero="" Trim=endCR
@@ -358,7 +374,7 @@ This is the primary section of the code.
 
             vr.Initialize(args.CharacteristicValue.ToArray());
 [[CHARACTERISTIC+PROPERTY+READ+FIELD]]
-            OnPropertyChanged("[[CharacteristicName.dotNet]]");
+            OnPropertyChanged([[CharacteristicName.dotNet]]PropertyChangedName); // "[[CharacteristicName.dotNet]]"
         }
 
 ```
@@ -390,7 +406,7 @@ The read method for each characteristic.
 
             vr.Initialize(result.ToArray());
 [[CHARACTERISTIC+PROPERTY+READ+FIELD]]
-            OnPropertyChanged("[[CharacteristicName.dotNet]]");
+            OnPropertyChanged([[CharacteristicName.dotNet]]PropertyChangedName); // "[[CharacteristicName.dotNet]]"
             return Curr[[DataGroupName.dotNet]];
         }
 ```
@@ -402,22 +418,6 @@ TODO: the numeric values are all handled correctly (turned into bytes). But what
 
 ```
             Curr[[DataGroupName.dotNet]].[[DataName.dotNet]] = vr.GetNextDouble();
-```
-
-## METHOD+LIST Type=list Source=Services/Characteristics CodeListSubZero="// No methods for [[Name]]"
-
-In my **TODO:** list
-- Each characteristic might have read, write and notify; these have to be conditionally applied
-- How should I handle the argument lists?
-
-```
-        // method.list for [[ServiceName.dotNet]] [[CharacteristicName.dotNet]]
-[[METHOD+PROPERTY]]
-[[METHOD+READ]]
-[[METHOD+NOTIFY]]
-[[METHOD+WRITE]]
-[[METHOD+COMMANDS]]
-
 ```
 
 
@@ -738,11 +738,11 @@ In my **TODO:** list
 
 ```
 // method.list for [[Name.dotNet]]
-[[METHOD+PROPERTY]]
-[[METHOD+READ]]
-[[METHOD+NOTIFY]]
-[[METHOD+WRITE]]
-[[METHOD+COMMANDS]]
+[[zzMETHOD+PROPERTY]]
+[[zzMETHOD+READ]]
+[[zzMETHOD+NOTIFY]]
+[[zzMETHOD+WRITE]]
+[[zzMETHOD+COMMANDS]]
 
 ```
 
