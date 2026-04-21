@@ -102,6 +102,7 @@ namespace BluetoothCodeGenerator
                     Log($"{NAME}");
                     Log("--help or /? for help");
                     Log("-inputTemplates <directory> to select directory with template files in Markdown format");
+                    Log("-inputTemplateFile <file> to select a single template file from the template directory");
                     Log("-inputBtFile <file> to select a single BT JSON file");
                     break;
                 case ProgramArgs.CommandType.Error:
@@ -110,14 +111,34 @@ namespace BluetoothCodeGenerator
                     break;
                 case ProgramArgs.CommandType.Run:
                     {
-                        IEnumerable<string> files = null;
+                        IEnumerable<string> potentialfiles = null;
+                        IEnumerable<string> files = new List<string>();
                         try
                         {
-                            files = Directory.EnumerateFiles(args.InputTemplateDirectory);
+                            potentialfiles = Directory.EnumerateFiles(args.InputTemplateDirectory);
                         }
                         catch (Exception)
                         {
                             Log($"Error: {NAME}: unable to get files from {args.InputTemplateDirectory}");
+                            nerror++;
+                            break;
+                        }
+                        foreach (var potentialfile in potentialfiles)
+                        {
+                            bool isSelected = args.InputTemplateFileMatches(potentialfile);
+                            if (isSelected)
+                            {
+                                files = files.Append(potentialfile);
+                            }
+                            else
+                            {
+                                Log($"Note: {NAME}: file {potentialfile} is not selected");
+
+                            }
+                        }
+                        if (files.Count() == 0 && args.InputTemplateFiles.Count > 0)
+                        {
+                            Log($"Error: {NAME}: no files found from {args.InputTemplateDirectory} matching the specified file list");
                             nerror++;
                             break;
                         }

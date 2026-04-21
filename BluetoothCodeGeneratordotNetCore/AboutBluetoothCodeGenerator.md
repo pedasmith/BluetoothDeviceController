@@ -158,3 +158,14 @@ SOURCE|Notes
 -----|-----|
 Services|All services
 Services/DataGroups|
+
+
+
+## Supporting common graphing libraries
+
+### [Livecharts.dev](https://livecharts.dev/docs/winui/2.0.0/gallery)
+
+Supports WinUI but seemingly WinUI2 and not WinUI3? They seem to require AvaloniaUI which is different? But [this blog post](https://xamlbrewer.wordpress.com/2023/12/04/displaying-charts-in-winui3-with-livecharts2/) says it works just fine?
+
+Regardless, the Line style chart 
+
