@@ -286,6 +286,8 @@ characteristics which is easily found in a GitHub search of the generated code.
             [[DataGroupName]] (DataGroup record)
 [[CharacteristicSummary]]
 ```
+
+
 ## CharacteristicSummary Type=list ListOutput=parent Source=Services/DataGroups/Characteristics CodeListSubZero="" Trim=false
 ```
                 [[Name]] characteristic has [[PropertySummary]] Guid=[[UuidShort]]
@@ -326,6 +328,7 @@ This is the primary section of the code.
         /// </summary>
         public class [[DataGroupName.dotNet]]
         {
+            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
 [[CharacteristicDataFields]]
         }
         public [[DataGroupName.dotNet]] Curr[[DataGroupName.dotNet]] { get; set; } = new [[DataGroupName.dotNet]]();
@@ -369,10 +372,11 @@ This is the primary section of the code.
         private void Notify[[CharacteristicName.dotNet]]Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.[[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("[[Type]]"); // TODO: should be done ahead of time!
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("[[Type]]");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
+            Curr[[DataGroupName.dotNet]].TimestampMostRecent = args.Timestamp;
 [[CHARACTERISTIC+PROPERTY+READ+FIELD]]
             OnPropertyChanged([[CharacteristicName.dotNet]]PropertyChangedName); // "[[CharacteristicName.dotNet]]"
         }
@@ -401,7 +405,7 @@ The read method for each characteristic.
             IBuffer result = await ReadAsync(ch, "[[CharacteristicName]]", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("[[Type]]"); // TODO: should be done ahead of time!
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("[[Type]]");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
@@ -414,7 +418,7 @@ The read method for each characteristic.
 
 ## CHARACTERISTIC+PROPERTY+READ+FIELD Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties
 
-TODO: the numeric values are all handled correctly (turned into bytes). But what about 
+TODO: the numeric values are all handled correctly (turned into bytes). But what about strings and bytes?
 
 ```
             Curr[[DataGroupName.dotNet]].[[DataName.dotNet]] = vr.GetNextDouble();
@@ -586,12 +590,11 @@ zzz## CHARACTERISTIC+GUID+LIST Type=list Source=Services/Characteristics Code=" 
 ## METHOD+READ If="[[Verbs]] contains :Read:" Type=list ListOutput=child Source=Services/Characteristics CodeListSubZero=""
 
 Replace the simple Reads Data comment with this better snippet.
- TODO:         /// Reads data for Characteristic=[[Name]] Service=[[../Name]] 
 
 ```
         // 
         /// <summary>
-        /// Reads data
+        /// Reads data Characteristic=[[CharacteristicName]] Service=[[ServiceName]] 
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>BCValueList of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -779,4 +782,106 @@ In my **TODO:** list
 ```
 // FUNCTION_ENUM_INITS is e.g. "            Left = 0,"
 
+
+# ProtocolCoreCollection FileName=[[CLASSNAME]]Collection.cs DirName=BluetoothProtocolsDevicesCore SuppressFile=:SuppressCSharpProtocol:
+
+
+```
+// Collections to support [[CLASSNAME]] data
+//From template: Protocol_Core_Body v2026-04-21 11:40
+
+using System;
+using System.Collections.ObjectModel; // Needed for ObservableCollection
+
+using System.Collections.Generic;
+using System.ComponentModel; // Needed for INotifyPropertyChanged
+using System.Runtime.CompilerServices; // Needed for CallerMemberNameAttribute
+using System.Runtime.InteropServices.WindowsRuntime; // Needed for IBuffer.ToArray extension method
+
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
+
+namespace BluetoothProtocols.NS_[[CLASSNAME]]
+{
+
+    /// <summary>
+    /// [[DESCRIPTION]].
+    /// This code was automatically generated [[CURRTIME]]
+    /// </summary>
+
+[[ServicesDataGroupsCollections]]
+}
+
+```
+
+## ServicesDataGroupsCollections Type=list Source=Services/DataGroups CodeListSubZero="" Trim=false
+
+```
+    ///<summary>
+    ///TODO:
+    ///[[DataGroupName]]Collection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the [[DataGroupName]] group from [[ServiceName]].
+    ///The lists are used when displaying historical graphs of the data.
+    ///</summary>
+    public class [[DataGroupName]]Collection 
+    {
+        public void Add([[CLASSNAME]].[[DataGroupName]] value)
+        {
+            TimestampMostRecentAdd = value.TimestampMostRecent;
+            Timestamps.Add (value.TimestampMostRecent);
+[[DataGroupMemberCollectionAdd]]
+        }
+        public void ReplaceMostRecent([[CLASSNAME]].[[DataGroupName]] value)
+        {
+            var index = Timestamps.Count - 1;
+            Timestamps[index] = value.TimestampMostRecent;
+[[DataGroupMemberCollectionReplaceMostRecent]]
+        }
+
+        ///<summary>
+        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
+        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
+        ///frequently than the UI updates
+        ///</summary>
+        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
+        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+[[DataGroupMemberCollection]]
+    }
+
+```
+
+
+## DataGroupMemberCollection Type=list ListOutput=parent Source=Services/DataGroups/Characteristics CodeListSubZero="" Trim=endCR
+
+```
+        // Data values (properties) from characteristic [[CharacteristicName]]
+[[PropertyCollection]]
+```
+
+## PropertyCollection Type=list ListOutput=parent Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" Trim=endCR
+```
+        public ObservableCollection<[[VARIABLETYPE+DS]]> [[DataName.dotNet]] { get; } = new ObservableCollection<[[VARIABLETYPE+DS]]>();
+```
+
+## DataGroupMemberCollectionAdd Type=list ListOutput=parent Source=Services/DataGroups/Characteristics CodeListSubZero="" Trim=endCR
+```
+[[PropertyCollectionAdd]]
+```
+
+## PropertyCollectionAdd Type=list ListOutput=parent Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" Trim=endCR
+```
+            [[DataName.dotNet]].Add (value.[[DataName.dotNet]]);
+```
+
+## DataGroupMemberCollectionReplaceMostRecent Type=list ListOutput=parent Source=Services/DataGroups/Characteristics CodeListSubZero="" Trim=endCR
+```
+[[PropertyCollectionReplaceMostRecent]]
+```
+
+## PropertyCollectionReplaceMostRecent Type=list ListOutput=parent Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" Trim=endCR
+```
+            [[DataName.dotNet]][index] = value.[[DataName.dotNet]];
+```
 

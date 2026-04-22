@@ -12,5 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothCommunicationStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothStatusHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Nordic_ThingyCollection.cs" />
   </ItemGroup>
 </Project>

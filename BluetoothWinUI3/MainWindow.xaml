@@ -78,6 +78,11 @@
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </StackPanel.Resources>
                     <Button Content="Start" Click="OnAdvertisementStart" />
                     <Button Content="Stop" Click="OnAdvertisementStop" />
                     <Button Content="Copy All" Click="OnAdvertisementCopy" />

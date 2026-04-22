@@ -45,6 +45,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     private string InternalDeviceType = "Nordic_Thingy";
     Nordic_Thingy Device;
+    BluetoothProtocols.NS_Nordic_Thingy.Environment_DataCollection HistoricalEnvironment_Data = new BluetoothProtocols.NS_Nordic_Thingy.Environment_DataCollection();
+
+    Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
+    Nordic_Thingy.Battery_Data CurrBattery_Data = null;
+    Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
+
     public BTNordic_ThingyControl()
     {
         InitializeComponent();
@@ -56,17 +62,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     {
         return DataContext as KnownDevice;
     }
-
-
-
-
-
-    
-
-
-
-
-
 
 
 
@@ -161,9 +156,6 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
         });
     }
 
-    Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
-    Nordic_Thingy.Battery_Data CurrBattery_Data = null;
-    Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
 
     Dictionary<string, int> NPropertyChanges = new Dictionary<string, int>();
     //List<string> Sparkles = new List<string>() { "\u00A0", "*" }; // ✨", "💫", "🌟", "⚡", "🔥", "💥" };
@@ -190,6 +182,25 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
                     break;
                 case Nordic_Thingy.Color_RGB_ClearPropertyChangedName: uiColorChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
             }
+        }
+
+        // Track the historical data
+        switch (name)
+        {
+            case Nordic_Thingy.Temperature_cPropertyChangedName:
+            case Nordic_Thingy.Pressure_hpaPropertyChangedName:
+            case Nordic_Thingy.HumidityPropertyChangedName:
+            case Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName:
+                var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_Data.TimestampMostRecentAdd).TotalSeconds;
+                if (deltaInSeconds > 5)
+                {
+                    HistoricalEnvironment_Data.Add(CurrEnvironment_Data); // Will copy the data as needed.
+                }
+                else
+                {
+                    HistoricalEnvironment_Data.ReplaceMostRecent(CurrEnvironment_Data); // Will copy the data as needed.
+                }
+                break;
         }
 
         if (CurrBattery_Data != null)

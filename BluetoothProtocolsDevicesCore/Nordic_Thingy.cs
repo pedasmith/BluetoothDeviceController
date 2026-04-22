@@ -18,10 +18,10 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-04-17::11:54
+    /// This class was automatically generated 2026-04-21::17:18
     /// </summary>
 
-    public class Nordic_Thingy : INotifyPropertyChanged
+    public  class Nordic_Thingy : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
         // Link: https://nordicsemiconductor.github.io/Nordic-Thingy52-FW/documentation/firmware_architecture.html#fw_arch_ble_services
@@ -118,9 +118,9 @@ namespace BluetoothProtocols
             Guid.Parse("00002a19-0000-1000-8000-00805f9b34fb"), // #6 is Battery BatteryLevel
         };
 
-        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, };
-        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false, };
-        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() { null, null, null, null, null, null, null, };
+        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null,  };
+        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false,  };
+        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  null, null, null, null, null, null, null,  };
 
 
         /// <summary>
@@ -207,8 +207,8 @@ namespace BluetoothProtocols
         }
 
 
-        private async Task<bool> SetupNotifyAsync(string name,
-            ServiceIndex serviceIndex, string serviceName, CharacteristicIndex index,
+        private async Task<bool> SetupNotifyAsync(string name, 
+            ServiceIndex serviceIndex, string serviceName, CharacteristicIndex index, 
             Windows.Foundation.TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> callback,
             GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
@@ -253,12 +253,13 @@ namespace BluetoothProtocols
 
 
         #region Service_Environment
-        // Service Environment 
+                // Service Environment 
         /// <summary>
         /// Data from all of the characteristics in the Environment Service
         /// </summary>
         public class Environment_Data
         {
+            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
             public double Temperature; // From Environment and Temperature (c)
             public double Pressure; // From Environment and Pressure (hpa)
             public double Humidity; // From Environment and Humidity (%)
@@ -284,10 +285,11 @@ namespace BluetoothProtocols
         private void NotifyTemperature_cCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Environment_Temperature_c_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I8/P8|FIXED|Temperature|C"); // TODO: should be done ahead of time!
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I8/P8|FIXED|Temperature|C");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.TimestampMostRecent = args.Timestamp;
             CurrEnvironment_Data.Temperature = vr.GetNextDouble();
             OnPropertyChanged(Temperature_cPropertyChangedName); // "Temperature_c"
         }
@@ -308,10 +310,11 @@ namespace BluetoothProtocols
         private void NotifyPressure_hpaCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Environment_Pressure_hpa_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I32/P8|FIXED|Pressure|hPA"); // TODO: should be done ahead of time!
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("/I32/P8|FIXED|Pressure|hPA");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.TimestampMostRecent = args.Timestamp;
             CurrEnvironment_Data.Pressure = vr.GetNextDouble();
             OnPropertyChanged(Pressure_hpaPropertyChangedName); // "Pressure_hpa"
         }
@@ -332,10 +335,11 @@ namespace BluetoothProtocols
         private void NotifyHumidityCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Environment_Humidity_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|Humidity|%"); // TODO: should be done ahead of time!
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|Humidity|%");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.TimestampMostRecent = args.Timestamp;
             CurrEnvironment_Data.Humidity = vr.GetNextDouble();
             OnPropertyChanged(HumidityPropertyChangedName); // "Humidity"
         }
@@ -356,10 +360,11 @@ namespace BluetoothProtocols
         private void NotifyAir_Quality_eCOS_TVOCCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Environment_Air_Quality_eCOS_TVOC_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb"); // TODO: should be done ahead of time!
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironment_Data.TimestampMostRecent = args.Timestamp;
             CurrEnvironment_Data.eCOS = vr.GetNextDouble();
             CurrEnvironment_Data.TVOC = vr.GetNextDouble();
             OnPropertyChanged(Air_Quality_eCOS_TVOCPropertyChangedName); // "Air_Quality_eCOS_TVOC"
@@ -381,7 +386,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Temperature (c)", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("/I8/P8|FIXED|Temperature|C"); // TODO: should be done ahead of time!
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("/I8/P8|FIXED|Temperature|C");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
@@ -406,7 +411,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Pressure (hpa)", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("/I32/P8|FIXED|Pressure|hPA"); // TODO: should be done ahead of time!
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("/I32/P8|FIXED|Pressure|hPA");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
@@ -431,7 +436,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Humidity (%)", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|Humidity|%"); // TODO: should be done ahead of time!
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|Humidity|%");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
@@ -456,7 +461,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Air Quality eCOS TVOC", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb"); // TODO: should be done ahead of time!
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
@@ -471,6 +476,7 @@ namespace BluetoothProtocols
         /// </summary>
         public class EnvironmentColor_Data
         {
+            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
             public double Red; // From Environment and Color RGB+Clear
             public double Green; // From Environment and Color RGB+Clear
             public double Blue; // From Environment and Color RGB+Clear
@@ -495,10 +501,11 @@ namespace BluetoothProtocols
         private void NotifyColor_RGB_ClearCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Environment_Color_RGB_Clear_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear"); // TODO: should be done ahead of time!
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironmentColor_Data.TimestampMostRecent = args.Timestamp;
             CurrEnvironmentColor_Data.Red = vr.GetNextDouble();
             CurrEnvironmentColor_Data.Green = vr.GetNextDouble();
             CurrEnvironmentColor_Data.Blue = vr.GetNextDouble();
@@ -522,7 +529,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Color RGB+Clear", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear"); // TODO: should be done ahead of time!
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
@@ -539,6 +546,7 @@ namespace BluetoothProtocols
         /// </summary>
         public class EnvironmentConfiguration_Data
         {
+            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
             public double TempInterval; // From Environment and Environment Configuration
             public double PressureInterval; // From Environment and Environment Configuration
             public double HumidityInterval; // From Environment and Environment Configuration
@@ -567,10 +575,11 @@ namespace BluetoothProtocols
         private void NotifyEnvironment_ConfigurationCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Environment_Environment_Configuration_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|TempInterval|ms U16|DEC|PressureInterval|ms U16|DEC|HumidityInterval|ms U16|DEC|ColorInterval|ms U8|DEC|GasMode U8|DEC|RedCalibration U8|DEC|GreenCalibration U8|DEC|BlueCalibration"); // TODO: should be done ahead of time!
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|TempInterval|ms U16|DEC|PressureInterval|ms U16|DEC|HumidityInterval|ms U16|DEC|ColorInterval|ms U8|DEC|GasMode U8|DEC|RedCalibration U8|DEC|GreenCalibration U8|DEC|BlueCalibration");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrEnvironmentConfiguration_Data.TimestampMostRecent = args.Timestamp;
             CurrEnvironmentConfiguration_Data.TempInterval = vr.GetNextDouble();
             CurrEnvironmentConfiguration_Data.PressureInterval = vr.GetNextDouble();
             CurrEnvironmentConfiguration_Data.HumidityInterval = vr.GetNextDouble();
@@ -598,7 +607,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Environment Configuration", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|TempInterval|ms U16|DEC|PressureInterval|ms U16|DEC|HumidityInterval|ms U16|DEC|ColorInterval|ms U8|DEC|GasMode U8|DEC|RedCalibration U8|DEC|GreenCalibration U8|DEC|BlueCalibration"); // TODO: should be done ahead of time!
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|TempInterval|ms U16|DEC|PressureInterval|ms U16|DEC|HumidityInterval|ms U16|DEC|ColorInterval|ms U8|DEC|GasMode U8|DEC|RedCalibration U8|DEC|GreenCalibration U8|DEC|BlueCalibration");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
@@ -615,14 +624,15 @@ namespace BluetoothProtocols
         }
 
         #endregion
-        //
+//
         #region Service_Battery
-        // Service Battery 
+                // Service Battery 
         /// <summary>
         /// Data from all of the characteristics in the Battery Service
         /// </summary>
         public class Battery_Data
         {
+            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
             public double BatteryLevel; // From Battery and BatteryLevel
         }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
@@ -644,10 +654,11 @@ namespace BluetoothProtocols
         private void NotifyBatteryLevelCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Battery_BatteryLevel_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%"); // TODO: should be done ahead of time!
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrBattery_Data.TimestampMostRecent = args.Timestamp;
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
             OnPropertyChanged(BatteryLevelPropertyChangedName); // "BatteryLevel"
         }
@@ -668,7 +679,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "BatteryLevel", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%"); // TODO: should be done ahead of time!
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
@@ -678,9 +689,9 @@ namespace BluetoothProtocols
         }
 
         #endregion
-        //
+//
 
 
-        // Long obsolete! [[zzMETHOD+LIST]]
+// Long obsolete! [[zzMETHOD+LIST]]
     }
 }
