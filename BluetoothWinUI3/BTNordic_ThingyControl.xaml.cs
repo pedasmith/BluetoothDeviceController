@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 using Utilities;
 using Windows.Devices.Bluetooth;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -38,6 +37,8 @@ public interface IDeviceControl
 
     void UpdateUX(UserPreferences userprefs);
 
+    void UpdateUX(MainWindow.WindowSize windowSize);
+
 }
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -54,6 +55,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
     Nordic_Thingy.Battery_Data CurrBattery_Data = null;
     Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
+
+
+    MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
 
     public BTNordic_ThingyControl()
     {
@@ -147,9 +151,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
-        // Set up the OxyPlot model
-        uiOxyPlot.Model = OxyPlotModel;
-
         // FYI: by the time this method is called, the DataContext is already set
 
         if (args.NewValue == null) return; // just bogus; ignore.
@@ -213,6 +214,24 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         UpdateUI(""); // all of them. // TODO: I really made both an UpdateUI and an UpdateUX? Wrrong, bucko!
     }
 
+    public void UpdateUX(MainWindow.WindowSize windowSize)
+    {
+        CurrWindowSize = windowSize;
+        // Nothing to do for now, but maybe in the future.
+        switch (CurrWindowSize)
+        {
+            default:
+            case MainWindow.WindowSize.Normal:
+                rootPanel.Width = 380;
+                rootPanel.Height = 380;
+                break;
+            case MainWindow.WindowSize.Large:
+                rootPanel.Width = 780;
+                rootPanel.Height = 580;
+                break;
+        }
+    }
+
     UserPreferences CurrUserPrefs { get; set; } = null;
 
 
@@ -270,7 +289,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             case Nordic_Thingy.HumidityPropertyChangedName:
             case Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName:
                 var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_Data.TimestampMostRecentAdd).TotalSeconds;
-                if (deltaInSeconds > 5)
+                if (deltaInSeconds > 5) // NOTE: should this be adjustable by the user?
                 {
                     HistoricalEnvironment_Data.Add(CurrEnvironment_Data); // Will copy the data as needed.
                     uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines

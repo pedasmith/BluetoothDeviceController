@@ -2,7 +2,6 @@
 
 ```
 //From template: Protocol_Core_Body v2026-04-17 11:43
-//From template: Protocol_Body v2022-07-02 9:54
 using System;
 using System.Collections.Generic;
 using System.ComponentModel; // Needed for INotifyPropertyChanged
@@ -314,7 +313,7 @@ This is the primary section of the code.
 
 ```
         #region Service_[[ServiceName.dotNet]]
-        [[ServiceDataGroups]]
+[[ServiceDataGroups]]
 
         #endregion
 //
@@ -331,6 +330,15 @@ This is the primary section of the code.
             public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
 [[CharacteristicDataFields]]
+
+            public [[DataGroupName.dotNet]] Clone()
+            {
+                return this.MemberwiseClone() as [[DataGroupName.dotNet]];
+            }
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")}[[CharacteristicDataGroupForToString]]");
+            }
         }
         public [[DataGroupName.dotNet]] Curr[[DataGroupName.dotNet]] { get; set; } = new [[DataGroupName.dotNet]]();
 
@@ -352,6 +360,13 @@ This is the primary section of the code.
             public [[VARIABLETYPE+DS]] [[DataName.dotNet]] { get; set; } // From [[ServiceName]] and [[CharacteristicName]]
 ```
 
+## CharacteristicDataGroupForToString Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics Code="[[CharacteristicDataGroupFieldForToString]]" CodeListSubZero=""
+
+Makes the list of data fields for the nice ToString()
+
+## CharacteristicDataGroupFieldForToString Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" Code=" {[[DataName.dotNet]]}"
+
+Individual data fields for the nice ToString()
 
 ## CHARACTERISTIC+METHOD+NOTIFY Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
 
@@ -831,7 +846,7 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
         public void Add([[CLASSNAME]].[[DataGroupName.dotNet]] value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
-            Data.Add (value);
+            Data.Add (value.Clone());
             Timestamps.Add (value.TimestampMostRecent);
             TimestampsDT.Add (value.TimestampMostRecent.DateTime);
 [[DataGroupMemberCollectionAdd]]
@@ -840,7 +855,7 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value;
+            Data[index] = value.Clone();
 [[DataGroupMemberCollectionReplaceMostRecent]]
         }
 

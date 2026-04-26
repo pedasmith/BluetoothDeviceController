@@ -85,6 +85,8 @@ namespace BluetoothWinUI3
         BluetoothWatcher.AdvertismentWatcher.AdvertisementWatcher AdvertisementWatcher = new BluetoothWatcher.AdvertismentWatcher.AdvertisementWatcher();
         int NAdvertisements = 0;
         UserPreferences CurrUserPrefs = new UserPreferences();
+
+        public enum WindowSize { Normal, Large } // Normal is 400x400 large is 600x800 (HxW)
         public MainWindow()
         {
             CurrUserPrefs = UserPreferences.Restore();
@@ -489,5 +491,16 @@ namespace BluetoothWinUI3
         }
 
 
+        WindowSize CurrSelectedWindowSize = WindowSize.Normal;
+        private async void OnDebugWindowSize(object sender, RoutedEventArgs e)
+        {
+            string verb = "Resize";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
+            var newSize = (CurrSelectedWindowSize == WindowSize.Normal) ? WindowSize.Large : WindowSize.Normal;
+            selected.UpdateUX(newSize);
+            CurrSelectedWindowSize = newSize;
+            // Don't have to do anything on failure (which can't really happen)
+        }
     }
 }

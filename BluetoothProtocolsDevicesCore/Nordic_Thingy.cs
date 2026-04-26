@@ -18,7 +18,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-04-25::17:11
+    /// This class was automatically generated 2026-04-26::10:35
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -253,7 +253,7 @@ namespace BluetoothProtocols
 
 
         #region Service_Environment
-                // Service Environment 
+        // Service Environment 
         /// <summary>
         /// Data from all of the characteristics in the Environment Service
         /// </summary>
@@ -266,6 +266,15 @@ namespace BluetoothProtocols
             public double Humidity { get; set; } // From Environment and Humidity (%)
             public double eCOS { get; set; } // From Environment and Air Quality eCOS TVOC
             public double TVOC { get; set; } // From Environment and Air Quality eCOS TVOC
+
+            public Environment_Data Clone()
+            {
+                return this.MemberwiseClone() as Environment_Data;
+            }
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {Temperature} {Pressure} {Humidity} {eCOS} {TVOC}");
+            }
         }
         public Environment_Data CurrEnvironment_Data { get; set; } = new Environment_Data();
 
@@ -483,6 +492,15 @@ namespace BluetoothProtocols
             public double Green { get; set; } // From Environment and Color RGB+Clear
             public double Blue { get; set; } // From Environment and Color RGB+Clear
             public double Clear { get; set; } // From Environment and Color RGB+Clear
+
+            public EnvironmentColor_Data Clone()
+            {
+                return this.MemberwiseClone() as EnvironmentColor_Data;
+            }
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {Red} {Green} {Blue} {Clear}");
+            }
         }
         public EnvironmentColor_Data CurrEnvironmentColor_Data { get; set; } = new EnvironmentColor_Data();
 
@@ -558,6 +576,15 @@ namespace BluetoothProtocols
             public double RedCalibration { get; set; } // From Environment and Environment Configuration
             public double GreenCalibration { get; set; } // From Environment and Environment Configuration
             public double BlueCalibration { get; set; } // From Environment and Environment Configuration
+
+            public EnvironmentConfiguration_Data Clone()
+            {
+                return this.MemberwiseClone() as EnvironmentConfiguration_Data;
+            }
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {TempInterval} {PressureInterval} {HumidityInterval} {ColorInterval} {GasMode} {RedCalibration} {GreenCalibration} {BlueCalibration}");
+            }
         }
         public EnvironmentConfiguration_Data CurrEnvironmentConfiguration_Data { get; set; } = new EnvironmentConfiguration_Data();
 
@@ -629,7 +656,7 @@ namespace BluetoothProtocols
         #endregion
 //
         #region Service_Battery
-                // Service Battery 
+        // Service Battery 
         /// <summary>
         /// Data from all of the characteristics in the Battery Service
         /// </summary>
@@ -638,6 +665,15 @@ namespace BluetoothProtocols
             public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
             public double BatteryLevel { get; set; } // From Battery and BatteryLevel
+
+            public Battery_Data Clone()
+            {
+                return this.MemberwiseClone() as Battery_Data;
+            }
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {BatteryLevel}");
+            }
         }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
 

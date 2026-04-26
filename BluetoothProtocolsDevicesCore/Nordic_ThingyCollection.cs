@@ -19,7 +19,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This code was automatically generated 2026-04-25::17:11
+    /// This code was automatically generated 2026-04-26::10:35
     /// </summary>
 
     ///<summary>
@@ -33,7 +33,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public void Add(Nordic_Thingy.Environment_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
-            Data.Add (value);
+            Data.Add (value.Clone());
             Timestamps.Add (value.TimestampMostRecent);
             TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             Temperature.Add (value.Temperature);
@@ -46,7 +46,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value;
+            Data[index] = value.Clone();
             Temperature[index] = value.Temperature;
             Pressure[index] = value.Pressure;
             Humidity[index] = value.Humidity;
@@ -84,7 +84,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public void Add(Nordic_Thingy.EnvironmentColor_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
-            Data.Add (value);
+            Data.Add (value.Clone());
             Timestamps.Add (value.TimestampMostRecent);
             TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             Red.Add (value.Red);
@@ -96,7 +96,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value;
+            Data[index] = value.Clone();
             Red[index] = value.Red;
             Green[index] = value.Green;
             Blue[index] = value.Blue;
@@ -129,7 +129,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public void Add(Nordic_Thingy.EnvironmentConfiguration_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
-            Data.Add (value);
+            Data.Add (value.Clone());
             Timestamps.Add (value.TimestampMostRecent);
             TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             TempInterval.Add (value.TempInterval);
@@ -145,7 +145,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value;
+            Data[index] = value.Clone();
             TempInterval[index] = value.TempInterval;
             PressureInterval[index] = value.PressureInterval;
             HumidityInterval[index] = value.HumidityInterval;
@@ -186,7 +186,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public void Add(Nordic_Thingy.Battery_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
-            Data.Add (value);
+            Data.Add (value.Clone());
             Timestamps.Add (value.TimestampMostRecent);
             TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             BatteryLevel.Add (value.BatteryLevel);
@@ -195,7 +195,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value;
+            Data[index] = value.Clone();
             BatteryLevel[index] = value.BatteryLevel;
         }
 

@@ -58,6 +58,7 @@
 
                 </MenuBarItem>
                 <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
+                    <ToggleMenuFlyoutItem Text="Set large" Click="OnDebugWindowSize" AccessKey="L" />
                     <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="D" />
                     <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
                     <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
