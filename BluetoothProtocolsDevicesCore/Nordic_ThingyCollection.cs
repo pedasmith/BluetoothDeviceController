@@ -19,7 +19,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This code was automatically generated 2026-04-21::17:18
+    /// This code was automatically generated 2026-04-25::17:11
     /// </summary>
 
     ///<summary>
@@ -33,7 +33,9 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public void Add(Nordic_Thingy.Environment_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value);
             Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             Temperature.Add (value.Temperature);
             Pressure.Add (value.Pressure);
             Humidity.Add (value.Humidity);
@@ -44,6 +46,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
+            Data[index] = value;
             Temperature[index] = value.Temperature;
             Pressure[index] = value.Pressure;
             Humidity[index] = value.Humidity;
@@ -58,6 +61,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
         public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
         // Data values (properties) from characteristic Temperature (c)
         public ObservableCollection<double> Temperature { get; } = new ObservableCollection<double>();
         // Data values (properties) from characteristic Pressure (hpa)
@@ -67,6 +71,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         // Data values (properties) from characteristic Air Quality eCOS TVOC
         public ObservableCollection<double> eCOS { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> TVOC { get; } = new ObservableCollection<double>();
+        public ObservableCollection<Nordic_Thingy.Environment_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Environment_Data>();
     }
     ///<summary>
     ///TODO:
@@ -79,7 +84,9 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public void Add(Nordic_Thingy.EnvironmentColor_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value);
             Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             Red.Add (value.Red);
             Green.Add (value.Green);
             Blue.Add (value.Blue);
@@ -89,6 +96,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
+            Data[index] = value;
             Red[index] = value.Red;
             Green[index] = value.Green;
             Blue[index] = value.Blue;
@@ -102,11 +110,13 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
         public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
         // Data values (properties) from characteristic Color RGB+Clear
         public ObservableCollection<double> Red { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> Green { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> Blue { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> Clear { get; } = new ObservableCollection<double>();
+        public ObservableCollection<Nordic_Thingy.EnvironmentColor_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.EnvironmentColor_Data>();
     }
     ///<summary>
     ///TODO:
@@ -119,7 +129,9 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public void Add(Nordic_Thingy.EnvironmentConfiguration_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value);
             Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             TempInterval.Add (value.TempInterval);
             PressureInterval.Add (value.PressureInterval);
             HumidityInterval.Add (value.HumidityInterval);
@@ -133,6 +145,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
+            Data[index] = value;
             TempInterval[index] = value.TempInterval;
             PressureInterval[index] = value.PressureInterval;
             HumidityInterval[index] = value.HumidityInterval;
@@ -150,6 +163,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
         public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
         // Data values (properties) from characteristic Environment Configuration
         public ObservableCollection<double> TempInterval { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> PressureInterval { get; } = new ObservableCollection<double>();
@@ -159,6 +173,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public ObservableCollection<double> RedCalibration { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> GreenCalibration { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> BlueCalibration { get; } = new ObservableCollection<double>();
+        public ObservableCollection<Nordic_Thingy.EnvironmentConfiguration_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.EnvironmentConfiguration_Data>();
     }
     ///<summary>
     ///TODO:
@@ -171,13 +186,16 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public void Add(Nordic_Thingy.Battery_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value);
             Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             BatteryLevel.Add (value.BatteryLevel);
         }
         public void ReplaceMostRecent(Nordic_Thingy.Battery_Data value)
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
+            Data[index] = value;
             BatteryLevel[index] = value.BatteryLevel;
         }
 
@@ -188,8 +206,10 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
         public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
         // Data values (properties) from characteristic BatteryLevel
         public ObservableCollection<double> BatteryLevel { get; } = new ObservableCollection<double>();
+        public ObservableCollection<Nordic_Thingy.Battery_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Battery_Data>();
     }
 
 }

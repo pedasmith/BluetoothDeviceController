@@ -3,12 +3,15 @@ using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
+using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 using Utilities;
 using Windows.Devices.Bluetooth;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -45,7 +48,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     private string InternalDeviceType = "Nordic_Thingy";
     Nordic_Thingy Device;
-    BluetoothProtocols.NS_Nordic_Thingy.Environment_DataCollection HistoricalEnvironment_Data = new BluetoothProtocols.NS_Nordic_Thingy.Environment_DataCollection();
+    BluetoothProtocols.NS_Nordic_Thingy.Environment_DataCollection HistoricalEnvironment_Data 
+        = new BluetoothProtocols.NS_Nordic_Thingy.Environment_DataCollection();
 
     Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
     Nordic_Thingy.Battery_Data CurrBattery_Data = null;
@@ -55,6 +59,15 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     {
         InitializeComponent();
         this.DataContextChanged += BTNordic_ThingyControl_DataContextChanged;
+        this.Loaded += BTNordic_ThingyControl_Loaded;
+    }
+
+    private void BTNordic_ThingyControl_Loaded(object sender, RoutedEventArgs e)
+    {
+        (OxyPlotModel.Series[0] as LineSeries).ItemsSource = HistoricalEnvironment_Data.Data; //DOC:
+        (OxyPlotModel.Series[1] as LineSeries).ItemsSource = HistoricalEnvironment_Data.Data; //DOC:
+        (OxyPlotModel.Series[2] as LineSeries).ItemsSource = HistoricalEnvironment_Data.Data; //DOC:
+        uiOxyPlot.Model = OxyPlotModel; // DOC:
     }
 
     KnownDevice KnownDeviceFromDataContext { get { return DataContext as KnownDevice; } }
@@ -63,16 +76,80 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         return DataContext as KnownDevice;
     }
 
-
-
-/// <summary>
-/// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
-/// trigger looking up the SaveData and change more things. And it will actually connect to the device.
-/// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
-/// used by other bits of the system.
-/// </summary>
-private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    // H.Oxyplot
+    private PlotModel OxyPlotModel { get; set; } = new PlotModel
     {
+        Title = "Environment Data",
+        PlotAreaBorderColor = OxyColors.Transparent,
+        Axes =
+            {
+                new DateTimeAxis { Position = AxisPosition.Bottom },
+                new LinearAxis
+                {
+                    Position = AxisPosition.Left,
+                    PositionTier = 0, // PositionTier=0 is the innermost tier. //DOC:
+                    MajorGridlineColor = OxyColors.Black,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MajorGridlineThickness = 1,
+                    MajorStep = 10, // 1 hpa
+                    Title="Pressure",
+                    Key="Pressure"
+                },
+                new LinearAxis
+                {
+                    Position = AxisPosition.Left,
+                    PositionTier = 1,
+                    Title="Temperature",
+                    Key="Temperature"
+                },
+                new LinearAxis
+                {
+                    Position = AxisPosition.Left,
+                    PositionTier = 2,
+                    Title="Humidity",
+                    Key="Humidity"
+                },
+            },
+        Series =
+            {
+                new LineSeries
+                {
+                    Title = "Temperature",
+                    MarkerType = MarkerType.Circle,
+                    DataFieldX = "TimestampMostRecentDT",
+                    DataFieldY = "Temperature",
+                    YAxisKey= "Temperature",
+                },
+                new LineSeries
+                {
+                    Title = "Pressure",
+                    MarkerType = MarkerType.Circle,
+                    DataFieldX = "TimestampMostRecentDT",
+                    DataFieldY = "Pressure",
+                    YAxisKey= "Pressure",
+                },
+                new LineSeries
+                {
+                    Title = "Humidity",
+                    MarkerType = MarkerType.Circle,
+                    DataFieldX = "TimestampMostRecentDT",
+                    DataFieldY = "Humidity",
+                    YAxisKey= "Humidity",
+                },
+            }
+    };
+
+    /// <summary>
+    /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
+    /// trigger looking up the SaveData and change more things. And it will actually connect to the device.
+    /// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
+    /// used by other bits of the system.
+    /// </summary>
+    private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    {
+        // Set up the OxyPlot model
+        uiOxyPlot.Model = OxyPlotModel;
+
         // FYI: by the time this method is called, the DataContext is already set
 
         if (args.NewValue == null) return; // just bogus; ignore.
@@ -162,6 +239,7 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
     List<string> Sparkles = new List<string>() { "╺", "╼", "╾", "╸", "╾", "╼" }; 
     private void UpdateUI(string name)
     {
+        if (Device == null) return;
         CurrBattery_Data = Device.CurrBattery_Data;
         CurrEnvironment_Data = Device.CurrEnvironment_Data;
         CurrEnvironmentColor_Data = Device.CurrEnvironmentColor_Data;
@@ -195,11 +273,20 @@ private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement se
                 if (deltaInSeconds > 5)
                 {
                     HistoricalEnvironment_Data.Add(CurrEnvironment_Data); // Will copy the data as needed.
+                    uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
                 }
                 else
                 {
                     HistoricalEnvironment_Data.ReplaceMostRecent(CurrEnvironment_Data); // Will copy the data as needed.
+                    uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
                 }
+                break;
+        }
+
+        switch (name)
+        {
+            case Nordic_Thingy.Temperature_cPropertyChangedName:
+                //TempSeries.Points.Add(new OxyPlot.DataPoint(HistoricalEnvironment_Data.Temperature.Count, CurrEnvironment_Data.Temperature));
                 break;
         }
 

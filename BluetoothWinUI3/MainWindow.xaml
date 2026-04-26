@@ -13,93 +13,99 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="rootPanel">
-        <!-- WEIRD: "rootPanel". See https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.contentdialog?view=windows-app-sdk-1.8 for why the rootPanel needs to be named that way -->
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="auto" />
-        </Grid.RowDefinitions>
+    <Page>
+        <!-- The Page element is needed to make the H.Oxyplot work correctly.
+        DOC: 
         
-        <!-- Title and menu -->
-        <MenuBar Grid.Row="0">
-            <MenuBarItem Title="File" AccessKey="F">
-                <ToggleMenuFlyoutItem Text="Keep Screen On" Click="OnFileKeepScreenOn" AccessKey="k" />
-                <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
-            </MenuBarItem>
-            <MenuBarItem Title="Bluetooth Device" AccessKey="B">
-                <MenuFlyoutItem Text="Rename" Click="OnBTRename" AccessKey="R" />
-                <MenuFlyoutItem Text="Background Color" Click="OnBTColor" Tag="BackgroundColor" AccessKey="T" />
-                <MenuFlyoutItem Text="Text Color" Click="OnBTColor" Tag="TextColor" AccessKey="T" />
-            </MenuBarItem>
-            <MenuBarItem Title="Preferences" AccessKey="P">
-                <MenuFlyoutSubItem Text="Temperature Units" x:Name="uiTemperaturePreferences">
-                    <RadioMenuFlyoutItem Text="Celcius" Click="OnPreferencesTemperature" Tag="Celcius" x:Name="uiPreferencesCelcius" GroupName="groupTemperature" />
-                    <RadioMenuFlyoutItem Text="Fahrenheit" Click="OnPreferencesTemperature" Tag="Fahrenheit" x:Name="uiPreferencesFahrenheit" GroupName="groupTemperature" />
-                    <RadioMenuFlyoutItem Text="Kelvin" Click="OnPreferencesTemperature" Tag="Kelvin" x:Name="uiPreferencesKelvin" GroupName="groupTemperature" />
-                    <RadioMenuFlyoutItem Text="Rankine" Click="OnPreferencesTemperature" Tag="Rankine" x:Name="uiPreferencesRankine" GroupName="groupTemperature" />
-                    <RadioMenuFlyoutItem Text="Réaumur" Click="OnPreferencesTemperature" Tag="Réaumur" x:Name="uiPreferencesRéaumur" GroupName="groupTemperature"/>
-                </MenuFlyoutSubItem>
-                <MenuFlyoutSubItem Text="Pressure Units">
-                    <RadioMenuFlyoutItem Text="MM of Mercury" Click="OnPreferencesPressure" Tag="mmHg" x:Name="uiPreferencesmmHg" GroupName="groupPressure" />
-                    <RadioMenuFlyoutItem Text="Inches of Mercury" Click="OnPreferencesPressure" Tag="inHg" x:Name="uiPreferencesinHg" GroupName="groupPressure" />
-                    <RadioMenuFlyoutItem Text="Millibar (hPa)" Click="OnPreferencesPressure" Tag="mbar_hpa" x:Name="uiPreferencesmbar_hpa" GroupName="groupPressure" />
-                    <RadioMenuFlyoutItem Text="KiloPascal" Click="OnPreferencesPressure" Tag="kiloPascal" x:Name="uiPreferenceskiloPascal" GroupName="groupPressure" />
-                    <RadioMenuFlyoutItem Text="Pascal" Click="OnPreferencesPressure" Tag="Pascal" x:Name="uiPreferencesPascal" GroupName="groupPressure" />
-                    <RadioMenuFlyoutItem Text="PSI" Click="OnPreferencesPressure" Tag="PSI" x:Name="uiPreferencesPSI" GroupName="groupPressure" />
-                    <RadioMenuFlyoutItem Text="Atmospheres" Click="OnPreferencesPressure" Tag="Atmosphere" x:Name="uiPreferencesAtmosphere" GroupName="groupPressure" />
-                </MenuFlyoutSubItem>
+        -->
+        <Grid x:Name="rootPanel">
+            <!-- WEIRD: "rootPanel". See https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.contentdialog?view=windows-app-sdk-1.8 for why the rootPanel needs to be named that way -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Title and menu -->
+            <MenuBar Grid.Row="0">
+                <MenuBarItem Title="File" AccessKey="F">
+                    <ToggleMenuFlyoutItem Text="Keep Screen On" Click="OnFileKeepScreenOn" AccessKey="k" />
+                    <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
+                </MenuBarItem>
+                <MenuBarItem Title="Bluetooth Device" AccessKey="B">
+                    <MenuFlyoutItem Text="Rename" Click="OnBTRename" AccessKey="R" />
+                    <MenuFlyoutItem Text="Background Color" Click="OnBTColor" Tag="BackgroundColor" AccessKey="T" />
+                    <MenuFlyoutItem Text="Text Color" Click="OnBTColor" Tag="TextColor" AccessKey="T" />
+                </MenuBarItem>
+                <MenuBarItem Title="Preferences" AccessKey="P">
+                    <MenuFlyoutSubItem Text="Temperature Units" x:Name="uiTemperaturePreferences">
+                        <RadioMenuFlyoutItem Text="Celcius" Click="OnPreferencesTemperature" Tag="Celcius" x:Name="uiPreferencesCelcius" GroupName="groupTemperature" />
+                        <RadioMenuFlyoutItem Text="Fahrenheit" Click="OnPreferencesTemperature" Tag="Fahrenheit" x:Name="uiPreferencesFahrenheit" GroupName="groupTemperature" />
+                        <RadioMenuFlyoutItem Text="Kelvin" Click="OnPreferencesTemperature" Tag="Kelvin" x:Name="uiPreferencesKelvin" GroupName="groupTemperature" />
+                        <RadioMenuFlyoutItem Text="Rankine" Click="OnPreferencesTemperature" Tag="Rankine" x:Name="uiPreferencesRankine" GroupName="groupTemperature" />
+                        <RadioMenuFlyoutItem Text="Réaumur" Click="OnPreferencesTemperature" Tag="Réaumur" x:Name="uiPreferencesRéaumur" GroupName="groupTemperature"/>
+                    </MenuFlyoutSubItem>
+                    <MenuFlyoutSubItem Text="Pressure Units">
+                        <RadioMenuFlyoutItem Text="MM of Mercury" Click="OnPreferencesPressure" Tag="mmHg" x:Name="uiPreferencesmmHg" GroupName="groupPressure" />
+                        <RadioMenuFlyoutItem Text="Inches of Mercury" Click="OnPreferencesPressure" Tag="inHg" x:Name="uiPreferencesinHg" GroupName="groupPressure" />
+                        <RadioMenuFlyoutItem Text="Millibar (hPa)" Click="OnPreferencesPressure" Tag="mbar_hpa" x:Name="uiPreferencesmbar_hpa" GroupName="groupPressure" />
+                        <RadioMenuFlyoutItem Text="KiloPascal" Click="OnPreferencesPressure" Tag="kiloPascal" x:Name="uiPreferenceskiloPascal" GroupName="groupPressure" />
+                        <RadioMenuFlyoutItem Text="Pascal" Click="OnPreferencesPressure" Tag="Pascal" x:Name="uiPreferencesPascal" GroupName="groupPressure" />
+                        <RadioMenuFlyoutItem Text="PSI" Click="OnPreferencesPressure" Tag="PSI" x:Name="uiPreferencesPSI" GroupName="groupPressure" />
+                        <RadioMenuFlyoutItem Text="Atmospheres" Click="OnPreferencesPressure" Tag="Atmosphere" x:Name="uiPreferencesAtmosphere" GroupName="groupPressure" />
+                    </MenuFlyoutSubItem>
 
 
-            </MenuBarItem>
-            <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
-                <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="D" />
-                <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
-                <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
-            </MenuBarItem>
-            <MenuBarItem Title="Help" AccessKey="H">
-                <MenuFlyoutItem Text="About" Click="OnHelpAbout" AccessKey="a" />
-            </MenuBarItem>
-        </MenuBar>
+                </MenuBarItem>
+                <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
+                    <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="D" />
+                    <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
+                    <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
+                </MenuBarItem>
+                <MenuBarItem Title="Help" AccessKey="H">
+                    <MenuFlyoutItem Text="About" Click="OnHelpAbout" AccessKey="a" />
+                </MenuBarItem>
+            </MenuBar>
 
-        <!-- All of the known devices -->
-        <GridView Grid.Row="1" x:Name="uiKnownDevices" SelectionMode="Single">
-        </GridView>
+            <!-- All of the known devices -->
+            <GridView Grid.Row="1" x:Name="uiKnownDevices" SelectionMode="Single">
+            </GridView>
 
-        <!-- Status row -->
-        <StackPanel Grid.Row="2">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                        </Style>
-                    </StackPanel.Resources>
-                    <Button Content="Start" Click="OnAdvertisementStart" />
-                    <Button Content="Stop" Click="OnAdvertisementStop" />
-                    <Button Content="Copy All" Click="OnAdvertisementCopy" />
-                    <Button Content="Copy Unique" Click="OnAdvertisementCopyUnique" />
-                    <Button Content="Copy Addresses" Click="OnAdvertisementCopyUniqueAddresses" />
-                    <TextBlock>N=</TextBlock>
-                    <TextBlock x:Name="uiAdvertCount" />
-                    <TextBlock>  | RAW=</TextBlock>
-                    <TextBlock x:Name="uiAdvertRaw" />
-                </StackPanel>
-            </Grid>
-            
-        </StackPanel>
-        <ContentDialog x:Name="uiDialogRenameDevice" Title="Rename Device"
+            <!-- Status row -->
+            <StackPanel Grid.Row="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <Button Content="Start" Click="OnAdvertisementStart" />
+                        <Button Content="Stop" Click="OnAdvertisementStop" />
+                        <Button Content="Copy All" Click="OnAdvertisementCopy" />
+                        <Button Content="Copy Unique" Click="OnAdvertisementCopyUnique" />
+                        <Button Content="Copy Addresses" Click="OnAdvertisementCopyUniqueAddresses" />
+                        <TextBlock>N=</TextBlock>
+                        <TextBlock x:Name="uiAdvertCount" />
+                        <TextBlock>  | RAW=</TextBlock>
+                        <TextBlock x:Name="uiAdvertRaw" />
+                    </StackPanel>
+                </Grid>
+
+            </StackPanel>
+            <ContentDialog x:Name="uiDialogRenameDevice" Title="Rename Device"
                        PrimaryButtonText="Ok" IsPrimaryButtonEnabled="True">
-            <TextBox x:Name="uiDialogRenameDeviceName" />
-        </ContentDialog>
-        
-    </Grid>
+                <TextBox x:Name="uiDialogRenameDeviceName" />
+            </ContentDialog>
+
+        </Grid>
+    </Page>
 </Window>

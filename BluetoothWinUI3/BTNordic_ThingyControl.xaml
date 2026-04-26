@@ -6,6 +6,7 @@
     xmlns:local="using:BluetoothWinUI3"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:oxyplot="using:OxyPlot"
     mc:Ignorable="d"
     >
 
@@ -22,7 +23,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
@@ -72,6 +73,8 @@
                     <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTVOC"/></TextBlock>
                     <Border Grid.Row="1" Grid.Column="2" Height="30" Width="90" x:Name="uiColor" Background="White" />
                 </Grid>
+                    <oxyplot:PlotView Grid.Row="2"  x:Name="uiOxyPlot"   />
+                <TextBlock Grid.Row="3" Style="{StaticResource sDeviceMinorText}">TESTING</TextBlock>
             </Grid>
             <TextBlock Grid.Row="2" Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
             <local:BTConnectionControl Grid.Row="3" x:Name="uiBTConnectionControl" />

@@ -328,7 +328,8 @@ This is the primary section of the code.
         /// </summary>
         public class [[DataGroupName.dotNet]]
         {
-            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
+            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
 [[CharacteristicDataFields]]
         }
         public [[DataGroupName.dotNet]] Curr[[DataGroupName.dotNet]] { get; set; } = new [[DataGroupName.dotNet]]();
@@ -348,7 +349,7 @@ This is the primary section of the code.
 ## CharacteristicPropertyDataFields Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
 
 ```
-            public [[VARIABLETYPE+DS]] [[DataName.dotNet]]; // From [[ServiceName]] and [[CharacteristicName]]
+            public [[VARIABLETYPE+DS]] [[DataName.dotNet]] { get; set; } // From [[ServiceName]] and [[CharacteristicName]]
 ```
 
 
@@ -825,18 +826,21 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
     ///of the characteristics groupled in the [[DataGroupName]] group from [[ServiceName]].
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class [[DataGroupName]]Collection 
+    public class [[DataGroupName.dotNet]]Collection 
     {
-        public void Add([[CLASSNAME]].[[DataGroupName]] value)
+        public void Add([[CLASSNAME]].[[DataGroupName.dotNet]] value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value);
             Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
 [[DataGroupMemberCollectionAdd]]
         }
-        public void ReplaceMostRecent([[CLASSNAME]].[[DataGroupName]] value)
+        public void ReplaceMostRecent([[CLASSNAME]].[[DataGroupName.dotNet]] value)
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
+            Data[index] = value;
 [[DataGroupMemberCollectionReplaceMostRecent]]
         }
 
@@ -847,7 +851,9 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
         public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
 [[DataGroupMemberCollection]]
+        public ObservableCollection<[[CLASSNAME]].[[DataGroupName.dotNet]]> Data { get; } = new ObservableCollection<[[CLASSNAME]].[[DataGroupName.dotNet]]>();
     }
 
 ```

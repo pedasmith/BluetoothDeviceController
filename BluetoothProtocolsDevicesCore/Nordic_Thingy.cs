@@ -18,7 +18,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-04-21::17:18
+    /// This class was automatically generated 2026-04-25::17:11
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -259,12 +259,13 @@ namespace BluetoothProtocols
         /// </summary>
         public class Environment_Data
         {
-            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
-            public double Temperature; // From Environment and Temperature (c)
-            public double Pressure; // From Environment and Pressure (hpa)
-            public double Humidity; // From Environment and Humidity (%)
-            public double eCOS; // From Environment and Air Quality eCOS TVOC
-            public double TVOC; // From Environment and Air Quality eCOS TVOC
+            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
+            public double Temperature { get; set; } // From Environment and Temperature (c)
+            public double Pressure { get; set; } // From Environment and Pressure (hpa)
+            public double Humidity { get; set; } // From Environment and Humidity (%)
+            public double eCOS { get; set; } // From Environment and Air Quality eCOS TVOC
+            public double TVOC { get; set; } // From Environment and Air Quality eCOS TVOC
         }
         public Environment_Data CurrEnvironment_Data { get; set; } = new Environment_Data();
 
@@ -476,11 +477,12 @@ namespace BluetoothProtocols
         /// </summary>
         public class EnvironmentColor_Data
         {
-            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
-            public double Red; // From Environment and Color RGB+Clear
-            public double Green; // From Environment and Color RGB+Clear
-            public double Blue; // From Environment and Color RGB+Clear
-            public double Clear; // From Environment and Color RGB+Clear
+            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
+            public double Red { get; set; } // From Environment and Color RGB+Clear
+            public double Green { get; set; } // From Environment and Color RGB+Clear
+            public double Blue { get; set; } // From Environment and Color RGB+Clear
+            public double Clear { get; set; } // From Environment and Color RGB+Clear
         }
         public EnvironmentColor_Data CurrEnvironmentColor_Data { get; set; } = new EnvironmentColor_Data();
 
@@ -546,15 +548,16 @@ namespace BluetoothProtocols
         /// </summary>
         public class EnvironmentConfiguration_Data
         {
-            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
-            public double TempInterval; // From Environment and Environment Configuration
-            public double PressureInterval; // From Environment and Environment Configuration
-            public double HumidityInterval; // From Environment and Environment Configuration
-            public double ColorInterval; // From Environment and Environment Configuration
-            public double GasMode; // From Environment and Environment Configuration
-            public double RedCalibration; // From Environment and Environment Configuration
-            public double GreenCalibration; // From Environment and Environment Configuration
-            public double BlueCalibration; // From Environment and Environment Configuration
+            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
+            public double TempInterval { get; set; } // From Environment and Environment Configuration
+            public double PressureInterval { get; set; } // From Environment and Environment Configuration
+            public double HumidityInterval { get; set; } // From Environment and Environment Configuration
+            public double ColorInterval { get; set; } // From Environment and Environment Configuration
+            public double GasMode { get; set; } // From Environment and Environment Configuration
+            public double RedCalibration { get; set; } // From Environment and Environment Configuration
+            public double GreenCalibration { get; set; } // From Environment and Environment Configuration
+            public double BlueCalibration { get; set; } // From Environment and Environment Configuration
         }
         public EnvironmentConfiguration_Data CurrEnvironmentConfiguration_Data { get; set; } = new EnvironmentConfiguration_Data();
 
@@ -632,8 +635,9 @@ namespace BluetoothProtocols
         /// </summary>
         public class Battery_Data
         {
-            public DateTimeOffset TimestampMostRecent = DateTimeOffset.MinValue;
-            public double BatteryLevel; // From Battery and BatteryLevel
+            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
+            public double BatteryLevel { get; set; } // From Battery and BatteryLevel
         }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
 
