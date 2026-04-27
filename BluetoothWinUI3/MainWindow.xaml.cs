@@ -1,5 +1,5 @@
-using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWatcher.Units;
+using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -191,6 +191,12 @@ namespace BluetoothWinUI3
                         control.DataContext = known;
                         var userControl = control as IDeviceControl;
                         userControl?.UpdateUX(CurrUserPrefs);
+
+                        if (uiKnownDevices.Items.Count == 1)
+                        {
+                            // Select it!
+                            uiKnownDevices.SelectedIndex = 0;
+                        }
                     }
                 }
             });
@@ -271,7 +277,7 @@ namespace BluetoothWinUI3
                 uiKnownDevices.SelectedIndex = 0;
                 selected = uiKnownDevices.Items[0] as IDeviceControl;
             }
-            if (selected == null)
+            if (selected == null && !String.IsNullOrEmpty(verb))
             {
                 await ShowNotice("No device selected", $"You must select a device to {verb} it");
                 return null;
@@ -314,7 +320,7 @@ namespace BluetoothWinUI3
             var tag = senderMenu?.Tag as string; // BackgroundColor or TextColor
             if (tag == null) return;
 
-            string verb = "rename";
+            string verb = "color";
             var selected = await GetBTSelectedAsync(verb);
             if (selected == null) return;
             var knownDevice = await GetKnownDevice(selected, verb);
@@ -501,6 +507,75 @@ namespace BluetoothWinUI3
             selected.UpdateUX(newSize);
             CurrSelectedWindowSize = newSize;
             // Don't have to do anything on failure (which can't really happen)
+        }
+
+        private async void OnKnownDeviceSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selected = await GetBTSelectedAsync(null);
+            if (selected == null) return;
+
+            // Update the set of graph line that can be colored
+            uiBTGraphColorsMenu.Items.Clear();
+            var graphnames = selected.GraphNames;
+            foreach (var graphname in graphnames)
+            {
+                var menu = new MenuFlyoutItem()
+                {
+                    Text = graphname,
+                    Tag= graphname,
+                };
+                menu.Click += OnChangeGraphColor ;
+                uiBTGraphColorsMenu.Items.Add(menu);
+            }
+
+        }
+        private async void OnChangeGraphColor(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as FrameworkElement)?.Tag as string; // e.g., "Temperature" or "Pressure"
+
+            string verb = "color";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
+            var knownDevice = await GetKnownDevice(selected, verb);
+            if (knownDevice == null) return;
+            var saveData = GetOrCreateSaveData(knownDevice);
+
+            var colorsSave = saveData.GetDeviceColors(Application.Current.RequestedTheme);
+
+            ulong colorulong = selected.GetGraphColor(tag);
+            Windows.UI.Color color= Windows.UI.Color.FromArgb(
+                0xFF, // always fully opaque for graph colors#
+                (byte)((colorulong >> 16) & 0xFF),
+                (byte)((colorulong >> 8) & 0xFF),
+                (byte)(colorulong & 0xFF)
+                );
+
+
+            var colorPicker = new ColorPicker
+            {
+                IsAlphaEnabled = false, // Allow transparency
+                IsColorChannelTextInputVisible = true,
+                IsHexInputVisible = true,
+                Color = color,
+            };
+            var dialog = new ContentDialog
+            {
+                Title = "Select a Color",
+                PrimaryButtonText = "OK",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = colorPicker,
+                XamlRoot = this.Content.XamlRoot // Required in WinUI 3
+            };
+            var result = await dialog.ShowAsync();
+            if (result != ContentDialogResult.Primary) return;
+
+            var newcolor = DeviceColorBrushes.ConvertBackIgnoreA(colorPicker.Color);
+
+            // Save it and update colors!
+            colorsSave.Set("Graph:" + tag, newcolor);
+            AllSaveData.Save();
+            selected.UpdateGraph(tag, newcolor);
         }
     }
 }

@@ -29,8 +29,19 @@ public interface IDeviceControl
     KnownDevice GetKnownDevice();
 
     /// <summary>
+    /// Get the list of graph name (e.g., "Temperature", "Pressure", "Humidity". This will be used by
+    /// e.g., the MainWindow to update the device menu display
+    /// </summary>
+    List<string> GraphNames { get; }
+    ulong GetGraphColor(string graphName); // ulong is also an OxyColor
+
+    /// <summary>
+    /// A graph is just a single line, like "Temperature" or "Pressure"
+    /// </summary>
+    void UpdateGraph(string graphName, ulong color);
+
+    /// <summary>
     /// updates the device control user interface base on the user preferences in SaveData.
-    /// As of 2026-04-05 this includes just the name
     /// </summary>
     /// <param name="saveData"></param>
     void UpdateUX(SaveData saveData);
@@ -68,11 +79,17 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     private void BTNordic_ThingyControl_Loaded(object sender, RoutedEventArgs e)
     {
-        (OxyPlotModel.Series[0] as LineSeries).ItemsSource = HistoricalEnvironment_Data.Data; //DOC:
-        (OxyPlotModel.Series[1] as LineSeries).ItemsSource = HistoricalEnvironment_Data.Data; //DOC:
-        (OxyPlotModel.Series[2] as LineSeries).ItemsSource = HistoricalEnvironment_Data.Data; //DOC:
+        foreach (var series in OxyPlotModel.Series)
+        {
+            if (series is LineSeries lineSeries)
+            {
+                lineSeries.ItemsSource = HistoricalEnvironment_Data.Data; //DOC:
+            }
+        }
         uiOxyPlot.Model = OxyPlotModel; // DOC:
     }
+
+    public List<string> GraphNames { get { return new List<string>() { "Temperature", "Pressure", "Humidity", /* "eCOS", "TVOC" */ }; } }
 
     KnownDevice KnownDeviceFromDataContext { get { return DataContext as KnownDevice; } }
     public KnownDevice GetKnownDevice()
@@ -119,6 +136,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 new LineSeries
                 {
                     Title = "Temperature",
+                    Color = OxyColors.DarkBlue,
                     MarkerType = MarkerType.Circle,
                     DataFieldX = "TimestampMostRecentDT",
                     DataFieldY = "Temperature",
@@ -127,6 +145,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 new LineSeries
                 {
                     Title = "Pressure",
+                    Color = OxyColors.LightBlue,
                     MarkerType = MarkerType.Circle,
                     DataFieldX = "TimestampMostRecentDT",
                     DataFieldY = "Pressure",
@@ -135,6 +154,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 new LineSeries
                 {
                     Title = "Humidity",
+                    Color = OxyColors.Violet,
                     MarkerType = MarkerType.Circle,
                     DataFieldX = "TimestampMostRecentDT",
                     DataFieldY = "Humidity",
@@ -142,6 +162,32 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 },
             }
     };
+
+    /// <summary>
+    /// Loop through the LineSeries for where a matching DataFieldY
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public ulong GetGraphColor(string name)
+    {
+        foreach (var series in OxyPlotModel.Series)
+        {
+            if (series is LineSeries lineSeries)
+            {
+                if (lineSeries.DataFieldY == name)
+                {
+                    return OxyColorToUulong(lineSeries.Color);
+                }
+            }
+        }
+        return OxyColorToUulong(OxyColors.Undefined);
+    }
+
+    private ulong OxyColorToUulong(OxyColor color)
+    {
+        ulong retval = ((ulong)color.A << 24) | ((ulong)color.R << 16) | ((ulong)color.G << 8) | color.B;
+        return retval;
+    }
 
     /// <summary>
     /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
@@ -194,6 +240,27 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
     }
 
+    public void UpdateGraph(string graphName, ulong color)
+    {
+        foreach (var series in OxyPlotModel.Series)
+        {
+            var lseries = series as LineSeries;
+            if (lseries != null)
+            {
+                if (lseries.DataFieldY == graphName)
+                {
+                    lseries.Color = OxyColor.FromUInt32((uint)color);
+                    OxyPlotModel.InvalidatePlot(false); //DOC: false is just the axes, true is everything.
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// SaveData is per-device and includes the display name (e.g., a "Thingy" might have a preferred name of "Library")
+    /// and also a bunch of color information.
+    /// </summary>
     public void UpdateUX(SaveData saveData)
     {
         if (saveData != null)
@@ -205,13 +272,22 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
             var brushes = new DeviceColorBrushes(colors);
             DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
+
+            // Also set the graph colors.
+            foreach (var (graphName, color) in colors.GraphColors)
+            {
+                UpdateGraph(graphName, color);
+            }
         }
     }
 
+    /// <summary>
+    /// UserPreferences are for the app as a whole, not for this particular device. For example: the preferred temperature unit.
+    /// </summary>
     public void UpdateUX(UserPreferences userprefs)
     {
         CurrUserPrefs = userprefs;
-        UpdateUI(""); // all of them. // TODO: I really made both an UpdateUI and an UpdateUX? Wrrong, bucko!
+        UpdateGraphData(""); // all of them.
     }
 
     public void UpdateUX(MainWindow.WindowSize windowSize)
@@ -247,7 +323,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             if (this.IsLoaded) // Won't be loaded when we exit the app!
             {
-                UpdateUI(e.PropertyName);
+                UpdateGraphData(e.PropertyName);
             }
         });
     }
@@ -256,7 +332,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     Dictionary<string, int> NPropertyChanges = new Dictionary<string, int>();
     //List<string> Sparkles = new List<string>() { "\u00A0", "*" }; // ✨", "💫", "🌟", "⚡", "🔥", "💥" };
     List<string> Sparkles = new List<string>() { "╺", "╼", "╾", "╸", "╾", "╼" }; 
-    private void UpdateUI(string name)
+    private void UpdateGraphData(string name)
     {
         if (Device == null) return;
         CurrBattery_Data = Device.CurrBattery_Data;
@@ -342,29 +418,5 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 uiColor.Background = RGB; //TODO: and the 'clear' value?
             }
         }
-
-#if NEVER_EVER_DEFINED
-        switch (name) 
-        {
-            case "Temperature_c":
-                break;
-            case "Pressure_hpa":
-                uiPressure_hpa.Text = CurrEnvironment_Data.Pressure_hpa.ToString("0.0");
-                break;
-            case "Humidity":
-                uiHumidity.Text = CurrEnvironment_Data.Humidity.ToString("0.0") + "%";
-                break;
-            case "TVOC": // sets both TVOC and eCOS
-                uieCOS.Text = CurrEnvironment_Data.eCOS.ToString("0.0");
-                uiTVOC.Text = CurrEnvironment_Data.TVOC.ToString("0.0");
-                break;
-            case "Color":
-                {
-                    var RGB = new SolidColorBrush(Windows.UI.Color.FromArgb(255, (byte)Device.Red, (byte)Device.Green, (byte)Device.Blue));
-                    uiColor.Background = RGB; //TODO: and the 'clear' value?
-                }
-                break;
-        }
-#endif
     }
 }

@@ -8,9 +8,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Windows.Networking.NetworkOperators;
 using Windows.UI;
-using static System.Net.Mime.MediaTypeNames;
 
 
 #if NET8_0_OR_GREATER
@@ -22,21 +20,7 @@ namespace BluetoothWinUI3
     public static class AllSaveData
     {
         public static List<SaveData> AllDevices = new List<SaveData>();
-#if NEVER_EVER_DEFINED
-        // Only needed to help kick-start the save/load code. Can be deleted later on.
-        {
-            new SaveData()
-            {
-                Id = new DeviceIdentification()
-                {
-                    AdvertisementAddress = 123456789,
-                    ConnectionAddress = 987654321,
-                    AdvertisementName = "ThingyAdv",
-                    ConnectName = "ThingyConn",
-                },
-            },
-        };
-#endif
+
         /// <summary>
         /// Saves the AllDevices into a .devices JSON file. This will be tucked into the Documents/BluetoothDevices 
         /// folder in a file called AllDeviceData.devices. It's restored with a call to Restore() which is done automatically
@@ -50,6 +34,13 @@ namespace BluetoothWinUI3
 
             var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
             File.WriteAllText(filePath, json);
+
+            Log($"Saved configuration to {filePath}");
+        }
+
+        private static void Log(string str)
+        {
+            System.Diagnostics.Debug.WriteLine(str);
         }
 
         /// <summary>
@@ -60,6 +51,7 @@ namespace BluetoothWinUI3
             string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
             Directory.CreateDirectory(folderPath);
             string filePath = Path.Combine(folderPath, "AllDeviceData.devices");
+            Log($"Reading configuration from {filePath}");
 
             if (File.Exists(filePath))
             {
@@ -74,6 +66,7 @@ namespace BluetoothWinUI3
                     Console.WriteLine($"Error: Unable to parse JSON file {filePath}. Message:{ex.Message}");
                 }
             }
+            Log($"Completed reading configuration from {filePath}");
         }
 
         /// <summary>
@@ -137,7 +130,6 @@ namespace BluetoothWinUI3
         /// <returns></returns>
         public DeviceColors GetDeviceColors(ApplicationTheme theme)
         {
-            //var theme = Application.Current.RequestedTheme;
             switch (theme)
             {
                 case ApplicationTheme.Dark:
@@ -193,12 +185,23 @@ namespace BluetoothWinUI3
         public ulong TextColor { get; set; } = ColorIsDefault;
         public ulong BackgroundColor { get; set; } = ColorIsDefault;
 
+        public Dictionary<string, ulong> GraphColors { get; set;  } = new Dictionary<string, ulong>(); //TODO: need a set for reading in?
+
+        public const string GraphPrefix = "Graph:";
+
         public void Set(string tagName, ulong color)
         {
             switch (tagName)
             {
                 case "BackgroundColor": BackgroundColor = color; break;
                 case "TextColor": TextColor = color; break;
+                default:
+                    if (tagName.StartsWith(GraphPrefix))
+                    {
+                        var gname = tagName.Substring(GraphPrefix.Length); // Remove "Graph:" prefix
+                        GraphColors[gname] = color;
+                    }
+                    break;
             }
         }
     }
@@ -301,10 +304,6 @@ namespace BluetoothWinUI3
         public string UserName { get; set; } = ""; // will depend on the DeviceIdentification, but could be set by the user to something more memorable
         public DeviceColors DarkColors { get; set; } = new DeviceColors();
         public DeviceColors LightColors { get; set; } = new DeviceColors();
-#if NEVER_EVER_DEFINED
-        public enum DisplayHighlight { Normal, Highlight, Dim };
-        DisplayHighlight HighlightPreference { get; set; } = DisplayHighlight.Normal;
-#endif
 
     }
 

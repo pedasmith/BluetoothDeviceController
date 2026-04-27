@@ -36,6 +36,8 @@
                     <MenuFlyoutItem Text="Rename" Click="OnBTRename" AccessKey="R" />
                     <MenuFlyoutItem Text="Background Color" Click="OnBTColor" Tag="BackgroundColor" AccessKey="T" />
                     <MenuFlyoutItem Text="Text Color" Click="OnBTColor" Tag="TextColor" AccessKey="T" />
+                    <MenuFlyoutSubItem Text="Graph Colors" x:Name="uiBTGraphColorsMenu">
+                    </MenuFlyoutSubItem>
                 </MenuBarItem>
                 <MenuBarItem Title="Preferences" AccessKey="P">
                     <MenuFlyoutSubItem Text="Temperature Units" x:Name="uiTemperaturePreferences">
@@ -69,7 +71,7 @@
             </MenuBar>
 
             <!-- All of the known devices -->
-            <GridView Grid.Row="1" x:Name="uiKnownDevices" SelectionMode="Single">
+            <GridView Grid.Row="1" x:Name="uiKnownDevices" SelectionMode="Single" SelectionChanged="OnKnownDeviceSelectionChanged">
             </GridView>
 
             <!-- Status row -->
