@@ -31,6 +31,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
+                        <RowDefinition Height="5" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -49,11 +50,15 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTemperature_c"/></TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPressure_hpa"/></TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
+                    <Line Grid.Row="2" Grid.Column="0" Tag="TemperatureColor" Style="{StaticResource sGraphLineKey}" />
+                    <Line Grid.Row="2" Grid.Column="1" Tag="PressureColor" Style="{StaticResource sGraphLineKey}" />
+                    <Line Grid.Row="2" Grid.Column="2" Tag="HumidityColor" Style="{StaticResource sGraphLineKey}"/>
                 </Grid>
                 <Grid Grid.Row="1" Margin="0,20,0,0" HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"  />
                         <RowDefinition Height="auto" />
+                        <RowDefinition Height="5" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -72,9 +77,10 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uieCOS"/></TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTVOC"/></TextBlock>
                     <Border Grid.Row="1" Grid.Column="2" Height="30" Width="90" x:Name="uiColor" Background="White" />
+                    <Line Grid.Row="2" Grid.Column="0" Tag="eCosColor" Style="{StaticResource sGraphLineKey}" />
+                    <Line Grid.Row="2" Grid.Column="1" Tag="TVOCColor" Style="{StaticResource sGraphLineKey}" />
                 </Grid>
-                    <oxyplot:PlotView Grid.Row="2"  x:Name="uiOxyPlot"   />
-                <TextBlock Grid.Row="3" Style="{StaticResource sDeviceMinorText}">TESTING</TextBlock>
+                    <oxyplot:PlotView Grid.Row="2"  x:Name="uiOxyPlot" Background="Transparent"   />
             </Grid>
             <TextBlock Grid.Row="2" Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
             <local:BTConnectionControl Grid.Row="3" x:Name="uiBTConnectionControl" />

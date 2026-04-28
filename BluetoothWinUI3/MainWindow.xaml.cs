@@ -552,13 +552,13 @@ namespace BluetoothWinUI3
 
             // Update the set of graph line that can be colored
             uiBTGraphColorsMenu.Items.Clear();
-            var graphnames = selected.GraphNames;
-            foreach (var graphname in graphnames)
+            var linenames = selected.LineNames;
+            foreach (var linename in linenames)
             {
                 var menu = new MenuFlyoutItem()
                 {
-                    Text = graphname,
-                    Tag= graphname,
+                    Text = linename,
+                    Tag= linename,
                 };
                 menu.Click += OnChangeGraphColor ;
                 uiBTGraphColorsMenu.Items.Add(menu);
@@ -578,12 +578,12 @@ namespace BluetoothWinUI3
 
             var colorsSave = saveData.GetDeviceColors(Application.Current.RequestedTheme);
 
-            ulong colorulong = selected.GetGraphColor(tag);
+            uint coloruint = selected.GetGraphColor(tag);
             Windows.UI.Color color= Windows.UI.Color.FromArgb(
                 0xFF, // always fully opaque for graph colors#
-                (byte)((colorulong >> 16) & 0xFF),
-                (byte)((colorulong >> 8) & 0xFF),
-                (byte)(colorulong & 0xFF)
+                (byte)((coloruint >> 16) & 0xFF),
+                (byte)((coloruint >> 8) & 0xFF),
+                (byte)(coloruint & 0xFF)
                 );
 
 

@@ -71,4 +71,16 @@
         <Setter Property="FontSize" Value="10" />
     </Style>
 
+
+    <Style x:Key="sGraphLineKey" TargetType="Line">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="X1" Value="0" />
+        <Setter Property="X2" Value="100" />
+        <Setter Property="Y1" Value="0" />
+        <Setter Property="Y2" Value="0" />
+        <Setter Property="Stroke" Value="Transparent" />
+        <Setter Property="StrokeThickness" Value="4" />
+    </Style>
+
+
 </ResourceDictionary>

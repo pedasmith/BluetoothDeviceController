@@ -181,15 +181,15 @@ namespace BluetoothWinUI3
     }
     public class DeviceColors
     {
-        public static ulong ColorIsDefault = 0xFF000000_000000; // not a valid ARGB color! Those are only 32 bits!
-        public ulong TextColor { get; set; } = ColorIsDefault;
-        public ulong BackgroundColor { get; set; } = ColorIsDefault;
+        public static uint ColorIsDefault = 0xAA000000; // Valid but uncommon ARGB color.
+        public uint TextColor { get; set; } = ColorIsDefault;
+        public uint BackgroundColor { get; set; } = ColorIsDefault;
 
-        public Dictionary<string, ulong> GraphColors { get; set;  } = new Dictionary<string, ulong>(); //TODO: need a set for reading in?
+        public Dictionary<string, uint> GraphColors { get; set;  } = new Dictionary<string, uint>(); //DOC: need a set for reading in?
 
         public const string GraphPrefix = "Graph:";
 
-        public void Set(string tagName, ulong color)
+        public void Set(string tagName, uint color)
         {
             switch (tagName)
             {
@@ -233,7 +233,7 @@ namespace BluetoothWinUI3
 
 
 
-        private static Color ConvertIgnoreA(ulong color)
+        private static Color ConvertIgnoreA(uint color)
         {
             Color retval = new Color()
             {
@@ -245,10 +245,10 @@ namespace BluetoothWinUI3
             return retval;
         }
 
-        public static ulong ConvertBackIgnoreA(Color color)
+        public static uint ConvertBackIgnoreA(Color color)
         {
             byte a = 0xFF; // would be color.A, but that's set to 0???
-            ulong retval = ((ulong)a << 24) | ((ulong)color.R << 16) | ((ulong)color.G << 8) | ((ulong)color.B << 0);
+            uint retval = ((uint)a << 24) | ((uint)color.R << 16) | ((uint)color.G << 8) | ((uint)color.B << 0);
             return retval;
         }
 
@@ -257,7 +257,7 @@ namespace BluetoothWinUI3
         /// </summary>
         /// <param name="color"></param>
         /// <returns></returns>
-        public static SolidColorBrush GetBrush(ulong color)
+        public static SolidColorBrush GetBrush(uint color)
         {
             if (color == DeviceColors.ColorIsDefault) return default;
             return new SolidColorBrush(ConvertIgnoreA(color));
