@@ -4,6 +4,7 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Storage;
 using Windows.System.Display;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -103,13 +105,47 @@ namespace BluetoothWinUI3
             CurrUserPrefs.Save();
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs args)
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs args)
         {
+            if (rootPanel.ActualHeight < 800)
+            {
+                // DOC: why this size? Because Windows does some kind of scaling that I'm not privy to?
+                // The value selected was just kind of eyeballed.
+                this.AppWindow.Resize(new Windows.Graphics.SizeInt32(1300, 1080));
+            }
+            await SetIconAsync();
+
             SetUxFromUserPreferences();
             if (CurrUserPrefs.AutostartAdvertisementWatcher)
             {
                 AdvertisementWatcher.Start();
             }
+        }
+
+        // Code is From https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.windowing.appwindow.seticon?view=windows-app-sdk-1.8#Microsoft_UI_Windowing_AppWindow_SetIcon_System_String_
+        private async Task SetIconAsync()
+        {
+            Uri uri = new Uri("ms-appx:///Assets/Icons/BTIcon.ico");
+            StorageFile storageFile = null;
+            try
+            {
+                storageFile = await StorageFile.GetFileFromApplicationUriAsync(uri);
+            }
+            catch (Exception ex)
+            {
+                Log($"Error while setting icon: {ex.Message}");
+            }
+
+            if (storageFile is not null)
+            {
+                this.AppWindow.SetIcon(storageFile.Path);
+            }
+        }
+
+        private static void Log(string str)
+        {
+            System.Diagnostics.Debug.WriteLine(str);
+            Console.WriteLine(str);
         }
 
         private void SetUxFromUserPreferences()

@@ -16,9 +16,9 @@
   <mp:PhoneIdentity PhoneProductId="d4259923-e686-4407-8e5d-b94dc791f931" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>BluetoothWinUI3</DisplayName>
-    <PublisherDisplayName>toomr</PublisherDisplayName>
-    <Logo>Assets\StoreLogo.png</Logo>
+    <DisplayName>Simple Bluetooth Device Controller</DisplayName>
+    <PublisherDisplayName>Shipwreck Software</PublisherDisplayName>
+    <Logo>Assets\Icons\StoreLogo.png</Logo>
   </Properties>
 
   <Dependencies>
@@ -35,13 +35,18 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="BluetoothWinUI3"
-        Description="BluetoothWinUI3"
+        DisplayName="Simple Bluetooth Device Controller"
+        Description="Simple to use program that displays well-known Bluetooth devices"
         BackgroundColor="transparent"
-        Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        Square150x150Logo="Assets\Icons\Square150x150Logo.png"
+        Square44x44Logo="Assets\Icons\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Icons\Wide310x150Logo.png" >
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo"/>
+            <uap:ShowOn Tile="wide310x150Logo"/>
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile >
+        <uap:SplashScreen Image="Assets\Icons\SplashScreen.png" />
       </uap:VisualElements>
     </Application>
   </Applications>
@@ -49,5 +54,6 @@
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
     <systemai:Capability Name="systemAIModels"/>
+    <DeviceCapability Name="bluetooth"/>
   </Capabilities>
 </Package>
