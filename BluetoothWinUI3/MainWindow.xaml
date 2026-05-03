@@ -66,6 +66,7 @@
                     <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
                 </MenuBarItem>
                 <MenuBarItem Title="Help" AccessKey="H">
+                    <MenuFlyoutItem Text="View Help" Click="OnHelpViewHelp" />
                     <MenuFlyoutItem Text="About" Click="OnHelpAbout" AccessKey="a" />
                 </MenuBarItem>
             </MenuBar>
@@ -73,6 +74,11 @@
             <!-- All of the known devices -->
             <GridView Grid.Row="1" x:Name="uiKnownDevices" SelectionMode="Single" SelectionChanged="OnKnownDeviceSelectionChanged">
             </GridView>
+
+            <Border Grid.Row="1" x:Name="uiGuidance" Style="{StaticResource sHelpPanel}" Visibility="Collapsed">
+                <local:MarkdownHelpSystem x:Name="uiMarkdownHelp" />
+            </Border>
+
 
             <!-- Status row -->
             <StackPanel Grid.Row="2">
@@ -107,6 +113,18 @@
             <ContentDialog x:Name="uiDialogRenameDevice" Title="Rename Device"
                        PrimaryButtonText="Ok" IsPrimaryButtonEnabled="True">
                 <TextBox x:Name="uiDialogRenameDeviceName" />
+            </ContentDialog>
+
+            <ContentDialog x:Name="uiDialogAbout" Title="About Simple Bluetooth DeviceController"
+                           PrimaryButtonText="Ok" IsPrimaryButtonEnabled="True">
+                <TextBlock IsTextSelectionEnabled="True">
+                    <LineBreak />
+                    Control some common Bluetooth devices with a simple interface.
+                    <LineBreak />
+                    Blog: <Hyperlink NavigateUri="https://shipwrecksoftware.wordpress.com/" >ShipwreckSoftware.wordpress.com</Hyperlink>
+                    <LineBreak />
+                    <Run>Version:</Run><Run x:Name="uiVersion" />
+                </TextBlock>
             </ContentDialog>
 
         </Grid>

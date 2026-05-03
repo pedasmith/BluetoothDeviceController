@@ -15,12 +15,20 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="Assets\HelpFiles\Device_Nordic_Thingy.md" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="AppDictionary.xaml" />
+    <None Remove="Assets\DevicePictures\Nordic_Thingy.png" />
+    <None Remove="Assets\HelpFiles\Help_Main.md" />
+    <None Remove="Assets\HelpFiles\Issues_With_MarkdownTextBlock.md" />
+    <None Remove="Assets\HelpFiles\Release_Notes.md" />
     <None Remove="Assets\Icons\BTIcon.ico" />
     <None Remove="Assets\Icons\Icon.png" />
     <None Remove="Assets\Icons\StoreLogo.png" />
     <None Remove="BTBlank_BlankControl.xaml" />
     <None Remove="BTNordic_ThingyControl.xaml" />
+    <None Remove="MarkdownHelpSystem.xaml" />
     <None Remove="TestUserControl.xaml" />
   </ItemGroup>
 	
@@ -42,11 +50,27 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Labs.WinUI.Controls.MarkdownTextBlock" Version="0.1.251217-build.2433" />
     <PackageReference Include="H.OxyPlot.WinUI" Version="0.9.30" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260209005" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Assets\DevicePictures\Nordic_Thingy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\DevicePictures\Nordic_Thingy_ScreenShot_01.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\HelpFiles\Help_Main.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\HelpFiles\Issues_With_MarkdownTextBlock.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\HelpFiles\Release_Notes.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\Icons\BTIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -78,6 +102,16 @@
     <Content Update="Assets\Icons\Wide310x150Logo.scale-200.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\HelpFiles\Device_Nordic_Thingy.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="MarkdownHelpSystem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="BTBlank_BlankControl.xaml">

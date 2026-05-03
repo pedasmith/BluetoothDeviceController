@@ -37,6 +37,20 @@
         <Setter Property="Width" Value="380" />
     </Style>
 
+    <Style x:Key="sHelpPanel" TargetType="Border"  >
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#DDDDDD" />
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="5" />
+    </Style>
+
+    <Style x:Key="sTitle" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="24" />
+    </Style>
+
+
     <!-- example: Thingy 52 -->
     <Style x:Key="sDeviceTitle" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
         <Setter Property="FontWeight" Value="Bold" />

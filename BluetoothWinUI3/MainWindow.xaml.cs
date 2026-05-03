@@ -1,10 +1,10 @@
+using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWatcher.Units;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,10 +12,12 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Utilities;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage;
 using Windows.System.Display;
+
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -84,6 +86,8 @@ namespace BluetoothWinUI3
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        // MARKDOWN: IImageProvider requires two methods, ShouldUseThisProvider() and GetImage()
+
         BluetoothWatcher.AdvertismentWatcher.AdvertisementWatcher AdvertisementWatcher = new BluetoothWatcher.AdvertismentWatcher.AdvertisementWatcher();
         int NAdvertisements = 0;
         UserPreferences CurrUserPrefs = new UserPreferences();
@@ -98,12 +102,14 @@ namespace BluetoothWinUI3
             // Activated is completely the wrong thing! this.Activated += MainWindow_Activated;
             rootPanel.Loaded += MainWindow_Loaded; // but it works for now. TODO: find a better way to trigger the autostart of the watcher after the window is ready.
             this.Closed += MainWindow_Closed;
+
         }
 
         private void MainWindow_Closed(object sender, WindowEventArgs args)
         {
             CurrUserPrefs.Save();
         }
+
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs args)
         {
@@ -288,9 +294,12 @@ namespace BluetoothWinUI3
             Application.Current.Exit();
         }
 
-        private void OnHelpAbout(object sender, RoutedEventArgs e)
+        private async void OnHelpAbout(object sender, RoutedEventArgs e)
         {
             // TODO: make this work
+            var version = Package.Current.Id.Version;
+            uiVersion.Text = $"{version.Major}.{version.Minor}";
+            await uiDialogAbout.ShowAsync();
         }
 
         private void OnDebugLoadDevices(object sender, RoutedEventArgs e)
@@ -612,6 +621,24 @@ namespace BluetoothWinUI3
             colorsSave.Set("Graph:" + tag, newcolor);
             AllSaveData.Save();
             selected.UpdateGraph(tag, newcolor);
+        }
+
+
+
+
+        private async void OnHelpViewHelp(object sender, RoutedEventArgs e)
+        {
+            switch (uiGuidance.Visibility)
+            {
+                case Visibility.Collapsed:
+                    var ok = await uiMarkdownHelp.ShowHelpAsync("Help_Main.md");
+                    if (ok) uiGuidance.Visibility = Visibility.Visible;
+                    break;
+                case Visibility.Visible:
+                    uiGuidance.Visibility = Visibility.Collapsed;
+                    break;
+            }
+
         }
     }
 }
