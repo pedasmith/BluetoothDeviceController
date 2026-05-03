@@ -24,14 +24,16 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
     /// </summary>
     public class KnownDevice
     {
-        public KnownDevice(WatcherData advertisement, UserControl control, SupportedDevice supported)
+        public KnownDevice(WatcherData advertisement, UserControl control, ZoomableDeviceControl container, SupportedDevice supported)
         {
             Advertisement = advertisement;
             Control = control;
+            Container = container;
             Supported = supported;
         }
         public WatcherData Advertisement { get; set;  }
         public UserControl Control { get; set; }
+        public ZoomableDeviceControl Container { get; set; }
         public SupportedDevice Supported { get; set; }
 
         public BluetoothLEDevice BTLEDevice { get; set; }
@@ -48,9 +50,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
 
     public static class KnownDevices
     {
-        public static KnownDevice Add(WatcherData advertisement, UserControl control, SupportedDevice supported)
+        public static KnownDevice Add(WatcherData advertisement, UserControl control, ZoomableDeviceControl container, SupportedDevice supported)
         {
-            var known = new KnownDevice(advertisement, control, supported);
+            var known = new KnownDevice(advertisement, control, container, supported);
             AllDevices.Add(known);
             return known;
         }

@@ -226,10 +226,13 @@ namespace BluetoothWinUI3
                     var known = KnownDevices.Get(e);
                     if (known == null)
                     {
+                        // a control is, e.g., a BTNordic_ThingyControl
+                        var zoomControl = new ZoomableDeviceControl();
                         var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
+                        zoomControl.SetDeviceControl(control);
+                        uiKnownDevices.Items.Add(zoomControl);
 
-                        uiKnownDevices.Items.Add(control);
-                        known = KnownDevices.Add(e, control, supportedDevice);
+                        known = KnownDevices.Add(e, control, zoomControl, supportedDevice);
                         control.DataContext = known;
                         var userControl = control as IDeviceControl;
                         userControl?.UpdateUX(CurrUserPrefs);
@@ -313,20 +316,26 @@ namespace BluetoothWinUI3
             AllSaveData.Save();
         }
 
-        private async Task<IDeviceControl> GetBTSelectedAsync(string verb)
+        private async Task<ZoomableDeviceControl> GetZoomableSelectedAsync(string verb)
         {
-            var selected = uiKnownDevices.SelectedItem as IDeviceControl;
-            if (selected == null && uiKnownDevices.Items.Count == 1)
+            var selectedContainer = uiKnownDevices.SelectedItem as ZoomableDeviceControl;
+            if (selectedContainer == null && uiKnownDevices.Items.Count == 1)
             {
                 // If there is only one device, we can be nice and just rename that one without forcing the user to select it first.
                 uiKnownDevices.SelectedIndex = 0;
-                selected = uiKnownDevices.Items[0] as IDeviceControl;
+                selectedContainer = uiKnownDevices.Items[0] as ZoomableDeviceControl;
             }
-            if (selected == null && !String.IsNullOrEmpty(verb))
+            if (selectedContainer == null && !String.IsNullOrEmpty(verb))
             {
                 await ShowNotice("No device selected", $"You must select a device to {verb} it");
                 return null;
             }
+            return selectedContainer;
+        }
+        private async Task<IDeviceControl> GetBTSelectedAsync(string verb)
+        {
+            var selectedContainer = await GetZoomableSelectedAsync(verb);
+            var selected = selectedContainer?.GetDeviceControl() as IDeviceControl;
             return selected;
         }
 
@@ -480,7 +489,8 @@ namespace BluetoothWinUI3
         {
             foreach (var item in uiKnownDevices.Items)
             {
-                var device = item as IDeviceControl;
+                var deviceContainer =item as ZoomableDeviceControl;
+                var device = deviceContainer?.GetDeviceControl() as IDeviceControl;
                 if (device == null) continue;
                 device.UpdateUX(CurrUserPrefs);
             }
@@ -546,9 +556,26 @@ namespace BluetoothWinUI3
         private async void OnDebugWindowSize(object sender, RoutedEventArgs e)
         {
             string verb = "Resize";
-            var selected = await GetBTSelectedAsync(verb);
-            if (selected == null) return;
+            var selectedContainer = await GetZoomableSelectedAsync(verb);
+            if (selectedContainer == null) return;
+            var selectedControl = selectedContainer.GetDeviceControl();
+            var selected = selectedControl as IDeviceControl;
+            if (selected == null) return; // should never happen
+
             var newSize = (CurrSelectedWindowSize == WindowSize.Normal) ? WindowSize.Large : WindowSize.Normal;
+            switch (newSize)
+            {
+                case WindowSize.Normal:
+                    uiZoomPanel.Children.Clear();
+                    selectedContainer.ReparentDeviceControl();
+                    break;
+                case WindowSize.Large:
+                    selectedContainer.UnparentDeviceControl();
+                    selectedControl.HorizontalAlignment = HorizontalAlignment.Center;
+                    selectedControl.VerticalAlignment = VerticalAlignment.Center;
+                    uiZoomPanel.Children.Add(selectedControl);
+                    break;
+            }
             selected.UpdateUX(newSize);
             CurrSelectedWindowSize = newSize;
             // Don't have to do anything on failure (which can't really happen)

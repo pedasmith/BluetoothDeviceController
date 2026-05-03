@@ -9,12 +9,14 @@
             <SolidColorBrush x:Key="sAllFonts_Foreground" Color="#FF5555FF" />
             <SolidColorBrush x:Key="sDeviceBorder_BorderBrush" Color="DarkGray" />
             <SolidColorBrush x:Key="sDeviceBorder_Background" Color="#FF221155" />
-
+            <SolidColorBrush x:Key="sZoomableDeviceBorder_Background" Color="Gray" />
         </ResourceDictionary>
+        
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="sAllFonts_Foreground" Color="DarkCyan" />
             <SolidColorBrush x:Key="sDeviceBorder_BorderBrush" Color="Gray" />
             <SolidColorBrush x:Key="sDeviceBorder_Background" Color="LightBlue" />
+            <SolidColorBrush x:Key="sZoomableDeviceBorder_Background" Color="Gray" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 
@@ -36,7 +38,11 @@
         <Setter Property="Height" Value="380" />
         <Setter Property="Width" Value="380" />
     </Style>
-
+    
+    <Style x:Key="sZoomableDeviceBorder" TargetType="Border" BasedOn="{StaticResource sDeviceBorder}">
+        <Setter Property="Background" Value="{ThemeResource sZoomableDeviceBorder_Background}" />
+    </Style>
+    
     <Style x:Key="sHelpPanel" TargetType="Border"  >
         <Setter Property="Background" Value="White" />
         <Setter Property="BorderBrush" Value="#DDDDDD" />

@@ -74,6 +74,9 @@
             <!-- All of the known devices -->
             <GridView Grid.Row="1" x:Name="uiKnownDevices" SelectionMode="Single" SelectionChanged="OnKnownDeviceSelectionChanged">
             </GridView>
+            <Grid Grid.Row="1" x:Name="uiZoomPanel">
+                
+            </Grid>
 
             <Border Grid.Row="1" x:Name="uiGuidance" Style="{StaticResource sHelpPanel}" Visibility="Collapsed">
                 <local:MarkdownHelpSystem x:Name="uiMarkdownHelp" />

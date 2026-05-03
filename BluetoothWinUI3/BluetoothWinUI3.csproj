@@ -30,6 +30,7 @@
     <None Remove="BTNordic_ThingyControl.xaml" />
     <None Remove="MarkdownHelpSystem.xaml" />
     <None Remove="TestUserControl.xaml" />
+    <None Remove="ZoomableDeviceControl.xaml" />
   </ItemGroup>
 	
   <ItemGroup> 
@@ -107,6 +108,9 @@
     <None Update="Assets\HelpFiles\Device_Nordic_Thingy.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Page Update="ZoomableDeviceControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="MarkdownHelpSystem.xaml">
