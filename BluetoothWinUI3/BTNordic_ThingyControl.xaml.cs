@@ -1,7 +1,6 @@
 using BluetoothProtocols;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
@@ -12,10 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 using System.Linq;
-using System.Xml.Linq;
 using Utilities;
 using Windows.Devices.Bluetooth;
-using Windows.UI.ApplicationSettings;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -25,37 +22,7 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
-public interface IDeviceControl
-{
-    /// <summary>
-    /// Returns the KnownDevice associated with the device
-    /// </summary>
-    /// <returns></returns>
-    KnownDevice GetKnownDevice();
 
-    /// <summary>
-    /// Get the list of graph name (e.g., "Temperature", "Pressure", "Humidity". This will be used by
-    /// e.g., the MainWindow to update the device menu display
-    /// </summary>
-    List<string> LineNames { get; }
-    uint GetGraphColor(string lineName); // OxyColor is a set of 4 bytes ARGB
-
-    /// <summary>
-    /// Update the color of a single line
-    /// </summary>
-    void UpdateGraph(string lineName, uint color);
-
-    /// <summary>
-    /// updates the device control user interface base on the user preferences in SaveData.
-    /// </summary>
-    /// <param name="saveData"></param>
-    void UpdateUX(SaveData saveData);
-
-    void UpdateUX(UserPreferences userprefs);
-
-    void UpdateUX(MainWindow.WindowSize windowSize);
-
-}
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
@@ -103,26 +70,13 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         return DataContext as KnownDevice;
     }
 
-    /// <summary>
-    /// Used to, e.g., find all lines with the right Tag and recolor them
-    /// </summary>
-    private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-    {
-        if (depObj == null) yield return (T)Enumerable.Empty<T>();
-        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-        {
-            DependencyObject ithChild = VisualTreeHelper.GetChild(depObj, i);
-            if (ithChild == null) continue;
-            if (ithChild is T t) yield return t;
-            foreach (T childOfChild in FindVisualChildren<T>(ithChild)) yield return childOfChild;
-        }
-    }
 
     // H.Oxyplot
     private PlotModel OxyPlotModel { get; set; } = new PlotModel
     {
         Title = "Environment Data",
         PlotAreaBorderColor = OxyColors.Transparent,
+        TextColor = OxyColors.Black, 
         Axes =
             {
                 new DateTimeAxis { Position = AxisPosition.Bottom },
@@ -192,7 +146,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     public void SetAxesVisibility(bool isVisible)
     {
-        // // // AxisPosition leftright = AxisPosition.Left;
         foreach (var axis in OxyPlotModel.Axes)
         {
             axis.IsAxisVisible = isVisible;
@@ -213,18 +166,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             {
                 if (lineSeries.DataFieldY == name)
                 {
-                    return OxyColorToUint(lineSeries.Color);
+                    return UtilitiesOxyColor.OxyColorToUint(lineSeries.Color);
                 }
             }
         }
-        return OxyColorToUint(OxyColors.Undefined);
+        return UtilitiesOxyColor.OxyColorToUint(OxyColors.Undefined);
     }
 
-    private uint OxyColorToUint(OxyColor color)
-    {
-        uint retval = ((uint)color.A << 24) | ((uint)color.R << 16) | ((uint)color.G << 8) | color.B;
-        return retval;
-    }
+
 
     /// <summary>
     /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
@@ -259,9 +208,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         KnownDeviceFromDataContext.Id = Device.ble.DeviceId ?? ""; // never null :-)
         KnownDeviceFromDataContext.BTLEDevice = Device.ble;
 
-        // Inititliaze the line colors from the default colors in the OxyPlotModel.
+        // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
-        InitializeLineColors();
+        InitializeKeyLineColorsFromDefaultOxyPlot();
 
 
         var saveData = AllSaveData.FindWithId(KnownDeviceFromDataContext.Id);
@@ -285,7 +234,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// <summary>
     /// Sets the line colors for the keys based on the OxyPlotModel values.
     /// </summary>
-    private void InitializeLineColors()
+    private void InitializeKeyLineColorsFromDefaultOxyPlot()
     {
         foreach (var series in OxyPlotModel.Series)
         {
@@ -297,8 +246,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                     if (lineSeries.Color != OxyColors.Automatic
                         && lineSeries.Color != OxyColors.Undefined)
                     {
-                        var color = OxyColorToUint(lineSeries.Color);
-                        SetLineColor(name, color);
+                        var color = UtilitiesOxyColor.OxyColorToUint(lineSeries.Color);
+                        SetLineKeyColor(name, color);
                     }
                 }
             }
@@ -306,7 +255,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     }
 
-    public void UpdateGraph(string lineName, uint color)
+    /// <summary>
+    /// Updates the OxyPlot line with a given name (e.g., "Temperature"). Is called from MainWindow when the
+    /// user picks a new color.
+    /// </summary>
+    /// <param name="lineName"></param>
+    /// <param name="color"></param>
+
+    public void UpdateGraphColor(string lineName, uint color)
     {
         foreach (var series in OxyPlotModel.Series)
         {
@@ -321,12 +277,19 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 }
             }
         }
-        SetLineColor(lineName, color);
+        SetLineKeyColor(lineName, color);
     }
 
-    private void SetLineColor(string lineName, uint color)
+    /// <summary>
+    /// The "line" here are the key lines that are generally placed below the data. For example, there's a block 
+    /// with the most recent Temperature data, plus a little title, plus a line that gets colored with the same
+    /// color as the graph line.
+    /// </summary>
+    /// <param name="lineName"></param>
+    /// <param name="color"></param>
+    private void SetLineKeyColor(string lineName, uint color)
     {
-        foreach (Line line in FindVisualChildren<Line>(rootPanel))
+        foreach (Line line in UtilitiesWinUI3.UtilitiesWinUI3.FindVisualChildren<Line>(rootPanel))
         {
             if ((line.Tag as string) == lineName + "Color") // e.g., Tag="TemperatureColor"
             {
@@ -355,10 +318,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             var brushes = new DeviceColorBrushes(colors);
             DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
 
-            // Also set the graph colors.
+            // Set the graph text colors
+            var oxyColorText = UtilitiesOxyColor.WinUI3ColorToOxyColor(colors.TextColor);
+            OxyPlotModel.TextColor = oxyColorText;
+
+            // Also set the graph line colors.
             foreach (var (lineName, color) in colors.GraphColors)
             {
-                UpdateGraph(lineName, color);
+                UpdateGraphColor(lineName, color);
             }
         }
     }
@@ -461,12 +428,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 break;
         }
 
-        switch (name)
-        {
-            case Nordic_Thingy.Temperature_cPropertyChangedName:
-                //TempSeries.Points.Add(new OxyPlot.DataPoint(HistoricalEnvironment_Data.Temperature.Count, CurrEnvironment_Data.Temperature));
-                break;
-        }
 
         if (CurrBattery_Data != null)
         {

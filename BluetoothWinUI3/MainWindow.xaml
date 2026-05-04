@@ -107,7 +107,7 @@
                         <Button Content="Copy Addresses" Click="OnAdvertisementCopyUniqueAddresses" />
                         <TextBlock>N=</TextBlock>
                         <TextBlock x:Name="uiAdvertCount" />
-                        <TextBlock>  | RAW=</TextBlock>
+                        <TextBlock>  | </TextBlock>
                         <TextBlock x:Name="uiAdvertRaw" />
                     </StackPanel>
                 </Grid>

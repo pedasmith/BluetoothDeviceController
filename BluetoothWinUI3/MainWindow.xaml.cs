@@ -647,7 +647,7 @@ namespace BluetoothWinUI3
             // Save it and update colors!
             colorsSave.Set("Graph:" + tag, newcolor);
             AllSaveData.Save();
-            selected.UpdateGraph(tag, newcolor);
+            selected.UpdateGraphColor(tag, newcolor);
         }
 
 

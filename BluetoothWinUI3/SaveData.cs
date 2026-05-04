@@ -182,6 +182,9 @@ namespace BluetoothWinUI3
     public class DeviceColors
     {
         public static uint ColorIsDefault = 0xAA000000; // Valid but uncommon ARGB color.
+        /// <summary>
+        /// Color is a uint of ARGB (msb to lsb, of course)
+        /// </summary>
         public uint TextColor { get; set; } = ColorIsDefault;
         public uint BackgroundColor { get; set; } = ColorIsDefault;
 

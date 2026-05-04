@@ -192,4 +192,5 @@
   <Import Project="..\BluetoothProtocolsAdvertisements\BluetoothProtocolsAdvertisements.projitems" Label="Shared" />
   <Import Project="..\IotNumberFormats\IotNumberFormats.projitems" Label="Shared" />
   <Import Project="..\BluetoothProtocolsDevicesCore\BluetoothProtocolsDevicesCore.projitems" Label="Shared" />
+  <Import Project="..\UtilitiesWinUI3\UtilitiesWinUI3.projitems" Label="Shared" />
 </Project>
