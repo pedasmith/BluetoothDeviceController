@@ -32,12 +32,15 @@
                     <ToggleMenuFlyoutItem Text="Keep Screen On" Click="OnFileKeepScreenOn" AccessKey="k" />
                     <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
                 </MenuBarItem>
+                <MenuBarItem Title="View" AccessKey="V">
+                    <ToggleMenuFlyoutItem Text="Set large" Click="OnViewWindowSize" AccessKey="L" />
+                    <ToggleMenuFlyoutItem Text="Show Table" Click="OnViewToggleTable" AccessKey="T" />
+                </MenuBarItem>
                 <MenuBarItem Title="Bluetooth Device" AccessKey="B">
                     <MenuFlyoutItem Text="Rename" Click="OnBTRename" AccessKey="R" />
                     <MenuFlyoutItem Text="Background Color" Click="OnBTColor" Tag="BackgroundColor" AccessKey="T" />
                     <MenuFlyoutItem Text="Text Color" Click="OnBTColor" Tag="TextColor" AccessKey="T" />
-                    <MenuFlyoutSubItem Text="Graph Colors" x:Name="uiBTGraphColorsMenu">
-                    </MenuFlyoutSubItem>
+                    <MenuFlyoutSubItem Text="Graph Colors" x:Name="uiBTGraphColorsMenu" />
                 </MenuBarItem>
                 <MenuBarItem Title="Preferences" AccessKey="P">
                     <MenuFlyoutSubItem Text="Temperature Units" x:Name="uiTemperaturePreferences">
@@ -60,7 +63,6 @@
 
                 </MenuBarItem>
                 <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
-                    <ToggleMenuFlyoutItem Text="Set large" Click="OnDebugWindowSize" AccessKey="L" />
                     <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="D" />
                     <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
                     <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />

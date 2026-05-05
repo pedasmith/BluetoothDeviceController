@@ -81,6 +81,7 @@
                     <Line Grid.Row="2" Grid.Column="1" Tag="TVOCColor" Style="{StaticResource sGraphLineKey}" />
                 </Grid>
                 <oxyplot:PlotView Grid.Row="2"  x:Name="uiOxyPlot" Background="Transparent"   />
+                <TextBlock Grid.Row="2" x:Name="uiDataGrid" Visibility="Collapsed" Text="Fake DataGrid" />
             </Grid>
             <TextBlock Grid.Row="2" Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
             <local:BTConnectionControl Grid.Row="3" x:Name="uiBTConnectionControl" />

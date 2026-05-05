@@ -551,9 +551,23 @@ namespace BluetoothWinUI3
             UpdateAllDeviceUserPreferences();
         }
 
+        private async void OnViewToggleTable(object sender, RoutedEventArgs e)
+        {
+            string verb = "View Table";
+            var selectedContainer = await GetZoomableSelectedAsync(verb);
+            if (selectedContainer == null) return;
+            var selectedControl = selectedContainer.GetDeviceControl();
+            var selected = selectedControl as IDeviceControl;
+            if (selected == null) return; // should never happen
+
+
+            var currVisibility = selected.GetDataGridVisibility();
+            var newVisibility = (currVisibility == IDeviceControl.Visibility.Collapsed) ? IDeviceControl.Visibility.Visible : IDeviceControl.Visibility.Collapsed;
+            selected.SetDataGridVisibility(newVisibility);
+        }
 
         WindowSize CurrSelectedWindowSize = WindowSize.Normal;
-        private async void OnDebugWindowSize(object sender, RoutedEventArgs e)
+        private async void OnViewWindowSize(object sender, RoutedEventArgs e)
         {
             string verb = "Resize";
             var selectedContainer = await GetZoomableSelectedAsync(verb);
@@ -667,5 +681,6 @@ namespace BluetoothWinUI3
             }
 
         }
+
     }
 }

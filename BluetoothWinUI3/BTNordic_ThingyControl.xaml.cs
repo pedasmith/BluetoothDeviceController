@@ -275,6 +275,30 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     }
 
+    public IDeviceControl.Visibility GetDataGridVisibility()
+    {
+        var retval = (uiDataGrid.Visibility == Visibility.Visible) 
+            ? IDeviceControl.Visibility.Visible : IDeviceControl.Visibility.Collapsed;
+        return retval;
+    }
+
+    public void SetDataGridVisibility(IDeviceControl.Visibility visibility)
+    {
+        switch (visibility)
+        {
+            case IDeviceControl.Visibility.Collapsed:
+                uiOxyPlot.Visibility = Visibility.Visible;
+                uiDataGrid.Visibility = Visibility.Collapsed;
+                break;
+            case IDeviceControl.Visibility.Visible:
+            default:
+                uiOxyPlot.Visibility = Visibility.Collapsed;
+                uiDataGrid.Visibility = Visibility.Visible;
+                break;
+        }
+    }
+
+
     /// <summary>
     /// Sets the line colors for the keys based on the OxyPlotModel values.
     /// </summary>
