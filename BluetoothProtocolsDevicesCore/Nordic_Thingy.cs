@@ -1,5 +1,4 @@
 ﻿//From template: Protocol_Core_Body v2026-04-17 11:43
-//From template: Protocol_Body v2022-07-02 9:54
 using System;
 using System.Collections.Generic;
 using System.ComponentModel; // Needed for INotifyPropertyChanged
@@ -18,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-04-26::10:35
+    /// This class was automatically generated 2026-05-05::11:36
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -261,11 +260,11 @@ namespace BluetoothProtocols
         {
             public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
-            public double Temperature { get; set; } // From Environment and Temperature (c)
-            public double Pressure { get; set; } // From Environment and Pressure (hpa)
-            public double Humidity { get; set; } // From Environment and Humidity (%)
-            public double eCOS { get; set; } // From Environment and Air Quality eCOS TVOC
-            public double TVOC { get; set; } // From Environment and Air Quality eCOS TVOC
+            public double Temperature { get; set; } = 0.0; // From Environment and Temperature (c)
+            public double Pressure { get; set; } = 0.0; // From Environment and Pressure (hpa)
+            public double Humidity { get; set; } = 0; // From Environment and Humidity (%)
+            public double eCOS { get; set; } = 0; // From Environment and Air Quality eCOS TVOC
+            public double TVOC { get; set; } = 0; // From Environment and Air Quality eCOS TVOC
 
             public Environment_Data Clone()
             {
@@ -488,10 +487,10 @@ namespace BluetoothProtocols
         {
             public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
-            public double Red { get; set; } // From Environment and Color RGB+Clear
-            public double Green { get; set; } // From Environment and Color RGB+Clear
-            public double Blue { get; set; } // From Environment and Color RGB+Clear
-            public double Clear { get; set; } // From Environment and Color RGB+Clear
+            public double Red { get; set; } = 0; // From Environment and Color RGB+Clear
+            public double Green { get; set; } = 0; // From Environment and Color RGB+Clear
+            public double Blue { get; set; } = 0; // From Environment and Color RGB+Clear
+            public double Clear { get; set; } = 0; // From Environment and Color RGB+Clear
 
             public EnvironmentColor_Data Clone()
             {
@@ -568,14 +567,14 @@ namespace BluetoothProtocols
         {
             public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
-            public double TempInterval { get; set; } // From Environment and Environment Configuration
-            public double PressureInterval { get; set; } // From Environment and Environment Configuration
-            public double HumidityInterval { get; set; } // From Environment and Environment Configuration
-            public double ColorInterval { get; set; } // From Environment and Environment Configuration
-            public double GasMode { get; set; } // From Environment and Environment Configuration
-            public double RedCalibration { get; set; } // From Environment and Environment Configuration
-            public double GreenCalibration { get; set; } // From Environment and Environment Configuration
-            public double BlueCalibration { get; set; } // From Environment and Environment Configuration
+            public double TempInterval { get; set; } = 0; // From Environment and Environment Configuration
+            public double PressureInterval { get; set; } = 0; // From Environment and Environment Configuration
+            public double HumidityInterval { get; set; } = 0; // From Environment and Environment Configuration
+            public double ColorInterval { get; set; } = 0; // From Environment and Environment Configuration
+            public double GasMode { get; set; } = 0; // From Environment and Environment Configuration
+            public double RedCalibration { get; set; } = 0; // From Environment and Environment Configuration
+            public double GreenCalibration { get; set; } = 0; // From Environment and Environment Configuration
+            public double BlueCalibration { get; set; } = 0; // From Environment and Environment Configuration
 
             public EnvironmentConfiguration_Data Clone()
             {
@@ -664,7 +663,7 @@ namespace BluetoothProtocols
         {
             public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
-            public double BatteryLevel { get; set; } // From Battery and BatteryLevel
+            public double BatteryLevel { get; set; } = 0; // From Battery and BatteryLevel
 
             public Battery_Data Clone()
             {

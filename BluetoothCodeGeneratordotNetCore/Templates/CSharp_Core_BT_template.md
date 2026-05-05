@@ -357,7 +357,7 @@ This is the primary section of the code.
 ## CharacteristicPropertyDataFields Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
 
 ```
-            public [[VARIABLETYPE+DS]] [[DataName.dotNet]] { get; set; } // From [[ServiceName]] and [[CharacteristicName]]
+            public [[VariableTypeDS]] [[DataName.dotNet]] { get; set; } = [[DoubleOrStringDefault]]; // From [[ServiceName]] and [[CharacteristicName]]
 ```
 
 ## CharacteristicDataGroupForToString Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics Code="[[CharacteristicDataGroupFieldForToString]]" CodeListSubZero=""
@@ -843,6 +843,19 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
     ///</summary>
     public class [[DataGroupName.dotNet]]Collection 
     {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update([[CLASSNAME]].[[DataGroupName.dotNet]] value, Verb verb)
+        {
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
         public void Add([[CLASSNAME]].[[DataGroupName.dotNet]] value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;

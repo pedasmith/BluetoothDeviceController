@@ -341,7 +341,7 @@ namespace BluetoothWinUI3
 
         private async Task<KnownDevice> GetKnownDevice(IDeviceControl selected, string verb)
         {
-            var knownDevice = selected.GetKnownDevice();
+            var knownDevice = selected.KnownDeviceFromDataContext;
             if (knownDevice == null)
             {
                 await ShowNotice($"Can't ${verb} that device", "You cannot {verb} this device");

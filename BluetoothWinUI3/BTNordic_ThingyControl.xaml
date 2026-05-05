@@ -77,7 +77,7 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uieCOS"/></TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTVOC"/></TextBlock>
                     <Border Grid.Row="1" Grid.Column="2" Height="30" Width="90" x:Name="uiColor" Background="White" />
-                    <Line Grid.Row="2" Grid.Column="0" Tag="eCosColor" Style="{StaticResource sGraphLineKey}" />
+                    <Line Grid.Row="2" Grid.Column="0" Tag="eCOSColor" Style="{StaticResource sGraphLineKey}" />
                     <Line Grid.Row="2" Grid.Column="1" Tag="TVOCColor" Style="{StaticResource sGraphLineKey}" />
                 </Grid>
                 <oxyplot:PlotView Grid.Row="2"  x:Name="uiOxyPlot" Background="Transparent"   />

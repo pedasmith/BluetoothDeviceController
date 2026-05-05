@@ -19,7 +19,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This code was automatically generated 2026-04-26::10:35
+    /// This code was automatically generated 2026-05-05::11:36
     /// </summary>
 
     ///<summary>
@@ -30,6 +30,19 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
     ///</summary>
     public class Environment_DataCollection 
     {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update(Nordic_Thingy.Environment_Data value, Verb verb)
+        {
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
         public void Add(Nordic_Thingy.Environment_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
@@ -81,6 +94,19 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
     ///</summary>
     public class EnvironmentColor_DataCollection 
     {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update(Nordic_Thingy.EnvironmentColor_Data value, Verb verb)
+        {
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
         public void Add(Nordic_Thingy.EnvironmentColor_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
@@ -126,6 +152,19 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
     ///</summary>
     public class EnvironmentConfiguration_DataCollection 
     {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update(Nordic_Thingy.EnvironmentConfiguration_Data value, Verb verb)
+        {
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
         public void Add(Nordic_Thingy.EnvironmentConfiguration_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
@@ -183,6 +222,19 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
     ///</summary>
     public class Battery_DataCollection 
     {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update(Nordic_Thingy.Battery_Data value, Verb verb)
+        {
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
         public void Add(Nordic_Thingy.Battery_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;

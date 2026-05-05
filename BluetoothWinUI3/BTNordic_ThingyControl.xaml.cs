@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMe
 using System.Linq;
 using Utilities;
 using Windows.Devices.Bluetooth;
-
+using BluetoothProtocols.NS_Nordic_Thingy;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -23,6 +23,20 @@ namespace BluetoothWinUI3;
 #endif
 
 
+public static class Environment_DataUtilities
+{
+    /// <summary>
+    /// Returns true when the data has valid pressure, humidity data. Can't detect when the temperature is invalid
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static bool IsValidPH(this Nordic_Thingy.Environment_Data data)
+    {
+        // 0.0 is a valid temperature :-(
+        var retval = (data.Pressure != 0.0 && data.Humidity!= 0.0);
+        return retval;
+    }
+}
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
@@ -32,13 +46,10 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     private string InternalDeviceType = "Nordic_Thingy";
     Nordic_Thingy Device;
-    BluetoothProtocols.NS_Nordic_Thingy.Environment_DataCollection HistoricalEnvironment_Data 
-        = new BluetoothProtocols.NS_Nordic_Thingy.Environment_DataCollection();
-
+    Environment_DataCollection HistoricalEnvironment_Data = new Environment_DataCollection();
     Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
     Nordic_Thingy.Battery_Data CurrBattery_Data = null;
     Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
-
 
     MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
 
@@ -46,11 +57,11 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     {
         InitializeComponent();
         this.DataContextChanged += BTNordic_ThingyControl_DataContextChanged;
-        this.Loaded += BTNordic_ThingyControl_Loaded;
-    }
 
-    private void BTNordic_ThingyControl_Loaded(object sender, RoutedEventArgs e)
-    {
+        //
+        // Set up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
+        // This can't be done at initialization time because of C#: it won't let me use a regular
+        // field when doing an initialization.
         foreach (var series in OxyPlotModel.Series)
         {
             if (series is LineSeries lineSeries)
@@ -58,20 +69,18 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 lineSeries.ItemsSource = HistoricalEnvironment_Data.Data; //DOC:
             }
         }
-        uiOxyPlot.Model = OxyPlotModel; // DOC:
-        SetAxesVisibility(false); // starts off not visible
+        uiOxyPlot.Model = OxyPlotModel;
+
     }
 
+
+    // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
     public List<string> LineNames { get { return new List<string>() { "Temperature", "Pressure", "Humidity", "eCOS", "TVOC"  }; } }
 
-    KnownDevice KnownDeviceFromDataContext { get { return DataContext as KnownDevice; } }
-    public KnownDevice GetKnownDevice()
-    {
-        return DataContext as KnownDevice;
-    }
+    public KnownDevice KnownDeviceFromDataContext { get { return DataContext as KnownDevice; } }
 
 
-    // H.Oxyplot
+    // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; } = new PlotModel
     {
         Title = "Environment Data",
@@ -106,6 +115,21 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                     Title="Humidity",
                     Key="Humidity"
                 },
+                new LinearAxis
+                {
+                    Position = AxisPosition.Right,
+                    PositionTier = 0,
+                    Minimum = 380, // Initial eCOS is zero, which isn't a realistic value. An actual sensor reading is always 400 or more?
+                    Title="eCOS",
+                    Key="eCOS"
+                },
+                new LinearAxis
+                {
+                    Position = AxisPosition.Right,
+                    PositionTier = 1,
+                    Title="TVOC",
+                    Key="TVOC"
+                },
             },
         Series =
             {
@@ -113,7 +137,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 {
                     Title = "Temperature",
                     Color = OxyColors.DarkBlue,
-                    MarkerType = MarkerType.Circle,
+                    StrokeThickness = 0.75,
+                    MarkerType = MarkerType.None,
                     DataFieldX = "TimestampMostRecentDT",
                     DataFieldY = "Temperature",
                     YAxisKey= "Temperature",
@@ -122,7 +147,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 {
                     Title = "Pressure",
                     Color = OxyColors.LightBlue,
-                    MarkerType = MarkerType.Circle,
+                    StrokeThickness = 0.75,
+                    MarkerType = MarkerType.None,
                     DataFieldX = "TimestampMostRecentDT",
                     DataFieldY = "Pressure",
                     YAxisKey= "Pressure",
@@ -131,18 +157,36 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 {
                     Title = "Humidity",
                     Color = OxyColors.Violet,
-                    MarkerType = MarkerType.Circle,
+                    StrokeThickness = 0.75,
+                    MarkerType = MarkerType.None,
                     DataFieldX = "TimestampMostRecentDT",
                     DataFieldY = "Humidity",
                     YAxisKey= "Humidity",
                 },
+                new LineSeries
+                {
+                    Title = "eCOS",
+                    Color = OxyColors.Black,
+                    StrokeThickness = 0.75,
+                    MarkerType = MarkerType.None,
+                    DataFieldX = "TimestampMostRecentDT",
+                    DataFieldY = "eCOS",
+                    YAxisKey= "eCOS",
+                },
+                new LineSeries
+                {
+                    Title = "TVOC",
+                    Color = OxyColors.Gray,
+                    StrokeThickness = 0.75,
+                    MarkerType = MarkerType.None,
+                    DataFieldX = "TimestampMostRecentDT",
+                    DataFieldY = "TVOC",
+                    YAxisKey= "TVOC",
+                },
             }
     };
-    private const string LastAxisOnLeftKey = "Humidity";
     /// <summary>
-    /// Set the axes to either visible or invisible. The DataTimeAxis is always set to the bottom
-    /// when visible; LinearAxis will be set on the left up to the point when an axis matches 
-    /// the LastAxisOnLeftKey at which point it switches to the right.
+    /// Set the axes to either visible or invisible. 
     /// </summary>
     public void SetAxesVisibility(bool isVisible)
     {
@@ -415,16 +459,18 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             case Nordic_Thingy.HumidityPropertyChangedName:
             case Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName:
                 var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_Data.TimestampMostRecentAdd).TotalSeconds;
-                if (deltaInSeconds > 5) // NOTE: should this be adjustable by the user?
+                var verb = (deltaInSeconds > 5) ? Environment_DataCollection.Verb.Add : Environment_DataCollection.Verb.ReplaceMostRecent;
+                HistoricalEnvironment_Data.Update(CurrEnvironment_Data, verb); // Will add or replace the data and will copy as needed.
+                if (verb == Environment_DataCollection.Verb.Add && HistoricalEnvironment_Data.Count == 2)
                 {
-                    HistoricalEnvironment_Data.Add(CurrEnvironment_Data); // Will copy the data as needed.
-                    uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
+                    // DOC: Can't have the axes start off invisible because then they can't be switched back on
+                    if (CurrWindowSize == MainWindow.WindowSize.Normal)
+                    {
+                        // Just in case the user quick set to large.
+                        SetAxesVisibility(false);
+                    }
                 }
-                else
-                {
-                    HistoricalEnvironment_Data.ReplaceMostRecent(CurrEnvironment_Data); // Will copy the data as needed.
-                    uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
-                }
+                uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
                 break;
         }
 
@@ -437,7 +483,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             }
         }
 
-        if (CurrEnvironment_Data != null)
+        if (CurrEnvironment_Data != null && CurrEnvironment_Data.IsValidPH())
         {
             if (name == Nordic_Thingy.Temperature_cPropertyChangedName || name == "")
             {

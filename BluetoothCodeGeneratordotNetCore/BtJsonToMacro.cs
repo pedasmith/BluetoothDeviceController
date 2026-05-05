@@ -572,6 +572,7 @@ namespace BluetoothCodeGenerator
 
                     TemplateSnippet.AddMacroList(prlist, "AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     TemplateSnippet.AddMacroList(prlist, "DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "DoubleOrStringDefault", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
 
                     TemplateSnippet.AddMacroList(prlist, "PropertyIsHidden", item.IsHidden ? "true" : "false");
                     TemplateSnippet.AddMacroList(prlist, "DEC+OR+HEX", displayFormat);
