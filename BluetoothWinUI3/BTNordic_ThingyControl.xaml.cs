@@ -46,7 +46,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     private string InternalDeviceType = "Nordic_Thingy";
     Nordic_Thingy Device;
-    Environment_DataCollection HistoricalEnvironment_Data = new Environment_DataCollection();
+    public Environment_DataCollection HistoricalEnvironment_Data { get;  } = new Environment_DataCollection();
     Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
     Nordic_Thingy.Battery_Data CurrBattery_Data = null;
     Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
@@ -56,6 +56,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     public BTNordic_ThingyControl()
     {
         InitializeComponent();
+        this.Loaded += BTNordic_ThingyControl_Loaded;
         this.DataContextChanged += BTNordic_ThingyControl_DataContextChanged;
 
         //
@@ -71,6 +72,22 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         }
         uiOxyPlot.Model = OxyPlotModel;
 
+        //
+        // Set up the uiTableView
+        // https://github.com/w-ahmad/WinUI.TableView
+        //
+        // TODO: need to remove the data/time column
+        // TODO: datetime show the date, not the hh:mm:ss
+
+    }
+
+    private void BTNordic_ThingyControl_Loaded(object sender, RoutedEventArgs e)
+    {
+        // TODO: in progress
+        // Loaded gets called first when it's first loaded an then each time it's 
+        // attached to somewhere else (e.g., when the control is made large and then small)
+        if (uiTableView.ItemsSource != null) return;
+        uiTableView.ItemsSource = HistoricalEnvironment_Data.Data;
     }
 
 
@@ -277,7 +294,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     public IDeviceControl.Visibility GetDataGridVisibility()
     {
-        var retval = (uiDataGrid.Visibility == Visibility.Visible) 
+        var retval = (uiDataGridPanel.Visibility == Visibility.Visible) 
             ? IDeviceControl.Visibility.Visible : IDeviceControl.Visibility.Collapsed;
         return retval;
     }
@@ -288,12 +305,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             case IDeviceControl.Visibility.Collapsed:
                 uiOxyPlot.Visibility = Visibility.Visible;
-                uiDataGrid.Visibility = Visibility.Collapsed;
+                uiDataGridPanel.Visibility = Visibility.Collapsed;
                 break;
             case IDeviceControl.Visibility.Visible:
             default:
                 uiOxyPlot.Visibility = Visibility.Collapsed;
-                uiDataGrid.Visibility = Visibility.Visible;
+                uiDataGridPanel.Visibility = Visibility.Visible;
                 break;
         }
     }
@@ -450,6 +467,25 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     Dictionary<string, int> NPropertyChanges = new Dictionary<string, int>();
     //List<string> Sparkles = new List<string>() { "\u00A0", "*" }; // ✨", "💫", "🌟", "⚡", "🔥", "💥" };
     List<string> Sparkles = new List<string>() { "╺", "╼", "╾", "╸", "╾", "╼" }; 
+
+    private void UpdateSparkles(string name)
+    {
+        if (name == "") return;
+        NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
+        switch (name)
+        {
+            case "": break;
+            case Nordic_Thingy.Temperature_cPropertyChangedName: uiTemperature_cChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
+            case Nordic_Thingy.Pressure_hpaPropertyChangedName: uiPressure_hpaChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
+            case Nordic_Thingy.HumidityPropertyChangedName: uiHumidityChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
+            case Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName:
+                uieCOSChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+                uiTVOCChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+                break;
+            case Nordic_Thingy.Color_RGB_ClearPropertyChangedName: uiColorChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
+        }
+
+    }
     private void UpdateGraphData(string name)
     {
         if (Device == null) return;
@@ -458,22 +494,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         CurrEnvironmentColor_Data = Device.CurrEnvironmentColor_Data;
 
         // from e.PropertyName when the Device does a PropertyChanged.
-        if (name != "")
-        {
-            NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
-            switch (name)
-            {
-                case "": break;
-                case Nordic_Thingy.Temperature_cPropertyChangedName: uiTemperature_cChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
-                case Nordic_Thingy.Pressure_hpaPropertyChangedName: uiPressure_hpaChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
-                case Nordic_Thingy.HumidityPropertyChangedName: uiHumidityChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
-                case Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName:
-                    uieCOSChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-                    uiTVOCChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-                    break;
-                case Nordic_Thingy.Color_RGB_ClearPropertyChangedName: uiColorChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count]; break;
-            }
-        }
+
+        UpdateSparkles(name);
 
         // Track the historical data
         switch (name)
@@ -482,19 +504,33 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             case Nordic_Thingy.Pressure_hpaPropertyChangedName:
             case Nordic_Thingy.HumidityPropertyChangedName:
             case Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName:
-                var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_Data.TimestampMostRecentAdd).TotalSeconds;
-                var verb = (deltaInSeconds > 5) ? Environment_DataCollection.Verb.Add : Environment_DataCollection.Verb.ReplaceMostRecent;
-                HistoricalEnvironment_Data.Update(CurrEnvironment_Data, verb); // Will add or replace the data and will copy as needed.
-                if (verb == Environment_DataCollection.Verb.Add && HistoricalEnvironment_Data.Count == 2)
+                //
+                // Don't add to the CurrEnvironment until we P+T+H data (technically, we don't check T)
+                // That's because otherwise the graph tries to include 0  pressure on the pressure line
+                // which looks really weird.
+                // It would be OK to add for the table, but I'm willing to give that up in order to 
+                // make the graph better.
+
+                if (CurrEnvironment_Data.IsValidPH())
                 {
-                    // DOC: Can't have the axes start off invisible because then they can't be switched back on
-                    if (CurrWindowSize == MainWindow.WindowSize.Normal)
+                    var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_Data.TimestampMostRecentAdd).TotalSeconds;
+                    var verb = (deltaInSeconds > 5) ? Environment_DataCollection.Verb.Add : Environment_DataCollection.Verb.ReplaceMostRecent;
+                    HistoricalEnvironment_Data.Update(CurrEnvironment_Data, verb); // Will add or replace the data and will copy as needed.
+
+                    //
+                    // Update the OxyPlot because it doesn't tracked the INotifyCollectionChanged
+                    //
+                    if (verb == Environment_DataCollection.Verb.Add && HistoricalEnvironment_Data.Count == 2)
                     {
-                        // Just in case the user quick set to large.
-                        SetAxesVisibility(false);
+                        // DOC: Can't have the axes start off invisible because then they can't be switched back on
+                        if (CurrWindowSize == MainWindow.WindowSize.Normal)
+                        {
+                            // Just in case the user quick set to large.
+                            SetAxesVisibility(false);
+                        }
                     }
+                    uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
                 }
-                uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
                 break;
         }
 
@@ -507,7 +543,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             }
         }
 
-        if (CurrEnvironment_Data != null && CurrEnvironment_Data.IsValidPH())
+        if (CurrEnvironment_Data != null)
         {
             if (name == Nordic_Thingy.Temperature_cPropertyChangedName || name == "")
             {
