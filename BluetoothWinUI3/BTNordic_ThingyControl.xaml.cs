@@ -510,7 +510,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 // which looks really weird.
                 // It would be OK to add for the table, but I'm willing to give that up in order to 
                 // make the graph better.
-
                 if (CurrEnvironment_Data.IsValidPH())
                 {
                     var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_Data.TimestampMostRecentAdd).TotalSeconds;

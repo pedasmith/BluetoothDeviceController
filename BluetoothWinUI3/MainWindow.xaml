@@ -63,9 +63,10 @@
 
                 </MenuBarItem>
                 <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
-                    <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="D" />
+                    <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="T" />
                     <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
                     <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
+                    <MenuFlyoutItem Text="Show directories" Click="OnDebugShowDirectories" AccessKey="D" />
                 </MenuBarItem>
                 <MenuBarItem Title="Help" AccessKey="H">
                     <MenuFlyoutItem Text="View Help" Click="OnHelpViewHelp" />
@@ -131,7 +132,19 @@
                     <Run>Version:</Run><Run x:Name="uiVersion" />
                 </TextBlock>
             </ContentDialog>
-
+            
+            <ContentDialog x:Name="uiDialogDirectories" Title="Save files directories"
+                           PrimaryButtonText="Ok" IsPrimaryButtonEnabled="True"  >
+                <TextBlock IsTextSelectionEnabled="True" TextWrapping="Wrap">
+                    <LineBreak />
+                    Location of save files for this app
+                    <LineBreak />
+                    <Run FontWeight="Bold" >Preferences: </Run><Run x:Name="uiDirectoriesPreferences" /><LineBreak />
+                    <Run FontWeight="Bold">ms-appx://Assets: </Run><Run x:Name="uiDirectoriesMsAppx" /><LineBreak />
+                    <Run FontWeight="Bold">Install: </Run><Run x:Name="uiDirectoriesInstallPath" /><LineBreak />
+                    <Run>Build:</Run><Run x:Name="uiDirectoriesBuild" /><LineBreak />
+                </TextBlock>
+            </ContentDialog>
         </Grid>
     </Page>
 </Window>

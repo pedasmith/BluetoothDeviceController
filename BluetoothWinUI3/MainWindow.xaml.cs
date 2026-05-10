@@ -18,7 +18,6 @@ using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage;
 using Windows.System.Display;
 
-
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -36,7 +35,7 @@ namespace BluetoothWinUI3
 
         public static UserPreferences Restore()
         {
-            string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
+            string folderPath = GetSaveDirectoryAsString();
             Directory.CreateDirectory(folderPath);
             string filePath = Path.Combine(folderPath, "UserPreferences.preferences");
 
@@ -63,12 +62,18 @@ namespace BluetoothWinUI3
         /// </summary>
         public void Save()
         {
-            string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
+            string folderPath = GetSaveDirectoryAsString();
             Directory.CreateDirectory(folderPath);
             string filePath = Path.Combine(folderPath, "UserPreferences.preferences");
 
             var json = System.Text.Json.JsonSerializer.Serialize(this, typeof(UserPreferences), UserPreferencesContext.Default);
             File.WriteAllText(filePath, json);
+        }
+
+        public static string GetSaveDirectoryAsString()
+        {
+            var retval = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
+            return retval;
         }
     }
 
@@ -299,7 +304,6 @@ namespace BluetoothWinUI3
 
         private async void OnHelpAbout(object sender, RoutedEventArgs e)
         {
-            // TODO: make this work
             var version = Package.Current.Id.Version;
             uiVersion.Text = $"{version.Major}.{version.Minor}";
             await uiDialogAbout.ShowAsync();
@@ -560,9 +564,9 @@ namespace BluetoothWinUI3
             var selected = selectedControl as IDeviceControl;
             if (selected == null) return; // should never happen
 
-
-            var currVisibility = selected.GetDataGridVisibility();
-            var newVisibility = (currVisibility == IDeviceControl.Visibility.Collapsed) ? IDeviceControl.Visibility.Visible : IDeviceControl.Visibility.Collapsed;
+            var isChecked = (sender as ToggleMenuFlyoutItem).IsChecked;
+            //var currVisibility = selected.GetDataGridVisibility();
+            var newVisibility = (isChecked) ? IDeviceControl.Visibility.Visible : IDeviceControl.Visibility.Collapsed;
             selected.SetDataGridVisibility(newVisibility);
         }
 
@@ -682,5 +686,32 @@ namespace BluetoothWinUI3
 
         }
 
+        private async void OnDebugShowDirectories(object sender, RoutedEventArgs e)
+        {
+            // Path Directory
+            uiDirectoriesPreferences.Text = UserPreferences.GetSaveDirectoryAsString();
+            try
+            {
+                Uri uri = new Uri("ms-appx:///Assets/Icons/BTIcon.ico");
+                StorageFile storageFile = await StorageFile.GetFileFromApplicationUriAsync(uri);
+                var path = storageFile.Path;
+                var lastslash = path.LastIndexOf("\\");
+                if (lastslash >= 0) path = path.Substring(0, lastslash); // Remove \BTIcon.ico
+                lastslash = path.LastIndexOf("\\");
+                if (lastslash >= 0) path = path.Substring(0, lastslash); // Remove \Icons
+                lastslash = path.LastIndexOf("\\");
+                if (lastslash >= 0) path = path.Substring(0, lastslash); // Remove \Assets
+                uiDirectoriesMsAppx.Text = path;
+            }
+            catch (Exception ex)
+            {
+                uiDirectoriesMsAppx.Text = ex.Message;
+            }
+            uiDirectoriesInstallPath.Text = Package.Current.InstalledPath;
+            // No amount of setting the width will help. 
+            //https://github.com/microsoft/microsoft-ui-xaml/issues/424
+            // uiDialogDirectories.Resources["ContentDialogMinWidth"] = 1080;
+            await uiDialogDirectories.ShowAsync();
+        }
     }
 }
