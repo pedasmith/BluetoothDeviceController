@@ -325,9 +325,20 @@ This is the primary section of the code.
         /// <summary>
         /// Data from all of the characteristics in the [[ServiceName]] Service
         /// </summary>
-        public class [[DataGroupName.dotNet]]
+        public class [[DataGroupName.dotNet]] :INotifyPropertyChanged
         {
-            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
+            public DateTimeOffset TimestampMostRecent 
+            {
+                get { return _TimestampMostRecent; }
+                set 
+                    { 
+                        if (value == _TimestampMostRecent) return; 
+                        _TimestampMostRecent = value; 
+                        OnPropertyChanged(); 
+                        OnPropertyChanged("TimestamptMostRecentDT"); 
+                    }
+            }
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
 [[CharacteristicDataFields]]
 
@@ -335,10 +346,23 @@ This is the primary section of the code.
             {
                 return this.MemberwiseClone() as [[DataGroupName.dotNet]];
             }
+            public void CopyFrom([[DataGroupName.dotNet]] value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+[[CharacteristicDataFieldsCopyFrom]]
+            }
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")}[[CharacteristicDataGroupForToString]]");
             }
+
+            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+           
         }
         public [[DataGroupName.dotNet]] Curr[[DataGroupName.dotNet]] { get; set; } = new [[DataGroupName.dotNet]]();
 
@@ -357,8 +381,31 @@ This is the primary section of the code.
 ## CharacteristicPropertyDataFields Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
 
 ```
-            public [[VariableTypeDS]] [[DataName.dotNet]] { get; set; } = [[DoubleOrStringDefault]]; // From [[ServiceName]] and [[CharacteristicName]]
+            private [[VariableTypeDS]] _[[DataName.dotNet]] = [[DoubleOrStringDefault]];
+            public [[VariableTypeDS]] [[DataName.dotNet]] 
+            { 
+                get { return _[[DataName.dotNet]]; }
+                set 
+                    { 
+                        if (value == _[[DataName.dotNet]]) return; 
+                        _[[DataName.dotNet]] = value;
+                        OnPropertyChanged();
+                    }
+            } // From [[ServiceName]] and [[CharacteristicName]]
 ```
+
+## CharacteristicDataFieldsCopyFrom Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
+```
+[[CharacteristicPropertyDataFieldsCopyFrom]]
+```
+
+
+## CharacteristicPropertyDataFieldsCopyFrom Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
+
+```
+                this.[[DataName.dotNet]] = value.[[DataName.dotNet]];
+```
+
 
 ## CharacteristicDataGroupForToString Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics Code="[[CharacteristicDataGroupFieldForToString]]" CodeListSubZero=""
 
@@ -868,7 +915,7 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value.Clone();
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
 [[DataGroupMemberCollectionReplaceMostRecent]]
         }
 

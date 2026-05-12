@@ -14,6 +14,7 @@ using System.Linq;
 using Utilities;
 using Windows.Devices.Bluetooth;
 using BluetoothProtocols.NS_Nordic_Thingy;
+using WinUI.TableView;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -76,14 +77,37 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // Set up the uiTableView
         // https://github.com/w-ahmad/WinUI.TableView
         //
-        // TODO: need to remove the data/time column
-        // TODO: datetime show the date, not the hh:mm:ss
+        //uiTableView.CornerButtonMode = TableViewCornerButtonMode.None;
+        //uiTableView.SelectionMode = ListViewSelectionMode.None;
+        uiTableView.AutoGeneratingColumn += (s, e) =>
+        {
+            switch (e.PropertyName)
+            {
+                case "TimestampMostRecent":
+                    var col = e.Column as TableViewDateColumn;
+                    if (col == null)
+                    {
+                        Log($"Error: TimestampMostRecent is not a TableViewDateColumn.");
+                        return;
+                    }
+                    col.IsReadOnly = true;
+                    // DateFormat is from the DateTimeFormatter which is completely different from the 
+                    // normal format from DateTimeOffset.ToString().
+                    // https://learn.microsoft.com/en-us/uwp/api/windows.globalization.datetimeformatting.datetimeformatter?view=winrt-28000
+                    col.DateFormat = "{hour.integer}:{minute.integer(2)}:{second.integer(2)}";
+                    col.Header = "Time";
+                    break;
+                case "TimestampMostRecentDT":
+                    e.Cancel = true; // Don't generate a column for this property because it's not user friendly. 
+                    break;
+            }
+        };
 
     }
 
+
     private void BTNordic_ThingyControl_Loaded(object sender, RoutedEventArgs e)
     {
-        // TODO: in progress
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         if (uiTableView.ItemsSource != null) return;

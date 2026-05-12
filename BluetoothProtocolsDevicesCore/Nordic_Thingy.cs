@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-05-05::11:36
+    /// This class was automatically generated 2026-05-12::06:54
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -256,24 +256,102 @@ namespace BluetoothProtocols
         /// <summary>
         /// Data from all of the characteristics in the Environment Service
         /// </summary>
-        public class Environment_Data
+        public class Environment_Data :INotifyPropertyChanged
         {
-            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
+            public DateTimeOffset TimestampMostRecent 
+            {
+                get { return _TimestampMostRecent; }
+                set 
+                    { 
+                        if (value == _TimestampMostRecent) return; 
+                        _TimestampMostRecent = value; 
+                        OnPropertyChanged(); 
+                        OnPropertyChanged("TimestamptMostRecentDT"); 
+                    }
+            }
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
-            public double Temperature { get; set; } = 0.0; // From Environment and Temperature (c)
-            public double Pressure { get; set; } = 0.0; // From Environment and Pressure (hpa)
-            public double Humidity { get; set; } = 0; // From Environment and Humidity (%)
-            public double eCOS { get; set; } = 0; // From Environment and Air Quality eCOS TVOC
-            public double TVOC { get; set; } = 0; // From Environment and Air Quality eCOS TVOC
+            private double _Temperature = 0.0;
+            public double Temperature 
+            { 
+                get { return _Temperature; }
+                set 
+                    { 
+                        if (value == _Temperature) return; 
+                        _Temperature = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Temperature (c)
+            private double _Pressure = 0.0;
+            public double Pressure 
+            { 
+                get { return _Pressure; }
+                set 
+                    { 
+                        if (value == _Pressure) return; 
+                        _Pressure = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Pressure (hpa)
+            private double _Humidity = 0;
+            public double Humidity 
+            { 
+                get { return _Humidity; }
+                set 
+                    { 
+                        if (value == _Humidity) return; 
+                        _Humidity = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Humidity (%)
+            private double _eCOS = 0;
+            public double eCOS 
+            { 
+                get { return _eCOS; }
+                set 
+                    { 
+                        if (value == _eCOS) return; 
+                        _eCOS = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Air Quality eCOS TVOC
+            private double _TVOC = 0;
+            public double TVOC 
+            { 
+                get { return _TVOC; }
+                set 
+                    { 
+                        if (value == _TVOC) return; 
+                        _TVOC = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Air Quality eCOS TVOC
 
             public Environment_Data Clone()
             {
                 return this.MemberwiseClone() as Environment_Data;
             }
+            public void CopyFrom(Environment_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Temperature = value.Temperature;
+                this.Pressure = value.Pressure;
+                this.Humidity = value.Humidity;
+                this.eCOS = value.eCOS;
+                this.TVOC = value.TVOC;
+            }
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {Temperature} {Pressure} {Humidity} {eCOS} {TVOC}");
             }
+
+            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
         }
         public Environment_Data CurrEnvironment_Data { get; set; } = new Environment_Data();
 
@@ -483,23 +561,90 @@ namespace BluetoothProtocols
         /// <summary>
         /// Data from all of the characteristics in the Environment Service
         /// </summary>
-        public class EnvironmentColor_Data
+        public class EnvironmentColor_Data :INotifyPropertyChanged
         {
-            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
+            public DateTimeOffset TimestampMostRecent 
+            {
+                get { return _TimestampMostRecent; }
+                set 
+                    { 
+                        if (value == _TimestampMostRecent) return; 
+                        _TimestampMostRecent = value; 
+                        OnPropertyChanged(); 
+                        OnPropertyChanged("TimestamptMostRecentDT"); 
+                    }
+            }
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
-            public double Red { get; set; } = 0; // From Environment and Color RGB+Clear
-            public double Green { get; set; } = 0; // From Environment and Color RGB+Clear
-            public double Blue { get; set; } = 0; // From Environment and Color RGB+Clear
-            public double Clear { get; set; } = 0; // From Environment and Color RGB+Clear
+            private double _Red = 0;
+            public double Red 
+            { 
+                get { return _Red; }
+                set 
+                    { 
+                        if (value == _Red) return; 
+                        _Red = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Color RGB+Clear
+            private double _Green = 0;
+            public double Green 
+            { 
+                get { return _Green; }
+                set 
+                    { 
+                        if (value == _Green) return; 
+                        _Green = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Color RGB+Clear
+            private double _Blue = 0;
+            public double Blue 
+            { 
+                get { return _Blue; }
+                set 
+                    { 
+                        if (value == _Blue) return; 
+                        _Blue = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Color RGB+Clear
+            private double _Clear = 0;
+            public double Clear 
+            { 
+                get { return _Clear; }
+                set 
+                    { 
+                        if (value == _Clear) return; 
+                        _Clear = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Color RGB+Clear
 
             public EnvironmentColor_Data Clone()
             {
                 return this.MemberwiseClone() as EnvironmentColor_Data;
             }
+            public void CopyFrom(EnvironmentColor_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Red = value.Red;
+                this.Green = value.Green;
+                this.Blue = value.Blue;
+                this.Clear = value.Clear;
+            }
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {Red} {Green} {Blue} {Clear}");
             }
+
+            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
         }
         public EnvironmentColor_Data CurrEnvironmentColor_Data { get; set; } = new EnvironmentColor_Data();
 
@@ -563,27 +708,138 @@ namespace BluetoothProtocols
         /// <summary>
         /// Data from all of the characteristics in the Environment Service
         /// </summary>
-        public class EnvironmentConfiguration_Data
+        public class EnvironmentConfiguration_Data :INotifyPropertyChanged
         {
-            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
+            public DateTimeOffset TimestampMostRecent 
+            {
+                get { return _TimestampMostRecent; }
+                set 
+                    { 
+                        if (value == _TimestampMostRecent) return; 
+                        _TimestampMostRecent = value; 
+                        OnPropertyChanged(); 
+                        OnPropertyChanged("TimestamptMostRecentDT"); 
+                    }
+            }
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
-            public double TempInterval { get; set; } = 0; // From Environment and Environment Configuration
-            public double PressureInterval { get; set; } = 0; // From Environment and Environment Configuration
-            public double HumidityInterval { get; set; } = 0; // From Environment and Environment Configuration
-            public double ColorInterval { get; set; } = 0; // From Environment and Environment Configuration
-            public double GasMode { get; set; } = 0; // From Environment and Environment Configuration
-            public double RedCalibration { get; set; } = 0; // From Environment and Environment Configuration
-            public double GreenCalibration { get; set; } = 0; // From Environment and Environment Configuration
-            public double BlueCalibration { get; set; } = 0; // From Environment and Environment Configuration
+            private double _TempInterval = 0;
+            public double TempInterval 
+            { 
+                get { return _TempInterval; }
+                set 
+                    { 
+                        if (value == _TempInterval) return; 
+                        _TempInterval = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Environment Configuration
+            private double _PressureInterval = 0;
+            public double PressureInterval 
+            { 
+                get { return _PressureInterval; }
+                set 
+                    { 
+                        if (value == _PressureInterval) return; 
+                        _PressureInterval = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Environment Configuration
+            private double _HumidityInterval = 0;
+            public double HumidityInterval 
+            { 
+                get { return _HumidityInterval; }
+                set 
+                    { 
+                        if (value == _HumidityInterval) return; 
+                        _HumidityInterval = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Environment Configuration
+            private double _ColorInterval = 0;
+            public double ColorInterval 
+            { 
+                get { return _ColorInterval; }
+                set 
+                    { 
+                        if (value == _ColorInterval) return; 
+                        _ColorInterval = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Environment Configuration
+            private double _GasMode = 0;
+            public double GasMode 
+            { 
+                get { return _GasMode; }
+                set 
+                    { 
+                        if (value == _GasMode) return; 
+                        _GasMode = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Environment Configuration
+            private double _RedCalibration = 0;
+            public double RedCalibration 
+            { 
+                get { return _RedCalibration; }
+                set 
+                    { 
+                        if (value == _RedCalibration) return; 
+                        _RedCalibration = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Environment Configuration
+            private double _GreenCalibration = 0;
+            public double GreenCalibration 
+            { 
+                get { return _GreenCalibration; }
+                set 
+                    { 
+                        if (value == _GreenCalibration) return; 
+                        _GreenCalibration = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Environment Configuration
+            private double _BlueCalibration = 0;
+            public double BlueCalibration 
+            { 
+                get { return _BlueCalibration; }
+                set 
+                    { 
+                        if (value == _BlueCalibration) return; 
+                        _BlueCalibration = value;
+                        OnPropertyChanged();
+                    }
+            } // From Environment and Environment Configuration
 
             public EnvironmentConfiguration_Data Clone()
             {
                 return this.MemberwiseClone() as EnvironmentConfiguration_Data;
             }
+            public void CopyFrom(EnvironmentConfiguration_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.TempInterval = value.TempInterval;
+                this.PressureInterval = value.PressureInterval;
+                this.HumidityInterval = value.HumidityInterval;
+                this.ColorInterval = value.ColorInterval;
+                this.GasMode = value.GasMode;
+                this.RedCalibration = value.RedCalibration;
+                this.GreenCalibration = value.GreenCalibration;
+                this.BlueCalibration = value.BlueCalibration;
+            }
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {TempInterval} {PressureInterval} {HumidityInterval} {ColorInterval} {GasMode} {RedCalibration} {GreenCalibration} {BlueCalibration}");
             }
+
+            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
         }
         public EnvironmentConfiguration_Data CurrEnvironmentConfiguration_Data { get; set; } = new EnvironmentConfiguration_Data();
 
@@ -659,20 +915,54 @@ namespace BluetoothProtocols
         /// <summary>
         /// Data from all of the characteristics in the Battery Service
         /// </summary>
-        public class Battery_Data
+        public class Battery_Data :INotifyPropertyChanged
         {
-            public DateTimeOffset TimestampMostRecent {get; set; } = DateTimeOffset.MinValue;
+            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
+            public DateTimeOffset TimestampMostRecent 
+            {
+                get { return _TimestampMostRecent; }
+                set 
+                    { 
+                        if (value == _TimestampMostRecent) return; 
+                        _TimestampMostRecent = value; 
+                        OnPropertyChanged(); 
+                        OnPropertyChanged("TimestamptMostRecentDT"); 
+                    }
+            }
             public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
-            public double BatteryLevel { get; set; } = 0; // From Battery and BatteryLevel
+            private double _BatteryLevel = 0;
+            public double BatteryLevel 
+            { 
+                get { return _BatteryLevel; }
+                set 
+                    { 
+                        if (value == _BatteryLevel) return; 
+                        _BatteryLevel = value;
+                        OnPropertyChanged();
+                    }
+            } // From Battery and BatteryLevel
 
             public Battery_Data Clone()
             {
                 return this.MemberwiseClone() as Battery_Data;
             }
+            public void CopyFrom(Battery_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.BatteryLevel = value.BatteryLevel;
+            }
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {BatteryLevel}");
             }
+
+            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
         }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
 

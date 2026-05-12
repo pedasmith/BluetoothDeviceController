@@ -19,7 +19,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This code was automatically generated 2026-05-05::11:36
+    /// This code was automatically generated 2026-05-12::06:54
     /// </summary>
 
     ///<summary>
@@ -59,7 +59,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value.Clone();
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
             Temperature[index] = value.Temperature;
             Pressure[index] = value.Pressure;
             Humidity[index] = value.Humidity;
@@ -122,7 +122,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value.Clone();
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
             Red[index] = value.Red;
             Green[index] = value.Green;
             Blue[index] = value.Blue;
@@ -184,7 +184,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value.Clone();
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
             TempInterval[index] = value.TempInterval;
             PressureInterval[index] = value.PressureInterval;
             HumidityInterval[index] = value.HumidityInterval;
@@ -247,7 +247,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
-            Data[index] = value.Clone();
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
             BatteryLevel[index] = value.BatteryLevel;
         }
 
