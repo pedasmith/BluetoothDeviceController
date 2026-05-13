@@ -30,7 +30,7 @@ namespace BluetoothWinUI3
         /// <param name="saveData"></param>
         void UpdateUX(SaveData saveData);
 
-        void UpdateUX(UserPreferences userprefs);
+        void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs);
 
         void UpdateUX(MainWindow.WindowSize windowSize);
 

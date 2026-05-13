@@ -37,7 +37,7 @@ namespace BluetoothWatcher.Units
                 case TemperatureUnit.Rankine:
                     return (valueC * 9 / 5) + 491.67;
                 case TemperatureUnit.Réaumur:
-                    return value / 1.25;
+                    return valueC / 1.25;
             }
             Console.WriteLine($"ERROR: Unknown conversion {from} {to}");
             return 0;

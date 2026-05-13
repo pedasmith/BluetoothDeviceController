@@ -17,6 +17,7 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage;
 using Windows.System.Display;
+using static BluetoothProtocols.Nordic_Thingy;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -69,6 +70,12 @@ namespace BluetoothWinUI3
             var json = System.Text.Json.JsonSerializer.Serialize(this, typeof(UserPreferences), UserPreferencesContext.Default);
             File.WriteAllText(filePath, json);
         }
+
+        public UserPreferences Clone()
+        {
+            return this.MemberwiseClone() as UserPreferences;
+        }
+
 
         public static string GetSaveDirectoryAsString()
         {
@@ -240,7 +247,7 @@ namespace BluetoothWinUI3
                         known = KnownDevices.Add(e, control, zoomControl, supportedDevice);
                         control.DataContext = known;
                         var userControl = control as IDeviceControl;
-                        userControl?.UpdateUX(CurrUserPrefs);
+                        userControl?.UpdateUX(CurrUserPrefs, null);
 
                         if (uiKnownDevices.Items.Count == 1)
                         {
@@ -489,14 +496,14 @@ namespace BluetoothWinUI3
 
         }
 
-        private void UpdateAllDeviceUserPreferences()
+        private void UpdateAllDeviceUserPreferences(UserPreferences currPrefs, UserPreferences oldPrefs)
         {
             foreach (var item in uiKnownDevices.Items)
             {
                 var deviceContainer =item as ZoomableDeviceControl;
                 var device = deviceContainer?.GetDeviceControl() as IDeviceControl;
                 if (device == null) continue;
-                device.UpdateUX(CurrUserPrefs);
+                device.UpdateUX(currPrefs, oldPrefs);
             }
         }
 
@@ -504,39 +511,40 @@ namespace BluetoothWinUI3
         {
             var tag = (sender as FrameworkElement)?.Tag as string;
             if (tag == null) return;
+            var oldPrefs = CurrUserPrefs.Clone();
             switch (tag)
             {
                 case "mmHg":
                     CurrUserPrefs.Pressure = Pressure.PressureUnit.mmHg_Torr;
-                    UpdateAllDeviceUserPreferences();
+                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
                     break;
                 case "inHg":
                     CurrUserPrefs.Pressure = Pressure.PressureUnit.inHg;
-                    UpdateAllDeviceUserPreferences();
+                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
                     break;
                 case "mbar_hpa": // same as hPa
                     CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar;
-                    UpdateAllDeviceUserPreferences();
+                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
                     break;
                 case "kiloPascal":
                     CurrUserPrefs.Pressure = Pressure.PressureUnit.kiloPascal;
-                    UpdateAllDeviceUserPreferences();
+                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
                     break;
                 case "Pascal":
                     CurrUserPrefs.Pressure = Pressure.PressureUnit.Pascal;
-                    UpdateAllDeviceUserPreferences();
+                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
                     break;
                 case "PSI":
                     CurrUserPrefs.Pressure = Pressure.PressureUnit.PSI;
-                    UpdateAllDeviceUserPreferences();
+                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
                     break;
                 case "Atmosphere":
                     CurrUserPrefs.Pressure = Pressure.PressureUnit.Atmosphere;
-                    UpdateAllDeviceUserPreferences();
+                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
                     break;
                 default:
                     CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar;
-                    UpdateAllDeviceUserPreferences();
+                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
                     break;
             }
         }
@@ -544,6 +552,7 @@ namespace BluetoothWinUI3
         {
             var tag = (sender as FrameworkElement)?.Tag as string;
             if (tag == null) return;
+            var oldPrefs = CurrUserPrefs.Clone();
             switch (tag)
             {
                 case "Celcius": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Celcius; break;
@@ -552,7 +561,7 @@ namespace BluetoothWinUI3
                 case "Rankine": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Rankine; break;
                 case "Réaumur": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Réaumur; break;
             }
-            UpdateAllDeviceUserPreferences();
+            UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
         }
 
         private async void OnViewToggleTable(object sender, RoutedEventArgs e)

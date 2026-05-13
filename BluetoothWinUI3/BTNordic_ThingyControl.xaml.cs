@@ -47,8 +47,24 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     private string InternalDeviceType = "Nordic_Thingy";
     Nordic_Thingy Device;
-    public Environment_DataCollection HistoricalEnvironment_Data { get;  } = new Environment_DataCollection();
+    /// <summary>
+    /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
+    /// The units are set right before the data is added to the colleciton.
+    /// </summary>
+    public Environment_DataCollection HistoricalEnvironment_DataUnits { get;  } = new Environment_DataCollection();
+    /// <summary>
+    /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
+    /// always in the 'native' units (e.g., always celcius for temperature).
+    /// </summary>
     Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
+
+    // TODO: update the HistoricalEnvironment_DataUnits with new user unit preferences.
+
+    /// <summary>
+    /// Similar to CurrEnvironment_Data , but the values are converted to the user's preferred units. 
+    /// This is what gets added to the HistoricalEnvironment_DataUnits collection.
+    /// </summary>
+    Nordic_Thingy.Environment_Data CurrEnvironment_DataUnits = null;
     Nordic_Thingy.Battery_Data CurrBattery_Data = null;
     Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
 
@@ -68,13 +84,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             if (series is LineSeries lineSeries)
             {
-                lineSeries.ItemsSource = HistoricalEnvironment_Data.Data; //DOC:
+                lineSeries.ItemsSource = HistoricalEnvironment_DataUnits.Data; //DOC:
             }
         }
         uiOxyPlot.Model = OxyPlotModel;
 
         //
         // Set up the uiTableView
+        // https://w-ahmad.dev/WinUI.TableView/index.html
         // https://github.com/w-ahmad/WinUI.TableView
         //
         //uiTableView.CornerButtonMode = TableViewCornerButtonMode.None;
@@ -111,9 +128,20 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         if (uiTableView.ItemsSource != null) return;
-        uiTableView.ItemsSource = HistoricalEnvironment_Data.Data;
+        uiTableView.ItemsSource = HistoricalEnvironment_DataUnits.Data;
     }
 
+    private Nordic_Thingy.Environment_Data CopyAndUpdateUnits(Nordic_Thingy.Environment_Data source, Nordic_Thingy.Environment_Data dest)
+    {
+        if (dest == null) dest = source.Clone();
+        dest.TimestampMostRecent = source.TimestampMostRecent;
+        dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(source.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
+        dest.Pressure = BluetoothWatcher.Units.Pressure.Convert(source.Pressure, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
+        dest.Humidity = source.Humidity; // Humidity is always in percent, so no conversion needed.
+        dest.eCOS = source.eCOS;
+        dest.TVOC = source.TVOC;
+        return dest;
+    }
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
     public List<string> LineNames { get { return new List<string>() { "Temperature", "Pressure", "Humidity", "eCOS", "TVOC"  }; } }
@@ -442,9 +470,23 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// <summary>
     /// UserPreferences are for the app as a whole, not for this particular device. For example: the preferred temperature unit.
     /// </summary>
-    public void UpdateUX(UserPreferences userprefs)
+    public void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs)
     {
-        CurrUserPrefs = userprefs;
+        CurrUserPrefs = newPrefs;
+
+        // Update the saved data in the HistoricalEnvironment_DataUnits to match the new user preferences.
+        foreach (var data in HistoricalEnvironment_DataUnits.Data)
+        {
+            if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
+            {
+                data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, CurrUserPrefs.Temperature);
+            }
+            if (oldPrefs != null && newPrefs.Pressure != oldPrefs.Pressure)
+            {
+                data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, CurrUserPrefs.Pressure);
+            }
+        }
+
         UpdateGraphData(""); // all of them.
     }
 
@@ -510,6 +552,11 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         }
 
     }
+    /// <summary>
+    /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
+    /// needs to be updated.
+    /// </summary>
+    /// <param name="name"></param>
     private void UpdateGraphData(string name)
     {
         if (Device == null) return;
@@ -517,9 +564,13 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         CurrEnvironment_Data = Device.CurrEnvironment_Data;
         CurrEnvironmentColor_Data = Device.CurrEnvironmentColor_Data;
 
-        // from e.PropertyName when the Device does a PropertyChanged.
+        // name is from e.PropertyName when the Device does a PropertyChanged.
 
         UpdateSparkles(name);
+
+        // Update to match the current preferred units. Will create a new CurrEnvironment_DataUnits the first time
+        // it's called
+        CurrEnvironment_DataUnits = CopyAndUpdateUnits(CurrEnvironment_Data, CurrEnvironment_DataUnits);
 
         // Track the historical data
         switch (name)
@@ -536,14 +587,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 // make the graph better.
                 if (CurrEnvironment_Data.IsValidPH())
                 {
-                    var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_Data.TimestampMostRecentAdd).TotalSeconds;
+                    var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_DataUnits.TimestampMostRecentAdd).TotalSeconds;
                     var verb = (deltaInSeconds > 5) ? Environment_DataCollection.Verb.Add : Environment_DataCollection.Verb.ReplaceMostRecent;
-                    HistoricalEnvironment_Data.Update(CurrEnvironment_Data, verb); // Will add or replace the data and will copy as needed.
+                    HistoricalEnvironment_DataUnits.Update(CurrEnvironment_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
                     //
                     // Update the OxyPlot because it doesn't tracked the INotifyCollectionChanged
                     //
-                    if (verb == Environment_DataCollection.Verb.Add && HistoricalEnvironment_Data.Count == 2)
+                    if (verb == Environment_DataCollection.Verb.Add && HistoricalEnvironment_DataUnits.Count == 2)
                     {
                         // DOC: Can't have the axes start off invisible because then they can't be switched back on
                         if (CurrWindowSize == MainWindow.WindowSize.Normal)
@@ -570,11 +621,11 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             if (name == Nordic_Thingy.Temperature_cPropertyChangedName || name == "")
             {
-                uiTemperature_c.Text = BluetoothWatcher.Units.Temperature.ConvertToString(CurrEnvironment_Data.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
+                uiTemperature_c.Text = BluetoothWatcher.Units.Temperature.AsString(CurrEnvironment_DataUnits.Temperature, CurrUserPrefs.Temperature);
             }
             if (name == Nordic_Thingy.Pressure_hpaPropertyChangedName || name == "")
             {
-                uiPressure_hpa.Text = BluetoothWatcher.Units.Pressure.ConvertToString(CurrEnvironment_Data.Pressure, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
+                uiPressure_hpa.Text = BluetoothWatcher.Units.Pressure.AsString(CurrEnvironment_DataUnits.Pressure, CurrUserPrefs.Pressure);
             }
             if (name == Nordic_Thingy.HumidityPropertyChangedName || name == "")
             {
