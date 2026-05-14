@@ -381,7 +381,7 @@ This is the primary section of the code.
 ## CharacteristicPropertyDataFields Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
 
 ```
-            private [[VariableTypeDS]] _[[DataName.dotNet]] = [[DoubleOrStringDefault]];
+            private [[VariableTypeDS]] _[[DataName.dotNet]] = [[DefaultValueCSharp]];
             public [[VariableTypeDS]] [[DataName.dotNet]] 
             { 
                 get { return _[[DataName.dotNet]]; }

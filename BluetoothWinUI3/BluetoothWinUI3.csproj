@@ -15,6 +15,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="Assets\About_BluetoothWinUI3_dev.md" />
     <Content Remove="Assets\HelpFiles\Device_Nordic_Thingy.md" />
     <Content Remove="Assets\HelpFiles\Issues_with_TRIM.md" />
   </ItemGroup>

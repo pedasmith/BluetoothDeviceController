@@ -2,6 +2,8 @@
 using System.Text;
 using TemplateExpander;
 
+// See https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/
+
 // See https://docs.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-enhance
 // See https://blogs.windows.com/windowsdeveloper/2020/09/03/calling-windows-apis-in-net5/
 namespace BluetoothCodeGenerator

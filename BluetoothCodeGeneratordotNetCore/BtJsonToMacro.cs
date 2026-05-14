@@ -1,11 +1,10 @@
-﻿using BluetoothDeviceController.BleEditor;
-using BluetoothDeviceController.Names;
+﻿using BluetoothDeviceController.Names;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using TemplateExpander;
 using BluetoothProtocols.IotNumberFormats;
-using Windows.UI.WebUI;
+// See https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/ for details
 
 namespace BluetoothCodeGenerator
 {
@@ -497,6 +496,7 @@ namespace BluetoothCodeGenerator
                 var dotNetDisplayFormat = "ToString()";
                 var isDouble = ByteFormatToCSharpAsDouble(item.ByteFormatPrimary) == "AsDouble";
                 var defaultValue = "*";
+                var defaultValueCSharp = ByteFormatToCSharpDefault(item.ByteFormatPrimary);
                 switch (item.DisplayFormatPrimary)
                 {
                     case "DEC":
@@ -519,9 +519,13 @@ namespace BluetoothCodeGenerator
 
                 if (item.DefaultValuePrimary != "")
                 {
-                    defaultValue = item.DefaultValuePrimary;
+                    defaultValue = item.DefaultValuePrimary.Replace("_", " "); // TODO: question: is this the right escape for spaces?
                 }
-                defaultValue = defaultValue.Replace("_", " "); // TODO: question: is this the right escape for spaces?
+                if (item.DefaultValuePrimary != "*" && item.DefaultValuePrimary != "") // the default is a * for some reason?
+                {
+                    var needsQuote = defaultValueCSharp.StartsWith("\""); // the default value might be 0, 0.0, or "";
+                    defaultValueCSharp = needsQuote ? "\"" + item.DefaultValuePrimary + "\"" : item.DefaultValuePrimary;
+                }
                 if (defaultValue == "UpdateXorAtEnd")
                 {
                     crc_xor_fixup = "CrcCalculations.UpdateXorAtEnd(command);";
@@ -577,6 +581,7 @@ namespace BluetoothCodeGenerator
                     TemplateSnippet.AddMacroList(prlist, "PropertyIsHidden", item.IsHidden ? "true" : "false");
                     TemplateSnippet.AddMacroList(prlist, "DEC+OR+HEX", displayFormat);
                     TemplateSnippet.AddMacroList(prlist, "DataToString.dotNet", dotNetDisplayFormat);
+                    TemplateSnippet.AddMacroList(prlist, "DefaultValueCSharp", defaultValueCSharp);
                     TemplateSnippet.AddMacroList(prlist, "DEFAULT+VALUE", defaultValue);
 
                     TemplateSnippet.AddMacroList(prlist, "IS+READ+ONLY", isReadOnly ? "True" : "False");

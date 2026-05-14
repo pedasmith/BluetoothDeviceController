@@ -71,7 +71,8 @@ namespace BluetoothWatcher.Units
         {
             int nerror = 0;
             double actualValue = Convert(value, from, to);
-            if (!DoubleApprox.Approx (actualValue, expectedValue, 0.0000001))
+            bool inRange = DoubleApprox.Approx(actualValue, expectedValue, 0.0000001) || (expectedValue == 0.0 && Math.Abs(actualValue) < 0.0000001);
+            if (!inRange)
             {
                 System.Diagnostics.Debug.WriteLine ($"ERROR: ({value}, {from}, {to}) expected {expectedValue} actual={actualValue}");
                 nerror++;
@@ -87,7 +88,8 @@ namespace BluetoothWatcher.Units
                 foreach (var to in Enum.GetValues<TemperatureUnit>())
                 {
                     var expected = Convert(trial, from, to);
-                    TestOne(trial, from, to, expected);
+                    nerror += TestOne(trial, from, to, expected);
+                    nerror += TestOne(expected, to, from, trial);
                 }
             }
             return nerror;

@@ -1,5 +1,4 @@
 ﻿using System;
-using static BluetoothWatcher.Units.Temperature;
 
 
 namespace BluetoothWatcher.Units
@@ -114,11 +113,13 @@ namespace BluetoothWatcher.Units
                 foreach (var to in Enum.GetValues<PressureUnit>())
                 {
                     var expected = Convert(trial, from, to);
-                    TestOne(trial, from, to, expected);
+                    nerror += TestOne(trial, from, to, expected);
+                    nerror += TestOne(expected, to, from, trial);
                 }
             }
             return nerror;
         }
+
         public static int Test()
         {
             int nerror = 0;

@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-05-12::06:54
+    /// This class was automatically generated 2026-05-14::12:43
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -304,7 +304,7 @@ namespace BluetoothProtocols
                         OnPropertyChanged();
                     }
             } // From Environment and Humidity (%)
-            private double _eCOS = 0;
+            private double _eCOS = 390;
             public double eCOS 
             { 
                 get { return _eCOS; }
@@ -447,7 +447,7 @@ namespace BluetoothProtocols
         private void NotifyAir_Quality_eCOS_TVOCCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Environment_Air_Quality_eCOS_TVOC_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm|390 U16|DEC|TVOC|ppb");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
@@ -548,7 +548,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Air Quality eCOS TVOC", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|eCOS|ppm|390 U16|DEC|TVOC|ppb");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
