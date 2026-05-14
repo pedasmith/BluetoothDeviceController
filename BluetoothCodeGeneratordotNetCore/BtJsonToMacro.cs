@@ -497,6 +497,7 @@ namespace BluetoothCodeGenerator
                 var isDouble = ByteFormatToCSharpAsDouble(item.ByteFormatPrimary) == "AsDouble";
                 var defaultValue = "*";
                 var defaultValueCSharp = ByteFormatToCSharpDefault(item.ByteFormatPrimary);
+                var replaceValueDetectCSharp = item.Get(4, 1); // e.g., Nordic Thingy eCOS is U16|DEC|eCOS|ppm|390^0 . This means that when the value from the sensor is 0, replace it with 390.
                 switch (item.DisplayFormatPrimary)
                 {
                     case "DEC":
@@ -583,6 +584,7 @@ namespace BluetoothCodeGenerator
                     TemplateSnippet.AddMacroList(prlist, "DataToString.dotNet", dotNetDisplayFormat);
                     TemplateSnippet.AddMacroList(prlist, "DefaultValueCSharp", defaultValueCSharp);
                     TemplateSnippet.AddMacroList(prlist, "DEFAULT+VALUE", defaultValue);
+                    TemplateSnippet.AddMacroList(prlist, "ReplaceValueDetectCSharp", replaceValueDetectCSharp);
 
                     TemplateSnippet.AddMacroList(prlist, "IS+READ+ONLY", isReadOnly ? "True" : "False");
                 }

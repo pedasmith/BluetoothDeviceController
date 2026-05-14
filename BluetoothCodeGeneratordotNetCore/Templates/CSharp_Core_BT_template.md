@@ -366,8 +366,8 @@ This is the primary section of the code.
         }
         public [[DataGroupName.dotNet]] Curr[[DataGroupName.dotNet]] { get; set; } = new [[DataGroupName.dotNet]]();
 
-[[CHARACTERISTIC+METHOD+NOTIFY]]
-[[CHARACTERISTIC+METHOD+READ]]
+[[CharacteristicMethodNotify]]
+[[CharacteristicMethodRead]]
 
 ```
 
@@ -415,7 +415,7 @@ Makes the list of data fields for the nice ToString()
 
 Individual data fields for the nice ToString()
 
-## CHARACTERISTIC+METHOD+NOTIFY Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
+## CharacteristicMethodNotify Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
 
 ```
         // Per-characteristics methods for [[ServiceName.dotNet]] [[CharacteristicName.dotNet]]
@@ -440,13 +440,13 @@ Individual data fields for the nice ToString()
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             Curr[[DataGroupName.dotNet]].TimestampMostRecent = args.Timestamp;
-[[CHARACTERISTIC+PROPERTY+READ+FIELD]]
+[[CharacteristicPropertyReadField]][[CharacteristicPropertyReadFieldReplace]]
             OnPropertyChanged([[CharacteristicName.dotNet]]PropertyChangedName); // "[[CharacteristicName.dotNet]]"
         }
 
 ```
 
-## CHARACTERISTIC+METHOD+READ Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
+## CharacteristicMethodRead Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
 
 The read method for each characteristic.
 
@@ -472,14 +472,14 @@ The read method for each characteristic.
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-[[CHARACTERISTIC+PROPERTY+READ+FIELD]]
+[[CharacteristicPropertyReadField]][[CharacteristicPropertyReadFieldReplace]]
             OnPropertyChanged([[CharacteristicName.dotNet]]PropertyChangedName); // "[[CharacteristicName.dotNet]]"
             return Curr[[DataGroupName.dotNet]];
         }
 ```
 
 
-## CHARACTERISTIC+PROPERTY+READ+FIELD Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties
+## CharacteristicPropertyReadField Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties
 
 TODO: the numeric values are all handled correctly (turned into bytes). But what about strings and bytes?
 
@@ -487,6 +487,20 @@ TODO: the numeric values are all handled correctly (turned into bytes). But what
             Curr[[DataGroupName.dotNet]].[[DataName.dotNet]] = vr.GetNextDouble();
 ```
 
+## CharacteristicPropertyReadFieldReplace If="T[[ReplaceValueDetectCSharp]] length> 1" Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties
+
+The e.g., Nordic Thingy:52 eCOS is U16|DEC|eCOS|ppm|390^0. This means that when the sensor returns 0, it should be 
+replaced by a 390
+
+The weird If statement is because the value might exist and be a number, or it might not exist at all. I want to use
+the string length> but that won't work when both sides are numeric!
+
+```
+            if (Curr[[DataGroupName.dotNet]].[[DataName.dotNet]] == [[ReplaceValueDetectCSharp]])
+            {
+                Curr[[DataGroupName.dotNet]].[[DataName.dotNet]] = [[DefaultValueCSharp]];
+            } 
+```
 
 //
 //

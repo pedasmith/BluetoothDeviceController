@@ -14,7 +14,7 @@ The temperature, pressure, and humidity will be displayed in less than 10 second
 
 Volitile Organic Compunds (VOC) measures the amounts of alcohols, ketones, amines and more in the atmosphere. The output measurement is in parts per billion.
 
-Equivilent CO₂ is a calculated amount of CO₂. The measurement range is in parts per million, and a normal reading is between 400 and 500.
+Equivilent CO₂ is a calculated amount of CO₂. The measurement range is in parts per million, and a normal reading is between 400 and 500. The reading will always start off as **390**; this is the indication that the sensor has not yet initialized.
 
 "AMS recommends that you run this sensor for 48 hours when you first receive it to "burn it in", and then 20 minutes in the desired mode every time the sensor is in use. This is because the sensitivity levels of the sensor will change during early use."
 

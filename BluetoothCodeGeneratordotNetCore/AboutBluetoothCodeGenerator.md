@@ -128,7 +128,7 @@ Opcode|Meaning
 !=|Not-equals
 contains|The left string contains the right string. Compare is case-insensitive
 !contains|The left string does not contain the right string. Compare is case-insensitive
-length\>|Length of left-hand macro is greater-than right hand value
+length\>|Length of left-hand macro is greater-than right hand value (e.g., If="[[Verb]] length\> 5")
 
 ### ListOutput=parent or child or global (default)
 
