@@ -1,8 +1,10 @@
 using BluetoothProtocols;
+using BluetoothProtocols.NS_Nordic_Thingy;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Shapes;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -10,10 +12,10 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
+using System.IO;
 using System.Linq;
 using Utilities;
 using Windows.Devices.Bluetooth;
-using BluetoothProtocols.NS_Nordic_Thingy;
 using WinUI.TableView;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -69,6 +71,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
 
     MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
+
+    public IDeviceControl.UXCapabilities GetUXCapabilities()
+    {
+        var retval = IDeviceControl.UXCapabilities.CanGetGraphAsPng | IDeviceControl.UXCapabilities.CanGetData;
+        return retval;
+    }
 
     public BTNordic_ThingyControl()
     {
@@ -642,5 +650,21 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 uiColor.Background = RGB; //TODO: and the 'clear' value?
             }
         }
+    }
+
+
+    public async void GetGraphAsPng()
+    {
+        // RenderTargetBitmap: https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.rendertargetbitmap?view=winrt-28000
+        // RenderAsync() https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.rendertargetbitmap.renderasync?view=winrt-28000
+        // GetPixelsAsync() https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.rendertargetbitmap.getpixelsasync?view=winrt-28000
+        // Format is BGRA8 premultiplied
+
+        var renderTargetBitmap = new Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap();
+        await renderTargetBitmap.RenderAsync(uiOxyPlot, 800, 600);
+        var pixels = await renderTargetBitmap.GetPixelsAsync(); // get an IBuffer in BGRA8 premultiplied format.
+        ;
+        //var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, new InMemoryBitmap(pixels));
+        //RenderedImage.Source = renderTargetBitmap;
     }
 }

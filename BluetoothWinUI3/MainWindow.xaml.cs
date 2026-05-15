@@ -482,6 +482,30 @@ namespace BluetoothWinUI3
             }
         }
 
+        private async void OnFileCopyGraphAsPNG(object sender, RoutedEventArgs e)
+        {
+            string verb = "rename";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
+            var knownDevice = await GetKnownDevice(selected, verb);
+            if (knownDevice == null) return;
+
+            selected.GetGraphAsPng(); // TODO: make sure it can!
+
+
+        }
+
+        private async void OnFileCopyDataForExcel(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private async void OnFileCopyDataAsCSV(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
         private void OnDebugDarkTheme(object sender, RoutedEventArgs e)
         {
             if (this.Content.XamlRoot == null) return;// Replacement for IsLoaded per https://stackoverflow.com/questions/71181437/winui-3-1-0-window-ready-event
@@ -722,5 +746,6 @@ namespace BluetoothWinUI3
             // uiDialogDirectories.Resources["ContentDialogMinWidth"] = 1080;
             await uiDialogDirectories.ShowAsync();
         }
+
     }
 }

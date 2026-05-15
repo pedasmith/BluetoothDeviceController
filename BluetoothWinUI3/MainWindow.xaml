@@ -30,6 +30,9 @@
             <MenuBar Grid.Row="0">
                 <MenuBarItem Title="File" AccessKey="F">
                     <ToggleMenuFlyoutItem Text="Keep Screen On" Click="OnFileKeepScreenOn" AccessKey="k" />
+                    <MenuFlyoutItem Text="Copy Graph as PNG" Click="OnFileCopyGraphAsPNG"  />
+                    <MenuFlyoutItem Text="Copy Data for Excel" Click="OnFileCopyDataForExcel"  />
+                    <MenuFlyoutItem Text="Copy Data as CSV" Click="OnFileCopyDataAsCSV"  />
                     <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
                 </MenuBarItem>
                 <MenuBarItem Title="View" AccessKey="V">

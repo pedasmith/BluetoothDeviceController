@@ -32,6 +32,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             Supported = supported;
         }
         public WatcherData Advertisement { get; set;  }
+        /// <summary>
+        /// The Control is only required to be a UserControl. But it's also often (always?) an IDeviceControl.
+        /// </summary>
         public UserControl Control { get; set; }
         public ZoomableDeviceControl Container { get; set; }
         public SupportedDevice Supported { get; set; }

@@ -1,4 +1,5 @@
 ﻿using BluetoothWinUI3.BluetoothWinUI3Registration;
+using System;
 using System.Collections.Generic;
 
 
@@ -37,6 +38,11 @@ namespace BluetoothWinUI3
         enum Visibility {  Visible, Collapsed, }
         Visibility GetDataGridVisibility();
         void SetDataGridVisibility(Visibility visibility);
+
+        [Flags] enum UXCapabilities {  CanGetGraphAsPng = 0x01, CanGetData = 0x02 }
+        UXCapabilities GetUXCapabilities();
+
+        void GetGraphAsPng();
 
     }
 }
