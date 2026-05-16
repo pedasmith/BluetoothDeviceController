@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-05-14::13:59
+    /// This class was automatically generated 2026-05-16::11:29
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -258,6 +258,7 @@ namespace BluetoothProtocols
         /// </summary>
         public class Environment_Data :INotifyPropertyChanged
         {
+            // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
             public DateTimeOffset TimestampMostRecent 
             {
@@ -340,6 +341,22 @@ namespace BluetoothProtocols
                 this.eCOS = value.eCOS;
                 this.TVOC = value.TVOC;
             }
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Temperature", "Pressure", "Humidity", "eCOS", "TVOC"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(Temperature);
+                exporter.CellSet(Pressure);
+                exporter.CellSet(Humidity);
+                exporter.CellSet(eCOS);
+                exporter.CellSet(TVOC);                
+                exporter.RowEnd();
+            }
+
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {Temperature} {Pressure} {Humidity} {eCOS} {TVOC}");
@@ -569,6 +586,7 @@ namespace BluetoothProtocols
         /// </summary>
         public class EnvironmentColor_Data :INotifyPropertyChanged
         {
+            // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
             public DateTimeOffset TimestampMostRecent 
             {
@@ -639,6 +657,21 @@ namespace BluetoothProtocols
                 this.Blue = value.Blue;
                 this.Clear = value.Clear;
             }
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Red", "Green", "Blue", "Clear"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(Red);
+                exporter.CellSet(Green);
+                exporter.CellSet(Blue);
+                exporter.CellSet(Clear);                
+                exporter.RowEnd();
+            }
+
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {Red} {Green} {Blue} {Clear}");
@@ -716,6 +749,7 @@ namespace BluetoothProtocols
         /// </summary>
         public class EnvironmentConfiguration_Data :INotifyPropertyChanged
         {
+            // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
             public DateTimeOffset TimestampMostRecent 
             {
@@ -834,6 +868,25 @@ namespace BluetoothProtocols
                 this.GreenCalibration = value.GreenCalibration;
                 this.BlueCalibration = value.BlueCalibration;
             }
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["TempInterval", "PressureInterval", "HumidityInterval", "ColorInterval", "GasMode", "RedCalibration", "GreenCalibration", "BlueCalibration"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TempInterval);
+                exporter.CellSet(PressureInterval);
+                exporter.CellSet(HumidityInterval);
+                exporter.CellSet(ColorInterval);
+                exporter.CellSet(GasMode);
+                exporter.CellSet(RedCalibration);
+                exporter.CellSet(GreenCalibration);
+                exporter.CellSet(BlueCalibration);                
+                exporter.RowEnd();
+            }
+
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {TempInterval} {PressureInterval} {HumidityInterval} {ColorInterval} {GasMode} {RedCalibration} {GreenCalibration} {BlueCalibration}");
@@ -923,6 +976,7 @@ namespace BluetoothProtocols
         /// </summary>
         public class Battery_Data :INotifyPropertyChanged
         {
+            // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
             public DateTimeOffset TimestampMostRecent 
             {
@@ -957,6 +1011,18 @@ namespace BluetoothProtocols
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.BatteryLevel = value.BatteryLevel;
             }
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["BatteryLevel"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(BatteryLevel);                
+                exporter.RowEnd();
+            }
+
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {BatteryLevel}");

@@ -65,7 +65,7 @@ this code block will be ignored
 There are multiple ways expansion can work
 
 Type|Where placed|Details
------|-----|-----|-----
+-----|-----|-----|
 Global|top-level|This is the default and doesn't need any options
 Global-List|top-level|Done when Type=list and a Source is provided. Each child in the Source list will be visited and expanded, and the results all concatenated together. This is used by, e.g., the LINKS to make a single top-level (global) list of links.
 Parent-List|above the child|Done when Type=list and a Source is provided and ListOutput=parent

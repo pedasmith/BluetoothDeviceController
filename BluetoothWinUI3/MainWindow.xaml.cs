@@ -342,6 +342,7 @@ namespace BluetoothWinUI3
             }
             return selectedContainer;
         }
+
         private async Task<IDeviceControl> GetBTSelectedAsync(string verb)
         {
             var selectedContainer = await GetZoomableSelectedAsync(verb);
@@ -483,7 +484,7 @@ namespace BluetoothWinUI3
 
         private async void OnFileCopyGraphAsPNG(object sender, RoutedEventArgs e)
         {
-            string verb = "rename";
+            string verb = "copy";
             var selected = await GetBTSelectedAsync(verb);
             if (selected == null) return;
             var knownDevice = await GetKnownDevice(selected, verb);
@@ -500,6 +501,12 @@ namespace BluetoothWinUI3
 
         private async void OnFileCopyDataForExcel(object sender, RoutedEventArgs e)
         {
+            string verb = "copy";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
+            var knownDevice = await GetKnownDevice(selected, verb);
+            if (knownDevice == null) return;
+
 
         }
 
@@ -617,7 +624,8 @@ namespace BluetoothWinUI3
             if (selected == null) return; // should never happen
 
             var newSize = (CurrSelectedWindowSize == WindowSize.Normal) ? WindowSize.Large : WindowSize.Normal;
-            var largeActualSize = new Windows.Foundation.Size(uiZoomPanel.ActualWidth, uiZoomPanel.ActualHeight);
+            // NOTE: I am not sure where the 10 comes from.
+            var largeActualSize = new Windows.Foundation.Size(uiZoomPanel.ActualWidth - 10, uiZoomPanel.ActualHeight - 10);
             switch (newSize)
             {
                 case WindowSize.Normal:
@@ -751,5 +759,18 @@ namespace BluetoothWinUI3
             await uiDialogDirectories.ShowAsync();
         }
 
+        private async void OnZoomPanelSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            string verb = "";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
+
+            if (CurrSelectedWindowSize == WindowSize.Large)
+            {
+                // NOTE: I am not sure where the 10 comes from.
+                var largeActualSize = new Windows.Foundation.Size(uiZoomPanel.ActualWidth-10, uiZoomPanel.ActualHeight-10);
+                selected.UpdateUX(CurrSelectedWindowSize, largeActualSize);
+            }
+        }
     }
 }

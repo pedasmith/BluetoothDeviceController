@@ -327,6 +327,7 @@ This is the primary section of the code.
         /// </summary>
         public class [[DataGroupName.dotNet]] :INotifyPropertyChanged
         {
+            // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
             public DateTimeOffset TimestampMostRecent 
             {
@@ -351,6 +352,18 @@ This is the primary section of the code.
                 this.TimestampMostRecent = value.TimestampMostRecent;
 [[CharacteristicDataFieldsCopyFrom]]
             }
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet([[[CharacteristicDataFieldsHeaders]]]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+[[CharacteristicDataFieldsRow]]                
+                exporter.RowEnd();
+            }
+
             public override string ToString()
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")}[[CharacteristicDataGroupForToString]]");
@@ -406,6 +419,29 @@ This is the primary section of the code.
                 this.[[DataName.dotNet]] = value.[[DataName.dotNet]];
 ```
 
+## CharacteristicDataFieldsHeaders Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics CodeListSubZero="" CodeListSeparator=", "
+```
+[[CharacteristicPropertyDataFieldsHeaders]]
+```
+
+
+## CharacteristicPropertyDataFieldsHeaders Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" CodeListSeparator=", "
+
+```
+"[[DataName]]"
+```
+
+## CharacteristicDataFieldsRow Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero="" 
+```
+[[CharacteristicPropertyDataFieldsRow]]
+```
+
+
+## CharacteristicPropertyDataFieldsRow Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" 
+
+```
+                exporter.CellSet([[DataName.dotNet]]);
+```
 
 ## CharacteristicDataGroupForToString Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics Code="[[CharacteristicDataGroupFieldForToString]]" CodeListSubZero=""
 
