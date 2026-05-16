@@ -4,7 +4,6 @@ using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Shapes;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -12,10 +11,12 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Utilities;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
+using Windows.Storage.Streams;
 using WinUI.TableView;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -59,8 +60,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// always in the 'native' units (e.g., always celcius for temperature).
     /// </summary>
     Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
-
-    // TODO: update the HistoricalEnvironment_DataUnits with new user unit preferences.
 
     /// <summary>
     /// Similar to CurrEnvironment_Data , but the values are converted to the user's preferred units. 
@@ -498,7 +497,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         UpdateGraphData(""); // all of them.
     }
 
-    public void UpdateUX(MainWindow.WindowSize windowSize)
+    public void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize)
     {
         CurrWindowSize = windowSize;
         switch (CurrWindowSize)
@@ -510,8 +509,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 SetAxesVisibility(false);
                 break;
             case MainWindow.WindowSize.Large:
-                rootPanel.Width = 780;
-                rootPanel.Height = 580;
+                rootPanel.Width = largeActualSize.Width;
+                rootPanel.Height = largeActualSize.Height;
                 SetAxesVisibility(true);
                 break;
         }
@@ -660,11 +659,77 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // GetPixelsAsync() https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.rendertargetbitmap.getpixelsasync?view=winrt-28000
         // Format is BGRA8 premultiplied
 
+        // Win2D requires B8G8R8A8UIntNormalized
+        // which is DXGI_FORMAT_B8G8R8A8_UNORM https://learn.microsoft.com/en-us/uwp/api/windows.graphics.directx.directxpixelformat
+        // which is described at https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format
+        // as "A four-component, 32-bit unsigned-normalized-integer format that supports 8 bits for each color channel and 8-bit alpha"
+
         var renderTargetBitmap = new Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap();
-        await renderTargetBitmap.RenderAsync(uiOxyPlot, 800, 600);
+        var oldBackground = uiOxyPlot.Background;
+        uiOxyPlot.Background = rootPanel.Background; //
+        await renderTargetBitmap.RenderAsync(uiOxyPlot);
+        uiOxyPlot.Background = oldBackground; // switch back to transparent!
+
         var pixels = await renderTargetBitmap.GetPixelsAsync(); // get an IBuffer in BGRA8 premultiplied format.
-        ;
-        //var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, new InMemoryBitmap(pixels));
-        //RenderedImage.Source = renderTargetBitmap;
+        var pixelsArray = pixels.ToArray();
+
+        var outputStream = new InMemoryRandomAccessStream();
+        var encoder = await Windows.Graphics.Imaging.BitmapEncoder.CreateAsync(Windows.Graphics.Imaging.BitmapEncoder.PngEncoderId, outputStream);
+        encoder.SetPixelData(
+            Windows.Graphics.Imaging.BitmapPixelFormat.Bgra8,
+            Windows.Graphics.Imaging.BitmapAlphaMode.Premultiplied,
+            (uint)renderTargetBitmap.PixelWidth,
+            (uint)renderTargetBitmap.PixelHeight,
+            96, // DPI X
+            96, // DPI Y
+            pixelsArray
+        );
+        try
+        {
+            await encoder.FlushAsync();
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: unable to make PNG file; {ex.Message}");
+        }
+
+        try
+        {
+            var dataPackage = new DataPackage()
+            {
+                RequestedOperation = DataPackageOperation.Copy
+            };
+            outputStream.Seek(0);
+            var streamref = RandomAccessStreamReference.CreateFromStream(outputStream);
+            dataPackage.SetBitmap(streamref);
+            Clipboard.SetContent(dataPackage);
+            Clipboard.Flush();
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: 30: unable to make PNG data for the clipboard; {ex.Message}");
+        }
+
+        /* Code to write to a file. Note that AFAICT the BinaryReader, when it goes out of scope, takes the
+         * outputStream with it, so this code is the last code that can use the outputStream.
+         * This code works fine, but it's not needed for my app. That's why it's commented out.
+         */
+#if TURN_ON_GRAPH_TO_FILE_TEST_CODE
+        try
+        {
+            outputStream.Seek(0);
+            using (var reader = new BinaryReader(outputStream.AsStreamForRead()))
+            {
+                var bytes = reader.ReadBytes((int)outputStream.Size);
+                System.IO.File.WriteAllBytes("c:\\temp\\2026\\junkgraph.png", bytes); 
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: 20: unable to make PNG file; {ex.Message}");
+        }
+#endif
+
+
     }
 }

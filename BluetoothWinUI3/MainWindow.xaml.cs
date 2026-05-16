@@ -17,7 +17,6 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage;
 using Windows.System.Display;
-using static BluetoothProtocols.Nordic_Thingy;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -490,9 +489,13 @@ namespace BluetoothWinUI3
             var knownDevice = await GetKnownDevice(selected, verb);
             if (knownDevice == null) return;
 
-            selected.GetGraphAsPng(); // TODO: make sure it can!
-
-
+            var caps = selected.GetUXCapabilities();
+            if ((caps & IDeviceControl.UXCapabilities.CanGetGraphAsPng) == 0)
+            {
+                await ShowNotice("Can't copy graph", "The selected device does not support copying the graph");
+                return;
+            }
+            selected.GetGraphAsPng();
         }
 
         private async void OnFileCopyDataForExcel(object sender, RoutedEventArgs e)
@@ -614,6 +617,7 @@ namespace BluetoothWinUI3
             if (selected == null) return; // should never happen
 
             var newSize = (CurrSelectedWindowSize == WindowSize.Normal) ? WindowSize.Large : WindowSize.Normal;
+            var largeActualSize = new Windows.Foundation.Size(uiZoomPanel.ActualWidth, uiZoomPanel.ActualHeight);
             switch (newSize)
             {
                 case WindowSize.Normal:
@@ -627,7 +631,7 @@ namespace BluetoothWinUI3
                     uiZoomPanel.Children.Add(selectedControl);
                     break;
             }
-            selected.UpdateUX(newSize);
+            selected.UpdateUX(newSize, largeActualSize);
             CurrSelectedWindowSize = newSize;
             // Don't have to do anything on failure (which can't really happen)
         }

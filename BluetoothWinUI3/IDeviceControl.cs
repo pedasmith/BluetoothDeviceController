@@ -33,7 +33,7 @@ namespace BluetoothWinUI3
 
         void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs);
 
-        void UpdateUX(MainWindow.WindowSize windowSize);
+        void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize);
 
         enum Visibility {  Visible, Collapsed, }
         Visibility GetDataGridVisibility();

@@ -81,7 +81,7 @@
                     <Line Grid.Row="2" Grid.Column="0" Tag="eCOSColor" Style="{StaticResource sGraphLineKey}" />
                     <Line Grid.Row="2" Grid.Column="1" Tag="TVOCColor" Style="{StaticResource sGraphLineKey}" />
                 </Grid>
-                <oxyplot:PlotView Grid.Row="2"  x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
+                <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
                     <tv:TableView x:Name="uiTableView" IsReadOnly="True" />
                     <!--
