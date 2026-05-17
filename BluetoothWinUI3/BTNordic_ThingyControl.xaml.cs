@@ -47,7 +47,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private string InternalDeviceType = "Nordic_Thingy";
+    private readonly string InternalDeviceType = "Nordic_Thingy";
     Nordic_Thingy Device;
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
@@ -134,7 +134,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     private Nordic_Thingy.Environment_Data CopyAndUpdateUnits(Nordic_Thingy.Environment_Data source, Nordic_Thingy.Environment_Data dest)
     {
-        if (dest == null) dest = source.Clone();
+        dest ??= source.Clone();
         dest.TimestampMostRecent = source.TimestampMostRecent;
         dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(source.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
         dest.Pressure = BluetoothWatcher.Units.Pressure.Convert(source.Pressure, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
@@ -145,7 +145,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     }
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    public List<string> LineNames { get { return new List<string>() { "Temperature", "Pressure", "Humidity", "eCOS", "TVOC"  }; } }
+    public List<string> LineNames { get { return [ "Temperature", "Pressure", "Humidity", "eCOS", "TVOC" ]; } }
 
     public KnownDevice KnownDeviceFromDataContext { get { return DataContext as KnownDevice; } }
 
@@ -310,9 +310,10 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
         uiAddress.Text = BluetoothAddress.AsString(KnownDeviceFromDataContext.Advertisement.Addr);
 
-        Device = new Nordic_Thingy();
-
-        Device.ble = await BluetoothLEDevice.FromBluetoothAddressAsync(KnownDeviceFromDataContext.Advertisement.Addr);
+        Device = new Nordic_Thingy()
+        {
+            ble = await BluetoothLEDevice.FromBluetoothAddressAsync(KnownDeviceFromDataContext.Advertisement.Addr),
+        };
         if (Device.ble == null)
         {
             Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(KnownDeviceFromDataContext.Advertisement.Addr)}");
@@ -404,8 +405,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     {
         foreach (var series in OxyPlotModel.Series)
         {
-            var lseries = series as LineSeries;
-            if (lseries != null)
+            if (series is LineSeries lseries)
             {
                 if (lseries.DataFieldY == lineName)
                 {
@@ -451,7 +451,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             var name = saveData.GetUserName();
             uiDeviceName.Text = name;
 
-            var theme = Application.Current.RequestedTheme;
             var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
             var brushes = new DeviceColorBrushes(colors);
             DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
@@ -534,9 +533,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     }
 
 
-    Dictionary<string, int> NPropertyChanges = new Dictionary<string, int>();
+    Dictionary<string, int> NPropertyChanges { get; } = [];
     //List<string> Sparkles = new List<string>() { "\u00A0", "*" }; // ✨", "💫", "🌟", "⚡", "🔥", "💥" };
-    List<string> Sparkles = new List<string>() { "╺", "╼", "╾", "╸", "╾", "╼" }; 
+    readonly List<string> Sparkles = [ "╺", "╼", "╾", "╸", "╾", "╼" ]; 
 
     private void UpdateSparkles(string name)
     {
