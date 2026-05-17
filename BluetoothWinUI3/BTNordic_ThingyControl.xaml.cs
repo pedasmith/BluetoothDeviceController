@@ -11,8 +11,7 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
@@ -71,11 +70,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
 
-    public IDeviceControl.UXCapabilities GetUXCapabilities()
-    {
-        var retval = IDeviceControl.UXCapabilities.CanGetGraphAsPng | IDeviceControl.UXCapabilities.CanGetData;
-        return retval;
-    }
 
     public BTNordic_ThingyControl()
     {
@@ -516,6 +510,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         }
     }
 
+    /// <summary>
+    /// User preferences as set by the UpdateUX call
+    /// </summary>
     UserPreferences CurrUserPrefs { get; set; } = null;
 
 
@@ -651,50 +648,24 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         }
     }
 
+    #region Exporters
+
+    /// <summary>
+    /// Called from MainWindow when the user asks for, e.g., exported data or graphs.
+    /// </summary>
+    /// <returns></returns>
+    public IDeviceControl.UXCapabilities GetUXCapabilities()
+    {
+        var retval = IDeviceControl.UXCapabilities.CanGetGraphAsPng | IDeviceControl.UXCapabilities.CanGetData;
+        return retval;
+    }
 
     public async void ExportGraphAsPng()
     {
-        // RenderTargetBitmap: https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.rendertargetbitmap?view=winrt-28000
-        // RenderAsync() https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.rendertargetbitmap.renderasync?view=winrt-28000
-        // GetPixelsAsync() https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.rendertargetbitmap.getpixelsasync?view=winrt-28000
-        // Format is BGRA8 premultiplied
-
-        // Win2D requires B8G8R8A8UIntNormalized
-        // which is DXGI_FORMAT_B8G8R8A8_UNORM https://learn.microsoft.com/en-us/uwp/api/windows.graphics.directx.directxpixelformat
-        // which is described at https://learn.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format
-        // as "A four-component, 32-bit unsigned-normalized-integer format that supports 8 bits for each color channel and 8-bit alpha"
-
-        var renderTargetBitmap = new Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap();
-        var oldBackground = uiOxyPlot.Background;
-        uiOxyPlot.Background = rootPanel.Background; //
-        await renderTargetBitmap.RenderAsync(uiOxyPlot);
-        uiOxyPlot.Background = oldBackground; // switch back to transparent!
-
-        var pixels = await renderTargetBitmap.GetPixelsAsync(); // get an IBuffer in BGRA8 premultiplied format.
-        var pixelsArray = pixels.ToArray();
-
-        var outputStream = new InMemoryRandomAccessStream();
-        var encoder = await Windows.Graphics.Imaging.BitmapEncoder.CreateAsync(Windows.Graphics.Imaging.BitmapEncoder.PngEncoderId, outputStream);
-        encoder.SetPixelData(
-            Windows.Graphics.Imaging.BitmapPixelFormat.Bgra8,
-            Windows.Graphics.Imaging.BitmapAlphaMode.Premultiplied,
-            (uint)renderTargetBitmap.PixelWidth,
-            (uint)renderTargetBitmap.PixelHeight,
-            96, // DPI X
-            96, // DPI Y
-            pixelsArray
-        );
         try
         {
-            await encoder.FlushAsync();
-        }
-        catch (Exception ex)
-        {
-            Log($"Error: unable to make PNG file; {ex.Message}");
-        }
-
-        try
-        {
+            var exporter = new Exporters.ExportControlAsPng();
+            var outputStream = await exporter.ExportAsync(uiOxyPlot, rootPanel.Background);
             var dataPackage = new DataPackage()
             {
                 RequestedOperation = DataPackageOperation.Copy
@@ -707,13 +678,15 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         }
         catch (Exception ex)
         {
-            Log($"Error: 30: unable to make PNG data for the clipboard; {ex.Message}");
+            Log($"Error: unable to make PNG data for the clipboard; {ex.Message}");
         }
+    }
 
-        /* Code to write to a file. Note that AFAICT the BinaryReader, when it goes out of scope, takes the
-         * outputStream with it, so this code is the last code that can use the outputStream.
-         * This code works fine, but it's not needed for my app. That's why it's commented out.
-         */
+
+    /* Code to write to a file. Note that AFAICT the BinaryReader, when it goes out of scope, takes the
+     * outputStream with it, so this code is the last code that can use the outputStream.
+     * This code works fine, but it's not needed for my app. That's why it's commented out.
+     */
 #if TURN_ON_GRAPH_TO_FILE_TEST_CODE
         try
         {
@@ -729,7 +702,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             Log($"Error: 20: unable to make PNG file; {ex.Message}");
         }
 #endif
-    }
 
     public string ExportData(IExportData exporter)
     {
@@ -748,5 +720,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         retval = exporter.Export();
         return retval;
     }
+
+    #endregion 
 
 } // end of class BTNordic_ThingyControl
