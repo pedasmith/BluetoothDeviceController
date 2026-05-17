@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-05-16::11:29
+    /// This class was automatically generated 2026-05-17::12:14
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -254,9 +254,10 @@ namespace BluetoothProtocols
         #region Service_Environment
         // Service Environment 
         /// <summary>
-        /// Data from all of the characteristics in the Environment Service
+        /// Data from all of the characteristics in the Environment Service. 
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Environment_Data :INotifyPropertyChanged
+        public class Environment_Data :INotifyPropertyChanged, IExportDataSource
         {
             // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
@@ -332,6 +333,7 @@ namespace BluetoothProtocols
             {
                 return this.MemberwiseClone() as Environment_Data;
             }
+
             public void CopyFrom(Environment_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
@@ -341,14 +343,17 @@ namespace BluetoothProtocols
                 this.eCOS = value.eCOS;
                 this.TVOC = value.TVOC;
             }
+
             public void ExportHeaders(IExportData exporter)
             {
-                exporter.HeadersSet(["Temperature", "Pressure", "Humidity", "eCOS", "TVOC"]);
+                exporter.HeadersSet(["Date", "Time", "Temperature", "Pressure", "Humidity", "eCOS", "TVOC"]);
             }
 
             public void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
                 exporter.CellSet(Temperature);
                 exporter.CellSet(Pressure);
                 exporter.CellSet(Humidity);
@@ -359,7 +364,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {Temperature} {Pressure} {Humidity} {eCOS} {TVOC}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Temperature} {Pressure} {Humidity} {eCOS} {TVOC}");
             }
 
             private void OnPropertyChanged([CallerMemberName]string propertyName = "")
@@ -582,9 +587,10 @@ namespace BluetoothProtocols
         }
         // Service Environment 
         /// <summary>
-        /// Data from all of the characteristics in the Environment Service
+        /// Data from all of the characteristics in the Environment Service. 
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class EnvironmentColor_Data :INotifyPropertyChanged
+        public class EnvironmentColor_Data :INotifyPropertyChanged, IExportDataSource
         {
             // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
@@ -649,6 +655,7 @@ namespace BluetoothProtocols
             {
                 return this.MemberwiseClone() as EnvironmentColor_Data;
             }
+
             public void CopyFrom(EnvironmentColor_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
@@ -657,14 +664,17 @@ namespace BluetoothProtocols
                 this.Blue = value.Blue;
                 this.Clear = value.Clear;
             }
+
             public void ExportHeaders(IExportData exporter)
             {
-                exporter.HeadersSet(["Red", "Green", "Blue", "Clear"]);
+                exporter.HeadersSet(["Date", "Time", "Red", "Green", "Blue", "Clear"]);
             }
 
             public void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
                 exporter.CellSet(Red);
                 exporter.CellSet(Green);
                 exporter.CellSet(Blue);
@@ -674,7 +684,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {Red} {Green} {Blue} {Clear}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Red} {Green} {Blue} {Clear}");
             }
 
             private void OnPropertyChanged([CallerMemberName]string propertyName = "")
@@ -745,9 +755,10 @@ namespace BluetoothProtocols
         }
         // Service Environment 
         /// <summary>
-        /// Data from all of the characteristics in the Environment Service
+        /// Data from all of the characteristics in the Environment Service. 
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class EnvironmentConfiguration_Data :INotifyPropertyChanged
+        public class EnvironmentConfiguration_Data :INotifyPropertyChanged, IExportDataSource
         {
             // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
@@ -856,6 +867,7 @@ namespace BluetoothProtocols
             {
                 return this.MemberwiseClone() as EnvironmentConfiguration_Data;
             }
+
             public void CopyFrom(EnvironmentConfiguration_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
@@ -868,14 +880,17 @@ namespace BluetoothProtocols
                 this.GreenCalibration = value.GreenCalibration;
                 this.BlueCalibration = value.BlueCalibration;
             }
+
             public void ExportHeaders(IExportData exporter)
             {
-                exporter.HeadersSet(["TempInterval", "PressureInterval", "HumidityInterval", "ColorInterval", "GasMode", "RedCalibration", "GreenCalibration", "BlueCalibration"]);
+                exporter.HeadersSet(["Date", "Time", "TempInterval", "PressureInterval", "HumidityInterval", "ColorInterval", "GasMode", "RedCalibration", "GreenCalibration", "BlueCalibration"]);
             }
 
             public void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
                 exporter.CellSet(TempInterval);
                 exporter.CellSet(PressureInterval);
                 exporter.CellSet(HumidityInterval);
@@ -889,7 +904,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {TempInterval} {PressureInterval} {HumidityInterval} {ColorInterval} {GasMode} {RedCalibration} {GreenCalibration} {BlueCalibration}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {TempInterval} {PressureInterval} {HumidityInterval} {ColorInterval} {GasMode} {RedCalibration} {GreenCalibration} {BlueCalibration}");
             }
 
             private void OnPropertyChanged([CallerMemberName]string propertyName = "")
@@ -972,9 +987,10 @@ namespace BluetoothProtocols
         #region Service_Battery
         // Service Battery 
         /// <summary>
-        /// Data from all of the characteristics in the Battery Service
+        /// Data from all of the characteristics in the Battery Service. 
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Battery_Data :INotifyPropertyChanged
+        public class Battery_Data :INotifyPropertyChanged, IExportDataSource
         {
             // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
@@ -1006,26 +1022,30 @@ namespace BluetoothProtocols
             {
                 return this.MemberwiseClone() as Battery_Data;
             }
+
             public void CopyFrom(Battery_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.BatteryLevel = value.BatteryLevel;
             }
+
             public void ExportHeaders(IExportData exporter)
             {
-                exporter.HeadersSet(["BatteryLevel"]);
+                exporter.HeadersSet(["Date", "Time", "BatteryLevel"]);
             }
 
             public void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
                 exporter.CellSet(BatteryLevel);                
                 exporter.RowEnd();
             }
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")} {BatteryLevel}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {BatteryLevel}");
             }
 
             private void OnPropertyChanged([CallerMemberName]string propertyName = "")

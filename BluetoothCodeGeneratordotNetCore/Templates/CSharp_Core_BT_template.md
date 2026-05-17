@@ -323,9 +323,10 @@ This is the primary section of the code.
 ```
         // Service [[Name]] 
         /// <summary>
-        /// Data from all of the characteristics in the [[ServiceName]] Service
+        /// Data from all of the characteristics in the [[ServiceName]] Service. 
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class [[DataGroupName.dotNet]] :INotifyPropertyChanged
+        public class [[DataGroupName.dotNet]] :INotifyPropertyChanged, IExportDataSource
         {
             // Template is ServiceDataGroups
             private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
@@ -347,26 +348,30 @@ This is the primary section of the code.
             {
                 return this.MemberwiseClone() as [[DataGroupName.dotNet]];
             }
+
             public void CopyFrom([[DataGroupName.dotNet]] value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
 [[CharacteristicDataFieldsCopyFrom]]
             }
+
             public void ExportHeaders(IExportData exporter)
             {
-                exporter.HeadersSet([[[CharacteristicDataFieldsHeaders]]]);
+                exporter.HeadersSet(["Date", "Time", [[CharacteristicDataFieldsHeaders]]]);
             }
 
             public void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
 [[CharacteristicDataFieldsRow]]                
                 exporter.RowEnd();
             }
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("mm.ss.fff")}[[CharacteristicDataGroupForToString]]");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")}[[CharacteristicDataGroupForToString]]");
             }
 
             private void OnPropertyChanged([CallerMemberName]string propertyName = "")

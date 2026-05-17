@@ -652,7 +652,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     }
 
 
-    public async void GetGraphAsPng()
+    public async void ExportGraphAsPng()
     {
         // RenderTargetBitmap: https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.rendertargetbitmap?view=winrt-28000
         // RenderAsync() https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.rendertargetbitmap.renderasync?view=winrt-28000
@@ -729,7 +729,24 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             Log($"Error: 20: unable to make PNG file; {ex.Message}");
         }
 #endif
-
-
     }
-}
+
+    public string ExportData(IExportData exporter)
+    {
+        string retval = "";
+        var data = HistoricalEnvironment_DataUnits.Data;
+        if (data.Count == 0)
+        {
+            Log("No data to export.");
+            return retval;
+        }
+        data[0].ExportHeaders(exporter);
+        foreach (var row in data)
+        {
+            row.ExportRow(exporter);
+        }
+        retval = exporter.Export();
+        return retval;
+    }
+
+} // end of class BTNordic_ThingyControl

@@ -1,4 +1,5 @@
-﻿using BluetoothWinUI3.BluetoothWinUI3Registration;
+﻿using BluetoothProtocols;
+using BluetoothWinUI3.BluetoothWinUI3Registration;
 using System;
 using System.Collections.Generic;
 
@@ -42,7 +43,9 @@ namespace BluetoothWinUI3
         [Flags] enum UXCapabilities {  CanGetGraphAsPng = 0x01, CanGetData = 0x02 }
         UXCapabilities GetUXCapabilities();
 
-        void GetGraphAsPng();
+        // TODO: make the Png exporter like the IExportData? So that all that awful code is in one place?
+        void ExportGraphAsPng();
+        string ExportData(IExportData exporter);
 
     }
 }

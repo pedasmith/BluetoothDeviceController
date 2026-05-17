@@ -16,6 +16,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.System.Display;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -496,7 +497,7 @@ namespace BluetoothWinUI3
                 await ShowNotice("Can't copy graph", "The selected device does not support copying the graph");
                 return;
             }
-            selected.GetGraphAsPng();
+            selected.ExportGraphAsPng();
         }
 
         private async void OnFileCopyDataForExcel(object sender, RoutedEventArgs e)
@@ -507,6 +508,23 @@ namespace BluetoothWinUI3
             var knownDevice = await GetKnownDevice(selected, verb);
             if (knownDevice == null) return;
 
+            var exporter = new Exporters.ExportHtmlForExcel();
+            var data = selected.ExportData(exporter);
+
+            try
+            {
+                var dataPackage = new DataPackage()
+                {
+                    RequestedOperation = DataPackageOperation.Copy
+                };
+                dataPackage.SetText(data);
+                Clipboard.SetContent(dataPackage);
+                Clipboard.Flush();
+            }
+            catch (Exception ex)
+            {
+                Log($"Error: unable to make export data for the clipboard; {ex.Message}");
+            }
 
         }
 
