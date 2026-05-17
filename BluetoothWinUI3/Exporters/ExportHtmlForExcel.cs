@@ -50,7 +50,7 @@ namespace Exporters
 
         public void RowStart()
         {
-            sb.Append("<tr>\n");
+            sb.Append("<tr>");
         }
     }
 }

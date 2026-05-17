@@ -505,8 +505,7 @@ namespace BluetoothWinUI3
             string verb = "copy";
             var selected = await GetBTSelectedAsync(verb);
             if (selected == null) return;
-            var knownDevice = await GetKnownDevice(selected, verb);
-            if (knownDevice == null) return;
+
 
             var exporter = new Exporters.ExportHtmlForExcel();
             var data = selected.ExportData(exporter);
@@ -525,12 +524,32 @@ namespace BluetoothWinUI3
             {
                 Log($"Error: unable to make export data for the clipboard; {ex.Message}");
             }
-
         }
 
         private async void OnFileCopyDataAsCSV(object sender, RoutedEventArgs e)
         {
+            string verb = "copy";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
 
+
+            var exporter = new Exporters.ExportCsv();
+            var data = selected.ExportData(exporter);
+
+            try
+            {
+                var dataPackage = new DataPackage()
+                {
+                    RequestedOperation = DataPackageOperation.Copy
+                };
+                dataPackage.SetText(data);
+                Clipboard.SetContent(dataPackage);
+                Clipboard.Flush();
+            }
+            catch (Exception ex)
+            {
+                Log($"Error: unable to make export data for the clipboard; {ex.Message}");
+            }
         }
 
 
