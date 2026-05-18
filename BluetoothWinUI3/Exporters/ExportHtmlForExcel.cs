@@ -28,9 +28,9 @@ namespace Exporters
             sb.Append($"<td>{Escape(value.ToString("F2"))}</td>");
         }
 
-        public string Export()
+        public string Export(string description)
         {
-            return "<html><body><table>\n" + sb.ToString() + "\n</table></body></html>";
+            return "<!DOCTYPE html>\n<html><head>\n<title>" + Escape(description) + "</title>\n</head>\n<body><table>\n" + sb.ToString() + "\n</table></body></html>";
         }
 
         public void HeadersSet(string[] headers)

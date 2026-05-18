@@ -21,7 +21,7 @@ namespace BluetoothProtocols
         /// Get the final data
         /// </summary>
         /// <returns></returns>
-        public string Export(); 
+        public string Export(string description); 
     }
 
     /// <summary>

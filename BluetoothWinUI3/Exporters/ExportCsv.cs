@@ -1,4 +1,5 @@
 ﻿using BluetoothProtocols;
+using System.Globalization;
 using System.Text;
 
 namespace Exporters
@@ -8,7 +9,7 @@ namespace Exporters
     /// </summary>
     public class ExportCsv : IExportData
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         public ExportCsv() { }
 
         /// <summary>
@@ -50,15 +51,12 @@ namespace Exporters
 
         public void CellSet(double value)
         {
-            if (!isFirstCellInRow)
-            {
-                sb.Append(",");
-            }
-            isFirstCellInRow = false;
-            sb.Append($"{value.ToString("F2")}");
+            // Languanges like French will use a comma as the decimal separator.
+            string strval = value.ToString("F2", CultureInfo.InvariantCulture);
+            CellSet(strval); // on the off change the the float needs to be escaped...
         }
 
-        public string Export()
+        public string Export(string _) // description is not used in CSV exports
         {
             return sb.ToString();
         }

@@ -716,7 +716,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             row.ExportRow(exporter);
         }
-        retval = exporter.Export();
+        var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        retval = exporter.Export($"Data from {Device.Name} at {now}");
         return retval;
     }
 

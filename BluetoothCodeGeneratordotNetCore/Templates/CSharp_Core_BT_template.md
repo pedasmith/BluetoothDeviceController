@@ -38,6 +38,9 @@ namespace BluetoothProtocols
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public string Name { get; } = "[[DeviceName]]";
+        public string Description { get; } = "[[Description]]";
+
         /* Service and Characteristics summary for the device [[DeviceName]]
 
 [[ServiceSummary]]

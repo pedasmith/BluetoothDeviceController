@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-05-17::12:14
+    /// This class was automatically generated 2026-05-18::08:51
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -34,6 +34,9 @@ namespace BluetoothProtocols
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public string Name { get; } = "Thingy";
+        public string Description { get; } = "The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC";
 
         /* Service and Characteristics summary for the device Thingy
 
