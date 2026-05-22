@@ -18,16 +18,58 @@ using static BluetoothConversions.BluetoothCompanyIdentifier;
 namespace BluetoothWatcher.AdvertismentWatcher
 {
  
+    /// <summary>
+    /// WatcherData is a super-summary of the data in the original Bluetooth advertisement. The original
+    /// is available as "OriginalArgs" (yeah, weird name). The fields are filled in in AdvertisementWatcher.
+    /// A key point is that a Bluetooth advertisement can optionally contain a bunch of fields; the
+    /// AdvertisementWatcher will read in each field and then fill in the WatcherData as appropriate.
+    /// </summary>
     public class WatcherData
     {
+        /// <summary>
+        /// Advertisement CompleteLocalName (BT 0x09) or ""
+        /// </summary>
         public String CompleteLocalName { get; set; } = "";
+        /// <summary>
+        /// Parsed manufacturer data from ManufacturerData (BT 0xFF).
+        /// </summary>
         public String ParsedCompanyData { get; set; } = "";
+        /// <summary>
+        /// Same as ParsedCompanyData but doesn't incude CR
+        /// </summary>
         public String ParsedCompanyDataTrim { get { return ParsedCompanyData.Trim('\n'); } }
+        /// <summary>
+        /// From the ManufacturerData (BT 0xFF)
+        /// </summary>
         public ushort CompanyId { get; set; } = 65534; // is unknown. Is kind of a valid value? //TODO: make this nullable
+        /// <summary>
+        /// ManufacturerType is my interpretation of the CompanyId and only includes companies that I can parse.
+        /// </summary>
         public CommonManufacturerType ManufacturerType { get; set; } = CommonManufacturerType.Other;
+        /// <summary>
+        /// From the TxPowerLevel field
+        /// </summary>
         public sbyte TransmitPower { get; set; } = 0;
+        /// <summary>
+        /// Can be one of many different possible objects including Apple_iBeacon or Ruuvi_Tag
+        /// </summary>
         public object SpecializedDecodedData { get; set; } = null;
+        /// <summary>
+        /// ULONG version of the address. See AddressAsString for the nicely formatted version.
+        /// </summary>
         public ulong Addr {  get { return OriginalArgs?.BluetoothAddress ?? 0; } }
+        public string AddressAsString { get { return BluetoothAddress.AsString(Addr); } }
+
+        public string TimeStampHHmmssfff
+        {  
+            get
+            {
+                return OriginalArgs.Timestamp.ToString("HH:mm:ss.fff");
+            } 
+        }
+        /// <summary>
+        /// Original advertisement data
+        /// </summary>
         public BluetoothLEAdvertisementReceivedEventArgs OriginalArgs { get; set; }
 
         public enum AdvertisementStringFormat { Full, CanCompare, AddressOnly };

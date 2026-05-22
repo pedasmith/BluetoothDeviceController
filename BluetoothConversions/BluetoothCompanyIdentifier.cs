@@ -4051,7 +4051,7 @@ namespace BluetoothConversions
         {
             CommonManufacturerType manufacturerType = CommonManufacturerType.Other;
             UInt16 companyId = 0xFFFF;
-            object speciality = null;
+            object specialty = null;
             try
             {
                 var bytes = section.Data.ToArray();
@@ -4090,7 +4090,7 @@ namespace BluetoothConversions
                             sb.Append(appleIBeacon.ToString());
                             sb.Append("\n");
                             displayAsHex = false; // we have a better display
-                            speciality = appleIBeacon;
+                            specialty = appleIBeacon;
                         }
                         else if (appleIBeacon.IsApple10)
                         {
@@ -4105,7 +4105,7 @@ namespace BluetoothConversions
                             sb.Append(ruuviTag.ToString());
                             sb.Append("\n");
                             displayAsHex = false; // we have a better display
-                            speciality = ruuviTag;
+                            specialty = ruuviTag;
                         }
                         break;
                     case 0x0006: // Microsoft
@@ -4191,11 +4191,11 @@ namespace BluetoothConversions
                     }
                     sb.Append('\n');
                 }
-                return (sb.ToString(), manufacturerType, companyId, speciality);
+                return (sb.ToString(), manufacturerType, companyId, specialty);
             }
             catch (Exception)
             {
-                return ("??\n", manufacturerType, companyId, speciality);
+                return ("??\n", manufacturerType, companyId, specialty);
             }
         }
 

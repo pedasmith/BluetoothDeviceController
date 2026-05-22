@@ -2,9 +2,13 @@
 // The NO_UX is required so that the BluetoothCodeGeneratordotNetCore will compile with VS 2022
 // Otherwise is just complains that it can't find the Microsoft.UI.Dispatching namespace.
 
+#if WINDOWS_UWP
+using System;
+#else
 using Microsoft.UI.Dispatching;
 using System;
 using System.Runtime.CompilerServices;
+#endif
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -14,7 +18,9 @@ namespace Utilities
 {
     static class UIThreadHelper
     {
+#if !WINDOWS_UWP
         public static DispatcherQueue DQueue = null;
+#endif
 
         /// <summary>
         /// Returns TRUE iff the current thread is the UI thread
@@ -22,6 +28,11 @@ namespace Utilities
         /// <returns></returns>
         public static bool IsOnUIThread()
         {
+#if WINDOWS_UWP
+            var dispather = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
+            var retval = dispather.HasThreadAccess;
+            return retval;
+#else
             bool retval = false;
             if (DQueue != null)
             {
@@ -33,6 +44,7 @@ namespace Utilities
                 retval = dispatcher.HasThreadAccess;
             }
             return retval;
+#endif
         }
 
         /// <summary>
@@ -48,6 +60,10 @@ namespace Utilities
             }
             else
             {
+#if WINDOWS_UWP
+                var dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
+                var task = dispatcher.TryRunAsync(priority, () => { f(); });
+#else
                 if (DQueue != null)
                 {
                     var prioritydqueue = DispatcherQueuePriority.Low;
@@ -66,6 +82,7 @@ namespace Utilities
                     var dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
                     var task = dispatcher.TryRunAsync(priority, () => { f(); });
                 }
+#endif
             }
         }
     }

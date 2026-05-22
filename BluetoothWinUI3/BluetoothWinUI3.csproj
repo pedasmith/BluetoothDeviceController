@@ -16,21 +16,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\About_BluetoothWinUI3_dev.md" />
-    <Content Remove="Assets\HelpFiles\Device_Nordic_Thingy.md" />
-    <Content Remove="Assets\HelpFiles\Issues_with_TRIM.md" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="AppDictionary.xaml" />
     <None Remove="Assets\DevicePictures\Nordic_Thingy.png" />
+    <None Remove="Assets\HelpFiles\Device_Nordic_Thingy.md" />
     <None Remove="Assets\HelpFiles\Help_Main.md" />
+    <None Remove="Assets\HelpFiles\How_To_Add_New_Device_Control.md" />
     <None Remove="Assets\HelpFiles\Issues_with_HOxyPlot.md" />
     <None Remove="Assets\HelpFiles\Issues_With_MarkdownTextBlock.md" />
+    <None Remove="Assets\HelpFiles\Issues_with_TRIM.md" />
     <None Remove="Assets\HelpFiles\Release_Notes.md" />
     <None Remove="Assets\Icons\BTIcon.ico" />
     <None Remove="Assets\Icons\Icon.png" />
     <None Remove="Assets\Icons\StoreLogo.png" />
     <None Remove="BTBlank_BlankControl.xaml" />
     <None Remove="BTNordic_ThingyControl.xaml" />
+    <None Remove="BTServicesCharacteristicsDisplay.xaml" />
     <None Remove="MarkdownHelpSystem.xaml" />
     <None Remove="TestUserControl.xaml" />
     <None Remove="ZoomableDeviceControl.xaml" />
@@ -72,10 +74,16 @@
     <Content Update="Assets\HelpFiles\Help_Main.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="Assets\HelpFiles\How_To_Add_New_Device_Control.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\HelpFiles\Issues_with_HOxyPlot.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\HelpFiles\Issues_With_MarkdownTextBlock.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\HelpFiles\Issues_with_TRIM.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\HelpFiles\Release_Notes.md">
@@ -114,9 +122,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Update="Assets\HelpFiles\Device_Nordic_Thingy.md">
+    <Content Update="Assets\HelpFiles\Device_Nordic_Thingy.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
+    <Page Update="BTServicesCharacteristicsDisplay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ZoomableDeviceControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

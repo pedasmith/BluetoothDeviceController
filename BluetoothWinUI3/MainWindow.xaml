@@ -62,15 +62,16 @@
                         <RadioMenuFlyoutItem Text="PSI" Click="OnPreferencesPressure" Tag="PSI" x:Name="uiPreferencesPSI" GroupName="groupPressure" />
                         <RadioMenuFlyoutItem Text="Atmospheres" Click="OnPreferencesPressure" Tag="Atmosphere" x:Name="uiPreferencesAtmosphere" GroupName="groupPressure" />
                     </MenuFlyoutSubItem>
-
-
                 </MenuBarItem>
+                
                 <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
                     <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="T" />
                     <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
                     <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
                     <MenuFlyoutItem Text="Show directories" Click="OnDebugShowDirectories" AccessKey="D" />
+                    <MenuFlyoutItem Text="Show advertisements" Click="OnDebugShowAdvertisements" AccessKey="D" />
                 </MenuBarItem>
+                
                 <MenuBarItem Title="Help" AccessKey="H">
                     <MenuFlyoutItem Text="View Help" Click="OnHelpViewHelp" />
                     <MenuFlyoutItem Text="About" Click="OnHelpAbout" AccessKey="a" />

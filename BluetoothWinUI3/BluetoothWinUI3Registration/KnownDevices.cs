@@ -21,6 +21,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
     /// 
     /// KnownDevice is transient: it's not saved between sessions at all. Saved data should be in
     /// SaveData. SaveData is linked to KnownDevice by the Id which is a BluetoothLEDevice DeviceId.
+    /// 
+    /// Note that a Known Device might be e.g., the BTServicesCharacteristicsDisplay which is not really a device 
+    /// and therefore doesn't have e.g., an advertisement WatcherData
     /// </summary>
     public class KnownDevice
     {
@@ -61,7 +64,12 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         }
         public static KnownDevice Get(WatcherData advertisement)
         {
-            var existing = AllDevices.FirstOrDefault(kd => kd.Advertisement.Addr == advertisement.Addr);
+            var existing = AllDevices.FirstOrDefault(kd =>
+            {
+                if (kd.Advertisement == null) return false;  
+                var retval = kd.Advertisement.Addr == advertisement.Addr;
+                return retval;
+            });
             return existing; // might be null when it cannot be found
         }
         private static List<KnownDevice> AllDevices { get; } = new List<KnownDevice>();

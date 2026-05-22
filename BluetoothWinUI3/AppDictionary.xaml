@@ -90,6 +90,15 @@
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="FontSize" Value="10" />
     </Style>
+    <Style x:Key="sDeviceListDataCompressed" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+    </Style>
+    <Style x:Key="sDeviceListDataCompressedPrimary" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+    </Style>
 
 
     <Style x:Key="sGraphLineKey" TargetType="Line">

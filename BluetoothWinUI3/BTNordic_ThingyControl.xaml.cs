@@ -42,8 +42,16 @@ public static class Environment_DataUtilities
 }
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
+public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControlBasic, IDeviceControlDevice
 {
+
+    /// <summary>
+    /// Standard: Panel size. Set in UpdateUX from MainWindow.
+    /// </summary>
+
+    MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
+
+
     /// <summary>
     /// Used for logging only
     /// </summary>
@@ -68,7 +76,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     Nordic_Thingy.Battery_Data CurrBattery_Data = null;
     Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
 
-    MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
+
 
 
     public BTNordic_ThingyControl()
@@ -346,22 +354,22 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     }
 
-    public IDeviceControl.Visibility GetDataGridVisibility()
+    public IDeviceControlBasic.Visibility GetDataGridVisibility()
     {
         var retval = (uiDataGridPanel.Visibility == Visibility.Visible) 
-            ? IDeviceControl.Visibility.Visible : IDeviceControl.Visibility.Collapsed;
+            ? IDeviceControlBasic.Visibility.Visible : IDeviceControlBasic.Visibility.Collapsed;
         return retval;
     }
 
-    public void SetDataGridVisibility(IDeviceControl.Visibility visibility)
+    public void SetDataGridVisibility(IDeviceControlBasic.Visibility visibility)
     {
         switch (visibility)
         {
-            case IDeviceControl.Visibility.Collapsed:
+            case IDeviceControlBasic.Visibility.Collapsed:
                 uiOxyPlot.Visibility = Visibility.Visible;
                 uiDataGridPanel.Visibility = Visibility.Collapsed;
                 break;
-            case IDeviceControl.Visibility.Visible:
+            case IDeviceControlBasic.Visibility.Visible:
             default:
                 uiOxyPlot.Visibility = Visibility.Collapsed;
                 uiDataGridPanel.Visibility = Visibility.Visible;
@@ -391,7 +399,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 }
             }
         }
-
     }
 
     /// <summary>
@@ -489,6 +496,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
         UpdateGraphData(""); // all of them.
     }
+
+    /// <summary>
+    /// Standard: the normal way to resize the control. 
+    /// </summary>
+    /// <param name="windowSize"></param>
+    /// <param name="largeActualSize"></param>
 
     public void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize)
     {
@@ -653,9 +666,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// Called from MainWindow when the user asks for, e.g., exported data or graphs.
     /// </summary>
     /// <returns></returns>
-    public IDeviceControl.UXCapabilities GetUXCapabilities()
+    public IDeviceControlBasic.UXCapabilities GetUXCapabilities()
     {
-        var retval = IDeviceControl.UXCapabilities.CanGetGraphAsPng | IDeviceControl.UXCapabilities.CanGetData;
+        var retval = IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng | IDeviceControlBasic.UXCapabilities.CanGetData;
         return retval;
     }
 

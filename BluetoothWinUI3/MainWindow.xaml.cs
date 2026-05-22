@@ -93,6 +93,11 @@ namespace BluetoothWinUI3
 
     }
 
+    public interface IHandleBTAdvertisements
+    {
+        void HandleAdvertisement(WatcherData data);
+    }
+
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -229,34 +234,42 @@ namespace BluetoothWinUI3
                 uiAdvertCount.Text = NAdvertisements.ToString();
                 uiAdvertRaw.Text = e.ToString();
 
-
-
                 // If this is a new advert, see if it's a known type
                 var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
                 if (supportedDevice != null)
                 {
                     var known = KnownDevices.Get(e);
-                    if (known == null)
+                    if (known == null) // not known (e.g.: this specific one hasn't been seen before in this session)
                     {
-                        // a control is, e.g., a BTNordic_ThingyControl
-                        var zoomControl = new ZoomableDeviceControl();
                         var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
-                        zoomControl.SetDeviceControl(control);
-                        uiKnownDevices.Items.Add(zoomControl);
-
-                        known = KnownDevices.Add(e, control, zoomControl, supportedDevice);
-                        control.DataContext = known;
-                        var userControl = control as IDeviceControl;
-                        userControl?.UpdateUX(CurrUserPrefs, null);
-
-                        if (uiKnownDevices.Items.Count == 1)
-                        {
-                            // Select it!
-                            uiKnownDevices.SelectedIndex = 0;
-                        }
+                        AddControl(e, control, supportedDevice);
+                        // a control is, e.g., a BTNordic_ThingyControl
                     }
                 }
+
+                foreach (var handler in BtServiceCharacteristics)
+                {
+                    handler.HandleAdvertisement(e);
+                }
             });
+        }
+
+        private void AddControl(WatcherData e, UserControl control, SupportedDevice supportedDevice)
+        {
+            var zoomControl = new ZoomableDeviceControl();
+            zoomControl.SetDeviceControl(control);
+            uiKnownDevices.Items.Add(zoomControl);
+
+            var known = KnownDevices.Add(e, control, zoomControl, supportedDevice);
+            control.DataContext = known;
+            var userControl = control as IDeviceControlBasic;
+            userControl?.UpdateUX(CurrUserPrefs, null);
+
+            if (uiKnownDevices.Items.Count == 1)
+            {
+                // Select it!
+                uiKnownDevices.SelectedIndex = 0;
+            }
         }
 
         private void OnAdvertisementStart(object sender, RoutedEventArgs e)
@@ -344,14 +357,14 @@ namespace BluetoothWinUI3
             return selectedContainer;
         }
 
-        private async Task<IDeviceControl> GetBTSelectedAsync(string verb)
+        private async Task<IDeviceControlBasic> GetBTSelectedAsync(string verb)
         {
             var selectedContainer = await GetZoomableSelectedAsync(verb);
-            var selected = selectedContainer?.GetDeviceControl() as IDeviceControl;
+            var selected = selectedContainer?.GetDeviceControl() as IDeviceControlBasic;
             return selected;
         }
 
-        private async Task<KnownDevice> GetKnownDevice(IDeviceControl selected, string verb)
+        private async Task<KnownDevice> GetKnownDevice(IDeviceControlDevice selected, string verb)
         {
             var knownDevice = selected.KnownDeviceFromDataContext;
             if (knownDevice == null)
@@ -387,7 +400,7 @@ namespace BluetoothWinUI3
             if (tag == null) return;
 
             string verb = "color";
-            var selected = await GetBTSelectedAsync(verb);
+            var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
             if (selected == null) return;
             var knownDevice = await GetKnownDevice(selected, verb);
             if (knownDevice == null) return;
@@ -428,7 +441,7 @@ namespace BluetoothWinUI3
         {
             // TODO: notice how much boilerplate there is here. Simplify it when I make the next change.
             string verb = "rename";
-            var selected = await GetBTSelectedAsync(verb);
+            var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
             if (selected == null) return;
             var knownDevice = await GetKnownDevice(selected, verb);
             if (knownDevice == null) return;
@@ -486,13 +499,11 @@ namespace BluetoothWinUI3
         private async void OnFileCopyGraphAsPNG(object sender, RoutedEventArgs e)
         {
             string verb = "copy";
-            var selected = await GetBTSelectedAsync(verb);
+            var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
             if (selected == null) return;
-            var knownDevice = await GetKnownDevice(selected, verb);
-            if (knownDevice == null) return;
 
             var caps = selected.GetUXCapabilities();
-            if ((caps & IDeviceControl.UXCapabilities.CanGetGraphAsPng) == 0)
+            if ((caps & IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng) == 0)
             {
                 await ShowNotice("Can't copy graph", "The selected device does not support copying the graph");
                 return;
@@ -572,7 +583,7 @@ namespace BluetoothWinUI3
             foreach (var item in uiKnownDevices.Items)
             {
                 var deviceContainer =item as ZoomableDeviceControl;
-                var device = deviceContainer?.GetDeviceControl() as IDeviceControl;
+                var device = deviceContainer?.GetDeviceControl() as IDeviceControlBasic;
                 if (device == null) continue;
                 device.UpdateUX(currPrefs, oldPrefs);
             }
@@ -641,12 +652,12 @@ namespace BluetoothWinUI3
             var selectedContainer = await GetZoomableSelectedAsync(verb);
             if (selectedContainer == null) return;
             var selectedControl = selectedContainer.GetDeviceControl();
-            var selected = selectedControl as IDeviceControl;
+            var selected = selectedControl as IDeviceControlDevice;
             if (selected == null) return; // should never happen
 
             var isChecked = (sender as ToggleMenuFlyoutItem).IsChecked;
             //var currVisibility = selected.GetDataGridVisibility();
-            var newVisibility = (isChecked) ? IDeviceControl.Visibility.Visible : IDeviceControl.Visibility.Collapsed;
+            var newVisibility = (isChecked) ? IDeviceControlDevice.Visibility.Visible : IDeviceControlDevice.Visibility.Collapsed;
             selected.SetDataGridVisibility(newVisibility);
         }
 
@@ -657,7 +668,7 @@ namespace BluetoothWinUI3
             var selectedContainer = await GetZoomableSelectedAsync(verb);
             if (selectedContainer == null) return;
             var selectedControl = selectedContainer.GetDeviceControl();
-            var selected = selectedControl as IDeviceControl;
+            var selected = selectedControl as IDeviceControlBasic;
             if (selected == null) return; // should never happen
 
             var newSize = (CurrSelectedWindowSize == WindowSize.Normal) ? WindowSize.Large : WindowSize.Normal;
@@ -683,7 +694,7 @@ namespace BluetoothWinUI3
 
         private async void OnKnownDeviceSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selected = await GetBTSelectedAsync(null);
+            var selected = await GetBTSelectedAsync(null) as IDeviceControlDevice;
             if (selected == null) return;
 
             // Update the set of graph line that can be colored
@@ -706,7 +717,7 @@ namespace BluetoothWinUI3
             var tag = (sender as FrameworkElement)?.Tag as string; // e.g., "Temperature" or "Pressure"
 
             string verb = "color";
-            var selected = await GetBTSelectedAsync(verb);
+            var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
             if (selected == null) return;
             var knownDevice = await GetKnownDevice(selected, verb);
             if (knownDevice == null) return;
@@ -808,6 +819,16 @@ namespace BluetoothWinUI3
                 var largeActualSize = new Windows.Foundation.Size(uiZoomPanel.ActualWidth-10, uiZoomPanel.ActualHeight-10);
                 selected.UpdateUX(CurrSelectedWindowSize, largeActualSize);
             }
+        }
+
+        IList<IHandleBTAdvertisements> BtServiceCharacteristics = new List<IHandleBTAdvertisements>();
+        private void OnDebugShowAdvertisements(object sender, RoutedEventArgs e)
+        {
+            var ctrl = new BTServicesCharacteristicsDisplay();
+            BtServiceCharacteristics.Add(ctrl);
+            AddControl(null, ctrl, null);
+            // null means no watcher dat
+            // null means not a supported device (since the supported device is determined from the watcher data)
         }
     }
 }

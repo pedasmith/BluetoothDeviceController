@@ -6,7 +6,34 @@ using System.Collections.Generic;
 
 namespace BluetoothWinUI3
 {
-    public interface IDeviceControl
+
+    public interface IDeviceControlBasic
+    {
+        /// <summary>
+        /// updates the device control user interface base on the user preferences in SaveData.
+        /// </summary>
+        /// <param name="saveData"></param>
+        void UpdateUX(SaveData saveData);
+
+        void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs);
+
+        void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize);
+
+        enum Visibility { Visible, Collapsed, }
+        Visibility GetDataGridVisibility();
+        void SetDataGridVisibility(Visibility visibility);
+
+        [Flags] enum UXCapabilities { None = 0x00, CanGetGraphAsPng = 0x01, CanGetData = 0x02 }
+        UXCapabilities GetUXCapabilities();
+
+        // TODO: make the Png exporter like the IExportData? So that all that awful code is in one place?
+        void ExportGraphAsPng();
+        string ExportData(IExportData exporter);
+
+    }
+
+
+    public interface IDeviceControlDevice : IDeviceControlBasic
     {
         /// <summary>
         /// Returns the KnownDevice associated with the device
@@ -26,26 +53,6 @@ namespace BluetoothWinUI3
         /// </summary>
         void UpdateGraphColor(string lineName, uint color);
 
-        /// <summary>
-        /// updates the device control user interface base on the user preferences in SaveData.
-        /// </summary>
-        /// <param name="saveData"></param>
-        void UpdateUX(SaveData saveData);
-
-        void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs);
-
-        void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize);
-
-        enum Visibility {  Visible, Collapsed, }
-        Visibility GetDataGridVisibility();
-        void SetDataGridVisibility(Visibility visibility);
-
-        [Flags] enum UXCapabilities {  CanGetGraphAsPng = 0x01, CanGetData = 0x02 }
-        UXCapabilities GetUXCapabilities();
-
-        // TODO: make the Png exporter like the IExportData? So that all that awful code is in one place?
-        void ExportGraphAsPng();
-        string ExportData(IExportData exporter);
 
     }
 }
