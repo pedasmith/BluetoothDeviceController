@@ -23,7 +23,15 @@ namespace BluetoothWinUI3
         Visibility GetDataGridVisibility();
         void SetDataGridVisibility(Visibility visibility);
 
-        [Flags] enum UXCapabilities { None = 0x00, CanGetGraphAsPng = 0x01, CanGetData = 0x02 }
+        [Flags] enum UXCapabilities 
+        { 
+            None = 0x00, 
+            CommonOptionsV01 = CanGetGraphAsPng + CanGetData + CanRename + CanShowTable,
+            CanGetGraphAsPng = 0x01, 
+            CanGetData = 0x02,
+            CanRename = 0x04,
+            CanShowTable = 0x08,
+        }
         UXCapabilities GetUXCapabilities();
 
         // TODO: make the Png exporter like the IExportData? So that all that awful code is in one place?

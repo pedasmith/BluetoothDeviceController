@@ -448,29 +448,28 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     }
 
     /// <summary>
-    /// SaveData is per-device and includes the display name (e.g., a "Thingy" might have a preferred name of "Library")
+    /// SaveData is per-device and includes the display name (e.g., a "Thingy" might have a preferred name of "Living Room")
     /// and also a bunch of color information.
     /// </summary>
     public void UpdateUX(SaveData saveData)
     {
-        if (saveData != null)
+        if (saveData == null) return;
+
+        var name = saveData.GetUserName();
+        uiDeviceName.Text = name;
+
+        var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
+        var brushes = new DeviceColorBrushes(colors);
+        DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
+
+        // Set the graph text colors
+        var oxyColorText = UtilitiesOxyColor.WinUI3ColorToOxyColor(colors.TextColor);
+        OxyPlotModel.TextColor = oxyColorText;
+
+        // Also set the graph line colors.
+        foreach (var (lineName, color) in colors.GraphColors)
         {
-            var name = saveData.GetUserName();
-            uiDeviceName.Text = name;
-
-            var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
-            var brushes = new DeviceColorBrushes(colors);
-            DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
-
-            // Set the graph text colors
-            var oxyColorText = UtilitiesOxyColor.WinUI3ColorToOxyColor(colors.TextColor);
-            OxyPlotModel.TextColor = oxyColorText;
-
-            // Also set the graph line colors.
-            foreach (var (lineName, color) in colors.GraphColors)
-            {
-                UpdateGraphColor(lineName, color);
-            }
+            UpdateGraphColor(lineName, color);
         }
     }
 
@@ -668,7 +667,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// <returns></returns>
     public IDeviceControlBasic.UXCapabilities GetUXCapabilities()
     {
-        var retval = IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng | IDeviceControlBasic.UXCapabilities.CanGetData;
+        var retval = 
+            IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng 
+            | IDeviceControlBasic.UXCapabilities.CanGetData
+            | IDeviceControlBasic.UXCapabilities.CanRename
+            | IDeviceControlBasic.UXCapabilities.CanShowTable
+            ;
         return retval;
     }
 

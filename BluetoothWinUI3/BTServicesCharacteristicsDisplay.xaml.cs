@@ -45,6 +45,12 @@ namespace BluetoothWinUI3
             ShowDetail(DetailPane.None);
         }
 
+        private void Log(string str)
+        {
+            Console.WriteLine(str);
+            System.Diagnostics.Debug.WriteLine(str);
+        }
+
         public ObservableCollection<WatcherData> WatcherDataList { get; internal set; } = new ObservableCollection<WatcherData>();
         private int FindWatcherDataIndex(WatcherData data)
         {
@@ -76,12 +82,22 @@ namespace BluetoothWinUI3
             ; // TODO: show details of the clicked item.
         }
 
+        /// <summary>
+        /// SaveData is per-device and includes the display name (e.g., a "Thingy" might have a preferred name of "Living Room")
+        /// and also a bunch of color information.
+        /// </summary>
         public void UpdateUX(SaveData saveData)
         {
+            if (saveData == null) return;
+
+            var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
+            var brushes = new DeviceColorBrushes(colors);
+            DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
         }
 
         public void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs)
         {
+            Log($"{InternalDeviceType}: UpdateUX with UserPreferences");
         }
 
         public void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize)

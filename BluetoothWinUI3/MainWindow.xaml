@@ -30,20 +30,20 @@
             <MenuBar Grid.Row="0">
                 <MenuBarItem Title="File" AccessKey="F">
                     <ToggleMenuFlyoutItem Text="Keep Screen On" Click="OnFileKeepScreenOn" AccessKey="k" />
-                    <MenuFlyoutItem Text="Copy Graph as PNG" Click="OnFileCopyGraphAsPNG"  />
-                    <MenuFlyoutItem Text="Copy Data for Excel" Click="OnFileCopyDataForExcel"  />
-                    <MenuFlyoutItem Text="Copy Data as CSV" Click="OnFileCopyDataAsCSV"  />
+                    <MenuFlyoutItem Text="Copy Graph as PNG" Click="OnFileCopyGraphAsPNG" x:Name="uimFileCopyGraphAsPNG" />
+                    <MenuFlyoutItem Text="Copy Data for Excel" Click="OnFileCopyDataForExcel" x:Name="uimFileCopyDataForExcel"  />
+                    <MenuFlyoutItem Text="Copy Data as CSV" Click="OnFileCopyDataAsCSV" x:Name="uimFileCopyDataAsCSV"  />
                     <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
                 </MenuBarItem>
                 <MenuBarItem Title="View" AccessKey="V">
                     <ToggleMenuFlyoutItem Text="Set large" Click="OnViewWindowSize" AccessKey="L" />
-                    <ToggleMenuFlyoutItem Text="Show Table" Click="OnViewToggleTable" AccessKey="T" />
+                    <ToggleMenuFlyoutItem Text="Show Table" Click="OnViewToggleTable" AccessKey="T"  x:Name="uimViewShowTable"/>
                 </MenuBarItem>
                 <MenuBarItem Title="Bluetooth Device" AccessKey="B">
-                    <MenuFlyoutItem Text="Rename" Click="OnBTRename" AccessKey="R" />
-                    <MenuFlyoutItem Text="Background Color" Click="OnBTColor" Tag="BackgroundColor" AccessKey="T" />
-                    <MenuFlyoutItem Text="Text Color" Click="OnBTColor" Tag="TextColor" AccessKey="T" />
-                    <MenuFlyoutSubItem Text="Graph Colors" x:Name="uiBTGraphColorsMenu" />
+                    <MenuFlyoutItem Text="Rename" Click="OnBTRename" AccessKey="R" x:Name="uimBTCanRename" />
+                    <MenuFlyoutItem Text="Background Color" Click="OnBTColorBackground" AccessKey="T" x:Name="uimBTColorBackground"  />
+                    <MenuFlyoutItem Text="Text Color" Click="OnBTColorText"  AccessKey="T" x:Name="uimBTColorText" />
+                    <MenuFlyoutSubItem Text="Graph Colors" x:Name="uimBTGraphColorsMenu" />
                 </MenuBarItem>
                 <MenuBarItem Title="Preferences" AccessKey="P">
                     <MenuFlyoutSubItem Text="Temperature Units" x:Name="uiTemperaturePreferences">

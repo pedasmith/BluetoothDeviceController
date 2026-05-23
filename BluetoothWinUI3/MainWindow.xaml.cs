@@ -393,11 +393,19 @@ namespace BluetoothWinUI3
             return saveData;
         }
 
-        private async void OnBTColor(object sender, RoutedEventArgs e)
+        private async void OnBTColorBackground(object sender, RoutedEventArgs e)
         {
-            var senderMenu = sender as MenuFlyoutItem;
-            var tag = senderMenu?.Tag as string; // BackgroundColor or TextColor
-            if (tag == null) return;
+            await DoBTColor("BackgroundColor");
+        }
+
+        private async void OnBTColorText(object sender, RoutedEventArgs e)
+        {
+            await DoBTColor("TextColor");
+        }
+
+        private async Task DoBTColor(string colorType)
+        {
+            if (colorType == null) return;
 
             string verb = "color";
             var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
@@ -408,7 +416,7 @@ namespace BluetoothWinUI3
 
             var colorsSave = saveData.GetDeviceColors(Application.Current.RequestedTheme);
             var colors = new DeviceColorBrushes(colorsSave);
-            Windows.UI.Color color = colors.Get(tag)?.Color ?? Colors.Gray;
+            Windows.UI.Color color = colors.Get(colorType)?.Color ?? Colors.Gray;
 
             var colorPicker = new ColorPicker
             {
@@ -428,11 +436,11 @@ namespace BluetoothWinUI3
             };
             var result = await dialog.ShowAsync();
             if (result != ContentDialogResult.Primary) return;
-            
-            var newcolor = DeviceColorBrushes.ConvertBackIgnoreA (colorPicker.Color);
+
+            var newcolor = DeviceColorBrushes.ConvertBackIgnoreA(colorPicker.Color);
 
             // Save it and update colors!
-            colorsSave.Set(tag, newcolor);
+            colorsSave.Set(colorType, newcolor);
             AllSaveData.Save();
             selected.UpdateUX(saveData);
         }
@@ -694,22 +702,42 @@ namespace BluetoothWinUI3
 
         private async void OnKnownDeviceSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selected = await GetBTSelectedAsync(null) as IDeviceControlDevice;
+            var selected = await GetBTSelectedAsync(null) as IDeviceControlBasic;
             if (selected == null) return;
+            var selectedDevice = selected as IDeviceControlDevice;
+            var capabilities = selected.GetUXCapabilities();
 
-            // Update the set of graph line that can be colored
-            uiBTGraphColorsMenu.Items.Clear();
-            var linenames = selected.LineNames;
-            foreach (var linename in linenames)
+            // In the menu, Update the set of graph line that can be colored
+            uimBTGraphColorsMenu.Items.Clear();
+            bool hasLineNames = false;
+            if (selectedDevice != null)
             {
-                var menu = new MenuFlyoutItem()
+                var linenames = selectedDevice.LineNames;
+                hasLineNames = linenames.Count > 0;
+                foreach (var linename in linenames)
                 {
-                    Text = linename,
-                    Tag= linename,
-                };
-                menu.Click += OnChangeGraphColor ;
-                uiBTGraphColorsMenu.Items.Add(menu);
+                    var menu = new MenuFlyoutItem()
+                    {
+                        Text = linename,
+                        Tag = linename,
+                    };
+                    menu.Click += OnChangeGraphColor;
+                    uimBTGraphColorsMenu.Items.Add(menu);
+                }
             }
+
+
+            // Selectively enable the Bluetooth Device menu options
+            uimFileCopyGraphAsPNG.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng);
+            uimFileCopyDataForExcel.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetData);
+            uimFileCopyDataAsCSV.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetData);
+
+            uimViewShowTable.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanShowTable);
+
+            uimBTCanRename.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanRename);
+            uimBTGraphColorsMenu.IsEnabled = hasLineNames;
+            uimBTColorBackground.IsEnabled = selectedDevice != null;
+            uimBTColorText.IsEnabled = selectedDevice != null;
 
         }
         private async void OnChangeGraphColor(object sender, RoutedEventArgs e)
