@@ -91,7 +91,5 @@ namespace BluetoothWatcher.AdvertismentWatcher
 
             WatcherEvent?.Invoke(sender, watcherData); // Often the MainPage.BleWatcher_WatcherEvent
         }
-
-
     }
 }

@@ -1,6 +1,7 @@
 using BluetoothProtocols;
 using BluetoothWatcher.AdvertismentWatcher;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -36,6 +37,12 @@ namespace BluetoothWinUI3
         public BTServicesCharacteristicsDisplay()
         {
             InitializeComponent();
+            Loaded += BTServicesCharacteristicsDisplay_Loaded;
+        }
+
+        private void BTServicesCharacteristicsDisplay_Loaded(object sender, RoutedEventArgs e)
+        {
+            ShowDetail(DetailPane.None);
         }
 
         public ObservableCollection<WatcherData> WatcherDataList { get; internal set; } = new ObservableCollection<WatcherData>();
@@ -116,6 +123,41 @@ namespace BluetoothWinUI3
         public string ExportData(IExportData exporter)
         {
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Which detail pane to show?
+        /// </summary>
+        private enum DetailPane { None, AdvertisementDetails, DeviceDetails }
+        private void ShowDetail(DetailPane pane)
+        {
+            switch (pane)
+            {
+                case DetailPane.None:
+                    uiDetailsPane.Visibility = Visibility.Collapsed;
+                    uiAdvertisementDetails.Visibility = Visibility.Collapsed;
+                    uiADeviceDetails.Visibility = Visibility.Collapsed;
+                    break;
+                case DetailPane.AdvertisementDetails:
+                    uiDetailsPane.Visibility = Visibility.Visible;
+                    uiAdvertisementDetails.Visibility = Visibility.Visible;
+                    uiADeviceDetails.Visibility = Visibility.Collapsed;
+                    break;
+                case DetailPane.DeviceDetails:
+                    uiDetailsPane.Visibility = Visibility.Visible;
+                    uiAdvertisementDetails.Visibility = Visibility.Collapsed;
+                    uiADeviceDetails.Visibility = Visibility.Visible;
+                    break;
+            }
+        }
+
+        private void OnAdvertisementSelected(ItemsView sender, ItemsViewSelectionChangedEventArgs args)
+        {
+            var data= sender.SelectedItem as WatcherData;
+            if (data == null) return;
+            var details = data.ToStringDetails();
+            uiAdvertisementDetailsTextBlock.Text = "\n\n" + details;
+            ShowDetail(DetailPane.AdvertisementDetails);
         }
     }
 }

@@ -27,6 +27,7 @@
             </Grid.Resources>
             <Grid x:Name="uiAdvertisementList" Grid.Row="1" Visibility="Visible" Style="{StaticResource sPanelDisplay}">
                 <ItemsView x:Name="uiAdvertisementListView" SelectionMode="Single" ItemsSource="{x:Bind WatcherDataList}"
+                           SelectionChanged="OnAdvertisementSelected"
                        >
                     <ItemsView.ItemTemplate>
                         <DataTemplate x:DataType="watcher:WatcherData">
@@ -42,10 +43,14 @@
                     </ItemsView.ItemTemplate>
                 </ItemsView>
             </Grid>
-            <Grid x:Name="uiAdvertisementDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
-                
-            </Grid>
-            <Grid x:Name="uiADeviceDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+            <Grid x:Name="uiDetailsPane" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+                <Grid x:Name="uiAdvertisementDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+                    <ScrollViewer x:Name="uiAdvertisementDetailScrollViewer">
+                        <TextBlock x:Name="uiAdvertisementDetailsTextBlock"  TextWrapping="Wrap" IsTextSelectionEnabled="True" >Advertisement Details</TextBlock>
+                    </ScrollViewer>
+                </Grid>
+                <Grid x:Name="uiADeviceDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+                </Grid>
             </Grid>
             <TextBlock x:Name="uiLog" Grid.Row="2" TextWrapping="Wrap" MaxWidth="350" IsTextSelectionEnabled="True">Show Data! TODO: fill in!</TextBlock>
         </Grid>

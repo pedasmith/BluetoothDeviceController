@@ -116,5 +116,43 @@ namespace BluetoothWatcher.AdvertismentWatcher
         {
             return $"{BluetoothAddress.AsString(Addr)} {CompleteLocalName} {ParsedCompanyDataTrim}";
         }
+
+        public string ToStringDetails()
+        {
+            var args = OriginalArgs;
+            string retval = "";
+            retval += $"Address: {BluetoothAddress.AsString(Addr)}\n";
+            retval += $"Address type: {args.BluetoothAddressType}\n";
+            retval += $"Advertisement type: {args.AdvertisementType}\n";
+
+            var isstr = "";
+            if (args.IsAnonymous) isstr += ",Anonymous";
+            if (args.IsConnectable) isstr += ",Connectable";
+            if (args.IsScanResponse) isstr += ",ScanResponse";
+            if (args.IsDirected) isstr += ",Directed";
+            if (isstr.Length > 0) isstr = isstr.Substring(1); // remove leading +
+            retval += $"Flags: {isstr}\n";
+
+            retval += $"Signal strength (dBm): {args.RawSignalStrengthInDBm}\n";
+            retval += $"Transmit power (dBm): {args.TransmitPowerLevelInDBm}\n";
+            retval += $"Timestamp: {args.Timestamp:yyyy-MM-dd HH:mm:ss.fff}\n";
+
+            // Primary/Secondary PHY may not exist on all SDK versions; use reflection if present.
+            var primaryPhyProp = args.GetType().GetProperty("PrimaryPhy");
+            if (primaryPhyProp != null)
+            {
+                var primaryPhyVal = primaryPhyProp.GetValue(args);
+                retval += $"Primary PHY: {primaryPhyVal}\n";
+            }
+
+            var secondaryPhyProp = args.GetType().GetProperty("SecondaryPhy");
+            if (secondaryPhyProp != null)
+            {
+                var secondaryPhyVal = secondaryPhyProp.GetValue(args);
+                retval += $"Secondary PHY: {secondaryPhyVal}\n";
+            }
+
+            return retval;
+        }
     }
 }
