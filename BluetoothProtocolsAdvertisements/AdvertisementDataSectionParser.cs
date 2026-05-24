@@ -4,8 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading.Tasks;
+using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 
@@ -106,14 +105,15 @@ namespace BluetoothProtocols
             {
                 switch (dtv)
                 {
-                    case DataTypeValue.ManufacturerData:
+                    case DataTypeValue.ManufacturerData: // 0xFF
                         (str, manufacturerType, companyId, speciality) = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower, parseAs);
+                        str = str.TrimStart(); // The ParseCompanyData puts an indent in which I don't like.
                         break;
-                    case DataTypeValue.Flags:
-                        str = ParseFlags(section);
+                    case DataTypeValue.Flags: // 0x01
+                        str = "Flags: " + ParseFlags(section);
                         break;
-                    case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf128BitServiceUuids:
-                    case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf128BitServiceUuids:
+                    case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf128BitServiceUuids: // 0x06
+                    case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf128BitServiceUuids: // 0x07
                         {
                             // Viatom pulse oximeter has these
                             // Correct output: 6e400001-b5a3-f393-e0a9-e50e24dcca9e
@@ -147,8 +147,8 @@ namespace BluetoothProtocols
                             }
                         }
                         break;
-                    case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids:
-                    case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids:
+                    case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids: // 0x02
+                    case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids: // 0x03
                         {
                             str = "";
                             var pre = dtv == DataTypeValue.CompleteListOf16BitServiceUuids ? "Service UUIDs (complete): " : "Service UUIDs (incomplete)";
@@ -173,8 +173,17 @@ namespace BluetoothProtocols
                             }
                         }
                         break;
-                    case DataTypeValue.ShortenedLocalName:
+                    case DataTypeValue.ShortenedLocalName: // 0x08
+                    case DataTypeValue.CompleteLocalName: // 0x09
                         {
+                            var dr = DataReader.FromBuffer(section.Data);
+                            var (name, status) = DataReaderReadStringRobust.ReadStringEntire(dr);
+                            str = "Name: " + name 
+                                + (dtv == DataTypeValue.CompleteLocalName ? "" : " (shortened)") 
+                                + (status == DataReaderReadStringRobust.ReadStatus.OK ? "" : " (hex)") 
+                                + "\n";
+#if NEVER_EVER_DEFINED
+// RThis is old code
                             var buffer = section.Data.ToArray();
                             var allNul = true;
                             foreach (var namebyte in buffer)
@@ -189,13 +198,14 @@ namespace BluetoothProtocols
                             {
                                 printAsHex = true;
                             }
+#endif
                         }
                         break;
-                    case DataTypeValue.TxPowerLevel:
+                    case DataTypeValue.TxPowerLevel: // 0x0a
                         var db = ParseTxPowerLevel(section);
                         str = $"{db}";
                         break;
-                    case DataTypeValue.ServiceData:
+                    case DataTypeValue.ServiceData: // 0x16
 #if SUPPORT_SWITCHBOT_PROTOCOL
                         SwitchBot switchbot = null;
                         switch (parseAs)
@@ -212,9 +222,16 @@ namespace BluetoothProtocols
                             str = $"{hexPrefix}section {dtv.ToString()} data={servicedatastr.AsString}\n";
                         }
 #else
+
+                        // https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/CSS_v11/out/en/supplement-to-the-bluetooth-core-specification/data-types-specification.html
+                        // Section 1.11 Service Data - contains a 16-bit, 32-bit or 128-bit service and the associated data.
                         var servicedatastr = IotNumberFormats.ValueParser.Parse(section.Data.ToArray(), "U16|HEX BYTES|HEX");
                         str = $"{hexPrefix}section {dtv.ToString()} data={servicedatastr.AsString}\n";
 #endif
+                        break;
+
+                    default:
+                        printAsHex = true;
                         break;
                 }
             }
@@ -231,6 +248,8 @@ namespace BluetoothProtocols
             if (!string.IsNullOrWhiteSpace(str)) str = indent + str;
             return (str, manufacturerType, companyId);
         }
+
+
         public static BluetoothCompanyIdentifier.CommonManufacturerType ParseManufacturerType(BluetoothLEAdvertisementDataSection section, sbyte txPower, string indent)
         {
             byte b = section.DataType;
@@ -252,36 +271,49 @@ namespace BluetoothProtocols
             }
             return manufacturerType;
         }
+
+
         /// <summary>
         /// Gotta say, the flags data is pretty uninteresting. Maybe only show flags
         /// when there's a special switch set?
         /// </summary>
-        /// <param name="section"></param>
-        /// <returns></returns>
         public static string ParseFlags(BluetoothLEAdvertisementDataSection section)
         {
+            // Flag data from https://academy.nordicsemi.com/courses/bluetooth-low-energy-fundamentals/lessons/lesson-2-bluetooth-le-advertising/topic/advertisement-packet/
+            // Official data: https://www.bluetooth.com/specifications/specs/core60-html/  
+            // Volume 3: Host > Part C: General Access Profile > Section 11: GAP Advertising and Scan Response Format
+            // (but it's vague and useless)
+            // Flags are in https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf
+            // section 2.3 common data types as common data type 0x01, flags.
+            // Values in CoreSpecificationSupplement,Part A,Section1.3
+            // https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/CSS_v15/out/en/core-supplementary-features/data-types-specification.html#UUID-801bc3e0-519d-2291-8acd-d32d1fd27a4e
             try
             {
                 var bytes = section.Data.ToArray();
                 var b0 = bytes[0];
                 var str = "";
-                if ((b0 & 0x01) != 0)
+                if ((b0 & 0x01) != 0) // bit 0 LE Limited Discoverable Mode
                 {
                     if (str != "") str += "+";
                     str += "LE Limited Discoverable Mode";
                 }
-                if ((b0 & 0x02) != 0)
+                if ((b0 & 0x02) != 0) // bit 1 LE General Discoverable Mode
                 {
                     if (str != "") str += "+";
                     str += "LE General Discoverable Mode";
                 }
                 // It just says if classic bluetooth is supported or not.
-                if ((b0 & 0x04) != 0)
+                if ((b0 & 0x04) != 0) // bit 2 BR/EDR Not Supported. Bit 37 of LMP Feature Mask Definitions­ (Page 0)
                 {
                     if (str != "") str += "+";
                     str += "BR/EDR Not Supported";
                 }
-                // BDR/EDR is not interesting.
+                if ((b0 & 0x08) != 0) // bit 3 Simultaneous LE and BR/EDR to Same Device Capable (Controller­).­ Bit 49 of LMP Feature Mask Definitions­ (Page 0)
+                {
+                    if (str != "") str += "+";
+                    str += "Simultaneous LE and BR/EDR to Same Device Capable (Controller­)";
+                }
+                // BR/EDR is classic bluetooth. 
                 if (str != "") str += "\n";
                 return str;
             }

@@ -97,7 +97,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
             retval += $",{OriginalArgs.BluetoothAddressType},{OriginalArgs.AdvertisementType},{flags},{power},{ds.Count()}";
             foreach (var section in OriginalArgs.Advertisement.DataSections)
             {
-                var dsname = Ad_types.Decode(section.DataType);
+                var dsname = AdvertisementSection_types.Decode(section.DataType);
                 switch (section.DataType)
                 {
                     default:
@@ -157,8 +157,12 @@ namespace BluetoothWatcher.AdvertismentWatcher
             var adv = args.Advertisement;
             foreach (var section in adv.DataSections)
             {
-                var dsname = Ad_types.Decode(section.DataType);
-                retval += $"Section: {dsname} (0x{section.DataType:X02})={section.Data.ToHex()}\n";
+                sbyte txPower = (sbyte)(args.TransmitPowerLevelInDBm ?? 0);
+                var mtype = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
+                var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, txPower, mtype, "");
+                //var dsname = AdvertisementSection_types.Decode(section.DataType);
+                //retval += $"Section: {dsname} (0x{section.DataType:X02})={section.Data.ToHex()}\n";
+                retval += str;
             } 
 
             return retval;

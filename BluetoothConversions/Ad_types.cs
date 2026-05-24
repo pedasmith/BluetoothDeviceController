@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BluetoothConversions
 {
-    static class Ad_types
+    static class AdvertisementSection_types
     {
         public static string Decode(UInt16 value)
         {
