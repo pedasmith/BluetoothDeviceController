@@ -40,9 +40,14 @@ namespace BluetoothWinUI3
             Loaded += BTServicesCharacteristicsDisplay_Loaded;
         }
 
+        bool IsFirstLoad = true;
         private void BTServicesCharacteristicsDisplay_Loaded(object sender, RoutedEventArgs e)
         {
-            ShowDetail(DetailPane.None);
+            if (IsFirstLoad)
+            {
+                ShowDetail(DetailPane.None);
+            }
+            IsFirstLoad = false;
         }
 
         private void Log(string str)
@@ -100,21 +105,32 @@ namespace BluetoothWinUI3
             Log($"{InternalDeviceType}: UpdateUX with UserPreferences");
         }
 
+        bool DetailsAlwaysShown = false;
         public void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize)
         {
             CurrWindowSize = windowSize;
+
             switch (CurrWindowSize)
             {
                 default:
                 case MainWindow.WindowSize.Normal:
                     rootPanel.Width = 380;
                     rootPanel.Height = 380;
+                    uiLog.MaxWidth = rootPanel.Width - 30;
+                    DetailsAlwaysShown = false;
                     break;
                 case MainWindow.WindowSize.Large:
                     rootPanel.Width = largeActualSize.Width;
                     rootPanel.Height = largeActualSize.Height;
+                    uiLog.MaxWidth = rootPanel.Width - 30;
+                    DetailsAlwaysShown = largeActualSize.Width > 800;
                     break;
             }
+
+            // This will update what's visible in the correct way (e.g., when switching
+            // to large and currently showing advertisement details, will show
+            // both the list and the details
+            ShowDetail(CurrDetailPane);
         }
 
         public IDeviceControlBasic.Visibility GetDataGridVisibility()
@@ -145,26 +161,42 @@ namespace BluetoothWinUI3
         /// Which detail pane to show?
         /// </summary>
         private enum DetailPane { None, AdvertisementDetails, DeviceDetails }
+        private DetailPane CurrDetailPane = DetailPane.None;
+
+        /// <summary>
+        /// Shows the new detail pane, or none. Will correctly set visibility and the 
+        /// column as appropriate (e.g., based on DetailsAlwaysShown).
+        /// </summary>
+        /// <param name="pane"></param>
         private void ShowDetail(DetailPane pane)
         {
+            CurrDetailPane = pane;
             switch (pane)
             {
                 case DetailPane.None:
-                    uiDetailsPane.Visibility = Visibility.Collapsed;
+                    uiAdvertisementList.Visibility = Visibility.Visible;
+                    uiDetailsPane.Visibility = DetailsAlwaysShown ? Visibility.Visible : Visibility.Collapsed;
                     uiAdvertisementDetails.Visibility = Visibility.Collapsed;
                     uiADeviceDetails.Visibility = Visibility.Collapsed;
+                    uiBack.IsEnabled = false;
                     break;
                 case DetailPane.AdvertisementDetails:
+                    uiAdvertisementList.Visibility = DetailsAlwaysShown ? Visibility.Visible : Visibility.Collapsed; ;
                     uiDetailsPane.Visibility = Visibility.Visible;
                     uiAdvertisementDetails.Visibility = Visibility.Visible;
                     uiADeviceDetails.Visibility = Visibility.Collapsed;
+                    uiBack.IsEnabled = DetailsAlwaysShown ? false : true;
                     break;
                 case DetailPane.DeviceDetails:
+                    uiAdvertisementList.Visibility = DetailsAlwaysShown ? Visibility.Visible : Visibility.Collapsed; ;
                     uiDetailsPane.Visibility = Visibility.Visible;
                     uiAdvertisementDetails.Visibility = Visibility.Collapsed;
                     uiADeviceDetails.Visibility = Visibility.Visible;
+                    uiBack.IsEnabled = true;
                     break;
             }
+
+            Grid.SetColumn(uiDetailsPane, DetailsAlwaysShown ? 1 : 0);
         }
 
         private void OnAdvertisementSelected(ItemsView sender, ItemsViewSelectionChangedEventArgs args)
@@ -172,8 +204,24 @@ namespace BluetoothWinUI3
             var data= sender.SelectedItem as WatcherData;
             if (data == null) return;
             var details = data.ToStringDetails();
-            uiAdvertisementDetailsTextBlock.Text = "\n\n" + details;
+            uiAdvertisementDetailsTextBlock.Text = details;
             ShowDetail(DetailPane.AdvertisementDetails);
+        }
+
+        private void OnBackClicked(object sender, RoutedEventArgs e)
+        {
+            switch (CurrDetailPane)
+            {
+                case DetailPane.None:
+                    ShowDetail(DetailPane.None); // should not be possible
+                    break;
+                case DetailPane.AdvertisementDetails:
+                    ShowDetail(DetailPane.None);
+                    break;
+                case DetailPane.DeviceDetails:
+                    ShowDetail(DetailPane.AdvertisementDetails);
+                    break;
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ namespace Utilities
                 return retval.ToString();
             }
         }
+
         public static string ToSsv(this IBuffer buffer)
         {
             using (var dataReader = DataReader.FromBuffer(buffer))
@@ -42,6 +43,22 @@ namespace Utilities
                 {
                     if (retval.Length > 0) retval.Append(" ");
                     retval.Append($"0x{b:X02}");
+                }
+                return retval.ToString();
+            }
+        }
+
+        public static string ToHex(this IBuffer buffer)
+        {
+            using (var dataReader = DataReader.FromBuffer(buffer))
+            {
+                byte[] byteArray = new byte[buffer.Length];
+                dataReader.ReadBytes(byteArray);
+                StringBuilder retval = new StringBuilder();
+                foreach (var b in byteArray)
+                {
+                    if (retval.Length > 0) retval.Append(" ");
+                    retval.Append($"{b:X02}");
                 }
                 return retval.ToString();
             }

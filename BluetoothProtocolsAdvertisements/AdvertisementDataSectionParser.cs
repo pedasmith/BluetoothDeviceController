@@ -97,7 +97,7 @@ namespace BluetoothProtocols
             string str = "??";
             byte b = section.DataType;
             UInt16 companyId = 0xFFFF;
-            DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value
+            DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value e.g. Flags (0x01) or IncompleteListOf16BitServiceUuids (0x02)
             object speciality = null;
             var manufacturerType = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
             var printAsHex = false;

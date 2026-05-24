@@ -43,7 +43,7 @@
                     </ItemsView.ItemTemplate>
                 </ItemsView>
             </Grid>
-            <Grid x:Name="uiDetailsPane" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+            <Grid x:Name="uiDetailsPane" Grid.Column="0" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
                 <Grid x:Name="uiAdvertisementDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
                     <ScrollViewer x:Name="uiAdvertisementDetailScrollViewer">
                         <TextBlock x:Name="uiAdvertisementDetailsTextBlock"  TextWrapping="Wrap" IsTextSelectionEnabled="True" >Advertisement Details</TextBlock>
@@ -52,7 +52,15 @@
                 <Grid x:Name="uiADeviceDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
                 </Grid>
             </Grid>
-            <TextBlock x:Name="uiLog" Grid.Row="2" TextWrapping="Wrap" MaxWidth="350" IsTextSelectionEnabled="True">Show Data! TODO: fill in!</TextBlock>
+
+            <Grid Grid.Row="2" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="uiLog" Grid.Column="1" TextWrapping="Wrap" MaxWidth="350" VerticalAlignment="Center" HorizontalAlignment="Left" IsTextSelectionEnabled="True">Advertisement Data</TextBlock>
+                <Button x:Name="uiBack" Grid.Column="0" Style="{StaticResource NavigationBackButtonSmallStyle}" Click="OnBackClicked" />
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

@@ -152,6 +152,15 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 retval += $"Secondary PHY: {secondaryPhyVal}\n";
             }
 
+            // And now, data directly from the advertisement!
+
+            var adv = args.Advertisement;
+            foreach (var section in adv.DataSections)
+            {
+                var dsname = Ad_types.Decode(section.DataType);
+                retval += $"Section: {dsname} (0x{section.DataType:X02})={section.Data.ToHex()}\n";
+            } 
+
             return retval;
         }
     }
