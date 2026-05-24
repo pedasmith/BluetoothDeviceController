@@ -9,6 +9,7 @@ using Windows.Storage.Streams;
 //using static BluetoothDeviceController.BluetoothDefinitionLanguage.AdvertisementDataSectionParser;
 
 using BluetoothConversions;
+using Utilities;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -54,10 +55,12 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 var dtv = AdvertisementDataSectionParser.ConvertDataTypeValue(section.DataType);
                 switch (dtv)
                 {
+                    case AdvertisementDataSectionParser.DataTypeValue.ShortenedLocalName:
                     case AdvertisementDataSectionParser.DataTypeValue.CompleteLocalName:
                         {
                             var dr = DataReader.FromBuffer(section.Data);
-                            watcherData.CompleteLocalName = dr.ReadString(dr.UnconsumedBufferLength);
+                            var (str, result) = DataReaderReadStringRobust.ReadStringEntire(dr);
+                            watcherData.CompleteLocalName = str + (dtv == AdvertisementDataSectionParser.DataTypeValue.ShortenedLocalName ? " (shortened)" : "");
                         }
                         break;
 

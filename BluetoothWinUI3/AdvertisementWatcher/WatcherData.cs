@@ -165,6 +165,20 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 retval += str;
             } 
 
+            // 
+            // Lastly: let's find special data like for Govee 
+            //
+
+            var goveeType = Govee.AdvertIsGovee(this);
+            if (goveeType != Govee.SensorType.NotGovee)
+            {
+                var goveeData = Govee.Parse(goveeType, this);
+                if (goveeData != null)
+                {
+                    retval += $"Govee: Type={goveeData.TagType}, Temp={goveeData.TemperatureInDegreesF:F1}F, Humidity={goveeData.Humidity}%, Battery={goveeData.BatteryInPercent}%\n";
+                }
+            }
+
             return retval;
         }
     }

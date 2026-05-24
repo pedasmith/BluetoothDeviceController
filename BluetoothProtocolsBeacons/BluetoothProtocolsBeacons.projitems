@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Apple_IBeacon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothAddress.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Eddystone.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Govee.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Ruuvi_Tag.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Ruuvi_Tag_v1_Helper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SensorDataRecord.cs" />
