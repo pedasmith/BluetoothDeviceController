@@ -46,10 +46,13 @@
             <Grid x:Name="uiDetailsPane" Grid.Column="0" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
                 <Grid x:Name="uiAdvertisementDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
                     <ScrollViewer x:Name="uiAdvertisementDetailScrollViewer">
-                        <TextBlock x:Name="uiAdvertisementDetailsTextBlock"  TextWrapping="Wrap" IsTextSelectionEnabled="True" >Advertisement Details</TextBlock>
+                        <TextBlock x:Name="uiAdvertisementDetailsTextBlock" Style="{StaticResource sAdvertisementData}" TextAlignment="Left" >Advertisement Details</TextBlock>
                     </ScrollViewer>
                 </Grid>
-                <Grid x:Name="uiADeviceDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+                <Grid x:Name="uiDeviceDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+                    <ScrollViewer x:Name="uiDeviceDetailScrollViewer">
+                        <TextBlock x:Name="uiDeviceDetailsTextBlock" Style="{StaticResource sAdvertisementData}" >Device Details</TextBlock>
+                    </ScrollViewer>
                 </Grid>
             </Grid>
 
@@ -58,8 +61,11 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBlock x:Name="uiLog" Grid.Column="1" TextWrapping="Wrap" MaxWidth="350" VerticalAlignment="Center" HorizontalAlignment="Left" IsTextSelectionEnabled="True">Advertisement Data</TextBlock>
-                <Button x:Name="uiBack" Grid.Column="0" Style="{StaticResource NavigationBackButtonSmallStyle}" Click="OnBackClicked" />
+                <TextBlock x:Name="uiLog" Grid.Column="1" Style="{StaticResource sDeviceData}" MaxWidth="350" VerticalAlignment="Center" HorizontalAlignment="Left" >Advertisement Data</TextBlock>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button x:Name="uiBack" Style="{StaticResource NavigationBackButtonSmallStyle}" Click="OnBackClicked" />
+                    <Button x:Name="uiConnect" Content="Connect" Click="OnConnectClicked" />
+                </StackPanel>
             </Grid>
         </Grid>
     </Border>

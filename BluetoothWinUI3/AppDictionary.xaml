@@ -75,10 +75,18 @@
         <Setter Property="FontSize" Value="26" />
         <Setter Property="TextAlignment" Value="Center" />
     </Style>
+    <Style x:Key="sAdvertisementData" TargetType="TextBlock" BasedOn="{StaticResource sDeviceListDataCompressed}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>    
     <!-- Example: Battery percentage -->
     <Style x:Key="sDeviceData" TargetType="TextBlock" BasedOn="{StaticResource sDevicePrimaryData}">
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="FontSize" Value="18" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="IsTextSelectionEnabled" Value="True" />
     </Style>
     <!-- Example: Battery percentage icon picture of little battery -->
     <Style x:Key="sDeviceDataIcon" TargetType="TextBlock" BasedOn="{StaticResource sDevicePrimaryData}">

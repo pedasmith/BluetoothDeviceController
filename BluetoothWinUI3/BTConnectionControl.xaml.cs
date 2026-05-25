@@ -21,11 +21,8 @@ using Microsoft.UI.Xaml.Navigation;
 #endif
 
 
-
-
 namespace BluetoothWinUI3
 {
-
     public sealed partial class BTConnectionControl : UserControl
     {
         public enum ConnectionState

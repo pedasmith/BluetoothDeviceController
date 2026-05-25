@@ -1,24 +1,17 @@
 using BluetoothProtocols;
 using BluetoothWatcher.AdvertismentWatcher;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.Devices.Bluetooth;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
+
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
 
 namespace BluetoothWinUI3
 {
@@ -68,6 +61,7 @@ namespace BluetoothWinUI3
             }
             return -1;
         }
+
         public void HandleAdvertisement(WatcherData data)
         {
             var index = FindWatcherDataIndex(data);
@@ -82,10 +76,6 @@ namespace BluetoothWinUI3
             uiLog.Text = data.ToString();
         }
 
-        private void uiAdvertisementListView_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            ; // TODO: show details of the clicked item.
-        }
 
         /// <summary>
         /// SaveData is per-device and includes the display name (e.g., a "Thingy" might have a preferred name of "Living Room")
@@ -177,21 +167,24 @@ namespace BluetoothWinUI3
                     uiAdvertisementList.Visibility = Visibility.Visible;
                     uiDetailsPane.Visibility = DetailsAlwaysShown ? Visibility.Visible : Visibility.Collapsed;
                     uiAdvertisementDetails.Visibility = Visibility.Collapsed;
-                    uiADeviceDetails.Visibility = Visibility.Collapsed;
+                    uiDeviceDetails.Visibility = Visibility.Collapsed;
+                    uiConnect.IsEnabled = false;
                     uiBack.IsEnabled = false;
                     break;
                 case DetailPane.AdvertisementDetails:
                     uiAdvertisementList.Visibility = DetailsAlwaysShown ? Visibility.Visible : Visibility.Collapsed; ;
                     uiDetailsPane.Visibility = Visibility.Visible;
                     uiAdvertisementDetails.Visibility = Visibility.Visible;
-                    uiADeviceDetails.Visibility = Visibility.Collapsed;
+                    uiDeviceDetails.Visibility = Visibility.Collapsed;
+                    uiConnect.IsEnabled = true;
                     uiBack.IsEnabled = DetailsAlwaysShown ? false : true;
                     break;
                 case DetailPane.DeviceDetails:
                     uiAdvertisementList.Visibility = DetailsAlwaysShown ? Visibility.Visible : Visibility.Collapsed; ;
                     uiDetailsPane.Visibility = Visibility.Visible;
                     uiAdvertisementDetails.Visibility = Visibility.Collapsed;
-                    uiADeviceDetails.Visibility = Visibility.Visible;
+                    uiDeviceDetails.Visibility = Visibility.Visible;
+                    uiConnect.IsEnabled = true;
                     uiBack.IsEnabled = true;
                     break;
             }
@@ -199,10 +192,12 @@ namespace BluetoothWinUI3
             Grid.SetColumn(uiDetailsPane, DetailsAlwaysShown ? 1 : 0);
         }
 
+        WatcherData CurrWatcherData = null;
         private void OnAdvertisementSelected(ItemsView sender, ItemsViewSelectionChangedEventArgs args)
         {
-            var data= sender.SelectedItem as WatcherData;
+            var data = sender.SelectedItem as WatcherData;
             if (data == null) return;
+            CurrWatcherData = data;
             var details = data.ToStringDetails();
             uiAdvertisementDetailsTextBlock.Text = details;
             ShowDetail(DetailPane.AdvertisementDetails);
@@ -221,6 +216,35 @@ namespace BluetoothWinUI3
                 case DetailPane.DeviceDetails:
                     ShowDetail(DetailPane.AdvertisementDetails);
                     break;
+            }
+        }
+
+        private async void OnConnectClicked(object sender, RoutedEventArgs e)
+        {
+            if (CurrWatcherData == null || CurrWatcherData.Addr == 0)
+            {
+                Log($"Error: no device selected to connect");
+                return;
+            }
+            ShowDetail(DetailPane.DeviceDetails);
+            Log($"Starting connection to {CurrWatcherData.AddressAsString}");
+            var addr = CurrWatcherData.Addr;
+            var le = await BluetoothLEDevice.FromBluetoothAddressAsync(addr);
+            if (le == null)
+            {
+                Log($"Unable to connect to {CurrWatcherData.AddressAsString}");
+                return;
+            }
+            var services = await le.GetGattServicesAsync(BluetoothCacheMode.Cached);
+            if (services.Status != Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
+            {
+                Log($"Unable to get services for {CurrWatcherData.AddressAsString}. Reason: {services.Status}");
+                return;
+            }
+            uiDeviceDetailsTextBlock.Text = $"Services for {CurrWatcherData.AddressAsString} {CurrWatcherData.CompleteLocalName}\n\n";
+            foreach (var service in services.Services)
+            {
+                uiDeviceDetailsTextBlock.Text += $"{service.Uuid}";
             }
         }
     }
