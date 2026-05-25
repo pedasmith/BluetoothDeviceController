@@ -30,7 +30,7 @@ namespace BluetoothConversions
 				case 0x0E: return "Simple Pairing Hash C-192"; // 
 				case 0x0F: return "Simple Pairing Randomizer R-192"; // 
 				case 0x10: return "Device ID"; // 
-				//case 0x10: return "Security Manager TK Value"; // 
+				//DUPLICATE: case 0x10: return "Security Manager TK Value"; // 
 				case 0x11: return "Security Manager Out of Band Flags"; // 
 				case 0x12: return "Peripheral Connection Interval Range"; // 
 				case 0x14: return "List of 16-bit Service Solicitation UUIDs"; // 
@@ -74,3 +74,4 @@ namespace BluetoothConversions
         }
     }
 }
+

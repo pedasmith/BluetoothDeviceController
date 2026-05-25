@@ -10,3 +10,4 @@ set CVT=%BINSRC%\BluetoothYamlToCSharpSwitch
 "%CVT%" --type updatefile --file "%CSHARPSRC%\BluetoothUnit.cs" --updatewith file > output\BluetoothUnit.cs
 "%CVT%" --type updatefile --file "%CSHARPSRC%\BluetoothCharacteristic.cs" --updatewith file > output\BluetoothCharacteristic.cs
 "%CVT%" --type updatefile --file "%CSHARPSRC%\BluetoothCompanyIdentifier.cs" --updatewith file > output\BluetoothCompanyIdentifier.cs
+"%CVT%" --type updatefile --file "%CSHARPSRC%\BluetoothServiceUuid16Bit.cs" --updatewith file > output\BluetoothServiceUuid16Bit.cs

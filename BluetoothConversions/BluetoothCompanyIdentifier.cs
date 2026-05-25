@@ -35,6 +35,42 @@ namespace BluetoothConversions
                 // url:https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
                 // file:company_identifiers.yaml
                 // startupdatefile:
+				case 0x10CC: /* 4300 */ return "Linde GmbH";
+				case 0x10CB: /* 4299 */ return "The90, Inc.";
+				case 0x10CA: /* 4298 */ return "FairPhone B.V";
+				case 0x10C9: /* 4297 */ return "Tractian Technologies Inc.";
+				case 0x10C8: /* 4296 */ return "mylife Diabetes Care AG";
+				case 0x10C7: /* 4295 */ return "CHIYODA TECHNOL CORPORATION";
+				case 0x10C6: /* 4294 */ return "Piscisea Tech Inc";
+				case 0x10C5: /* 4293 */ return "Cardinal Scale Mfg";
+				case 0x10C4: /* 4292 */ return "OPICA GmbH";
+				case 0x10C3: /* 4291 */ return "TECH FASS s.r.o.";
+				case 0x10C2: /* 4290 */ return "SainStore Technology Co., Ltd.";
+				case 0x10C1: /* 4289 */ return "Shenzhen ECO-NEWLEAF CO., LTD";
+				case 0x10C0: /* 4288 */ return "Minda Corporation Ltd";
+				case 0x10BF: /* 4287 */ return "All Inspire Health, Inc.";
+				case 0x10BE: /* 4286 */ return "UNIVERSAL REMOTE CONTROL, INC.";
+				case 0x10BD: /* 4285 */ return "Variowell Development GmbH";
+				case 0x10BC: /* 4284 */ return "Harley-Davidson Motor Company";
+				case 0x10BB: /* 4283 */ return "VERGESENSE INC";
+				case 0x10BA: /* 4282 */ return "Noble HiFi, LLC";
+				case 0x10B9: /* 4281 */ return "CYNC Labs, Inc.";
+				case 0x10B8: /* 4280 */ return "Palarum LLC";
+				case 0x10B7: /* 4279 */ return "Fosilicon Co., Ltd";
+				case 0x10B6: /* 4278 */ return "SHENZHEN CHINA MICRO SEMICON CO.,LIMITED";
+				case 0x10B5: /* 4277 */ return "SpartanLync Technologies Corp.";
+				case 0x10B4: /* 4276 */ return "Solabs Technology (HK) Co., Limited";
+				case 0x10B3: /* 4275 */ return "HOSEOTELNET Co., Ltd.";
+				case 0x10B2: /* 4274 */ return "Shenzhen Xunzong Zhilian Technology Co., Ltd.";
+				case 0x10B1: /* 4273 */ return "Senops Tracker, LLC";
+				case 0x10B0: /* 4272 */ return "VSC Synapse LLC";
+				case 0x10AF: /* 4271 */ return "Hangzhou SDIC Microelectronics Inc.";
+				case 0x10AE: /* 4270 */ return "Raycon Inc.";
+				case 0x10AD: /* 4269 */ return "CoreHW Semiconductor Oy";
+				case 0x10AC: /* 4268 */ return "ATsens Co.,Ltd.";
+				case 0x10AB: /* 4267 */ return "ObjectSpectrum, LLC";
+				case 0x10AA: /* 4266 */ return "Sigenergy Technology Co., Ltd.";
+				case 0x10A9: /* 4265 */ return "Mallow";
 				case 0x10A8: /* 4264 */ return "Zhejiang Wanyou Intelligent Technology Co., Ltd.";
 				case 0x10A7: /* 4263 */ return "Pedigree Technologies, LLC";
 				case 0x10A6: /* 4262 */ return "Lightnovo ApS";
@@ -434,7 +470,6 @@ namespace BluetoothConversions
 				case 0x0EBB: /* 3771 */ return "Asahi Denso Co.,Ltd.";
 				case 0x0EBA: /* 3770 */ return "THERMY LTD";
 				case 0x0EB9: /* 3769 */ return "egojin co,.ltd";
-				case 0x0EB8: /* 3768 */ return "PARAGON ID";
 				case 0x0EB7: /* 3767 */ return "Embedded Solutions LLC";
 				case 0x0EB6: /* 3766 */ return "Server Products, Inc.";
 				case 0x0EB5: /* 3765 */ return "Preseed Japan Corporation";
@@ -453,7 +488,6 @@ namespace BluetoothConversions
 				case 0x0EA8: /* 3752 */ return "Dongguan Trangjan Industrial Co., Ltd";
 				case 0x0EA7: /* 3751 */ return "BrickXter GmbH";
 				case 0x0EA6: /* 3750 */ return "AMG Lab LLC";
-				case 0x0EA5: /* 3749 */ return "EasyReach Solutions Private Limited";
 				case 0x0EA4: /* 3748 */ return "BiTECH Automotive (Wuhu) Co.,Ltd";
 				case 0x0EA3: /* 3747 */ return "OLIS ELECTRONICS, LLC";
 				case 0x0EA2: /* 3746 */ return "QIKCONNEX LLC";
@@ -508,12 +542,10 @@ namespace BluetoothConversions
 				case 0x0E71: /* 3697 */ return "ENABLEWEAR LLC";
 				case 0x0E70: /* 3696 */ return "Powerstick.com";
 				case 0x0E6F: /* 3695 */ return "OpConnect, Inc.";
-				case 0x0E6D: /* 3693 */ return "FEVOS LIMITED";
 				case 0x0E6C: /* 3692 */ return "RIGH, INC.";
 				case 0x0E6B: /* 3691 */ return "Shenzhen Goodocom Information Technology Co., Ltd.";
 				case 0x0E6A: /* 3690 */ return "Hyena Inc.";
 				case 0x0E69: /* 3689 */ return "Megatronix (Beijing) Technology Co., Ltd";
-				case 0x0E68: /* 3688 */ return "EarTex Ltd";
 				case 0x0E67: /* 3687 */ return "NEXT DEVICES LTDA";
 				case 0x0E66: /* 3686 */ return "Shenzhen Baseus Technology Co., Ltd.";
 				case 0x0E65: /* 3685 */ return "Daikin Industries, LTD";
@@ -864,7 +896,6 @@ namespace BluetoothConversions
 				case 0x0D03: /* 3331 */ return "MakuSafe Corp";
 				case 0x0D02: /* 3330 */ return "Rocky Mountain ATV/MC Jake Wilson";
 				case 0x0D01: /* 3329 */ return "KEEPEN";
-				case 0x0D00: /* 3328 */ return "Sparkpark AS";
 				case 0x0CFF: /* 3327 */ return "Ergodriven Inc";
 				case 0x0CFE: /* 3326 */ return "Thule Group AB";
 				case 0x0CFC: /* 3324 */ return "ElectronX design";
@@ -963,7 +994,6 @@ namespace BluetoothConversions
 				case 0x0C9B: /* 3227 */ return "NTT sonority, Inc.";
 				case 0x0C9A: /* 3226 */ return "ALF Inc.";
 				case 0x0C99: /* 3225 */ return "Vire Health Oy";
-				case 0x0C98: /* 3224 */ return "MiX Telematics International (PTY) LTD";
 				case 0x0C97: /* 3223 */ return "Deako";
 				case 0x0C96: /* 3222 */ return "H+B Hightech GmbH";
 				case 0x0C95: /* 3221 */ return "Gemstone Lights Canada Ltd.";
@@ -1042,7 +1072,6 @@ namespace BluetoothConversions
 				case 0x0C49: /* 3145 */ return "twopounds gmbh";
 				case 0x0C48: /* 3144 */ return "VALEO MANAGEMENT SERVICES";
 				case 0x0C47: /* 3143 */ return "Epsilon Electronics,lnc";
-				case 0x0C46: /* 3142 */ return "Granwin IoT Technology (Guangzhou) Co.,Ltd";
 				case 0x0C45: /* 3141 */ return "Brose Verwaltung SE, Bamberg";
 				case 0x0C44: /* 3140 */ return "ONCELABS LLC";
 				case 0x0C43: /* 3139 */ return "Berlinger & Co. AG";
@@ -1128,7 +1157,6 @@ namespace BluetoothConversions
 				case 0x0BEF: /* 3055 */ return "Safetytest GmbH";
 				case 0x0BEE: /* 3054 */ return "LINKSYS USA, INC.";
 				case 0x0BED: /* 3053 */ return "CORAL-TAIYI Co. Ltd.";
-				case 0x0BEC: /* 3052 */ return "Miracle-Ear, Inc.";
 				case 0x0BEB: /* 3051 */ return "Luna Health, Inc.";
 				case 0x0BEA: /* 3050 */ return "Twenty Five Seven, prodaja in storitve, d.o.o.";
 				case 0x0BE9: /* 3049 */ return "Shindengen Electric Manufacturing Co., Ltd.";
@@ -1143,11 +1171,10 @@ namespace BluetoothConversions
 				case 0x0BDF: /* 3039 */ return "WINKEY ENTERPRISE (HONG KONG) LIMITED";
 				case 0x0BDE: /* 3038 */ return "Yale";
 				case 0x0BDD: /* 3037 */ return "Coroflo Limited";
-				case 0x0BDC: /* 3036 */ return "Ledworks S.r.l.";
+				case 0x0BDC: /* 3036 */ return "TWINKLY SRL";
 				case 0x0BDB: /* 3035 */ return "CHAR-BROIL, LLC";
 				case 0x0BDA: /* 3034 */ return "Aardex Ltd.";
 				case 0x0BD8: /* 3032 */ return "PURA SCENTS, INC.";
-				case 0x0BD7: /* 3031 */ return "VINFAST TRADING AND PRODUCTION JOINT STOCK COMPANY";
 				case 0x0BD6: /* 3030 */ return "Shenzhen Injoinic Technology Co., Ltd.";
 				case 0x0BD5: /* 3029 */ return "Super B Lithium Power B.V.";
 				case 0x0BD4: /* 3028 */ return "ndd Medizintechnik AG";
@@ -1213,9 +1240,7 @@ namespace BluetoothConversions
 				case 0x0B96: /* 2966 */ return "Telecom Design";
 				case 0x0B94: /* 2964 */ return "Dreem SAS";
 				case 0x0B93: /* 2963 */ return "Hangzhou BroadLink Technology Co., Ltd.";
-				case 0x0B92: /* 2962 */ return "Citisend Solutions, SL";
 				case 0x0B91: /* 2961 */ return "Alfen ICU B.V.";
-				case 0x0B90: /* 2960 */ return "Ineos Automotive Limited";
 				case 0x0B8F: /* 2959 */ return "Senscomm Semiconductor Co., Ltd.";
 				case 0x0B8E: /* 2958 */ return "Gentle Energy Corp.";
 				case 0x0B8D: /* 2957 */ return "Pertech Industries Inc";
@@ -1313,7 +1338,6 @@ namespace BluetoothConversions
 				case 0x0B2C: /* 2860 */ return "ILLUMAGEAR, Inc.";
 				case 0x0B2B: /* 2859 */ return "MAINBOT";
 				case 0x0B29: /* 2857 */ return "Tech-Venom Entertainment Private Limited";
-				case 0x0B28: /* 2856 */ return "CHACON";
 				case 0x0B27: /* 2855 */ return "Lumi United Technology Co., Ltd";
 				case 0x0B26: /* 2854 */ return "Baracoda Daily Healthtech.";
 				case 0x0B25: /* 2853 */ return "NIBROTECH LTD";
@@ -1325,7 +1349,6 @@ namespace BluetoothConversions
 				case 0x0B1E: /* 2846 */ return "PB INC.";
 				case 0x0B1D: /* 2845 */ return "Accelerated Systems";
 				case 0x0B1C: /* 2844 */ return "Nanoleq AG";
-				case 0x0B1B: /* 2843 */ return "Enerpac Tool Group Corp.";
 				case 0x0B1A: /* 2842 */ return "Roca Sanitario, S.A.";
 				case 0x0B19: /* 2841 */ return "WBS PROJECT H PTY LTD";
 				case 0x0B18: /* 2840 */ return "DECATHLON SE";
@@ -1343,7 +1366,6 @@ namespace BluetoothConversions
 				case 0x0B0C: /* 2828 */ return "BluPeak";
 				case 0x0B0B: /* 2827 */ return "Sanistaal A/S";
 				case 0x0B0A: /* 2826 */ return "Belun Technology Company Limited";
-				case 0x0B09: /* 2825 */ return "soonisys";
 				case 0x0B08: /* 2824 */ return "Shenzhen Qianfenyi Intelligent Technology Co., LTD";
 				case 0x0B07: /* 2823 */ return "Workaround Gmbh";
 				case 0x0B06: /* 2822 */ return "FAZUA GmbH";
@@ -1387,7 +1409,6 @@ namespace BluetoothConversions
 				case 0x0ADC: /* 2780 */ return "Duravit AG";
 				case 0x0ADB: /* 2779 */ return "Reelables, Inc.";
 				case 0x0ADA: /* 2778 */ return "Codefabrik GmbH";
-				case 0x0AD9: /* 2777 */ return "Shenzhen Aimore. Co.,Ltd";
 				case 0x0AD8: /* 2776 */ return "Franz Kaldewei GmbH&Co KG";
 				case 0x0AD7: /* 2775 */ return "AL-KO Geraete GmbH";
 				case 0x0AD6: /* 2774 */ return "nymea GmbH";
@@ -1452,7 +1473,6 @@ namespace BluetoothConversions
 				case 0x0A9A: /* 2714 */ return "TEMKIN ASSOCIATES, LLC";
 				case 0x0A99: /* 2713 */ return "Shanghai high-flying electronics technology Co.,Ltd";
 				case 0x0A98: /* 2712 */ return "Foil, Inc.";
-				case 0x0A97: /* 2711 */ return "SensTek";
 				case 0x0A95: /* 2709 */ return "Pamex Inc.";
 				case 0x0A94: /* 2708 */ return "OOBIK Inc.";
 				case 0x0A93: /* 2707 */ return "GiPStech S.r.l.";
@@ -1526,7 +1546,6 @@ namespace BluetoothConversions
 				case 0x0A4C: /* 2636 */ return "SiFli Technologies (shanghai) Inc.";
 				case 0x0A4B: /* 2635 */ return "MistyWest Energy and Transport Ltd.";
 				case 0x0A4A: /* 2634 */ return "Map Large, Inc.";
-				case 0x0A49: /* 2633 */ return "Venture Research Inc.";
 				case 0x0A48: /* 2632 */ return "JRC Mobility Inc.";
 				case 0x0A47: /* 2631 */ return "The Wand Company Ltd";
 				case 0x0A46: /* 2630 */ return "Beijing HC-Infinite Technology Limited";
@@ -1557,7 +1576,6 @@ namespace BluetoothConversions
 				case 0x0A2A: /* 2602 */ return "Yamaha Corporation";
 				case 0x0A29: /* 2601 */ return "Worthcloud Technology Co.,Ltd";
 				case 0x0A28: /* 2600 */ return "NanoFlex Power Corporation";
-				case 0x0A27: /* 2599 */ return "AYU DEVICES PRIVATE LIMITED";
 				case 0x0A26: /* 2598 */ return "Louis Vuitton";
 				case 0x0A25: /* 2597 */ return "Eran Financial Services LLC";
 				case 0x0A24: /* 2596 */ return "Atmosic Technologies, Inc.";
@@ -1598,7 +1616,6 @@ namespace BluetoothConversions
 				case 0x0A00: /* 2560 */ return "Ampler Bikes OU";
 				case 0x09FF: /* 2559 */ return "AIRSTAR";
 				case 0x09FE: /* 2558 */ return "Lichtvision Engineering GmbH";
-				case 0x09FD: /* 2557 */ return "Keep Technologies, Inc.";
 				case 0x09FC: /* 2556 */ return "Confidex";
 				case 0x09FB: /* 2555 */ return "TOITU CO., LTD.";
 				case 0x09FA: /* 2554 */ return "Listen Technologies Corporation";
@@ -1625,12 +1642,10 @@ namespace BluetoothConversions
 				case 0x09E5: /* 2533 */ return "Mobilogix";
 				case 0x09E4: /* 2532 */ return "CPS AS";
 				case 0x09E3: /* 2531 */ return "Friday Home Aps";
-				case 0x09E2: /* 2530 */ return "Wuhan Linptech Co.,Ltd.";
 				case 0x09E1: /* 2529 */ return "Tag-N-Trac Inc";
 				case 0x09DF: /* 2527 */ return "Magnus Technology Sdn Bhd";
 				case 0x09DE: /* 2526 */ return "JLD Technology Solutions, LLC";
 				case 0x09DD: /* 2525 */ return "Innoware Development AB";
-				case 0x09DC: /* 2524 */ return "AON2 Ltd.";
 				case 0x09DB: /* 2523 */ return "Bionic Avionics Inc.";
 				case 0x09DA: /* 2522 */ return "Nagravision SA";
 				case 0x09D9: /* 2521 */ return "VivoSensMedical GmbH";
@@ -1733,13 +1748,10 @@ namespace BluetoothConversions
 				case 0x0975: /* 2421 */ return "BlueIOT(Beijing) Technology Co.,Ltd";
 				case 0x0974: /* 2420 */ return "ABEYE";
 				case 0x0973: /* 2419 */ return "Popit Oy";
-				case 0x0972: /* 2418 */ return "Closed Joint Stock Company 'Zavod Flometr' ('Zavod Flometr' CJSC)";
 				case 0x0971: /* 2417 */ return "GA";
 				case 0x0970: /* 2416 */ return "IBA Dosimetry GmbH";
-				case 0x096F: /* 2415 */ return "Lund Motion Products, Inc.";
 				case 0x096E: /* 2414 */ return "Band Industries, inc.";
 				case 0x096D: /* 2413 */ return "Gunwerks, LLC";
-				case 0x096C: /* 2412 */ return "9374-7319 Quebec inc";
 				case 0x096B: /* 2411 */ return "Guide ID B.V.";
 				case 0x096A: /* 2410 */ return "dricos, Inc.";
 				case 0x0969: /* 2409 */ return "Woan Technology (Shenzhen) Co., Ltd.";
@@ -1795,7 +1807,6 @@ namespace BluetoothConversions
 				case 0x0935: /* 2357 */ return "Reconnect, Inc.";
 				case 0x0934: /* 2356 */ return "KiteSpring Inc.";
 				case 0x0933: /* 2355 */ return "SRAM";
-				case 0x0932: /* 2354 */ return "BarVision, LLC";
 				case 0x0931: /* 2353 */ return "BREATHINGS Co., Ltd.";
 				case 0x0930: /* 2352 */ return "James Walker RotaBolt Limited";
 				case 0x092F: /* 2351 */ return "C.O.B.O. SpA";
@@ -1850,7 +1861,6 @@ namespace BluetoothConversions
 				case 0x08FD: /* 2301 */ return "BioIntelliSense, Inc.";
 				case 0x08FC: /* 2300 */ return "Hill-Rom";
 				case 0x08FB: /* 2299 */ return "Darkglass Electronics Oy";
-				case 0x08FA: /* 2298 */ return "Troo Corporation";
 				case 0x08F9: /* 2297 */ return "Spacelabs Medical Inc.";
 				case 0x08F8: /* 2296 */ return "instagrid GmbH";
 				case 0x08F7: /* 2295 */ return "MTD Products Inc & Affiliates";
@@ -1901,7 +1911,6 @@ namespace BluetoothConversions
 				case 0x08C9: /* 2249 */ return "Noventa AG";
 				case 0x08C8: /* 2248 */ return "Liteboxer Technologies Inc.";
 				case 0x08C7: /* 2247 */ return "Monadnock Systems Ltd.";
-				case 0x08C6: /* 2246 */ return "Integra Optics Inc";
 				case 0x08C5: /* 2245 */ return "J. Wagner GmbH";
 				case 0x08C3: /* 2243 */ return "CHIPOLO d.o.o.";
 				case 0x08C2: /* 2242 */ return "Lindinvent AB";
@@ -1917,7 +1926,6 @@ namespace BluetoothConversions
 				case 0x08B8: /* 2232 */ return "Check Technology Solutions LLC";
 				case 0x08B7: /* 2231 */ return "ABB Inc";
 				case 0x08B6: /* 2230 */ return "Boehringer Ingelheim Vetmedica GmbH";
-				case 0x08B5: /* 2229 */ return "TransferFi";
 				case 0x08B4: /* 2228 */ return "Sengled Co., Ltd.";
 				case 0x08B3: /* 2227 */ return "IONIQ Skincare GmbH & Co. KG";
 				case 0x08B2: /* 2226 */ return "PF SCHWEISSTECHNOLOGIE GMBH";
@@ -1945,7 +1953,6 @@ namespace BluetoothConversions
 				case 0x089B: /* 2203 */ return "Saucon Technologies";
 				case 0x089A: /* 2202 */ return "Private limited company 'Teltonika'";
 				case 0x0899: /* 2201 */ return "SFS unimarket AG";
-				case 0x0898: /* 2200 */ return "Sensibo, Inc.";
 				case 0x0897: /* 2199 */ return "Current Lighting Solutions LLC";
 				case 0x0896: /* 2198 */ return "Nokian Renkaat Oyj";
 				case 0x0895: /* 2197 */ return "Gimer medical";
@@ -2124,7 +2131,6 @@ namespace BluetoothConversions
 				case 0x07E4: /* 2020 */ return "Geeksme S.L.";
 				case 0x07E3: /* 2019 */ return "Airoha Technology Corp.";
 				case 0x07E2: /* 2018 */ return "Alfred Kaercher SE & Co. KG";
-				case 0x07E1: /* 2017 */ return "Lucie Labs";
 				case 0x07E0: /* 2016 */ return "Edifier International Limited";
 				case 0x07DF: /* 2015 */ return "Snap-on Incorporated";
 				case 0x07DE: /* 2014 */ return "Unlimited Engineering SL";
@@ -2147,7 +2153,6 @@ namespace BluetoothConversions
 				case 0x07CD: /* 1997 */ return "Smart Wave Technologies Canada Inc";
 				case 0x07CC: /* 1996 */ return "Barnacle Systems Inc.";
 				case 0x07CB: /* 1995 */ return "West Pharmaceutical Services, Inc.";
-				case 0x07CA: /* 1994 */ return "Modul-System HH AB";
 				case 0x07C9: /* 1993 */ return "Skullcandy, Inc.";
 				case 0x07C8: /* 1992 */ return "WRLDS Creations AB";
 				case 0x07C7: /* 1991 */ return "iaconicDesign Inc.";
@@ -2160,10 +2165,8 @@ namespace BluetoothConversions
 				case 0x07BF: /* 1983 */ return "REGULA Ltd.";
 				case 0x07BE: /* 1982 */ return "Axentia Technologies AB";
 				case 0x07BD: /* 1981 */ return "Genedrive Diagnostics Ltd";
-				case 0x07BC: /* 1980 */ return "KD CIRCUITS LLC";
 				case 0x07BB: /* 1979 */ return "EPIC S.R.L.";
 				case 0x07BA: /* 1978 */ return "Battery-Biz Inc.";
-				case 0x07B9: /* 1977 */ return "Epona Biotec Limited";
 				case 0x07B8: /* 1976 */ return "iSwip";
 				case 0x07B7: /* 1975 */ return "ETABLISSEMENTS GEORGES RENAULT";
 				case 0x07B6: /* 1974 */ return "Soundbrenner Limited";
@@ -2186,7 +2189,6 @@ namespace BluetoothConversions
 				case 0x07A5: /* 1957 */ return "RAB Lighting, Inc.";
 				case 0x07A4: /* 1956 */ return "Xiamen Mage Information Technology Co., Ltd.";
 				case 0x07A2: /* 1954 */ return "Roku, Inc.";
-				case 0x07A1: /* 1953 */ return "Apollo Neuroscience, Inc.";
 				case 0x07A0: /* 1952 */ return "Regent Beleuchtungskorper AG";
 				case 0x079F: /* 1951 */ return "Pune Scientific LLP";
 				case 0x079E: /* 1950 */ return "Smartloxx GmbH";
@@ -2230,7 +2232,6 @@ namespace BluetoothConversions
 				case 0x0776: /* 1910 */ return "Cyber Transport Control GmbH";
 				case 0x0775: /* 1909 */ return "4eBusiness GmbH";
 				case 0x0774: /* 1908 */ return "C-MAX Asia Limited";
-				case 0x0773: /* 1907 */ return "Echoflex Solutions Inc.";
 				case 0x0772: /* 1906 */ return "Thirdwayv Inc.";
 				case 0x0771: /* 1905 */ return "Corvex Connected Safety";
 				case 0x0770: /* 1904 */ return "InnoCon Medical ApS";
@@ -2359,7 +2360,6 @@ namespace BluetoothConversions
 				case 0x06F0: /* 1776 */ return "Chargy Technologies, SL";
 				case 0x06EF: /* 1775 */ return "ALCARE Co., Ltd.";
 				case 0x06ED: /* 1773 */ return "J Neades Ltd";
-				case 0x06EC: /* 1772 */ return "Sigur";
 				case 0x06EB: /* 1771 */ return "Houston Radar LLC";
 				case 0x06EA: /* 1770 */ return "SafeLine Sweden AB";
 				case 0x06E9: /* 1769 */ return "Zmartfun Electronics, Inc.";
@@ -2383,7 +2383,6 @@ namespace BluetoothConversions
 				case 0x06D7: /* 1751 */ return "FUBA Automotive Electronics GmbH";
 				case 0x06D6: /* 1750 */ return "JCT Healthcare Pty Ltd";
 				case 0x06D5: /* 1749 */ return "Sensirion AG";
-				case 0x06D4: /* 1748 */ return "DYNAKODE TECHNOLOGY PRIVATE LIMITED";
 				case 0x06D2: /* 1746 */ return "CeoTronics AG";
 				case 0x06D1: /* 1745 */ return "Meyer Sound Laboratories, Incorporated";
 				case 0x06D0: /* 1744 */ return "Etekcity Corporation";
@@ -2394,7 +2393,6 @@ namespace BluetoothConversions
 				case 0x06CA: /* 1738 */ return "Shenzhen Zhongguang Infotech Technology Development Co., Ltd";
 				case 0x06C9: /* 1737 */ return "MYLAPS B.V.";
 				case 0x06C8: /* 1736 */ return "Storz & Bickel GmbH & Co. KG";
-				case 0x06C7: /* 1735 */ return "Somatix Inc";
 				case 0x06C6: /* 1734 */ return "Simm Tronic Limited";
 				case 0x06C5: /* 1733 */ return "Urban Compass, Inc";
 				case 0x06C4: /* 1732 */ return "Dream Labs GmbH";
@@ -2561,7 +2559,6 @@ namespace BluetoothConversions
 				case 0x061A: /* 1562 */ return "R.W. Beckett Corporation";
 				case 0x0619: /* 1561 */ return "Six Guys Labs, s.r.o.";
 				case 0x0618: /* 1560 */ return "Audio-Technica Corporation";
-				case 0x0617: /* 1559 */ return "WIZCONNECTED COMPANY LIMITED";
 				case 0x0616: /* 1558 */ return "OS42 UG (haftungsbeschraenkt)";
 				case 0x0615: /* 1557 */ return "INTER ACTION Corporation";
 				case 0x0614: /* 1556 */ return "OnAsset Intelligence, Inc.";
@@ -2949,7 +2946,6 @@ namespace BluetoothConversions
 				case 0x047F: /* 1151 */ return "Pro-Mark, Inc.";
 				case 0x047E: /* 1150 */ return "OurHub Dev IvS";
 				case 0x047D: /* 1149 */ return "Occly LLC";
-				case 0x047C: /* 1148 */ return "POWERMAT LTD";
 				case 0x047B: /* 1147 */ return "MIYOSHI ELECTRONICS CORPORATION";
 				case 0x047A: /* 1146 */ return "Sinosun Technology Co., Ltd.";
 				case 0x0479: /* 1145 */ return "mywerk system GmbH";
@@ -2984,7 +2980,6 @@ namespace BluetoothConversions
 				case 0x0458: /* 1112 */ return "Mini Solution Co., Ltd.";
 				case 0x0457: /* 1111 */ return "RF INNOVATION";
 				case 0x0456: /* 1110 */ return "Nemik Consulting Inc";
-				case 0x0455: /* 1109 */ return "Atomation";
 				case 0x0454: /* 1108 */ return "Sphinx Electronics GmbH & Co KG";
 				case 0x0453: /* 1107 */ return "Qorvo Utrecht B.V.";
 				case 0x0452: /* 1106 */ return "Svep Design Center AB";
@@ -3052,7 +3047,6 @@ namespace BluetoothConversions
 				case 0x040F: /* 1039 */ return "CO-AX Technology, Inc.";
 				case 0x040E: /* 1038 */ return "SKF (U.K.) Limited";
 				case 0x040D: /* 1037 */ return "NorthStar Battery Company, LLC";
-				case 0x040C: /* 1036 */ return "Senix Corporation";
 				case 0x040B: /* 1035 */ return "Jana Care Inc.";
 				case 0x040A: /* 1034 */ return "ZF OPENMATICS s.r.o.";
 				case 0x0409: /* 1033 */ return "RYSE INC.";
@@ -3086,7 +3080,6 @@ namespace BluetoothConversions
 				case 0x03EB: /* 1003 */ return "Ozo Edu, Inc.";
 				case 0x03EA: /* 1002 */ return "Hello Inc.";
 				case 0x03E9: /* 1001 */ return "SHENZHEN LEMONJOY TECHNOLOGY CO., LTD.";
-				case 0x03E8: /* 1000 */ return "Reiner Kartengeraete GmbH & Co. KG.";
 				case 0x03E7: /* 999 */ return "TRUE Fitness Technology";
 				case 0x03E6: /* 998 */ return "IoT Instruments Oy";
 				case 0x03E5: /* 997 */ return "ffly4u";
@@ -3245,11 +3238,9 @@ namespace BluetoothConversions
 				case 0x0343: /* 835 */ return "Drekker Development Pty. Ltd.";
 				case 0x0342: /* 834 */ return "GERTEC BRASIL LTDA.";
 				case 0x0341: /* 833 */ return "Etesian Technologies LLC";
-				case 0x0340: /* 832 */ return "Letsense s.r.l.";
 				case 0x033F: /* 831 */ return "Automation Components, Inc.";
 				case 0x033E: /* 830 */ return "Monitra SA";
 				case 0x033D: /* 829 */ return "TPV Technology Limited";
-				case 0x033C: /* 828 */ return "Virtuosys";
 				case 0x033B: /* 827 */ return "Courtney Thorne Limited";
 				case 0x033A: /* 826 */ return "Appception, Inc.";
 				case 0x0339: /* 825 */ return "Blue Sky Scientific, LLC";
@@ -3271,7 +3262,6 @@ namespace BluetoothConversions
 				case 0x0328: /* 808 */ return "Grundfos A/S";
 				case 0x0327: /* 807 */ return "Essex Electronics";
 				case 0x0326: /* 806 */ return "Healthwear Technologies (Changzhou)Ltd";
-				case 0x0325: /* 805 */ return "Amotus Solutions";
 				case 0x0324: /* 804 */ return "Astro, Inc.";
 				case 0x0323: /* 803 */ return "Rotor Bike Components";
 				case 0x0320: /* 800 */ return "SONO ELECTRONICS. CO., LTD";
@@ -3366,7 +3356,6 @@ namespace BluetoothConversions
 				case 0x02C2: /* 706 */ return "Guillemot Corporation";
 				case 0x02C1: /* 705 */ return "LINE Corporation";
 				case 0x02C0: /* 704 */ return "Dash Robotics";
-				case 0x02BF: /* 703 */ return "Redbird Flight Simulations";
 				case 0x02BE: /* 702 */ return "Seguro Technology Sp. z o.o.";
 				case 0x02BD: /* 701 */ return "Chemtronics";
 				case 0x02BC: /* 700 */ return "Genevac Ltd";
@@ -3385,7 +3374,6 @@ namespace BluetoothConversions
 				case 0x02AF: /* 687 */ return "Technicolor USA Inc.";
 				case 0x02AE: /* 686 */ return "WeatherFlow, Inc.";
 				case 0x02AD: /* 685 */ return "Rx Networks, Inc.";
-				case 0x02AC: /* 684 */ return "RTB Elektronik GmbH & Co. KG";
 				case 0x02AB: /* 683 */ return "BBPOS Limited";
 				case 0x02AA: /* 682 */ return "Doppler Lab";
 				case 0x02A9: /* 681 */ return "Chargelib";
@@ -3563,7 +3551,6 @@ namespace BluetoothConversions
 				case 0x01F0: /* 496 */ return "KloudNation";
 				case 0x01EF: /* 495 */ return "Fullpower Technologies, Inc.";
 				case 0x01EE: /* 494 */ return "Valeo Service";
-				case 0x01ED: /* 493 */ return "CuteCircuit LTD";
 				case 0x01EC: /* 492 */ return "Spreadtrum Communications Shanghai Ltd";
 				case 0x01EA: /* 490 */ return "Advanced Application Design, Inc.";
 				case 0x01E6: /* 486 */ return "Technology Solutions (UK) Ltd";
@@ -3575,7 +3562,6 @@ namespace BluetoothConversions
 				case 0x01DF: /* 479 */ return "Bison Group Ltd.";
 				case 0x01DE: /* 478 */ return "Minelab Electronics Pty Limited";
 				case 0x01DD: /* 477 */ return "Koninklijke Philips N.V.";
-				case 0x01DC: /* 476 */ return "iParking Ltd.";
 				case 0x01DB: /* 475 */ return "Innblue Consulting";
 				case 0x01DA: /* 474 */ return "Logitech International SA";
 				case 0x01D9: /* 473 */ return "Savant Systems LLC";
@@ -3628,7 +3614,6 @@ namespace BluetoothConversions
 				case 0x01A6: /* 422 */ return "Wille Engineering";
 				case 0x01A5: /* 421 */ return "Icon Health and Fitness";
 				case 0x01A4: /* 420 */ return "MSA Innovation, LLC";
-				case 0x01A3: /* 419 */ return "EROAD";
 				case 0x01A2: /* 418 */ return "GIGALANE.CO.,LTD";
 				case 0x01A1: /* 417 */ return "FIAMM";
 				case 0x01A0: /* 416 */ return "Channel Enterprises (HK) Ltd.";
@@ -3656,10 +3641,8 @@ namespace BluetoothConversions
 				case 0x0189: /* 393 */ return "Physical Enterprises Inc.";
 				case 0x0188: /* 392 */ return "Unico RBC";
 				case 0x0187: /* 391 */ return "Seraphim Sense Ltd";
-				case 0x0186: /* 390 */ return "CORE Lighting Ltd";
 				case 0x0184: /* 388 */ return "Nectar";
 				case 0x0183: /* 387 */ return "Walt Disney";
-				case 0x0182: /* 386 */ return "HOP Ubiquitous";
 				case 0x0181: /* 385 */ return "Gecko Health Innovations, Inc.";
 				case 0x0180: /* 384 */ return "Gigaset Technologies GmbH";
 				case 0x017F: /* 383 */ return "XTel Wireless ApS";
@@ -3795,7 +3778,6 @@ namespace BluetoothConversions
 				case 0x00FA: /* 250 */ return "Crystal Alarm AB";
 				case 0x00F8: /* 248 */ return "AceUni Corp., Ltd.";
 				case 0x00F7: /* 247 */ return "VSN Technologies, Inc.";
-				case 0x00F6: /* 246 */ return "Elcometer Limited";
 				case 0x00F5: /* 245 */ return "Smartifier Oy";
 				case 0x00F4: /* 244 */ return "Nautilus Inc.";
 				case 0x00F3: /* 243 */ return "Kent Displays Inc.";
@@ -3903,7 +3885,6 @@ namespace BluetoothConversions
 				case 0x008B: /* 139 */ return "Topcon Positioning Systems, LLC";
 				case 0x008A: /* 138 */ return "Jawbone";
 				case 0x0089: /* 137 */ return "GN Hearing A/S";
-				case 0x0088: /* 136 */ return "Ecotest";
 				case 0x0087: /* 135 */ return "Garmin International, Inc.";
 				case 0x0086: /* 134 */ return "Equinux AG";
 				case 0x0085: /* 133 */ return "BlueRadios, Inc.";
@@ -3913,7 +3894,6 @@ namespace BluetoothConversions
 				case 0x0081: /* 129 */ return "WuXi Vimicro";
 				case 0x0080: /* 128 */ return "DeLorme Publishing Company, Inc.";
 				case 0x007F: /* 127 */ return "Autonet Mobile";
-				case 0x007E: /* 126 */ return "Sports Tracking Technologies Ltd.";
 				case 0x007D: /* 125 */ return "Seers Technology Co., Ltd.";
 				case 0x007B: /* 123 */ return "Hanlynn Technologies";
 				case 0x007A: /* 122 */ return "MStar Semiconductor, Inc.";
@@ -3983,7 +3963,6 @@ namespace BluetoothConversions
 				case 0x0038: /* 56 */ return "Syntronix Corporation";
 				case 0x0037: /* 55 */ return "Mobilian Corporation";
 				case 0x0036: /* 54 */ return "Renesas Electronics Corporation";
-				case 0x0035: /* 53 */ return "Eclipse (HQ Espana) S.L.";
 				case 0x0034: /* 52 */ return "Computer Access Technology Corporation (CATC)";
 				case 0x0033: /* 51 */ return "Commil Ltd";
 				case 0x0032: /* 50 */ return "Red-M (Communications) Ltd";

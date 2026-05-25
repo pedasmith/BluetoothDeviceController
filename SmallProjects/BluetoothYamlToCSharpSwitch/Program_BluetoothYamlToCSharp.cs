@@ -5,9 +5,7 @@
 
 using SharpYaml;
 using System.Globalization;
-using System.Net.Sockets;
-using System.Security.Cryptography;
-using System.Xml.Linq;
+
 
 namespace BluetoothYamlToCSharpSwitch
 {
@@ -38,7 +36,7 @@ namespace BluetoothYamlToCSharpSwitch
             public string id { get; set; }
             public override string ToString()
             {
-                return $"case {value}: return \"{name.RemoveQuotes}\"; // {id}";
+                return $"case {value}: return \"{name.RemoveQuotes()}\"; // {id}";
             }
 
         }
@@ -187,6 +185,11 @@ namespace BluetoothYamlToCSharpSwitch
             return null;
         }
 
+        /// <summary>
+        /// Old method; I used to just generate the inner CASE statements. The new way is that 
+        /// each file includes a set of commands for where in the generated code should go.
+        /// </summary>
+        /// <param name="options"></param>
         static void DoMakeCase(UserOptions options)
         {
             string yaml = File.ReadAllText(options.Filename);
@@ -205,6 +208,10 @@ namespace BluetoothYamlToCSharpSwitch
         }
 
         enum UpdateStates {  Copy, InUpdateFile }
+        /// <summary>
+        /// The most common method! This is the sophisticed code that handles the updatefile command.
+        /// </summary>
+        /// <param name="options"></param>
         static void DoUpdateFile(UserOptions options)
         {
             string[] source = [];
@@ -271,9 +278,19 @@ namespace BluetoothYamlToCSharpSwitch
                                 Console.Error.WriteLine($"Error: no list of values to substitute in for {options.Filename}");
                                 Environment.Exit(1);
                             }
+                            HashSet<string> potentialDups = new HashSet<string>();
                             foreach (var item in list)
                             {
-                                results.Add($"\t\t\t\t{item}");
+                                bool itemIsNew = potentialDups.Add(item.value);
+                                if (!itemIsNew)
+                                {
+                                    Console.Error.WriteLine($"Warning: duplicate value {item} in {options.Filename}");
+                                    results.Add($"\t\t\t\t//DUPLICATE: {item}");
+                                }
+                                else
+                                {
+                                    results.Add($"\t\t\t\t{item}");
+                                }
                             }
 
                         }

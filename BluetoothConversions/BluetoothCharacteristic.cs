@@ -516,6 +516,8 @@ namespace BluetoothConversions
 				case 0x2C36: return "Voice Assistant Session Flag"; // org.bluetooth.characteristic.voice_assistant_session_flag
 				case 0x2C37: return "Voice Assistant Supported Languages"; // org.bluetooth.characteristic.voice_assistant_supported_languages
 				case 0x2C38: return "Voice Assistant Supported Features"; // org.bluetooth.characteristic.voice_assistant_supported_features
+				case 0x2C39: return "HID SCI Mode"; // org.bluetooth.characteristic.hid_sci_mode
+				case 0x2C3A: return "HID SCI Information"; // org.bluetooth.characteristic.hid_sci_information
                 // endupdatefile:
             }
             return $"{value:X2}";

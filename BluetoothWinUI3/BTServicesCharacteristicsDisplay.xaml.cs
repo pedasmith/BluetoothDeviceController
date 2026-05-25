@@ -4,7 +4,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.ObjectModel;
+using System.Text;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -221,6 +223,8 @@ namespace BluetoothWinUI3
 
         private async void OnConnectClicked(object sender, RoutedEventArgs e)
         {
+            BluetoothCacheMode cacheMode = BluetoothCacheMode.Cached;
+
             if (CurrWatcherData == null || CurrWatcherData.Addr == 0)
             {
                 Log($"Error: no device selected to connect");
@@ -235,7 +239,7 @@ namespace BluetoothWinUI3
                 Log($"Unable to connect to {CurrWatcherData.AddressAsString}");
                 return;
             }
-            var services = await le.GetGattServicesAsync(BluetoothCacheMode.Cached);
+            var services = await le.GetGattServicesAsync(cacheMode);
             if (services.Status != Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
             {
                 Log($"Unable to get services for {CurrWatcherData.AddressAsString}. Reason: {services.Status}");
@@ -244,7 +248,33 @@ namespace BluetoothWinUI3
             uiDeviceDetailsTextBlock.Text = $"Services for {CurrWatcherData.AddressAsString} {CurrWatcherData.CompleteLocalName}\n\n";
             foreach (var service in services.Services)
             {
-                uiDeviceDetailsTextBlock.Text += $"{service.Uuid}";
+                var servicesb = new StringBuilder();
+                servicesb.AppendLine($"Service Uuid={service.Uuid}  handle={service.AttributeHandle}");
+                var dai = service.DeviceAccessInformation;
+                var session = service.Session;
+                servicesb.AppendLine($"    AccessInformation: status={dai.CurrentStatus} prompt={dai.UserPromptRequired}");
+                servicesb.AppendLine($"    DeviceId={service.DeviceId}");
+                servicesb.AppendLine($"    Session: Status={session.SessionStatus} MaxPduSize (MTU)={session.MaxPduSize}");
+                servicesb.AppendLine($"    Session: CanMaintainConnection={session.MaintainConnection} MaintainConnection={session.MaintainConnection}");
+                uiDeviceDetailsTextBlock.Text += servicesb.ToString();
+
+                var chresult = await service.GetCharacteristicsAsync(cacheMode);
+                if (chresult.Status != GattCommunicationStatus.Success)
+                {
+                    uiDeviceDetailsTextBlock.Text += $"    Unable to get characteristics reason={chresult.Status} {chresult.ProtocolError}";
+                }
+                else
+                {
+                    foreach (var characteristic in chresult.Characteristics)
+                    {
+                        var chsb = new StringBuilder();
+                        chsb.AppendLine($"    Characteristic Uuid={characteristic.Uuid} handle={characteristic.AttributeHandle}");
+                        uiDeviceDetailsTextBlock.Text += chsb.ToString();
+
+                    }
+                }
+
+                uiDeviceDetailsTextBlock.Text += $"\n";
             }
         }
     }

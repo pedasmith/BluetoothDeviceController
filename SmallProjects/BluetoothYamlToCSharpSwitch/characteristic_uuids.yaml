@@ -1538,3 +1538,9 @@ uuids:
  - uuid: 0x2C38
    name: Voice Assistant Supported Features
    id: org.bluetooth.characteristic.voice_assistant_supported_features
+ - uuid: 0x2C39
+   name: HID SCI Mode
+   id: org.bluetooth.characteristic.hid_sci_mode
+ - uuid: 0x2C3A
+   name: HID SCI Information
+   id: org.bluetooth.characteristic.hid_sci_information
