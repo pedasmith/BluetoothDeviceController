@@ -15,8 +15,8 @@ namespace IotNumberFormats
             CurrStringValues = new Dictionary<string, string>();
         }
         Dictionary<string, double> PreviousValues = null;
-        Dictionary<string, double> CurrValues = null;
-        Dictionary<string, string> CurrStringValues = null;
+        internal Dictionary<string, double> CurrValues = null;
+        internal Dictionary<string, string> CurrStringValues = null;
 
         public double GetCurrDouble(string name)
         {

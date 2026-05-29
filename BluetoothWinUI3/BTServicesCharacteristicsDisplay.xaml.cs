@@ -1,12 +1,19 @@
+using BluetoothConversions;
 using BluetoothProtocols;
+using BluetoothProtocolsNames;
 using BluetoothWatcher.AdvertismentWatcher;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+using Utilities;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Storage.Streams;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -199,6 +206,11 @@ namespace BluetoothWinUI3
         {
             var data = sender.SelectedItem as WatcherData;
             if (data == null) return;
+            Log($"OnAdvertisementSelected: selected={data.AddressAsString} name={data.CompleteLocalName}");
+            if ( CurrWatcherData != null && CurrWatcherData.Addr == data.Addr)
+            {
+                return;
+            }
             CurrWatcherData = data;
             var details = data.ToStringDetails();
             uiAdvertisementDetailsTextBlock.Text = details;
@@ -246,10 +258,26 @@ namespace BluetoothWinUI3
                 return;
             }
             uiDeviceDetailsTextBlock.Text = $"Services for {CurrWatcherData.AddressAsString} {CurrWatcherData.CompleteLocalName}\n\n";
+
+            var nameDeviceList = new NameAllBleDevices();
+            var nameDevice = new NameDevice();
+            nameDevice.Name = le.Name;
+            nameDevice.Details += "TODO: line 190";
+            nameDeviceList.AllDevices.Add(nameDevice);
+            // TODO: skipping copying classModifiers ClassName Description from knownDevice
+            int serviceCount = 0;
+
             foreach (var service in services.Services)
             {
+                var nameService = new NameService(service, null, serviceCount++);
+                nameDevice.Services.Add(nameService);
+
+                var shortuuid = BluetoothUuidHelper.TryGetShortId(service.Uuid);
+                var serviceUuidStr = (shortuuid != null) ? $"{shortuuid:X4}" : service.Uuid.ToString();
+                var servicename = (shortuuid != null) ? BluetoothServiceUuid16Bit.Decode((ushort)shortuuid) + " " : "";
+
                 var servicesb = new StringBuilder();
-                servicesb.AppendLine($"Service Uuid={service.Uuid}  handle={service.AttributeHandle}");
+                servicesb.AppendLine($"Service {servicename}Uuid={serviceUuidStr}  handle={service.AttributeHandle}");
                 var dai = service.DeviceAccessInformation;
                 var session = service.Session;
                 servicesb.AppendLine($"    AccessInformation: status={dai.CurrentStatus} prompt={dai.UserPromptRequired}");
@@ -265,10 +293,55 @@ namespace BluetoothWinUI3
                 }
                 else
                 {
+                    int characteristicCount = 0;
+
                     foreach (var characteristic in chresult.Characteristics)
                     {
+                        var chshortuuid = BluetoothUuidHelper.TryGetShortId(characteristic.Uuid);
+                        var chUuidStr = (chshortuuid != null) ? $"{chshortuuid:X4}" : characteristic.Uuid.ToString();
+                        var chname = (chshortuuid != null) ? $"name={BluetoothCharacteristic.Decode((ushort)chshortuuid)} " : "";
+
+
+                        var nameCharacteristic = new NameCharacteristic(characteristic, null, null, characteristicCount++);
+                        nameService.Characteristics.Add(nameCharacteristic);
+
                         var chsb = new StringBuilder();
-                        chsb.AppendLine($"    Characteristic Uuid={characteristic.Uuid} handle={characteristic.AttributeHandle}");
+                        chsb.AppendLine($"    Characteristic {chname}Uuid={chUuidStr} handle={characteristic.AttributeHandle}");
+                        if (!String.IsNullOrEmpty(characteristic.UserDescription))
+                        {
+                            chsb.AppendLine($"        Description: {characteristic.UserDescription}");
+                        }
+                        chsb.AppendLine($"        Properties: {characteristic.CharacteristicProperties}");
+                        chsb.AppendLine($"        Protection Level: {characteristic.ProtectionLevel}");
+                        foreach (var format in characteristic.PresentationFormats)
+                        {
+                            chsb.AppendLine($"        Presentation: type={format.FormatType} description={format.Description} unit={format.Unit} exp={format.Exponent} namespace={format.Namespace:X2} sig={GattPresentationFormat.BluetoothSigAssignedNumbers:X2}");
+                        }
+
+                        if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
+                        {
+                            var readresult = await characteristic.ReadValueAsync(cacheMode);
+                            if (readresult.Status != GattCommunicationStatus.Success)
+                            {
+                                chsb.AppendLine($"        Read failed: {readresult.Status} protocol error={readresult.ProtocolError}");
+                            }
+                            else
+                            {
+                                var buff = readresult.Value;
+                                if (buff.Length == 1)
+                                {
+                                    ;
+                                }
+                                var dr = DataReader.FromBuffer(buff);
+                                var (str, readstatus) = DataReaderReadStringRobust.ReadStringEntire(dr);
+
+                                nameCharacteristic.ExampleData.Add(str);
+
+                                chsb.AppendLine($"        Read: {str}");
+                            }
+                        }
+
+
                         uiDeviceDetailsTextBlock.Text += chsb.ToString();
 
                     }
@@ -276,6 +349,21 @@ namespace BluetoothWinUI3
 
                 uiDeviceDetailsTextBlock.Text += $"\n";
             }
+            // Build a JsonNode that omits empty strings and empty arrays, then
+            // serialize with System.Text.Json.
+            var resolver = new DefaultJsonTypeInfoResolver();
+            var jsonOptions = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+                TypeInfoResolver = resolver,
+            };
+            //var JsonAsList = System.Text.Json.JsonSerializer.Serialize(nameDeviceList, jsonOptions); // , jsonFormat, jsonSettings);
+            var node = BluetoothWinUI3.SystemTextJsonCleaner.ToJsonNode(nameDeviceList);
+            var JsonAsList = node?.ToJsonString(jsonOptions) ?? "";
+
+            uiDeviceDetailsTextBlock.Text += $"\n\n\n" + JsonAsList;
+
         }
     }
 }

@@ -37,6 +37,26 @@
     <None Remove="TestUserControl.xaml" />
     <None Remove="ZoomableDeviceControl.xaml" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\DefaultBluetooth.json" Link="Assets\CharacteristicsData\DefaultBluetooth.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H5074.json" Link="Assets\CharacteristicsData\Govee_H5074.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H5075.json" Link="Assets\CharacteristicsData\Govee_H5075.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H5106.json" Link="Assets\CharacteristicsData\Govee_H5106.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H6005.json" Link="Assets\CharacteristicsData\Govee_H6005.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json" Link="Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 	
   <ItemGroup> 
  	<!-- Platforms supported by this SDK for analyzer warnings. Spec: https://github.com/dotnet/designs/blob/main/accepted/2020/platform-exclusion/platform-exclusion.md  -->
@@ -162,6 +182,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\CharacteristicsData\" />
+  </ItemGroup>
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
@@ -221,4 +244,5 @@
   <Import Project="..\IotNumberFormats\IotNumberFormats.projitems" Label="Shared" />
   <Import Project="..\BluetoothProtocolsDevicesCore\BluetoothProtocolsDevicesCore.projitems" Label="Shared" />
   <Import Project="..\UtilitiesWinUI3\UtilitiesWinUI3.projitems" Label="Shared" />
+  <Import Project="..\BluetoothProtocolsNames\BluetoothProtocolsNames.projitems" Label="Shared" />
 </Project>
