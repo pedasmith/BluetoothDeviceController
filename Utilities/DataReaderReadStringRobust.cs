@@ -86,18 +86,24 @@ namespace Utilities
 
         /// <summary>
         /// Returns true if the buffer has control chars (bytes with vaules 0..31 and 127=DEL) including NUL.
-        /// But not including
+        /// But not including tabs, newline, etc.
+        /// And if there's "enough" normal chars and then the buffer ends with NUL only, that's OK.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         private static bool ArrayHasControlChars(byte[] value)
         {
+            int nnullAtEnd = 0;
+            int nnotcontrol = 0;
             for (int i = 0; i < value.Length; i++)
             {
                 var b = value[i];
                 switch (b)
                 {
-                    case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+                    case 0:
+                        nnullAtEnd++;
+                        break;
+                    case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
                         return true;
                     // 9=HT 10=LF
                     case 11: case 12:
@@ -109,9 +115,19 @@ namespace Utilities
                         return true;
                     case 127: //DEL
                         return true;
+                    default:
+                        if (nnullAtEnd > 0)
+                        {
+                            // we got one or more NUL and then a regular ASCII char. That's
+                            // enough to declare that this isn't a real ascii string.
+                            return true;
+                        }
+                        nnotcontrol++;
+                        break;
                 }
             }
-            return false;
+            var isOK = (nnullAtEnd == 0) || (nnotcontrol >= 4);
+            return !isOK;
         }
 
         private static void Log(string str)
