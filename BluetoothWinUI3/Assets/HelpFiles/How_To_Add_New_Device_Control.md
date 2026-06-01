@@ -2,6 +2,12 @@
 
 The device controls are the 400x400 (approx) square(ish) panels. There is one per each instance of a device (e.g., if you have two Nordic Thingy:52s, there will be two panes visible).
 
+It's important to distinguish
+
+- **Supported** devices are like a Nordic Thingy:53. This code knows about the Nordic Thingy.
+- **Known** device are specific instances of a supported device. If you have several of them, you will have several instances. Each known device gets its own control in the  uiKnownDevices panel in MainWindow.
+
+
 
 # Critical quality items
 

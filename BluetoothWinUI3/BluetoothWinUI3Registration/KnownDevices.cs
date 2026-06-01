@@ -49,6 +49,8 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         /// SaveData.
         /// This is set in the UserControl when the DataContext is set and the device is connected. In case of 
         /// failures, it will be a blank string (not null).
+        /// Alternative: it might be the bluetooth address and not the DeviceId for devices that are only
+        /// known from their advertisements.
 
         /// </summary>
         public string Id { get; set; } = "";

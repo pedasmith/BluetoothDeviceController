@@ -1,9 +1,12 @@
-﻿using System;
+﻿using BluetoothWatcher.AdvertismentWatcher;
+using BluetoothWinUI3;
+using System;
+using System.Collections.ObjectModel;
 using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
-using BluetoothWatcher.AdvertismentWatcher;
 using static BluetoothProtocols.AdvertisementDataSectionParser;
+using static BluetoothProtocols.Nordic_Thingy;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -11,17 +14,65 @@ using static BluetoothProtocols.AdvertisementDataSectionParser;
 
 namespace BluetoothProtocols
 {
-    public class Govee : SensorDataRecord
+    public class Govee : SensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
     {
 
         public bool IsValid { get; set; } = true;
-        public UInt16 CompanyId { get; set; } // will by 0xEC88 for the Govee H5074 H5075
+        /// <summary>
+        /// CompanyId is from the advertisement in the manufacturer-specific section. It's supposed to only be one of the values 
+        /// from the Bluetooth SIG. See the BluetoothCompanyIdentifier for details.
+        /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
+        /// </summary>
+        public UInt16 CompanyId { get; set; } // will by 0xEC88=60552 for the Govee H5074 H5075
         public enum SensorType { Other, H5074, H5075, H5106, NotGovee };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
-        public double BatteryInPercent { get; set; }
+
+        private double _BatteryInPercent;
+        /// <summary>
+        /// BatteryInPercent isn't available for all devices.
+        /// </summary>
+        public double BatteryInPercent { get { return _BatteryInPercent; } set { if (value == _BatteryInPercent) return; _BatteryInPercent = value; OnPropertyChanged(); } }
+
+        /// <summary>
+        /// Message created by the Parse method; it's a handy user-readable string for the temp / humidity
+        /// </summary>
         public string EncodeMessage { get; set; }
 
+        public Govee Clone()
+        {
+            return this.MemberwiseClone() as Govee;
+        }
+
+        public static Govee CopyAndUpdateUnits(Govee source, Govee dest, UserPreferences CurrUserPrefs)
+        {
+            dest ??= source.Clone();
+            dest.EventTime = source.EventTime;
+            dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(source.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
+            dest.Pressure = BluetoothWatcher.Units.Pressure.Convert(source.Pressure, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
+            dest.Humidity = source.Humidity; // Humidity is always in percent, so no conversion needed.
+            dest.PM25 = source.PM25;
+
+            dest.IsValid = source.IsValid;
+            dest.CompanyId= source.CompanyId;
+            dest.TagType = source.TagType;
+            dest.BatteryInPercent = source.BatteryInPercent;
+            return dest;
+        }
+
+        public void CopyFrom(Govee value)
+        {
+            EventTime = value.EventTime;
+            Temperature = value.Temperature;
+            Pressure = value.Pressure;
+            Humidity = value.Humidity; // Humidity is always in percent, so no conversion needed.
+            PM25 = value.PM25;
+
+            IsValid = value.IsValid;
+            CompanyId = value.CompanyId;
+            TagType = value.TagType;
+            BatteryInPercent = value.BatteryInPercent;
+        }
 
 
         /// <summary>
@@ -55,7 +106,7 @@ namespace BluetoothProtocols
         /// </summary>
         /// <param name="wrapper"></param>
         /// <returns></returns>
-        public static Govee Parse(SensorType sensorType, WatcherData wrapper)
+        public static Govee Parse(SensorType sensorType, WatcherData wrapper, Govee source)
         {
             if (sensorType == SensorType.NotGovee) return null;
 
@@ -67,23 +118,32 @@ namespace BluetoothProtocols
                 switch (dtv)
                 {
                     case DataTypeValue.ManufacturerData:
-                        retval = Parse(sensorType, section);
+                        retval = Parse(sensorType, section, source);
                         break;
                 }
             }
 
             return retval;
         }
-        public static Govee Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section)
+
+        /// <summary>
+        /// Will parse a Govee sensor. Must be given the sensor type which is from AdvertIsGovee (parsing depends on 
+        /// the type)
+        /// </summary>
+        /// <param name="sensorType"></param>
+        /// <param name="section"></param>
+        /// <returns></returns>
+        public static Govee Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section, Govee source)
         {
             if (sensorType == SensorType.NotGovee) return null;
-            var retval = new Govee() { TagType = sensorType };
+            var retval = source ?? new Govee();
+            retval.TagType = sensorType;
 
             try
             {
                 var dr = DataReader.FromBuffer(section.Data);
                 dr.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
-                retval.CompanyId = dr.ReadUInt16(); // Will be 0xEC88 but that's explicitly not enforced here
+                retval.CompanyId = dr.ReadUInt16(); // Will be 0xEC88=60552 but that's explicitly not enforced here
                 var expectedCompanyId = 0xEC88;
                 if (sensorType == SensorType.H5106) expectedCompanyId = 0x01; // Nokia??
                 if (dr.UnconsumedBufferLength > 16 || retval.CompanyId != expectedCompanyId)
@@ -171,5 +231,69 @@ namespace BluetoothProtocols
             return $"Temperature={Temperature} Humidity={Humidity}% PM2.5={PM25} "
                 + $"Battery={BatteryInPercent}";
         }
+    }
+
+
+
+    ///<summary>
+    ///TODO:
+    ///Environment_DataCollection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the Environment_Data group from Environment.
+    ///The lists are used when displaying historical graphs of the data.
+    ///</summary>
+    public class GoveeCollection
+    {
+        public enum Verb { Add, ReplaceMostRecent };
+
+        public int Count { get { return Timestamps.Count; } }
+
+        public void Update(Govee value, Verb verb)
+        {
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
+        public void Add(Govee value)
+        {
+            TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add(value.Clone());
+            Timestamps.Add(value.TimestampMostRecent);
+            TimestampsDT.Add(value.TimestampMostRecent.DateTime);
+            Temperature.Add(value.Temperature);
+            Pressure.Add(value.Pressure);
+            Humidity.Add(value.Humidity);
+            PM25.Add(value.PM25);
+        }
+        public void ReplaceMostRecent(Govee value)
+        {
+            var index = Timestamps.Count - 1;
+            Timestamps[index] = value.TimestampMostRecent;
+            Data[index].CopyFrom(value);  // was value.Clone(); switching to reduce flickering.
+            Temperature[index] = value.Temperature;
+            Pressure[index] = value.Pressure;
+            Humidity[index] = value.Humidity;
+            PM25[index] = value.PM25;
+        }
+
+        ///<summary>
+        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
+        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
+        ///frequently than the UI updates
+        ///</summary>
+        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
+        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // Data values (properties) from characteristic Temperature (c)
+        public ObservableCollection<double> Temperature { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic Pressure (hpa)
+        public ObservableCollection<double> Pressure { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic Humidity (%)
+        public ObservableCollection<double> Humidity { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic Air Quality eCOS TVOC
+        public ObservableCollection<double> PM25 { get; } = new ObservableCollection<double>();
+        public ObservableCollection<Govee> Data { get; } = new ObservableCollection<Govee>();
     }
 }

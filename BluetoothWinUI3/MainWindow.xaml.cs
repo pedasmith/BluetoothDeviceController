@@ -93,9 +93,21 @@ namespace BluetoothWinUI3
 
     }
 
+    /// <summary>
+    /// Wants to get all of the advertisements that are seen. Used by e.g., BTServicesCharacteristicsDisplay
+    /// </summary>
     public interface IHandleBTAdvertisements
     {
         void HandleAdvertisement(WatcherData data);
+    }
+
+    /// <summary>
+    /// Wants all of the advertisements for my specific (known) device based on BT address. Used by 
+    /// Govee_EnvironmentalControl because the Govee data is packed into the adverts.
+    /// </summary>
+    public interface IHandleMyBTAdvertisements
+    {
+        void HandleMyAdvertisement(WatcherData data);
     }
 
     /// <summary>
@@ -105,7 +117,7 @@ namespace BluetoothWinUI3
     {
         // MARKDOWN: IImageProvider requires two methods, ShouldUseThisProvider() and GetImage()
 
-        BluetoothWatcher.AdvertismentWatcher.AdvertisementWatcher AdvertisementWatcher = new BluetoothWatcher.AdvertismentWatcher.AdvertisementWatcher();
+        AdvertisementWatcher AdvertisementWatcher = new AdvertisementWatcher();
         int NAdvertisements = 0;
         UserPreferences CurrUserPrefs = new UserPreferences();
 
@@ -216,15 +228,21 @@ namespace BluetoothWinUI3
         StringBuilder AllAdvertisements = new StringBuilder();
         Dictionary<string, string> UniqueAdvertisements = new Dictionary<string, string>();
         Dictionary<string, string> UniqueBTAddresses = new Dictionary<string, string>();
+        /// <summary>
+        /// List of all of the controls (like BTServicesCharacteristicsDisplay) that can do something with all of the 
+        /// advertisements that are seen. Is added to in e.g., OnDebugShowAdvertisements and is used by the
+        /// AdvertisementWatcher_WatcherEvent.
+        /// </summary>
+        IList<IHandleBTAdvertisements> BTAdvertisementHandlers = new List<IHandleBTAdvertisements>();
 
         private void AdvertisementWatcher_WatcherEvent(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)
         {
             // A little bit of logging and storing stuff for debugging
             NAdvertisements++;
             AllAdvertisements.AppendLine($"{NAdvertisements}, " + e.ToStringFull());
-            var fmt = BluetoothWatcher.AdvertismentWatcher.WatcherData.AdvertisementStringFormat.CanCompare;
+            var fmt = WatcherData.AdvertisementStringFormat.CanCompare;
             UniqueAdvertisements[e.ToStringFull(fmt)] = e.ToStringFull();
-            fmt = BluetoothWatcher.AdvertismentWatcher.WatcherData.AdvertisementStringFormat.AddressOnly;
+            fmt = WatcherData.AdvertisementStringFormat.AddressOnly;
             UniqueBTAddresses[e.ToStringFull(fmt)] = e.ToStringFull();
 
 
@@ -234,6 +252,11 @@ namespace BluetoothWinUI3
                 uiAdvertCount.Text = NAdvertisements.ToString();
                 uiAdvertRaw.Text = e.ToString();
 
+                if(e.ToString().Contains("GVH"))
+                {
+                    ; // handy place for a debugger
+                }
+
                 // If this is a new advert, see if it's a known type
                 var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
                 if (supportedDevice != null)
@@ -242,12 +265,16 @@ namespace BluetoothWinUI3
                     if (known == null) // not known (e.g.: this specific one hasn't been seen before in this session)
                     {
                         var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
-                        AddControl(e, control, supportedDevice);
-                        // a control is, e.g., a BTNordic_ThingyControl
+                        AddControl(e, control, supportedDevice); // will add to KnownDevices and updated UX and ...
+                        // a control is, e.g., a BTNordic_ThingyControl. AddControl will add to the Known Device list
+                    }
+                    else if (known.Control is IHandleMyBTAdvertisements handleMy)
+                    {
+                        handleMy.HandleMyAdvertisement(e);
                     }
                 }
 
-                foreach (var handler in BtServiceCharacteristics)
+                foreach (var handler in BTAdvertisementHandlers)
                 {
                     handler.HandleAdvertisement(e);
                 }
@@ -366,7 +393,7 @@ namespace BluetoothWinUI3
 
         private async Task<KnownDevice> GetKnownDevice(IDeviceControlDevice selected, string verb)
         {
-            var knownDevice = selected.KnownDeviceFromDataContext;
+            var knownDevice = selected.DataContextAsKnownDevice;
             if (knownDevice == null)
             {
                 await ShowNotice($"Can't ${verb} that device", "You cannot {verb} this device");
@@ -849,13 +876,12 @@ namespace BluetoothWinUI3
             }
         }
 
-        IList<IHandleBTAdvertisements> BtServiceCharacteristics = new List<IHandleBTAdvertisements>();
         private void OnDebugShowAdvertisements(object sender, RoutedEventArgs e)
         {
             var ctrl = new BTServicesCharacteristicsDisplay();
-            BtServiceCharacteristics.Add(ctrl);
+            BTAdvertisementHandlers.Add(ctrl);
             AddControl(null, ctrl, null);
-            // null means no watcher dat
+            // null means no watcher data
             // null means not a supported device (since the supported device is determined from the watcher data)
         }
     }

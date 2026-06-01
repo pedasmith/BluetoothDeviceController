@@ -20,7 +20,7 @@ namespace BluetoothProtocols
             public Ruuvi_Communication(bool success, double temperature, double pressure, double humidity, string ruuviUri = null)
             {
                 Success = success;
-                Data = new SensorDataRecord(temperature, pressure, humidity);
+                Data = new SensorDataRecord(temperature, pressure, humidity, null);
                 RuuviUri = ruuviUri;
             }
             public static Ruuvi_Communication MakeFailure()
@@ -120,7 +120,7 @@ namespace BluetoothProtocols
                                     {
                                         //foundValues.Add(AdvertisementType.RuuviTag);
                                         var ruuvi = ParseRuuviTag(result.Url);
-                                        ruuvi.Data.EventTime = DateTime.Now;
+                                        ruuvi.Data.EventTime = DateTimeOffset.Now;
                                         return ruuvi;
                                     }
                                     break;

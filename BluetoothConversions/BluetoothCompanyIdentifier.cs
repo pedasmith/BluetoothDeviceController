@@ -4021,7 +4021,7 @@ namespace BluetoothConversions
                 case 65534: return "Company FFFE??";
                 case 65535: return "Company FFFF (has special meaning depending on the context)";
             }
-            return $"CompanyId={companyId}";
+            return $"CompanyId={companyId:X4}";
         }
 
         public enum CommonManufacturerType {  Other, Apple10, Govee, Microsoft, MicrosoftRome, Ruuvi, SwitchBot }

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="BluetoothWinUI3.BTGovee_EnvironmentalControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothWinUI3"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:oxyplot="using:OxyPlot"
+    xmlns:tv="using:WinUI.TableView"
+    mc:Ignorable="d"
+    >
+
+    <Border Style="{StaticResource sDeviceBorder}" x:Name="rootPanel">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="uiDeviceName" Grid.Row="0" Text="Govee" Style="{StaticResource sDeviceTitle}"/>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" HorizontalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="5" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Temperature</Run><Run Text="&#160;"/><Run x:Name="uiTemperatureChange" Text="┄"/>
+                    </TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Humidity</Run><Run Text="&#160;"/><Run x:Name="uiHumidityChange" Text="┄"/>
+                    </TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>PM25</Run><Run Text="&#160;"/><Run x:Name="uiPM25Change" Text="┄"/>
+                    </TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTemperature"/></TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPM25"/></TextBlock>
+                    <Line Grid.Row="2" Grid.Column="0" Tag="TemperatureColor" Style="{StaticResource sGraphLineKey}" />
+                    <Line Grid.Row="2" Grid.Column="1" Tag="HumidityColor" Style="{StaticResource sGraphLineKey}"/>
+                    <Line Grid.Row="2" Grid.Column="2" Tag="PM25Color" Style="{StaticResource sGraphLineKey}" />
+                </Grid>
+                <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
+                <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
+                    <tv:TableView x:Name="uiTableView" IsReadOnly="True" />
+                </Grid>
+
+            </Grid>
+            <TextBlock Grid.Row="2" Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
+            <!-- TODO: remove entirely? -->
+            <local:BTConnectionControl Grid.Row="3" x:Name="uiBTConnectionControl" />
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using BluetoothWinUI3;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using static BluetoothProtocols.Nordic_Thingy;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -27,18 +29,49 @@ namespace BluetoothProtocols
             Pressure = double.NaN;
             Humidity = double.NaN;
             PM25 = double.NaN;
-            EventTime = DateTime.Now;
+            EventTime = DateTimeOffset.Now;
         }
-        public SensorDataRecord(double temperature, double pressure, double humidity)
+        public SensorDataRecord(double temperature, double pressure, double humidity, DateTimeOffset? eventTime)
         {
             Temperature = temperature;
             Pressure = pressure;
             Humidity = humidity;
             PM25 = double.NaN;
-            EventTime = DateTime.Now;
+            EventTime = eventTime ?? DateTimeOffset.Now;
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity;
         }
+        public SensorDataRecord(double temperature, double humidity, DateTimeOffset? eventTime)
+        {
+            Temperature = temperature;
+            Humidity = humidity;
+            PM25 = double.NaN;
+            EventTime = eventTime ?? DateTimeOffset.Now;
+            IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+        }
 
+
+        public void ExportHeaders(IExportData exporter)
+        {
+            exporter.HeadersSet(["Date", "Time", "Temperature", "Humidity", "PM25"]);
+        }
+
+        public void ExportRow(IExportData exporter)
+        {
+            exporter.RowStart();
+            exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+            exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+            exporter.CellSet(Temperature);
+            exporter.CellSet(Humidity);
+            exporter.CellSet(PM25);
+            exporter.RowEnd();
+        }
+
+
+
+        public const string TemperaturePropertyChangedName = "Temperature";
+        public const string PM25PropertyChangedName = "PM25";
+        public const string PressurePropertyChangedName = "Pressure";
+        public const string HumidityPropertyChangedName = "Humidity";
 
         // For the INPC INotifyPropertyChanged values
         public event PropertyChangedEventHandler PropertyChanged;
@@ -46,8 +79,20 @@ namespace BluetoothProtocols
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        private DateTime _EventTime;
-        public DateTime EventTime { get { return _EventTime; } set { if (value == _EventTime) return; _EventTime = value; OnPropertyChanged(); } }
+        // Uggg -- this is not set correctly? Should be set from the value in the stack,
+        // which is more accurate.
+        private DateTimeOffset _EventTime;
+        public DateTimeOffset EventTime { get { return _EventTime; } 
+            set { if (value == _EventTime) return; _EventTime = value; 
+                OnPropertyChanged(); 
+                OnPropertyChanged("TimestampMostRecent"); 
+                OnPropertyChanged("TimestampMostRecentDT");  
+            } 
+        }
+
+        public DateTimeOffset TimestampMostRecent {  get { return EventTime; } }
+        public DateTime TimestampMostRecentDT { get { return TimestampMostRecent.DateTime; } }
+
 
         private double _Temperature;
         /// <summary>

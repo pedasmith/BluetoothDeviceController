@@ -1,5 +1,5 @@
 using BluetoothProtocols;
-using BluetoothProtocols.NS_Nordic_Thingy;
+using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -26,23 +26,9 @@ namespace BluetoothWinUI3;
 #endif
 
 
-public static class Environment_DataUtilities
-{
-    /// <summary>
-    /// Returns true when the data has valid pressure, humidity data. Can't detect when the temperature is invalid
-    /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    public static bool IsValidPH(this Nordic_Thingy.Environment_Data data)
-    {
-        // 0.0 is a valid temperature :-(
-        var retval = (data.Pressure != 0.0 && data.Humidity!= 0.0);
-        return retval;
-    }
-}
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControlBasic, IDeviceControlDevice
+public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceControlBasic, IDeviceControlDevice, IHandleMyBTAdvertisements
 {
 
     /// <summary>
@@ -51,39 +37,35 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
 
-
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "Nordic_Thingy";
-    Nordic_Thingy Device;
+    private readonly string InternalDeviceType = "Govee_Environmental";
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public Environment_DataCollection HistoricalEnvironment_DataUnits { get;  } = new Environment_DataCollection();
+    public GoveeCollection HistoricalGoveeUnits { get; } = new GoveeCollection();
     /// <summary>
     /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
     /// always in the 'native' units (e.g., always celcius for temperature).
     /// </summary>
-    Nordic_Thingy.Environment_Data CurrEnvironment_Data = null;
+    Govee CurrGovee = null;
 
     /// <summary>
-    /// Similar to CurrEnvironment_Data , but the values are converted to the user's preferred units. 
-    /// This is what gets added to the HistoricalEnvironment_DataUnits collection.
+    /// Similar to CurrGoveeData , but the values are converted to the user's preferred units. 
+    /// This is what gets added to the HistoricalGoveeUnits collection.
     /// </summary>
-    Nordic_Thingy.Environment_Data CurrEnvironment_DataUnits = null;
-    Nordic_Thingy.Battery_Data CurrBattery_Data = null;
-    Nordic_Thingy.EnvironmentColor_Data CurrEnvironmentColor_Data = null;
+    Govee CurrGoveeUnits = null;
 
 
 
 
-    public BTNordic_ThingyControl()
+    public BTGovee_EnvironmentalControl()
     {
         InitializeComponent();
-        this.Loaded += BTNordic_ThingyControl_Loaded;
-        this.DataContextChanged += BTNordic_ThingyControl_DataContextChanged;
+        this.Loaded += BTGovee_EnvironmentalControl_Loaded;
+        this.DataContextChanged += BTGovee_EnvironmentalControl_DataContextChanged;
 
         //
         // Set up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
@@ -93,7 +75,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             if (series is LineSeries lineSeries)
             {
-                lineSeries.ItemsSource = HistoricalEnvironment_DataUnits.Data; //DOC:
+                lineSeries.ItemsSource = HistoricalGoveeUnits.Data; //DOC:
             }
         }
         uiOxyPlot.Model = OxyPlotModel;
@@ -132,28 +114,17 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     }
 
 
-    private void BTNordic_ThingyControl_Loaded(object sender, RoutedEventArgs e)
+    private void BTGovee_EnvironmentalControl_Loaded(object sender, RoutedEventArgs e)
     {
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         if (uiTableView.ItemsSource != null) return;
-        uiTableView.ItemsSource = HistoricalEnvironment_DataUnits.Data;
+        uiTableView.ItemsSource = HistoricalGoveeUnits.Data;
     }
 
-    private Nordic_Thingy.Environment_Data CopyAndUpdateUnits(Nordic_Thingy.Environment_Data source, Nordic_Thingy.Environment_Data dest)
-    {
-        dest ??= source.Clone();
-        dest.TimestampMostRecent = source.TimestampMostRecent;
-        dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(source.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
-        dest.Pressure = BluetoothWatcher.Units.Pressure.Convert(source.Pressure, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
-        dest.Humidity = source.Humidity; // Humidity is always in percent, so no conversion needed.
-        dest.eCOS = source.eCOS;
-        dest.TVOC = source.TVOC;
-        return dest;
-    }
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    public List<string> LineNames { get { return [ "Temperature", "Pressure", "Humidity", "eCOS", "TVOC" ]; } }
+    public List<string> LineNames { get { return ["Temperature", "Humidity", "PM25", ]; } }
 
     public KnownDevice DataContextAsKnownDevice { get { return DataContext as KnownDevice; } }
 
@@ -163,50 +134,30 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     {
         Title = "Environment Data",
         PlotAreaBorderColor = OxyColors.Transparent,
-        TextColor = OxyColors.Black, 
+        TextColor = OxyColors.Black,
         Axes =
             {
                 new DateTimeAxis { Position = AxisPosition.Bottom },
                 new LinearAxis
                 {
                     Position = AxisPosition.Left,
-                    PositionTier = 0, // PositionTier=0 is the innermost tier. //DOC:
-                    MajorGridlineColor = OxyColors.Black,
-                    MajorGridlineStyle = LineStyle.Solid,
-                    MajorGridlineThickness = 1,
-                    MajorStep = 10, // 1 hpa
-                    MinimumRange= 30,
-                    Title="Pressure",
-                    Key="Pressure"
-                },
-                new LinearAxis
-                {
-                    Position = AxisPosition.Left,
-                    PositionTier = 1,
+                    PositionTier = 0,
                     Title="Temperature",
                     Key="Temperature"
                 },
                 new LinearAxis
                 {
                     Position = AxisPosition.Left,
-                    PositionTier = 2,
+                    PositionTier = 1,
                     Title="Humidity",
                     Key="Humidity"
                 },
                 new LinearAxis
                 {
                     Position = AxisPosition.Right,
-                    PositionTier = 0,
-                    Minimum = 380, // Initial eCOS is zero, which isn't a realistic value. An actual sensor reading is always 400 or more?
-                    Title="eCOS",
-                    Key="eCOS"
-                },
-                new LinearAxis
-                {
-                    Position = AxisPosition.Right,
                     PositionTier = 1,
-                    Title="TVOC",
-                    Key="TVOC"
+                    Title="PM25",
+                    Key="PM25"
                 },
             },
         Series =
@@ -223,16 +174,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 },
                 new LineSeries
                 {
-                    Title = "Pressure",
-                    Color = OxyColors.LightBlue,
-                    StrokeThickness = 0.75,
-                    MarkerType = MarkerType.None,
-                    DataFieldX = "TimestampMostRecentDT",
-                    DataFieldY = "Pressure",
-                    YAxisKey= "Pressure",
-                },
-                new LineSeries
-                {
                     Title = "Humidity",
                     Color = OxyColors.Violet,
                     StrokeThickness = 0.75,
@@ -243,23 +184,13 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 },
                 new LineSeries
                 {
-                    Title = "eCOS",
-                    Color = OxyColors.Black,
-                    StrokeThickness = 0.75,
-                    MarkerType = MarkerType.None,
-                    DataFieldX = "TimestampMostRecentDT",
-                    DataFieldY = "eCOS",
-                    YAxisKey= "eCOS",
-                },
-                new LineSeries
-                {
-                    Title = "TVOC",
+                    Title = "PM25",
                     Color = OxyColors.Gray,
                     StrokeThickness = 0.75,
                     MarkerType = MarkerType.None,
                     DataFieldX = "TimestampMostRecentDT",
-                    DataFieldY = "TVOC",
-                    YAxisKey= "TVOC",
+                    DataFieldY = "PM25",
+                    YAxisKey= "PM25",
                 },
             }
     };
@@ -303,7 +234,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
     /// used by other bits of the system.
     /// </summary>
-    private async void BTNordic_ThingyControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    private async void BTGovee_EnvironmentalControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
         // FYI: by the time this method is called, the DataContext is already set
 
@@ -316,20 +247,24 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             return;
         }
 
-        uiAddress.Text = BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr);
+        uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
 
-        Device = new Nordic_Thingy()
-        {
-            ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
-        };
-        if (Device.ble == null)
-        {
-            Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
-            return;
-        }
+        // In the Nordic_Thingy, setting the DataContext to a KnownDevice is the trigger
+        // for connecting via BluetoothLE to a device. But this Govee display is driven entirely by advertisements,
+        // and the device is not needed.
+        //Device = new Nordic_Thingy()
+        //{
+        //    ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
+        //};
+        //if (Device.ble == null)
+        //{
+        //    Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString//(DataContextAsKnownDevice.Advertisement.Addr)}");
+        //    return;
+        //}
+
         // It's critical to set these!
-        DataContextAsKnownDevice.Id = Device.ble.DeviceId ?? ""; // never null :-)
-        DataContextAsKnownDevice.BTLEDevice = Device.ble;
+        DataContextAsKnownDevice.Id = DataContextAsKnownDevice.Advertisement.AddressAsString; //  Device.ble.DeviceId ?? ""; // never null :-)
+        //DataContextAsKnownDevice.BTLEDevice = Device.ble;
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
@@ -342,21 +277,13 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             UpdateUX(saveData);
         }
 
-
-        Device.PropertyChanged += Device_PropertyChanged;
-        await Device.NotifyBatteryLevelAsync();
-        await Device.NotifyTemperature_cAsync();
-        await Device.NotifyPressure_hpaAsync();
-        await Device.NotifyHumidityAsync();
-        await Device.NotifyAir_Quality_eCOS_TVOCAsync(); // both TVOC and eCOS
-        await Device.NotifyColor_RGB_ClearAsync();
-        await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
-
+        // Initialize data values
+        HandleMyAdvertisement(DataContextAsKnownDevice.Advertisement);
     }
 
     public IDeviceControlBasic.Visibility GetDataGridVisibility()
     {
-        var retval = (uiDataGridPanel.Visibility == Visibility.Visible) 
+        var retval = (uiDataGridPanel.Visibility == Visibility.Visible)
             ? IDeviceControlBasic.Visibility.Visible : IDeviceControlBasic.Visibility.Collapsed;
         return retval;
     }
@@ -388,7 +315,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             if (series is LineSeries lineSeries)
             {
                 var name = lineSeries.DataFieldY;
-                if (!String.IsNullOrEmpty(name)) 
+                if (!String.IsNullOrEmpty(name))
                 {
                     if (lineSeries.Color != OxyColors.Automatic
                         && lineSeries.Color != OxyColors.Undefined)
@@ -480,8 +407,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     {
         CurrUserPrefs = newPrefs;
 
-        // Update the saved data in the HistoricalEnvironment_DataUnits to match the new user preferences.
-        foreach (var data in HistoricalEnvironment_DataUnits.Data)
+        // Update the saved data in the HistoricalGoveeUnits to match the new user preferences.
+        foreach (var data in HistoricalGoveeUnits.Data)
         {
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
@@ -493,7 +420,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             }
         }
 
-        UpdateGraphData(""); // all of them.
+        UpdateGraphData(""); // the graph is changed, but not the data
     }
 
     /// <summary>
@@ -533,6 +460,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         Console.WriteLine(str);
     }
 
+#if NEVER_EVER_DEFINED
     private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         UIThreadHelper.CallOnUIThread(() =>
@@ -543,94 +471,65 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             }
         });
     }
-
+#endif
 
     Dictionary<string, int> NPropertyChanges { get; } = [];
     //List<string> Sparkles = new List<string>() { "\u00A0", "*" }; // ✨", "💫", "🌟", "⚡", "🔥", "💥" };
-    readonly List<string> Sparkles = [ "╺", "╼", "╾", "╸", "╾", "╼" ]; 
+    readonly List<string> Sparkles = ["╺", "╼", "╾", "╸", "╾", "╼"];
 
     private void UpdateSparkles(string name)
     {
-        // In practice, name is never "*". The code is set up this way to match the Govee code.
         if (name == "") return;
         NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
 
-
-        if (name == Nordic_Thingy.Temperature_cPropertyChangedName ||  name == "*")
+        if (name == SensorDataRecord.TemperaturePropertyChangedName || name == "*")
         {
-            uiTemperature_cChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-        } 
-        if (name == Nordic_Thingy.Pressure_hpaPropertyChangedName ||  name == "*")
-        {
-            uiPressure_hpaChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+            uiTemperatureChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
         }
-        if (name == Nordic_Thingy.HumidityPropertyChangedName ||  name == "*")
+        if (name == SensorDataRecord.PM25PropertyChangedName || name == "*")
+        {
+            uiPM25Change.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+        }
+        if (name == SensorDataRecord.HumidityPropertyChangedName || name == "*")
         {
             uiHumidityChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
         }
-        if (name == Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName ||  name == "*")
-        {
-            uieCOSChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-            uiTVOCChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-        }
-        if (name == Nordic_Thingy.Color_RGB_ClearPropertyChangedName ||  name == "*")
-        {
-            uiColorChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-        }
-
     }
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
-    /// needs to be updated.
+    /// needs to be updated. For the Govee, there's never just one piece of data; we either get it all 
+    /// or just the one.
     /// </summary>
     /// <param name="name"></param>
     private void UpdateGraphData(string name)
     {
-        if (Device == null) return;
-        CurrBattery_Data = Device.CurrBattery_Data;
-        CurrEnvironment_Data = Device.CurrEnvironment_Data;
-        CurrEnvironmentColor_Data = Device.CurrEnvironmentColor_Data;
+        if (CurrGovee == null) return;
 
         // name is from e.PropertyName when the Device does a PropertyChanged.
 
         UpdateSparkles(name);
 
-        // Update to match the current preferred units. Will create a new CurrEnvironment_DataUnits the first time
+        // Update to match the current preferred units. Will create a new CurrGoveeUnits the first time
         // it's called
-        CurrEnvironment_DataUnits = CopyAndUpdateUnits(CurrEnvironment_Data, CurrEnvironment_DataUnits);
+        CurrGoveeUnits = Govee.CopyAndUpdateUnits(CurrGovee, CurrGoveeUnits, CurrUserPrefs);
 
-        // Update this historical data; this will automatically update the table and graph.
-        //
-        // There's two kinds of sensors: ones like the Nordic_Thingy that send each bit of data separately,
-        // and ones that send all the data at once (like the Govee). 
-        //
         // Track the historical data
         switch (name)
         {
-            case "*": // never used, but here so it matches the Govee code.
-            case Nordic_Thingy.Temperature_cPropertyChangedName:
-            case Nordic_Thingy.Pressure_hpaPropertyChangedName:
-            case Nordic_Thingy.HumidityPropertyChangedName:
-            case Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName:
-                //
-                // Don't add to the CurrEnvironment until we P+T+H data (technically, we don't check T)
-                // That's because otherwise the graph tries to include 0  pressure on the pressure line
-                // which looks really weird.
-                // It would be OK to add for the table, but I'm willing to give that up in order to 
-                // make the graph better.
-                if (!CurrEnvironment_Data.IsValidPH())
-                {
-                    break;
-                }
-
-                var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_DataUnits.TimestampMostRecentAdd).TotalSeconds;
-                var verb = (deltaInSeconds > 5) ? Environment_DataCollection.Verb.Add : Environment_DataCollection.Verb.ReplaceMostRecent;
-                HistoricalEnvironment_DataUnits.Update(CurrEnvironment_DataUnits, verb); // Will add or replace the data and will copy as needed.
+            case "*": // All the data changed. This is what always happens with the govee.
+            case SensorDataRecord.TemperaturePropertyChangedName:
+            case SensorDataRecord.PM25PropertyChangedName:
+            case SensorDataRecord.HumidityPropertyChangedName:
+                // Unlike the Nordic_Thingy52 where the different values come in at different
+                // time, the Govee comes in all at once.
+                var deltaInSeconds = CurrGovee.TimestampMostRecent.Subtract(HistoricalGoveeUnits.TimestampMostRecentAdd).TotalSeconds;
+                var verb = (deltaInSeconds > 5) ? GoveeCollection.Verb.Add : GoveeCollection.Verb.ReplaceMostRecent;
+                HistoricalGoveeUnits.Update(CurrGoveeUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
                 // Update the OxyPlot because it doesn't tracked the INotifyCollectionChanged
                 //
-                if (verb == Environment_DataCollection.Verb.Add && HistoricalEnvironment_DataUnits.Count == 2)
+                if (verb == GoveeCollection.Verb.Add && HistoricalGoveeUnits.Count == 2)
                 {
                     // DOC: Can't have the axes start off invisible because then they can't be switched back on
                     if (CurrWindowSize == MainWindow.WindowSize.Normal)
@@ -643,42 +542,26 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 break;
         }
 
-        //
-        // Update the text values on the screen.
-        //
 
-        if (CurrBattery_Data != null)
-        {
-            if (name == "BatteryLevel" || name == "")
-            {
-                uiBTConnectionControl.SetBatteryLevel(CurrBattery_Data.BatteryLevel);
-            }
-        }
 
-        if (CurrEnvironment_Data != null)
+        if (CurrGovee != null)
         {
-            if (name == Nordic_Thingy.Temperature_cPropertyChangedName || name == "")
+            if (name == SensorDataRecord.TemperaturePropertyChangedName || name == "" || name == "*")
             {
-                uiTemperature_c.Text = BluetoothWatcher.Units.Temperature.AsString(CurrEnvironment_DataUnits.Temperature, CurrUserPrefs.Temperature);
+                uiTemperature.Text = BluetoothWatcher.Units.Temperature.AsString(CurrGoveeUnits.Temperature, CurrUserPrefs.Temperature);
             }
-            if (name == Nordic_Thingy.Pressure_hpaPropertyChangedName || name == "")
+            if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
             {
-                uiPressure_hpa.Text = BluetoothWatcher.Units.Pressure.AsString(CurrEnvironment_DataUnits.Pressure, CurrUserPrefs.Pressure);
+                uiPM25.Text = CurrGovee.PM25.ToString("0.0");
             }
-            if (name == Nordic_Thingy.HumidityPropertyChangedName || name == "")
+            if (name == SensorDataRecord.HumidityPropertyChangedName || name == "" || name == "*")
             {
-                uiHumidity.Text = CurrEnvironment_Data.Humidity.ToString("0.0") + "%";
+                uiHumidity.Text = CurrGovee.Humidity.ToString("0.0") + "%";
             }
-            if (name == Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName || name == "")
+            if (name == "BatteryLevel" || name == "BatteryInPercent" || name == "" || name == "*") // TODO: which is right?
             {
-                uieCOS.Text = CurrEnvironment_Data.eCOS.ToString("0.0");
-                uiTVOC.Text = CurrEnvironment_Data.TVOC.ToString("0.0");
-            }
-            if (name == Nordic_Thingy.Color_RGB_ClearPropertyChangedName || name == "")
-            {
-                var RGB = new SolidColorBrush(Windows.UI.Color.FromArgb(255, (byte)CurrEnvironmentColor_Data.Red, (byte)CurrEnvironmentColor_Data.Green, (byte)CurrEnvironmentColor_Data.Blue));
-                uiColor.Background = RGB; //TODO: and the 'clear' value?
-            }
+                uiBTConnectionControl.SetBatteryLevel(CurrGovee.BatteryInPercent);
+            }       
         }
     }
 
@@ -690,8 +573,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// <returns></returns>
     public IDeviceControlBasic.UXCapabilities GetUXCapabilities()
     {
-        var retval = 
-            IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng 
+        var retval =
+            IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
             | IDeviceControlBasic.UXCapabilities.CanGetData
             | IDeviceControlBasic.UXCapabilities.CanRename
             | IDeviceControlBasic.UXCapabilities.CanShowTable
@@ -745,7 +628,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     public string ExportData(IExportData exporter)
     {
         string retval = "";
-        var data = HistoricalEnvironment_DataUnits.Data;
+        var data = HistoricalGoveeUnits.Data;
         if (data.Count == 0)
         {
             Log("No data to export.");
@@ -757,10 +640,28 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             row.ExportRow(exporter);
         }
         var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        retval = exporter.Export($"Data from {Device.Name} at {now}");
+        retval = exporter.Export($"Data from {name} at {now}");
         return retval;
     }
 
-    #endregion 
+    string name = "Govee";
+    public void HandleMyAdvertisement(WatcherData data)
+    {
+        UIThreadHelper.CallOnUIThread(() =>
+        {
+            if (this.IsLoaded) // Won't be loaded when we exit the app!
+            {
+                name = data.CompleteLocalName;
+                Govee.SensorType sensorType = Govee.SensorType.H5075; // TODO: make this dynamic!
+                CurrGovee = Govee.Parse(sensorType, data, CurrGovee);
+                CurrGovee.EventTime = data.OriginalArgs.Timestamp;
 
-} // end of class BTNordic_ThingyControl
+                UpdateGraphData("*"); // Update all the data!
+            }
+        });
+
+    }
+
+    #endregion
+
+} // end of class BTGovee_EnvironmentalControl

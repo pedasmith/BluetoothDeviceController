@@ -47,7 +47,7 @@ namespace BluetoothWinUI3
         /// Returns the KnownDevice associated with the device
         /// </summary>
         /// <returns></returns>
-        KnownDevice KnownDeviceFromDataContext { get;  }
+        KnownDevice DataContextAsKnownDevice { get;  }
 
         /// <summary>
         /// Get the list of graph name (e.g., "Temperature", "Pressure", "Humidity". This will be used by

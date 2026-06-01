@@ -46,6 +46,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         public static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()
         {
             new SupportedDevice("Thingy*", typeof(BTNordic_ThingyControl)),
+            new SupportedDevice("GVH5075_*", typeof(BTGovee_EnvironmentalControl)),
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {
