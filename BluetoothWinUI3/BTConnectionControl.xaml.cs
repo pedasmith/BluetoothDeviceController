@@ -95,7 +95,7 @@ namespace BluetoothWinUI3
         {
             CurrWatcherData = data;
             CurrLEDevice = null;
-            uiStatus.Text = $"Selected {CurrWatcherData.AddressAsString} {CurrWatcherData.CompleteLocalName}";
+            uiStatus.Text = $"Selected {CurrWatcherData.AddressAsString} {CurrWatcherData.BestName}";
             CurrState = ConnectionState.FoundViaAdvertisement; // will trigger events
         }
 

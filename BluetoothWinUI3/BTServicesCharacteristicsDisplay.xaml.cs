@@ -50,11 +50,11 @@ namespace BluetoothWinUI3
             switch (e.NewConnectionState)
             {
                 case BTConnectionControl.ConnectionState.Connecting:
-                    uiDeviceDetailsTextBlock.Text = $"Connecting to {e.CurrWatcherData.AddressAsString} {e.CurrWatcherData.CompleteLocalName}";
+                    uiDeviceDetailsTextBlock.Text = $"Connecting to {e.CurrWatcherData.AddressAsString} {e.CurrWatcherData.BestName}";
                     ShowDetail(DetailPane.DeviceDetails);
                     break;
                 case BTConnectionControl.ConnectionState.ConnectionFailed:
-                    uiDeviceDetailsTextBlock.Text = $"Unable to connect to {e.CurrWatcherData.AddressAsString} {e.CurrWatcherData.CompleteLocalName}";
+                    uiDeviceDetailsTextBlock.Text = $"Unable to connect to {e.CurrWatcherData.AddressAsString} {e.CurrWatcherData.BestName}";
                     break;
                 case BTConnectionControl.ConnectionState.Connected:
                     // Connected, so let's grab data from the device
@@ -234,7 +234,7 @@ namespace BluetoothWinUI3
         {
             var data = sender.SelectedItem as WatcherData;
             if (data == null) return;
-            Log($"OnAdvertisementSelected: selected={data.AddressAsString} name={data.CompleteLocalName}");
+            Log($"OnAdvertisementSelected: selected={data.AddressAsString} name={data.BestName}");
             if ( CurrWatcherData != null && CurrWatcherData.Addr == data.Addr)
             {
                 return;
@@ -281,7 +281,7 @@ namespace BluetoothWinUI3
                 DeviceDetailsLog($"Unable to get services for {CurrWatcherData.AddressAsString}. Reason: {services.Status}");
                 return;
             }
-            uiDeviceDetailsTextBlock.Text = $"Services for {CurrWatcherData.AddressAsString} {CurrWatcherData.CompleteLocalName}\n\n";
+            uiDeviceDetailsTextBlock.Text = $"Services for {CurrWatcherData.AddressAsString} {CurrWatcherData.BestName}\n\n";
 
             var nameDeviceList = new NameAllBleDevices();
             var nameDevice = new NameDevice();
@@ -415,7 +415,7 @@ namespace BluetoothWinUI3
                 Log($"Unable to get services for {CurrWatcherData.AddressAsString}. Reason: {services.Status}");
                 return;
             }
-            uiDeviceDetailsTextBlock.Text = $"Services for {CurrWatcherData.AddressAsString} {CurrWatcherData.CompleteLocalName}\n\n";
+            uiDeviceDetailsTextBlock.Text = $"Services for {CurrWatcherData.AddressAsString} {CurrWatcherData.BestName}\n\n";
 
             var nameDeviceList = new NameAllBleDevices();
             var nameDevice = new NameDevice();

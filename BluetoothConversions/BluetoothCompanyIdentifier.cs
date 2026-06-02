@@ -27,6 +27,10 @@ namespace BluetoothConversions
         {
             switch (companyId)
             {
+				// Hand-entered values
+                case 0xEC88: /* 60552 */ return "Govee Intellirocks";
+
+
                 //Examples
                 //case 0: return "Ericsson Technology Licensing";
                 //case 1: return "Nokia Mobile Phones";
@@ -35,7 +39,7 @@ namespace BluetoothConversions
                 // url:https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
                 // file:company_identifiers.yaml
                 // startupdatefile:
-				case 0x10CC: /* 4300 */ return "Linde GmbH";
+                case 0x10CC: /* 4300 */ return "Linde GmbH";
 				case 0x10CB: /* 4299 */ return "The90, Inc.";
 				case 0x10CA: /* 4298 */ return "FairPhone B.V";
 				case 0x10C9: /* 4297 */ return "Tractian Technologies Inc.";

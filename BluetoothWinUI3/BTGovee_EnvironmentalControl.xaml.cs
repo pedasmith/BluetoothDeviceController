@@ -11,7 +11,7 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-
+using System.Linq;
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
@@ -59,6 +59,10 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
     Govee CurrGoveeUnits = null;
 
 
+    /// <summary>
+    /// There are multiple Govee sensors that this one control can handle.
+    /// </summary>
+    Govee.SensorType GoveeSensorType = Govee.SensorType.NotGovee; // Initialize as not a Govee at all.
 
 
     public BTGovee_EnvironmentalControl()
@@ -120,11 +124,12 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
         // attached to somewhere else (e.g., when the control is made large and then small)
         if (uiTableView.ItemsSource != null) return;
         uiTableView.ItemsSource = HistoricalGoveeUnits.Data;
+        uiDeviceName.Text = "Govee " + GoveeSensorType.ToString();
     }
 
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    public List<string> LineNames { get { return ["Temperature", "Humidity", "PM25", ]; } }
+    public List<string> LineNames { get { return ["Temperature", "Humidity", "PM25",]; }  }
 
     public KnownDevice DataContextAsKnownDevice { get { return DataContext as KnownDevice; } }
 
@@ -278,6 +283,7 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
         }
 
         // Initialize data values
+        GoveeSensorType = Govee.AdvertIsGovee(DataContextAsKnownDevice.Advertisement);
         HandleMyAdvertisement(DataContextAsKnownDevice.Advertisement);
     }
 
@@ -426,8 +432,6 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
     /// <summary>
     /// Standard: the normal way to resize the control. 
     /// </summary>
-    /// <param name="windowSize"></param>
-    /// <param name="largeActualSize"></param>
 
     public void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize)
     {
@@ -645,21 +649,56 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
     }
 
     string name = "Govee";
+    bool FirstCallWithIsValid = true;
     public void HandleMyAdvertisement(WatcherData data)
     {
         UIThreadHelper.CallOnUIThread(() =>
         {
             if (this.IsLoaded) // Won't be loaded when we exit the app!
             {
-                name = data.CompleteLocalName;
-                Govee.SensorType sensorType = Govee.SensorType.H5075; // TODO: make this dynamic!
-                CurrGovee = Govee.Parse(sensorType, data, CurrGovee);
-                CurrGovee.EventTime = data.OriginalArgs.Timestamp;
+                name = data.BestName;
+                CurrGovee = Govee.Parse(GoveeSensorType, data, CurrGovee);
+                if (CurrGovee == null)
+                {
+                    Log($"ERROR: unable to parse Govee data for sensor type {GoveeSensorType}");
+                    return;
+                }
+                CurrGovee.EventTime = data.MostRecentAdvertisement.Timestamp;
+                if (CurrGovee.IsValid)
+                {
+                    if (FirstCallWithIsValid)
+                    {
+                        // Only display valid values
+                        int row = 0;
+                        int col = 0;
+                        // These must be in the same order they they should be visible in
+                        AdjustSensor(uiSensorTemperature, SensorDataRecord.SensorPresent.Temperature, ref row, ref col);
+                        AdjustSensor(uiSensorHumidity, SensorDataRecord.SensorPresent.Humidity, ref row, ref col);
+                        AdjustSensor(uiSensorPM25, SensorDataRecord.SensorPresent.PM25, ref row, ref col);
+                        AdjustSensor(uiSensorPressure, SensorDataRecord.SensorPresent.Pressure, ref row, ref col);
 
-                UpdateGraphData("*"); // Update all the data!
+                        FirstCallWithIsValid = false;
+                    }
+                    // Lots of reasons it might be invalid
+                    UpdateGraphData("*"); // Update all the data!
+                }
             }
         });
 
+    }
+
+    private void AdjustSensor(Panel panel, SensorDataRecord.SensorPresent flag, ref int row, ref int col)
+    {
+        if (CurrGovee.IsSensorPresent.HasFlag(flag)) // e.g., SensorDataRecord.SensorPresent.Temperature
+        {
+            Grid.SetRow(panel, row); // panel is e.g., uiSensorTemperature
+            Grid.SetColumn(panel, col++);
+            if (col >= 3) { row++; col = 0; }
+        }
+        else
+        {
+            panel.Visibility = Visibility.Collapsed;
+        }
     }
 
     #endregion

@@ -32,7 +32,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         public Type FactoryInterface { get; set; } = null;
         public bool Matches(WatcherData advertisement)
         {
-            var name = advertisement.CompleteLocalName;
+            var name = advertisement.BestName;
             var retval = name.StarMatch(MatchingName);
             return retval;
         }
@@ -46,11 +46,12 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         public static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()
         {
             new SupportedDevice("Thingy*", typeof(BTNordic_ThingyControl)),
+            new SupportedDevice("Govee_H5074_*", typeof(BTGovee_EnvironmentalControl)),
             new SupportedDevice("GVH5075_*", typeof(BTGovee_EnvironmentalControl)),
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {
-            var name = advertisement.CompleteLocalName;
+            var name = advertisement.BestName;
             foreach (var device in Devices)
             {
                 if (device.Matches(advertisement))

@@ -82,10 +82,10 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public static SensorType AdvertIsGovee(WatcherData wrapper)
         {
-            var retval = NameToSensorType(wrapper.CompleteLocalName);
-            if (retval == SensorType.NotGovee && wrapper.OriginalArgs != null)
+            var retval = NameToSensorType(wrapper.BestName);
+            if (retval == SensorType.NotGovee && wrapper.OriginalAdvertisement != null)
             {
-                retval = NameToSensorType(wrapper.OriginalArgs.Advertisement.LocalName);
+                retval = NameToSensorType(wrapper.OriginalAdvertisement.Advertisement.LocalName);
             }
             return retval;
         }
@@ -103,23 +103,45 @@ namespace BluetoothProtocols
         }
         /// <summary>
         /// Parses a BleAdvertisementWrapper and returns a Govee data record. Return might be null or might be Invalid.
+        /// The source will be overwritten! Null is never returned!
         /// </summary>
         /// <param name="wrapper"></param>
         /// <returns></returns>
         public static Govee Parse(SensorType sensorType, WatcherData wrapper, Govee source)
         {
-            if (sensorType == SensorType.NotGovee) return null;
-
-            Govee retval = null;
-            var ble = wrapper.OriginalArgs;
-            foreach (var section in ble.Advertisement.DataSections)
+            var retval = source ?? new Govee();
+            if (sensorType == SensorType.NotGovee)
             {
-                DataTypeValue dtv = ConvertDataTypeValue(section.DataType); // get the enum value
-                switch (dtv)
+                retval.IsValid = false;
+                return retval;
+            }
+
+            var ble = wrapper.OriginalAdvertisement;
+            if (ble != null)
+            {
+                foreach (var section in ble.Advertisement.DataSections)
                 {
-                    case DataTypeValue.ManufacturerData:
-                        retval = Parse(sensorType, section, source);
-                        break;
+                    DataTypeValue dtv = ConvertDataTypeValue(section.DataType); // get the enum value
+                    switch (dtv)
+                    {
+                        case DataTypeValue.ManufacturerData:
+                            retval = Parse(sensorType, section, source);
+                            break;
+                    }
+                }
+            }
+            ble = wrapper.ResponseAdvertisement;
+            if (ble != null)
+            {
+                foreach (var section in ble.Advertisement.DataSections)
+                {
+                    DataTypeValue dtv = ConvertDataTypeValue(section.DataType); // get the enum value
+                    switch (dtv)
+                    {
+                        case DataTypeValue.ManufacturerData:
+                            retval = Parse(sensorType, section, source);
+                            break;
+                    }
                 }
             }
 
@@ -135,9 +157,11 @@ namespace BluetoothProtocols
         /// <returns></returns>
         public static Govee Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section, Govee source)
         {
-            if (sensorType == SensorType.NotGovee) return null;
             var retval = source ?? new Govee();
             retval.TagType = sensorType;
+            retval.IsValid = false; // will be set true if the data is valid.
+
+            if (sensorType == SensorType.NotGovee) return retval;
 
             try
             {
@@ -184,6 +208,9 @@ namespace BluetoothProtocols
                     // At this point, we've read in two bytes from dr.
                     switch (sensorType)
                     {
+                        default:
+                            retval.IsValid = false;
+                            break;
                         case SensorType.H5074:
                             var junk = dr.ReadByte();
                             retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
@@ -191,6 +218,7 @@ namespace BluetoothProtocols
                             retval.Humidity = dr.ReadInt16() / 100.0;
                             retval.BatteryInPercent = dr.ReadByte();
                             retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk}) ";
+                            retval.IsValid = true;
                             break;
                         case SensorType.H5075:
                             var junk2 = dr.ReadByte();
@@ -205,6 +233,7 @@ namespace BluetoothProtocols
                             retval.Humidity = ((double)(value % 1000)) / 10.0;
                             retval.BatteryInPercent = dr.ReadByte();
                             retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk2}) ";
+                            retval.IsValid = true;
                             break;
                         case SensorType.H5106:
                             var junk3 = dr.ReadInt16();
@@ -215,6 +244,7 @@ namespace BluetoothProtocols
                             retval.Humidity = ((double)((value3 / 1_000) % 1000)) / 10.0;
                             retval.PM25 = (double)(value3 % 1_000);
                             retval.BatteryInPercent = 100.0; // it's line powered.
+                            retval.IsValid = true;
                             break;
                     }
                 }

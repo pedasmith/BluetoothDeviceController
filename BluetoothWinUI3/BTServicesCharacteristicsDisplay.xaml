@@ -35,8 +35,8 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{x:Bind TimeStampHHmmssfff}" MinWidth="80" Style="{StaticResource sDeviceListDataCompressed}" />
                                     <TextBlock Text="{x:Bind AddressAsString}" MinWidth="110" Style="{StaticResource sDeviceListDataCompressed}" />
-                                    <TextBlock Text="{x:Bind OriginalArgs.RawSignalStrengthInDBm}" MinWidth="20" Margin="4,0,0,0" Style="{StaticResource sDeviceListDataCompressed}" />
-                                    <TextBlock Text="{x:Bind CompleteLocalName}" Margin="4,0,0,0" Style="{StaticResource sDeviceListDataCompressedPrimary}" />
+                                    <TextBlock Text="{x:Bind MostRecentAdvertisement.RawSignalStrengthInDBm}" MinWidth="20" Margin="4,0,0,0" Style="{StaticResource sDeviceListDataCompressed}" />
+                                    <TextBlock Text="{x:Bind BestName}" Margin="4,0,0,0" Style="{StaticResource sDeviceListDataCompressedPrimary}" />
                                 </StackPanel>
                             </ItemContainer>
                         </DataTemplate>

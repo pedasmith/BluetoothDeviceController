@@ -117,7 +117,7 @@ namespace BluetoothWinUI3
     {
         // MARKDOWN: IImageProvider requires two methods, ShouldUseThisProvider() and GetImage()
 
-        AdvertisementWatcher AdvertisementWatcher = new AdvertisementWatcher();
+        AdvertisementWatcher AdvertisementWatcher = new AdvertisementWatcher(); // Wraps the BluetoothLEAdvertisementWatcher
         int NAdvertisements = 0;
         UserPreferences CurrUserPrefs = new UserPreferences();
 
@@ -258,6 +258,24 @@ namespace BluetoothWinUI3
                 }
 
                 // If this is a new advert, see if it's a known type
+
+                var known = KnownDevices.Get(e);
+                if (known == null) // not known (e.g.: this specific one hasn't been seen before in this session)
+                {
+                    var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
+                    if (supportedDevice != null)
+                    {
+                        var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
+                        AddControl(e, control, supportedDevice); // will add to KnownDevices and updated UX and ...
+                                                                 // a control is, e.g., a BTNordic_ThingyControl. AddControl will add to the Known Device list
+                    }
+                }
+                else if (known.Control is IHandleMyBTAdvertisements handleMy)
+                {
+                    handleMy.HandleMyAdvertisement(e);
+                }
+
+#if NEVER_EVER_DEFINED
                 var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
                 if (supportedDevice != null)
                 {
@@ -273,6 +291,7 @@ namespace BluetoothWinUI3
                         handleMy.HandleMyAdvertisement(e);
                     }
                 }
+#endif
 
                 foreach (var handler in BTAdvertisementHandlers)
                 {

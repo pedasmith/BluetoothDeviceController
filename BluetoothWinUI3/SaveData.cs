@@ -102,7 +102,7 @@ namespace BluetoothWinUI3
         public SaveData(KnownDevice knownDevice)
         {
             Id.AdvertisementAddress = knownDevice.Advertisement?.Addr ?? 0;
-            Id.AdvertisementName = knownDevice.Advertisement?.CompleteLocalName ?? "";
+            Id.AdvertisementName = knownDevice.Advertisement?.BestName ?? "";
             Id.ConnectAddress = knownDevice.BTLEDevice?.BluetoothAddress ?? 0;
             Id.ConnectName = knownDevice.BTLEDevice?.Name ?? "";
             Id.DeviceId = knownDevice.BTLEDevice?.DeviceId ?? "";

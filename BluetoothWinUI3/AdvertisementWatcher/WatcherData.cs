@@ -17,19 +17,21 @@ using static BluetoothConversions.BluetoothCompanyIdentifier;
 
 namespace BluetoothWatcher.AdvertismentWatcher
 {
- 
+
     /// <summary>
-    /// WatcherData is a super-summary of the data in the original Bluetooth advertisement. The original
-    /// is available as "OriginalArgs" (yeah, weird name). The fields are filled in in AdvertisementWatcher.
+    /// WatcherData is a super-summary of the data in the original Bluetooth advertisement + scan response. 
+    /// The original is available as "OriginalAdvertisement"; if there's a ScanResponse, it's in "ResponseAdvertisement".
+    /// 
+    /// The fields are filled in in AdvertisementWatcher.
     /// A key point is that a Bluetooth advertisement can optionally contain a bunch of fields; the
     /// AdvertisementWatcher will read in each field and then fill in the WatcherData as appropriate.
     /// </summary>
     public class WatcherData
     {
         /// <summary>
-        /// Advertisement CompleteLocalName (BT 0x09) or ""
+        /// Advertisement CompleteLocalName (BT 0x09) or ShortenedLocalName (BT 0x08) or ""
         /// </summary>
-        public String CompleteLocalName { get; set; } = "";
+        public String BestName { get; set; } = "";
         /// <summary>
         /// Parsed manufacturer data from ManufacturerData (BT 0xFF).
         /// </summary>
@@ -57,20 +59,23 @@ namespace BluetoothWatcher.AdvertismentWatcher
         /// <summary>
         /// ULONG version of the address. See AddressAsString for the nicely formatted version.
         /// </summary>
-        public ulong Addr {  get { return OriginalArgs?.BluetoothAddress ?? 0; } }
+        public ulong Addr {  get { return OriginalAdvertisement?.BluetoothAddress ?? 0; } }
         public string AddressAsString { get { return BluetoothAddress.AsString(Addr); } }
 
         public string TimeStampHHmmssfff
         {  
             get
             {
-                return OriginalArgs.Timestamp.ToString("HH:mm:ss.fff");
+                return MostRecentAdvertisement.Timestamp.ToString("HH:mm:ss.fff");
             } 
         }
         /// <summary>
         /// Original advertisement data
         /// </summary>
-        public BluetoothLEAdvertisementReceivedEventArgs OriginalArgs { get; set; }
+        public BluetoothLEAdvertisementReceivedEventArgs OriginalAdvertisement { get; set; }
+        public BluetoothLEAdvertisementReceivedEventArgs ResponseAdvertisement { get; set; }
+        public BluetoothLEAdvertisementReceivedEventArgs MostRecentAdvertisement
+            { get {  var retval = ResponseAdvertisement ?? OriginalAdvertisement; return retval;  } } 
 
         public enum AdvertisementStringFormat { Full, CanCompare, AddressOnly };
         public string ToStringFull(AdvertisementStringFormat format = AdvertisementStringFormat.Full)
@@ -81,28 +86,44 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 return BluetoothAddress.AsString(Addr);
             }
 
-            var ts = (format == AdvertisementStringFormat.Full) ? OriginalArgs.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.ff") : "NoTimeStamp";
+            var ts = (format == AdvertisementStringFormat.Full) ? MostRecentAdvertisement.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.ff") : "NoTimeStamp";
             var power = (format == AdvertisementStringFormat.Full)
-                ? $"{OriginalArgs.RawSignalStrengthInDBm},{OriginalArgs.TransmitPowerLevelInDBm}" : ",";
-            var ds = OriginalArgs.Advertisement.DataSections;
+                ? $"{MostRecentAdvertisement.RawSignalStrengthInDBm},{MostRecentAdvertisement.TransmitPowerLevelInDBm}" : ",";
+            var ds = MostRecentAdvertisement.Advertisement.DataSections;
             string flags = "";
-            if (OriginalArgs.IsAnonymous) flags += "+Anonymous";
-            if (OriginalArgs.IsConnectable) flags += "+Connectable";
-            if (OriginalArgs.IsScanResponse) flags += "+ScanResponse";
-            if (OriginalArgs.IsDirected) flags += "+Directed";
+            if (MostRecentAdvertisement.IsAnonymous) flags += "+Anonymous";
+            if (MostRecentAdvertisement.IsConnectable) flags += "+Connectable";
+            if (MostRecentAdvertisement.IsScanResponse) flags += "+ScanResponse";
+            if (MostRecentAdvertisement.IsDirected) flags += "+Directed";
             if (flags.Length > 0) flags = flags.Substring(1); // remove leading +
 
-            string retval = $"{ts},{BluetoothAddress.AsString(Addr)},{CompleteLocalName}";
+            string retval = $"{ts},{BluetoothAddress.AsString(Addr)},{BestName}";
 
-            retval += $",{OriginalArgs.BluetoothAddressType},{OriginalArgs.AdvertisementType},{flags},{power},{ds.Count()}";
-            foreach (var section in OriginalArgs.Advertisement.DataSections)
+            retval += $",{OriginalAdvertisement.BluetoothAddressType},{MostRecentAdvertisement.AdvertisementType},{flags},{power},{ds.Count()}";
+            if (OriginalAdvertisement != null)
             {
-                var dsname = AdvertisementSection_types.Decode(section.DataType);
-                switch (section.DataType)
+                foreach (var section in OriginalAdvertisement.Advertisement.DataSections)
                 {
-                    default:
-                        retval += $",{dsname} (0x{section.DataType:X02})={section.Data.ToSsv()}";
-                        break;
+                    var dsname = AdvertisementSection_types.Decode(section.DataType);
+                    switch (section.DataType)
+                    {
+                        default:
+                            retval += $",{dsname} (0x{section.DataType:X02})={section.Data.ToSsv()}";
+                            break;
+                    }
+                }
+            }
+            if (ResponseAdvertisement != null)
+            {
+                foreach (var section in ResponseAdvertisement.Advertisement.DataSections)
+                {
+                    var dsname = AdvertisementSection_types.Decode(section.DataType);
+                    switch (section.DataType)
+                    {
+                        default:
+                            retval += $",{dsname} (0x{section.DataType:X02})={section.Data.ToSsv()}";
+                            break;
+                    }
                 }
             }
             return retval;
@@ -114,12 +135,12 @@ namespace BluetoothWatcher.AdvertismentWatcher
         }
         public override string ToString()
         {
-            return $"{BluetoothAddress.AsString(Addr)} {CompleteLocalName} {ParsedCompanyDataTrim}";
+            return $"{BluetoothAddress.AsString(Addr)} {BestName} {ParsedCompanyDataTrim}";
         }
 
         public string ToStringDetails()
         {
-            var args = OriginalArgs;
+            var args = MostRecentAdvertisement;
             string retval = "";
             retval += $"Address: {BluetoothAddress.AsString(Addr)}\n";
             retval += $"Address type: {args.BluetoothAddressType}\n";
@@ -154,16 +175,33 @@ namespace BluetoothWatcher.AdvertismentWatcher
 
             // And now, data directly from the advertisement!
 
-            var adv = args.Advertisement;
-            foreach (var section in adv.DataSections)
+            var adv = OriginalAdvertisement?.Advertisement;
+            if (adv != null)
             {
-                sbyte txPower = (sbyte)(args.TransmitPowerLevelInDBm ?? 0);
-                var mtype = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-                var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, txPower, mtype, "");
-                //var dsname = AdvertisementSection_types.Decode(section.DataType);
-                //retval += $"Section: {dsname} (0x{section.DataType:X02})={section.Data.ToHex()}\n";
-                retval += str;
-            } 
+                foreach (var section in adv.DataSections)
+                {
+                    sbyte txPower = (sbyte)(args.TransmitPowerLevelInDBm ?? 0);
+                    var mtype = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
+                    var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, txPower, mtype, "");
+                    //var dsname = AdvertisementSection_types.Decode(section.DataType);
+                    //retval += $"Section: {dsname} (0x{section.DataType:X02})={section.Data.ToHex()}\n";
+                    retval += str;
+                }
+            }
+
+            adv = ResponseAdvertisement?.Advertisement;
+            if (adv != null)
+            {
+                foreach (var section in adv.DataSections)
+                {
+                    sbyte txPower = (sbyte)(args.TransmitPowerLevelInDBm ?? 0);
+                    var mtype = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
+                    var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, txPower, mtype, "");
+                    //var dsname = AdvertisementSection_types.Decode(section.DataType);
+                    //retval += $"Section: {dsname} (0x{section.DataType:X02})={section.Data.ToHex()}\n";
+                    retval += str;
+                }
+            }
 
             // 
             // Lastly: let's find special data like for Govee 

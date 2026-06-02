@@ -32,28 +32,45 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
-                        <RowDefinition Height="5" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}">
+                    
+                    <StackPanel Grid.Row="0" Grid.Column="0" x:Name="uiSensorTemperature">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Temperature</Run><Run Text="&#160;"/><Run x:Name="uiTemperatureChange" Text="┄"/>
-                    </TextBlock>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource sDevicePrimaryTitle}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTemperature"/></TextBlock>
+                        <Line Height="5" Tag="TemperatureColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="1" x:Name="uiSensorHumidity">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Humidity</Run><Run Text="&#160;"/><Run x:Name="uiHumidityChange" Text="┄"/>
-                    </TextBlock>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource sDevicePrimaryTitle}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
+                        <Line Height="5" Tag="HumidityColor" Style="{StaticResource sGraphLineKey}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="2" x:Name="uiSensorPM25">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>PM25</Run><Run Text="&#160;"/><Run x:Name="uiPM25Change" Text="┄"/>
-                    </TextBlock>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTemperature"/></TextBlock>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
-                    <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPM25"/></TextBlock>
-                    <Line Grid.Row="2" Grid.Column="0" Tag="TemperatureColor" Style="{StaticResource sGraphLineKey}" />
-                    <Line Grid.Row="2" Grid.Column="1" Tag="HumidityColor" Style="{StaticResource sGraphLineKey}"/>
-                    <Line Grid.Row="2" Grid.Column="2" Tag="PM25Color" Style="{StaticResource sGraphLineKey}" />
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPM25"/></TextBlock>
+                        <Line Height="5" Tag="PM25Color" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0" x:Name="uiSensorPressure">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Pressure</Run><Run Text="&#160;"/><Run x:Name="uiPressureChange" Text="┄"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPressure"/></TextBlock>
+                        <Line Height="5" Tag="PressureColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
                 </Grid>
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >

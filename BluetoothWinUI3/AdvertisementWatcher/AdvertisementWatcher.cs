@@ -27,6 +27,8 @@ namespace BluetoothWatcher.AdvertismentWatcher
         public void Start()
         {
             BleAdvertisementWatcher = new BluetoothLEAdvertisementWatcher();
+            BleAdvertisementWatcher.AllowExtendedAdvertisements = true;
+            BleAdvertisementWatcher.ScanningMode = BluetoothLEScanningMode.Active; // Required for Govee H5074
             BleAdvertisementWatcher.Received += BleAdvertisementWatcher_Received;
             BleAdvertisementWatcher.Start();
 
@@ -38,15 +40,30 @@ namespace BluetoothWatcher.AdvertismentWatcher
             BleAdvertisementWatcher.Received -= BleAdvertisementWatcher_Received;
             BleAdvertisementWatcher.Stop();
         }
+
+        Dictionary<ulong, WatcherData> OriginalAdvertisements = new Dictionary<ulong, WatcherData>();
+
         private void BleAdvertisementWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
             int filterLevel = -75;
-
-
-            var watcherData = new WatcherData()
+            WatcherData watcherData = null;
+            if (args.IsScanResponse)
             {
-                OriginalArgs = args,
-            };
+                OriginalAdvertisements.TryGetValue(args.BluetoothAddress, out watcherData);
+                if (watcherData != null) 
+                {
+                    watcherData.ResponseAdvertisement = args;
+                }
+            }
+            else
+            {
+                watcherData = new WatcherData()
+                {
+                    OriginalAdvertisement = args,
+                };
+                OriginalAdvertisements[args.BluetoothAddress] = watcherData;
+            }
+            if (watcherData == null) return; // got a rogue ScanResponse!
 
 
             // Convert the raw args to specialized args.
@@ -60,7 +77,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                         {
                             var dr = DataReader.FromBuffer(section.Data);
                             var (str, result) = DataReaderReadStringRobust.ReadStringEntire(dr);
-                            watcherData.CompleteLocalName = str + (dtv == AdvertisementDataSectionParser.DataTypeValue.ShortenedLocalName ? " (shortened)" : "");
+                            watcherData.BestName = str + (dtv == AdvertisementDataSectionParser.DataTypeValue.ShortenedLocalName ? " (shortened)" : "");
                         }
                         break;
 
@@ -89,7 +106,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
             if (watcherData.ManufacturerType != BluetoothCompanyIdentifier.CommonManufacturerType.Apple10)
             {
                 // don't bother spiting out apple data; there's much too much of it
-                System.Diagnostics.Debug.WriteLine($"Bluetooth Event: addr={BluetoothAddress.AsString(args.BluetoothAddress)} rx={args.RawSignalStrengthInDBm} tx={watcherData.TransmitPower}  txarg={args.TransmitPowerLevelInDBm} name={watcherData.CompleteLocalName} company {watcherData.CompanyId}={BluetoothCompanyIdentifier.GetBluetoothCompanyIdentifier(watcherData.CompanyId)} data={watcherData.ParsedCompanyDataTrim}");
+                System.Diagnostics.Debug.WriteLine($"Bluetooth Event: addr={BluetoothAddress.AsString(args.BluetoothAddress)} rx={args.RawSignalStrengthInDBm} tx={watcherData.TransmitPower}  txarg={args.TransmitPowerLevelInDBm} name={watcherData.BestName} company {watcherData.CompanyId}={BluetoothCompanyIdentifier.GetBluetoothCompanyIdentifier(watcherData.CompanyId)} data={watcherData.ParsedCompanyDataTrim}");
             }
 
             WatcherEvent?.Invoke(sender, watcherData); // Often the MainPage.BleWatcher_WatcherEvent
