@@ -3,6 +3,7 @@ using System.Runtime;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using Windows.Foundation.Diagnostics;
+using Windows.Networking.BackgroundTransfer;
 using Windows.Storage.Streams;
 
 #if NET8_0_OR_GREATER
@@ -83,6 +84,14 @@ namespace Utilities
         {
             return ReadString(dr, dr.UnconsumedBufferLength);
         }
+
+        public static (string, ReadStatus) ReadStringEntire(byte[] value)
+        {
+            var dr = DataReader.FromBuffer(value.AsBuffer());
+            return ReadString(dr, dr.UnconsumedBufferLength);
+        }
+
+
 
         /// <summary>
         /// Returns true if the buffer has control chars (bytes with vaules 0..31 and 127=DEL) including NUL.

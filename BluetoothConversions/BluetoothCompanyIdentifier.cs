@@ -4030,7 +4030,7 @@ namespace BluetoothConversions
 
         public enum CommonManufacturerType {  Other, Apple10, Govee, Microsoft, MicrosoftRome, Ruuvi, SwitchBot }
         public static (string result, CommonManufacturerType, UInt16 companyId, object specialty) 
-            ParseManufacturerData(BluetoothLEAdvertisementDataSection section, sbyte txPower, CommonManufacturerType parseAs)
+            ParseManufacturerData(BluetoothLEAdvertisementDataSection section, short rawSignalStrengthInDBm, sbyte txPower, CommonManufacturerType parseAs)
         {
             CommonManufacturerType manufacturerType = CommonManufacturerType.Other;
             UInt16 companyId = 0xFFFF;
@@ -4067,7 +4067,7 @@ namespace BluetoothConversions
                 switch (companyId)
                 {
                     case 0x004C: // Apple
-                        var appleIBeacon = Apple_IBeacon.Parse(section, txPower);
+                        var appleIBeacon = Apple_IBeacon.Parse(section, rawSignalStrengthInDBm, txPower);
                         if (appleIBeacon.IsValid)
                         {
                             sb.Append(appleIBeacon.ToString());
@@ -4190,7 +4190,7 @@ namespace BluetoothConversions
         /// <param name="section"></param>
         /// <param name="txPower"></param>
         /// <returns></returns>
-        public static CommonManufacturerType ParseManufacturerDataType(BluetoothLEAdvertisementDataSection section, sbyte txPower)
+        public static CommonManufacturerType ParseManufacturerDataType(BluetoothLEAdvertisementDataSection section, short rawSignalStrengthInDBm, sbyte txPower)
         {
             CommonManufacturerType manufacturerType = CommonManufacturerType.Other;
             UInt16 companyId; // Not need to initialize = 0xFFFF;
@@ -4218,7 +4218,7 @@ namespace BluetoothConversions
                         }
                         break;
                     case 0x004C: // Apple
-                        var appleIBeacon = Apple_IBeacon.Parse(section, txPower);
+                        var appleIBeacon = Apple_IBeacon.Parse(section, rawSignalStrengthInDBm, txPower);
                         if (appleIBeacon.IsValid)
                         {
                             ;

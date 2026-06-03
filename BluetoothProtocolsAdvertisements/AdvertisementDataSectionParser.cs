@@ -91,7 +91,7 @@ namespace BluetoothProtocols
             return db;
         }
 
-        public static (string result, BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType, UInt16 companyId) Parse(BluetoothLEAdvertisementDataSection section, sbyte txPower, BluetoothCompanyIdentifier.CommonManufacturerType parseAs, string indent)
+        public static (string result, BluetoothCompanyIdentifier.CommonManufacturerType manufacturerType, UInt16 companyId) Parse(BluetoothLEAdvertisementDataSection section, short rawSignalStrengthInDBm, sbyte txPower, BluetoothCompanyIdentifier.CommonManufacturerType parseAs, string indent)
         {
             string str = "??";
             byte b = section.DataType;
@@ -106,7 +106,7 @@ namespace BluetoothProtocols
                 switch (dtv)
                 {
                     case DataTypeValue.ManufacturerData: // 0xFF
-                        (str, manufacturerType, companyId, speciality) = BluetoothCompanyIdentifier.ParseManufacturerData(section, txPower, parseAs);
+                        (str, manufacturerType, companyId, speciality) = BluetoothCompanyIdentifier.ParseManufacturerData(section, rawSignalStrengthInDBm, txPower, parseAs);
                         str = str.TrimStart(); // The ParseCompanyData puts an indent in which I don't like.
                         break;
                     case DataTypeValue.Flags: // 0x01
@@ -249,8 +249,8 @@ namespace BluetoothProtocols
             return (str, manufacturerType, companyId);
         }
 
-
-        public static BluetoothCompanyIdentifier.CommonManufacturerType ParseManufacturerType(BluetoothLEAdvertisementDataSection section, sbyte txPower, string indent)
+#if NEVER_EVER_DEFINED
+        public static BluetoothCompanyIdentifier.CommonManufacturerType ParseManufacturerType(BluetoothLEAdvertisementDataSection section, short rawSignalStrengthInDBm, sbyte txPower, string indent)
         {
             byte b = section.DataType;
             DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value
@@ -260,7 +260,7 @@ namespace BluetoothProtocols
                 switch (dtv)
                 {
                     case DataTypeValue.ManufacturerData:
-                        manufacturerType = BluetoothCompanyIdentifier.ParseManufacturerDataType(section, txPower);
+                        manufacturerType = BluetoothCompanyIdentifier.ParseManufacturerDataType(section, rawSignalStrengthInDBm, txPower);
                         break;
                     default:
                         break;
@@ -271,7 +271,7 @@ namespace BluetoothProtocols
             }
             return manufacturerType;
         }
-
+#endif
 
         /// <summary>
         /// Gotta say, the flags data is pretty uninteresting. Maybe only show flags

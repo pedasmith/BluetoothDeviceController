@@ -1,4 +1,5 @@
 ﻿using System;
+using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 
@@ -15,7 +16,8 @@ namespace BluetoothProtocols
         public byte BeaconLen { get; set; }
         public bool IsValid { get { return BeaconType == IBeaconType && BeaconLen >= IBeaconLen; } }
         public bool IsApple10 { get { return BeaconType == ApplePhoneType; } }
-        public Guid BeaconGuid { get; set; }
+        public Guid BeaconGuid { get; internal set; }
+        public string BeaconGuidRobustString { get; internal set; } = "";
         public UInt16 Major { get; set; }
         public UInt16 Minor { get; set; }
         public sbyte MeasuredPower { get; set; }
@@ -42,7 +44,7 @@ namespace BluetoothProtocols
             }
         }
 
-        public static Apple_IBeacon Parse(BluetoothLEAdvertisementDataSection section, sbyte RSSI)
+        public static Apple_IBeacon Parse(BluetoothLEAdvertisementDataSection section, short rawSignalStrengthInDBm, sbyte txPower)
         {
             var retval = new Apple_IBeacon();
 
@@ -66,10 +68,22 @@ namespace BluetoothProtocols
                         byte[] guidBytes = new byte[16];
                         dr.ReadBytes(guidBytes);
                         retval.BeaconGuid = new Guid(guidBytes);
+                        // The Govee devices uses INTELLI_ROCKS_HW as their "GUID". If the
+                        // buffer is convertable to ASCII, show as ASCII
+                        var (guidstring, stringstatus) = DataReaderReadStringRobust.ReadStringEntire(guidBytes);
+                        switch (stringstatus)
+                        {
+                            case DataReaderReadStringRobust.ReadStatus.OK:
+                                retval.BeaconGuidRobustString = guidstring;
+                                break;
+                            default:
+                                retval.BeaconGuidRobustString = retval.BeaconGuid.ToString();
+                                break;
+                        }
                         retval.Major = dr.ReadUInt16();
                         retval.Minor = dr.ReadUInt16();
                         retval.MeasuredPower = (sbyte)dr.ReadByte();
-                        retval.MeasuredPower = RSSI;
+                        retval.ProvidedRssi = rawSignalStrengthInDBm;
                         break;
                     case 0x10:
                     case 0x12:
@@ -91,7 +105,7 @@ namespace BluetoothProtocols
         {
             if (!IsValid) return "Invalid IBeacon";
 
-            return $"{MeasuredProximity.ToString()} {Major}.{Minor} {BeaconGuid.ToString()}";
+            return $"{MeasuredProximity.ToString()} {Major}.{Minor} {BeaconGuidRobustString}";
         }
     }
 }

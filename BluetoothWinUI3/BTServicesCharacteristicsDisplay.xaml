@@ -71,9 +71,6 @@
                 </StackPanel>
                 
                 <local:BTConnectionControl x:Name="uiConnectionControl" Grid.Row="1" Grid.ColumnSpan="2" />
-                <!-- TODO: remove old code
-                <Button x:Name="uiConnect" Content="Connect" Click="OnConnectClicked" />
-                -->
             </Grid>
         </Grid>
     </Border>

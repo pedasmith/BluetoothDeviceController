@@ -49,6 +49,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("Govee_H5074_*", typeof(BTGovee_EnvironmentalControl)),
             new SupportedDevice("GVH5075_*", typeof(BTGovee_EnvironmentalControl)),
             new SupportedDevice("GVH5106_*", typeof(BTGovee_EnvironmentalControl)),
+            new SupportedDevice("GV5171*", typeof(BTGovee_EnvironmentalControl)),
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {

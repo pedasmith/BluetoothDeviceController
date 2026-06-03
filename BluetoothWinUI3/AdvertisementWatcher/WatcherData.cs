@@ -10,6 +10,7 @@ using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 using static BluetoothConversions.BluetoothCompanyIdentifier;
+using static BluetoothProtocols.AdvertisementDataSectionParser;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -76,6 +77,16 @@ namespace BluetoothWatcher.AdvertismentWatcher
         public BluetoothLEAdvertisementReceivedEventArgs ResponseAdvertisement { get; set; }
         public BluetoothLEAdvertisementReceivedEventArgs MostRecentAdvertisement
             { get {  var retval = ResponseAdvertisement ?? OriginalAdvertisement; return retval;  } } 
+        public List<BluetoothLEAdvertisementReceivedEventArgs> Advertisements
+        {
+            get
+            {
+                var retval = new List<BluetoothLEAdvertisementReceivedEventArgs>();
+                if (OriginalAdvertisement != null) retval.Add(OriginalAdvertisement);
+                if (ResponseAdvertisement != null) retval.Add(ResponseAdvertisement);
+                return retval;
+            }
+        }
 
         public enum AdvertisementStringFormat { Full, CanCompare, AddressOnly };
         public string ToStringFull(AdvertisementStringFormat format = AdvertisementStringFormat.Full)
@@ -100,9 +111,9 @@ namespace BluetoothWatcher.AdvertismentWatcher
             string retval = $"{ts},{BluetoothAddress.AsString(Addr)},{BestName}";
 
             retval += $",{OriginalAdvertisement.BluetoothAddressType},{MostRecentAdvertisement.AdvertisementType},{flags},{power},{ds.Count()}";
-            if (OriginalAdvertisement != null)
+            foreach (var advertisement in Advertisements)
             {
-                foreach (var section in OriginalAdvertisement.Advertisement.DataSections)
+                foreach (var section in advertisement.Advertisement.DataSections)
                 {
                     var dsname = AdvertisementSection_types.Decode(section.DataType);
                     switch (section.DataType)
@@ -113,19 +124,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                     }
                 }
             }
-            if (ResponseAdvertisement != null)
-            {
-                foreach (var section in ResponseAdvertisement.Advertisement.DataSections)
-                {
-                    var dsname = AdvertisementSection_types.Decode(section.DataType);
-                    switch (section.DataType)
-                    {
-                        default:
-                            retval += $",{dsname} (0x{section.DataType:X02})={section.Data.ToSsv()}";
-                            break;
-                    }
-                }
-            }
+
             return retval;
         }
 
@@ -138,10 +137,15 @@ namespace BluetoothWatcher.AdvertismentWatcher
             return $"{BluetoothAddress.AsString(Addr)} {BestName} {ParsedCompanyDataTrim}";
         }
 
+        /// <summary>
+        /// Very full details of the WatcherData. Is used by the Advertisements display
+        /// Goal is to display all the data known about the advertisement
+        /// </summary>
         public string ToStringDetails()
         {
             var args = MostRecentAdvertisement;
             string retval = "";
+            retval += $"Event time: {MostRecentAdvertisement.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}\n";
             retval += $"Address: {BluetoothAddress.AsString(Addr)}\n";
             retval += $"Address type: {args.BluetoothAddressType}\n";
             retval += $"Advertisement type: {args.AdvertisementType}\n";
@@ -174,32 +178,31 @@ namespace BluetoothWatcher.AdvertismentWatcher
             }
 
             // And now, data directly from the advertisement!
-
-            var adv = OriginalAdvertisement?.Advertisement;
-            if (adv != null)
+            foreach (var advertisement in Advertisements)
             {
-                foreach (var section in adv.DataSections)
+                foreach (var section in advertisement.Advertisement.DataSections)
                 {
                     sbyte txPower = (sbyte)(args.TransmitPowerLevelInDBm ?? 0);
                     var mtype = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-                    var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, txPower, mtype, "");
-                    //var dsname = AdvertisementSection_types.Decode(section.DataType);
-                    //retval += $"Section: {dsname} (0x{section.DataType:X02})={section.Data.ToHex()}\n";
-                    retval += str;
+                    var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, args.RawSignalStrengthInDBm, txPower, mtype, "");
+                    retval += "Section: " + str;
                 }
             }
 
-            adv = ResponseAdvertisement?.Advertisement;
-            if (adv != null)
+            foreach (var advertisement in Advertisements)
             {
-                foreach (var section in adv.DataSections)
+                // I don't want to use the ManufacturerData directly because that already has the two-byte
+                // ManufacturerID pulled out. The AI tools that can handle BT ManufacturerData prefer clean
+                // and complete sections of data
+                foreach (var section in advertisement.Advertisement.DataSections)
                 {
-                    sbyte txPower = (sbyte)(args.TransmitPowerLevelInDBm ?? 0);
-                    var mtype = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-                    var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, txPower, mtype, "");
-                    //var dsname = AdvertisementSection_types.Decode(section.DataType);
-                    //retval += $"Section: {dsname} (0x{section.DataType:X02})={section.Data.ToHex()}\n";
-                    retval += str;
+                    byte b = section.DataType;
+                    DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value e.g. Flags (0x01) or IncompleteListOf16BitServiceUuids (0x02)
+                    if (dtv == DataTypeValue.ManufacturerData)
+                    {
+                        var str = "Manufacturer Hex: " + section.Data.ToHex() + "\n";
+                        retval += str;
+                    }
                 }
             }
 
@@ -213,7 +216,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 var goveeData = Govee.Parse(goveeType, this, null);
                 if (goveeData != null)
                 {
-                    retval += $"Govee: Type={goveeData.TagType}, Temp={goveeData.TemperatureInDegreesF:F1}F, Humidity={goveeData.Humidity}%, Battery={goveeData.BatteryInPercent}%\n";
+                    retval += $"Govee data: Type={goveeData.TagType}, Temp={goveeData.TemperatureInDegreesF:F1}F, Humidity={goveeData.Humidity}%, Battery={goveeData.BatteryInPercent}%\n";
                 }
             }
 

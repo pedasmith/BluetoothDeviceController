@@ -24,7 +24,7 @@ namespace BluetoothProtocols
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
         public UInt16 CompanyId { get; set; } // will by 0xEC88=60552 for the Govee H5074 H5075
-        public enum SensorType { Other, H5074, H5075, H5106, NotGovee };
+        public enum SensorType { Other, H5074, H5075, H5106, H5171, NotGovee };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -98,6 +98,8 @@ namespace BluetoothProtocols
                 if (name.StartsWith("Govee_H5074_")) retval = SensorType.H5074;
                 if (name.StartsWith("GVH5075_")) retval = SensorType.H5075;
                 if (name.StartsWith("GVH5106_")) retval = SensorType.H5106;
+                if (name.StartsWith("V5171")) retval = SensorType.H5171;
+                if (name.StartsWith("GV5171")) retval = SensorType.H5171;
             }
             return retval;
         }
@@ -169,7 +171,13 @@ namespace BluetoothProtocols
                 dr.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
                 retval.CompanyId = dr.ReadUInt16(); // Will be 0xEC88=60552 but that's explicitly not enforced here
                 var expectedCompanyId = 0xEC88;
-                if (sensorType == SensorType.H5106) expectedCompanyId = 0x01; // Nokia??
+                switch (sensorType)
+                {
+                    case SensorType.H5106:
+                    case SensorType.H5171:
+                        expectedCompanyId = 0x01;
+                        break;
+                }
                 if (dr.UnconsumedBufferLength > 16 || retval.CompanyId != expectedCompanyId)
                 {
                     var pre = dr.ReadInt16();
@@ -244,6 +252,21 @@ namespace BluetoothProtocols
                             retval.Humidity = ((double)((value3 / 1_000) % 1000)) / 10.0;
                             retval.PM25 = (double)(value3 % 1_000);
                             retval.BatteryInPercent = 100.0; // it's line powered.
+                            retval.IsValid = true;
+                            break;
+                        case SensorType.H5171:
+                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                            var frameType = dr.ReadByte();
+                            var sequence = dr.ReadByte();
+                            var flags = dr.ReadByte();
+                            retval.Temperature = dr.ReadInt16() / 100.0;
+                            retval.Humidity = dr.ReadByte();;
+                            retval.BatteryInPercent = dr.ReadByte();
+                            retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (frametype={frameType}) sequence={sequence} flags={flags:X2}) ";
+                            if (frameType != 1)
+                            {
+                                ;
+                            }
                             retval.IsValid = true;
                             break;
                     }

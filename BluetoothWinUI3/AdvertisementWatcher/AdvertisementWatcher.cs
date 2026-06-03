@@ -52,6 +52,10 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 OriginalAdvertisements.TryGetValue(args.BluetoothAddress, out watcherData);
                 if (watcherData != null) 
                 {
+                    if (watcherData.ResponseAdvertisement != null)
+                    {
+                        Log($"DBG: got a second response advertisement!");
+                    }
                     watcherData.ResponseAdvertisement = args;
                 }
             }
@@ -60,6 +64,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 watcherData = new WatcherData()
                 {
                     OriginalAdvertisement = args,
+                    ResponseAdvertisement = null,
                 };
                 OriginalAdvertisements[args.BluetoothAddress] = watcherData;
             }
@@ -82,7 +87,10 @@ namespace BluetoothWatcher.AdvertismentWatcher
                         break;
 
                     case AdvertisementDataSectionParser.DataTypeValue.ManufacturerData:
-                        (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, watcherData.TransmitPower, BluetoothCompanyIdentifier.CommonManufacturerType.Other);
+                        var tx = watcherData.TransmitPower;
+                        var rssi = watcherData.MostRecentAdvertisement.RawSignalStrengthInDBm;
+                        var other = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
+                        (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, rssi, tx, other);
                         if (watcherData.CompanyId == 18498)
                         {
                             ; // Handy hook for debugging.
@@ -111,5 +119,11 @@ namespace BluetoothWatcher.AdvertismentWatcher
 
             WatcherEvent?.Invoke(sender, watcherData); // Often the MainPage.BleWatcher_WatcherEvent
         }
-    }
+
+        private static void Log(string str)
+        {
+            System.Diagnostics.Debug.WriteLine(str);
+            Console.WriteLine(str);
+        }
+    } // end of class AdvertisementWatcher
 }
