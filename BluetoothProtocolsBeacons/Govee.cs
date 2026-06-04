@@ -304,7 +304,7 @@ namespace BluetoothProtocols
                                 var (temperature, humidity) = ConvertThreeBytes(b1, b2, b3);
                                 retval.Temperature = temperature;
                                 retval.Humidity = humidity;
-                                retval.BatteryInPercent = dr.ReadByte(); // 2026-06-04 unconfirmed this is battery
+                                retval.BatteryInPercent = dr.ReadByte(); // 2026-06-04 confirmed this is battery
                                 retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}%  ";
                                 retval.IsValid = true;
                             }
