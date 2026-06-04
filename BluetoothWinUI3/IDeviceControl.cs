@@ -31,12 +31,16 @@ namespace BluetoothWinUI3
             CanGetData = 0x02,
             CanRename = 0x04,
             CanShowTable = 0x08,
+            CanGetDetails = 0x10,
         }
         UXCapabilities GetUXCapabilities();
 
         // TODO: make the Png exporter like the IExportData? So that all that awful code is in one place?
         void ExportGraphAsPng();
         string ExportData(IExportData exporter);
+
+        enum DetailsType {  Normal, All, }
+        string GetDetails(DetailsType detailsType);
 
     }
 

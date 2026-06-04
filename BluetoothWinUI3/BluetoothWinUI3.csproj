@@ -19,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="AppDictionary.xaml" />
+    <None Remove="Assets\CharacteristicsData\Govee_H5171.json" />
     <None Remove="Assets\DevicePictures\Nordic_Thingy.png" />
     <None Remove="Assets\HelpFiles\Device_Nordic_Thingy.md" />
     <None Remove="Assets\HelpFiles\Help_Main.md" />
@@ -86,6 +87,9 @@
     <PackageReference Include="WinUI.TableView" Version="1.4.1" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Assets\CharacteristicsData\Govee_H5171.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\DevicePictures\Nordic_Thingy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -182,9 +186,6 @@
     <Page Update="AppDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\CharacteristicsData\" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="BTGovee_EnvironmentalControl.xaml">

@@ -761,6 +761,10 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         return retval;
     }
 
+    public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
+    {
+        return "Internal error: no details are available";
+    }
     #endregion 
 
 } // end of class BTNordic_ThingyControl

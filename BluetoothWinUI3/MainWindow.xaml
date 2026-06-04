@@ -33,6 +33,8 @@
                     <MenuFlyoutItem Text="Copy Graph as PNG" Click="OnFileCopyGraphAsPNG" x:Name="uimFileCopyGraphAsPNG" />
                     <MenuFlyoutItem Text="Copy Data for Excel" Click="OnFileCopyDataForExcel" x:Name="uimFileCopyDataForExcel"  />
                     <MenuFlyoutItem Text="Copy Data as CSV" Click="OnFileCopyDataAsCSV" x:Name="uimFileCopyDataAsCSV"  />
+                    <MenuFlyoutItem Text="Copy Details" Click="OnFileCopyDetailsNormal" x:Name="uimFileCopyDetailsNormal"  />
+                    <MenuFlyoutItem Text="Copy Details All" Click="OnFileCopyDetailsAll" x:Name="uimFileCopyDetailsAll"  />
                     <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
                 </MenuBarItem>
                 <MenuBarItem Title="View" AccessKey="V">

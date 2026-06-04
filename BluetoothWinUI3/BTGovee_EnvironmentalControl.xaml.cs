@@ -701,6 +701,11 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
         }
     }
 
+    public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
+    {
+        return "Internal error: no details are available";
+    }
+
     #endregion
 
 } // end of class BTGovee_EnvironmentalControl

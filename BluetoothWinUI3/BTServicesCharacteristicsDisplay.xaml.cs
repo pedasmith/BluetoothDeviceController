@@ -5,6 +5,7 @@ using BluetoothWatcher.AdvertismentWatcher;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.Json;
@@ -44,6 +45,13 @@ namespace BluetoothWinUI3
             uiConnectionControl.SetBatteryVisibility(Visibility.Collapsed); // never show battery level here.
             uiConnectionControl.ConnectionChanged += UiConnectionControl_ConnectionChanged;
         }
+
+        /// <summary>
+        /// AllAdvertisementHistory is used only by AddHistory and GetHistory
+        /// </summary>
+        private SortedDictionary<ulong, string> AllAdvertisementHistory = new SortedDictionary<ulong, string>();
+        private SortedDictionary<ulong, string> AllAdvertisementManufacturerDataHistory = new SortedDictionary<ulong, string>();
+
 
         private async void UiConnectionControl_ConnectionChanged(object sender, ConnectionChangedEventArgs e)
         {
@@ -86,6 +94,48 @@ namespace BluetoothWinUI3
             System.Diagnostics.Debug.WriteLine(str);
         }
 
+        private void AddHistory(WatcherData data)
+        {
+            var addr = data.Addr;
+            if (AllAdvertisementHistory.ContainsKey(addr))
+            {
+                AllAdvertisementHistory[addr] += "\n\n" + data.ToStringDetails();
+                AllAdvertisementManufacturerDataHistory[addr] += data.ToStringManufacturerData("");
+            }
+            else
+            {
+                AllAdvertisementHistory.Add(data.Addr, data.ToStringDetails());
+                AllAdvertisementManufacturerDataHistory.Add(addr, data.ToStringManufacturerData(""));
+            }
+        }
+
+        private string GetHistory(string defaultValue)
+        {
+            if (AllAdvertisementHistory.Count == 0) return defaultValue;
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var (index, str) in AllAdvertisementHistory)
+            {
+                sb.Append(str);
+                sb.Append("\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n");
+                var md = AllAdvertisementManufacturerDataHistory[index];
+                var lastComma = md.LastIndexOf(',');
+                if (lastComma > 0) // Also implies there's data!
+                {
+                    md = md.Remove(lastComma, 1); // Remove the last comma so it's JSON compatible
+                    sb.Append("\t\t\"AdvertisementData\" : [\n");
+                    sb.Append(md);
+                    sb.Append("\t\t,\n");
+                }
+                sb.Append("\n\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n");
+            }
+            var retval = sb.ToString();
+            return retval;
+        }
+
+
+
+
         /// <summary>
         /// Observable List of all of the WatcherData we have gotten. Is displayed in the 
         /// list of advertisements.
@@ -114,11 +164,13 @@ namespace BluetoothWinUI3
             {
                 WatcherDataList[index] = data;
             }
+            AddHistory(data);
+            MostRecentWatcherData = data;
             uiLog.Text = data.ToString();
-            if (CurrWatcherData != null && data.Addr == CurrWatcherData.Addr)
+            if (SelectedWatcherData != null && data.Addr == SelectedWatcherData.Addr)
             {
                 // The device the user selected has sent a new (or scan-response) advertisement! Update!
-                CurrWatcherData = data;
+                SelectedWatcherData = data;
                 var details = data.ToStringDetails();
                 uiAdvertisementDetailsTextBlock.Text = details;
                 uiConnectionControl.SetAdvertisementData(data);
@@ -183,7 +235,7 @@ namespace BluetoothWinUI3
 
         public IDeviceControlBasic.UXCapabilities GetUXCapabilities()
         {
-            var retval = IDeviceControlBasic.UXCapabilities.None; //  IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng | IDeviceControlBasic.UXCapabilities.CanGetData;
+            var retval = IDeviceControlBasic.UXCapabilities.CanGetDetails; 
             return retval;
         }
 
@@ -241,17 +293,19 @@ namespace BluetoothWinUI3
             Grid.SetColumn(uiDetailsPane, DetailsAlwaysShown ? 1 : 0);
         }
 
-        WatcherData CurrWatcherData = null;
+        WatcherData SelectedWatcherData = null;
+        WatcherData MostRecentWatcherData = null;
+
         private void OnAdvertisementSelected(ItemsView sender, ItemsViewSelectionChangedEventArgs args)
         {
             var data = sender.SelectedItem as WatcherData;
             if (data == null) return;
             Log($"OnAdvertisementSelected: selected={data.AddressAsString} name={data.BestName}");
-            if ( CurrWatcherData != null && CurrWatcherData.Addr == data.Addr)
+            if (SelectedWatcherData != null && SelectedWatcherData.Addr == data.Addr)
             {
-                return;
+                return; // is already selected
             }
-            CurrWatcherData = data;
+            SelectedWatcherData = data;
             var details = data.ToStringDetails();
             uiAdvertisementDetailsTextBlock.Text = details;
             uiConnectionControl.SetAdvertisementData(data);
@@ -277,14 +331,14 @@ namespace BluetoothWinUI3
         private async Task DoConnected(BluetoothLEDevice le)
         {
             BluetoothCacheMode cacheMode = BluetoothCacheMode.Cached;
-            var addr = CurrWatcherData.Addr;
+            var addr = SelectedWatcherData.Addr;
             var services = await le.GetGattServicesAsync(cacheMode);
             if (services.Status != Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
             {
-                DeviceDetailsLog($"Unable to get services for {CurrWatcherData.AddressAsString}. Reason: {services.Status}");
+                DeviceDetailsLog($"Unable to get services for {SelectedWatcherData.AddressAsString}. Reason: {services.Status}");
                 return;
             }
-            uiDeviceDetailsTextBlock.Text = $"Services for {CurrWatcherData.AddressAsString} {CurrWatcherData.BestName}\n\n";
+            uiDeviceDetailsTextBlock.Text = $"Services for {SelectedWatcherData.AddressAsString} {SelectedWatcherData.BestName}\n\n";
 
             var nameDeviceList = new NameAllBleDevices();
             var nameDevice = new NameDevice();
@@ -387,6 +441,26 @@ namespace BluetoothWinUI3
             var JsonAsList = node?.ToJsonString(jsonOptions) ?? "";
 
             uiDeviceDetailsTextBlock.Text += $"\n\n\n" + JsonAsList;
+        }
+
+        public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
+        {
+            string retval = "No details";
+
+            switch (detailsType)
+            {
+                case IDeviceControlBasic.DetailsType.Normal:
+                    if (SelectedWatcherData != null) retval = SelectedWatcherData.ToStringDetails();
+                    else if (MostRecentWatcherData != null) retval = MostRecentWatcherData.ToStringDetails();
+                    else retval = "No advertisement details";
+                    break;
+
+                default:
+                case IDeviceControlBasic.DetailsType.All:
+                    retval = GetHistory("No advertisements");
+                    break;
+            }
+            return retval;
         }
     }
 }

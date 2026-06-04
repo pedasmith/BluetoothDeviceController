@@ -617,6 +617,41 @@ namespace BluetoothWinUI3
             }
         }
 
+        private async void OnFileCopyDetailsAll(object sender, RoutedEventArgs e)
+        {
+            await DoFileCopyDetails(IDeviceControlBasic.DetailsType.All);
+        }
+
+        private async void OnFileCopyDetailsNormal(object sender, RoutedEventArgs e)
+        {
+            await DoFileCopyDetails(IDeviceControlBasic.DetailsType.Normal);
+        }
+
+        private async Task DoFileCopyDetails(IDeviceControlBasic.DetailsType detailsType)
+        {
+            string verb = "get details";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
+
+
+            var data = selected.GetDetails(detailsType);
+
+            try
+            {
+                var dataPackage = new DataPackage()
+                {
+                    RequestedOperation = DataPackageOperation.Copy
+                };
+                dataPackage.SetText(data);
+                Clipboard.SetContent(dataPackage);
+                Clipboard.Flush();
+            }
+            catch (Exception ex)
+            {
+                Log($"Error: unable to get details for the clipboard; {ex.Message}");
+            }
+
+        }
 
         private void OnDebugDarkTheme(object sender, RoutedEventArgs e)
         {
@@ -777,6 +812,8 @@ namespace BluetoothWinUI3
             uimFileCopyGraphAsPNG.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng);
             uimFileCopyDataForExcel.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetData);
             uimFileCopyDataAsCSV.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetData);
+            uimFileCopyDetailsAll.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetDetails);
+            uimFileCopyDetailsNormal.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetDetails);
 
             uimViewShowTable.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanShowTable);
 
@@ -903,5 +940,7 @@ namespace BluetoothWinUI3
             // null means no watcher data
             // null means not a supported device (since the supported device is determined from the watcher data)
         }
+
+
     }
 }

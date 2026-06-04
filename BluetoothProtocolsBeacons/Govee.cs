@@ -6,7 +6,6 @@ using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 using static BluetoothProtocols.AdvertisementDataSectionParser;
-using static BluetoothProtocols.Nordic_Thingy;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -150,6 +149,53 @@ namespace BluetoothProtocols
             return retval;
         }
 
+        private static SensorType SpecializedSensorTypeFromData(BluetoothLEAdvertisementDataSection section)
+        {
+            SensorType sensorType = SensorType.Other;
+            var dr = DataReader.FromBuffer(section.Data);
+            switch (dr.UnconsumedBufferLength)
+            {
+                case 9: sensorType = SensorType.H5075; break;
+                case 10:
+                    {
+                        dr.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
+                        var typecompany = dr.ReadInt16(); 
+                        var b0 = dr.ReadByte();
+                        var b1 = dr.ReadByte();
+                        if (b0 == 0x01 && b1 == 0x01)
+                        {
+                            sensorType = SensorType.H5106;
+                        }
+                        else
+                        {
+                            // Check to make sure that b0==0?
+                            sensorType = SensorType.H5074; break; // or H5106 :-(
+                        }
+                    }
+                    break;
+            }
+            return sensorType;
+        }
+
+        /// <summary>
+        /// Converts the remarkably idiotic three-byte combined temp/humidity values
+        /// </summary>
+        public static (double temperature, double humidity) ConvertThreeBytes(byte b1, byte b2, byte b3)
+        {
+            double temperature = double.NaN;
+            double humidity = double.NaN;
+
+            var isneg = (b1 & 0x80) != 0;
+            var value = ((b1 & 0x7F) << 16) + (b2 << 8) + b3;
+
+            var bottomRaw = (value % 1000);
+            temperature = ((double)((value - bottomRaw) / 1000)) / 10.0;
+            if (isneg) temperature = -temperature;
+            humidity = ((double)bottomRaw) / 10.0;
+
+            return (temperature, humidity);
+        }
+
         /// <summary>
         /// Will parse a Govee sensor. Must be given the sensor type which is from AdvertIsGovee (parsing depends on 
         /// the type)
@@ -190,84 +236,78 @@ namespace BluetoothProtocols
                 {
                     if (sensorType == SensorType.Other)
                     {
-                        switch (dr.UnconsumedBufferLength)
-                        {
-                            case 9: sensorType = SensorType.H5075; break;
-                            case 10:
-                                {
-                                    var drtype = DataReader.FromBuffer(section.Data);
-                                    drtype.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
-                                    var typecompany = dr.ReadInt16(); // TODO: why isn't this reading from drtype?
-                                    var b0 = dr.ReadByte();
-                                    var b1 = dr.ReadByte();
-                                    if (b0 == 0x01 && b1 == 0x01)
-                                    {
-                                        sensorType = SensorType.H5106;
-                                    }
-                                    else
-                                    {
-                                        // Check to make sure that b0==0?
-                                        sensorType = SensorType.H5074; break; // or H5106 :-(
-                                    }
-                                }
-                                break;
-                        }
+                        sensorType = SpecializedSensorTypeFromData(section);
                     }
-                    // At this point, we've read in two bytes from dr.
+
+                    // At this point, we've read in two bytes from dr (the company ID)
                     switch (sensorType)
                     {
                         default:
                             retval.IsValid = false;
                             break;
                         case SensorType.H5074:
-                            var junk = dr.ReadByte();
-                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
-                            retval.Temperature = dr.ReadInt16() / 100.0;
-                            retval.Humidity = dr.ReadInt16() / 100.0;
-                            retval.BatteryInPercent = dr.ReadByte();
-                            retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk}) ";
-                            retval.IsValid = true;
+                            {
+                                var junk = dr.ReadByte();
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                                retval.Temperature = dr.ReadInt16() / 100.0;
+                                retval.Humidity = dr.ReadInt16() / 100.0;
+                                retval.BatteryInPercent = dr.ReadByte();
+                                retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk}) ";
+                                retval.IsValid = true;
+                            }
                             break;
                         case SensorType.H5075:
-                            var junk2 = dr.ReadByte();
-                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
-                            // Yes, this encoding is horrible for no good reason.
-                            var b1 = dr.ReadByte();
-                            var b2 = dr.ReadByte();
-                            var b3 = dr.ReadByte();
-                            var isneg = (b1 & 0x80) != 0;
-                            var value = ((b1 & 0x7F) << 16) + (b2 << 8) + b3;
-                            retval.Temperature = ((double)(value / 1000)) / 10.0;
-                            retval.Humidity = ((double)(value % 1000)) / 10.0;
-                            retval.BatteryInPercent = dr.ReadByte();
-                            retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk2}) ";
-                            retval.IsValid = true;
+                            {
+                                var junk2 = dr.ReadByte();
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                                // Yes, this encoding is horrible for no good reason.
+                                var b1 = dr.ReadByte();
+                                var b2 = dr.ReadByte();
+                                var b3 = dr.ReadByte();
+                                var (temperature, humidity) = ConvertThreeBytes(b1, b2, b3);
+                                retval.Temperature = temperature;
+                                retval.Humidity = humidity;
+                                //var isneg = (b1 & 0x80) != 0;
+                                //var value = ((b1 & 0x7F) << 16) + (b2 << 8) + b3;
+                                //retval.Temperature = ((double)(value / 1000)) / 10.0;
+                                //retval.Humidity = ((double)(value % 1000)) / 10.0;
+                                retval.BatteryInPercent = dr.ReadByte();
+                                retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (junk={junk2}) ";
+                                retval.IsValid = true;
+                            }
                             break;
                         case SensorType.H5106:
-                            var junk3 = dr.ReadInt16();
-                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.PM25;
-                            dr.ByteOrder = ByteOrder.BigEndian; // Surprise! It's big endian!
-                            var value3 = dr.ReadUInt32();
-                            retval.Temperature = ((double)(value3 / 1_000_000)) / 10.0;
-                            retval.Humidity = ((double)((value3 / 1_000) % 1000)) / 10.0;
-                            retval.PM25 = (double)(value3 % 1_000);
-                            retval.BatteryInPercent = 100.0; // it's line powered.
-                            retval.IsValid = true;
+                            {
+                                var junk3 = dr.ReadInt16();
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.PM25;
+                                dr.ByteOrder = ByteOrder.BigEndian; // Surprise! It's big endian!
+                                var value3 = dr.ReadUInt32();
+                                retval.Temperature = ((double)(value3 / 1_000_000)) / 10.0;
+                                retval.Humidity = ((double)((value3 / 1_000) % 1000)) / 10.0;
+                                retval.PM25 = (double)(value3 % 1_000);
+                                retval.BatteryInPercent = 100.0; // it's line powered.
+                                retval.IsValid = true;
+                            }
                             break;
                         case SensorType.H5171:
-                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
-                            var frameType = dr.ReadByte();
-                            var sequence = dr.ReadByte();
-                            var flags = dr.ReadByte();
-                            retval.Temperature = dr.ReadInt16() / 100.0;
-                            retval.Humidity = dr.ReadByte();;
-                            retval.BatteryInPercent = dr.ReadByte();
-                            retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}% (frametype={frameType}) sequence={sequence} flags={flags:X2}) ";
-                            if (frameType != 1)
+                            // Example: 01 00 01 01 03 35 D7 64 00 00 is 21C 39%
+                            // Example: 01 00 01 01 01 78 C1 64 00 00 is 9C 44%
+                            // The first two  bytes have already been read in.
+                            // Example: 01 00 [company] 01 01 01 78 C1 64 00 00 is 9C 44%
                             {
-                                ;
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                                var junk1 = dr.ReadByte();
+                                var junk2 = dr.ReadByte();
+                                var b1 = dr.ReadByte();
+                                var b2 = dr.ReadByte();
+                                var b3 = dr.ReadByte();
+                                var (temperature, humidity) = ConvertThreeBytes(b1, b2, b3);
+                                retval.Temperature = temperature;
+                                retval.Humidity = humidity;
+                                retval.BatteryInPercent = dr.ReadByte(); // 2026-06-04 unconfirmed this is battery
+                                retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}%  ";
+                                retval.IsValid = true;
                             }
-                            retval.IsValid = true;
                             break;
                     }
                 }

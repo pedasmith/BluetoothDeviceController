@@ -222,5 +222,34 @@ namespace BluetoothWatcher.AdvertismentWatcher
 
             return retval;
         }
+
+        /// <summary>
+        /// Returns a string with \n for CR (or the defaultValue). The strings are in 
+        /// almost JSON format tabs at the start and with double-quotes
+        /// </summary>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public string ToStringManufacturerData(string defaultValue)
+        {
+            var retval = "";
+            foreach (var advertisement in Advertisements)
+            {
+                // I don't want to use the ManufacturerData directly because that already has the two-byte
+                // ManufacturerID pulled out. The AI tools that can handle BT ManufacturerData prefer clean
+                // and complete sections of data
+                foreach (var section in advertisement.Advertisement.DataSections)
+                {
+                    byte b = section.DataType;
+                    DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value e.g. Flags (0x01) or IncompleteListOf16BitServiceUuids (0x02)
+                    if (dtv == DataTypeValue.ManufacturerData)
+                    {
+                        var str = $"\t\t\t\"{section.Data.ToHex()}\",\n";
+                        retval += str;
+                    }
+                }
+            }
+            if (retval == "") retval = defaultValue;
+            return retval;
+        }
     }
 }
