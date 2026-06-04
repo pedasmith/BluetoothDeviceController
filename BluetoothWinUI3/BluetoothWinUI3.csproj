@@ -19,7 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="AppDictionary.xaml" />
-    <None Remove="Assets\CharacteristicsData\Govee_H5171.json" />
     <None Remove="Assets\DevicePictures\Nordic_Thingy.png" />
     <None Remove="Assets\HelpFiles\Device_Nordic_Thingy.md" />
     <None Remove="Assets\HelpFiles\Help_Main.md" />
@@ -50,6 +49,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H5106.json" Link="Assets\CharacteristicsData\Govee_H5106.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H5171.json" Link="Assets\CharacteristicsData\Govee_H5171.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H5179.json" Link="Assets\CharacteristicsData\Govee_H5179.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H6005.json" Link="Assets\CharacteristicsData\Govee_H6005.json">
@@ -87,9 +92,6 @@
     <PackageReference Include="WinUI.TableView" Version="1.4.1" />
   </ItemGroup>
   <ItemGroup>
-    <Content Update="Assets\CharacteristicsData\Govee_H5171.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Update="Assets\DevicePictures\Nordic_Thingy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

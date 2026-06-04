@@ -23,7 +23,7 @@ namespace BluetoothProtocols
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
         public UInt16 CompanyId { get; set; } // will by 0xEC88=60552 for the Govee H5074 H5075
-        public enum SensorType { Other, H5074, H5075, H5106, H5171, NotGovee };
+        public enum SensorType { Other, H5074, H5075, H5106, H5171, H5179, NotGovee };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -99,6 +99,7 @@ namespace BluetoothProtocols
                 if (name.StartsWith("GVH5106_")) retval = SensorType.H5106;
                 if (name.StartsWith("V5171")) retval = SensorType.H5171;
                 if (name.StartsWith("GV5171")) retval = SensorType.H5171;
+                if (name.StartsWith("GV5179_")) retval = SensorType.H5179;
             }
             return retval;
         }
@@ -221,6 +222,7 @@ namespace BluetoothProtocols
                 {
                     case SensorType.H5106:
                     case SensorType.H5171:
+                    case SensorType.H5179:
                         expectedCompanyId = 0x01;
                         break;
                 }
@@ -305,6 +307,26 @@ namespace BluetoothProtocols
                                 retval.Temperature = temperature;
                                 retval.Humidity = humidity;
                                 retval.BatteryInPercent = dr.ReadByte(); // 2026-06-04 confirmed this is battery
+                                retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}%  ";
+                                retval.IsValid = true;
+                            }
+                            break;
+                        case SensorType.H5179:
+                            // Example: 01 00 01 01 02 C8 B1 64 is 
+                            // The first two  bytes have already been read in.
+                            // Example: 01 00 [company] 01 01 01 78 C1 64 00 00 is 9C 44%
+                            // Is just like the H5171 but without the last 2 bytes 
+                            {
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                                var junk1 = dr.ReadByte();
+                                var junk2 = dr.ReadByte();
+                                var b1 = dr.ReadByte();
+                                var b2 = dr.ReadByte();
+                                var b3 = dr.ReadByte();
+                                var (temperature, humidity) = ConvertThreeBytes(b1, b2, b3);
+                                retval.Temperature = temperature;
+                                retval.Humidity = humidity;
+                                retval.BatteryInPercent = dr.ReadByte(); 
                                 retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% Bat={retval.BatteryInPercent}%  ";
                                 retval.IsValid = true;
                             }
