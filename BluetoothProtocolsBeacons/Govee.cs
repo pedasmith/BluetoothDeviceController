@@ -23,7 +23,7 @@ namespace BluetoothProtocols
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
         public UInt16 CompanyId { get; set; } // will by 0xEC88=60552 for the Govee H5074 H5075
-        public enum SensorType { Other, H5074, H5075, H5106, H5171, H5179, NotGovee };
+        public enum SensorType { Other, H5074, H5075, H5103, H5106, H5171, H5179, NotGovee };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -96,6 +96,7 @@ namespace BluetoothProtocols
             {
                 if (name.StartsWith("Govee_H5074_")) retval = SensorType.H5074;
                 if (name.StartsWith("GVH5075_")) retval = SensorType.H5075;
+                if (name.StartsWith("GVH5103_")) retval = SensorType.H5103;
                 if (name.StartsWith("GVH5106_")) retval = SensorType.H5106;
                 if (name.StartsWith("V5171")) retval = SensorType.H5171;
                 if (name.StartsWith("GV5171")) retval = SensorType.H5171;
@@ -220,6 +221,7 @@ namespace BluetoothProtocols
                 var expectedCompanyId = 0xEC88;
                 switch (sensorType)
                 {
+                    case SensorType.H5103:
                     case SensorType.H5106:
                     case SensorType.H5171:
                     case SensorType.H5179:
@@ -311,10 +313,11 @@ namespace BluetoothProtocols
                                 retval.IsValid = true;
                             }
                             break;
+                        case SensorType.H5103:
                         case SensorType.H5179:
                             // Example: 01 00 01 01 02 C8 B1 64 is 
                             // The first two  bytes have already been read in.
-                            // Example: 01 00 [company] 01 01 01 78 C1 64 00 00 is 9C 44%
+                            // Example: 01 00 [company] 01 01 01 78 C1 64 is 9C 44%
                             // Is just like the H5171 but without the last 2 bytes 
                             {
                                 retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
