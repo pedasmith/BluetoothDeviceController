@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 using System.Linq;
+using System.Threading;
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
@@ -63,7 +64,7 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
     /// There are multiple Govee sensors that this one control can handle.
     /// </summary>
     Govee.SensorType GoveeSensorType = Govee.SensorType.NotGovee; // Initialize as not a Govee at all.
-
+    List<string> TableColumns = new();
 
     public BTGovee_EnvironmentalControl()
     {
@@ -71,26 +72,13 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
         this.Loaded += BTGovee_EnvironmentalControl_Loaded;
         this.DataContextChanged += BTGovee_EnvironmentalControl_DataContextChanged;
 
-        //
-        // Set up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
-        // This can't be done at initialization time because of C#: it won't let me use a regular
-        // field when doing an initialization.
-        foreach (var series in OxyPlotModel.Series)
-        {
-            if (series is LineSeries lineSeries)
-            {
-                lineSeries.ItemsSource = HistoricalGoveeUnits.Data; //DOC:
-            }
-        }
-        uiOxyPlot.Model = OxyPlotModel;
+
 
         //
         // Set up the uiTableView
         // https://w-ahmad.dev/WinUI.TableView/index.html
         // https://github.com/w-ahmad/WinUI.TableView
         //
-        //uiTableView.CornerButtonMode = TableViewCornerButtonMode.None;
-        //uiTableView.SelectionMode = ListViewSelectionMode.None;
         uiTableView.AutoGeneratingColumn += (s, e) =>
         {
             switch (e.PropertyName)
@@ -112,18 +100,25 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
                 case "TimestampMostRecentDT":
                     e.Cancel = true; // Don't generate a column for this property because it's not user friendly. 
                     break;
+                default:
+                    if (!TableColumns.Contains(e.PropertyName))
+                    {
+                        // The Govee has a bunch of fields (e.g., "TagType") which should not be part of the data grid.
+                        e.Cancel = true;
+                    }
+                    break;
             }
         };
 
     }
 
-
+    bool FirstLoad = true;
     private void BTGovee_EnvironmentalControl_Loaded(object sender, RoutedEventArgs e)
     {
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
-        if (uiTableView.ItemsSource != null) return;
-        uiTableView.ItemsSource = HistoricalGoveeUnits.Data;
+        if (!FirstLoad) return;
+        FirstLoad = false;
         uiDeviceName.Text = "Govee " + GoveeSensorType.ToString();
     }
 
@@ -133,6 +128,35 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
 
     public KnownDevice DataContextAsKnownDevice { get { return DataContext as KnownDevice; } }
 
+    int NLeftAxis = 0;
+    int NRightAxis = 0;
+
+    private void AddPlotAxisAndSeries(PlotModel oxyPlotModel, AxisPosition position, string title, string key, OxyColor color)
+    {
+        var tier = position == AxisPosition.Left ? NLeftAxis++ : NRightAxis++;
+        var axis = new LinearAxis()
+        {
+            Position = position,
+            PositionTier = tier,
+            Title = title,
+            Key = key,
+        };
+
+        var series = new LineSeries
+        {
+            Title = title,
+            Color = color,
+            StrokeThickness = 0.75,
+            MarkerType = MarkerType.None,
+            DataFieldX = "TimestampMostRecentDT",
+            DataFieldY = key,
+            YAxisKey = key,
+            ItemsSource = HistoricalGoveeUnits.Data,
+        };
+
+        oxyPlotModel.Axes.Add(axis);
+        oxyPlotModel.Series.Add(series);
+    }
 
     // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; } = new PlotModel
@@ -143,61 +167,7 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
         Axes =
             {
                 new DateTimeAxis { Position = AxisPosition.Bottom },
-                new LinearAxis
-                {
-                    Position = AxisPosition.Left,
-                    PositionTier = 0,
-                    Title="Temperature",
-                    Key="Temperature"
-                },
-                new LinearAxis
-                {
-                    Position = AxisPosition.Left,
-                    PositionTier = 1,
-                    Title="Humidity",
-                    Key="Humidity"
-                },
-                new LinearAxis
-                {
-                    Position = AxisPosition.Right,
-                    PositionTier = 1,
-                    Title="PM25",
-                    Key="PM25"
-                },
             },
-        Series =
-            {
-                new LineSeries
-                {
-                    Title = "Temperature",
-                    Color = OxyColors.DarkBlue,
-                    StrokeThickness = 0.75,
-                    MarkerType = MarkerType.None,
-                    DataFieldX = "TimestampMostRecentDT",
-                    DataFieldY = "Temperature",
-                    YAxisKey= "Temperature",
-                },
-                new LineSeries
-                {
-                    Title = "Humidity",
-                    Color = OxyColors.Violet,
-                    StrokeThickness = 0.75,
-                    MarkerType = MarkerType.None,
-                    DataFieldX = "TimestampMostRecentDT",
-                    DataFieldY = "Humidity",
-                    YAxisKey= "Humidity",
-                },
-                new LineSeries
-                {
-                    Title = "PM25",
-                    Color = OxyColors.Gray,
-                    StrokeThickness = 0.75,
-                    MarkerType = MarkerType.None,
-                    DataFieldX = "TimestampMostRecentDT",
-                    DataFieldY = "PM25",
-                    YAxisKey= "PM25",
-                },
-            }
     };
     /// <summary>
     /// Set the axes to either visible or invisible. 
@@ -271,16 +241,6 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
         DataContextAsKnownDevice.Id = DataContextAsKnownDevice.Advertisement.AddressAsString; //  Device.ble.DeviceId ?? ""; // never null :-)
         //DataContextAsKnownDevice.BTLEDevice = Device.ble;
 
-        // Initialize the line colors from the default colors in the OxyPlotModel.
-        // This will get over-ridden with the data from the saveData
-        InitializeKeyLineColorsFromDefaultOxyPlot();
-
-
-        var saveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id);
-        if (saveData != null)
-        {
-            UpdateUX(saveData);
-        }
 
         // Initialize data values
         GoveeSensorType = Govee.AdvertIsGovee(DataContextAsKnownDevice.Advertisement);
@@ -650,50 +610,112 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
 
     string name = "Govee";
     bool FirstCallWithIsValid = true;
+
+    /// <summary>
+    /// Called by MainWindow / Advertisement Watcher when a new advertisement from the specific (known)
+    /// device is seen.
+    /// </summary>
+    /// <param name="data"></param>
     public void HandleMyAdvertisement(WatcherData data)
     {
         UIThreadHelper.CallOnUIThread(() =>
         {
-            if (this.IsLoaded) // Won't be loaded when we exit the app!
-            {
-                name = data.BestName;
-                CurrGovee = Govee.Parse(GoveeSensorType, data, CurrGovee);
-                if (CurrGovee == null)
-                {
-                    Log($"ERROR: unable to parse Govee data for sensor type {GoveeSensorType}");
-                    return;
-                }
-                CurrGovee.EventTime = data.MostRecentAdvertisement.Timestamp;
-                if (CurrGovee.IsValid)
-                {
-                    if (FirstCallWithIsValid)
-                    {
-                        // Only display valid values
-                        int row = 0;
-                        int col = 0;
-                        // These must be in the same order they they should be visible in
-                        AdjustSensor(uiSensorTemperature, SensorDataRecord.SensorPresent.Temperature, ref row, ref col);
-                        AdjustSensor(uiSensorHumidity, SensorDataRecord.SensorPresent.Humidity, ref row, ref col);
-                        AdjustSensor(uiSensorPM25, SensorDataRecord.SensorPresent.PM25, ref row, ref col);
-                        AdjustSensor(uiSensorPressure, SensorDataRecord.SensorPresent.Pressure, ref row, ref col);
+            if (!this.IsLoaded) return; // Won't be loaded when we exit the app!
 
-                        FirstCallWithIsValid = false;
-                    }
-                    // Lots of reasons it might be invalid
-                    UpdateGraphData("*"); // Update all the data!
+            name = data.BestName;
+            CurrGovee = Govee.Parse(GoveeSensorType, data, CurrGovee);
+            if (CurrGovee == null)
+            {
+                // Lots of reasons it might be invalid. For example, we get an advert that includes a 
+                // name (and creates this control), but the advert doesn't include the data because
+                // we haven't gotten the BT advertisement response yet.
+                Log($"ERROR: unable to parse Govee data for sensor type {GoveeSensorType}");
+                return;
+            }
+            CurrGovee.Name = name;
+            CurrGovee.EventTime = data.MostRecentAdvertisement.Timestamp;
+            if (CurrGovee.IsValid)
+            {
+                if (FirstCallWithIsValid)
+                {
+                    SetupOnFirstValidData();
+                    FirstCallWithIsValid = false;
                 }
+                UpdateGraphData("*"); // Update all the data!
             }
         });
 
     }
 
-    private void AdjustSensor(Panel panel, SensorDataRecord.SensorPresent flag, ref int row, ref int col)
+    private void SetupOnFirstValidData()
     {
+        // Set up the Connect button and Battery visibility
+        uiBTConnectionControl.SetConnectVisibility(Visibility.Collapsed);
+        if (!CurrGovee.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Battery))
+        {
+            uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
+        }
+
+        // Only display valid values
+        int row = 0;
+        int col = 0;
+        // These must be in the same order they they should be visible in
+        AdjustSensorPosition(uiSensorTemperature, SensorDataRecord.SensorPresent.Temperature, ref row, ref col);
+        AdjustSensorPosition(uiSensorHumidity, SensorDataRecord.SensorPresent.Humidity, ref row, ref col);
+        AdjustSensorPosition(uiSensorPM25, SensorDataRecord.SensorPresent.PM25, ref row, ref col);
+        AdjustSensorPosition(uiSensorPressure, SensorDataRecord.SensorPresent.Pressure, ref row, ref col);
+
+        if (CurrGovee.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature))
+        {
+            AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Left, "Temperature", "Temperature", OxyColors.DarkBlue);
+            TableColumns.Add("Temperature");
+        }
+
+        if (CurrGovee.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity))
+        {
+            AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Left, "Humidity", "Humidity", OxyColors.Violet);
+            TableColumns.Add("Humidity");
+        }
+
+        if (CurrGovee.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.PM25))
+        {
+            AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Right, "PM25", "PM25", OxyColors.Gray);
+            TableColumns.Add("PM25");
+        }
+        //
+        uiOxyPlot.Model = OxyPlotModel;
+
+        // Initialize the line colors from the default colors in the OxyPlotModel.
+        // This will get over-ridden with the data from the saveData
+        InitializeKeyLineColorsFromDefaultOxyPlot();
+
+        var saveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id);
+        if (saveData != null)
+        {
+            UpdateUX(saveData);
+        }
+
+        //
+        // Initialize the table
+        //
+        uiTableView.ItemsSource = HistoricalGoveeUnits.Data;
+    }
+
+    /// <summary>
+    /// Update the row/column for each of the data block (e.g., the block that says "Temperature")
+    /// </summary>
+    /// <param name="panel"></param>
+    /// <param name="flag"></param>
+    /// <param name="row"></param>
+    /// <param name="col"></param>
+    private void AdjustSensorPosition(Panel panel, SensorDataRecord.SensorPresent flag, ref int row, ref int col)
+    {
+        const int NCOL = 3;
         if (CurrGovee.IsSensorPresent.HasFlag(flag)) // e.g., SensorDataRecord.SensorPresent.Temperature
         {
             Grid.SetRow(panel, row); // panel is e.g., uiSensorTemperature
             Grid.SetColumn(panel, col++);
-            if (col >= 3) { row++; col = 0; }
+            if (col >= NCOL) { row++; col = 0; }
         }
         else
         {

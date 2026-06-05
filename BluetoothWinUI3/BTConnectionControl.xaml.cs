@@ -68,6 +68,11 @@ namespace BluetoothWinUI3
             internal set { if (value == _CurrState) return; _CurrState = value; UpdateIcon();  OnConnectionChanged(); } 
         }
 
+        public void SetConnectVisibility(Visibility visibility)
+        {
+            uiConnectInfo.Visibility = visibility;
+        }
+
         public void SetBatteryVisibility(Visibility visibility)
         {
             uiBatteryLevelIcon.Visibility = visibility;

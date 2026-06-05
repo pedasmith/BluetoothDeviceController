@@ -27,11 +27,7 @@ namespace BluetoothProtocols
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
-        private double _BatteryInPercent;
-        /// <summary>
-        /// BatteryInPercent isn't available for all devices.
-        /// </summary>
-        public double BatteryInPercent { get { return _BatteryInPercent; } set { if (value == _BatteryInPercent) return; _BatteryInPercent = value; OnPropertyChanged(); } }
+
 
         /// <summary>
         /// Message created by the Parse method; it's a handy user-readable string for the temp / humidity
@@ -47,15 +43,22 @@ namespace BluetoothProtocols
         {
             dest ??= source.Clone();
             dest.EventTime = source.EventTime;
-            dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(source.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
-            dest.Pressure = BluetoothWatcher.Units.Pressure.Convert(source.Pressure, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
+            dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(
+                source.Temperature, 
+                BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, 
+                CurrUserPrefs.Temperature);
+            dest.Pressure = BluetoothWatcher.Units.Pressure.Convert(
+                source.Pressure, 
+                BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, 
+                CurrUserPrefs.Pressure);
             dest.Humidity = source.Humidity; // Humidity is always in percent, so no conversion needed.
             dest.PM25 = source.PM25;
+            dest.BatteryInPercent = source.BatteryInPercent;
+            dest.Name = source.Name;
 
             dest.IsValid = source.IsValid;
             dest.CompanyId= source.CompanyId;
             dest.TagType = source.TagType;
-            dest.BatteryInPercent = source.BatteryInPercent;
             return dest;
         }
 
@@ -66,11 +69,12 @@ namespace BluetoothProtocols
             Pressure = value.Pressure;
             Humidity = value.Humidity; // Humidity is always in percent, so no conversion needed.
             PM25 = value.PM25;
+            BatteryInPercent = value.BatteryInPercent;
+            Name = value.Name;
 
             IsValid = value.IsValid;
             CompanyId = value.CompanyId;
             TagType = value.TagType;
-            BatteryInPercent = value.BatteryInPercent;
         }
 
 
@@ -108,8 +112,6 @@ namespace BluetoothProtocols
         /// Parses a BleAdvertisementWrapper and returns a Govee data record. Return might be null or might be Invalid.
         /// The source will be overwritten! Null is never returned!
         /// </summary>
-        /// <param name="wrapper"></param>
-        /// <returns></returns>
         public static Govee Parse(SensorType sensorType, WatcherData wrapper, Govee source)
         {
             var retval = source ?? new Govee();
@@ -118,25 +120,10 @@ namespace BluetoothProtocols
                 retval.IsValid = false;
                 return retval;
             }
-
-            var ble = wrapper.OriginalAdvertisement;
-            if (ble != null)
+            foreach (var advert in wrapper.Advertisements)
             {
-                foreach (var section in ble.Advertisement.DataSections)
-                {
-                    DataTypeValue dtv = ConvertDataTypeValue(section.DataType); // get the enum value
-                    switch (dtv)
-                    {
-                        case DataTypeValue.ManufacturerData:
-                            retval = Parse(sensorType, section, source);
-                            break;
-                    }
-                }
-            }
-            ble = wrapper.ResponseAdvertisement;
-            if (ble != null)
-            {
-                foreach (var section in ble.Advertisement.DataSections)
+                if (advert == null) continue;
+                foreach (var section in advert.Advertisement.DataSections)
                 {
                     DataTypeValue dtv = ConvertDataTypeValue(section.DataType); // get the enum value
                     switch (dtv)
@@ -252,7 +239,7 @@ namespace BluetoothProtocols
                         case SensorType.H5074:
                             {
                                 var junk = dr.ReadByte();
-                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
                                 retval.Temperature = dr.ReadInt16() / 100.0;
                                 retval.Humidity = dr.ReadInt16() / 100.0;
                                 retval.BatteryInPercent = dr.ReadByte();
@@ -263,7 +250,7 @@ namespace BluetoothProtocols
                         case SensorType.H5075:
                             {
                                 var junk2 = dr.ReadByte();
-                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
                                 // Yes, this encoding is horrible for no good reason.
                                 var b1 = dr.ReadByte();
                                 var b2 = dr.ReadByte();
@@ -299,7 +286,7 @@ namespace BluetoothProtocols
                             // The first two  bytes have already been read in.
                             // Example: 01 00 [company] 01 01 01 78 C1 64 00 00 is 9C 44%
                             {
-                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
                                 var junk1 = dr.ReadByte();
                                 var junk2 = dr.ReadByte();
                                 var b1 = dr.ReadByte();
@@ -320,7 +307,7 @@ namespace BluetoothProtocols
                             // Example: 01 00 [company] 01 01 01 78 C1 64 is 9C 44%
                             // Is just like the H5171 but without the last 2 bytes 
                             {
-                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
                                 var junk1 = dr.ReadByte();
                                 var junk2 = dr.ReadByte();
                                 var b1 = dr.ReadByte();

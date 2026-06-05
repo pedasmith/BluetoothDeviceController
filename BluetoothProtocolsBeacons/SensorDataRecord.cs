@@ -21,7 +21,7 @@ namespace BluetoothProtocols
          * 2. Update the RuuvitagPage.xaml.cs with the new value (about line 50, // SensorDataRecord: Update)
          */
         [Flags]
-        public enum SensorPresent {  None=0x00, Temperature = 0x01, Pressure = 0x02, Humidity = 0x04, PM25 = 0x08, All=0x0F };
+        public enum SensorPresent {  None=0x00, Temperature = 0x01, Pressure = 0x02, Humidity = 0x04, PM25 = 0x08, Battery = 0x10, All=0x1F };
         public SensorPresent IsSensorPresent { get; set; } = SensorPresent.All;
         public SensorDataRecord()
         {
@@ -40,6 +40,7 @@ namespace BluetoothProtocols
             EventTime = eventTime ?? DateTimeOffset.Now;
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity;
         }
+
         public SensorDataRecord(double temperature, double humidity, DateTimeOffset? eventTime)
         {
             Temperature = temperature;
@@ -49,10 +50,16 @@ namespace BluetoothProtocols
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
         }
 
-
         public void ExportHeaders(IExportData exporter)
         {
-            exporter.HeadersSet(["Date", "Time", "Temperature", "Humidity", "PM25"]);
+            List<string> headers = new List<string>() { "Date", "Time", "Name" };
+            if (IsSensorPresent.HasFlag(SensorPresent.Temperature)) headers.Add("Temperature");
+            if (IsSensorPresent.HasFlag(SensorPresent.Pressure)) headers.Add("Pressure");
+            if (IsSensorPresent.HasFlag(SensorPresent.Humidity)) headers.Add("Humidity");
+            if (IsSensorPresent.HasFlag(SensorPresent.PM25)) headers.Add("PM25");
+            if (IsSensorPresent.HasFlag(SensorPresent.Battery)) headers.Add("Battery");
+
+            exporter.HeadersSet(headers.ToArray());
         }
 
         public void ExportRow(IExportData exporter)
@@ -60,9 +67,12 @@ namespace BluetoothProtocols
             exporter.RowStart();
             exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
             exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-            exporter.CellSet(Temperature);
-            exporter.CellSet(Humidity);
-            exporter.CellSet(PM25);
+            exporter.CellSet(Name);
+            if (IsSensorPresent.HasFlag(SensorPresent.Temperature)) exporter.CellSet(Temperature);
+            if (IsSensorPresent.HasFlag(SensorPresent.Pressure)) exporter.CellSet(Pressure);
+            if (IsSensorPresent.HasFlag(SensorPresent.Humidity)) exporter.CellSet(Humidity);
+            if (IsSensorPresent.HasFlag(SensorPresent.PM25)) exporter.CellSet(PM25);
+            if (IsSensorPresent.HasFlag(SensorPresent.Battery)) exporter.CellSet(BatteryInPercent);
             exporter.RowEnd();
         }
 
@@ -72,6 +82,7 @@ namespace BluetoothProtocols
         public const string PM25PropertyChangedName = "PM25";
         public const string PressurePropertyChangedName = "Pressure";
         public const string HumidityPropertyChangedName = "Humidity";
+        public const string BatteryPropertyChangedName = "BatteryInPercent";
 
         // For the INPC INotifyPropertyChanged values
         public event PropertyChangedEventHandler PropertyChanged;
@@ -114,8 +125,19 @@ namespace BluetoothProtocols
         /// </summary>
         private double _PM25;
         public double PM25 { get { return _PM25; } set { if (value == _PM25) return; _PM25 = value; OnPropertyChanged(); } }
+
+
+        private double _BatteryInPercent;
+        /// <summary>
+        /// Battery in percent
+        /// </summary>
+        public double BatteryInPercent { get { return _BatteryInPercent; } set { if (value == _BatteryInPercent) return; _BatteryInPercent = value; OnPropertyChanged(); } }
+
         private String _Note;
         public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
+
+        private String _Name;
+        public String Name { get { return _Name; } set { if (value == _Name) return; _Name = value; OnPropertyChanged(); } }
 
         public override string ToString()
         {
