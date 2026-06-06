@@ -31,7 +31,6 @@
     <None Remove="Assets\Icons\Icon.png" />
     <None Remove="Assets\Icons\StoreLogo.png" />
     <None Remove="BTBlank_BlankControl.xaml" />
-    <None Remove="BTGovee_EnvironmentalControl.xaml" />
     <None Remove="BTNordic_ThingyControl.xaml" />
     <None Remove="BTServicesCharacteristicsDisplay.xaml" />
     <None Remove="MarkdownHelpSystem.xaml" />
@@ -190,7 +189,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="BTGovee_EnvironmentalControl.xaml">
+    <Page Update="BTCommon_EnvironmentalControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

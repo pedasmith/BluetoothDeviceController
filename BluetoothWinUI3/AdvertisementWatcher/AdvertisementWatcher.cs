@@ -71,6 +71,13 @@ namespace BluetoothWatcher.AdvertismentWatcher
             if (watcherData == null) return; // got a rogue ScanResponse!
 
 
+            // When a system goes to sleep and then wakes up, there's often a flood of old advertisements. Don't print them out;
+            // it takes a lot of time for no benefit.
+            var now = DateTimeOffset.UtcNow;
+            var delta = now.Subtract(watcherData.MostRecentAdvertisement.Timestamp);
+            var isOldAdvertisement = delta.TotalMinutes > 1;
+
+
             // Convert the raw args to specialized args.
             foreach (var section in args.Advertisement.DataSections)
             {
@@ -111,7 +118,8 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 return;
             }
 
-            if (watcherData.ManufacturerType != BluetoothCompanyIdentifier.CommonManufacturerType.Apple10)
+            var ignoreForPrinting = isOldAdvertisement || watcherData.ManufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
+            if (!ignoreForPrinting)
             {
                 // don't bother spiting out apple data; there's much too much of it
                 System.Diagnostics.Debug.WriteLine($"Bluetooth Event: addr={BluetoothAddress.AsString(args.BluetoothAddress)} rx={args.RawSignalStrengthInDBm} tx={watcherData.TransmitPower}  txarg={args.TransmitPowerLevelInDBm} name={watcherData.BestName} company {watcherData.CompanyId}={BluetoothCompanyIdentifier.GetBluetoothCompanyIdentifier(watcherData.CompanyId)} data={watcherData.ParsedCompanyDataTrim}");

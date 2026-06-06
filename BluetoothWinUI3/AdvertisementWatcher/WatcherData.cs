@@ -243,7 +243,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                     DataTypeValue dtv = ConvertDataTypeValue(b); // get the enum value e.g. Flags (0x01) or IncompleteListOf16BitServiceUuids (0x02)
                     if (dtv == DataTypeValue.ManufacturerData)
                     {
-                        var str = $"\t\t\t\"{section.Data.ToHex()}\",\n";
+                        var str = $"\t\t\t\t\"{section.Data.ToHex()}\",\n";
                         retval += str;
                     }
                 }

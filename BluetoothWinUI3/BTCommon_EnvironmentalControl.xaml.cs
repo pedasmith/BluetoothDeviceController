@@ -29,7 +29,7 @@ namespace BluetoothWinUI3;
 
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceControlBasic, IDeviceControlDevice, IHandleMyBTAdvertisements
+public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDeviceControlBasic, IDeviceControlDevice, IHandleMyBTAdvertisements
 {
 
     /// <summary>
@@ -66,11 +66,11 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
     Govee.SensorType GoveeSensorType = Govee.SensorType.NotGovee; // Initialize as not a Govee at all.
     List<string> TableColumns = new();
 
-    public BTGovee_EnvironmentalControl()
+    public BTCommon_EnvironmentalControl()
     {
         InitializeComponent();
-        this.Loaded += BTGovee_EnvironmentalControl_Loaded;
-        this.DataContextChanged += BTGovee_EnvironmentalControl_DataContextChanged;
+        this.Loaded += BTCommon_EnvironmentalControl_Loaded;
+        this.DataContextChanged += BTCommon_EnvironmentalControl_DataContextChanged;
 
 
 
@@ -113,7 +113,7 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
     }
 
     bool FirstLoad = true;
-    private void BTGovee_EnvironmentalControl_Loaded(object sender, RoutedEventArgs e)
+    private void BTCommon_EnvironmentalControl_Loaded(object sender, RoutedEventArgs e)
     {
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
@@ -209,7 +209,7 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
     /// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
     /// used by other bits of the system.
     /// </summary>
-    private async void BTGovee_EnvironmentalControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    private async void BTCommon_EnvironmentalControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
         // FYI: by the time this method is called, the DataContext is already set
 
@@ -730,4 +730,4 @@ public sealed partial class BTGovee_EnvironmentalControl : UserControl, IDeviceC
 
     #endregion
 
-} // end of class BTGovee_EnvironmentalControl
+} // end of class BTCommon_EnvironmentalControl

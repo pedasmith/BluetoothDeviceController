@@ -11,6 +11,18 @@
         "https://github.com/pasky/tp357",
         "https://github.com/zett90/tp357-browser-view/blob/2efdd3ca726f65c554d0674da70538ec79567061/app/src/utils/thermoPro.js#L11"
       ],
+
+			"AdvertisementData" : [
+        "-- T0 T1 HH -- --  T=(T0<<8 + T1)/10 H=HH",
+        "ERROR: the device is using the manufacturer id for data!",
+				"C2 C0 00 32 02 2C",
+				"C2 C0 00 32 02 2C",
+				"C2 C0 00 32 02 2C",
+				"C2 C0 00 32 02 2C",
+				"C2 C0 00 32 02 2C",
+				"C2 C0 00 32 02 2C"
+			],      
+      
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

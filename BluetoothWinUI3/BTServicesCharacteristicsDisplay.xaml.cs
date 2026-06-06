@@ -123,9 +123,9 @@ namespace BluetoothWinUI3
                 if (lastComma > 0) // Also implies there's data!
                 {
                     md = md.Remove(lastComma, 1); // Remove the last comma so it's JSON compatible
-                    sb.Append("\t\t\"AdvertisementData\" : [\n");
+                    sb.Append("\t\t\t\"AdvertisementData\" : [\n");
                     sb.Append(md);
-                    sb.Append("\t\t,\n");
+                    sb.Append("\t\t\t],\n");
                 }
                 sb.Append("\n\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n");
             }
