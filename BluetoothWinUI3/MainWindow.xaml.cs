@@ -941,6 +941,10 @@ namespace BluetoothWinUI3
             // null means not a supported device (since the supported device is determined from the watcher data)
         }
 
-
+        private void OnDebugSetFilterRssiDb(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (sender as ToggleMenuFlyoutItem)?.IsChecked ?? false;
+            AdvertisementWatcher.FilterRssiDb = isChecked ? -65 : -200;
+        }
     }
 }

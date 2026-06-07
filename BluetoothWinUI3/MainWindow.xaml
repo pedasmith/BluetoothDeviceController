@@ -71,7 +71,8 @@
                     <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
                     <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
                     <MenuFlyoutItem Text="Show directories" Click="OnDebugShowDirectories" AccessKey="D" />
-                    <MenuFlyoutItem Text="Show advertisements" Click="OnDebugShowAdvertisements" AccessKey="D" />
+                    <ToggleMenuFlyoutItem Text="Filter far-away advertisements" Click="OnDebugSetFilterRssiDb" AccessKey="F" />
+                    <MenuFlyoutItem Text="Show advertisements" Click="OnDebugShowAdvertisements" AccessKey="A" />
                 </MenuBarItem>
                 
                 <MenuBarItem Title="Help" AccessKey="H">

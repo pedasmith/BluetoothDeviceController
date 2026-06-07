@@ -21,6 +21,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
     {
         public delegate void WatcherEventHandler(BluetoothLEAdvertisementWatcher sender, WatcherData e);
         public event WatcherEventHandler WatcherEvent;
+        public double FilterRssiDb = -200; // essentially everything
 
         BluetoothLEAdvertisementWatcher BleAdvertisementWatcher = null;
 
@@ -45,8 +46,10 @@ namespace BluetoothWatcher.AdvertismentWatcher
 
         private void BleAdvertisementWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
-            int filterLevel = -75;
+            bool ignoreRssiDbFilter = false;
             WatcherData watcherData = null;
+            bool havePreviousAdvert = false;
+            WatcherData previousAdvert = null;
             if (args.IsScanResponse)
             {
                 OriginalAdvertisements.TryGetValue(args.BluetoothAddress, out watcherData);
@@ -61,6 +64,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
             }
             else
             {
+                havePreviousAdvert = OriginalAdvertisements.TryGetValue(args.BluetoothAddress, out previousAdvert);
                 watcherData = new WatcherData()
                 {
                     OriginalAdvertisement = args,
@@ -108,12 +112,16 @@ namespace BluetoothWatcher.AdvertismentWatcher
                         break;
                 }
             }
+            if (string.IsNullOrEmpty(watcherData.BestName) && havePreviousAdvert)
+            {
+                watcherData.BestName = previousAdvert.BestName;
+            }
             if (watcherData.CompanyId == 18498)
             {
                 var n = args.Advertisement.LocalName;
-                filterLevel = -255; // Always let in the blood pressure cuff, because reasons.
+                ignoreRssiDbFilter = true;
             }
-            if (args.RawSignalStrengthInDBm < filterLevel)
+            if (args.RawSignalStrengthInDBm < FilterRssiDb && !ignoreRssiDbFilter)
             {
                 return;
             }
