@@ -13,10 +13,10 @@ using static BluetoothProtocols.AdvertisementDataSectionParser;
 
 namespace BluetoothProtocols
 {
-    public class ThermPro : CopyableSensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
+    public class SensorPro : CopyableSensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
     {
         /// <summary>
-        /// CompanyId is from the advertisement in the manufacturer-specific section. ThermPro devices
+        /// CompanyId is from the advertisement in the manufacturer-specific section. SensorPro devices
         /// completely mess it up; the CompanyId includes actual data.
         /// 
         /// It's supposed to only be one of the values 
@@ -24,7 +24,7 @@ namespace BluetoothProtocols
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
         public UInt16 CompanyId { get; set; } // will by 0xEC88=60552 for the Govee H5074 H5075
-        public enum SensorType { Other, TP357, NotThisSensorFamily };
+        public enum SensorType { Other, T201, NotThisSensorFamily };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -35,12 +35,12 @@ namespace BluetoothProtocols
         /// </summary>
         public string EncodeMessage { get; set; }
 
-        public override ThermPro Clone()
+        public override SensorPro Clone()
         {
-            return this.MemberwiseClone() as ThermPro;
+            return this.MemberwiseClone() as SensorPro;
         }
 
-        public ThermPro CopyToAndUpdateUnits(ThermPro dest, UserPreferences CurrUserPrefs)
+        public SensorPro CopyToAndUpdateUnits(SensorPro dest, UserPreferences CurrUserPrefs)
         {
             dest ??= this.Clone();
             base.CopyToAndUpdateUnits(dest, CurrUserPrefs);
@@ -51,7 +51,7 @@ namespace BluetoothProtocols
             return dest;
         }
 
-        public void CopyFrom(ThermPro value)
+        public void CopyFrom(SensorPro value)
         {
             base.CopyFrom(value);
 
@@ -83,7 +83,7 @@ namespace BluetoothProtocols
             SensorType retval = SensorType.NotThisSensorFamily;
             if (name != null)
             {
-                if (name.StartsWith("TP357")) retval = SensorType.TP357;
+                if (name.StartsWith("T201")) retval = SensorType.T201;
             }
             return retval;
         }
@@ -92,9 +92,9 @@ namespace BluetoothProtocols
         /// Parses a BleAdvertisementWrapper and returns a Govee data record. Return might be null or might be Invalid.
         /// The source will be overwritten! Null is never returned!
         /// </summary>
-        public static ThermPro Parse(SensorType sensorType, WatcherData wrapper, ThermPro source)
+        public static SensorPro Parse(SensorType sensorType, WatcherData wrapper, SensorPro source)
         {
-            var retval = source ?? new ThermPro();
+            var retval = source ?? new SensorPro();
             if (sensorType == SensorType.NotThisSensorFamily)
             {
                 retval.IsValid = false;
@@ -120,15 +120,15 @@ namespace BluetoothProtocols
 
 
         /// <summary>
-        /// Will parse a ThermPro sensor. Must be given the sensor type which is from AdvertIsThermPro (parsing depends on 
+        /// Will parse a SensorPro sensor. Must be given the sensor type which is from AdvertIsThermPro (parsing depends on 
         /// the type)
         /// </summary>
         /// <param name="sensorType"></param>
         /// <param name="section"></param>
         /// <returns></returns>
-        public static ThermPro Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section, ThermPro source)
+        public static SensorPro Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section, SensorPro source)
         {
-            var retval = source ?? new ThermPro();
+            var retval = source ?? new SensorPro();
             retval.TagType = sensorType;
             retval.IsValid = false; // will be set true if the data is valid.
 
@@ -138,7 +138,7 @@ namespace BluetoothProtocols
             {
                 var dr = DataReader.FromBuffer(section.Data);
                 dr.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
-                if (dr.UnconsumedBufferLength > 6)
+                if (dr.UnconsumedBufferLength > 19)
                 {
                     var pre = dr.ReadInt16();
                     var (strName, nameOk) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength - 4);
@@ -154,17 +154,28 @@ namespace BluetoothProtocols
                         default:
                             retval.IsValid = false;
                             break;
-                        case SensorType.TP357: // Example: C2 C0 00 32 02 2C
+                        case SensorType.T201: // Example: 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 08 1F 12 71 64 00 01  #18.9C 46%
                             {
-                                // -- TL TH HU
-                                // C2 C0 00 32 02 2C
                                 //
+                                // -- -- -- -- 05 -- -- -- -- 10 -- -- -- -- 15 -- -- -- -- 20
+                                // -- -- -- -- -- -- -- -- -- -- -- le Th Tl Hh Hl Ba -- -- 
+                                // 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 07 56 15 23 64 00 01
+                                // 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 07 F9 12 E9 64 00 01
+                                // 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 08 1F 12 71 64 00 01  #18.9C 46%
+                                //
+                                // 081F is 2079 (big endian)
+                                // 1271 is 4721 (also big endian)
 
-                                var junk = dr.ReadByte();
-                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
-                                retval.Temperature = dr.ReadInt16() / 10.0;
-                                retval.Humidity = dr.ReadByte();
-                                //retval.BatteryInPercent = dr.ReadByte();
+                                dr.ByteOrder = ByteOrder.BigEndian; // Yeah, not ideal
+                                var start = dr.ReadInt16(); // 55AA
+                                byte[] junk = new byte[9];
+                                dr.ReadBytes(junk);
+                                var len = dr.ReadByte();
+
+                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
+                                retval.Temperature = dr.ReadInt16() / 100.0;
+                                retval.Humidity = dr.ReadInt16() / 100.0;
+                                retval.BatteryInPercent = dr.ReadByte();
                                 retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% ";
                                 retval.IsValid = true;
                             }

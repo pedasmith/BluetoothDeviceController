@@ -55,6 +55,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("GV5171*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GV5179_*", typeof(BTCommon_EnvironmentalControl)),
 
+            // SensorPro devices
+            new SupportedDevice("T201", typeof(BTCommon_EnvironmentalControl)),
+
             // ThermPro devices
             new SupportedDevice("TP357*", typeof(BTCommon_EnvironmentalControl)),
         };

@@ -103,7 +103,8 @@ namespace BluetoothWinUI3
 
     /// <summary>
     /// Wants all of the advertisements for my specific (known) device based on BT address. Used by 
-    /// Govee_EnvironmentalControl because the Govee data is packed into the adverts.
+    /// a bunch of sensor like the BTCommon_EnvironmentalControl because the Govee, SensorPro, ThermPro etc. 
+    /// data is packed into the adverts.
     /// </summary>
     public interface IHandleMyBTAdvertisements
     {

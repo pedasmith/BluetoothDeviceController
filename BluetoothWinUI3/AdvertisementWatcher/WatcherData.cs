@@ -210,8 +210,8 @@ namespace BluetoothWatcher.AdvertismentWatcher
             // Lastly: let's find special data like for Govee 
             //
 
-            var goveeType = Govee.AdvertIsGovee(this);
-            if (goveeType != Govee.SensorType.NotGovee)
+            var goveeType = Govee.AdvertIsSensorFamily(this);
+            if (goveeType != Govee.SensorType.NotThisSensorFamily)
             {
                 var goveeData = Govee.Parse(goveeType, this, null);
                 if (goveeData != null)

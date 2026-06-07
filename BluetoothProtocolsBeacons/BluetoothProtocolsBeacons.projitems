@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Ruuvi_Tag_v1_Helper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SensorDataCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SensorDataRecord.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SensorPro.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ThermPro.cs" />
   </ItemGroup>
 </Project>

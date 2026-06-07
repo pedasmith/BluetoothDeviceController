@@ -11,8 +11,7 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-using System.Linq;
-using System.Threading;
+
 using Utilities;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
@@ -41,7 +40,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "EnivonrmentSensor";
+    private readonly string InternalDeviceType = "EnvironmentSensor";
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
@@ -52,7 +51,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// always in the 'native' units (e.g., always celcius for temperature).
     /// </summary>
     CopyableSensorDataRecord CurrSensor = null;
-    enum SensorType {  Govee, ThermPro};
+    enum SensorType {  Govee, SensorPro, ThermPro};
     SensorType CurrSensorType = SensorType.Govee;
 
     /// <summary>
@@ -65,8 +64,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// <summary>
     /// There are multiple sensors that this one control can handle.
     /// </summary>
-    Govee.SensorType GoveeSensorType = Govee.SensorType.NotGovee; // Initialize as not this kind.
-    ThermPro.SensorType ThermProSensorType = ThermPro.SensorType.NotThermPro; // Initialize as not this kind.
+    Govee.SensorType GoveeSensorType = Govee.SensorType.NotThisSensorFamily; // Initialize as not this kind.
+    SensorPro.SensorType SensorProSensorType = SensorPro.SensorType.NotThisSensorFamily; // Initialize as not this kind.
+    ThermPro.SensorType ThermProSensorType = ThermPro.SensorType.NotThisSensorFamily; // Initialize as not this kind.
     List<string> TableColumns = new();
 
     public BTCommon_EnvironmentalControl()
@@ -122,11 +122,15 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // attached to somewhere else (e.g., when the control is made large and then small)
         if (!FirstLoad) return;
         FirstLoad = false;
-        if (GoveeSensorType != Govee.SensorType.NotGovee)
+        if (GoveeSensorType != Govee.SensorType.NotThisSensorFamily)
         {
             uiDeviceName.Text = "Sensor " + GoveeSensorType.ToString();
         }
-        if (ThermProSensorType != ThermPro.SensorType.NotThermPro)
+        if (SensorProSensorType != SensorPro.SensorType.NotThisSensorFamily)
+        {
+            uiDeviceName.Text = "Sensor " + SensorProSensorType.ToString();
+        }
+        if (ThermProSensorType != ThermPro.SensorType.NotThisSensorFamily)
         {
             uiDeviceName.Text = "Sensor " + ThermProSensorType.ToString();
         }
@@ -253,8 +257,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
 
         // Initialize data values
-        GoveeSensorType = Govee.AdvertIsGovee(DataContextAsKnownDevice.Advertisement);
-        ThermProSensorType = ThermPro.AdvertIsThermPro(DataContextAsKnownDevice.Advertisement);
+        GoveeSensorType = Govee.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
+        SensorProSensorType = SensorPro.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
+        ThermProSensorType = ThermPro.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
         HandleMyAdvertisement(DataContextAsKnownDevice.Advertisement);
     }
 
@@ -635,11 +640,15 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             if (!this.IsLoaded) return; // Won't be loaded when we exit the app!
 
             name = data.BestName;
-            if (GoveeSensorType != Govee.SensorType.NotGovee)
+            if (GoveeSensorType != Govee.SensorType.NotThisSensorFamily)
             {
                 CurrSensor = Govee.Parse(GoveeSensorType, data, CurrSensor as Govee);
             }
-            if (ThermProSensorType != ThermPro.SensorType.NotThermPro)
+            if (SensorProSensorType != SensorPro.SensorType.NotThisSensorFamily)
+            {
+                CurrSensor = SensorPro.Parse(SensorProSensorType, data, CurrSensor as SensorPro);
+            }
+            if (ThermProSensorType != ThermPro.SensorType.NotThisSensorFamily)
             {
                 CurrSensor = ThermPro.Parse(ThermProSensorType, data, CurrSensor as ThermPro);
             }

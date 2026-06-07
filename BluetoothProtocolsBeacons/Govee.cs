@@ -23,7 +23,7 @@ namespace BluetoothProtocols
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
         public UInt16 CompanyId { get; set; } // will by 0xEC88=60552 for the Govee H5074 H5075
-        public enum SensorType { Other, H5074, H5075, H5103, H5106, H5171, H5179, NotGovee };
+        public enum SensorType { Other, H5074, H5075, H5103, H5106, H5171, H5179, NotThisSensorFamily };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -62,13 +62,14 @@ namespace BluetoothProtocols
 
         /// <summary>
         /// Returns true if the local name OR the original name matches Govee_H5074_ or GVH5075_
+        /// All of these parsers happen to have an AdvertIsSensorFamily :-)
         /// </summary>
         /// <param name="wrapper"></param>
         /// <returns></returns>
-        public static SensorType AdvertIsGovee(WatcherData wrapper)
+        public static SensorType AdvertIsSensorFamily(WatcherData wrapper)
         {
             var retval = NameToSensorType(wrapper.BestName);
-            if (retval == SensorType.NotGovee && wrapper.OriginalAdvertisement != null)
+            if (retval == SensorType.NotThisSensorFamily && wrapper.OriginalAdvertisement != null)
             {
                 retval = NameToSensorType(wrapper.OriginalAdvertisement.Advertisement.LocalName);
             }
@@ -77,7 +78,7 @@ namespace BluetoothProtocols
 
         private static SensorType NameToSensorType(string name)
         {
-            SensorType retval = SensorType.NotGovee;
+            SensorType retval = SensorType.NotThisSensorFamily;
             if (name != null)
             {
                 if (name.StartsWith("Govee_H5074_")) retval = SensorType.H5074;
@@ -90,6 +91,7 @@ namespace BluetoothProtocols
             }
             return retval;
         }
+
         /// <summary>
         /// Parses a BleAdvertisementWrapper and returns a Govee data record. Return might be null or might be Invalid.
         /// The source will be overwritten! Null is never returned!
@@ -97,7 +99,7 @@ namespace BluetoothProtocols
         public static Govee Parse(SensorType sensorType, WatcherData wrapper, Govee source)
         {
             var retval = source ?? new Govee();
-            if (sensorType == SensorType.NotGovee)
+            if (sensorType == SensorType.NotThisSensorFamily)
             {
                 retval.IsValid = false;
                 return retval;
@@ -180,7 +182,7 @@ namespace BluetoothProtocols
             retval.TagType = sensorType;
             retval.IsValid = false; // will be set true if the data is valid.
 
-            if (sensorType == SensorType.NotGovee) return retval;
+            if (sensorType == SensorType.NotThisSensorFamily) return retval;
 
             try
             {
@@ -218,8 +220,10 @@ namespace BluetoothProtocols
                         default:
                             retval.IsValid = false;
                             break;
-                        case SensorType.H5074:
+                        case SensorType.H5074: // Example: 88 EC 00 F1 07 A2 13 64 02
                             {
+                                // 88 EC -- TL TH HL HH BB --
+                                // 88 EC 00 F1 07 A2 13 64 02
                                 var junk = dr.ReadByte();
                                 retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
                                 retval.Temperature = dr.ReadInt16() / 100.0;
@@ -229,8 +233,12 @@ namespace BluetoothProtocols
                                 retval.IsValid = true;
                             }
                             break;
-                        case SensorType.H5075:
+                        case SensorType.H5075: // Example: 88 EC 00 02 EF E0 0B 00
                             {
+                                // 88 EC -- b1 b2 b3 BB
+                                // 88 EC 00 02 EF E0 0B 00
+                                //
+
                                 var junk2 = dr.ReadByte();
                                 retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
                                 // Yes, this encoding is horrible for no good reason.
@@ -249,7 +257,11 @@ namespace BluetoothProtocols
                                 retval.IsValid = true;
                             }
                             break;
-                        case SensorType.H5106:
+                        case SensorType.H5106: // Example: 01 00 01 01 0B 3C D0 D9
+                            //
+                            // 01 00 q1 q2 q3 q4
+                            // 01 00 01 01 0B 3C D0 D9
+
                             {
                                 var junk3 = dr.ReadInt16();
                                 retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.PM25;
@@ -263,6 +275,7 @@ namespace BluetoothProtocols
                             }
                             break;
                         case SensorType.H5171:
+                            //          01 00 -- -- b1 b2 b3 BB
                             // Example: 01 00 01 01 03 35 D7 64 00 00 is 21C 39%
                             // Example: 01 00 01 01 01 78 C1 64 00 00 is 9C 44%
                             // The first two  bytes have already been read in.
@@ -282,12 +295,15 @@ namespace BluetoothProtocols
                                 retval.IsValid = true;
                             }
                             break;
-                        case SensorType.H5103:
-                        case SensorType.H5179:
+                        case SensorType.H5103: // Example: 01 00 01 01 03 51 41 2C
+                        case SensorType.H5179: // Example: 01 00 01 01 02 C8 B1 64
                             // Example: 01 00 01 01 02 C8 B1 64 is 
                             // The first two  bytes have already been read in.
                             // Example: 01 00 [company] 01 01 01 78 C1 64 is 9C 44%
-                            // Is just like the H5171 but without the last 2 bytes 
+                            // Is just like the H5171 but without the last 2 bytes
+                            // 
+                            // 01 00 -- -- b1 b2 b3 BB
+                            // 01 00 01 01 03 51 41 2C
                             {
                                 retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
                                 var junk1 = dr.ReadByte();
