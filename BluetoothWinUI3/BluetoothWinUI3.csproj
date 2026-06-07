@@ -23,6 +23,7 @@
     <None Remove="Assets\HelpFiles\Device_Nordic_Thingy.md" />
     <None Remove="Assets\HelpFiles\Help_Main.md" />
     <None Remove="Assets\HelpFiles\How_To_Add_New_Device_Control.md" />
+    <None Remove="Assets\HelpFiles\Issues_With_Devices.md" />
     <None Remove="Assets\HelpFiles\Issues_with_HOxyPlot.md" />
     <None Remove="Assets\HelpFiles\Issues_With_MarkdownTextBlock.md" />
     <None Remove="Assets\HelpFiles\Issues_with_TRIM.md" />
@@ -101,6 +102,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\HelpFiles\How_To_Add_New_Device_Control.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\HelpFiles\Issues_With_Devices.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\HelpFiles\Issues_with_HOxyPlot.md">

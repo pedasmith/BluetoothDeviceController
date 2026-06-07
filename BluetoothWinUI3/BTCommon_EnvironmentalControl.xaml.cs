@@ -41,29 +41,32 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "Govee_Environmental";
+    private readonly string InternalDeviceType = "EnivonrmentSensor";
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public GoveeCollection HistoricalGoveeUnits { get; } = new GoveeCollection();
+    public SensorDataCollection HistoricalSensorDataUnits { get; } = new SensorDataCollection();
     /// <summary>
     /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
     /// always in the 'native' units (e.g., always celcius for temperature).
     /// </summary>
-    Govee CurrGovee = null;
+    CopyableSensorDataRecord CurrSensor = null;
+    enum SensorType {  Govee, ThermPro};
+    SensorType CurrSensorType = SensorType.Govee;
 
     /// <summary>
     /// Similar to CurrGoveeData , but the values are converted to the user's preferred units. 
-    /// This is what gets added to the HistoricalGoveeUnits collection.
+    /// This is what gets added to the HistoricalSensorDataUnits collection.
     /// </summary>
-    Govee CurrGoveeUnits = null;
+    CopyableSensorDataRecord CurrSensorUnits = null;
 
 
     /// <summary>
-    /// There are multiple Govee sensors that this one control can handle.
+    /// There are multiple sensors that this one control can handle.
     /// </summary>
-    Govee.SensorType GoveeSensorType = Govee.SensorType.NotGovee; // Initialize as not a Govee at all.
+    Govee.SensorType GoveeSensorType = Govee.SensorType.NotGovee; // Initialize as not this kind.
+    ThermPro.SensorType ThermProSensorType = ThermPro.SensorType.NotThermPro; // Initialize as not this kind.
     List<string> TableColumns = new();
 
     public BTCommon_EnvironmentalControl()
@@ -103,7 +106,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                 default:
                     if (!TableColumns.Contains(e.PropertyName))
                     {
-                        // The Govee has a bunch of fields (e.g., "TagType") which should not be part of the data grid.
+                        // The sensor has a bunch of fields (e.g., "TagType") which should not be part of the data grid.
                         e.Cancel = true;
                     }
                     break;
@@ -119,7 +122,14 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // attached to somewhere else (e.g., when the control is made large and then small)
         if (!FirstLoad) return;
         FirstLoad = false;
-        uiDeviceName.Text = "Govee " + GoveeSensorType.ToString();
+        if (GoveeSensorType != Govee.SensorType.NotGovee)
+        {
+            uiDeviceName.Text = "Sensor " + GoveeSensorType.ToString();
+        }
+        if (ThermProSensorType != ThermPro.SensorType.NotThermPro)
+        {
+            uiDeviceName.Text = "Sensor " + ThermProSensorType.ToString();
+        }
     }
 
 
@@ -151,7 +161,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             DataFieldX = "TimestampMostRecentDT",
             DataFieldY = key,
             YAxisKey = key,
-            ItemsSource = HistoricalGoveeUnits.Data,
+            ItemsSource = HistoricalSensorDataUnits.Data,
         };
 
         oxyPlotModel.Axes.Add(axis);
@@ -225,8 +235,8 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
 
         // In the Nordic_Thingy, setting the DataContext to a KnownDevice is the trigger
-        // for connecting via BluetoothLE to a device. But this Govee display is driven entirely by advertisements,
-        // and the device is not needed.
+        // for connecting via BluetoothLE to a device. But this Sensor display is driven
+        // entirely by advertisements, and the device is not needed.
         //Device = new Nordic_Thingy()
         //{
         //    ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
@@ -244,6 +254,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         // Initialize data values
         GoveeSensorType = Govee.AdvertIsGovee(DataContextAsKnownDevice.Advertisement);
+        ThermProSensorType = ThermPro.AdvertIsThermPro(DataContextAsKnownDevice.Advertisement);
         HandleMyAdvertisement(DataContextAsKnownDevice.Advertisement);
     }
 
@@ -373,8 +384,8 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     {
         CurrUserPrefs = newPrefs;
 
-        // Update the saved data in the HistoricalGoveeUnits to match the new user preferences.
-        foreach (var data in HistoricalGoveeUnits.Data)
+        // Update the saved data in the HistoricalSensorDataUnits to match the new user preferences.
+        foreach (var data in HistoricalSensorDataUnits.Data)
         {
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
@@ -461,39 +472,39 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     }
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
-    /// needs to be updated. For the Govee, there's never just one piece of data; we either get it all 
+    /// needs to be updated. For the Govee and ThermPro, there's never just one piece of data; we either get it all 
     /// or just the one.
     /// </summary>
     /// <param name="name"></param>
     private void UpdateGraphData(string name)
     {
-        if (CurrGovee == null) return;
+        if (CurrSensor == null) return;
 
         // name is from e.PropertyName when the Device does a PropertyChanged.
 
         UpdateSparkles(name);
 
-        // Update to match the current preferred units. Will create a new CurrGoveeUnits the first time
+        // Update to match the current preferred units. Will create a new CurrSensorUnits the first time
         // it's called
-        CurrGoveeUnits = Govee.CopyAndUpdateUnits(CurrGovee, CurrGoveeUnits, CurrUserPrefs);
+        CurrSensorUnits = CurrSensor.CopyToAndUpdateUnits(CurrSensorUnits, CurrUserPrefs);
 
         // Track the historical data
         switch (name)
         {
-            case "*": // All the data changed. This is what always happens with the govee.
+            case "*": // All the data changed. This is what always happens with the sensor.
             case SensorDataRecord.TemperaturePropertyChangedName:
             case SensorDataRecord.PM25PropertyChangedName:
             case SensorDataRecord.HumidityPropertyChangedName:
                 // Unlike the Nordic_Thingy52 where the different values come in at different
-                // time, the Govee comes in all at once.
-                var deltaInSeconds = CurrGovee.TimestampMostRecent.Subtract(HistoricalGoveeUnits.TimestampMostRecentAdd).TotalSeconds;
-                var verb = (deltaInSeconds > 5) ? GoveeCollection.Verb.Add : GoveeCollection.Verb.ReplaceMostRecent;
-                HistoricalGoveeUnits.Update(CurrGoveeUnits, verb); // Will add or replace the data and will copy as needed.
+                // time, the sensor data comes in all at once.
+                var deltaInSeconds = CurrSensor.TimestampMostRecent.Subtract(HistoricalSensorDataUnits.TimestampMostRecentAdd).TotalSeconds;
+                var verb = (deltaInSeconds > 5) ? SensorDataCollection.Verb.Add : SensorDataCollection.Verb.ReplaceMostRecent;
+                HistoricalSensorDataUnits.Update(CurrSensorUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
                 // Update the OxyPlot because it doesn't tracked the INotifyCollectionChanged
                 //
-                if (verb == GoveeCollection.Verb.Add && HistoricalGoveeUnits.Count == 2)
+                if (verb == SensorDataCollection.Verb.Add && HistoricalSensorDataUnits.Count == 2)
                 {
                     // DOC: Can't have the axes start off invisible because then they can't be switched back on
                     if (CurrWindowSize == MainWindow.WindowSize.Normal)
@@ -508,23 +519,23 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
 
 
-        if (CurrGovee != null)
+        if (CurrSensor != null)
         {
             if (name == SensorDataRecord.TemperaturePropertyChangedName || name == "" || name == "*")
             {
-                uiTemperature.Text = BluetoothWatcher.Units.Temperature.AsString(CurrGoveeUnits.Temperature, CurrUserPrefs.Temperature);
+                uiTemperature.Text = BluetoothWatcher.Units.Temperature.AsString(CurrSensorUnits.Temperature, CurrUserPrefs.Temperature);
             }
             if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
             {
-                uiPM25.Text = CurrGovee.PM25.ToString("0.0");
+                uiPM25.Text = CurrSensor.PM25.ToString("0.0");
             }
             if (name == SensorDataRecord.HumidityPropertyChangedName || name == "" || name == "*")
             {
-                uiHumidity.Text = CurrGovee.Humidity.ToString("0.0") + "%";
+                uiHumidity.Text = CurrSensor.Humidity.ToString("0.0") + "%";
             }
             if (name == "BatteryLevel" || name == "BatteryInPercent" || name == "" || name == "*") // TODO: which is right?
             {
-                uiBTConnectionControl.SetBatteryLevel(CurrGovee.BatteryInPercent);
+                uiBTConnectionControl.SetBatteryLevel(CurrSensor.BatteryInPercent);
             }       
         }
     }
@@ -592,7 +603,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     public string ExportData(IExportData exporter)
     {
         string retval = "";
-        var data = HistoricalGoveeUnits.Data;
+        var data = HistoricalSensorDataUnits.Data;
         if (data.Count == 0)
         {
             Log("No data to export.");
@@ -608,8 +619,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         return retval;
     }
 
-    string name = "Govee";
+    string name = "EnvironmentSensor";
     bool FirstCallWithIsValid = true;
+
 
     /// <summary>
     /// Called by MainWindow / Advertisement Watcher when a new advertisement from the specific (known)
@@ -623,18 +635,25 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             if (!this.IsLoaded) return; // Won't be loaded when we exit the app!
 
             name = data.BestName;
-            CurrGovee = Govee.Parse(GoveeSensorType, data, CurrGovee);
-            if (CurrGovee == null)
+            if (GoveeSensorType != Govee.SensorType.NotGovee)
+            {
+                CurrSensor = Govee.Parse(GoveeSensorType, data, CurrSensor as Govee);
+            }
+            if (ThermProSensorType != ThermPro.SensorType.NotThermPro)
+            {
+                CurrSensor = ThermPro.Parse(ThermProSensorType, data, CurrSensor as ThermPro);
+            }
+            if (CurrSensor == null)
             {
                 // Lots of reasons it might be invalid. For example, we get an advert that includes a 
                 // name (and creates this control), but the advert doesn't include the data because
                 // we haven't gotten the BT advertisement response yet.
-                Log($"ERROR: unable to parse Govee data for sensor type {GoveeSensorType}");
+                Log($"ERROR: unable to parse sensor data for sensor type {GoveeSensorType}");
                 return;
             }
-            CurrGovee.Name = name;
-            CurrGovee.EventTime = data.MostRecentAdvertisement.Timestamp;
-            if (CurrGovee.IsValid)
+            CurrSensor.Name = name;
+            CurrSensor.EventTime = data.MostRecentAdvertisement.Timestamp;
+            if (CurrSensor.IsValid)
             {
                 if (FirstCallWithIsValid)
                 {
@@ -651,7 +670,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     {
         // Set up the Connect button and Battery visibility
         uiBTConnectionControl.SetConnectVisibility(Visibility.Collapsed);
-        if (!CurrGovee.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Battery))
+        if (!CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Battery))
         {
             uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
         }
@@ -665,19 +684,19 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         AdjustSensorPosition(uiSensorPM25, SensorDataRecord.SensorPresent.PM25, ref row, ref col);
         AdjustSensorPosition(uiSensorPressure, SensorDataRecord.SensorPresent.Pressure, ref row, ref col);
 
-        if (CurrGovee.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature))
+        if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature))
         {
             AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Left, "Temperature", "Temperature", OxyColors.DarkBlue);
             TableColumns.Add("Temperature");
         }
 
-        if (CurrGovee.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity))
+        if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity))
         {
             AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Left, "Humidity", "Humidity", OxyColors.Violet);
             TableColumns.Add("Humidity");
         }
 
-        if (CurrGovee.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.PM25))
+        if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.PM25))
         {
             AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Right, "PM25", "PM25", OxyColors.Gray);
             TableColumns.Add("PM25");
@@ -698,7 +717,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         //
         // Initialize the table
         //
-        uiTableView.ItemsSource = HistoricalGoveeUnits.Data;
+        uiTableView.ItemsSource = HistoricalSensorDataUnits.Data;
     }
 
     /// <summary>
@@ -711,7 +730,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     private void AdjustSensorPosition(Panel panel, SensorDataRecord.SensorPresent flag, ref int row, ref int col)
     {
         const int NCOL = 3;
-        if (CurrGovee.IsSensorPresent.HasFlag(flag)) // e.g., SensorDataRecord.SensorPresent.Temperature
+        if (CurrSensor.IsSensorPresent.HasFlag(flag)) // e.g., SensorDataRecord.SensorPresent.Temperature
         {
             Grid.SetRow(panel, row); // panel is e.g., uiSensorTemperature
             Grid.SetColumn(panel, col++);

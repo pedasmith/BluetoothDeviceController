@@ -46,12 +46,17 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         public static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()
         {
             new SupportedDevice("Thingy*", typeof(BTNordic_ThingyControl)),
+
+            // Govee Environmental Thermometer devices
             new SupportedDevice("Govee_H5074_*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GVH5075_*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GVH5103_*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GVH5106_*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GV5171*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GV5179_*", typeof(BTCommon_EnvironmentalControl)),
+
+            // ThermPro devices
+            new SupportedDevice("TP357*", typeof(BTCommon_EnvironmentalControl)),
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {

@@ -2,6 +2,7 @@
 using BluetoothWinUI3;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
 using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
@@ -13,10 +14,9 @@ using static BluetoothProtocols.AdvertisementDataSectionParser;
 
 namespace BluetoothProtocols
 {
-    public class Govee : SensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
-    {
 
-        public bool IsValid { get; set; } = true;
+    public class Govee : CopyableSensorDataRecord // SensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
+    {
         /// <summary>
         /// CompanyId is from the advertisement in the manufacturer-specific section. It's supposed to only be one of the values 
         /// from the Bluetooth SIG. See the BluetoothCompanyIdentifier for details.
@@ -34,43 +34,25 @@ namespace BluetoothProtocols
         /// </summary>
         public string EncodeMessage { get; set; }
 
-        public Govee Clone()
+        public override Govee Clone()
         {
             return this.MemberwiseClone() as Govee;
         }
 
-        public static Govee CopyAndUpdateUnits(Govee source, Govee dest, UserPreferences CurrUserPrefs)
+        public Govee CopyAndUpdateUnits(Govee source, Govee dest, UserPreferences CurrUserPrefs)
         {
             dest ??= source.Clone();
-            dest.EventTime = source.EventTime;
-            dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(
-                source.Temperature, 
-                BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, 
-                CurrUserPrefs.Temperature);
-            dest.Pressure = BluetoothWatcher.Units.Pressure.Convert(
-                source.Pressure, 
-                BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, 
-                CurrUserPrefs.Pressure);
-            dest.Humidity = source.Humidity; // Humidity is always in percent, so no conversion needed.
-            dest.PM25 = source.PM25;
-            dest.BatteryInPercent = source.BatteryInPercent;
-            dest.Name = source.Name;
+            base.CopyToAndUpdateUnits(dest, CurrUserPrefs);
 
-            dest.IsValid = source.IsValid;
-            dest.CompanyId= source.CompanyId;
-            dest.TagType = source.TagType;
+            dest.IsValid = IsValid;
+            dest.CompanyId= CompanyId;
+            dest.TagType = TagType;
             return dest;
         }
 
         public void CopyFrom(Govee value)
         {
-            EventTime = value.EventTime;
-            Temperature = value.Temperature;
-            Pressure = value.Pressure;
-            Humidity = value.Humidity; // Humidity is always in percent, so no conversion needed.
-            PM25 = value.PM25;
-            BatteryInPercent = value.BatteryInPercent;
-            Name = value.Name;
+            base.CopyFrom(value);
 
             IsValid = value.IsValid;
             CompanyId = value.CompanyId;
@@ -340,65 +322,4 @@ namespace BluetoothProtocols
 
 
 
-    ///<summary>
-    ///TODO:
-    ///Environment_DataCollection contains lists of data, one list per property value for all
-    ///of the characteristics groupled in the Environment_Data group from Environment.
-    ///The lists are used when displaying historical graphs of the data.
-    ///</summary>
-    public class GoveeCollection
-    {
-        public enum Verb { Add, ReplaceMostRecent };
-
-        public int Count { get { return Timestamps.Count; } }
-
-        public void Update(Govee value, Verb verb)
-        {
-            switch (verb)
-            {
-                case Verb.Add: Add(value); break;
-                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
-            }
-        }
-
-        public void Add(Govee value)
-        {
-            TimestampMostRecentAdd = value.TimestampMostRecent;
-            Data.Add(value.Clone());
-            Timestamps.Add(value.TimestampMostRecent);
-            TimestampsDT.Add(value.TimestampMostRecent.DateTime);
-            Temperature.Add(value.Temperature);
-            Pressure.Add(value.Pressure);
-            Humidity.Add(value.Humidity);
-            PM25.Add(value.PM25);
-        }
-        public void ReplaceMostRecent(Govee value)
-        {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
-            Data[index].CopyFrom(value);  // was value.Clone(); switching to reduce flickering.
-            Temperature[index] = value.Temperature;
-            Pressure[index] = value.Pressure;
-            Humidity[index] = value.Humidity;
-            PM25[index] = value.PM25;
-        }
-
-        ///<summary>
-        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
-        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
-        ///frequently than the UI updates
-        ///</summary>
-        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic Temperature (c)
-        public ObservableCollection<double> Temperature { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Pressure (hpa)
-        public ObservableCollection<double> Pressure { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Humidity (%)
-        public ObservableCollection<double> Humidity { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Air Quality eCOS TVOC
-        public ObservableCollection<double> PM25 { get; } = new ObservableCollection<double>();
-        public ObservableCollection<Govee> Data { get; } = new ObservableCollection<Govee>();
-    }
 }
