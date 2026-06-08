@@ -23,8 +23,8 @@ namespace BluetoothProtocols
         /// from the Bluetooth SIG. See the BluetoothCompanyIdentifier for details.
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
-        public UInt16 CompanyId { get; set; } // will by 0xEC88=60552 for the Govee H5074 H5075
-        public enum SensorType { Other, TP357, NotThisSensorFamily };
+        public UInt16 CompanyId { get; set; } 
+        public enum SensorType { Other, TP351, TP357, NotThisSensorFamily };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -83,6 +83,7 @@ namespace BluetoothProtocols
             SensorType retval = SensorType.NotThisSensorFamily;
             if (name != null)
             {
+                if (name.StartsWith("TP351")) retval = SensorType.TP351;
                 if (name.StartsWith("TP357")) retval = SensorType.TP357;
             }
             return retval;
@@ -138,38 +139,38 @@ namespace BluetoothProtocols
             {
                 var dr = DataReader.FromBuffer(section.Data);
                 dr.ByteOrder = ByteOrder.LittleEndian; // BT is generally little endian.
-                if (dr.UnconsumedBufferLength > 6)
+                if (dr.UnconsumedBufferLength > 10)
                 {
                     var pre = dr.ReadInt16();
                     var (strName, nameOk) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength - 4);
                     var (strPost, postOk) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength);
                     retval.EncodeMessage = $"Pre={pre} Str={strName} Post={strPost} ";
                     retval.IsValid = false;
+                    return retval;
                 }
-                else
-                {
-                    // At this point, we've read in two bytes from dr (the company ID)
-                    switch (sensorType)
-                    {
-                        default:
-                            retval.IsValid = false;
-                            break;
-                        case SensorType.TP357: // Example: C2 C0 00 32 02 2C
-                            {
-                                // -- TL TH HU
-                                // C2 C0 00 32 02 2C
-                                //
 
-                                var junk = dr.ReadByte();
-                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
-                                retval.Temperature = dr.ReadInt16() / 10.0;
-                                retval.Humidity = dr.ReadByte();
-                                //retval.BatteryInPercent = dr.ReadByte();
-                                retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% ";
-                                retval.IsValid = true;
-                            }
-                            break;
-                    }
+                // At this point, we've read in two bytes from dr (the company ID)
+                switch (sensorType)
+                {
+                    default:
+                        retval.IsValid = false;
+                        break;
+                    case SensorType.TP351: // Example: C2 DA 00 2B 22 33 01 # 21.6C 45%
+                    case SensorType.TP357: // Example: C2 C0 00 32 02 2C
+                        {
+                            // -- TL TH HU
+                            // C2 C0 00 32 02 2C
+                            //
+
+                            var junk = dr.ReadByte();
+                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
+                            retval.Temperature = dr.ReadInt16() / 10.0;
+                            retval.Humidity = dr.ReadByte();
+                            //retval.BatteryInPercent = dr.ReadByte();
+                            retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% ";
+                            retval.IsValid = true;
+                        }
+                        break;
                 }
             }
             catch (Exception ex)

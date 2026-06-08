@@ -43,7 +43,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
     /// </summary>
     public static class SupportedDevices
     {
-        public static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()
+        private static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()
         {
             new SupportedDevice("Thingy*", typeof(BTNordic_ThingyControl)),
 
@@ -59,6 +59,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("T201", typeof(BTCommon_EnvironmentalControl)),
 
             // ThermPro devices
+            new SupportedDevice("TP351*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("TP357*", typeof(BTCommon_EnvironmentalControl)),
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)

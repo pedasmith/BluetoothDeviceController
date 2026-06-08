@@ -32,8 +32,6 @@ namespace BluetoothWatcher.AdvertismentWatcher
             BleAdvertisementWatcher.ScanningMode = BluetoothLEScanningMode.Active; // Required for Govee H5074
             BleAdvertisementWatcher.Received += BleAdvertisementWatcher_Received;
             BleAdvertisementWatcher.Start();
-
-            // TODO: scanning mode?
         }
         public void Stop()
         {

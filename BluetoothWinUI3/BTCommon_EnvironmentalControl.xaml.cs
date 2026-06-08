@@ -524,24 +524,21 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
 
 
-        if (CurrSensor != null)
+        if (name == SensorDataRecord.TemperaturePropertyChangedName || name == "" || name == "*")
         {
-            if (name == SensorDataRecord.TemperaturePropertyChangedName || name == "" || name == "*")
-            {
-                uiTemperature.Text = BluetoothWatcher.Units.Temperature.AsString(CurrSensorUnits.Temperature, CurrUserPrefs.Temperature);
-            }
-            if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
-            {
-                uiPM25.Text = CurrSensor.PM25.ToString("0.0");
-            }
-            if (name == SensorDataRecord.HumidityPropertyChangedName || name == "" || name == "*")
-            {
-                uiHumidity.Text = CurrSensor.Humidity.ToString("0.0") + "%";
-            }
-            if (name == "BatteryLevel" || name == "BatteryInPercent" || name == "" || name == "*") // TODO: which is right?
-            {
-                uiBTConnectionControl.SetBatteryLevel(CurrSensor.BatteryInPercent);
-            }       
+            uiTemperature.Text = BluetoothWatcher.Units.Temperature.AsString(CurrSensorUnits.Temperature, CurrUserPrefs.Temperature);
+        }
+        if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
+        {
+            uiPM25.Text = CurrSensor.PM25.ToString("0.0");
+        }
+        if (name == SensorDataRecord.HumidityPropertyChangedName || name == "" || name == "*")
+        {
+            uiHumidity.Text = CurrSensor.Humidity.ToString("0.0") + "%";
+        }
+        if (name == SensorDataRecord.BatteryPropertyChangedName || name == "" || name == "*") 
+        {
+            uiBTConnectionControl.SetBatteryLevel(CurrSensor.BatteryInPercent);
         }
     }
 

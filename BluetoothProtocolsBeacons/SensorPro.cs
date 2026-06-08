@@ -145,42 +145,41 @@ namespace BluetoothProtocols
                     var (strPost, postOk) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength);
                     retval.EncodeMessage = $"Pre={pre} Str={strName} Post={strPost} ";
                     retval.IsValid = false;
+                    return retval;
                 }
-                else
+
+                // At this point, we've read in two bytes from dr (the company ID)
+                switch (sensorType)
                 {
-                    // At this point, we've read in two bytes from dr (the company ID)
-                    switch (sensorType)
-                    {
-                        default:
-                            retval.IsValid = false;
-                            break;
-                        case SensorType.T201: // Example: 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 08 1F 12 71 64 00 01  #18.9C 46%
-                            {
-                                //
-                                // -- -- -- -- 05 -- -- -- -- 10 -- -- -- -- 15 -- -- -- -- 20
-                                // -- -- -- -- -- -- -- -- -- -- -- le Th Tl Hh Hl Ba -- -- 
-                                // 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 07 56 15 23 64 00 01
-                                // 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 07 F9 12 E9 64 00 01
-                                // 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 08 1F 12 71 64 00 01  #18.9C 46%
-                                //
-                                // 081F is 2079 (big endian)
-                                // 1271 is 4721 (also big endian)
+                    default:
+                        retval.IsValid = false;
+                        break;
+                    case SensorType.T201: // Example: 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 08 1F 12 71 64 00 01  #18.9C 46%
+                        {
+                            //
+                            // -- -- -- -- 05 -- -- -- -- 10 -- -- -- -- 15 -- -- -- -- 20
+                            // -- -- -- -- -- -- -- -- -- -- -- le Th Tl Hh Hl Ba -- -- 
+                            // 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 07 56 15 23 64 00 01
+                            // 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 07 F9 12 E9 64 00 01
+                            // 55 AA 01 01 A4 C1 38 E5 86 C9 01 07 08 1F 12 71 64 00 01  #18.9C 46%
+                            //
+                            // 081F is 2079 (big endian)
+                            // 1271 is 4721 (also big endian)
 
-                                dr.ByteOrder = ByteOrder.BigEndian; // Yeah, not ideal
-                                var start = dr.ReadInt16(); // 55AA
-                                byte[] junk = new byte[9];
-                                dr.ReadBytes(junk);
-                                var len = dr.ReadByte();
+                            dr.ByteOrder = ByteOrder.BigEndian; // Yeah, not ideal
+                            var start = dr.ReadInt16(); // 55AA
+                            byte[] junk = new byte[9];
+                            dr.ReadBytes(junk);
+                            var len = dr.ReadByte();
 
-                                retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
-                                retval.Temperature = dr.ReadInt16() / 100.0;
-                                retval.Humidity = dr.ReadInt16() / 100.0;
-                                retval.BatteryInPercent = dr.ReadByte();
-                                retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% ";
-                                retval.IsValid = true;
-                            }
-                            break;
-                    }
+                            retval.IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity | SensorPresent.Battery;
+                            retval.Temperature = dr.ReadInt16() / 100.0;
+                            retval.Humidity = dr.ReadInt16() / 100.0;
+                            retval.BatteryInPercent = dr.ReadByte();
+                            retval.EncodeMessage = $"Temp={retval.Temperature}℃ ({retval.TemperatureInDegreesF}℉) Hum={retval.Humidity}% ";
+                            retval.IsValid = true;
+                        }
+                        break;
                 }
             }
             catch (Exception ex)
