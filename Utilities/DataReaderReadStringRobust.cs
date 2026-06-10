@@ -58,6 +58,10 @@ namespace Utilities
                     Utf8NonThrowingDecoder.Convert(buffer, 0, buffer.Length, outbuffer, 0, outbuffer.Length, true, out bytesUsed, out charsUsed, out completed);
                     retval = new string(outbuffer, 0, charsUsed);
                     readStatus = retval.Contains(EncoderFallbackDetectionString) ? ReadStatus.Hex : ReadStatus.OK;
+                    if (retval.Length == 1)
+                    {
+                        readStatus = ReadStatus.Hex; // 1=char strings should be hex for e.g., battery levels.
+                    }
                 }
             }
             catch (Exception)

@@ -11,8 +11,12 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothCommunicationStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothStatusHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BTStandard_Demo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BTStandard_DemoCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IExportData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_ThingyCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TAOPE_CyclingSpeedCadence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TAOPE_CyclingSpeedCadenceCollection.cs" />
   </ItemGroup>
 </Project>

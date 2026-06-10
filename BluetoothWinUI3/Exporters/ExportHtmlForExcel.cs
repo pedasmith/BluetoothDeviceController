@@ -28,6 +28,17 @@ namespace Exporters
             sb.Append($"<td>{Escape(value.ToString("F2"))}</td>");
         }
 
+        public void CellSet(byte[] value)
+        {
+            StringBuilder sb = new();
+            foreach (byte b in value)
+            {
+                sb.Append($"{b:X2} ");
+            }
+            string strval = sb.ToString().TrimEnd();
+            sb.Append($"<td>{Escape(strval)}</td>");
+        }
+
         public string Export(string description)
         {
             return "<!DOCTYPE html>\n<html><head>\n<title>" + Escape(description) + "</title>\n</head>\n<body><table>\n" + sb.ToString() + "\n</table></body></html>";

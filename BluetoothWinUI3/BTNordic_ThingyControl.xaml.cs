@@ -628,7 +628,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 HistoricalEnvironment_DataUnits.Update(CurrEnvironment_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
-                // Update the OxyPlot because it doesn't tracked the INotifyCollectionChanged
+                // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
                 //
                 if (verb == Environment_DataCollection.Verb.Add && HistoricalEnvironment_DataUnits.Count == 2)
                 {

@@ -38,7 +38,16 @@
         <Setter Property="Height" Value="380" />
         <Setter Property="Width" Value="380" />
     </Style>
-    
+
+    <Style x:Key="sDeviceDataList" TargetType="GridView">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="SelectionMode" Value="None" />
+    </Style>
+
+    <Style x:Key="sDeviceDataPanel" TargetType="StackPanel">
+        <Setter Property="Width" Value="120" />
+    </Style>
+
     <Style x:Key="sZoomableDeviceBorder" TargetType="Border" BasedOn="{StaticResource sDeviceBorder}">
         <Setter Property="Background" Value="{ThemeResource sZoomableDeviceBorder_Background}" />
     </Style>

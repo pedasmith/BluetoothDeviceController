@@ -45,6 +45,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
     {
         private static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()
         {
+            new SupportedDevice("Thingy*", typeof(BTStandard_DemoControl)),
+
+
             new SupportedDevice("Thingy*", typeof(BTNordic_ThingyControl)),
 
             // Govee Environmental Thermometer devices

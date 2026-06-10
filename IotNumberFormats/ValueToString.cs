@@ -147,12 +147,12 @@ namespace IotNumberFormats
         //TODO: rename as needed
 
         /// <summary>
-        /// stritem is the string value of a single field being handled.
+        /// stringValue is the string value of a single field being handled.
         /// </summary>
-        string stritem = "";
-        double dvalue = double.NaN;
-        byte[] byteArrayItem = null;
-        List<double> dvalues = null;
+        string stringValue = "";
+        double doubleValue = double.NaN;
+        byte[] byteArrayValue = null;
+        List<double> doubleValues = null;
         string readcmd = "U8";
         char readindicator = 'U';
         string displayFormat = "";
@@ -184,7 +184,20 @@ namespace IotNumberFormats
         public double GetNextDouble()
         {
             GetNext();
-            return dvalue;
+            return doubleValue;
+        }
+
+        public string GetNextString()
+        {
+            GetNext();
+            return stringValue;
+        }
+
+
+        public byte[] GetNextByteArray()
+        {
+            GetNext();
+            return byteArrayValue;
         }
 
         /// <summary>
@@ -235,8 +248,8 @@ namespace IotNumberFormats
                         {
                             if (isOptional)
                             {
-                                dvalue = double.NaN;
-                                stritem = "";
+                                doubleValue = double.NaN;
+                                stringValue = "";
                                 break;
                             }
                             else
@@ -249,7 +262,7 @@ namespace IotNumberFormats
                         {
                             case "F32":
                                 {
-                                    dvalue = dr.ReadSingle();
+                                    doubleValue = dr.ReadSingle();
                                     switch (displayFormat)
                                     {
                                         case "":
@@ -263,12 +276,12 @@ namespace IotNumberFormats
                                             CurrError = ValueParserResult.CreateError(logstr, $"Float displayFormat unrecognized; should be FIXED {displayFormat}");
                                             return false;
                                     }
-                                    stritem = dvalue.ToString(displayFormat); // e.g. N3 for 3 digits
+                                    stringValue = doubleValue.ToString(displayFormat); // e.g. N3 for 3 digits
                                 }
                                 break;
                             case "F64":
                                 {
-                                    dvalue = dr.ReadDouble();
+                                    doubleValue = dr.ReadDouble();
                                     switch (displayFormat)
                                     {
                                         case "":
@@ -282,7 +295,7 @@ namespace IotNumberFormats
                                             CurrError = ValueParserResult.CreateError(logstr, $"Float displayFormat unrecognized; should be FIXED {displayFormat}");
                                             return false;
                                     }
-                                    stritem = dvalue.ToString(displayFormat); // e.g. N3 for 3 digits
+                                    stringValue = doubleValue.ToString(displayFormat); // e.g. N3 for 3 digits
                                 }
                                 break;
                             case "F32S": // Array of F32
@@ -299,11 +312,11 @@ namespace IotNumberFormats
                                     }
 
                                     resultState = ResultState.IsDoubleArray;
-                                    dvalues = new List<double>();
+                                    doubleValues = new List<double>();
                                     while ((dr.UnconsumedBufferLength-skip) >= 4) // 2026-03-26: FIXED BUG! Needs to be 4 bytes long, not 2!
                                     {
-                                        dvalue = dr.ReadSingle();
-                                        dvalues.Add(dvalue);
+                                        doubleValue = dr.ReadSingle();
+                                        doubleValues.Add(doubleValue);
                                         switch (displayFormat)
                                         {
                                             case "":
@@ -318,8 +331,8 @@ namespace IotNumberFormats
                                                 return false;
                                         }
 
-                                        if (stritem != "") stritem += " ";
-                                        stritem += dvalue.ToString(displayFormat); // e.g. N3 for 3 digits
+                                        if (stringValue != "") stringValue += " ";
+                                        stringValue += doubleValue.ToString(displayFormat); // e.g. N3 for 3 digits
                                     } // end while loop
                                 }
                                 break;
@@ -333,8 +346,8 @@ namespace IotNumberFormats
                         {
                             if (isOptional)
                             {
-                                dvalue = double.NaN;
-                                stritem = "";
+                                doubleValue = double.NaN;
+                                stringValue = "";
                                 break;
                             }
                             else
@@ -358,14 +371,14 @@ namespace IotNumberFormats
                                             {
                                                 var value = (sbyte)dr.ReadByte();
                                                 intFormat = "X2";
-                                                dvalue = (double)value;
+                                                doubleValue = (double)value;
                                             }
                                             break;
                                         case "I16":
                                             {
                                                 var value = dr.ReadInt16();
                                                 intFormat = "X4";
-                                                dvalue = (double)value;
+                                                doubleValue = (double)value;
                                             }
                                             break;
                                         case "I24":
@@ -377,22 +390,22 @@ namespace IotNumberFormats
                                                 var lsb = dr.ByteOrder == ByteOrder.BigEndian ? b2 : b0;
                                                 int value = (int)(msb << 16) + (b1 << 8) + (lsb);
                                                 intFormat = "X6";
-                                                dvalue = (double)value;
+                                                doubleValue = (double)value;
                                             }
                                             break;
                                         case "I32":
                                             {
                                                 var value = dr.ReadInt32();
                                                 intFormat = "X8";
-                                                dvalue = (double)value;
+                                                doubleValue = (double)value;
                                             }
                                             break;
                                     }
                                     string calculateCommand = command.Get(0, 1); // e.g. for I24^100_/ for TI 1350 barometer values
                                     if (!string.IsNullOrEmpty(calculateCommand))
                                     {
-                                        dvalue = ValueCalculate.Calculate(calculateCommand, dvalue).D;
-                                        if (double.IsNaN(dvalue))
+                                        doubleValue = ValueCalculate.Calculate(calculateCommand, doubleValue).D;
+                                        if (double.IsNaN(doubleValue))
                                         {
                                             CurrError = ValueParserResult.CreateError(logstr, $"Calculation failed for {calculateCommand} in {readcmd}");
                                             return false;
@@ -400,8 +413,8 @@ namespace IotNumberFormats
                                         else
                                         {
                                             // Everything worked and got a value
-                                            stritem = DoubleToString(dvalue, displayFormat, displayFormatSecondary);
-                                            if (stritem == null)
+                                            stringValue = DoubleToString(doubleValue, displayFormat, displayFormatSecondary);
+                                            if (stringValue == null)
                                             {
                                                 CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
                                                 return false;
@@ -411,8 +424,8 @@ namespace IotNumberFormats
                                     else
                                     {
                                         if (displayFormat == "") displayFormat = "HEX";
-                                        stritem = DoubleToString(dvalue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
-                                        if (stritem == null)
+                                        stringValue = DoubleToString(doubleValue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
+                                        if (stringValue == null)
                                         {
                                             CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
                                             return false;
@@ -440,21 +453,21 @@ namespace IotNumberFormats
                                     }
 
                                     resultState = ResultState.IsDoubleArray;
-                                    dvalues = new List<double>();
+                                    doubleValues = new List<double>();
                                     while ((dr.UnconsumedBufferLength-skip) >= 2)
                                     {
-                                        dvalue = dr.ReadInt16();
-                                        dvalues.Add(dvalue);
+                                        doubleValue = dr.ReadInt16();
+                                        doubleValues.Add(doubleValue);
 
-                                        var intstr = DoubleToString(dvalue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
+                                        var intstr = DoubleToString(doubleValue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
                                         if (intstr == null)
                                         {
                                             CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
                                             return false;
                                         }
 
-                                        if (stritem != "") stritem += " ";
-                                        stritem += intstr;
+                                        if (stringValue != "") stringValue += " ";
+                                        stringValue += intstr;
                                     } // end while loop
                                 }
                                 break;
@@ -470,8 +483,8 @@ namespace IotNumberFormats
                         {
                             if (isOptional)
                             {
-                                dvalue = double.NaN;
-                                stritem = "";
+                                doubleValue = double.NaN;
+                                stringValue = "";
                                 break;
                             }
                             else
@@ -488,7 +501,7 @@ namespace IotNumberFormats
                                 CurrError = ValueParserResult.CreateError(logstr, $"Q command unrecognized; wrong number of Qs {readcmd}");
                                 return false;
                             }
-                            stritem = FixedQuotientHelper(dr, subtypes[1], subtypes[2], displayFormat, out dvalue);
+                            stringValue = FixedQuotientHelper(dr, subtypes[1], subtypes[2], displayFormat, out doubleValue);
                             //NOTE: fail on failure
                         }
                         break;
@@ -498,8 +511,8 @@ namespace IotNumberFormats
                         {
                             if (isOptional)
                             {
-                                dvalue = double.NaN;
-                                stritem = "";
+                                doubleValue = double.NaN;
+                                stringValue = "";
                                 break;
                             }
                             else
@@ -520,14 +533,14 @@ namespace IotNumberFormats
                                     case "U8":
                                         {
                                             var value = dr.ReadByte();
-                                            dvalue = (double)value;
+                                            doubleValue = (double)value;
                                             xfmt = "X2";
                                         }
                                         break;
                                     case "U16":
                                         {
                                             var value = dr.ReadUInt16();
-                                            dvalue = (double)value;
+                                            doubleValue = (double)value;
                                             xfmt = "X4";
                                         }
                                         break;
@@ -539,14 +552,14 @@ namespace IotNumberFormats
                                             var msb = (byte)(dr.ByteOrder == ByteOrder.BigEndian ? b0 : b2);
                                             var lsb = dr.ByteOrder == ByteOrder.BigEndian ? b2 : b0;
                                             int value = (int)(msb << 16) + (b1 << 8) + (lsb);
-                                            dvalue = (double)value;
+                                            doubleValue = (double)value;
                                             xfmt = "X6";
                                         }
                                         break;
                                     case "U32":
                                         {
                                             var value = dr.ReadUInt32();
-                                            dvalue = (double)value;
+                                            doubleValue = (double)value;
                                             xfmt = "X8";
                                         }
                                         break;
@@ -554,16 +567,16 @@ namespace IotNumberFormats
                                 string calculateCommand = command.Get(0, 1); // e.g. for I24^100_/ for TI 1350 barometer values
                                 if (!string.IsNullOrEmpty(calculateCommand))
                                 {
-                                    dvalue = ValueCalculate.Calculate(calculateCommand, dvalue).D;
-                                    if (double.IsNaN(dvalue))
+                                    doubleValue = ValueCalculate.Calculate(calculateCommand, doubleValue).D;
+                                    if (double.IsNaN(doubleValue))
                                     {
                                         CurrError = ValueParserResult.CreateError(logstr, $"Calculation failed for {calculateCommand} in {readcmd}");
                                         return false;
                                     }
                                     else
                                     {
-                                        stritem = DoubleToString(dvalue, displayFormat, displayFormatSecondary);
-                                        if (stritem == null)
+                                        stringValue = DoubleToString(doubleValue, displayFormat, displayFormatSecondary);
+                                        if (stringValue == null)
                                         {
                                             CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
                                             return false;
@@ -573,8 +586,8 @@ namespace IotNumberFormats
                                 else
                                 {
                                     if (displayFormat == "") displayFormat = "HEX";
-                                    stritem = DoubleToString(dvalue, displayFormat, displayFormatSecondary, "F2", xfmt);
-                                    if (stritem == null)
+                                    stringValue = DoubleToString(doubleValue, displayFormat, displayFormatSecondary, "F2", xfmt);
+                                    if (stringValue == null)
                                     {
                                         CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized;\nshould be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
                                         return false;
@@ -592,8 +605,8 @@ namespace IotNumberFormats
                         {
                             if (isOptional)
                             {
-                                dvalue = double.NaN;
-                                stritem = "";
+                                doubleValue = double.NaN;
+                                stringValue = "";
                                 break;
                             }
                             else
@@ -609,7 +622,7 @@ namespace IotNumberFormats
                                 CurrError = ValueParserResult.CreateError(logstr, $"/ command unrecognized; wrong number of slashes {readcmd}");
                                 return false;
                             }
-                            stritem = FixedFractionHelper(dr, subtypes[1], subtypes[2], displayFormat, out dvalue);
+                            stringValue = FixedFractionHelper(dr, subtypes[1], subtypes[2], displayFormat, out doubleValue);
                             // NOTE: fail on failure
                         }
                         break;
@@ -634,7 +647,7 @@ namespace IotNumberFormats
                                 case "STRING":
                                     {
                                         ReadStatus readStatus;
-                                        (stritem, readStatus) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength - (uint)skip);
+                                        (stringValue, readStatus) = DataReaderReadStringRobust.ReadString(dr, dr.UnconsumedBufferLength - (uint)skip);
                                         switch (readStatus)
                                         {
                                             case ReadStatus.OK:
@@ -642,10 +655,10 @@ namespace IotNumberFormats
                                                 {
                                                     case "":
                                                     case "ASCII":
-                                                        stritem = EscapeString(stritem, displayFormatSecondary);
+                                                        stringValue = EscapeString(stringValue, displayFormatSecondary);
                                                         break;
                                                     case "Eddystone":
-                                                        stritem = BluetoothProtocols.EddystoneUtilities.EddystoneUrlToString(stritem);
+                                                        stringValue = BluetoothProtocols.EddystoneUtilities.EddystoneUrlToString(stringValue);
                                                         break;
                                                     default:
                                                         CurrError = ValueParserResult.CreateError(logstr, $"Unknown string format type {displayFormat}");
@@ -664,13 +677,13 @@ namespace IotNumberFormats
                                         //You might want bytes, but this methods is explicitly generating a string.
                                         if (dr.UnconsumedBufferLength == 0)
                                         {
-                                            stritem = "(no bytes)";
+                                            stringValue = "(no bytes)";
                                             resultState = ResultState.IsString;
                                         }
                                         else
                                         {
                                             IBuffer buffer = dr.ReadBuffer(dr.UnconsumedBufferLength - (uint)skip);
-                                            byteArrayItem = buffer.ToArray();
+                                            byteArrayValue = buffer.ToArray();
                                             var format = "X2";
                                             switch (displayFormat)
                                             {
@@ -678,10 +691,10 @@ namespace IotNumberFormats
                                                 default:
                                                 case "HEX": format = "X2"; break;
                                             }
-                                            for (uint ii = 0; ii < byteArrayItem.Length; ii++)
+                                            for (uint ii = 0; ii < byteArrayValue.Length; ii++)
                                             {
-                                                if (ii != 0) stritem += " ";
-                                                stritem += byteArrayItem[ii].ToString(format);
+                                                if (ii != 0) stringValue += " ";
+                                                stringValue += byteArrayValue[ii].ToString(format);
                                             }
                                             resultState = ResultState.IsBytes;
                                         }
@@ -698,13 +711,13 @@ namespace IotNumberFormats
             }
             catch (Exception e)
             {
-                stritem = $"EXCEPTION reading data {e} index {defaultIndex} command {command} len {CurrDR.UnconsumedBufferLength}";
-                CurrError = ValueParserResult.CreateError(returnsb + stritem, stritem);
+                stringValue = $"EXCEPTION reading data {e} index {defaultIndex} command {command} len {CurrDR.UnconsumedBufferLength}";
+                CurrError = ValueParserResult.CreateError(returnsb + stringValue, stringValue);
                 return false;
             }
 
-            if (returnsb.Length > 0 && stritem.Length > 0) returnsb.Append(" "); // Bug fixed 2026-03-27: nothing to add means no space
-            returnsb.Append(stritem);
+            if (returnsb.Length > 0 && stringValue.Length > 0) returnsb.Append(" "); // Bug fixed 2026-03-27: nothing to add means no space
+            returnsb.Append(stringValue);
 
             return true; // everything worked.
         }
@@ -718,8 +731,8 @@ namespace IotNumberFormats
             defaultIndex = NextCommandIndex;
             var command = Commands.Fields[NextCommandIndex++];
 
-            stritem = "";
-            byteArrayItem = null;
+            stringValue = "";
+            byteArrayValue = null;
 
             readcmd = command.ByteFormatPrimary;
             readindicator = readcmd[0];
@@ -731,8 +744,8 @@ namespace IotNumberFormats
             units = command.UnitsPrimary;
 
             resultState = ResultState.IsDouble; // the most common result
-            dvalue = double.NaN;
-            dvalues = null;
+            doubleValue = double.NaN;
+            doubleValues = null;
 
             return command;
         }

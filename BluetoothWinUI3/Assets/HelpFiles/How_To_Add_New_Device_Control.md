@@ -8,6 +8,13 @@ It's important to distinguish
 - **Known** device are specific instances of a supported device. If you have several of them, you will have several instances. Each known device gets its own control in the  uiKnownDevices panel in MainWindow.
 
 
+# The easy path: start with BTStandard_Demo
+
+A cut-down sample is part of the source code! The BTStandard_Demo is a fully commented XAML and XAML.CS file that provides a complete example of connecting a device to this app.
+
+
+
+
 
 # Critical quality items
 
@@ -18,7 +25,7 @@ It's important to distinguish
 ```
 
 
-## Size is the CurrWindowSize. And there's a standard IntenralDeviceType string for logging purposes.
+## Size is the CurrWindowSize. And there's a standard InternalDeviceType string for logging purposes.
 
 ```
     /// <summary>

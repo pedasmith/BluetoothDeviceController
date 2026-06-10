@@ -56,10 +56,22 @@ namespace Exporters
             CellSet(strval); // on the off change the the float needs to be escaped...
         }
 
+        public void CellSet(byte[] value)
+        {
+            StringBuilder sb = new();
+            foreach (byte b in value)
+            {
+                sb.Append($"{b:X2} ");
+            }
+            string strval = sb.ToString().TrimEnd();
+            CellSet(strval); // on the off change the the float needs to be escaped...
+        }
+
         public string Export(string _) // description is not used in CSV exports
         {
             return sb.ToString();
         }
+
 
         public void HeadersSet(string[] headers)
         {

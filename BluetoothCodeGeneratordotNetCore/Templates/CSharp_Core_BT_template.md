@@ -246,7 +246,7 @@ Original: OnPropertyChanged("[[CharacteristicName.dotNet]]");
 ```
 
 
-## ServiceIndexList Type=list Source=Services Trim=endCR Code="            [[Name]]_index = [[Count.Child]]," 
+## ServiceIndexList Type=list Source=Services Trim=endCR Code="            [[Name.dotNet]]_index = [[Count.Child]]," 
 
 ## ServiceGuidsList Type=list Source=Services Trim=endCR  
 
@@ -402,8 +402,8 @@ This is the primary section of the code.
 ## CharacteristicPropertyDataFields Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
 
 ```
-            private [[VariableTypeDS]] _[[DataName.dotNet]] = [[DefaultValueCSharp]];
-            public [[VariableTypeDS]] [[DataName.dotNet]] 
+            private [[VariableTypeDsb]] _[[DataName.dotNet]] = [[DefaultValueCSharp]];
+            public [[VariableTypeDsb]] [[DataName.dotNet]] 
             { 
                 get { return _[[DataName.dotNet]]; }
                 set 
@@ -528,7 +528,7 @@ The read method for each characteristic.
 TODO: the numeric values are all handled correctly (turned into bytes). But what about strings and bytes?
 
 ```
-            Curr[[DataGroupName.dotNet]].[[DataName.dotNet]] = vr.GetNextDouble();
+            Curr[[DataGroupName.dotNet]].[[DataName.dotNet]] = vr.[[GetNextType.dotNext]]();
 ```
 
 ## CharacteristicPropertyReadFieldReplace If="T[[ReplaceValueDetectCSharp]] length> 1" Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties
@@ -1001,7 +1001,7 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
 
 ## PropertyCollection Type=list ListOutput=parent Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" Trim=endCR
 ```
-        public ObservableCollection<[[VARIABLETYPE+DS]]> [[DataName.dotNet]] { get; } = new ObservableCollection<[[VARIABLETYPE+DS]]>();
+        public ObservableCollection<[[VariableTypeDsb]]> [[DataName.dotNet]] { get; } = new ObservableCollection<[[VariableTypeDsb]]>();
 ```
 
 ## DataGroupMemberCollectionAdd Type=list ListOutput=parent Source=Services/DataGroups/Characteristics CodeListSubZero="" Trim=endCR

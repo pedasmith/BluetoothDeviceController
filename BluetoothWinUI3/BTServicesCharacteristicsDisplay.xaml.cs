@@ -356,6 +356,10 @@ namespace BluetoothWinUI3
                 var shortuuid = BluetoothUuidHelper.TryGetShortId(service.Uuid);
                 var serviceUuidStr = (shortuuid != null) ? $"{shortuuid:X4}" : service.Uuid.ToString();
                 var servicename = (shortuuid != null) ? BluetoothServiceUuid16Bit.Decode((ushort)shortuuid) + " " : "";
+                if (shortuuid != null)
+                {
+                    nameService.Name = BluetoothServiceUuid16Bit.Decode((ushort)shortuuid);
+                }
 
                 var servicesb = new StringBuilder();
                 servicesb.AppendLine($"Service {servicename}Uuid={serviceUuidStr}  handle={service.AttributeHandle}");
@@ -384,6 +388,10 @@ namespace BluetoothWinUI3
 
 
                         var nameCharacteristic = new NameCharacteristic(characteristic, null, null, characteristicCount++);
+                        if (chshortuuid != null)
+                        {
+                            nameCharacteristic.Name = BluetoothCharacteristic.Decode((ushort)chshortuuid);
+                        }
                         nameService.Characteristics.Add(nameCharacteristic);
 
                         var chsb = new StringBuilder();

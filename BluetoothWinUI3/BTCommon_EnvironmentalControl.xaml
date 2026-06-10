@@ -28,18 +28,8 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0" HorizontalAlignment="Stretch">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    
-                    <StackPanel Grid.Row="0" Grid.Column="0" x:Name="uiSensorTemperature">
+                <GridView Grid.Row="0" x:Name="uiDeviceDataList" Style="{StaticResource sDeviceDataList}">
+                    <StackPanel x:Name="uiSensorTemperature" Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Temperature</Run><Run Text="&#160;"/><Run x:Name="uiTemperatureChange" Text="┄"/>
                         </TextBlock>
@@ -47,7 +37,7 @@
                         <Line Height="5" Tag="TemperatureColor" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
 
-                    <StackPanel Grid.Row="0" Grid.Column="1" x:Name="uiSensorHumidity">
+                    <StackPanel x:Name="uiSensorHumidity" Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Humidity</Run><Run Text="&#160;"/><Run x:Name="uiHumidityChange" Text="┄"/>
                         </TextBlock>
@@ -55,7 +45,7 @@
                         <Line Height="5" Tag="HumidityColor" Style="{StaticResource sGraphLineKey}"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="0" Grid.Column="2" x:Name="uiSensorPM25">
+                    <StackPanel x:Name="uiSensorPM25" Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>PM25</Run><Run Text="&#160;"/><Run x:Name="uiPM25Change" Text="┄"/>
                         </TextBlock>
@@ -63,15 +53,14 @@
                         <Line Height="5" Tag="PM25Color" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
 
-                    <StackPanel Grid.Row="1" Grid.Column="0" x:Name="uiSensorPressure">
+                    <StackPanel x:Name="uiSensorPressure" Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Pressure</Run><Run Text="&#160;"/><Run x:Name="uiPressureChange" Text="┄"/>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPressure"/></TextBlock>
                         <Line Height="5" Tag="PressureColor" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
-
-                </Grid>
+                </GridView>
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
                     <tv:TableView x:Name="uiTableView" IsReadOnly="True" />

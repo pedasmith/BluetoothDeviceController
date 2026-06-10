@@ -39,6 +39,9 @@
     <None Remove="ZoomableDeviceControl.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\BTStandard_Demo.json" Link="Assets\CharacteristicsData\BTStandard_Demo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\DefaultBluetooth.json" Link="Assets\CharacteristicsData\DefaultBluetooth.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -58,6 +61,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H6005.json" Link="Assets\CharacteristicsData\Govee_H6005.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Nordic_Thingy.json" Link="Assets\CharacteristicsData\Nordic_Thingy.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TOAPE_Cycling_Speed_Cadence.json" Link="Assets\CharacteristicsData\TOAPE_Cycling_Speed_Cadence.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json" Link="Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json">
@@ -155,6 +164,9 @@
     <Content Update="Assets\HelpFiles\Device_Nordic_Thingy.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Page Update="BTStandard_DemoControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="BTServicesCharacteristicsDisplay.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

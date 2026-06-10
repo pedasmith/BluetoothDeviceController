@@ -90,7 +90,26 @@ namespace BluetoothCodeGenerator
             }
             return $"X47_UNKNOWN_TYPE_{format}";
         }
+        private static string ByteFormatToGetNextCall(string format)
+        {
+            switch (format)
+            {
+                case "":
+                case "BYTES": return "GetNextByteArray";
+                case "STRING": return "GetNextString";
+                case "I8": return "GetNextDouble";
+                case "U8": return "GetNextDouble";
+                case "I16": return "GetNextDouble";
+                case "U16": return "GetNextDouble";
+                case "I24": return "GetNextDouble";
+                case "U24": return "GetNextDouble";
+                case "I32": return "GetNextDouble";
+                case "U32": return "GetNextDouble";
+                case "F32": return "GetNextDouble";
+            }
+            return $"GetNext_X82_UNKNOWN_TYPE_{format}";
 
+        }
         private static string ByteFormatToDataWriterCall(string format)
         {
             switch (format)
@@ -169,6 +188,15 @@ namespace BluetoothCodeGenerator
             switch (format)
             {
                 case "BYTES": return "string";
+                case "STRING": return "string";
+            }
+            return $"double";
+        }
+        private static string ByteFormatToCSharpStringOrDoubleOrBytes(string format)
+        {
+            switch (format)
+            {
+                case "BYTES": return "byte[]";
                 case "STRING": return "string";
             }
             return $"double";
@@ -563,9 +591,11 @@ namespace BluetoothCodeGenerator
                     TemplateSnippet.AddMacroList(prlist, "DataName.dotNet", dataname.DotNetSafe());
                     TemplateSnippet.AddMacroList(prlist, "DATANAMEUSER", dataname.Replace("_", " "));
 
+                    TemplateSnippet.AddMacroList(prlist, "GetNextType.dotNext", ByteFormatToGetNextCall(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VariableType", ByteFormatToCSharp(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VariableTypeParam", ByteFormatToCSharpParam(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VariableTypeDS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "VariableTypeDsb", ByteFormatToCSharpStringOrDoubleOrBytes(item.ByteFormatPrimary));
 
                     TemplateSnippet.AddMacroList(prlist, "VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
