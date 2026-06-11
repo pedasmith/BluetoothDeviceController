@@ -64,6 +64,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             // ThermPro devices
             new SupportedDevice("TP351*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("TP357*", typeof(BTCommon_EnvironmentalControl)),
+            new SupportedDevice("TP359*", typeof(BTCommon_EnvironmentalControl)),
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {

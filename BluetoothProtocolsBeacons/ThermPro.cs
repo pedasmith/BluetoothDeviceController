@@ -24,7 +24,7 @@ namespace BluetoothProtocols
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
         public UInt16 CompanyId { get; set; } 
-        public enum SensorType { Other, TP351, TP357, NotThisSensorFamily };
+        public enum SensorType { Other, TP351, TP357, TP359, NotThisSensorFamily };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -85,6 +85,7 @@ namespace BluetoothProtocols
             {
                 if (name.StartsWith("TP351")) retval = SensorType.TP351;
                 if (name.StartsWith("TP357")) retval = SensorType.TP357;
+                if (name.StartsWith("TP359")) retval = SensorType.TP357;
             }
             return retval;
         }
@@ -157,6 +158,7 @@ namespace BluetoothProtocols
                         break;
                     case SensorType.TP351: // Example: C2 DA 00 2B 22 33 01 # 21.6C 45%
                     case SensorType.TP357: // Example: C2 C0 00 32 02 2C
+                    case SensorType.TP359: // Example: C2 EA 00 29 22 13 01 # 24.2C 39%
                         {
                             // -- TL TH HU
                             // C2 C0 00 32 02 2C
