@@ -250,6 +250,7 @@ namespace BluetoothWinUI3
             // Update the UI as needed and create the next device
             UIThreadHelper.CallOnUIThread(() =>
             {
+                if (!rootPanel.IsLoaded) return;
                 uiAdvertCount.Text = NAdvertisements.ToString();
                 uiAdvertRaw.Text = e.ToString();
 

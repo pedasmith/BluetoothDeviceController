@@ -493,7 +493,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             }
         }
 
-        UpdateGraphData(""); // all of them.
+        UpdateDeviceDataUX(""); // all of them.
     }
 
     /// <summary>
@@ -539,7 +539,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             if (this.IsLoaded) // Won't be loaded when we exit the app!
             {
-                UpdateGraphData(e.PropertyName);
+                UpdateDeviceDataUX(e.PropertyName);
             }
         });
     }
@@ -584,7 +584,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// needs to be updated.
     /// </summary>
     /// <param name="name"></param>
-    private void UpdateGraphData(string name)
+    private void UpdateDeviceDataUX(string name)
     {
         if (Device == null) return;
         CurrBattery_Data = Device.CurrBattery_Data;

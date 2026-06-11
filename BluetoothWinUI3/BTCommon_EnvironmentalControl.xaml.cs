@@ -402,7 +402,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             }
         }
 
-        UpdateGraphData(""); // the graph is changed, but not the data
+        UpdateDeviceDataUX(""); // the graph is changed, but not the data
     }
 
     /// <summary>
@@ -445,10 +445,8 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     {
         UIThreadHelper.CallOnUIThread(() =>
         {
-            if (this.IsLoaded) // Won't be loaded when we exit the app!
-            {
-                UpdateGraphData(e.PropertyName);
-            }
+            if (!IsLoaded) return;
+            UpdateDeviceDataUX(e.PropertyName);
         });
     }
 #endif
@@ -481,7 +479,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// or just the one.
     /// </summary>
     /// <param name="name"></param>
-    private void UpdateGraphData(string name)
+    private void UpdateDeviceDataUX(string name)
     {
         if (CurrSensor == null) return;
 
@@ -634,7 +632,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     {
         UIThreadHelper.CallOnUIThread(() =>
         {
-            if (!this.IsLoaded) return; // Won't be loaded when we exit the app!
+            if (!IsLoaded) return; // Won't be loaded when we exit the app!
 
             name = data.BestName;
             if (GoveeSensorType != Govee.SensorType.NotThisSensorFamily)
@@ -666,7 +664,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                     SetupOnFirstValidData();
                     FirstCallWithIsValid = false;
                 }
-                UpdateGraphData("*"); // Update all the data!
+                UpdateDeviceDataUX("*"); // Update all the data!
             }
         });
 
@@ -691,7 +689,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         }
         else
         {
-            uiDeviceDataList.Items.Remove(uiSensorTemperature);
+            uiDeviceDataList.Items.Remove(uiDeviceDataTemperature);
         }
 
         if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity))
@@ -701,7 +699,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         }
         else
         {
-            uiDeviceDataList.Items.Remove(uiSensorHumidity);
+            uiDeviceDataList.Items.Remove(uiDeviceDataHumidity);
         }
 
         if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.PM25))
@@ -711,7 +709,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         }
         else
         {
-            uiDeviceDataList.Items.Remove(uiSensorPM25);
+            uiDeviceDataList.Items.Remove(uiDeviceDataPM25);
         }
 
         if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Pressure))
@@ -721,7 +719,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         }
         else
         {
-            uiDeviceDataList.Items.Remove(uiSensorPressure);
+            uiDeviceDataList.Items.Remove(uiDeviceDataPressure);
         }
 
 

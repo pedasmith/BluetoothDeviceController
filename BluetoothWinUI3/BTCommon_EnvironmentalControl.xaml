@@ -29,7 +29,7 @@
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
                 <GridView Grid.Row="0" x:Name="uiDeviceDataList" Style="{StaticResource sDeviceDataList}">
-                    <StackPanel x:Name="uiSensorTemperature" Style="{StaticResource sDeviceDataPanel}">
+                    <StackPanel x:Name="uiDeviceDataTemperature" Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Temperature</Run><Run Text="&#160;"/><Run x:Name="uiTemperatureChange" Text="┄"/>
                         </TextBlock>
@@ -37,7 +37,7 @@
                         <Line Height="5" Tag="TemperatureColor" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
 
-                    <StackPanel x:Name="uiSensorHumidity" Style="{StaticResource sDeviceDataPanel}">
+                    <StackPanel x:Name="uiDeviceDataHumidity" Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Humidity</Run><Run Text="&#160;"/><Run x:Name="uiHumidityChange" Text="┄"/>
                         </TextBlock>
@@ -45,7 +45,7 @@
                         <Line Height="5" Tag="HumidityColor" Style="{StaticResource sGraphLineKey}"/>
                     </StackPanel>
 
-                    <StackPanel x:Name="uiSensorPM25" Style="{StaticResource sDeviceDataPanel}">
+                    <StackPanel x:Name="uiDeviceDataPM25" Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>PM25</Run><Run Text="&#160;"/><Run x:Name="uiPM25Change" Text="┄"/>
                         </TextBlock>
@@ -53,7 +53,7 @@
                         <Line Height="5" Tag="PM25Color" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
 
-                    <StackPanel x:Name="uiSensorPressure" Style="{StaticResource sDeviceDataPanel}">
+                    <StackPanel x:Name="uiDeviceDataPressure" Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Pressure</Run><Run Text="&#160;"/><Run x:Name="uiPressureChange" Text="┄"/>
                         </TextBlock>

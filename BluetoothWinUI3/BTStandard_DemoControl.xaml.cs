@@ -30,6 +30,7 @@ namespace BluetoothWinUI3;
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControlBasic, IDeviceControlDevice
 {
+    bool HasData = true; // Data is the BatteryLevel data. But it might not exist.
 
     /// <summary>
     /// Standard: Panel size. Set in UpdateUX from MainWindow.
@@ -121,6 +122,8 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     {
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
+        // We only want to do work the first time.
+
         if (uiTableView.ItemsSource != null) return;
         uiTableView.ItemsSource = HistoricalBattery_DataUnits.Data;
     }
@@ -128,16 +131,43 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     private BTStandard_Demo.Battery_Data CopyAndUpdateUnits(BTStandard_Demo.Battery_Data source, BTStandard_Demo.Battery_Data dest)
     {
         dest ??= source.Clone();
-        dest.CopyFrom(source); // TODO: the Nordic has a ton of duplication here.
+        // CHANGE: You might be tempted to use the dest.CopyFrom(source) at this point. But that will 
+        // copy all the fields without updating the units (and will therefore trigger a bunch of INPC callbacks)
+        // An easy way to fill this is in:
+        // 1. Copy the dest.CopyFrom() method, changing "this" to dest and "value" to source.
+        // 2. Each field that's a unit with user preferences needs to be changed to use
+        //    the BluetoothWatcher.Units.(type).Convert
+        //    Example (from Nordic_thingy.xaml.cs):
+        //        dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(source.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
+        // The starting units is always the units of the raw protocol. For the Nordic, the temperature
+        // is always in Celcius. 
+        // For this, the raw battery level is always in percent, and there's no user adjustment.
+
+        dest.TimestampMostRecent = source.TimestampMostRecent;
+        dest.BatteryLevel = source.BatteryLevel;
         return dest;
     }
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
     public List<string> LineNames { get { return ["Battery", ]; } } // CHANGE:
 
+    /// <summary>
+    /// The DataContext is a WinUI3 (and the rest of XAML) thing, and is just an object. And it can be
+    /// set by anyone, at any time, to any value. The Bluetooth controls generally require that the 
+    /// DataContext be a KnownDevice (which is turn is a bunch of data: the SupportedDevice, the
+    /// WatcherData / Bluetooth advertisement that triggered this control being created, etc.)
+    /// 
+    /// DataContextAsKnownDevice is either a real KnownDevice or it's null.
+    /// </summary>
     public KnownDevice DataContextAsKnownDevice { get { return DataContext as KnownDevice; } }
 
-
+    /// <summary>
+    /// The OxyPlotModel is the graph for the sensor data that we want to plot. It's of
+    /// type "H.Oxyplot" which is a WinUI3 port of the original OxyPlot code.
+    /// CHANGE: you will want to set the Title and the list of Axes and LineSeries. In
+    /// general, each sensor type (e.g, on the Nordic Thingy there's a sensor for temperature,
+    /// dumidity, pressure, etc.) has its own Axis and its own LineSeries.
+    /// </summary>
     // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; } = new PlotModel
     {
@@ -154,10 +184,10 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
                     MajorGridlineColor = OxyColors.Black,
                     MajorGridlineStyle = LineStyle.Solid,
                     MajorGridlineThickness = 1,
-                    MajorStep = 10, // 1 hpa
-                    MinimumRange= 30,
-                    Title="Battery Percent",
-                    Key="BatteryLevel"
+                    MajorStep = 10, // CHANGE: Battery percentage run 0..100
+                    MinimumRange= 30, // CHANGE: set this match your graphing needs
+                    Title="Battery Percent", // CHANGE: set to something the user will recognize
+                    Key="BatteryLevel" // CHANGE: Key has to match the YAxisKey in the Series
                 },
             },
         Series =
@@ -168,14 +198,15 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
                     Color = OxyColors.DarkBlue,
                     StrokeThickness = 0.75,
                     MarkerType = MarkerType.None,
-                    DataFieldX = "TimestampMostRecentDT",
-                    DataFieldY = "BatteryLevel",
-                    YAxisKey= "BatteryLevel",
+                    DataFieldX = "TimestampMostRecentDT", // All sensor data has a TimestampMostRecentDT
+                    DataFieldY = "BatteryLevel", // CHANGE: Must match the data in the sensor data class
+                    YAxisKey= "BatteryLevel", // CHANGE: this key has to match the one in the Axis field.
+                    // Suggestion is to set the YAxisKey to be the same as the DataFieldY
                 },
             }
     };
     /// <summary>
-    /// Set the axes to either visible or invisible. 
+    /// Set all of the axes to either visible or invisible. 
     /// </summary>
     public void SetAxesVisibility(bool isVisible)
     {
@@ -207,7 +238,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     }
 
 
-
+    ulong OriginalBTAddr = 0xFFFFFFFF_FFFFFFFF;
     /// <summary>
     /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
     /// trigger looking up the SaveData and change more things. And it will actually connect to the device.
@@ -216,17 +247,23 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// </summary>
     private async void BTStandard_DemoControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
-        // FYI: by the time this method is called, the DataContext is already set
+        // FYI: by the time this method is called, the DataContext in the object is already set
 
         if (args.NewValue == null) return; // just bogus; ignore.
 
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
+        // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
         if (DataContextAsKnownDevice == null)
         {
             Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {args.NewValue.GetType()}");
             return;
         }
-
+        if (OriginalBTAddr != 0xFFFFFFFF_FFFFFFFF)
+        {
+            ; // duplicate call!
+            return;
+        }
+        OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
         uiAddress.Text = BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr);
 
         Device = new BTStandard_Demo()
@@ -256,7 +293,24 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
 
         Device.PropertyChanged += Device_PropertyChanged;
         await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
-        await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
+        var battery = await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
+        if (battery == null)
+        {
+            // Happens when the device doesn't report a battery level (e.g., JBL Pro 4 Speakers, but lots of others)
+            // BTW: if you know your device will never have a battery level but there is a connection control,
+            // you should just set the visibility to collapsed in the OnLoaded event.
+
+            // TODO: this gets sets when the DataContext is updated. But the calling code they keeps going
+            // and sets up the UX (because the device is selected). I need a feedback mechanism so that the 
+            // device, when it's finished getting set up, will call back to the MainWindow.
+            // The Sender, BTW, is this object, not the MainWindow :-(
+            HasData = false;
+            uiDeviceDataList.Items.Remove(uiDeviceDataBattery);
+            uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
+            uiOxyPlot.Visibility = Visibility.Collapsed;
+            uiTableView.Visibility = Visibility.Visible;
+        }
+        await Device.ReadDevice_Name(BluetoothCacheMode.Cached);
         await Device.ReadConnection_Parameter(BluetoothCacheMode.Cached);
 
     }
@@ -402,7 +456,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
             }
         }
 
-        UpdateGraphData(""); // all of them.
+        UpdateDeviceDataUX(""); // all of them.
     }
 
     /// <summary>
@@ -446,10 +500,8 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     {
         UIThreadHelper.CallOnUIThread(() =>
         {
-            if (this.IsLoaded) // Won't be loaded when we exit the app!
-            {
-                UpdateGraphData(e.PropertyName);
-            }
+            if (!IsLoaded) return;
+            UpdateDeviceDataUX(e.PropertyName);
         });
     }
 
@@ -464,36 +516,23 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         if (name == "") return;
         NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
 
-
-        if (name == Nordic_Thingy.Temperature_cPropertyChangedName || name == "*")
+        if (name == BTStandard_Demo.BatteryLevelPropertyChangedName || name == "*")
         {
-            uiTemperature_cChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+            uiBatteryLevelChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
         }
-        if (name == Nordic_Thingy.Pressure_hpaPropertyChangedName || name == "*")
+        if (name == BTStandard_Demo.Connection_ParameterPropertyChangedName || name == "*")
         {
-            uiPressure_hpaChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-        }
-        if (name == Nordic_Thingy.HumidityPropertyChangedName || name == "*")
-        {
-            uiHumidityChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-        }
-        if (name == Nordic_Thingy.Air_Quality_eCOS_TVOCPropertyChangedName || name == "*")
-        {
-            uieCOSChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-            uiTVOCChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-        }
-        if (name == Nordic_Thingy.Color_RGB_ClearPropertyChangedName || name == "*")
-        {
-            uiColorChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+            uiConnection_ParametersChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
         }
 
     }
+
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated.
     /// </summary>
     /// <param name="name"></param>
-    private void UpdateGraphData(string name)
+    private void UpdateDeviceDataUX(string name)
     {
         if (Device == null) return;
         CurrBattery_Data = Device.CurrBattery_Data;
@@ -515,8 +554,21 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         // Track the historical data
         switch (name)
         {
+            case BTStandard_Demo.Device_NamePropertyChangedName:
+                uiName.Text = CurrCommon_Configuration_Data.Device_Name;
+                break;
+
+            case BTStandard_Demo.Connection_ParameterPropertyChangedName:
+                uiInterval_Min.Text = CurrCommon_Configuration_Data.Interval_Min.ToString("F2");
+                uiInterval_Max.Text = CurrCommon_Configuration_Data.Interval_Max.ToString("F2");
+                uiLatency.Text = CurrCommon_Configuration_Data.Latency.ToString("F2");
+                uiTimeout.Text = CurrCommon_Configuration_Data.Timeout.ToString("F2");
+                break;
+
+
             case "*": // never used, but here so it matches the Govee code.
             case BTStandard_Demo.BatteryLevelPropertyChangedName:
+                uiBattery.Text = CurrBattery_Data.BatteryLevel.ToString("F2");
 
 
                 var deltaInSeconds = CurrBattery_Data.TimestampMostRecent.Subtract(HistoricalBattery_DataUnits.TimestampMostRecentAdd).TotalSeconds;
@@ -560,12 +612,16 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// <returns></returns>
     public IDeviceControlBasic.UXCapabilities GetUXCapabilities()
     {
-        var retval =
+
+        var retval = IDeviceControlBasic.UXCapabilities.CanRename;
+        if (HasData)
+        {
+            retval |=
             IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
             | IDeviceControlBasic.UXCapabilities.CanGetData
-            | IDeviceControlBasic.UXCapabilities.CanRename
             | IDeviceControlBasic.UXCapabilities.CanShowTable
             ;
+        }
         return retval;
     }
 

@@ -1,0 +1,291 @@
+
+
+{
+  "AllDevices": [
+    {
+      "Name": "JBL Go 4",
+      "CompletionStatus": 0,
+      "Services": [
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "GATT",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changed",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": false,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": false,
+              "IsIndicate": true,
+              "Verbs": ":WriteWithoutResponse:Indicate:RdInNo:InNo:WrWw:"
+            }
+          ]
+        },
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "GAP",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": true,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "JBL Go 4\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": true,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "00 00"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Peripheral Preferred Connection Parameters",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "64 00 E8 03 00 00 E8 03"
+              ]
+            },
+            {
+              "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+              "Name": "Central Address Resolution",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "01"
+              ]
+            },
+            {
+              "UUID": "00002bf5-0000-1000-8000-00805f9b34fb",
+              "Name": "LE GATT Security Levels",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown4",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "01 04"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000fe2c-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Google",
+          "Characteristics": [
+            {
+              "UUID": "fe2c1234-8366-4814-8eb0-01de32100bea",
+              "Name": "Unknown0",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": false,
+              "IsWrite": true,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "Verbs": ":Write:Notify:RdInNo:InNo:WrWw:"
+            },
+            {
+              "UUID": "fe2c1235-8366-4814-8eb0-01de32100bea",
+              "Name": "Unknown1",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": false,
+              "IsWrite": true,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "Verbs": ":Write:Notify:RdInNo:InNo:WrWw:"
+            },
+            {
+              "UUID": "fe2c1236-8366-4814-8eb0-01de32100bea",
+              "Name": "Unknown2",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown2",
+              "IsRead": false,
+              "IsWrite": true,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Write:WrWw:"
+            },
+            {
+              "UUID": "00001233-0000-1000-8000-00805f9b34fb",
+              "Name": "1233",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown3",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "00 47 6D"
+              ]
+            },
+            {
+              "UUID": "fe2c1237-8366-4814-8eb0-01de32100bea",
+              "Name": "Unknown4",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown4",
+              "IsRead": false,
+              "IsWrite": true,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "Verbs": ":Write:Notify:RdInNo:InNo:WrWw:"
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision String",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown5",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "V1.25"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "65786365-6c70-6f69-6e74-2e636f6d0000",
+          "Name": "Unknown3",
+          "Characteristics": [
+            {
+              "UUID": "65786365-6c70-6f69-6e74-2e636f6d0001",
+              "Name": "Unknown0",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "Verbs": ":Read:Notify:RdInNo:InNo:"
+            },
+            {
+              "UUID": "65786365-6c70-6f69-6e74-2e636f6d0002",
+              "Name": "Unknown1",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": false,
+              "IsWrite": true,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Write:WriteWithoutResponse:WrWw:"
+            }
+          ]
+        },
+        {
+          "UUID": "00001850-0000-1000-8000-00805f9b34fb",
+          "Name": "Published Audio Capabilities"
+        },
+        {
+          "UUID": "0000184e-0000-1000-8000-00805f9b34fb",
+          "Name": "Audio Stream Control"
+        },
+        {
+          "UUID": "00001844-0000-1000-8000-00805f9b34fb",
+          "Name": "Volume Control"
+        },
+        {
+          "UUID": "00001855-0000-1000-8000-00805f9b34fb",
+          "Name": "Telephony and Media Audio",
+          "Characteristics": [
+            {
+              "UUID": "00002b51-0000-1000-8000-00805f9b34fb",
+              "Name": "TMAP Role",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown0",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "38 00"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "TODO: line 190"
+    }
+  ]
+}

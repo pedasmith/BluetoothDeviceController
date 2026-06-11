@@ -21,7 +21,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
     {
         public delegate void WatcherEventHandler(BluetoothLEAdvertisementWatcher sender, WatcherData e);
         public event WatcherEventHandler WatcherEvent;
-        public double FilterRssiDb = -200; // essentially everything
+        public double FilterRssiDb = -75; // filter out far away things because they are irritating.
 
         BluetoothLEAdvertisementWatcher BleAdvertisementWatcher = null;
 
