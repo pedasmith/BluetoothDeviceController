@@ -1,5 +1,5 @@
 using BluetoothProtocols;
-using BluetoothProtocols.NS_BTStandard_Demo;
+using BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -25,6 +25,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage.Streams;
 using WinUI.TableView;
+using static BluetoothProtocols.TAOPE_CyclingSpeedCadence;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -41,8 +42,6 @@ namespace BluetoothWinUI3;
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDeviceControlBasic, IDeviceControlDevice
 {
-    bool HasData = true; // Data is the BatteryLevel data. But it might not exist.
-
     /// <summary>
     /// Standard: Panel size. Set in UpdateUX from MainWindow.
     /// </summary>
@@ -53,33 +52,28 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "BTStandard_Demo";
-    BTStandard_Demo Device;
+    private readonly string InternalDeviceType = "TOAPE_Cycle";
+    TAOPE_CyclingSpeedCadence Device;
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public Battery_DataCollection HistoricalBattery_DataUnits { get; } = new Battery_DataCollection(); // CHANGE:
-    /// <summary>
-    /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
-    /// always in the 'native' units (e.g., always celcius for temperature).
-    /// </summary>
-    BTStandard_Demo.Common_Configuration_Data CurrCommon_Configuration_Data = null;
+    public Cycling_Speed_and_Cadence_DataCollection HistoricalSpeed_and_Cadence_DataUnits { get; } = new Cycling_Speed_and_Cadence_DataCollection(); // CHANGE:
 
     /// <summary>
     /// Similar to CurrBattery_Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalBattery_DataUnits collection.
     /// </summary>
-    BTStandard_Demo.Battery_Data CurrBattery_Data = null;
-    BTStandard_Demo.Battery_Data CurrBattery_DataUnits = null;
+    Cycling_Speed_and_Cadence_Data CurrSpeed_and_Cadence_Data = null;
+    Cycling_Speed_and_Cadence_Data CurrSpeed_and_Cadence_DataUnits = null;
 
 
 
     public TAOPE_CyclingSpeedCadenceControl()
     {
         InitializeComponent();
-        this.Loaded += BTStandard_DemoControl_Loaded;
-        this.DataContextChanged += BTStandard_DemoControl_DataContextChanged;
+        this.Loaded += TAOPE_CyclingSpeedCadenceControl_Loaded;
+        this.DataContextChanged += TAOPE_CyclingSpeedCadenceControl_DataContextChanged;
 
         //
         // Set up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
@@ -89,7 +83,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         {
             if (series is LineSeries lineSeries)
             {
-                lineSeries.ItemsSource = HistoricalBattery_DataUnits.Data; //DOC:
+                lineSeries.ItemsSource = HistoricalSpeed_and_Cadence_DataUnits.Data; //DOC:
             }
         }
         uiOxyPlot.Model = OxyPlotModel;
@@ -128,17 +122,17 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
     }
 
 
-    private void BTStandard_DemoControl_Loaded(object sender, RoutedEventArgs e)
+    private void TAOPE_CyclingSpeedCadenceControl_Loaded(object sender, RoutedEventArgs e)
     {
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         // We only want to do work the first time.
 
         if (uiTableView.ItemsSource != null) return;
-        uiTableView.ItemsSource = HistoricalBattery_DataUnits.Data;
+        uiTableView.ItemsSource = HistoricalSpeed_and_Cadence_DataUnits.Data;
     }
 
-    private BTStandard_Demo.Battery_Data CopyAndUpdateUnits(BTStandard_Demo.Battery_Data source, BTStandard_Demo.Battery_Data dest)
+    private Cycling_Speed_and_Cadence_Data CopyAndUpdateUnits(Cycling_Speed_and_Cadence_Data source, Cycling_Speed_and_Cadence_Data dest)
     {
         dest ??= source.Clone();
         // CHANGE: You might be tempted to use the dest.CopyFrom(source) at this point. But that will 
@@ -154,7 +148,14 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         // For this, the raw battery level is always in percent, and there's no user adjustment.
 
         dest.TimestampMostRecent = source.TimestampMostRecent;
-        dest.BatteryLevel = source.BatteryLevel;
+        dest.Flags = source.Flags;
+        dest.RevolutionA = source.RevolutionA;
+        dest.TimeA = source.TimeA;
+        dest.RevolutionB = source.RevolutionB;
+        dest.TimeB = source.TimeB;
+        dest.FeatureFlags = source.FeatureFlags;
+        dest.SensorLocation = source.SensorLocation;
+        dest.Unknown3 = source.Unknown3;
         return dest;
     }
 
@@ -163,7 +164,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
     // so the main window menus get updated.
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    List<string> _LineNames = new List<string>() { "Battery" }; // CHANGE:
+    List<string> _LineNames = new List<string>() { "Revolution" }; // CHANGE:
     public List<string> LineNames { get { return _LineNames; } }
 
     /// <summary>
@@ -186,7 +187,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
     // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; } = new PlotModel
     {
-        Title = "Battery Data", //CHANGE:
+        Title = "Cadence Data", //CHANGE:
         PlotAreaBorderColor = OxyColors.Transparent,
         TextColor = OxyColors.Black,
         Axes =
@@ -201,21 +202,21 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
                 MajorGridlineThickness = 1,
                 MajorStep = 10, // CHANGE: Battery percentage run 0..100
                 MinimumRange= 30, // CHANGE: set this match your graphing needs
-                Title="Battery Percent", // CHANGE: set to something the user will recognize
-                Key="BatteryLevel" // CHANGE: Key has to match the YAxisKey in the Series
+                Title="Cadence", // CHANGE: set to something the user will recognize
+                Key="RevolutionA" // CHANGE: Key has to match the YAxisKey in the Series
             },
         },
         Series =
         {
             new LineSeries // CHANGE:
             {
-                Title = "Battery",
+                Title = "Revolutions",
                 Color = OxyColors.DarkBlue,
                 StrokeThickness = 0.75,
                 MarkerType = MarkerType.None,
                 DataFieldX = "TimestampMostRecentDT", // All sensor data has a TimestampMostRecentDT
-                DataFieldY = "BatteryLevel", // CHANGE: Must match the data in the sensor data class
-                YAxisKey= "BatteryLevel", // CHANGE: this key has to match the one in the Axis field.
+                DataFieldY = "RevolutionA", // CHANGE: Must match the data in the sensor data class
+                YAxisKey= "RevolutionA", // CHANGE: this key has to match the one in the Axis field.
                 // Suggestion is to set the YAxisKey to be the same as the DataFieldY
             },
         }
@@ -260,7 +261,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
     /// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
     /// used by other bits of the system.
     /// </summary>
-    private async void BTStandard_DemoControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    private async void TAOPE_CyclingSpeedCadenceControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
         // FYI: by the time this method is called, the DataContext in the object is already set
 
@@ -281,7 +282,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
         uiAddress.Text = BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr);
 
-        Device = new BTStandard_Demo()
+        Device = new TAOPE_CyclingSpeedCadence()
         {
             ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
         };
@@ -307,32 +308,8 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
 
 
         Device.PropertyChanged += Device_PropertyChanged;
-        await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
-        var battery = await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
-
-        // CHANGE: for your particular device, the battery might always be present
-        // the battery will never be null.
-        if (battery == null)
-        {
-            // Happens when the device doesn't report a battery level (e.g., JBL Pro 4 Speakers, but lots of others)
-            // BTW: if you know your device will never have a battery level but there is a connection control,
-            // you should just set the visibility to collapsed in the OnLoaded event.
-
-            HasData = false;
-            LineNames.Clear();
-            uiDeviceDataList.Items.Remove(uiDeviceDataBattery);
-            uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
-            uiOxyPlot.Visibility = Visibility.Collapsed;
-            uiTableView.Visibility = Visibility.Visible;
-
-            // Notify MainWindow that the UX capabilities have changed. This might change
-            // the UX (e.g., device> show graph/table might be removed)
-            // Will also trigger redoing the graph line names via LineNames, which
-            // technically isn't quite in accordance with the name.
-            NotifyDeviceControlChangesWindows?.OnGetUXCapabilitiesChanged(this, GetUXCapabilities());
-        }
-        await Device.ReadDevice_Name(BluetoothCacheMode.Cached);
-        await Device.ReadConnection_Parameter(BluetoothCacheMode.Cached);
+        await Device.NotifyCSC_MeasurementAsync(); // CHANGE: and the next lines
+        var battery = await Device.NotifyBattery_LevelAsync(); // I'm happy getting unchanged data? TODO: think about this more. 
 
     }
 
@@ -463,10 +440,11 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         CurrUserPrefs = newPrefs;
 
         // Update the saved data in the HistoricalEnvironment_DataUnits to match the new user preferences.
-        foreach (var data in HistoricalBattery_DataUnits.Data)
+        // TODO: eventually there will be a speed in MPH or KPH!
+        foreach (var data in HistoricalSpeed_and_Cadence_DataUnits.Data)
         {
             // CHANGE: demonstrate how to change what the user sees based on unit preferences.
-            // For the BTStandard_Demo, there are no units to change
+            // For the TAOPE_CyclingSpeedCadence, there are no units to change
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
                 // data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, CurrUserPrefs.Temperature);
@@ -537,15 +515,10 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         if (name == "") return;
         NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
 
-        if (name == BTStandard_Demo.BatteryLevelPropertyChangedName || name == "*")
+        if (name == TAOPE_CyclingSpeedCadence.CSC_MeasurementPropertyChangedName || name == "*")
         {
-            uiBatteryLevelChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+            uiRevolutionAChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
         }
-        if (name == BTStandard_Demo.Connection_ParameterPropertyChangedName || name == "*")
-        {
-            uiConnection_ParametersChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-        }
-
     }
 
     /// <summary>
@@ -556,8 +529,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
     private void UpdateDeviceDataUX(string name)
     {
         if (Device == null) return;
-        CurrBattery_Data = Device.CurrBattery_Data;
-        CurrCommon_Configuration_Data = Device.CurrCommon_Configuration_Data;
+        CurrSpeed_and_Cadence_Data = Device.CurrCycling_Speed_and_Cadence_Data;
 
         // name is from e.PropertyName when the Device does a PropertyChanged.
 
@@ -565,7 +537,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
 
         // Update to match the current preferred units. Will create a new CurrEnvironment_DataUnits the first time
         // it's called
-        CurrBattery_DataUnits = CopyAndUpdateUnits(CurrBattery_Data, CurrBattery_DataUnits);
+        CurrSpeed_and_Cadence_DataUnits = CopyAndUpdateUnits(CurrSpeed_and_Cadence_Data, CurrSpeed_and_Cadence_DataUnits);
 
         // Update this historical data; this will automatically update the table and graph.
         //
@@ -575,31 +547,19 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         // Track the historical data
         switch (name)
         {
-            case BTStandard_Demo.Device_NamePropertyChangedName:
-                uiName.Text = CurrCommon_Configuration_Data.Device_Name;
-                break;
+            case TAOPE_CyclingSpeedCadence.CSC_MeasurementPropertyChangedName:
 
-            case BTStandard_Demo.Connection_ParameterPropertyChangedName:
-                uiInterval_Min.Text = CurrCommon_Configuration_Data.Interval_Min.ToString("F2");
-                uiInterval_Max.Text = CurrCommon_Configuration_Data.Interval_Max.ToString("F2");
-                uiLatency.Text = CurrCommon_Configuration_Data.Latency.ToString("F2");
-                uiTimeout.Text = CurrCommon_Configuration_Data.Timeout.ToString("F2");
-                break;
+                uiRevolutionA.Text = CurrSpeed_and_Cadence_Data.RevolutionA.ToString("F2");
 
 
-            case "*": // never used, but here so it matches the Govee code.
-            case BTStandard_Demo.BatteryLevelPropertyChangedName:
-                uiBattery.Text = CurrBattery_Data.BatteryLevel.ToString("F2");
-
-
-                var deltaInSeconds = CurrBattery_Data.TimestampMostRecent.Subtract(HistoricalBattery_DataUnits.TimestampMostRecentAdd).TotalSeconds;
-                var verb = (deltaInSeconds > 5) ? Battery_DataCollection.Verb.Add : Battery_DataCollection.Verb.ReplaceMostRecent;
-                HistoricalBattery_DataUnits.Update(CurrBattery_DataUnits, verb); // Will add or replace the data and will copy as needed.
+                var deltaInSeconds = CurrSpeed_and_Cadence_Data.TimestampMostRecent.Subtract(HistoricalSpeed_and_Cadence_DataUnits.TimestampMostRecentAdd).TotalSeconds;
+                var verb = (deltaInSeconds > 5) ? Cycling_Speed_and_Cadence_DataCollection.Verb.Add : Cycling_Speed_and_Cadence_DataCollection.Verb.ReplaceMostRecent;
+                HistoricalSpeed_and_Cadence_DataUnits.Update(CurrSpeed_and_Cadence_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
                 // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
                 //
-                if (verb == Battery_DataCollection.Verb.Add && HistoricalBattery_DataUnits.Count == 2)
+                if (verb == Cycling_Speed_and_Cadence_DataCollection.Verb.Add && HistoricalSpeed_and_Cadence_DataUnits.Count == 2)
                 {
                     // DOC: Can't have the axes start off invisible because then they can't be switched back on
                     if (CurrWindowSize == MainWindow.WindowSize.Normal)
@@ -616,11 +576,11 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         // Update the text values on the screen.
         //
 
-        if (CurrBattery_Data != null)
+        if (CurrSpeed_and_Cadence_Data != null)
         {
             if (name == "BatteryLevel" || name == "")
             {
-                uiBTConnectionControl.SetBatteryLevel(CurrBattery_Data.BatteryLevel);
+                // TODO: uiBTConnectionControl.SetBatteryLevel(CurrBattery_Data.BatteryLevel);
             }
         }
     }
@@ -633,16 +593,11 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
     /// <returns></returns>
     public IDeviceControlBasic.UXCapabilities GetUXCapabilities()
     {
-
-        var retval = IDeviceControlBasic.UXCapabilities.CanRename;
-        if (HasData)
-        {
-            retval |=
-            IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
+        var retval = IDeviceControlBasic.UXCapabilities.CanRename
+            | IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
             | IDeviceControlBasic.UXCapabilities.CanGetData
             | IDeviceControlBasic.UXCapabilities.CanShowTable
             ;
-        }
         return retval;
     }
 
@@ -672,7 +627,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
     public string ExportData(IExportData exporter)
     {
         string retval = "";
-        var data = HistoricalBattery_DataUnits.Data;
+        var data = HistoricalSpeed_and_Cadence_DataUnits.Data;
         if (data.Count == 0)
         {
             Log("No data to export.");
@@ -701,4 +656,4 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
 
     #endregion
 
-} // end of class BTStandard_DemoControl
+} // end of class TAOPE_CyclingSpeedCadenceControl

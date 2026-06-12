@@ -19,7 +19,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="uiDeviceName" Grid.Row="0" Text="Demonstation Display" Style="{StaticResource sDeviceTitle}"/>
+            <TextBlock x:Name="uiDeviceName" Grid.Row="0" Text="Cycle Cadence" Style="{StaticResource sDeviceTitle}"/>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
@@ -31,39 +31,10 @@
                 <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" x:Name="uiDeviceDataList">
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Name</Run><Run Text="&#160;"/><Run x:Name="uiNameChange" Text="┄"/>
+                        <Run>Revolution</Run><Run Text="&#160;"/><Run x:Name="uiRevolutionAChange" Text="┄"/>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiName"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRevolutionA"/></TextBlock>
                     </StackPanel>
-
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Interval Min</Run><Run Text="&#160;"/><Run x:Name="uiConnection_ParametersChange" Text="┄"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiInterval_Min"/></TextBlock>
-                    </StackPanel>
-
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Interval Max</Run><Run Text="&#160;"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiInterval_Max"/></TextBlock>
-                    </StackPanel>
-
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Latency</Run><Run Text="&#160;"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiLatency"/></TextBlock>
-                    </StackPanel>
-
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Timeout</Run><Run Text="&#160;"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTimeout"/></TextBlock>
-                    </StackPanel>
-
 
                     <!-- This StackPanel has a name because it might be removed from the display (not ever
                          device has a Battery service (0000180f-0000-1000-8000-00805f9b34fb) and the
