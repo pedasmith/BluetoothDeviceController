@@ -1,11 +1,29 @@
 ﻿using BluetoothProtocols;
+using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 
 
 namespace BluetoothWinUI3
 {
+    /// <summary>
+    /// Implemented by MainWindow to handle device control changes that happen
+    /// after a DeviceControl device get a DataContextChanged notification.
+    /// 
+    /// This happens in e.g., BTStandard_Demo when the device doesn't have a 
+    /// battery and the main UX needs to update (the MainWindow Device> menu has
+    /// to be updated to not allow showing the graph versus table)
+    /// </summary>
+    public interface IHandleNotifyDeviceControlChanges
+    {
+        /// <summary>
+        /// Says the the UXCapabilities have changed. Can also means that the LineNames have changed,
+        /// which is a little over-broad.
+        /// </summary>
+        void OnGetUXCapabilitiesChanged(UserControl deviceControl, IDeviceControlBasic.UXCapabilities newCapabilities);
+    }
 
     public interface IDeviceControlBasic
     {
@@ -42,6 +60,7 @@ namespace BluetoothWinUI3
         enum DetailsType {  Normal, All, }
         string GetDetails(DetailsType detailsType);
 
+        void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow);
     }
 
 
@@ -64,7 +83,27 @@ namespace BluetoothWinUI3
         /// Update the color of a single line
         /// </summary>
         void UpdateGraphColor(string lineName, uint color);
-
-
     }
+
+    /// <summary>
+    /// The DeviceControl wants to get all of the advertisements that are seen. 
+    /// Used by e.g., BTServicesCharacteristicsDisplay
+    /// Is a speciality interface; most device controls will not implement this.
+    /// </summary>
+    public interface IHandleBTAdvertisements
+    {
+        void HandleAdvertisement(WatcherData data);
+    }
+
+    /// <summary>
+    /// The DeviceControl wants all of the advertisements for the specific (known) device based on 
+    /// BT address. Used by a bunch of sensor like the BTCommon_EnvironmentalControl because the 
+    /// Govee, SensorPro, ThermPro etc. data is packed into the adverts.
+    /// Many device control do not implement this.
+    /// </summary>
+    public interface IHandleMyBTAdvertisements
+    {
+        void HandleMyAdvertisement(WatcherData data);
+    }
+
 }

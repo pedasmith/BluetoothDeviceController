@@ -765,6 +765,13 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     {
         return "Internal error: no details are available";
     }
+
+    IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
+    public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
+    {
+        NotifyDeviceControlChangesWindows = mainWindow;
+    }
+
     #endregion 
 
 } // end of class BTNordic_ThingyControl

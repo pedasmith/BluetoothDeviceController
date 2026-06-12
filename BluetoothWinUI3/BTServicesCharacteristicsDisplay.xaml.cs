@@ -470,5 +470,12 @@ namespace BluetoothWinUI3
             }
             return retval;
         }
+
+        IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
+        public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
+        {
+            NotifyDeviceControlChangesWindows = mainWindow;
+        }
+
     }
 }

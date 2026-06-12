@@ -758,6 +758,12 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         return "Internal error: no details are available";
     }
 
+    IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
+    public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
+    {
+        NotifyDeviceControlChangesWindows = mainWindow;
+    }
+
     #endregion
 
 } // end of class BTCommon_EnvironmentalControl

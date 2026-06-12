@@ -64,7 +64,6 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
 
 
 
-
     public BTStandard_DemoControl()
     {
         InitializeComponent();
@@ -148,8 +147,13 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         return dest;
     }
 
+    // If you have to update these dynamically, be sure to call 
+    // NotifyDeviceControlChangesWindows.OnGetUXCapabilitiesChanged
+    // so the main window menus get updated.
+
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    public List<string> LineNames { get { return ["Battery", ]; } } // CHANGE:
+    List<string> _LineNames = new List<string>() { "Battery" }; // CHANGE:
+    public List<string> LineNames { get { return _LineNames; } } 
 
     /// <summary>
     /// The DataContext is a WinUI3 (and the rest of XAML) thing, and is just an object. And it can be
@@ -294,21 +298,27 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         Device.PropertyChanged += Device_PropertyChanged;
         await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
         var battery = await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
+
+        // CHANGE: for your particular device, the battery might always be present
+        // the battery will never be null.
         if (battery == null)
         {
             // Happens when the device doesn't report a battery level (e.g., JBL Pro 4 Speakers, but lots of others)
             // BTW: if you know your device will never have a battery level but there is a connection control,
             // you should just set the visibility to collapsed in the OnLoaded event.
 
-            // TODO: this gets sets when the DataContext is updated. But the calling code they keeps going
-            // and sets up the UX (because the device is selected). I need a feedback mechanism so that the 
-            // device, when it's finished getting set up, will call back to the MainWindow.
-            // The Sender, BTW, is this object, not the MainWindow :-(
             HasData = false;
+            LineNames.Clear();
             uiDeviceDataList.Items.Remove(uiDeviceDataBattery);
             uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
             uiOxyPlot.Visibility = Visibility.Collapsed;
             uiTableView.Visibility = Visibility.Visible;
+
+            // Notify MainWindow that the UX capabilities have changed. This might change
+            // the UX (e.g., device> show graph/table might be removed)
+            // Will also trigger redoing the graph line names via LineNames, which
+            // technically isn't quite in accordance with the name.
+            NotifyDeviceControlChangesWindows?.OnGetUXCapabilitiesChanged(this, GetUXCapabilities());
         }
         await Device.ReadDevice_Name(BluetoothCacheMode.Cached);
         await Device.ReadConnection_Parameter(BluetoothCacheMode.Cached);
@@ -671,6 +681,13 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     {
         return "Internal error: no details are available";
     }
+
+    IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
+    public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
+    {
+        NotifyDeviceControlChangesWindows = mainWindow;
+    }
+
     #endregion 
 
 } // end of class BTStandard_DemoControl

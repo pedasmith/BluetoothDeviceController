@@ -28,61 +28,6 @@ using Windows.System.Display;
 
 namespace BluetoothWinUI3
 {
-    public class UserPreferences
-    {
-        public Pressure.PressureUnit Pressure { get; set; } = BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar;
-        public Temperature.TemperatureUnit Temperature { get; set; } = BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius;
-        public bool AutostartAdvertisementWatcher { get; set; } = true;
-
-        public static UserPreferences Restore()
-        {
-            string folderPath = GetSaveDirectoryAsString();
-            Directory.CreateDirectory(folderPath);
-            string filePath = Path.Combine(folderPath, "UserPreferences.preferences");
-
-            if (File.Exists(filePath))
-            {
-                var json = File.ReadAllText(filePath);
-                try
-                {
-                    var retval = (UserPreferences)System.Text.Json.JsonSerializer.Deserialize(json, typeof(UserPreferences), UserPreferencesContext.Default);
-                    return retval;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: Unable to parse JSON file {filePath}. Message:{ex.Message}");
-                }
-            }
-            return new UserPreferences();// return a default value.
-        }
-
-        /// <summary>
-        /// Saves the UserPreferences into a .preferences JSON file. This will be tucked into the Documents/BluetoothDevices 
-        /// folder in a file called UserPreferences.devices. It's restored with a call to Restore() which is done automatically
-        /// in MainWindow
-        /// </summary>
-        public void Save()
-        {
-            string folderPath = GetSaveDirectoryAsString();
-            Directory.CreateDirectory(folderPath);
-            string filePath = Path.Combine(folderPath, "UserPreferences.preferences");
-
-            var json = System.Text.Json.JsonSerializer.Serialize(this, typeof(UserPreferences), UserPreferencesContext.Default);
-            File.WriteAllText(filePath, json);
-        }
-
-        public UserPreferences Clone()
-        {
-            return this.MemberwiseClone() as UserPreferences;
-        }
-
-
-        public static string GetSaveDirectoryAsString()
-        {
-            var retval = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
-            return retval;
-        }
-    }
 
     // See https://sunriseprogrammer.blogspot.com/2026/04/il2104-il2026-trim-and-json-with-winui3.html
     // See https://stackoverflow.com/questions/70825664/how-to-implement-system-text-json-source-generator-with-a-generic-class
@@ -93,28 +38,11 @@ namespace BluetoothWinUI3
 
     }
 
-    /// <summary>
-    /// Wants to get all of the advertisements that are seen. Used by e.g., BTServicesCharacteristicsDisplay
-    /// </summary>
-    public interface IHandleBTAdvertisements
-    {
-        void HandleAdvertisement(WatcherData data);
-    }
 
     /// <summary>
-    /// Wants all of the advertisements for my specific (known) device based on BT address. Used by 
-    /// a bunch of sensor like the BTCommon_EnvironmentalControl because the Govee, SensorPro, ThermPro etc. 
-    /// data is packed into the adverts.
+    /// The main window for the app.
     /// </summary>
-    public interface IHandleMyBTAdvertisements
-    {
-        void HandleMyAdvertisement(WatcherData data);
-    }
-
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class MainWindow : Window
+    public sealed partial class MainWindow : Window, IHandleNotifyDeviceControlChanges
     {
         // MARKDOWN: IImageProvider requires two methods, ShouldUseThisProvider() and GetImage()
 
@@ -304,13 +232,15 @@ namespace BluetoothWinUI3
 
         private void AddControl(WatcherData e, UserControl control, SupportedDevice supportedDevice)
         {
+            var userControl = control as IDeviceControlBasic;
+
             var zoomControl = new ZoomableDeviceControl();
             zoomControl.SetDeviceControl(control);
             uiKnownDevices.Items.Add(zoomControl);
 
             var known = KnownDevices.Add(e, control, zoomControl, supportedDevice);
+            userControl?.SetNotifyDeviceControlChanges(this);
             control.DataContext = known;
-            var userControl = control as IDeviceControlBasic;
             userControl?.UpdateUX(CurrUserPrefs, null);
 
             if (uiKnownDevices.Items.Count == 1)
@@ -405,6 +335,12 @@ namespace BluetoothWinUI3
             return selectedContainer;
         }
 
+        /// <summary>
+        /// Critical note: when verb is NULL or empty, this won't actually await. The await is only
+        /// for the ShowNotice.
+        /// </summary>
+        /// <param name="verb"></param>
+        /// <returns></returns>
         private async Task<IDeviceControlBasic> GetBTSelectedAsync(string verb)
         {
             var selectedContainer = await GetZoomableSelectedAsync(verb);
@@ -783,34 +719,43 @@ namespace BluetoothWinUI3
             // Don't have to do anything on failure (which can't really happen)
         }
 
-        private async void OnKnownDeviceSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void UpdateGraphColorMenus(IDeviceControlDevice selectedDevice)
         {
-            var selected = await GetBTSelectedAsync(null) as IDeviceControlBasic;
-            if (selected == null) return;
-            var selectedDevice = selected as IDeviceControlDevice;
-            var capabilities = selected.GetUXCapabilities();
-
-            // In the menu, Update the set of graph line that can be colored
+            // Always clear even when selectedDevice is null (we might have gone 
+            // from a device that's a IDeviceControlDevice and are now 
+            // selecting something that isn't)
             uimBTGraphColorsMenu.Items.Clear();
-            bool hasLineNames = false;
-            if (selectedDevice != null)
+
+            if (selectedDevice == null)
             {
-                var linenames = selectedDevice.LineNames;
-                hasLineNames = linenames.Count > 0;
-                foreach (var linename in linenames)
-                {
-                    var menu = new MenuFlyoutItem()
-                    {
-                        Text = linename,
-                        Tag = linename,
-                    };
-                    menu.Click += OnChangeGraphColor;
-                    uimBTGraphColorsMenu.Items.Add(menu);
-                }
+                uimBTGraphColorsMenu.IsEnabled = false;
+                return;
             }
 
+            // In the menu, Update the set of graph line that can be colored
+            var linenames = selectedDevice.LineNames;
+            foreach (var linename in linenames)
+            {
+                var menu = new MenuFlyoutItem()
+                {
+                    Text = linename,
+                    Tag = linename,
+                };
+                menu.Click += OnChangeGraphColor;
+                uimBTGraphColorsMenu.Items.Add(menu);
+            }
 
-            // Selectively enable the Bluetooth Device menu options
+            var hasLineNames = linenames.Count > 0;
+            uimBTGraphColorsMenu.IsEnabled = hasLineNames;
+        }
+
+        /// <summary>
+        /// Updates menus based on the selected device capabilities.
+        /// Capabilities is from GetUXCapabilities() from a device that supports IDeviceControlBasic.
+        /// 
+        /// </summary>
+        private void UpdateFileCopyViewBTMenus(IDeviceControlBasic.UXCapabilities capabilities)
+        {
             uimFileCopyGraphAsPNG.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng);
             uimFileCopyDataForExcel.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetData);
             uimFileCopyDataAsCSV.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetData);
@@ -818,9 +763,24 @@ namespace BluetoothWinUI3
             uimFileCopyDetailsNormal.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetDetails);
 
             uimViewShowTable.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanShowTable);
-
             uimBTCanRename.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanRename);
-            uimBTGraphColorsMenu.IsEnabled = hasLineNames;
+        }
+
+        private async void OnKnownDeviceSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selected = await GetBTSelectedAsync(null) as IDeviceControlBasic;
+            if (selected == null) return;
+
+            var selectedDevice = selected as IDeviceControlDevice;
+            UpdateGraphColorMenus(selectedDevice);
+
+            // Selectively enable the Bluetooth Device menu options. Note that UpdateFileCopyViewBTMenus
+            // is also called by OnGetUXCapabilitiesChanged which is triggered when the device changes
+            // the capabilities. This happens with e.g., the BTStandard_Demo when the selected device
+            // doesn't have a battery and therefore the graph+table are removed.
+            var capabilities = selected.GetUXCapabilities();
+            UpdateFileCopyViewBTMenus(capabilities);
+
             uimBTColorBackground.IsEnabled = selectedDevice != null;
             uimBTColorText.IsEnabled = selectedDevice != null;
 
@@ -947,6 +907,22 @@ namespace BluetoothWinUI3
         {
             var isChecked = (sender as ToggleMenuFlyoutItem)?.IsChecked ?? false;
             AdvertisementWatcher.FilterRssiDb = isChecked ? -65 : -200;
+        }
+
+        public async void OnGetUXCapabilitiesChanged(UserControl deviceControl, IDeviceControlBasic.UXCapabilities newCapabilities)
+        {
+            // If the deviceControl is the currently selected on ..
+            var dcb = deviceControl as IDeviceControlBasic;
+            if (dcb == null) return;
+            var bt = await GetBTSelectedAsync(null); // null means it won't show a notice 
+            if (bt == null) return;
+            if (bt == dcb)
+            {
+                // The device that changed is the device that's selected.
+                // Update the menus based on the capabilities.
+                this.UpdateFileCopyViewBTMenus(newCapabilities);
+                UpdateGraphColorMenus(deviceControl as IDeviceControlDevice); // theoretically might be null. 
+            }
         }
     }
 }
