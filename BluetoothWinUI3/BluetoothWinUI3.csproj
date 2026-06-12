@@ -35,6 +35,7 @@
     <None Remove="BTNordic_ThingyControl.xaml" />
     <None Remove="BTServicesCharacteristicsDisplay.xaml" />
     <None Remove="MarkdownHelpSystem.xaml" />
+    <None Remove="TAOPE_CyclingSpeedCadenceControl.xaml" />
     <None Remove="TestUserControl.xaml" />
     <None Remove="ZoomableDeviceControl.xaml" />
   </ItemGroup>
@@ -164,6 +165,9 @@
     <Content Update="Assets\HelpFiles\Device_Nordic_Thingy.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Page Update="TAOPE_CyclingSpeedCadenceControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="BTStandard_DemoControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

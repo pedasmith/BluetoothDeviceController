@@ -48,7 +48,6 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("JBL*", typeof(BTStandard_DemoControl)),
 
 
-            new SupportedDevice("Thingy*", typeof(BTNordic_ThingyControl)),
 
             // Govee Environmental Thermometer devices
             new SupportedDevice("Govee_H5074_*", typeof(BTCommon_EnvironmentalControl)),
@@ -58,6 +57,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("GV5171*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GV5179_*", typeof(BTCommon_EnvironmentalControl)),
 
+            // Nordic
+            new SupportedDevice("Thingy*", typeof(BTNordic_ThingyControl)),
+
             // SensorPro devices
             new SupportedDevice("T201", typeof(BTCommon_EnvironmentalControl)),
 
@@ -65,6 +67,10 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("TP351*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("TP357*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("TP359*", typeof(BTCommon_EnvironmentalControl)),
+
+            // Bike Cycle Cadence and Speed
+            new SupportedDevice("BK6*", typeof(TAOPE_CyclingSpeedCadenceControl)),
+
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {
