@@ -954,6 +954,10 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
 
         public void Update([[CLASSNAME]].[[DataGroupName.dotNet]] value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;

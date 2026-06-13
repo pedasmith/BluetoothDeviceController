@@ -19,7 +19,7 @@ namespace BluetoothProtocols.NS_BTStandard_Demo
 
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This code was automatically generated 2026-06-09::12:02
+    /// This code was automatically generated 2026-06-13::09:31
     /// </summary>
 
     ///<summary>
@@ -36,6 +36,10 @@ namespace BluetoothProtocols.NS_BTStandard_Demo
 
         public void Update(BTStandard_Demo.Common_Configuration_Data value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;
@@ -120,22 +124,6 @@ namespace BluetoothProtocols.NS_BTStandard_Demo
         public void ReplaceMostRecent(BTStandard_Demo.Battery_Data value)
         {
             var index = Timestamps.Count - 1;
-            if (index < 0)
-            {
-                ; // handy place for debugger
-            }
-            if (index >= Timestamps.Count)
-            {
-                ;
-            }
-            if (index >= Data.Count)
-            {
-                ;
-            }
-            if (index >= BatteryLevel.Count)
-            {
-                ;
-            }
             Timestamps[index] = value.TimestampMostRecent;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
             BatteryLevel[index] = value.BatteryLevel;

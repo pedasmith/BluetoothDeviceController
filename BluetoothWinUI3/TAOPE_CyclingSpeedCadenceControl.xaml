@@ -31,23 +31,38 @@
                 <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" x:Name="uiDeviceDataList">
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Revolution</Run><Run Text="&#160;"/><Run x:Name="uiRevolutionAChange" Text="┄"/>
+                        <Run>Revolution</Run><Run Text="&#160;"/><Run x:Name="uiRevolutionWheelChange" Text="┄"/>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRevolutionA"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRevolutionWheel"/></TextBlock>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Time</Run><Run Text="&#160;"/><Run x:Name="uiTimeAChange" Text="┄"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTimeA"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Time</TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTimeWheel"/></TextBlock>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">RPS</TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRpsWheel"/></TextBlock>
+                    </StackPanel>
+
+
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>RPS</Run><Run Text="&#160;"/><Run x:Name="uiRpsChange" Text="┄"/>
+                        <Run>Revolution</Run><Run Text="&#160;"/><Run x:Name="uiRevolutionCrankChange" Text="┄"/>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRpsA"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRevolutionCrank"/></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Time</TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTimeCrank"/></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">RPS</TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRpsCrank"/></TextBlock>
                     </StackPanel>
 
 

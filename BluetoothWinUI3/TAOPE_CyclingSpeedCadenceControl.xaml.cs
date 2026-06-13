@@ -149,10 +149,10 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
 
         dest.TimestampMostRecent = source.TimestampMostRecent;
         dest.Flags = source.Flags;
-        dest.RevolutionA = source.RevolutionA;
-        dest.TimeA = source.TimeA;
-        dest.RevolutionB = source.RevolutionB;
-        dest.TimeB = source.TimeB;
+        dest.RevolutionWheel = source.RevolutionWheel;
+        dest.TimeWheel = source.TimeWheel;
+        dest.RevolutionCrank = source.RevolutionCrank;
+        dest.TimeCrank = source.TimeCrank;
         dest.FeatureFlags = source.FeatureFlags;
         dest.SensorLocation = source.SensorLocation;
         dest.Unknown3 = source.Unknown3;
@@ -517,13 +517,18 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
 
         if (name == TAOPE_CyclingSpeedCadence.CSC_MeasurementPropertyChangedName || name == "*")
         {
-            uiRevolutionAChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+            uiRevolutionWheelChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+            uiRevolutionCrankChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
         }
     }
 
-    double StartingTimeA = 0.0;
-    double LastTimeA = 0.0;
-    double LastRevolutionA = 0.0;
+    double StartingTimeWheel = 0.0;
+    double LastTimeWheel = 0.0;
+    double LastRevolutionWheel = 0.0;
+
+    double StartingTimeCrank = 0.0;
+    double LastTimeCrank = 0.0;
+    double LastRevolutionCrank = 0.0;
 
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
@@ -564,27 +569,27 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
                 }
                 uiFlags.Text = flags;
 
-                if (StartingTimeA == 0.0)
+                if (StartingTimeWheel == 0.0)
                 {
-                    StartingTimeA = CurrSpeed_and_Cadence_Data.TimeA;
+                    StartingTimeWheel = CurrSpeed_and_Cadence_Data.TimeWheel;
                 }
                 else
                 {
-                    var currTimeA = CurrSpeed_and_Cadence_Data.TimeA - StartingTimeA;
-                    var instananeousTimeA = currTimeA - LastTimeA; // Seconds since the last report.
-                    uiTimeA.Text = currTimeA.ToString("F3"); // Time is in seconds
+                    var currTimeA = CurrSpeed_and_Cadence_Data.TimeWheel - StartingTimeWheel;
+                    var instananeousTimeA = currTimeA - LastTimeWheel; // Seconds since the last report.
+                    uiTimeWheel.Text = currTimeA.ToString("F3"); // Time is in seconds
 
                     //
                     // Calculate some instantanous values
                     //
-                    var instantaneousRevolutionA = LastRevolutionA - CurrSpeed_and_Cadence_Data.RevolutionA;
+                    var instantaneousRevolutionA = LastRevolutionWheel - CurrSpeed_and_Cadence_Data.RevolutionWheel;
                     var rps = instantaneousRevolutionA * (1.0 / instananeousTimeA);
-                    uiRpsA.Text = rps.ToString("F0"); // Time is in seconds
+                    uiRpsWheel.Text = rps.ToString("F0"); // Time is in seconds
 
-                    LastTimeA = currTimeA;
+                    LastTimeWheel = currTimeA;
                 }
-                uiRevolutionA.Text = CurrSpeed_and_Cadence_Data.RevolutionA.ToString("F0");
-                LastRevolutionA = CurrSpeed_and_Cadence_Data.RevolutionA;
+                uiRevolutionWheel.Text = CurrSpeed_and_Cadence_Data.RevolutionWheel.ToString("F0");
+                LastRevolutionWheel = CurrSpeed_and_Cadence_Data.RevolutionWheel;
 
 
                 var deltaInSeconds = CurrSpeed_and_Cadence_Data.TimestampMostRecent.Subtract(HistoricalSpeed_and_Cadence_DataUnits.TimestampMostRecentAdd).TotalSeconds;

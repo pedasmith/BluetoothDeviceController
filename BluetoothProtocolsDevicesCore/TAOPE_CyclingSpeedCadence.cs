@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-06-09::12:02
+    /// This class was automatically generated 2026-06-13::09:31
     /// </summary>
 
     public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged
@@ -42,7 +42,7 @@ namespace BluetoothProtocols
 
         Cycling Speed and Cadence service Guid=1816
             Cycling Speed and Cadence_Data (DataGroup record)
-                CSC Measurement characteristic has Flags (Byte-->double) RevolutionA (UInt32-->double) TimeA (UInt16-->double) RevolutionB (UInt32-->double) TimeB (UInt16-->double)  Guid=2a5b
+                CSC Measurement characteristic has Flags (Byte-->double) RevolutionWheel (UInt32-->double) TimeWheel (UInt16-->double) RevolutionCrank (UInt16-->double) TimeCrank (UInt16-->double)  Guid=2a5b
                 CSC Feature characteristic has FeatureFlags (UInt16-->double)  Guid=2a5c
                 Sensor Location characteristic has SensorLocation (Byte-->double)  Guid=2a5d
                 SC Control Point characteristic has Unknown3 (Bytes-->string)  Guid=2a55
@@ -327,47 +327,47 @@ namespace BluetoothProtocols
                         OnPropertyChanged();
                     }
             } // From Cycling Speed and Cadence and CSC Measurement
-            private double _RevolutionA = 0;
-            public double RevolutionA 
+            private double _RevolutionWheel = 0;
+            public double RevolutionWheel 
             { 
-                get { return _RevolutionA; }
+                get { return _RevolutionWheel; }
                 set 
                     { 
-                        if (value == _RevolutionA) return; 
-                        _RevolutionA = value;
+                        if (value == _RevolutionWheel) return; 
+                        _RevolutionWheel = value;
                         OnPropertyChanged();
                     }
             } // From Cycling Speed and Cadence and CSC Measurement
-            private double _TimeA = 0;
-            public double TimeA 
+            private double _TimeWheel = 0;
+            public double TimeWheel 
             { 
-                get { return _TimeA; }
+                get { return _TimeWheel; }
                 set 
                     { 
-                        if (value == _TimeA) return; 
-                        _TimeA = value;
+                        if (value == _TimeWheel) return; 
+                        _TimeWheel = value;
                         OnPropertyChanged();
                     }
             } // From Cycling Speed and Cadence and CSC Measurement
-            private double _RevolutionB = 0;
-            public double RevolutionB 
+            private double _RevolutionCrank = 0;
+            public double RevolutionCrank 
             { 
-                get { return _RevolutionB; }
+                get { return _RevolutionCrank; }
                 set 
                     { 
-                        if (value == _RevolutionB) return; 
-                        _RevolutionB = value;
+                        if (value == _RevolutionCrank) return; 
+                        _RevolutionCrank = value;
                         OnPropertyChanged();
                     }
             } // From Cycling Speed and Cadence and CSC Measurement
-            private double _TimeB = 0;
-            public double TimeB 
+            private double _TimeCrank = 0;
+            public double TimeCrank 
             { 
-                get { return _TimeB; }
+                get { return _TimeCrank; }
                 set 
                     { 
-                        if (value == _TimeB) return; 
-                        _TimeB = value;
+                        if (value == _TimeCrank) return; 
+                        _TimeCrank = value;
                         OnPropertyChanged();
                     }
             } // From Cycling Speed and Cadence and CSC Measurement
@@ -414,10 +414,10 @@ namespace BluetoothProtocols
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Flags = value.Flags;
-                this.RevolutionA = value.RevolutionA;
-                this.TimeA = value.TimeA;
-                this.RevolutionB = value.RevolutionB;
-                this.TimeB = value.TimeB;
+                this.RevolutionWheel = value.RevolutionWheel;
+                this.TimeWheel = value.TimeWheel;
+                this.RevolutionCrank = value.RevolutionCrank;
+                this.TimeCrank = value.TimeCrank;
                 this.FeatureFlags = value.FeatureFlags;
                 this.SensorLocation = value.SensorLocation;
                 this.Unknown3 = value.Unknown3;
@@ -425,7 +425,7 @@ namespace BluetoothProtocols
 
             public void ExportHeaders(IExportData exporter)
             {
-                exporter.HeadersSet(["Date", "Time", "Flags", "RevolutionA", "TimeA", "RevolutionB", "TimeB", "FeatureFlags", "SensorLocation", "Unknown3"]);
+                exporter.HeadersSet(["Date", "Time", "Flags", "RevolutionWheel", "TimeWheel", "RevolutionCrank", "TimeCrank", "FeatureFlags", "SensorLocation", "Unknown3"]);
             }
 
             public void ExportRow(IExportData exporter)
@@ -434,10 +434,10 @@ namespace BluetoothProtocols
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
                 exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
                 exporter.CellSet(Flags);
-                exporter.CellSet(RevolutionA);
-                exporter.CellSet(TimeA);
-                exporter.CellSet(RevolutionB);
-                exporter.CellSet(TimeB);
+                exporter.CellSet(RevolutionWheel);
+                exporter.CellSet(TimeWheel);
+                exporter.CellSet(RevolutionCrank);
+                exporter.CellSet(TimeCrank);
                 exporter.CellSet(FeatureFlags);
                 exporter.CellSet(SensorLocation);
                 exporter.CellSet(Unknown3);                
@@ -446,7 +446,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Flags} {RevolutionA} {TimeA} {RevolutionB} {TimeB} {FeatureFlags} {SensorLocation} {Unknown3}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Flags} {RevolutionWheel} {TimeWheel} {RevolutionCrank} {TimeCrank} {FeatureFlags} {SensorLocation} {Unknown3}");
             }
 
             private void OnPropertyChanged([CallerMemberName]string propertyName = "")
@@ -479,19 +479,13 @@ namespace BluetoothProtocols
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OOPT OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionWheel U16^1024_/|FIXED|TimeWheel| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionCrank U16^1024_/|FIXED|TimeCrank|");
             var vr = ValueParsers[index];
 
-            var array = args.CharacteristicValue.ToArray();
-            var len = array.Length;
-            if (len != 5)
-            {
-                ; // handy place for a debugger
-            }
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrCycling_Speed_and_Cadence_Data.TimestampMostRecent = args.Timestamp;
             CurrCycling_Speed_and_Cadence_Data.Flags = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.RevolutionA = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.TimeA = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.RevolutionB = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.TimeB = vr.GetNextDouble();
+            CurrCycling_Speed_and_Cadence_Data.RevolutionWheel = vr.GetNextDouble();
+            CurrCycling_Speed_and_Cadence_Data.TimeWheel = vr.GetNextDouble();
+            CurrCycling_Speed_and_Cadence_Data.RevolutionCrank = vr.GetNextDouble();
+            CurrCycling_Speed_and_Cadence_Data.TimeCrank = vr.GetNextDouble();
             OnPropertyChanged(CSC_MeasurementPropertyChangedName); // "CSC_Measurement"
         }
         // Per-characteristics methods for Cycling_Speed_and_Cadence CSC_Feature
@@ -586,15 +580,15 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "CSC Measurement", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OOPT U32|DEC|RevolutionA U16^1024_*|DEC|TimeA| U32|DEC|RevolutionB U16^1024_*|DEC|TimeB|");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OOPT OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionWheel U16^1024_/|FIXED|TimeWheel| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionCrank U16^1024_/|FIXED|TimeCrank|");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
             CurrCycling_Speed_and_Cadence_Data.Flags = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.RevolutionA = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.TimeA = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.RevolutionB = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.TimeB = vr.GetNextDouble();
+            CurrCycling_Speed_and_Cadence_Data.RevolutionWheel = vr.GetNextDouble();
+            CurrCycling_Speed_and_Cadence_Data.TimeWheel = vr.GetNextDouble();
+            CurrCycling_Speed_and_Cadence_Data.RevolutionCrank = vr.GetNextDouble();
+            CurrCycling_Speed_and_Cadence_Data.TimeCrank = vr.GetNextDouble();
             OnPropertyChanged(CSC_MeasurementPropertyChangedName); // "CSC_Measurement"
             return CurrCycling_Speed_and_Cadence_Data;
         }

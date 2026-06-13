@@ -19,7 +19,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
     /// <summary>
     /// .
-    /// This code was automatically generated 2026-06-09::12:02
+    /// This code was automatically generated 2026-06-13::09:31
     /// </summary>
 
     ///<summary>
@@ -36,6 +36,10 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
         public void Update(TAOPE_CyclingSpeedCadence.Cycling_Speed_and_Cadence_Data value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;
@@ -50,10 +54,10 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             Timestamps.Add (value.TimestampMostRecent);
             TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             Flags.Add (value.Flags);
-            RevolutionA.Add (value.RevolutionA);
-            TimeA.Add (value.TimeA);
-            RevolutionB.Add (value.RevolutionB);
-            TimeB.Add (value.TimeB);
+            RevolutionWheel.Add (value.RevolutionWheel);
+            TimeWheel.Add (value.TimeWheel);
+            RevolutionCrank.Add (value.RevolutionCrank);
+            TimeCrank.Add (value.TimeCrank);
             FeatureFlags.Add (value.FeatureFlags);
             SensorLocation.Add (value.SensorLocation);
             Unknown3.Add (value.Unknown3);
@@ -64,10 +68,10 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             Timestamps[index] = value.TimestampMostRecent;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
             Flags[index] = value.Flags;
-            RevolutionA[index] = value.RevolutionA;
-            TimeA[index] = value.TimeA;
-            RevolutionB[index] = value.RevolutionB;
-            TimeB[index] = value.TimeB;
+            RevolutionWheel[index] = value.RevolutionWheel;
+            TimeWheel[index] = value.TimeWheel;
+            RevolutionCrank[index] = value.RevolutionCrank;
+            TimeCrank[index] = value.TimeCrank;
             FeatureFlags[index] = value.FeatureFlags;
             SensorLocation[index] = value.SensorLocation;
             Unknown3[index] = value.Unknown3;
@@ -83,10 +87,10 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
         public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
         // Data values (properties) from characteristic CSC Measurement
         public ObservableCollection<double> Flags { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> RevolutionA { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> TimeA { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> RevolutionB { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> TimeB { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> RevolutionWheel { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> TimeWheel { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> RevolutionCrank { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> TimeCrank { get; } = new ObservableCollection<double>();
         // Data values (properties) from characteristic CSC Feature
         public ObservableCollection<double> FeatureFlags { get; } = new ObservableCollection<double>();
         // Data values (properties) from characteristic Sensor Location
@@ -109,6 +113,10 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
         public void Update(TAOPE_CyclingSpeedCadence.Service_FD00_Data value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;
@@ -170,6 +178,10 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
         public void Update(TAOPE_CyclingSpeedCadence.Battery_Data value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;
@@ -219,6 +231,10 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
         public void Update(TAOPE_CyclingSpeedCadence.Device_Information_Data value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;
