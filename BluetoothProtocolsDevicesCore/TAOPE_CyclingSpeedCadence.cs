@@ -476,9 +476,15 @@ namespace BluetoothProtocols
         private void NotifyCSC_MeasurementCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Cycling_Speed_and_Cadence_CSC_Measurement_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OOPT U32|DEC|RevolutionA U16^1024_*|DEC|TimeA| U32|DEC|RevolutionB U16^1024_*|DEC|TimeB|");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OOPT OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionWheel U16^1024_/|FIXED|TimeWheel| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionCrank U16^1024_/|FIXED|TimeCrank|");
             var vr = ValueParsers[index];
 
+            var array = args.CharacteristicValue.ToArray();
+            var len = array.Length;
+            if (len != 5)
+            {
+                ; // handy place for a debugger
+            }
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrCycling_Speed_and_Cadence_Data.TimestampMostRecent = args.Timestamp;
             CurrCycling_Speed_and_Cadence_Data.Flags = vr.GetNextDouble();

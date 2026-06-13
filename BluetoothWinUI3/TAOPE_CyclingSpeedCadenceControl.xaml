@@ -36,16 +36,31 @@
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRevolutionA"/></TextBlock>
                     </StackPanel>
 
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Time</Run><Run Text="&#160;"/><Run x:Name="uiTimeAChange" Text="┄"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTimeA"/></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>RPS</Run><Run Text="&#160;"/><Run x:Name="uiRpsChange" Text="┄"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRpsA"/></TextBlock>
+                    </StackPanel>
+
+
+
                     <!-- This StackPanel has a name because it might be removed from the display (not ever
                          device has a Battery service (0000180f-0000-1000-8000-00805f9b34fb) and the
                          \corresponding BatteryLevel characteristic (00002a19-0000-1000-8000-00805f9b34fb)
                     -->
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataBattery">
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" >
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Battery</Run><Run Text=" "/><Run x:Name="uiBatteryLevelChange" Text=" "/>
+                        <Run>Flags</Run><Run Text=" "/><Run x:Name="uiFlagsChange" Text=" "/>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiBattery"/></TextBlock>
-                        <Line Tag="TVOCColor" Style="{StaticResource sGraphLineKey}" />
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiFlags"/></TextBlock>
                     </StackPanel>
 
                 </GridView>

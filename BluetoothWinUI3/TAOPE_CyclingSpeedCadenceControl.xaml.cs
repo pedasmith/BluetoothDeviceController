@@ -521,6 +521,10 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         }
     }
 
+    double StartingTimeA = 0.0;
+    double LastTimeA = 0.0;
+    double LastRevolutionA = 0.0;
+
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated.
@@ -549,7 +553,38 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         {
             case TAOPE_CyclingSpeedCadence.CSC_MeasurementPropertyChangedName:
 
-                uiRevolutionA.Text = CurrSpeed_and_Cadence_Data.RevolutionA.ToString("F2");
+                var flags = "";
+                if (((int)CurrSpeed_and_Cadence_Data.Flags & 0x01) != 0)
+                {
+                    flags += "Wheel";
+                }
+                if (((int)CurrSpeed_and_Cadence_Data.Flags & 0x02) != 0)
+                {
+                    flags += "Crank";
+                }
+                uiFlags.Text = flags;
+
+                if (StartingTimeA == 0.0)
+                {
+                    StartingTimeA = CurrSpeed_and_Cadence_Data.TimeA;
+                }
+                else
+                {
+                    var currTimeA = CurrSpeed_and_Cadence_Data.TimeA - StartingTimeA;
+                    var instananeousTimeA = currTimeA - LastTimeA; // Seconds since the last report.
+                    uiTimeA.Text = currTimeA.ToString("F3"); // Time is in seconds
+
+                    //
+                    // Calculate some instantanous values
+                    //
+                    var instantaneousRevolutionA = LastRevolutionA - CurrSpeed_and_Cadence_Data.RevolutionA;
+                    var rps = instantaneousRevolutionA * (1.0 / instananeousTimeA);
+                    uiRpsA.Text = rps.ToString("F0"); // Time is in seconds
+
+                    LastTimeA = currTimeA;
+                }
+                uiRevolutionA.Text = CurrSpeed_and_Cadence_Data.RevolutionA.ToString("F0");
+                LastRevolutionA = CurrSpeed_and_Cadence_Data.RevolutionA;
 
 
                 var deltaInSeconds = CurrSpeed_and_Cadence_Data.TimestampMostRecent.Subtract(HistoricalSpeed_and_Cadence_DataUnits.TimestampMostRecentAdd).TotalSeconds;

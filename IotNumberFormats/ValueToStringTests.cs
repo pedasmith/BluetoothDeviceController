@@ -14,9 +14,19 @@ namespace IotNumberFormats
         public static int Test()
         {
             int NError = 0;
+            NError += TestFlags();
             NError += TestSimple();
             NError += TestStringEscape();
             NError += TestBytes();
+            return NError;
+        }
+
+        private static int TestFlags()
+        {
+            int NError = 0;
+            var CSC = "U8|HEX|Flags OOPT OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionA U16^1024_/|FIXED|TimeA| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionB U16^1024_/|FIXED|TimeB|";
+            NError += TestOk(CSC, "00", "00");
+            NError += TestOk(CSC, "01 11 22 33 44 55 66", "01 44332211 25.58");
             return NError;
         }
 

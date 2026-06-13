@@ -259,6 +259,11 @@ namespace IotNumberFormats
                                 break;
                             case "NO": // no-op
                                 break;
+                            case "NT": // NOT // Added 2026-06-13
+                                d1 = stack.Pop();
+                                value = (d1 == 0) ? 1 : 0;
+                                stack.Push(value);
+                                break;
                             case "PO": // pop
                                 d1 = stack.Pop();
                                 break;

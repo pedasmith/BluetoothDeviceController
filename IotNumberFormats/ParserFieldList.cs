@@ -10,10 +10,12 @@ using System.Xml.Linq;
 namespace IotNumberFormats
 {
     /// <summary>
-    /// Represents a parsed list of IotNumber Formats. In original string form, they look like "U8|HEX|Opcode U16|DEC|Value U16|HEX|Options||0"
-    /// where it's a list of fields seperated by spaces; each field has multiple sections (type, display format, name, units, default value) 
-    /// seperated by vertical bars (|); each section can have multiple sub-fields seperated by carets (^). For a small number of sub-fields,
-    /// there are multiple items which are seperated by underscores (_).
+    /// Represents a parsed list of IotNumber Formats. In original string form, they look like 
+    /// "U8|HEX|Opcode U16|DEC|Value U16|HEX|Options||0" where it's a list of fields separated by 
+    /// spaces; each field has multiple sections (type, display format, name, units, default value) 
+    /// separated by vertical bars (|); each section can have multiple sub-fields separated by 
+    /// carets (^). For a small number of sub-fields, there are multiple items which are separated 
+    /// by underscores (_).
     /// 
     /// see: https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/
     /// </summary>
