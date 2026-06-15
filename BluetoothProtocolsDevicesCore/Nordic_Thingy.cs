@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-05-18::08:51
+    /// This class was automatically generated 2026-06-15::11:34
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -54,9 +54,34 @@ namespace BluetoothProtocols
                 Environment Configuration characteristic has TempInterval (UInt16-->double) PressureInterval (UInt16-->double) HumidityInterval (UInt16-->double) ColorInterval (UInt16-->double) GasMode (Byte-->double) RedCalibration (Byte-->double) GreenCalibration (Byte-->double) BlueCalibration (Byte-->double)  Guid=ef680206-9b35-4933-9b10-52ffa9740042
 
 
+        Common Configuration service Guid=1800
+            Common Configuration_Data (DataGroup record)
+                Device Name characteristic has Device_Name (String-->string)  Guid=2a00
+                Appearance characteristic has Appearance (UInt16-->double)  Guid=2a01
+                Connection Parameter characteristic has ConnectionParameter (Bytes-->string)  Guid=2a04
+                Central Address Resolution characteristic has AddressResolutionSupported (Byte-->double)  Guid=2aa6
+
+
+        Generic Service service Guid=1801
+            Generic Service_Data (DataGroup record)
+                Service Changes characteristic has StartRange (UInt16-->double) EndRange (UInt16-->double)  Guid=2a05
+
+
         Battery service Guid=180f
             Battery_Data (DataGroup record)
                 BatteryLevel characteristic has BatteryLevel (SByte-->double)  Guid=2a19
+
+
+        Configuration service Guid=ef680100-9b35-4933-9b10-52ffa9740042
+            Configuration_Data (DataGroup record)
+                Configuration Device Name characteristic has Name (String-->string)  Guid=ef680101-9b35-4933-9b10-52ffa9740042
+                Advertising Parameter characteristic has Interval (UInt16-->double) Timeout (Byte-->double)  Guid=ef680102-9b35-4933-9b10-52ffa9740042
+                Connection parameters characteristic has MinInterval (UInt16-->double) MaxInterval (UInt16-->double) Latency (UInt16-->double) SupervisionTimeout (UInt16-->double)  Guid=ef680104-9b35-4933-9b10-52ffa9740042
+                Eddystone URL characteristic has Eddystone (String-->string)  Guid=ef680105-9b35-4933-9b10-52ffa9740042
+                Cloud Token characteristic has CloudToken (Bytes-->string)  Guid=ef680106-9b35-4933-9b10-52ffa9740042
+                Firmware Version characteristic has Major (Byte-->double) Minor (Byte-->double) Patch (Byte-->double)  Guid=ef680107-9b35-4933-9b10-52ffa9740042
+                MTU Request characteristic has param0 (Byte-->double) param1 (UInt16-->double)  Guid=ef680108-9b35-4933-9b10-52ffa9740042
+                NFC Tag characteristic has NFCTag (String-->string)  Guid=ef680109-9b35-4933-9b10-52ffa9740042
         */
 
         public const string Temperature_cPropertyChangedName = "Temperature_c";
@@ -65,7 +90,20 @@ namespace BluetoothProtocols
         public const string Air_Quality_eCOS_TVOCPropertyChangedName = "Air_Quality_eCOS_TVOC";
         public const string Color_RGB_ClearPropertyChangedName = "Color_RGB_Clear";
         public const string Environment_ConfigurationPropertyChangedName = "Environment_Configuration";
+        public const string Device_NamePropertyChangedName = "Device_Name";
+        public const string AppearancePropertyChangedName = "Appearance";
+        public const string Connection_ParameterPropertyChangedName = "Connection_Parameter";
+        public const string Central_Address_ResolutionPropertyChangedName = "Central_Address_Resolution";
+        public const string Service_ChangesPropertyChangedName = "Service_Changes";
         public const string BatteryLevelPropertyChangedName = "BatteryLevel";
+        public const string Configuration_Device_NamePropertyChangedName = "Configuration_Device_Name";
+        public const string Advertising_ParameterPropertyChangedName = "Advertising_Parameter";
+        public const string Connection_parametersPropertyChangedName = "Connection_parameters";
+        public const string Eddystone_URLPropertyChangedName = "Eddystone_URL";
+        public const string Cloud_TokenPropertyChangedName = "Cloud_Token";
+        public const string Firmware_VersionPropertyChangedName = "Firmware_Version";
+        public const string MTU_RequestPropertyChangedName = "MTU_Request";
+        public const string NFC_TagPropertyChangedName = "NFC_Tag";
 
 
         /// <summary>
@@ -74,7 +112,10 @@ namespace BluetoothProtocols
         enum ServiceIndex
         {
             Environment_index = 0,
-            Battery_index = 1,
+            Common_Configuration_index = 1,
+            Generic_Service_index = 2,
+            Battery_index = 3,
+            Configuration_index = 4,
         }
 
         /// <summary>
@@ -88,7 +129,20 @@ namespace BluetoothProtocols
             Environment_Air_Quality_eCOS_TVOC_index = 3,     // GUID EF680204-9B35-4933-9B10-52FFA9740042
             Environment_Color_RGB_Clear_index = 4,     // GUID EF680205-9B35-4933-9B10-52FFA9740042
             Environment_Environment_Configuration_index = 5,     // GUID EF680206-9B35-4933-9B10-52FFA9740042
-            Battery_BatteryLevel_index = 6,     // GUID 00002a19-0000-1000-8000-00805f9b34fb
+            Common_Configuration_Device_Name_index = 6,     // GUID 00002a00-0000-1000-8000-00805f9b34fb
+            Common_Configuration_Appearance_index = 7,     // GUID 00002a01-0000-1000-8000-00805f9b34fb
+            Common_Configuration_Connection_Parameter_index = 8,     // GUID 00002a04-0000-1000-8000-00805f9b34fb
+            Common_Configuration_Central_Address_Resolution_index = 9,     // GUID 00002aa6-0000-1000-8000-00805f9b34fb
+            Generic_Service_Service_Changes_index = 10,     // GUID 00002a05-0000-1000-8000-00805f9b34fb
+            Battery_BatteryLevel_index = 11,     // GUID 00002a19-0000-1000-8000-00805f9b34fb
+            Configuration_Configuration_Device_Name_index = 12,     // GUID EF680101-9B35-4933-9B10-52FFA9740042
+            Configuration_Advertising_Parameter_index = 13,     // GUID EF680102-9B35-4933-9B10-52FFA9740042
+            Configuration_Connection_parameters_index = 14,     // GUID EF680104-9B35-4933-9B10-52FFA9740042
+            Configuration_Eddystone_URL_index = 15,     // GUID EF680105-9B35-4933-9B10-52FFA9740042
+            Configuration_Cloud_Token_index = 16,     // GUID EF680106-9B35-4933-9B10-52FFA9740042
+            Configuration_Firmware_Version_index = 17,     // GUID EF680107-9B35-4933-9B10-52FFA9740042
+            Configuration_MTU_Request_index = 18,     // GUID EF680108-9B35-4933-9B10-52FFA9740042
+            Configuration_NFC_Tag_index = 19,     // GUID EF680109-9B35-4933-9B10-52FFA9740042
         }
 
         /// <summary>
@@ -97,13 +151,16 @@ namespace BluetoothProtocols
         List<Guid> Service_Guids = new List<Guid>()
         {
             Guid.Parse("EF680200-9B35-4933-9B10-52FFA9740042"), // #0 is Environment
-            Guid.Parse("0000180f-0000-1000-8000-00805f9b34fb"), // #1 is Battery
+            Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"), // #1 is Common Configuration
+            Guid.Parse("00001801-0000-1000-8000-00805f9b34fb"), // #2 is Generic Service
+            Guid.Parse("0000180f-0000-1000-8000-00805f9b34fb"), // #3 is Battery
+            Guid.Parse("EF680100-9B35-4933-9B10-52FFA9740042"), // #4 is Configuration
         };
 
         /// <summary>
         /// Active list of services. Will be filled in as the services are connected. Starts off as null.
         /// </summary>
-        List<GattDeviceService> Services = new List<GattDeviceService>() { null, null, };
+        List<GattDeviceService> Services = new List<GattDeviceService>() { null, null, null, null, null, };
 
         /// <summary>
         /// List of the Characteristic GUIDS for all of the characteristics for all of the services.
@@ -117,12 +174,25 @@ namespace BluetoothProtocols
             Guid.Parse("EF680204-9B35-4933-9B10-52FFA9740042"), // #3 is Environment Air Quality eCOS TVOC
             Guid.Parse("EF680205-9B35-4933-9B10-52FFA9740042"), // #4 is Environment Color RGB+Clear
             Guid.Parse("EF680206-9B35-4933-9B10-52FFA9740042"), // #5 is Environment Environment Configuration
-            Guid.Parse("00002a19-0000-1000-8000-00805f9b34fb"), // #6 is Battery BatteryLevel
+            Guid.Parse("00002a00-0000-1000-8000-00805f9b34fb"), // #6 is Common Configuration Device Name
+            Guid.Parse("00002a01-0000-1000-8000-00805f9b34fb"), // #7 is Common Configuration Appearance
+            Guid.Parse("00002a04-0000-1000-8000-00805f9b34fb"), // #8 is Common Configuration Connection Parameter
+            Guid.Parse("00002aa6-0000-1000-8000-00805f9b34fb"), // #9 is Common Configuration Central Address Resolution
+            Guid.Parse("00002a05-0000-1000-8000-00805f9b34fb"), // #10 is Generic Service Service Changes
+            Guid.Parse("00002a19-0000-1000-8000-00805f9b34fb"), // #11 is Battery BatteryLevel
+            Guid.Parse("EF680101-9B35-4933-9B10-52FFA9740042"), // #12 is Configuration Configuration Device Name
+            Guid.Parse("EF680102-9B35-4933-9B10-52FFA9740042"), // #13 is Configuration Advertising Parameter
+            Guid.Parse("EF680104-9B35-4933-9B10-52FFA9740042"), // #14 is Configuration Connection parameters
+            Guid.Parse("EF680105-9B35-4933-9B10-52FFA9740042"), // #15 is Configuration Eddystone URL
+            Guid.Parse("EF680106-9B35-4933-9B10-52FFA9740042"), // #16 is Configuration Cloud Token
+            Guid.Parse("EF680107-9B35-4933-9B10-52FFA9740042"), // #17 is Configuration Firmware Version
+            Guid.Parse("EF680108-9B35-4933-9B10-52FFA9740042"), // #18 is Configuration MTU Request
+            Guid.Parse("EF680109-9B35-4933-9B10-52FFA9740042"), // #19 is Configuration NFC Tag
         };
 
-        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null,  };
-        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false,  };
-        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  null, null, null, null, null, null, null,  };
+        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
+        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,  };
+        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
 
 
         /// <summary>
@@ -987,6 +1057,464 @@ namespace BluetoothProtocols
 
         #endregion
 //
+        #region Service_Common_Configuration
+        // Service Common Configuration 
+        /// <summary>
+        /// Data from all of the characteristics in the Common Configuration Service. 
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Common_Configuration_Data :INotifyPropertyChanged, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
+            public DateTimeOffset TimestampMostRecent 
+            {
+                get { return _TimestampMostRecent; }
+                set 
+                    { 
+                        if (value == _TimestampMostRecent) return; 
+                        _TimestampMostRecent = value; 
+                        OnPropertyChanged(); 
+                        OnPropertyChanged("TimestamptMostRecentDT"); 
+                    }
+            }
+            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
+            private string _Device_Name = "";
+            public string Device_Name 
+            { 
+                get { return _Device_Name; }
+                set 
+                    { 
+                        if (value == _Device_Name) return; 
+                        _Device_Name = value;
+                        OnPropertyChanged();
+                    }
+            } // From Common Configuration and Device Name
+            private double _Appearance = 0;
+            public double Appearance 
+            { 
+                get { return _Appearance; }
+                set 
+                    { 
+                        if (value == _Appearance) return; 
+                        _Appearance = value;
+                        OnPropertyChanged();
+                    }
+            } // From Common Configuration and Appearance
+            private byte[] _ConnectionParameter = null;
+            public byte[] ConnectionParameter 
+            { 
+                get { return _ConnectionParameter; }
+                set 
+                    { 
+                        if (value == _ConnectionParameter) return; 
+                        _ConnectionParameter = value;
+                        OnPropertyChanged();
+                    }
+            } // From Common Configuration and Connection Parameter
+            private double _AddressResolutionSupported = 0;
+            public double AddressResolutionSupported 
+            { 
+                get { return _AddressResolutionSupported; }
+                set 
+                    { 
+                        if (value == _AddressResolutionSupported) return; 
+                        _AddressResolutionSupported = value;
+                        OnPropertyChanged();
+                    }
+            } // From Common Configuration and Central Address Resolution
+
+            public Common_Configuration_Data Clone()
+            {
+                return this.MemberwiseClone() as Common_Configuration_Data;
+            }
+
+            public void CopyFrom(Common_Configuration_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Device_Name = value.Device_Name;
+                this.Appearance = value.Appearance;
+                this.ConnectionParameter = value.ConnectionParameter;
+                this.AddressResolutionSupported = value.AddressResolutionSupported;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Device_Name", "Appearance", "ConnectionParameter", "AddressResolutionSupported"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Device_Name);
+                exporter.CellSet(Appearance);
+                exporter.CellSet(ConnectionParameter);
+                exporter.CellSet(AddressResolutionSupported);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Device_Name} {Appearance} {ConnectionParameter} {AddressResolutionSupported}");
+            }
+
+            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
+        }
+        public Common_Configuration_Data CurrCommon_Configuration_Data { get; set; } = new Common_Configuration_Data();
+
+        // Per-characteristics methods for Common_Configuration Device_Name
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyDevice_NameAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Device_Name", ServiceIndex.Common_Configuration_index, "Common Configuration", CharacteristicIndex.Common_Configuration_Device_Name_index, NotifyDevice_NameCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyDevice_NameCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Common_Configuration_Device_Name_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("STRING|ASCII|Device_Name");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrCommon_Configuration_Data.TimestampMostRecent = args.Timestamp;
+            CurrCommon_Configuration_Data.Device_Name = vr.GetNextString();
+            OnPropertyChanged(Device_NamePropertyChangedName); // "Device_Name"
+        }
+        // Per-characteristics methods for Common_Configuration Appearance
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyAppearanceAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Appearance", ServiceIndex.Common_Configuration_index, "Common Configuration", CharacteristicIndex.Common_Configuration_Appearance_index, NotifyAppearanceCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyAppearanceCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Common_Configuration_Appearance_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|Speciality^Appearance|Appearance");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrCommon_Configuration_Data.TimestampMostRecent = args.Timestamp;
+            CurrCommon_Configuration_Data.Appearance = vr.GetNextDouble();
+            OnPropertyChanged(AppearancePropertyChangedName); // "Appearance"
+        }
+        // Per-characteristics methods for Common_Configuration Connection_Parameter
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyConnection_ParameterAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Connection_Parameter", ServiceIndex.Common_Configuration_index, "Common Configuration", CharacteristicIndex.Common_Configuration_Connection_Parameter_index, NotifyConnection_ParameterCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyConnection_ParameterCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Common_Configuration_Connection_Parameter_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|ConnectionParameter");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrCommon_Configuration_Data.TimestampMostRecent = args.Timestamp;
+            CurrCommon_Configuration_Data.ConnectionParameter = vr.GetNextByteArray();
+            OnPropertyChanged(Connection_ParameterPropertyChangedName); // "Connection_Parameter"
+        }
+        // Per-characteristics methods for Common_Configuration Central_Address_Resolution
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyCentral_Address_ResolutionAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Central_Address_Resolution", ServiceIndex.Common_Configuration_index, "Common Configuration", CharacteristicIndex.Common_Configuration_Central_Address_Resolution_index, NotifyCentral_Address_ResolutionCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyCentral_Address_ResolutionCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Common_Configuration_Central_Address_Resolution_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|AddressResolutionSupported");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrCommon_Configuration_Data.TimestampMostRecent = args.Timestamp;
+            CurrCommon_Configuration_Data.AddressResolutionSupported = vr.GetNextDouble();
+            OnPropertyChanged(Central_Address_ResolutionPropertyChangedName); // "Central_Address_Resolution"
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Common_Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Common_Configuration_Data> ReadDevice_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Common_Configuration_Device_Name_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Common_Configuration_index, "Common Configuration", index, "Device Name");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Device Name", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("STRING|ASCII|Device_Name");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrCommon_Configuration_Data.Device_Name = vr.GetNextString();
+            OnPropertyChanged(Device_NamePropertyChangedName); // "Device_Name"
+            return CurrCommon_Configuration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Common_Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Common_Configuration_Data> ReadAppearance(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Common_Configuration_Appearance_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Common_Configuration_index, "Common Configuration", index, "Appearance");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Appearance", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|Speciality^Appearance|Appearance");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrCommon_Configuration_Data.Appearance = vr.GetNextDouble();
+            OnPropertyChanged(AppearancePropertyChangedName); // "Appearance"
+            return CurrCommon_Configuration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Common_Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Common_Configuration_Data> ReadConnection_Parameter(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Common_Configuration_Connection_Parameter_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Common_Configuration_index, "Common Configuration", index, "Connection Parameter");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Connection Parameter", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|ConnectionParameter");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrCommon_Configuration_Data.ConnectionParameter = vr.GetNextByteArray();
+            OnPropertyChanged(Connection_ParameterPropertyChangedName); // "Connection_Parameter"
+            return CurrCommon_Configuration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Common_Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Common_Configuration_Data> ReadCentral_Address_Resolution(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Common_Configuration_Central_Address_Resolution_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Common_Configuration_index, "Common Configuration", index, "Central Address Resolution");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Central Address Resolution", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|AddressResolutionSupported");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrCommon_Configuration_Data.AddressResolutionSupported = vr.GetNextDouble();
+            OnPropertyChanged(Central_Address_ResolutionPropertyChangedName); // "Central_Address_Resolution"
+            return CurrCommon_Configuration_Data;
+        }
+
+        #endregion
+//
+        #region Service_Generic_Service
+        // Service Generic Service 
+        /// <summary>
+        /// Data from all of the characteristics in the Generic Service Service. 
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Generic_Service_Data :INotifyPropertyChanged, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
+            public DateTimeOffset TimestampMostRecent 
+            {
+                get { return _TimestampMostRecent; }
+                set 
+                    { 
+                        if (value == _TimestampMostRecent) return; 
+                        _TimestampMostRecent = value; 
+                        OnPropertyChanged(); 
+                        OnPropertyChanged("TimestamptMostRecentDT"); 
+                    }
+            }
+            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
+            private double _StartRange = 0;
+            public double StartRange 
+            { 
+                get { return _StartRange; }
+                set 
+                    { 
+                        if (value == _StartRange) return; 
+                        _StartRange = value;
+                        OnPropertyChanged();
+                    }
+            } // From Generic Service and Service Changes
+            private double _EndRange = 0;
+            public double EndRange 
+            { 
+                get { return _EndRange; }
+                set 
+                    { 
+                        if (value == _EndRange) return; 
+                        _EndRange = value;
+                        OnPropertyChanged();
+                    }
+            } // From Generic Service and Service Changes
+
+            public Generic_Service_Data Clone()
+            {
+                return this.MemberwiseClone() as Generic_Service_Data;
+            }
+
+            public void CopyFrom(Generic_Service_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.StartRange = value.StartRange;
+                this.EndRange = value.EndRange;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "StartRange", "EndRange"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(StartRange);
+                exporter.CellSet(EndRange);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {StartRange} {EndRange}");
+            }
+
+            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
+        }
+        public Generic_Service_Data CurrGeneric_Service_Data { get; set; } = new Generic_Service_Data();
+
+        // Per-characteristics methods for Generic_Service Service_Changes
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyService_ChangesAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Service_Changes", ServiceIndex.Generic_Service_index, "Generic Service", CharacteristicIndex.Generic_Service_Service_Changes_index, NotifyService_ChangesCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyService_ChangesCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Generic_Service_Service_Changes_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|StartRange U16|DEC|EndRange");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrGeneric_Service_Data.TimestampMostRecent = args.Timestamp;
+            CurrGeneric_Service_Data.StartRange = vr.GetNextDouble();
+            CurrGeneric_Service_Data.EndRange = vr.GetNextDouble();
+            OnPropertyChanged(Service_ChangesPropertyChangedName); // "Service_Changes"
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Generic_Service_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Generic_Service_Data> ReadService_Changes(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Generic_Service_Service_Changes_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Generic_Service_index, "Generic Service", index, "Service Changes");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Service Changes", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|StartRange U16|DEC|EndRange");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrGeneric_Service_Data.StartRange = vr.GetNextDouble();
+            CurrGeneric_Service_Data.EndRange = vr.GetNextDouble();
+            OnPropertyChanged(Service_ChangesPropertyChangedName); // "Service_Changes"
+            return CurrGeneric_Service_Data;
+        }
+
+        #endregion
+//
         #region Service_Battery
         // Service Battery 
         /// <summary>
@@ -1110,6 +1638,679 @@ namespace BluetoothProtocols
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
             OnPropertyChanged(BatteryLevelPropertyChangedName); // "BatteryLevel"
             return CurrBattery_Data;
+        }
+
+        #endregion
+//
+        #region Service_Configuration
+        // Service Configuration 
+        /// <summary>
+        /// Data from all of the characteristics in the Configuration Service. 
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Configuration_Data :INotifyPropertyChanged, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
+            public DateTimeOffset TimestampMostRecent 
+            {
+                get { return _TimestampMostRecent; }
+                set 
+                    { 
+                        if (value == _TimestampMostRecent) return; 
+                        _TimestampMostRecent = value; 
+                        OnPropertyChanged(); 
+                        OnPropertyChanged("TimestamptMostRecentDT"); 
+                    }
+            }
+            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
+            private string _Name = "";
+            public string Name 
+            { 
+                get { return _Name; }
+                set 
+                    { 
+                        if (value == _Name) return; 
+                        _Name = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Configuration Device Name
+            private double _Interval = 0;
+            public double Interval 
+            { 
+                get { return _Interval; }
+                set 
+                    { 
+                        if (value == _Interval) return; 
+                        _Interval = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Advertising Parameter
+            private double _Timeout = 0;
+            public double Timeout 
+            { 
+                get { return _Timeout; }
+                set 
+                    { 
+                        if (value == _Timeout) return; 
+                        _Timeout = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Advertising Parameter
+            private double _MinInterval = 0;
+            public double MinInterval 
+            { 
+                get { return _MinInterval; }
+                set 
+                    { 
+                        if (value == _MinInterval) return; 
+                        _MinInterval = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Connection parameters
+            private double _MaxInterval = 0;
+            public double MaxInterval 
+            { 
+                get { return _MaxInterval; }
+                set 
+                    { 
+                        if (value == _MaxInterval) return; 
+                        _MaxInterval = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Connection parameters
+            private double _Latency = 0;
+            public double Latency 
+            { 
+                get { return _Latency; }
+                set 
+                    { 
+                        if (value == _Latency) return; 
+                        _Latency = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Connection parameters
+            private double _SupervisionTimeout = 0;
+            public double SupervisionTimeout 
+            { 
+                get { return _SupervisionTimeout; }
+                set 
+                    { 
+                        if (value == _SupervisionTimeout) return; 
+                        _SupervisionTimeout = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Connection parameters
+            private string _Eddystone = "";
+            public string Eddystone 
+            { 
+                get { return _Eddystone; }
+                set 
+                    { 
+                        if (value == _Eddystone) return; 
+                        _Eddystone = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Eddystone URL
+            private byte[] _CloudToken = null;
+            public byte[] CloudToken 
+            { 
+                get { return _CloudToken; }
+                set 
+                    { 
+                        if (value == _CloudToken) return; 
+                        _CloudToken = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Cloud Token
+            private double _Major = 0;
+            public double Major 
+            { 
+                get { return _Major; }
+                set 
+                    { 
+                        if (value == _Major) return; 
+                        _Major = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Firmware Version
+            private double _Minor = 0;
+            public double Minor 
+            { 
+                get { return _Minor; }
+                set 
+                    { 
+                        if (value == _Minor) return; 
+                        _Minor = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Firmware Version
+            private double _Patch = 0;
+            public double Patch 
+            { 
+                get { return _Patch; }
+                set 
+                    { 
+                        if (value == _Patch) return; 
+                        _Patch = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and Firmware Version
+            private double _param0 = 0;
+            public double param0 
+            { 
+                get { return _param0; }
+                set 
+                    { 
+                        if (value == _param0) return; 
+                        _param0 = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and MTU Request
+            private double _param1 = 0;
+            public double param1 
+            { 
+                get { return _param1; }
+                set 
+                    { 
+                        if (value == _param1) return; 
+                        _param1 = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and MTU Request
+            private string _NFCTag = "";
+            public string NFCTag 
+            { 
+                get { return _NFCTag; }
+                set 
+                    { 
+                        if (value == _NFCTag) return; 
+                        _NFCTag = value;
+                        OnPropertyChanged();
+                    }
+            } // From Configuration and NFC Tag
+
+            public Configuration_Data Clone()
+            {
+                return this.MemberwiseClone() as Configuration_Data;
+            }
+
+            public void CopyFrom(Configuration_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
+                this.Interval = value.Interval;
+                this.Timeout = value.Timeout;
+                this.MinInterval = value.MinInterval;
+                this.MaxInterval = value.MaxInterval;
+                this.Latency = value.Latency;
+                this.SupervisionTimeout = value.SupervisionTimeout;
+                this.Eddystone = value.Eddystone;
+                this.CloudToken = value.CloudToken;
+                this.Major = value.Major;
+                this.Minor = value.Minor;
+                this.Patch = value.Patch;
+                this.param0 = value.param0;
+                this.param1 = value.param1;
+                this.NFCTag = value.NFCTag;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Name", "Interval", "Timeout", "MinInterval", "MaxInterval", "Latency", "SupervisionTimeout", "Eddystone", "CloudToken", "Major", "Minor", "Patch", "param0", "param1", "NFCTag"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Name);
+                exporter.CellSet(Interval);
+                exporter.CellSet(Timeout);
+                exporter.CellSet(MinInterval);
+                exporter.CellSet(MaxInterval);
+                exporter.CellSet(Latency);
+                exporter.CellSet(SupervisionTimeout);
+                exporter.CellSet(Eddystone);
+                exporter.CellSet(CloudToken);
+                exporter.CellSet(Major);
+                exporter.CellSet(Minor);
+                exporter.CellSet(Patch);
+                exporter.CellSet(param0);
+                exporter.CellSet(param1);
+                exporter.CellSet(NFCTag);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Name} {Interval} {Timeout} {MinInterval} {MaxInterval} {Latency} {SupervisionTimeout} {Eddystone} {CloudToken} {Major} {Minor} {Patch} {param0} {param1} {NFCTag}");
+            }
+
+            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
+        }
+        public Configuration_Data CurrConfiguration_Data { get; set; } = new Configuration_Data();
+
+        // Per-characteristics methods for Configuration Configuration_Device_Name
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyConfiguration_Device_NameAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Configuration_Device_Name", ServiceIndex.Configuration_index, "Configuration", CharacteristicIndex.Configuration_Configuration_Device_Name_index, NotifyConfiguration_Device_NameCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyConfiguration_Device_NameCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Configuration_Configuration_Device_Name_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("STRING|ASCII|Name");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrConfiguration_Data.TimestampMostRecent = args.Timestamp;
+            CurrConfiguration_Data.Name = vr.GetNextString();
+            OnPropertyChanged(Configuration_Device_NamePropertyChangedName); // "Configuration_Device_Name"
+        }
+        // Per-characteristics methods for Configuration Advertising_Parameter
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyAdvertising_ParameterAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Advertising_Parameter", ServiceIndex.Configuration_index, "Configuration", CharacteristicIndex.Configuration_Advertising_Parameter_index, NotifyAdvertising_ParameterCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyAdvertising_ParameterCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Configuration_Advertising_Parameter_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|Interval|ms U8|DEC|Timeout|s");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrConfiguration_Data.TimestampMostRecent = args.Timestamp;
+            CurrConfiguration_Data.Interval = vr.GetNextDouble();
+            CurrConfiguration_Data.Timeout = vr.GetNextDouble();
+            OnPropertyChanged(Advertising_ParameterPropertyChangedName); // "Advertising_Parameter"
+        }
+        // Per-characteristics methods for Configuration Connection_parameters
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyConnection_parametersAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Connection_parameters", ServiceIndex.Configuration_index, "Configuration", CharacteristicIndex.Configuration_Connection_parameters_index, NotifyConnection_parametersCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyConnection_parametersCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Configuration_Connection_parameters_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16|DEC|MinInterval U16|DEC|MaxInterval U16|DEC|Latency U16|DEC|SupervisionTimeout|10ms");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrConfiguration_Data.TimestampMostRecent = args.Timestamp;
+            CurrConfiguration_Data.MinInterval = vr.GetNextDouble();
+            CurrConfiguration_Data.MaxInterval = vr.GetNextDouble();
+            CurrConfiguration_Data.Latency = vr.GetNextDouble();
+            CurrConfiguration_Data.SupervisionTimeout = vr.GetNextDouble();
+            OnPropertyChanged(Connection_parametersPropertyChangedName); // "Connection_parameters"
+        }
+        // Per-characteristics methods for Configuration Eddystone_URL
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyEddystone_URLAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Eddystone_URL", ServiceIndex.Configuration_index, "Configuration", CharacteristicIndex.Configuration_Eddystone_URL_index, NotifyEddystone_URLCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyEddystone_URLCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Configuration_Eddystone_URL_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("STRING|Eddystone|Eddystone");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrConfiguration_Data.TimestampMostRecent = args.Timestamp;
+            CurrConfiguration_Data.Eddystone = vr.GetNextString();
+            OnPropertyChanged(Eddystone_URLPropertyChangedName); // "Eddystone_URL"
+        }
+        // Per-characteristics methods for Configuration Cloud_Token
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyCloud_TokenAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Cloud_Token", ServiceIndex.Configuration_index, "Configuration", CharacteristicIndex.Configuration_Cloud_Token_index, NotifyCloud_TokenCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyCloud_TokenCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Configuration_Cloud_Token_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|CloudToken");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrConfiguration_Data.TimestampMostRecent = args.Timestamp;
+            CurrConfiguration_Data.CloudToken = vr.GetNextByteArray();
+            OnPropertyChanged(Cloud_TokenPropertyChangedName); // "Cloud_Token"
+        }
+        // Per-characteristics methods for Configuration Firmware_Version
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyFirmware_VersionAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Firmware_Version", ServiceIndex.Configuration_index, "Configuration", CharacteristicIndex.Configuration_Firmware_Version_index, NotifyFirmware_VersionCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyFirmware_VersionCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Configuration_Firmware_Version_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|Major U8|DEC|Minor U8|DEC|Patch");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrConfiguration_Data.TimestampMostRecent = args.Timestamp;
+            CurrConfiguration_Data.Major = vr.GetNextDouble();
+            CurrConfiguration_Data.Minor = vr.GetNextDouble();
+            CurrConfiguration_Data.Patch = vr.GetNextDouble();
+            OnPropertyChanged(Firmware_VersionPropertyChangedName); // "Firmware_Version"
+        }
+        // Per-characteristics methods for Configuration MTU_Request
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyMTU_RequestAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("MTU_Request", ServiceIndex.Configuration_index, "Configuration", CharacteristicIndex.Configuration_MTU_Request_index, NotifyMTU_RequestCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyMTU_RequestCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Configuration_MTU_Request_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8 U16");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrConfiguration_Data.TimestampMostRecent = args.Timestamp;
+            CurrConfiguration_Data.param0 = vr.GetNextDouble();
+            CurrConfiguration_Data.param1 = vr.GetNextDouble();
+            OnPropertyChanged(MTU_RequestPropertyChangedName); // "MTU_Request"
+        }
+        // Per-characteristics methods for Configuration NFC_Tag
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyNFC_TagAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("NFC_Tag", ServiceIndex.Configuration_index, "Configuration", CharacteristicIndex.Configuration_NFC_Tag_index, NotifyNFC_TagCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyNFC_TagCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Configuration_NFC_Tag_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("STRING|ASCII|NFCTag");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrConfiguration_Data.TimestampMostRecent = args.Timestamp;
+            CurrConfiguration_Data.NFCTag = vr.GetNextString();
+            OnPropertyChanged(NFC_TagPropertyChangedName); // "NFC_Tag"
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Configuration_Data> ReadConfiguration_Device_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Configuration_Configuration_Device_Name_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Configuration_index, "Configuration", index, "Configuration Device Name");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Configuration Device Name", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("STRING|ASCII|Name");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrConfiguration_Data.Name = vr.GetNextString();
+            OnPropertyChanged(Configuration_Device_NamePropertyChangedName); // "Configuration_Device_Name"
+            return CurrConfiguration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Configuration_Data> ReadAdvertising_Parameter(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Configuration_Advertising_Parameter_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Configuration_index, "Configuration", index, "Advertising Parameter");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Advertising Parameter", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|Interval|ms U8|DEC|Timeout|s");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrConfiguration_Data.Interval = vr.GetNextDouble();
+            CurrConfiguration_Data.Timeout = vr.GetNextDouble();
+            OnPropertyChanged(Advertising_ParameterPropertyChangedName); // "Advertising_Parameter"
+            return CurrConfiguration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Configuration_Data> ReadConnection_parameters(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Configuration_Connection_parameters_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Configuration_index, "Configuration", index, "Connection parameters");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Connection parameters", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16|DEC|MinInterval U16|DEC|MaxInterval U16|DEC|Latency U16|DEC|SupervisionTimeout|10ms");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrConfiguration_Data.MinInterval = vr.GetNextDouble();
+            CurrConfiguration_Data.MaxInterval = vr.GetNextDouble();
+            CurrConfiguration_Data.Latency = vr.GetNextDouble();
+            CurrConfiguration_Data.SupervisionTimeout = vr.GetNextDouble();
+            OnPropertyChanged(Connection_parametersPropertyChangedName); // "Connection_parameters"
+            return CurrConfiguration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Configuration_Data> ReadEddystone_URL(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Configuration_Eddystone_URL_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Configuration_index, "Configuration", index, "Eddystone URL");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Eddystone URL", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("STRING|Eddystone|Eddystone");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrConfiguration_Data.Eddystone = vr.GetNextString();
+            OnPropertyChanged(Eddystone_URLPropertyChangedName); // "Eddystone_URL"
+            return CurrConfiguration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Configuration_Data> ReadCloud_Token(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Configuration_Cloud_Token_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Configuration_index, "Configuration", index, "Cloud Token");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Cloud Token", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|CloudToken");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrConfiguration_Data.CloudToken = vr.GetNextByteArray();
+            OnPropertyChanged(Cloud_TokenPropertyChangedName); // "Cloud_Token"
+            return CurrConfiguration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Configuration_Data> ReadFirmware_Version(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Configuration_Firmware_Version_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Configuration_index, "Configuration", index, "Firmware Version");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Firmware Version", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|Major U8|DEC|Minor U8|DEC|Patch");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrConfiguration_Data.Major = vr.GetNextDouble();
+            CurrConfiguration_Data.Minor = vr.GetNextDouble();
+            CurrConfiguration_Data.Patch = vr.GetNextDouble();
+            OnPropertyChanged(Firmware_VersionPropertyChangedName); // "Firmware_Version"
+            return CurrConfiguration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Configuration_Data> ReadMTU_Request(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Configuration_MTU_Request_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Configuration_index, "Configuration", index, "MTU Request");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "MTU Request", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8 U16");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrConfiguration_Data.param0 = vr.GetNextDouble();
+            CurrConfiguration_Data.param1 = vr.GetNextDouble();
+            OnPropertyChanged(MTU_RequestPropertyChangedName); // "MTU_Request"
+            return CurrConfiguration_Data;
+        }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Configuration_Data> ReadNFC_Tag(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Configuration_NFC_Tag_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Configuration_index, "Configuration", index, "NFC Tag");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "NFC Tag", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("STRING|ASCII|NFCTag");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrConfiguration_Data.NFCTag = vr.GetNextString();
+            OnPropertyChanged(NFC_TagPropertyChangedName); // "NFC_Tag"
+            return CurrConfiguration_Data;
         }
 
         #endregion

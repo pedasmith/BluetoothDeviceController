@@ -102,7 +102,7 @@ namespace BluetoothDeviceController.Names
         /// </summary>
         public List<string> Aliases { get; set; } = new List<string>(); // Must not be null
         public IList<String> Links { get; } = new List<String>();
-        public IList<NameService> Services { get; } = new List<NameService>();
+        public List<NameService> Services { get; } = new List<NameService>();
 
         public NameService GetService (string uuid)
         {

@@ -19,7 +19,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This code was automatically generated 2026-05-18::08:51
+    /// This code was automatically generated 2026-06-15::11:34
     /// </summary>
 
     ///<summary>
@@ -36,6 +36,10 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
         public void Update(Nordic_Thingy.Environment_Data value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;
@@ -100,6 +104,10 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
         public void Update(Nordic_Thingy.EnvironmentColor_Data value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;
@@ -158,6 +166,10 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
         public void Update(Nordic_Thingy.EnvironmentConfiguration_Data value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;
@@ -216,6 +228,127 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
     }
     ///<summary>
     ///TODO:
+    ///Common Configuration_DataCollection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the Common Configuration_Data group from Common Configuration.
+    ///The lists are used when displaying historical graphs of the data.
+    ///</summary>
+    public class Common_Configuration_DataCollection 
+    {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update(Nordic_Thingy.Common_Configuration_Data value, Verb verb)
+        {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
+        public void Add(Nordic_Thingy.Common_Configuration_Data value)
+        {
+            TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value.Clone());
+            Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            Device_Name.Add (value.Device_Name);
+            Appearance.Add (value.Appearance);
+            ConnectionParameter.Add (value.ConnectionParameter);
+            AddressResolutionSupported.Add (value.AddressResolutionSupported);
+        }
+        public void ReplaceMostRecent(Nordic_Thingy.Common_Configuration_Data value)
+        {
+            var index = Timestamps.Count - 1;
+            Timestamps[index] = value.TimestampMostRecent;
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
+            Device_Name[index] = value.Device_Name;
+            Appearance[index] = value.Appearance;
+            ConnectionParameter[index] = value.ConnectionParameter;
+            AddressResolutionSupported[index] = value.AddressResolutionSupported;
+        }
+
+        ///<summary>
+        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
+        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
+        ///frequently than the UI updates
+        ///</summary>
+        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
+        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // Data values (properties) from characteristic Device Name
+        public ObservableCollection<string> Device_Name { get; } = new ObservableCollection<string>();
+        // Data values (properties) from characteristic Appearance
+        public ObservableCollection<double> Appearance { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic Connection Parameter
+        public ObservableCollection<byte[]> ConnectionParameter { get; } = new ObservableCollection<byte[]>();
+        // Data values (properties) from characteristic Central Address Resolution
+        public ObservableCollection<double> AddressResolutionSupported { get; } = new ObservableCollection<double>();
+        public ObservableCollection<Nordic_Thingy.Common_Configuration_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Common_Configuration_Data>();
+    }
+    ///<summary>
+    ///TODO:
+    ///Generic Service_DataCollection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the Generic Service_Data group from Generic Service.
+    ///The lists are used when displaying historical graphs of the data.
+    ///</summary>
+    public class Generic_Service_DataCollection 
+    {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update(Nordic_Thingy.Generic_Service_Data value, Verb verb)
+        {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
+        public void Add(Nordic_Thingy.Generic_Service_Data value)
+        {
+            TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value.Clone());
+            Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            StartRange.Add (value.StartRange);
+            EndRange.Add (value.EndRange);
+        }
+        public void ReplaceMostRecent(Nordic_Thingy.Generic_Service_Data value)
+        {
+            var index = Timestamps.Count - 1;
+            Timestamps[index] = value.TimestampMostRecent;
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
+            StartRange[index] = value.StartRange;
+            EndRange[index] = value.EndRange;
+        }
+
+        ///<summary>
+        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
+        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
+        ///frequently than the UI updates
+        ///</summary>
+        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
+        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // Data values (properties) from characteristic Service Changes
+        public ObservableCollection<double> StartRange { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> EndRange { get; } = new ObservableCollection<double>();
+        public ObservableCollection<Nordic_Thingy.Generic_Service_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Generic_Service_Data>();
+    }
+    ///<summary>
+    ///TODO:
     ///Battery_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the Battery_Data group from Battery.
     ///The lists are used when displaying historical graphs of the data.
@@ -228,6 +361,10 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
         public void Update(Nordic_Thingy.Battery_Data value, Verb verb)
         {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
             switch (verb)
             {
                 case Verb.Add: Add(value); break;
@@ -262,6 +399,108 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         // Data values (properties) from characteristic BatteryLevel
         public ObservableCollection<double> BatteryLevel { get; } = new ObservableCollection<double>();
         public ObservableCollection<Nordic_Thingy.Battery_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Battery_Data>();
+    }
+    ///<summary>
+    ///TODO:
+    ///Configuration_DataCollection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the Configuration_Data group from Configuration.
+    ///The lists are used when displaying historical graphs of the data.
+    ///</summary>
+    public class Configuration_DataCollection 
+    {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update(Nordic_Thingy.Configuration_Data value, Verb verb)
+        {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
+        public void Add(Nordic_Thingy.Configuration_Data value)
+        {
+            TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value.Clone());
+            Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            Name.Add (value.Name);
+            Interval.Add (value.Interval);
+            Timeout.Add (value.Timeout);
+            MinInterval.Add (value.MinInterval);
+            MaxInterval.Add (value.MaxInterval);
+            Latency.Add (value.Latency);
+            SupervisionTimeout.Add (value.SupervisionTimeout);
+            Eddystone.Add (value.Eddystone);
+            CloudToken.Add (value.CloudToken);
+            Major.Add (value.Major);
+            Minor.Add (value.Minor);
+            Patch.Add (value.Patch);
+            param0.Add (value.param0);
+            param1.Add (value.param1);
+            NFCTag.Add (value.NFCTag);
+        }
+        public void ReplaceMostRecent(Nordic_Thingy.Configuration_Data value)
+        {
+            var index = Timestamps.Count - 1;
+            Timestamps[index] = value.TimestampMostRecent;
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
+            Name[index] = value.Name;
+            Interval[index] = value.Interval;
+            Timeout[index] = value.Timeout;
+            MinInterval[index] = value.MinInterval;
+            MaxInterval[index] = value.MaxInterval;
+            Latency[index] = value.Latency;
+            SupervisionTimeout[index] = value.SupervisionTimeout;
+            Eddystone[index] = value.Eddystone;
+            CloudToken[index] = value.CloudToken;
+            Major[index] = value.Major;
+            Minor[index] = value.Minor;
+            Patch[index] = value.Patch;
+            param0[index] = value.param0;
+            param1[index] = value.param1;
+            NFCTag[index] = value.NFCTag;
+        }
+
+        ///<summary>
+        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
+        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
+        ///frequently than the UI updates
+        ///</summary>
+        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
+        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // Data values (properties) from characteristic Configuration Device Name
+        public ObservableCollection<string> Name { get; } = new ObservableCollection<string>();
+        // Data values (properties) from characteristic Advertising Parameter
+        public ObservableCollection<double> Interval { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> Timeout { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic Connection parameters
+        public ObservableCollection<double> MinInterval { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> MaxInterval { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> Latency { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> SupervisionTimeout { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic Eddystone URL
+        public ObservableCollection<string> Eddystone { get; } = new ObservableCollection<string>();
+        // Data values (properties) from characteristic Cloud Token
+        public ObservableCollection<byte[]> CloudToken { get; } = new ObservableCollection<byte[]>();
+        // Data values (properties) from characteristic Firmware Version
+        public ObservableCollection<double> Major { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> Minor { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> Patch { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic MTU Request
+        public ObservableCollection<double> param0 { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> param1 { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic NFC Tag
+        public ObservableCollection<string> NFCTag { get; } = new ObservableCollection<string>();
+        public ObservableCollection<Nordic_Thingy.Configuration_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Configuration_Data>();
     }
 
 }

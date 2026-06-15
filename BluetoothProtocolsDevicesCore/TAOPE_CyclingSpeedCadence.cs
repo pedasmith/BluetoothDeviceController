@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-06-13::09:31
+    /// This class was automatically generated 2026-06-15::11:34
     /// </summary>
 
     public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged
@@ -580,7 +580,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "CSC Measurement", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OOPT OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionWheel U16^1024_/|FIXED|TimeWheel| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionCrank U16^1024_/|FIXED|TimeCrank|");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionWheel U16^1024_/|FIXED|TimeWheel| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionCrank U16^1024_/|FIXED|TimeCrank|");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());

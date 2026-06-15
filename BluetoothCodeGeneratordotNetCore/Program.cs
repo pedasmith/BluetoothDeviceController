@@ -63,6 +63,13 @@ namespace BluetoothCodeGenerator
                             ndevicesNotOk++;
                             continue; // unusable is not an error; lots of devices are unusable.
                         }
+
+                        nameDevice.Services.RemoveAll(service => service.Suppress);
+                        foreach (var service in nameDevice.Services)
+                        {
+                            service.Characteristics.RemoveAll(characteristic => characteristic.Suppress);
+                        }
+
                         step = "convert";
                         outputList.Add(BtJsonToMacro.Convert(nameDevice));
                         step = "convert-complete";

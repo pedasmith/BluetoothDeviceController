@@ -46,6 +46,22 @@ namespace BluetoothCodeGenerator
             }
             return name;
         }
+
+        private static string ShortFormat(string format)
+        {
+            var firstchar = format.Substring(0, 1);
+            switch (firstchar)
+            {
+                case "/":
+                case "F":
+                case "I":
+                case "Q":
+                case "U":
+                    return firstchar;
+            }
+            return format;
+        }
+
         private static string ByteFormatToCSharp(string format)
         {
             switch (format)
@@ -92,20 +108,19 @@ namespace BluetoothCodeGenerator
         }
         private static string ByteFormatToGetNextCall(string format)
         {
-            switch (format)
+            var shortFormat = ShortFormat(format);
+            switch (shortFormat)
             {
                 case "":
-                case "BYTES": return "GetNextByteArray";
+                case "BYTES": 
+                    return "GetNextByteArray";
                 case "STRING": return "GetNextString";
-                case "I8": return "GetNextDouble";
-                case "U8": return "GetNextDouble";
-                case "I16": return "GetNextDouble";
-                case "U16": return "GetNextDouble";
-                case "I24": return "GetNextDouble";
-                case "U24": return "GetNextDouble";
-                case "I32": return "GetNextDouble";
-                case "U32": return "GetNextDouble";
-                case "F32": return "GetNextDouble";
+                case "/": 
+                case "Q": 
+                case "I": 
+                case "U": 
+                case "F": 
+                    return "GetNextDouble";
             }
             return $"GetNext_X82_UNKNOWN_TYPE_{format}";
 
@@ -141,24 +156,18 @@ namespace BluetoothCodeGenerator
 
         private static string ByteFormatToCSharpDefault(string format)
         {
-            switch (format)
+            var shortFormat = ShortFormat(format);
+            switch (shortFormat)
             {
-                case "F32": return "0.0";
-                case "F64": return "0.0";
-                case "I8": return "0";
-                case "U8": return "0";
-                case "I16": return "0";
-                case "U16": return "0";
-                case "I24": return "0";
-                case "U24": return "0";
-                case "I32": return "0";
-                case "U32": return "0";
+                case "/": 
+                case "F": 
+                case "Q": 
+                    return "0.0";
+                case "I": 
+                case "U": 
+                    return "0";
                 case "BYTES": return "null";
                 case "STRING": return "\"\"";
-            }
-            if (format.StartsWith("/") || format.StartsWith("Q"))
-            {
-                return "0.0";
             }
             Error($"ByteFormatToCSharpDefault: unknown format {format}");
             return $"OtherType{format}";

@@ -93,7 +93,7 @@ namespace BluetoothDeviceController.Names
             return null;
         }
 
-        public IList<NameCharacteristic> Characteristics { get; } = new List<NameCharacteristic>();
+        public List<NameCharacteristic> Characteristics { get; } = new List<NameCharacteristic>();
 
 
         public IList<string> DataGroupNames

@@ -19,7 +19,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
     /// <summary>
     /// .
-    /// This code was automatically generated 2026-06-13::09:31
+    /// This code was automatically generated 2026-06-15::11:34
     /// </summary>
 
     ///<summary>
