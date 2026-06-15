@@ -6,6 +6,8 @@
       "Name": "BK6",
       "ClassName": "TAOPE_CyclingSpeedCadence",
       "CompletionStatus": 0,
+      "Links": [
+      ],
 
       "IgnoredServices": [
         {
