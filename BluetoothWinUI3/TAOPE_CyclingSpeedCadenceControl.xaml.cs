@@ -522,13 +522,25 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         }
     }
 
-    double StartingTimeWheel = 0.0;
-    double LastTimeWheel = 0.0;
+    double LastTimeWheel = -1.0;
     double LastRevolutionWheel = 0.0;
 
-    double StartingTimeCrank = 0.0;
     double LastTimeCrank = 0.0;
     double LastRevolutionCrank = 0.0;
+
+    private string CadenceFlagsToString(int ssflags)
+    {
+        var retval = "";
+        if ((ssflags & 0x01) != 0)
+        {
+            retval += "Wheel ";
+        }
+        if ((ssflags & 0x02) != 0)
+        {
+            retval += "Crank " ;
+        }
+        return retval.TrimEnd();
+    }
 
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
@@ -558,39 +570,60 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         {
             case TAOPE_CyclingSpeedCadence.CSC_MeasurementPropertyChangedName:
 
-                var flags = "";
-                if (((int)CurrSpeed_and_Cadence_Data.Flags & 0x01) != 0)
-                {
-                    flags += "Wheel";
-                }
-                if (((int)CurrSpeed_and_Cadence_Data.Flags & 0x02) != 0)
-                {
-                    flags += "Crank";
-                }
+                var iflags = (int)CurrSpeed_and_Cadence_Data.Flags;
+                var flags = CadenceFlagsToString(iflags);
                 uiFlags.Text = flags;
-
-                if (StartingTimeWheel == 0.0)
+                if ((iflags & 0x01) != 0) // Has wheel data
                 {
-                    StartingTimeWheel = CurrSpeed_and_Cadence_Data.TimeWheel;
+                    // The time values are just U16 in 1024th (2^^10) of a second. That means they
+                    // roll over in 2^^6 seconds = 64 seconds!
+                    if (LastTimeWheel == -1.0)
+                    {
+                        LastTimeWheel = CurrSpeed_and_Cadence_Data.TimeWheel;
+                    }
+                    else
+                    {
+                        var deltaTimeWheel = CurrSpeed_and_Cadence_Data.TimeWheel - LastTimeWheel;
+                        if (deltaTimeWheel < 0) deltaTimeWheel += 64.00; // rollover is exactly every 64 seconds
+                        uiTimeWheel.Text = deltaTimeWheel.ToString("F3"); // Time is in seconds
+
+                        var deltaRevolutionWheel = CurrSpeed_and_Cadence_Data.RevolutionWheel - LastRevolutionWheel;
+                        var rps = deltaRevolutionWheel * (1.0 / deltaTimeWheel);
+                        uiRpsWheel.Text = double.IsNaN(rps) ? "--" : rps.ToString("F1"); // Time is in seconds
+
+                        LastTimeWheel = CurrSpeed_and_Cadence_Data.TimeWheel;
+                    }
+                    uiRevolutionWheel.Text = CurrSpeed_and_Cadence_Data.RevolutionWheel.ToString("F0");
+                    LastRevolutionWheel = CurrSpeed_and_Cadence_Data.RevolutionWheel;
                 }
-                else
+
+                if ((iflags & 0x02) != 0) // Has crank data
                 {
-                    var currTimeA = CurrSpeed_and_Cadence_Data.TimeWheel - StartingTimeWheel;
-                    var instananeousTimeA = currTimeA - LastTimeWheel; // Seconds since the last report.
-                    uiTimeWheel.Text = currTimeA.ToString("F3"); // Time is in seconds
 
-                    //
-                    // Calculate some instantanous values
-                    //
-                    var instantaneousRevolutionA = LastRevolutionWheel - CurrSpeed_and_Cadence_Data.RevolutionWheel;
-                    var rps = instantaneousRevolutionA * (1.0 / instananeousTimeA);
-                    uiRpsWheel.Text = rps.ToString("F0"); // Time is in seconds
+                    // Same thing, but for the crank. The crank revolutions rolls over at 2^^16
+                    if (LastTimeCrank == -1.0)
+                    {
+                        LastTimeCrank = CurrSpeed_and_Cadence_Data.TimeCrank;
+                    }
+                    else
+                    {
+                        var deltaTimeCrank = CurrSpeed_and_Cadence_Data.TimeCrank - LastTimeCrank;
+                        if (deltaTimeCrank < 0) deltaTimeCrank += 64.00; // rollover is exactly every 64 seconds
+                        uiTimeCrank.Text = deltaTimeCrank.ToString("F3"); // Time is in seconds
 
-                    LastTimeWheel = currTimeA;
+                        var deltaRevolutionCrank = CurrSpeed_and_Cadence_Data.RevolutionCrank - LastRevolutionCrank;
+                        if (deltaRevolutionCrank < 0)
+                        {
+                            deltaRevolutionCrank += Math.Pow(2, 16);
+                        }
+                        var rps = deltaRevolutionCrank * (1.0 / deltaTimeCrank);
+                        uiRpsCrank.Text = double.IsNaN(rps) ? "--" : rps.ToString("F1"); // Time is in seconds
+
+                        LastTimeCrank = CurrSpeed_and_Cadence_Data.TimeCrank;
+                    }
+                    uiRevolutionCrank.Text = CurrSpeed_and_Cadence_Data.RevolutionCrank.ToString("F0");
+                    LastRevolutionCrank = CurrSpeed_and_Cadence_Data.RevolutionCrank;
                 }
-                uiRevolutionWheel.Text = CurrSpeed_and_Cadence_Data.RevolutionWheel.ToString("F0");
-                LastRevolutionWheel = CurrSpeed_and_Cadence_Data.RevolutionWheel;
-
 
                 var deltaInSeconds = CurrSpeed_and_Cadence_Data.TimestampMostRecent.Subtract(HistoricalSpeed_and_Cadence_DataUnits.TimestampMostRecentAdd).TotalSeconds;
                 var verb = (deltaInSeconds > 5) ? Cycling_Speed_and_Cadence_DataCollection.Verb.Add : Cycling_Speed_and_Cadence_DataCollection.Verb.ReplaceMostRecent;
