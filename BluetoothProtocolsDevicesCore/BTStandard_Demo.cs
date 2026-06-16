@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This class was automatically generated 2026-06-16::11:17
+    /// This class was automatically generated 2026-06-16::12:34
     /// </summary>
 
     public  class BTStandard_Demo : INotifyPropertyChanged
@@ -54,6 +54,159 @@ namespace BluetoothProtocols
         public const string Device_NamePropertyChangedName = "Device_Name";
         public const string Connection_ParameterPropertyChangedName = "Connection_Parameter";
         public const string BatteryLevelPropertyChangedName = "BatteryLevel";
+
+
+
+        //
+        // All services / characteristics data types 
+        //
+
+        #region All_Data_Types
+        /// <summary>
+        /// Data from all of the characteristics in the Common Configuration Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Common_Configuration_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private string _Device_Name = "";
+            /// <summary>
+            /// From Common Configuration and Device Name
+            ///</summary>
+            public string Device_Name 
+            { 
+                get { return _Device_Name; }
+                set { if (value == _Device_Name) return; _Device_Name = value; OnPropertyChanged();}
+            }
+            private double _Interval_Min = 0;
+            /// <summary>
+            /// From Common Configuration and Connection Parameter
+            ///</summary>
+            public double Interval_Min 
+            { 
+                get { return _Interval_Min; }
+                set { if (value == _Interval_Min) return; _Interval_Min = value; OnPropertyChanged();}
+            } 
+            private double _Interval_Max = 0;
+            /// <summary>
+            /// From Common Configuration and Connection Parameter
+            ///</summary>
+            public double Interval_Max 
+            { 
+                get { return _Interval_Max; }
+                set { if (value == _Interval_Max) return; _Interval_Max = value; OnPropertyChanged();}
+            } 
+            private double _Latency = 0;
+            /// <summary>
+            /// From Common Configuration and Connection Parameter
+            ///</summary>
+            public double Latency 
+            { 
+                get { return _Latency; }
+                set { if (value == _Latency) return; _Latency = value; OnPropertyChanged();}
+            } 
+            private double _Timeout = 0;
+            /// <summary>
+            /// From Common Configuration and Connection Parameter
+            ///</summary>
+            public double Timeout 
+            { 
+                get { return _Timeout; }
+                set { if (value == _Timeout) return; _Timeout = value; OnPropertyChanged();}
+            }
+            public Common_Configuration_Data Clone()
+            {
+                return this.MemberwiseClone() as Common_Configuration_Data;
+            }
+
+            public void CopyFrom(Common_Configuration_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Device_Name = value.Device_Name;
+                this.Interval_Min = value.Interval_Min;
+                this.Interval_Max = value.Interval_Max;
+                this.Latency = value.Latency;
+                this.Timeout = value.Timeout;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Device_Name", "Interval_Min", "Interval_Max", "Latency", "Timeout"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Device_Name);
+                exporter.CellSet(Interval_Min);
+                exporter.CellSet(Interval_Max);
+                exporter.CellSet(Latency);
+                exporter.CellSet(Timeout);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Device_Name} {Interval_Min} {Interval_Max} {Latency} {Timeout}");
+            }
+        }
+//
+        /// <summary>
+        /// Data from all of the characteristics in the Battery Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Battery_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private double _BatteryLevel = 0;
+            /// <summary>
+            /// From Battery and BatteryLevel
+            ///</summary>
+            public double BatteryLevel 
+            { 
+                get { return _BatteryLevel; }
+                set { if (value == _BatteryLevel) return; _BatteryLevel = value; OnPropertyChanged();}
+            }
+            public Battery_Data Clone()
+            {
+                return this.MemberwiseClone() as Battery_Data;
+            }
+
+            public void CopyFrom(Battery_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.BatteryLevel = value.BatteryLevel;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "BatteryLevel"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(BatteryLevel);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {BatteryLevel}");
+            }
+        }
+//
+
+
+        #endregion
 
 
         /// <summary>
@@ -230,114 +383,13 @@ namespace BluetoothProtocols
 
 
         //
-        // All services / characteristics and data structures
+        // All services / characteristics methods. 
         //
 
 
         #region Service_Common_Configuration
         // Service Common Configuration 
-        /// <summary>
-        /// Data from all of the characteristics in the Common Configuration Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Common_Configuration_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private string _Device_Name = "";
-            public string Device_Name 
-            { 
-                get { return _Device_Name; }
-                set 
-                    { 
-                        if (value == _Device_Name) return; 
-                        _Device_Name = value;
-                        OnPropertyChanged();
-                    }
-            } // From Common Configuration and Device Name
-            private double _Interval_Min = 0;
-            public double Interval_Min 
-            { 
-                get { return _Interval_Min; }
-                set 
-                    { 
-                        if (value == _Interval_Min) return; 
-                        _Interval_Min = value;
-                        OnPropertyChanged();
-                    }
-            } // From Common Configuration and Connection Parameter
-            private double _Interval_Max = 0;
-            public double Interval_Max 
-            { 
-                get { return _Interval_Max; }
-                set 
-                    { 
-                        if (value == _Interval_Max) return; 
-                        _Interval_Max = value;
-                        OnPropertyChanged();
-                    }
-            } // From Common Configuration and Connection Parameter
-            private double _Latency = 0;
-            public double Latency 
-            { 
-                get { return _Latency; }
-                set 
-                    { 
-                        if (value == _Latency) return; 
-                        _Latency = value;
-                        OnPropertyChanged();
-                    }
-            } // From Common Configuration and Connection Parameter
-            private double _Timeout = 0;
-            public double Timeout 
-            { 
-                get { return _Timeout; }
-                set 
-                    { 
-                        if (value == _Timeout) return; 
-                        _Timeout = value;
-                        OnPropertyChanged();
-                    }
-            } // From Common Configuration and Connection Parameter
-            public Common_Configuration_Data Clone()
-            {
-                return this.MemberwiseClone() as Common_Configuration_Data;
-            }
 
-            public void CopyFrom(Common_Configuration_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Device_Name = value.Device_Name;
-                this.Interval_Min = value.Interval_Min;
-                this.Interval_Max = value.Interval_Max;
-                this.Latency = value.Latency;
-                this.Timeout = value.Timeout;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "Device_Name", "Interval_Min", "Interval_Max", "Latency", "Timeout"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Device_Name);
-                exporter.CellSet(Interval_Min);
-                exporter.CellSet(Interval_Max);
-                exporter.CellSet(Latency);
-                exporter.CellSet(Timeout);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Device_Name} {Interval_Min} {Interval_Max} {Latency} {Timeout}");
-            }
-        }
         public Common_Configuration_Data CurrCommon_Configuration_Data { get; set; } = new Common_Configuration_Data();
 
         // Per-characteristics methods for Common_Configuration Device_Name
@@ -451,56 +503,7 @@ namespace BluetoothProtocols
 //
         #region Service_Battery
         // Service Battery 
-        /// <summary>
-        /// Data from all of the characteristics in the Battery Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Battery_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private double _BatteryLevel = 0;
-            public double BatteryLevel 
-            { 
-                get { return _BatteryLevel; }
-                set 
-                    { 
-                        if (value == _BatteryLevel) return; 
-                        _BatteryLevel = value;
-                        OnPropertyChanged();
-                    }
-            } // From Battery and BatteryLevel
-            public Battery_Data Clone()
-            {
-                return this.MemberwiseClone() as Battery_Data;
-            }
 
-            public void CopyFrom(Battery_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.BatteryLevel = value.BatteryLevel;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "BatteryLevel"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(BatteryLevel);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {BatteryLevel}");
-            }
-        }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
 
         // Per-characteristics methods for Battery BatteryLevel

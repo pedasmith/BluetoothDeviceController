@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-06-16::11:17
+    /// This class was automatically generated 2026-06-16::12:34
     /// </summary>
 
     public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged
@@ -86,6 +86,378 @@ namespace BluetoothProtocols
         public const string Firmware_Revision_StringPropertyChangedName = "Firmware_Revision_String";
         public const string Software_Revision_StringPropertyChangedName = "Software_Revision_String";
         public const string System_IDPropertyChangedName = "System_ID";
+
+
+
+        //
+        // All services / characteristics data types 
+        //
+
+        #region All_Data_Types
+        /// <summary>
+        /// Data from all of the characteristics in the Cycling Speed and Cadence Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Cycling_Speed_and_Cadence_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private double _Flags = 0;
+            /// <summary>
+            /// From Cycling Speed and Cadence and CSC Measurement
+            ///</summary>
+            public double Flags 
+            { 
+                get { return _Flags; }
+                set { if (value == _Flags) return; _Flags = value; OnPropertyChanged();}
+            } 
+            private double _RevolutionWheel = 0;
+            /// <summary>
+            /// From Cycling Speed and Cadence and CSC Measurement
+            ///</summary>
+            public double RevolutionWheel 
+            { 
+                get { return _RevolutionWheel; }
+                set { if (value == _RevolutionWheel) return; _RevolutionWheel = value; OnPropertyChanged();}
+            } 
+            private double _TimeWheel = 0;
+            /// <summary>
+            /// From Cycling Speed and Cadence and CSC Measurement
+            ///</summary>
+            public double TimeWheel 
+            { 
+                get { return _TimeWheel; }
+                set { if (value == _TimeWheel) return; _TimeWheel = value; OnPropertyChanged();}
+            } 
+            private double _RevolutionCrank = 0;
+            /// <summary>
+            /// From Cycling Speed and Cadence and CSC Measurement
+            ///</summary>
+            public double RevolutionCrank 
+            { 
+                get { return _RevolutionCrank; }
+                set { if (value == _RevolutionCrank) return; _RevolutionCrank = value; OnPropertyChanged();}
+            } 
+            private double _TimeCrank = 0;
+            /// <summary>
+            /// From Cycling Speed and Cadence and CSC Measurement
+            ///</summary>
+            public double TimeCrank 
+            { 
+                get { return _TimeCrank; }
+                set { if (value == _TimeCrank) return; _TimeCrank = value; OnPropertyChanged();}
+            }
+            private double _FeatureFlags = 0;
+            /// <summary>
+            /// From Cycling Speed and Cadence and CSC Feature
+            ///</summary>
+            public double FeatureFlags 
+            { 
+                get { return _FeatureFlags; }
+                set { if (value == _FeatureFlags) return; _FeatureFlags = value; OnPropertyChanged();}
+            }
+            private double _SensorLocation = 0;
+            /// <summary>
+            /// From Cycling Speed and Cadence and Sensor Location
+            ///</summary>
+            public double SensorLocation 
+            { 
+                get { return _SensorLocation; }
+                set { if (value == _SensorLocation) return; _SensorLocation = value; OnPropertyChanged();}
+            }
+            private byte[] _Unknown3 = null;
+            /// <summary>
+            /// From Cycling Speed and Cadence and SC Control Point
+            ///</summary>
+            public byte[] Unknown3 
+            { 
+                get { return _Unknown3; }
+                set { if (value == _Unknown3) return; _Unknown3 = value; OnPropertyChanged();}
+            }
+            public Cycling_Speed_and_Cadence_Data Clone()
+            {
+                return this.MemberwiseClone() as Cycling_Speed_and_Cadence_Data;
+            }
+
+            public void CopyFrom(Cycling_Speed_and_Cadence_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Flags = value.Flags;
+                this.RevolutionWheel = value.RevolutionWheel;
+                this.TimeWheel = value.TimeWheel;
+                this.RevolutionCrank = value.RevolutionCrank;
+                this.TimeCrank = value.TimeCrank;
+                this.FeatureFlags = value.FeatureFlags;
+                this.SensorLocation = value.SensorLocation;
+                this.Unknown3 = value.Unknown3;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Flags", "RevolutionWheel", "TimeWheel", "RevolutionCrank", "TimeCrank", "FeatureFlags", "SensorLocation", "Unknown3"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Flags);
+                exporter.CellSet(RevolutionWheel);
+                exporter.CellSet(TimeWheel);
+                exporter.CellSet(RevolutionCrank);
+                exporter.CellSet(TimeCrank);
+                exporter.CellSet(FeatureFlags);
+                exporter.CellSet(SensorLocation);
+                exporter.CellSet(Unknown3);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Flags} {RevolutionWheel} {TimeWheel} {RevolutionCrank} {TimeCrank} {FeatureFlags} {SensorLocation} {Unknown3}");
+            }
+        }
+//
+        /// <summary>
+        /// Data from all of the characteristics in the Service_FD00 Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Service_FD00_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private byte[] _Unknown0 = null;
+            /// <summary>
+            /// From Service_FD00 and FD09
+            ///</summary>
+            public byte[] Unknown0 
+            { 
+                get { return _Unknown0; }
+                set { if (value == _Unknown0) return; _Unknown0 = value; OnPropertyChanged();}
+            }
+            private byte[] _Unknown1 = null;
+            /// <summary>
+            /// From Service_FD00 and FD0A
+            ///</summary>
+            public byte[] Unknown1 
+            { 
+                get { return _Unknown1; }
+                set { if (value == _Unknown1) return; _Unknown1 = value; OnPropertyChanged();}
+            }
+            private byte[] _Unknown2 = null;
+            /// <summary>
+            /// From Service_FD00 and FD19
+            ///</summary>
+            public byte[] Unknown2 
+            { 
+                get { return _Unknown2; }
+                set { if (value == _Unknown2) return; _Unknown2 = value; OnPropertyChanged();}
+            }
+            private byte[] _Unknown3 = null;
+            /// <summary>
+            /// From Service_FD00 and FD1A
+            ///</summary>
+            public byte[] Unknown3 
+            { 
+                get { return _Unknown3; }
+                set { if (value == _Unknown3) return; _Unknown3 = value; OnPropertyChanged();}
+            }
+            public Service_FD00_Data Clone()
+            {
+                return this.MemberwiseClone() as Service_FD00_Data;
+            }
+
+            public void CopyFrom(Service_FD00_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Unknown0 = value.Unknown0;
+                this.Unknown1 = value.Unknown1;
+                this.Unknown2 = value.Unknown2;
+                this.Unknown3 = value.Unknown3;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Unknown0", "Unknown1", "Unknown2", "Unknown3"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Unknown0);
+                exporter.CellSet(Unknown1);
+                exporter.CellSet(Unknown2);
+                exporter.CellSet(Unknown3);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Unknown0} {Unknown1} {Unknown2} {Unknown3}");
+            }
+        }
+//
+        /// <summary>
+        /// Data from all of the characteristics in the Battery Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Battery_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private byte[] _Unknown0 = null;
+            /// <summary>
+            /// From Battery and Battery Level
+            ///</summary>
+            public byte[] Unknown0 
+            { 
+                get { return _Unknown0; }
+                set { if (value == _Unknown0) return; _Unknown0 = value; OnPropertyChanged();}
+            }
+            public Battery_Data Clone()
+            {
+                return this.MemberwiseClone() as Battery_Data;
+            }
+
+            public void CopyFrom(Battery_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Unknown0 = value.Unknown0;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Unknown0"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Unknown0);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Unknown0}");
+            }
+        }
+//
+        /// <summary>
+        /// Data from all of the characteristics in the Device Information Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Device_Information_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private string _Manufacturer = "";
+            /// <summary>
+            /// From Device Information and Manufacturer Name String
+            ///</summary>
+            public string Manufacturer 
+            { 
+                get { return _Manufacturer; }
+                set { if (value == _Manufacturer) return; _Manufacturer = value; OnPropertyChanged();}
+            }
+            private string _ModelNumber = "";
+            /// <summary>
+            /// From Device Information and Model Number String
+            ///</summary>
+            public string ModelNumber 
+            { 
+                get { return _ModelNumber; }
+                set { if (value == _ModelNumber) return; _ModelNumber = value; OnPropertyChanged();}
+            }
+            private string _HardwareRevision = "";
+            /// <summary>
+            /// From Device Information and Hardware Revision String
+            ///</summary>
+            public string HardwareRevision 
+            { 
+                get { return _HardwareRevision; }
+                set { if (value == _HardwareRevision) return; _HardwareRevision = value; OnPropertyChanged();}
+            }
+            private string _FirmwareRevision = "";
+            /// <summary>
+            /// From Device Information and Firmware Revision String
+            ///</summary>
+            public string FirmwareRevision 
+            { 
+                get { return _FirmwareRevision; }
+                set { if (value == _FirmwareRevision) return; _FirmwareRevision = value; OnPropertyChanged();}
+            }
+            private string _SoftwareRevision = "";
+            /// <summary>
+            /// From Device Information and Software Revision String
+            ///</summary>
+            public string SoftwareRevision 
+            { 
+                get { return _SoftwareRevision; }
+                set { if (value == _SoftwareRevision) return; _SoftwareRevision = value; OnPropertyChanged();}
+            }
+            private byte[] _SystemID = null;
+            /// <summary>
+            /// From Device Information and System ID
+            ///</summary>
+            public byte[] SystemID 
+            { 
+                get { return _SystemID; }
+                set { if (value == _SystemID) return; _SystemID = value; OnPropertyChanged();}
+            }
+            public Device_Information_Data Clone()
+            {
+                return this.MemberwiseClone() as Device_Information_Data;
+            }
+
+            public void CopyFrom(Device_Information_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Manufacturer = value.Manufacturer;
+                this.ModelNumber = value.ModelNumber;
+                this.HardwareRevision = value.HardwareRevision;
+                this.FirmwareRevision = value.FirmwareRevision;
+                this.SoftwareRevision = value.SoftwareRevision;
+                this.SystemID = value.SystemID;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Manufacturer", "ModelNumber", "HardwareRevision", "FirmwareRevision", "SoftwareRevision", "SystemID"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Manufacturer);
+                exporter.CellSet(ModelNumber);
+                exporter.CellSet(HardwareRevision);
+                exporter.CellSet(FirmwareRevision);
+                exporter.CellSet(SoftwareRevision);
+                exporter.CellSet(SystemID);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Manufacturer} {ModelNumber} {HardwareRevision} {FirmwareRevision} {SoftwareRevision} {SystemID}");
+            }
+        }
+//
+
+
+        #endregion
 
 
         /// <summary>
@@ -290,153 +662,13 @@ namespace BluetoothProtocols
 
 
         //
-        // All services / characteristics and data structures
+        // All services / characteristics methods. 
         //
 
 
         #region Service_Cycling_Speed_and_Cadence
         // Service Cycling Speed and Cadence 
-        /// <summary>
-        /// Data from all of the characteristics in the Cycling Speed and Cadence Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Cycling_Speed_and_Cadence_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private double _Flags = 0;
-            public double Flags 
-            { 
-                get { return _Flags; }
-                set 
-                    { 
-                        if (value == _Flags) return; 
-                        _Flags = value;
-                        OnPropertyChanged();
-                    }
-            } // From Cycling Speed and Cadence and CSC Measurement
-            private double _RevolutionWheel = 0;
-            public double RevolutionWheel 
-            { 
-                get { return _RevolutionWheel; }
-                set 
-                    { 
-                        if (value == _RevolutionWheel) return; 
-                        _RevolutionWheel = value;
-                        OnPropertyChanged();
-                    }
-            } // From Cycling Speed and Cadence and CSC Measurement
-            private double _TimeWheel = 0;
-            public double TimeWheel 
-            { 
-                get { return _TimeWheel; }
-                set 
-                    { 
-                        if (value == _TimeWheel) return; 
-                        _TimeWheel = value;
-                        OnPropertyChanged();
-                    }
-            } // From Cycling Speed and Cadence and CSC Measurement
-            private double _RevolutionCrank = 0;
-            public double RevolutionCrank 
-            { 
-                get { return _RevolutionCrank; }
-                set 
-                    { 
-                        if (value == _RevolutionCrank) return; 
-                        _RevolutionCrank = value;
-                        OnPropertyChanged();
-                    }
-            } // From Cycling Speed and Cadence and CSC Measurement
-            private double _TimeCrank = 0;
-            public double TimeCrank 
-            { 
-                get { return _TimeCrank; }
-                set 
-                    { 
-                        if (value == _TimeCrank) return; 
-                        _TimeCrank = value;
-                        OnPropertyChanged();
-                    }
-            } // From Cycling Speed and Cadence and CSC Measurement
-            private double _FeatureFlags = 0;
-            public double FeatureFlags 
-            { 
-                get { return _FeatureFlags; }
-                set 
-                    { 
-                        if (value == _FeatureFlags) return; 
-                        _FeatureFlags = value;
-                        OnPropertyChanged();
-                    }
-            } // From Cycling Speed and Cadence and CSC Feature
-            private double _SensorLocation = 0;
-            public double SensorLocation 
-            { 
-                get { return _SensorLocation; }
-                set 
-                    { 
-                        if (value == _SensorLocation) return; 
-                        _SensorLocation = value;
-                        OnPropertyChanged();
-                    }
-            } // From Cycling Speed and Cadence and Sensor Location
-            private byte[] _Unknown3 = null;
-            public byte[] Unknown3 
-            { 
-                get { return _Unknown3; }
-                set 
-                    { 
-                        if (value == _Unknown3) return; 
-                        _Unknown3 = value;
-                        OnPropertyChanged();
-                    }
-            } // From Cycling Speed and Cadence and SC Control Point
-            public Cycling_Speed_and_Cadence_Data Clone()
-            {
-                return this.MemberwiseClone() as Cycling_Speed_and_Cadence_Data;
-            }
 
-            public void CopyFrom(Cycling_Speed_and_Cadence_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Flags = value.Flags;
-                this.RevolutionWheel = value.RevolutionWheel;
-                this.TimeWheel = value.TimeWheel;
-                this.RevolutionCrank = value.RevolutionCrank;
-                this.TimeCrank = value.TimeCrank;
-                this.FeatureFlags = value.FeatureFlags;
-                this.SensorLocation = value.SensorLocation;
-                this.Unknown3 = value.Unknown3;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "Flags", "RevolutionWheel", "TimeWheel", "RevolutionCrank", "TimeCrank", "FeatureFlags", "SensorLocation", "Unknown3"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Flags);
-                exporter.CellSet(RevolutionWheel);
-                exporter.CellSet(TimeWheel);
-                exporter.CellSet(RevolutionCrank);
-                exporter.CellSet(TimeCrank);
-                exporter.CellSet(FeatureFlags);
-                exporter.CellSet(SensorLocation);
-                exporter.CellSet(Unknown3);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Flags} {RevolutionWheel} {TimeWheel} {RevolutionCrank} {TimeCrank} {FeatureFlags} {SensorLocation} {Unknown3}");
-            }
-        }
         public Cycling_Speed_and_Cadence_Data CurrCycling_Speed_and_Cadence_Data { get; set; } = new Cycling_Speed_and_Cadence_Data();
 
         // Per-characteristics methods for Cycling_Speed_and_Cadence CSC_Measurement
@@ -652,95 +884,7 @@ namespace BluetoothProtocols
 //
         #region Service_Service_FD00
         // Service Service_FD00 
-        /// <summary>
-        /// Data from all of the characteristics in the Service_FD00 Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Service_FD00_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private byte[] _Unknown0 = null;
-            public byte[] Unknown0 
-            { 
-                get { return _Unknown0; }
-                set 
-                    { 
-                        if (value == _Unknown0) return; 
-                        _Unknown0 = value;
-                        OnPropertyChanged();
-                    }
-            } // From Service_FD00 and FD09
-            private byte[] _Unknown1 = null;
-            public byte[] Unknown1 
-            { 
-                get { return _Unknown1; }
-                set 
-                    { 
-                        if (value == _Unknown1) return; 
-                        _Unknown1 = value;
-                        OnPropertyChanged();
-                    }
-            } // From Service_FD00 and FD0A
-            private byte[] _Unknown2 = null;
-            public byte[] Unknown2 
-            { 
-                get { return _Unknown2; }
-                set 
-                    { 
-                        if (value == _Unknown2) return; 
-                        _Unknown2 = value;
-                        OnPropertyChanged();
-                    }
-            } // From Service_FD00 and FD19
-            private byte[] _Unknown3 = null;
-            public byte[] Unknown3 
-            { 
-                get { return _Unknown3; }
-                set 
-                    { 
-                        if (value == _Unknown3) return; 
-                        _Unknown3 = value;
-                        OnPropertyChanged();
-                    }
-            } // From Service_FD00 and FD1A
-            public Service_FD00_Data Clone()
-            {
-                return this.MemberwiseClone() as Service_FD00_Data;
-            }
 
-            public void CopyFrom(Service_FD00_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Unknown0 = value.Unknown0;
-                this.Unknown1 = value.Unknown1;
-                this.Unknown2 = value.Unknown2;
-                this.Unknown3 = value.Unknown3;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "Unknown0", "Unknown1", "Unknown2", "Unknown3"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Unknown0);
-                exporter.CellSet(Unknown1);
-                exporter.CellSet(Unknown2);
-                exporter.CellSet(Unknown3);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Unknown0} {Unknown1} {Unknown2} {Unknown3}");
-            }
-        }
         public Service_FD00_Data CurrService_FD00_Data { get; set; } = new Service_FD00_Data();
 
         // Per-characteristics methods for Service_FD00 FD09
@@ -948,56 +1092,7 @@ namespace BluetoothProtocols
 //
         #region Service_Battery
         // Service Battery 
-        /// <summary>
-        /// Data from all of the characteristics in the Battery Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Battery_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private byte[] _Unknown0 = null;
-            public byte[] Unknown0 
-            { 
-                get { return _Unknown0; }
-                set 
-                    { 
-                        if (value == _Unknown0) return; 
-                        _Unknown0 = value;
-                        OnPropertyChanged();
-                    }
-            } // From Battery and Battery Level
-            public Battery_Data Clone()
-            {
-                return this.MemberwiseClone() as Battery_Data;
-            }
 
-            public void CopyFrom(Battery_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Unknown0 = value.Unknown0;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "Unknown0"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Unknown0);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Unknown0}");
-            }
-        }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
 
         // Per-characteristics methods for Battery Battery_Level
@@ -1055,121 +1150,7 @@ namespace BluetoothProtocols
 //
         #region Service_Device_Information
         // Service Device Information 
-        /// <summary>
-        /// Data from all of the characteristics in the Device Information Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Device_Information_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private string _Manufacturer = "";
-            public string Manufacturer 
-            { 
-                get { return _Manufacturer; }
-                set 
-                    { 
-                        if (value == _Manufacturer) return; 
-                        _Manufacturer = value;
-                        OnPropertyChanged();
-                    }
-            } // From Device Information and Manufacturer Name String
-            private string _ModelNumber = "";
-            public string ModelNumber 
-            { 
-                get { return _ModelNumber; }
-                set 
-                    { 
-                        if (value == _ModelNumber) return; 
-                        _ModelNumber = value;
-                        OnPropertyChanged();
-                    }
-            } // From Device Information and Model Number String
-            private string _HardwareRevision = "";
-            public string HardwareRevision 
-            { 
-                get { return _HardwareRevision; }
-                set 
-                    { 
-                        if (value == _HardwareRevision) return; 
-                        _HardwareRevision = value;
-                        OnPropertyChanged();
-                    }
-            } // From Device Information and Hardware Revision String
-            private string _FirmwareRevision = "";
-            public string FirmwareRevision 
-            { 
-                get { return _FirmwareRevision; }
-                set 
-                    { 
-                        if (value == _FirmwareRevision) return; 
-                        _FirmwareRevision = value;
-                        OnPropertyChanged();
-                    }
-            } // From Device Information and Firmware Revision String
-            private string _SoftwareRevision = "";
-            public string SoftwareRevision 
-            { 
-                get { return _SoftwareRevision; }
-                set 
-                    { 
-                        if (value == _SoftwareRevision) return; 
-                        _SoftwareRevision = value;
-                        OnPropertyChanged();
-                    }
-            } // From Device Information and Software Revision String
-            private byte[] _SystemID = null;
-            public byte[] SystemID 
-            { 
-                get { return _SystemID; }
-                set 
-                    { 
-                        if (value == _SystemID) return; 
-                        _SystemID = value;
-                        OnPropertyChanged();
-                    }
-            } // From Device Information and System ID
-            public Device_Information_Data Clone()
-            {
-                return this.MemberwiseClone() as Device_Information_Data;
-            }
 
-            public void CopyFrom(Device_Information_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Manufacturer = value.Manufacturer;
-                this.ModelNumber = value.ModelNumber;
-                this.HardwareRevision = value.HardwareRevision;
-                this.FirmwareRevision = value.FirmwareRevision;
-                this.SoftwareRevision = value.SoftwareRevision;
-                this.SystemID = value.SystemID;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "Manufacturer", "ModelNumber", "HardwareRevision", "FirmwareRevision", "SoftwareRevision", "SystemID"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Manufacturer);
-                exporter.CellSet(ModelNumber);
-                exporter.CellSet(HardwareRevision);
-                exporter.CellSet(FirmwareRevision);
-                exporter.CellSet(SoftwareRevision);
-                exporter.CellSet(SystemID);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Manufacturer} {ModelNumber} {HardwareRevision} {FirmwareRevision} {SoftwareRevision} {SystemID}");
-            }
-        }
         public Device_Information_Data CurrDevice_Information_Data { get; set; } = new Device_Information_Data();
 
         // Per-characteristics methods for Device_Information Manufacturer_Name_String

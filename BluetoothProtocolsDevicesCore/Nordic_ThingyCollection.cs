@@ -19,7 +19,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This code was automatically generated 2026-06-16::11:17
+    /// This code was automatically generated 2026-06-16::12:34
     /// </summary>
 
     ///<summary>
@@ -431,7 +431,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
             Data.Add (value.Clone());
             Timestamps.Add (value.TimestampMostRecent);
             TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            Name.Add (value.Name);
+            DeviceName.Add (value.DeviceName);
             Interval.Add (value.Interval);
             Timeout.Add (value.Timeout);
             MinInterval.Add (value.MinInterval);
@@ -452,7 +452,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            Name[index] = value.Name;
+            DeviceName[index] = value.DeviceName;
             Interval[index] = value.Interval;
             Timeout[index] = value.Timeout;
             MinInterval[index] = value.MinInterval;
@@ -478,7 +478,7 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
         public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
         // Data values (properties) from characteristic Configuration Device Name
-        public ObservableCollection<string> Name { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> DeviceName { get; } = new ObservableCollection<string>();
         // Data values (properties) from characteristic Advertising Parameter
         public ObservableCollection<double> Interval { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> Timeout { get; } = new ObservableCollection<double>();

@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-06-16::11:17
+    /// This class was automatically generated 2026-06-16::12:34
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -74,7 +74,7 @@ namespace BluetoothProtocols
 
         Configuration service Guid=ef680100-9b35-4933-9b10-52ffa9740042
             Configuration_Data (DataGroup record)
-                Configuration Device Name characteristic has Name (String-->string)  Guid=ef680101-9b35-4933-9b10-52ffa9740042
+                Configuration Device Name characteristic has DeviceName (String-->string)  Guid=ef680101-9b35-4933-9b10-52ffa9740042
                 Advertising Parameter characteristic has Interval (UInt16-->double) Timeout (Byte-->double)  Guid=ef680102-9b35-4933-9b10-52ffa9740042
                 Connection parameters characteristic has MinInterval (UInt16-->double) MaxInterval (UInt16-->double) Latency (UInt16-->double) SupervisionTimeout (UInt16-->double)  Guid=ef680104-9b35-4933-9b10-52ffa9740042
                 Eddystone URL characteristic has Eddystone (String-->string)  Guid=ef680105-9b35-4933-9b10-52ffa9740042
@@ -104,6 +104,710 @@ namespace BluetoothProtocols
         public const string Firmware_VersionPropertyChangedName = "Firmware_Version";
         public const string MTU_RequestPropertyChangedName = "MTU_Request";
         public const string NFC_TagPropertyChangedName = "NFC_Tag";
+
+
+
+        //
+        // All services / characteristics data types 
+        //
+
+        #region All_Data_Types
+        /// <summary>
+        /// Data from all of the characteristics in the Environment Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Environment_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private double _Temperature = 0.0;
+            /// <summary>
+            /// From Environment and Temperature (c)
+            ///</summary>
+            public double Temperature 
+            { 
+                get { return _Temperature; }
+                set { if (value == _Temperature) return; _Temperature = value; OnPropertyChanged();}
+            }
+            private double _Pressure = 0.0;
+            /// <summary>
+            /// From Environment and Pressure (hpa)
+            ///</summary>
+            public double Pressure 
+            { 
+                get { return _Pressure; }
+                set { if (value == _Pressure) return; _Pressure = value; OnPropertyChanged();}
+            }
+            private double _Humidity = 0;
+            /// <summary>
+            /// From Environment and Humidity (%)
+            ///</summary>
+            public double Humidity 
+            { 
+                get { return _Humidity; }
+                set { if (value == _Humidity) return; _Humidity = value; OnPropertyChanged();}
+            }
+            private double _eCOS = 390;
+            /// <summary>
+            /// From Environment and Air Quality eCOS TVOC
+            ///</summary>
+            public double eCOS 
+            { 
+                get { return _eCOS; }
+                set { if (value == _eCOS) return; _eCOS = value; OnPropertyChanged();}
+            } 
+            private double _TVOC = 0;
+            /// <summary>
+            /// From Environment and Air Quality eCOS TVOC
+            ///</summary>
+            public double TVOC 
+            { 
+                get { return _TVOC; }
+                set { if (value == _TVOC) return; _TVOC = value; OnPropertyChanged();}
+            }
+            public Environment_Data Clone()
+            {
+                return this.MemberwiseClone() as Environment_Data;
+            }
+
+            public void CopyFrom(Environment_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Temperature = value.Temperature;
+                this.Pressure = value.Pressure;
+                this.Humidity = value.Humidity;
+                this.eCOS = value.eCOS;
+                this.TVOC = value.TVOC;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Temperature", "Pressure", "Humidity", "eCOS", "TVOC"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Temperature);
+                exporter.CellSet(Pressure);
+                exporter.CellSet(Humidity);
+                exporter.CellSet(eCOS);
+                exporter.CellSet(TVOC);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Temperature} {Pressure} {Humidity} {eCOS} {TVOC}");
+            }
+        }
+        /// <summary>
+        /// Data from all of the characteristics in the Environment Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class EnvironmentColor_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private double _Red = 0;
+            /// <summary>
+            /// From Environment and Color RGB+Clear
+            ///</summary>
+            public double Red 
+            { 
+                get { return _Red; }
+                set { if (value == _Red) return; _Red = value; OnPropertyChanged();}
+            } 
+            private double _Green = 0;
+            /// <summary>
+            /// From Environment and Color RGB+Clear
+            ///</summary>
+            public double Green 
+            { 
+                get { return _Green; }
+                set { if (value == _Green) return; _Green = value; OnPropertyChanged();}
+            } 
+            private double _Blue = 0;
+            /// <summary>
+            /// From Environment and Color RGB+Clear
+            ///</summary>
+            public double Blue 
+            { 
+                get { return _Blue; }
+                set { if (value == _Blue) return; _Blue = value; OnPropertyChanged();}
+            } 
+            private double _Clear = 0;
+            /// <summary>
+            /// From Environment and Color RGB+Clear
+            ///</summary>
+            public double Clear 
+            { 
+                get { return _Clear; }
+                set { if (value == _Clear) return; _Clear = value; OnPropertyChanged();}
+            }
+            public EnvironmentColor_Data Clone()
+            {
+                return this.MemberwiseClone() as EnvironmentColor_Data;
+            }
+
+            public void CopyFrom(EnvironmentColor_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Red = value.Red;
+                this.Green = value.Green;
+                this.Blue = value.Blue;
+                this.Clear = value.Clear;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Red", "Green", "Blue", "Clear"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Red);
+                exporter.CellSet(Green);
+                exporter.CellSet(Blue);
+                exporter.CellSet(Clear);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Red} {Green} {Blue} {Clear}");
+            }
+        }
+        /// <summary>
+        /// Data from all of the characteristics in the Environment Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class EnvironmentConfiguration_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private double _TempInterval = 0;
+            /// <summary>
+            /// From Environment and Environment Configuration
+            ///</summary>
+            public double TempInterval 
+            { 
+                get { return _TempInterval; }
+                set { if (value == _TempInterval) return; _TempInterval = value; OnPropertyChanged();}
+            } 
+            private double _PressureInterval = 0;
+            /// <summary>
+            /// From Environment and Environment Configuration
+            ///</summary>
+            public double PressureInterval 
+            { 
+                get { return _PressureInterval; }
+                set { if (value == _PressureInterval) return; _PressureInterval = value; OnPropertyChanged();}
+            } 
+            private double _HumidityInterval = 0;
+            /// <summary>
+            /// From Environment and Environment Configuration
+            ///</summary>
+            public double HumidityInterval 
+            { 
+                get { return _HumidityInterval; }
+                set { if (value == _HumidityInterval) return; _HumidityInterval = value; OnPropertyChanged();}
+            } 
+            private double _ColorInterval = 0;
+            /// <summary>
+            /// From Environment and Environment Configuration
+            ///</summary>
+            public double ColorInterval 
+            { 
+                get { return _ColorInterval; }
+                set { if (value == _ColorInterval) return; _ColorInterval = value; OnPropertyChanged();}
+            } 
+            private double _GasMode = 0;
+            /// <summary>
+            /// From Environment and Environment Configuration
+            ///</summary>
+            public double GasMode 
+            { 
+                get { return _GasMode; }
+                set { if (value == _GasMode) return; _GasMode = value; OnPropertyChanged();}
+            } 
+            private double _RedCalibration = 0;
+            /// <summary>
+            /// From Environment and Environment Configuration
+            ///</summary>
+            public double RedCalibration 
+            { 
+                get { return _RedCalibration; }
+                set { if (value == _RedCalibration) return; _RedCalibration = value; OnPropertyChanged();}
+            } 
+            private double _GreenCalibration = 0;
+            /// <summary>
+            /// From Environment and Environment Configuration
+            ///</summary>
+            public double GreenCalibration 
+            { 
+                get { return _GreenCalibration; }
+                set { if (value == _GreenCalibration) return; _GreenCalibration = value; OnPropertyChanged();}
+            } 
+            private double _BlueCalibration = 0;
+            /// <summary>
+            /// From Environment and Environment Configuration
+            ///</summary>
+            public double BlueCalibration 
+            { 
+                get { return _BlueCalibration; }
+                set { if (value == _BlueCalibration) return; _BlueCalibration = value; OnPropertyChanged();}
+            }
+            public EnvironmentConfiguration_Data Clone()
+            {
+                return this.MemberwiseClone() as EnvironmentConfiguration_Data;
+            }
+
+            public void CopyFrom(EnvironmentConfiguration_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.TempInterval = value.TempInterval;
+                this.PressureInterval = value.PressureInterval;
+                this.HumidityInterval = value.HumidityInterval;
+                this.ColorInterval = value.ColorInterval;
+                this.GasMode = value.GasMode;
+                this.RedCalibration = value.RedCalibration;
+                this.GreenCalibration = value.GreenCalibration;
+                this.BlueCalibration = value.BlueCalibration;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "TempInterval", "PressureInterval", "HumidityInterval", "ColorInterval", "GasMode", "RedCalibration", "GreenCalibration", "BlueCalibration"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(TempInterval);
+                exporter.CellSet(PressureInterval);
+                exporter.CellSet(HumidityInterval);
+                exporter.CellSet(ColorInterval);
+                exporter.CellSet(GasMode);
+                exporter.CellSet(RedCalibration);
+                exporter.CellSet(GreenCalibration);
+                exporter.CellSet(BlueCalibration);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {TempInterval} {PressureInterval} {HumidityInterval} {ColorInterval} {GasMode} {RedCalibration} {GreenCalibration} {BlueCalibration}");
+            }
+        }
+//
+        /// <summary>
+        /// Data from all of the characteristics in the Common Configuration Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Common_Configuration_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private string _Device_Name = "";
+            /// <summary>
+            /// From Common Configuration and Device Name
+            ///</summary>
+            public string Device_Name 
+            { 
+                get { return _Device_Name; }
+                set { if (value == _Device_Name) return; _Device_Name = value; OnPropertyChanged();}
+            }
+            private double _Appearance = 0;
+            /// <summary>
+            /// From Common Configuration and Appearance
+            ///</summary>
+            public double Appearance 
+            { 
+                get { return _Appearance; }
+                set { if (value == _Appearance) return; _Appearance = value; OnPropertyChanged();}
+            }
+            private byte[] _ConnectionParameter = null;
+            /// <summary>
+            /// From Common Configuration and Connection Parameter
+            ///</summary>
+            public byte[] ConnectionParameter 
+            { 
+                get { return _ConnectionParameter; }
+                set { if (value == _ConnectionParameter) return; _ConnectionParameter = value; OnPropertyChanged();}
+            }
+            private double _AddressResolutionSupported = 0;
+            /// <summary>
+            /// From Common Configuration and Central Address Resolution
+            ///</summary>
+            public double AddressResolutionSupported 
+            { 
+                get { return _AddressResolutionSupported; }
+                set { if (value == _AddressResolutionSupported) return; _AddressResolutionSupported = value; OnPropertyChanged();}
+            }
+            public Common_Configuration_Data Clone()
+            {
+                return this.MemberwiseClone() as Common_Configuration_Data;
+            }
+
+            public void CopyFrom(Common_Configuration_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Device_Name = value.Device_Name;
+                this.Appearance = value.Appearance;
+                this.ConnectionParameter = value.ConnectionParameter;
+                this.AddressResolutionSupported = value.AddressResolutionSupported;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "Device_Name", "Appearance", "ConnectionParameter", "AddressResolutionSupported"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(Device_Name);
+                exporter.CellSet(Appearance);
+                exporter.CellSet(ConnectionParameter);
+                exporter.CellSet(AddressResolutionSupported);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Device_Name} {Appearance} {ConnectionParameter} {AddressResolutionSupported}");
+            }
+        }
+//
+        /// <summary>
+        /// Data from all of the characteristics in the Generic Service Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Generic_Service_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private double _StartRange = 0;
+            /// <summary>
+            /// From Generic Service and Service Changes
+            ///</summary>
+            public double StartRange 
+            { 
+                get { return _StartRange; }
+                set { if (value == _StartRange) return; _StartRange = value; OnPropertyChanged();}
+            } 
+            private double _EndRange = 0;
+            /// <summary>
+            /// From Generic Service and Service Changes
+            ///</summary>
+            public double EndRange 
+            { 
+                get { return _EndRange; }
+                set { if (value == _EndRange) return; _EndRange = value; OnPropertyChanged();}
+            }
+            public Generic_Service_Data Clone()
+            {
+                return this.MemberwiseClone() as Generic_Service_Data;
+            }
+
+            public void CopyFrom(Generic_Service_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.StartRange = value.StartRange;
+                this.EndRange = value.EndRange;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "StartRange", "EndRange"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(StartRange);
+                exporter.CellSet(EndRange);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {StartRange} {EndRange}");
+            }
+        }
+//
+        /// <summary>
+        /// Data from all of the characteristics in the Battery Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Battery_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private double _BatteryLevel = 0;
+            /// <summary>
+            /// From Battery and BatteryLevel
+            ///</summary>
+            public double BatteryLevel 
+            { 
+                get { return _BatteryLevel; }
+                set { if (value == _BatteryLevel) return; _BatteryLevel = value; OnPropertyChanged();}
+            }
+            public Battery_Data Clone()
+            {
+                return this.MemberwiseClone() as Battery_Data;
+            }
+
+            public void CopyFrom(Battery_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.BatteryLevel = value.BatteryLevel;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "BatteryLevel"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(BatteryLevel);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {BatteryLevel}");
+            }
+        }
+//
+        /// <summary>
+        /// Data from all of the characteristics in the Configuration Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Configuration_Data :BTCommonMetaData, IExportDataSource
+        {
+            // Template is ServiceDataGroups
+            private string _DeviceName = "";
+            /// <summary>
+            /// From Configuration and Configuration Device Name
+            ///</summary>
+            public string DeviceName 
+            { 
+                get { return _DeviceName; }
+                set { if (value == _DeviceName) return; _DeviceName = value; OnPropertyChanged();}
+            }
+            private double _Interval = 0;
+            /// <summary>
+            /// From Configuration and Advertising Parameter
+            ///</summary>
+            public double Interval 
+            { 
+                get { return _Interval; }
+                set { if (value == _Interval) return; _Interval = value; OnPropertyChanged();}
+            } 
+            private double _Timeout = 0;
+            /// <summary>
+            /// From Configuration and Advertising Parameter
+            ///</summary>
+            public double Timeout 
+            { 
+                get { return _Timeout; }
+                set { if (value == _Timeout) return; _Timeout = value; OnPropertyChanged();}
+            }
+            private double _MinInterval = 0;
+            /// <summary>
+            /// From Configuration and Connection parameters
+            ///</summary>
+            public double MinInterval 
+            { 
+                get { return _MinInterval; }
+                set { if (value == _MinInterval) return; _MinInterval = value; OnPropertyChanged();}
+            } 
+            private double _MaxInterval = 0;
+            /// <summary>
+            /// From Configuration and Connection parameters
+            ///</summary>
+            public double MaxInterval 
+            { 
+                get { return _MaxInterval; }
+                set { if (value == _MaxInterval) return; _MaxInterval = value; OnPropertyChanged();}
+            } 
+            private double _Latency = 0;
+            /// <summary>
+            /// From Configuration and Connection parameters
+            ///</summary>
+            public double Latency 
+            { 
+                get { return _Latency; }
+                set { if (value == _Latency) return; _Latency = value; OnPropertyChanged();}
+            } 
+            private double _SupervisionTimeout = 0;
+            /// <summary>
+            /// From Configuration and Connection parameters
+            ///</summary>
+            public double SupervisionTimeout 
+            { 
+                get { return _SupervisionTimeout; }
+                set { if (value == _SupervisionTimeout) return; _SupervisionTimeout = value; OnPropertyChanged();}
+            }
+            private string _Eddystone = "";
+            /// <summary>
+            /// From Configuration and Eddystone URL
+            ///</summary>
+            public string Eddystone 
+            { 
+                get { return _Eddystone; }
+                set { if (value == _Eddystone) return; _Eddystone = value; OnPropertyChanged();}
+            }
+            private byte[] _CloudToken = null;
+            /// <summary>
+            /// From Configuration and Cloud Token
+            ///</summary>
+            public byte[] CloudToken 
+            { 
+                get { return _CloudToken; }
+                set { if (value == _CloudToken) return; _CloudToken = value; OnPropertyChanged();}
+            }
+            private double _Major = 0;
+            /// <summary>
+            /// From Configuration and Firmware Version
+            ///</summary>
+            public double Major 
+            { 
+                get { return _Major; }
+                set { if (value == _Major) return; _Major = value; OnPropertyChanged();}
+            } 
+            private double _Minor = 0;
+            /// <summary>
+            /// From Configuration and Firmware Version
+            ///</summary>
+            public double Minor 
+            { 
+                get { return _Minor; }
+                set { if (value == _Minor) return; _Minor = value; OnPropertyChanged();}
+            } 
+            private double _Patch = 0;
+            /// <summary>
+            /// From Configuration and Firmware Version
+            ///</summary>
+            public double Patch 
+            { 
+                get { return _Patch; }
+                set { if (value == _Patch) return; _Patch = value; OnPropertyChanged();}
+            }
+            private double _param0 = 0;
+            /// <summary>
+            /// From Configuration and MTU Request
+            ///</summary>
+            public double param0 
+            { 
+                get { return _param0; }
+                set { if (value == _param0) return; _param0 = value; OnPropertyChanged();}
+            } 
+            private double _param1 = 0;
+            /// <summary>
+            /// From Configuration and MTU Request
+            ///</summary>
+            public double param1 
+            { 
+                get { return _param1; }
+                set { if (value == _param1) return; _param1 = value; OnPropertyChanged();}
+            }
+            private string _NFCTag = "";
+            /// <summary>
+            /// From Configuration and NFC Tag
+            ///</summary>
+            public string NFCTag 
+            { 
+                get { return _NFCTag; }
+                set { if (value == _NFCTag) return; _NFCTag = value; OnPropertyChanged();}
+            }
+            public Configuration_Data Clone()
+            {
+                return this.MemberwiseClone() as Configuration_Data;
+            }
+
+            public void CopyFrom(Configuration_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.DeviceName = value.DeviceName;
+                this.Interval = value.Interval;
+                this.Timeout = value.Timeout;
+                this.MinInterval = value.MinInterval;
+                this.MaxInterval = value.MaxInterval;
+                this.Latency = value.Latency;
+                this.SupervisionTimeout = value.SupervisionTimeout;
+                this.Eddystone = value.Eddystone;
+                this.CloudToken = value.CloudToken;
+                this.Major = value.Major;
+                this.Minor = value.Minor;
+                this.Patch = value.Patch;
+                this.param0 = value.param0;
+                this.param1 = value.param1;
+                this.NFCTag = value.NFCTag;
+            }
+
+            public void ExportHeaders(IExportData exporter)
+            {
+                exporter.HeadersSet(["Date", "Time", "DeviceName", "Interval", "Timeout", "MinInterval", "MaxInterval", "Latency", "SupervisionTimeout", "Eddystone", "CloudToken", "Major", "Minor", "Patch", "param0", "param1", "NFCTag"]);
+            }
+
+            public void ExportRow(IExportData exporter)
+            {
+                exporter.RowStart();
+                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
+                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                exporter.CellSet(DeviceName);
+                exporter.CellSet(Interval);
+                exporter.CellSet(Timeout);
+                exporter.CellSet(MinInterval);
+                exporter.CellSet(MaxInterval);
+                exporter.CellSet(Latency);
+                exporter.CellSet(SupervisionTimeout);
+                exporter.CellSet(Eddystone);
+                exporter.CellSet(CloudToken);
+                exporter.CellSet(Major);
+                exporter.CellSet(Minor);
+                exporter.CellSet(Patch);
+                exporter.CellSet(param0);
+                exporter.CellSet(param1);
+                exporter.CellSet(NFCTag);                
+                exporter.RowEnd();
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {DeviceName} {Interval} {Timeout} {MinInterval} {MaxInterval} {Latency} {SupervisionTimeout} {Eddystone} {CloudToken} {Major} {Minor} {Patch} {param0} {param1} {NFCTag}");
+            }
+        }
+//
+
+
+        #endregion
 
 
         /// <summary>
@@ -320,114 +1024,13 @@ namespace BluetoothProtocols
 
 
         //
-        // All services / characteristics and data structures
+        // All services / characteristics methods. 
         //
 
 
         #region Service_Environment
         // Service Environment 
-        /// <summary>
-        /// Data from all of the characteristics in the Environment Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Environment_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private double _Temperature = 0.0;
-            public double Temperature 
-            { 
-                get { return _Temperature; }
-                set 
-                    { 
-                        if (value == _Temperature) return; 
-                        _Temperature = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Temperature (c)
-            private double _Pressure = 0.0;
-            public double Pressure 
-            { 
-                get { return _Pressure; }
-                set 
-                    { 
-                        if (value == _Pressure) return; 
-                        _Pressure = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Pressure (hpa)
-            private double _Humidity = 0;
-            public double Humidity 
-            { 
-                get { return _Humidity; }
-                set 
-                    { 
-                        if (value == _Humidity) return; 
-                        _Humidity = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Humidity (%)
-            private double _eCOS = 390;
-            public double eCOS 
-            { 
-                get { return _eCOS; }
-                set 
-                    { 
-                        if (value == _eCOS) return; 
-                        _eCOS = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Air Quality eCOS TVOC
-            private double _TVOC = 0;
-            public double TVOC 
-            { 
-                get { return _TVOC; }
-                set 
-                    { 
-                        if (value == _TVOC) return; 
-                        _TVOC = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Air Quality eCOS TVOC
-            public Environment_Data Clone()
-            {
-                return this.MemberwiseClone() as Environment_Data;
-            }
 
-            public void CopyFrom(Environment_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Temperature = value.Temperature;
-                this.Pressure = value.Pressure;
-                this.Humidity = value.Humidity;
-                this.eCOS = value.eCOS;
-                this.TVOC = value.TVOC;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "Temperature", "Pressure", "Humidity", "eCOS", "TVOC"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Temperature);
-                exporter.CellSet(Pressure);
-                exporter.CellSet(Humidity);
-                exporter.CellSet(eCOS);
-                exporter.CellSet(TVOC);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Temperature} {Pressure} {Humidity} {eCOS} {TVOC}");
-            }
-        }
         public Environment_Data CurrEnvironment_Data { get; set; } = new Environment_Data();
 
         // Per-characteristics methods for Environment Temperature_c
@@ -639,95 +1242,7 @@ namespace BluetoothProtocols
             return CurrEnvironment_Data;
         }
         // Service Environment 
-        /// <summary>
-        /// Data from all of the characteristics in the Environment Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class EnvironmentColor_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private double _Red = 0;
-            public double Red 
-            { 
-                get { return _Red; }
-                set 
-                    { 
-                        if (value == _Red) return; 
-                        _Red = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Color RGB+Clear
-            private double _Green = 0;
-            public double Green 
-            { 
-                get { return _Green; }
-                set 
-                    { 
-                        if (value == _Green) return; 
-                        _Green = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Color RGB+Clear
-            private double _Blue = 0;
-            public double Blue 
-            { 
-                get { return _Blue; }
-                set 
-                    { 
-                        if (value == _Blue) return; 
-                        _Blue = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Color RGB+Clear
-            private double _Clear = 0;
-            public double Clear 
-            { 
-                get { return _Clear; }
-                set 
-                    { 
-                        if (value == _Clear) return; 
-                        _Clear = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Color RGB+Clear
-            public EnvironmentColor_Data Clone()
-            {
-                return this.MemberwiseClone() as EnvironmentColor_Data;
-            }
 
-            public void CopyFrom(EnvironmentColor_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Red = value.Red;
-                this.Green = value.Green;
-                this.Blue = value.Blue;
-                this.Clear = value.Clear;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "Red", "Green", "Blue", "Clear"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Red);
-                exporter.CellSet(Green);
-                exporter.CellSet(Blue);
-                exporter.CellSet(Clear);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Red} {Green} {Blue} {Clear}");
-            }
-        }
         public EnvironmentColor_Data CurrEnvironmentColor_Data { get; set; } = new EnvironmentColor_Data();
 
         // Per-characteristics methods for Environment Color_RGB_Clear
@@ -787,147 +1302,7 @@ namespace BluetoothProtocols
             return CurrEnvironmentColor_Data;
         }
         // Service Environment 
-        /// <summary>
-        /// Data from all of the characteristics in the Environment Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class EnvironmentConfiguration_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private double _TempInterval = 0;
-            public double TempInterval 
-            { 
-                get { return _TempInterval; }
-                set 
-                    { 
-                        if (value == _TempInterval) return; 
-                        _TempInterval = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Environment Configuration
-            private double _PressureInterval = 0;
-            public double PressureInterval 
-            { 
-                get { return _PressureInterval; }
-                set 
-                    { 
-                        if (value == _PressureInterval) return; 
-                        _PressureInterval = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Environment Configuration
-            private double _HumidityInterval = 0;
-            public double HumidityInterval 
-            { 
-                get { return _HumidityInterval; }
-                set 
-                    { 
-                        if (value == _HumidityInterval) return; 
-                        _HumidityInterval = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Environment Configuration
-            private double _ColorInterval = 0;
-            public double ColorInterval 
-            { 
-                get { return _ColorInterval; }
-                set 
-                    { 
-                        if (value == _ColorInterval) return; 
-                        _ColorInterval = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Environment Configuration
-            private double _GasMode = 0;
-            public double GasMode 
-            { 
-                get { return _GasMode; }
-                set 
-                    { 
-                        if (value == _GasMode) return; 
-                        _GasMode = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Environment Configuration
-            private double _RedCalibration = 0;
-            public double RedCalibration 
-            { 
-                get { return _RedCalibration; }
-                set 
-                    { 
-                        if (value == _RedCalibration) return; 
-                        _RedCalibration = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Environment Configuration
-            private double _GreenCalibration = 0;
-            public double GreenCalibration 
-            { 
-                get { return _GreenCalibration; }
-                set 
-                    { 
-                        if (value == _GreenCalibration) return; 
-                        _GreenCalibration = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Environment Configuration
-            private double _BlueCalibration = 0;
-            public double BlueCalibration 
-            { 
-                get { return _BlueCalibration; }
-                set 
-                    { 
-                        if (value == _BlueCalibration) return; 
-                        _BlueCalibration = value;
-                        OnPropertyChanged();
-                    }
-            } // From Environment and Environment Configuration
-            public EnvironmentConfiguration_Data Clone()
-            {
-                return this.MemberwiseClone() as EnvironmentConfiguration_Data;
-            }
 
-            public void CopyFrom(EnvironmentConfiguration_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.TempInterval = value.TempInterval;
-                this.PressureInterval = value.PressureInterval;
-                this.HumidityInterval = value.HumidityInterval;
-                this.ColorInterval = value.ColorInterval;
-                this.GasMode = value.GasMode;
-                this.RedCalibration = value.RedCalibration;
-                this.GreenCalibration = value.GreenCalibration;
-                this.BlueCalibration = value.BlueCalibration;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "TempInterval", "PressureInterval", "HumidityInterval", "ColorInterval", "GasMode", "RedCalibration", "GreenCalibration", "BlueCalibration"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(TempInterval);
-                exporter.CellSet(PressureInterval);
-                exporter.CellSet(HumidityInterval);
-                exporter.CellSet(ColorInterval);
-                exporter.CellSet(GasMode);
-                exporter.CellSet(RedCalibration);
-                exporter.CellSet(GreenCalibration);
-                exporter.CellSet(BlueCalibration);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {TempInterval} {PressureInterval} {HumidityInterval} {ColorInterval} {GasMode} {RedCalibration} {GreenCalibration} {BlueCalibration}");
-            }
-        }
         public EnvironmentConfiguration_Data CurrEnvironmentConfiguration_Data { get; set; } = new EnvironmentConfiguration_Data();
 
         // Per-characteristics methods for Environment Environment_Configuration
@@ -999,95 +1374,7 @@ namespace BluetoothProtocols
 //
         #region Service_Common_Configuration
         // Service Common Configuration 
-        /// <summary>
-        /// Data from all of the characteristics in the Common Configuration Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Common_Configuration_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private string _Device_Name = "";
-            public string Device_Name 
-            { 
-                get { return _Device_Name; }
-                set 
-                    { 
-                        if (value == _Device_Name) return; 
-                        _Device_Name = value;
-                        OnPropertyChanged();
-                    }
-            } // From Common Configuration and Device Name
-            private double _Appearance = 0;
-            public double Appearance 
-            { 
-                get { return _Appearance; }
-                set 
-                    { 
-                        if (value == _Appearance) return; 
-                        _Appearance = value;
-                        OnPropertyChanged();
-                    }
-            } // From Common Configuration and Appearance
-            private byte[] _ConnectionParameter = null;
-            public byte[] ConnectionParameter 
-            { 
-                get { return _ConnectionParameter; }
-                set 
-                    { 
-                        if (value == _ConnectionParameter) return; 
-                        _ConnectionParameter = value;
-                        OnPropertyChanged();
-                    }
-            } // From Common Configuration and Connection Parameter
-            private double _AddressResolutionSupported = 0;
-            public double AddressResolutionSupported 
-            { 
-                get { return _AddressResolutionSupported; }
-                set 
-                    { 
-                        if (value == _AddressResolutionSupported) return; 
-                        _AddressResolutionSupported = value;
-                        OnPropertyChanged();
-                    }
-            } // From Common Configuration and Central Address Resolution
-            public Common_Configuration_Data Clone()
-            {
-                return this.MemberwiseClone() as Common_Configuration_Data;
-            }
 
-            public void CopyFrom(Common_Configuration_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Device_Name = value.Device_Name;
-                this.Appearance = value.Appearance;
-                this.ConnectionParameter = value.ConnectionParameter;
-                this.AddressResolutionSupported = value.AddressResolutionSupported;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "Device_Name", "Appearance", "ConnectionParameter", "AddressResolutionSupported"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Device_Name);
-                exporter.CellSet(Appearance);
-                exporter.CellSet(ConnectionParameter);
-                exporter.CellSet(AddressResolutionSupported);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Device_Name} {Appearance} {ConnectionParameter} {AddressResolutionSupported}");
-            }
-        }
         public Common_Configuration_Data CurrCommon_Configuration_Data { get; set; } = new Common_Configuration_Data();
 
         // Per-characteristics methods for Common_Configuration Device_Name
@@ -1295,69 +1582,7 @@ namespace BluetoothProtocols
 //
         #region Service_Generic_Service
         // Service Generic Service 
-        /// <summary>
-        /// Data from all of the characteristics in the Generic Service Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Generic_Service_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private double _StartRange = 0;
-            public double StartRange 
-            { 
-                get { return _StartRange; }
-                set 
-                    { 
-                        if (value == _StartRange) return; 
-                        _StartRange = value;
-                        OnPropertyChanged();
-                    }
-            } // From Generic Service and Service Changes
-            private double _EndRange = 0;
-            public double EndRange 
-            { 
-                get { return _EndRange; }
-                set 
-                    { 
-                        if (value == _EndRange) return; 
-                        _EndRange = value;
-                        OnPropertyChanged();
-                    }
-            } // From Generic Service and Service Changes
-            public Generic_Service_Data Clone()
-            {
-                return this.MemberwiseClone() as Generic_Service_Data;
-            }
 
-            public void CopyFrom(Generic_Service_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.StartRange = value.StartRange;
-                this.EndRange = value.EndRange;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "StartRange", "EndRange"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(StartRange);
-                exporter.CellSet(EndRange);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {StartRange} {EndRange}");
-            }
-        }
         public Generic_Service_Data CurrGeneric_Service_Data { get; set; } = new Generic_Service_Data();
 
         // Per-characteristics methods for Generic_Service Service_Changes
@@ -1417,56 +1642,7 @@ namespace BluetoothProtocols
 //
         #region Service_Battery
         // Service Battery 
-        /// <summary>
-        /// Data from all of the characteristics in the Battery Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Battery_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private double _BatteryLevel = 0;
-            public double BatteryLevel 
-            { 
-                get { return _BatteryLevel; }
-                set 
-                    { 
-                        if (value == _BatteryLevel) return; 
-                        _BatteryLevel = value;
-                        OnPropertyChanged();
-                    }
-            } // From Battery and BatteryLevel
-            public Battery_Data Clone()
-            {
-                return this.MemberwiseClone() as Battery_Data;
-            }
 
-            public void CopyFrom(Battery_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.BatteryLevel = value.BatteryLevel;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "BatteryLevel"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(BatteryLevel);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {BatteryLevel}");
-            }
-        }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
 
         // Per-characteristics methods for Battery BatteryLevel
@@ -1524,238 +1700,7 @@ namespace BluetoothProtocols
 //
         #region Service_Configuration
         // Service Configuration 
-        /// <summary>
-        /// Data from all of the characteristics in the Configuration Service. Dervices from
-        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
-        /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
-        /// </summary>
-        public class Configuration_Data :BTCommonMetaData, IExportDataSource
-        {
-            // Template is ServiceDataGroups
-            private string _Name = "";
-            public string Name 
-            { 
-                get { return _Name; }
-                set 
-                    { 
-                        if (value == _Name) return; 
-                        _Name = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Configuration Device Name
-            private double _Interval = 0;
-            public double Interval 
-            { 
-                get { return _Interval; }
-                set 
-                    { 
-                        if (value == _Interval) return; 
-                        _Interval = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Advertising Parameter
-            private double _Timeout = 0;
-            public double Timeout 
-            { 
-                get { return _Timeout; }
-                set 
-                    { 
-                        if (value == _Timeout) return; 
-                        _Timeout = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Advertising Parameter
-            private double _MinInterval = 0;
-            public double MinInterval 
-            { 
-                get { return _MinInterval; }
-                set 
-                    { 
-                        if (value == _MinInterval) return; 
-                        _MinInterval = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Connection parameters
-            private double _MaxInterval = 0;
-            public double MaxInterval 
-            { 
-                get { return _MaxInterval; }
-                set 
-                    { 
-                        if (value == _MaxInterval) return; 
-                        _MaxInterval = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Connection parameters
-            private double _Latency = 0;
-            public double Latency 
-            { 
-                get { return _Latency; }
-                set 
-                    { 
-                        if (value == _Latency) return; 
-                        _Latency = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Connection parameters
-            private double _SupervisionTimeout = 0;
-            public double SupervisionTimeout 
-            { 
-                get { return _SupervisionTimeout; }
-                set 
-                    { 
-                        if (value == _SupervisionTimeout) return; 
-                        _SupervisionTimeout = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Connection parameters
-            private string _Eddystone = "";
-            public string Eddystone 
-            { 
-                get { return _Eddystone; }
-                set 
-                    { 
-                        if (value == _Eddystone) return; 
-                        _Eddystone = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Eddystone URL
-            private byte[] _CloudToken = null;
-            public byte[] CloudToken 
-            { 
-                get { return _CloudToken; }
-                set 
-                    { 
-                        if (value == _CloudToken) return; 
-                        _CloudToken = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Cloud Token
-            private double _Major = 0;
-            public double Major 
-            { 
-                get { return _Major; }
-                set 
-                    { 
-                        if (value == _Major) return; 
-                        _Major = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Firmware Version
-            private double _Minor = 0;
-            public double Minor 
-            { 
-                get { return _Minor; }
-                set 
-                    { 
-                        if (value == _Minor) return; 
-                        _Minor = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Firmware Version
-            private double _Patch = 0;
-            public double Patch 
-            { 
-                get { return _Patch; }
-                set 
-                    { 
-                        if (value == _Patch) return; 
-                        _Patch = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and Firmware Version
-            private double _param0 = 0;
-            public double param0 
-            { 
-                get { return _param0; }
-                set 
-                    { 
-                        if (value == _param0) return; 
-                        _param0 = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and MTU Request
-            private double _param1 = 0;
-            public double param1 
-            { 
-                get { return _param1; }
-                set 
-                    { 
-                        if (value == _param1) return; 
-                        _param1 = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and MTU Request
-            private string _NFCTag = "";
-            public string NFCTag 
-            { 
-                get { return _NFCTag; }
-                set 
-                    { 
-                        if (value == _NFCTag) return; 
-                        _NFCTag = value;
-                        OnPropertyChanged();
-                    }
-            } // From Configuration and NFC Tag
-            public Configuration_Data Clone()
-            {
-                return this.MemberwiseClone() as Configuration_Data;
-            }
 
-            public void CopyFrom(Configuration_Data value)
-            {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Name = value.Name;
-                this.Interval = value.Interval;
-                this.Timeout = value.Timeout;
-                this.MinInterval = value.MinInterval;
-                this.MaxInterval = value.MaxInterval;
-                this.Latency = value.Latency;
-                this.SupervisionTimeout = value.SupervisionTimeout;
-                this.Eddystone = value.Eddystone;
-                this.CloudToken = value.CloudToken;
-                this.Major = value.Major;
-                this.Minor = value.Minor;
-                this.Patch = value.Patch;
-                this.param0 = value.param0;
-                this.param1 = value.param1;
-                this.NFCTag = value.NFCTag;
-            }
-
-            public void ExportHeaders(IExportData exporter)
-            {
-                exporter.HeadersSet(["Date", "Time", "Name", "Interval", "Timeout", "MinInterval", "MaxInterval", "Latency", "SupervisionTimeout", "Eddystone", "CloudToken", "Major", "Minor", "Patch", "param0", "param1", "NFCTag"]);
-            }
-
-            public void ExportRow(IExportData exporter)
-            {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Name);
-                exporter.CellSet(Interval);
-                exporter.CellSet(Timeout);
-                exporter.CellSet(MinInterval);
-                exporter.CellSet(MaxInterval);
-                exporter.CellSet(Latency);
-                exporter.CellSet(SupervisionTimeout);
-                exporter.CellSet(Eddystone);
-                exporter.CellSet(CloudToken);
-                exporter.CellSet(Major);
-                exporter.CellSet(Minor);
-                exporter.CellSet(Patch);
-                exporter.CellSet(param0);
-                exporter.CellSet(param1);
-                exporter.CellSet(NFCTag);                
-                exporter.RowEnd();
-            }
-
-            public override string ToString()
-            {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Name} {Interval} {Timeout} {MinInterval} {MaxInterval} {Latency} {SupervisionTimeout} {Eddystone} {CloudToken} {Major} {Minor} {Patch} {param0} {param1} {NFCTag}");
-            }
-        }
         public Configuration_Data CurrConfiguration_Data { get; set; } = new Configuration_Data();
 
         // Per-characteristics methods for Configuration Configuration_Device_Name
@@ -1775,12 +1720,12 @@ namespace BluetoothProtocols
         private void NotifyConfiguration_Device_NameCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Configuration_Configuration_Device_Name_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("STRING|ASCII|Name");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("STRING|ASCII|DeviceName");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrConfiguration_Data.TimestampMostRecent = args.Timestamp;
-            CurrConfiguration_Data.Name = vr.GetNextString();
+            CurrConfiguration_Data.DeviceName = vr.GetNextString();
             OnPropertyChanged(Configuration_Device_NamePropertyChangedName); // "Configuration_Device_Name"
         }
         // Per-characteristics methods for Configuration Advertising_Parameter
@@ -1982,11 +1927,11 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Configuration Device Name", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("STRING|ASCII|Name");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("STRING|ASCII|DeviceName");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrConfiguration_Data.Name = vr.GetNextString();
+            CurrConfiguration_Data.DeviceName = vr.GetNextString();
             OnPropertyChanged(Configuration_Device_NamePropertyChangedName); // "Configuration_Device_Name"
             return CurrConfiguration_Data;
         }

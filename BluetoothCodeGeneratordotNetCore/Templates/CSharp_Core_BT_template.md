@@ -48,6 +48,17 @@ namespace BluetoothProtocols
 
 [[CharacteristicOnPropertyChangedNames]]
 
+
+        //
+        // All services / characteristics data types 
+        //
+
+        #region All_Data_Types
+[[ServicesDataClass]]
+
+        #endregion
+
+
         /// <summary>
         /// Enumeration of all services
         /// </summary>
@@ -216,7 +227,7 @@ namespace BluetoothProtocols
 
 
         //
-        // All services / characteristics and data structures
+        // All services / characteristics methods. 
         //
 
 
@@ -312,7 +323,8 @@ characteristics which is easily found in a GitHub search of the generated code.
 ```
 ## ServicesReadWriteNotify Type=list Source=Services CodeListSubZero="" Trim=false
 
-This is the primary section of the code. 
+This is the primary section of the code for all the methods for the
+data classes declared much earlier in the CSharp.
 
 ```
         #region Service_[[ServiceName.dotNet]]
@@ -322,9 +334,19 @@ This is the primary section of the code.
 //
 ```
 
-## ServiceDataGroups Type=list ListOutput=parent Source=Services/DataGroups CodeListSubZero="" Trim=endCR
+## ServicesDataClass Type=list Source=Services CodeListSubZero="" Trim=false
+
+This is the primary section of the code. 
+
 ```
-        // Service [[Name]] 
+[[ServiceDataGroupsDataClass]]
+//
+
+```
+
+## ServiceDataGroupsDataClass Type=list ListOutput=parent Source=Services/DataGroups CodeListSubZero="" Trim=endCR
+
+```
         /// <summary>
         /// Data from all of the characteristics in the [[ServiceName]] Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
@@ -365,6 +387,13 @@ This is the primary section of the code.
                 return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")}[[CharacteristicDataGroupForToString]]");
             }
         }
+
+```
+
+## ServiceDataGroups Type=list ListOutput=parent Source=Services/DataGroups CodeListSubZero="" Trim=endCR
+```
+        // Service [[Name]] 
+
         public [[DataGroupName.dotNet]] Curr[[DataGroupName.dotNet]] { get; set; } = new [[DataGroupName.dotNet]]();
 
 [[CharacteristicMethodNotify]]
@@ -383,16 +412,14 @@ This is the primary section of the code.
 
 ```
             private [[VariableTypeDsb]] _[[DataName.dotNet]] = [[DefaultValueCSharp]];
+            /// <summary>
+            /// From [[ServiceName]] and [[CharacteristicName]]
+            ///</summary>
             public [[VariableTypeDsb]] [[DataName.dotNet]] 
             { 
                 get { return _[[DataName.dotNet]]; }
-                set 
-                    { 
-                        if (value == _[[DataName.dotNet]]) return; 
-                        _[[DataName.dotNet]] = value;
-                        OnPropertyChanged();
-                    }
-            } // From [[ServiceName]] and [[CharacteristicName]]
+                set { if (value == _[[DataName.dotNet]]) return; _[[DataName.dotNet]] = value; OnPropertyChanged();}
+            } 
 ```
 
 ## CharacteristicDataFieldsCopyFrom Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
