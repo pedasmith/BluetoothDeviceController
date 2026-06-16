@@ -13,7 +13,7 @@ using static BluetoothProtocols.Nordic_Thingy;
 
 namespace BluetoothProtocols
 {
-    public class SensorDataRecord : INotifyPropertyChanged
+    public class SensorDataRecord : BTCommonMetaData
     {
         /* Adding more fields? Here's a quick guide:
          * 1. When you add a new field, you must also bump the .All value. Do a search in the code
@@ -29,7 +29,7 @@ namespace BluetoothProtocols
             Pressure = double.NaN;
             Humidity = double.NaN;
             PM25 = double.NaN;
-            EventTime = DateTimeOffset.Now;
+            TimestampMostRecent = DateTimeOffset.Now;
         }
         public SensorDataRecord(double temperature, double pressure, double humidity, DateTimeOffset? eventTime)
         {
@@ -37,7 +37,7 @@ namespace BluetoothProtocols
             Pressure = pressure;
             Humidity = humidity;
             PM25 = double.NaN;
-            EventTime = eventTime ?? DateTimeOffset.Now;
+            TimestampMostRecent = eventTime ?? DateTimeOffset.Now;
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity;
         }
 
@@ -46,7 +46,7 @@ namespace BluetoothProtocols
             Temperature = temperature;
             Humidity = humidity;
             PM25 = double.NaN;
-            EventTime = eventTime ?? DateTimeOffset.Now;
+            TimestampMostRecent = eventTime ?? DateTimeOffset.Now;
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
         }
 
@@ -84,26 +84,6 @@ namespace BluetoothProtocols
         public const string HumidityPropertyChangedName = "Humidity";
         public const string BatteryPropertyChangedName = "BatteryInPercent";
 
-        // For the INPC INotifyPropertyChanged values
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        // Uggg -- this is not set correctly? Should be set from the value in the stack,
-        // which is more accurate.
-        private DateTimeOffset _EventTime;
-        public DateTimeOffset EventTime { get { return _EventTime; } 
-            set { if (value == _EventTime) return; _EventTime = value; 
-                OnPropertyChanged(); 
-                OnPropertyChanged("TimestampMostRecent"); 
-                OnPropertyChanged("TimestampMostRecentDT");  
-            } 
-        }
-
-        public DateTimeOffset TimestampMostRecent {  get { return EventTime; } }
-        public DateTime TimestampMostRecentDT { get { return TimestampMostRecent.DateTime; } }
-
 
         private double _Temperature;
         /// <summary>
@@ -136,8 +116,6 @@ namespace BluetoothProtocols
         private String _Note;
         public String Note { get { return _Note; } set { if (value == _Note) return; _Note = value; OnPropertyChanged(); } }
 
-        private String _Name;
-        public String Name { get { return _Name; } set { if (value == _Name) return; _Name = value; OnPropertyChanged(); } }
 
         public override string ToString()
         {

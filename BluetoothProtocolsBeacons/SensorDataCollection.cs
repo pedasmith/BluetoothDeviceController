@@ -23,7 +23,7 @@ namespace BluetoothProtocols
 
         public virtual void CopyFrom(CopyableSensorDataRecord value)
         {
-            EventTime = value.EventTime;
+            TimestampMostRecent = value.TimestampMostRecent;
             Temperature = value.Temperature;
             Pressure = value.Pressure;
             Humidity = value.Humidity; // Humidity is always in percent, so no conversion needed.
@@ -35,7 +35,7 @@ namespace BluetoothProtocols
         public virtual CopyableSensorDataRecord CopyToAndUpdateUnits(CopyableSensorDataRecord dest, UserPreferences CurrUserPrefs)
         {
             dest ??= this.Clone();
-            dest.EventTime = EventTime;
+            dest.TimestampMostRecent = TimestampMostRecent;
             dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(
                 Temperature,
                 BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius,

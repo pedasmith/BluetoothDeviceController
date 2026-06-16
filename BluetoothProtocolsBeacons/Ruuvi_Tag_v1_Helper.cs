@@ -120,7 +120,7 @@ namespace BluetoothProtocols
                                     {
                                         //foundValues.Add(AdvertisementType.RuuviTag);
                                         var ruuvi = ParseRuuviTag(result.Url);
-                                        ruuvi.Data.EventTime = DateTimeOffset.Now;
+                                        ruuvi.Data.TimestampMostRecent = DateTimeOffset.Now;
                                         return ruuvi;
                                     }
                                     break;

@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This class was automatically generated 2026-06-15::11:34
+    /// This class was automatically generated 2026-06-16::11:17
     /// </summary>
 
     public  class BTStandard_Demo : INotifyPropertyChanged
@@ -237,25 +237,14 @@ namespace BluetoothProtocols
         #region Service_Common_Configuration
         // Service Common Configuration 
         /// <summary>
-        /// Data from all of the characteristics in the Common Configuration Service. 
+        /// Data from all of the characteristics in the Common Configuration Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Common_Configuration_Data :INotifyPropertyChanged, IExportDataSource
+        public class Common_Configuration_Data :BTCommonMetaData, IExportDataSource
         {
             // Template is ServiceDataGroups
-            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
-            public DateTimeOffset TimestampMostRecent 
-            {
-                get { return _TimestampMostRecent; }
-                set 
-                    { 
-                        if (value == _TimestampMostRecent) return; 
-                        _TimestampMostRecent = value; 
-                        OnPropertyChanged(); 
-                        OnPropertyChanged("TimestamptMostRecentDT"); 
-                    }
-            }
-            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
             private string _Device_Name = "";
             public string Device_Name 
             { 
@@ -311,7 +300,6 @@ namespace BluetoothProtocols
                         OnPropertyChanged();
                     }
             } // From Common Configuration and Connection Parameter
-
             public Common_Configuration_Data Clone()
             {
                 return this.MemberwiseClone() as Common_Configuration_Data;
@@ -349,14 +337,6 @@ namespace BluetoothProtocols
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Device_Name} {Interval_Min} {Interval_Max} {Latency} {Timeout}");
             }
-
-            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
         }
         public Common_Configuration_Data CurrCommon_Configuration_Data { get; set; } = new Common_Configuration_Data();
 
@@ -472,25 +452,14 @@ namespace BluetoothProtocols
         #region Service_Battery
         // Service Battery 
         /// <summary>
-        /// Data from all of the characteristics in the Battery Service. 
+        /// Data from all of the characteristics in the Battery Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Battery_Data :INotifyPropertyChanged, IExportDataSource
+        public class Battery_Data :BTCommonMetaData, IExportDataSource
         {
             // Template is ServiceDataGroups
-            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
-            public DateTimeOffset TimestampMostRecent 
-            {
-                get { return _TimestampMostRecent; }
-                set 
-                    { 
-                        if (value == _TimestampMostRecent) return; 
-                        _TimestampMostRecent = value; 
-                        OnPropertyChanged(); 
-                        OnPropertyChanged("TimestamptMostRecentDT"); 
-                    }
-            }
-            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
             private double _BatteryLevel = 0;
             public double BatteryLevel 
             { 
@@ -502,7 +471,6 @@ namespace BluetoothProtocols
                         OnPropertyChanged();
                     }
             } // From Battery and BatteryLevel
-
             public Battery_Data Clone()
             {
                 return this.MemberwiseClone() as Battery_Data;
@@ -532,14 +500,6 @@ namespace BluetoothProtocols
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {BatteryLevel}");
             }
-
-            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
         }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
 

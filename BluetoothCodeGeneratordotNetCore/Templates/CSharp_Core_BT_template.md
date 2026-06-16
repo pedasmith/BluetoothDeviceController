@@ -326,27 +326,15 @@ This is the primary section of the code.
 ```
         // Service [[Name]] 
         /// <summary>
-        /// Data from all of the characteristics in the [[ServiceName]] Service. 
+        /// Data from all of the characteristics in the [[ServiceName]] Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class [[DataGroupName.dotNet]] :INotifyPropertyChanged, IExportDataSource
+        public class [[DataGroupName.dotNet]] :BTCommonMetaData, IExportDataSource
         {
             // Template is ServiceDataGroups
-            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
-            public DateTimeOffset TimestampMostRecent 
-            {
-                get { return _TimestampMostRecent; }
-                set 
-                    { 
-                        if (value == _TimestampMostRecent) return; 
-                        _TimestampMostRecent = value; 
-                        OnPropertyChanged(); 
-                        OnPropertyChanged("TimestamptMostRecentDT"); 
-                    }
-            }
-            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
 [[CharacteristicDataFields]]
-
             public [[DataGroupName.dotNet]] Clone()
             {
                 return this.MemberwiseClone() as [[DataGroupName.dotNet]];
@@ -376,14 +364,6 @@ This is the primary section of the code.
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")}[[CharacteristicDataGroupForToString]]");
             }
-
-            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-           
         }
         public [[DataGroupName.dotNet]] Curr[[DataGroupName.dotNet]] { get; set; } = new [[DataGroupName.dotNet]]();
 

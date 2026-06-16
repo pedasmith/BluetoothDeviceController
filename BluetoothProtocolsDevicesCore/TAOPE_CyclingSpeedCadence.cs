@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-06-15::11:34
+    /// This class was automatically generated 2026-06-16::11:17
     /// </summary>
 
     public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged
@@ -297,25 +297,14 @@ namespace BluetoothProtocols
         #region Service_Cycling_Speed_and_Cadence
         // Service Cycling Speed and Cadence 
         /// <summary>
-        /// Data from all of the characteristics in the Cycling Speed and Cadence Service. 
+        /// Data from all of the characteristics in the Cycling Speed and Cadence Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Cycling_Speed_and_Cadence_Data :INotifyPropertyChanged, IExportDataSource
+        public class Cycling_Speed_and_Cadence_Data :BTCommonMetaData, IExportDataSource
         {
             // Template is ServiceDataGroups
-            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
-            public DateTimeOffset TimestampMostRecent 
-            {
-                get { return _TimestampMostRecent; }
-                set 
-                    { 
-                        if (value == _TimestampMostRecent) return; 
-                        _TimestampMostRecent = value; 
-                        OnPropertyChanged(); 
-                        OnPropertyChanged("TimestamptMostRecentDT"); 
-                    }
-            }
-            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
             private double _Flags = 0;
             public double Flags 
             { 
@@ -404,7 +393,6 @@ namespace BluetoothProtocols
                         OnPropertyChanged();
                     }
             } // From Cycling Speed and Cadence and SC Control Point
-
             public Cycling_Speed_and_Cadence_Data Clone()
             {
                 return this.MemberwiseClone() as Cycling_Speed_and_Cadence_Data;
@@ -448,14 +436,6 @@ namespace BluetoothProtocols
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Flags} {RevolutionWheel} {TimeWheel} {RevolutionCrank} {TimeCrank} {FeatureFlags} {SensorLocation} {Unknown3}");
             }
-
-            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
         }
         public Cycling_Speed_and_Cadence_Data CurrCycling_Speed_and_Cadence_Data { get; set; } = new Cycling_Speed_and_Cadence_Data();
 
@@ -673,25 +653,14 @@ namespace BluetoothProtocols
         #region Service_Service_FD00
         // Service Service_FD00 
         /// <summary>
-        /// Data from all of the characteristics in the Service_FD00 Service. 
+        /// Data from all of the characteristics in the Service_FD00 Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Service_FD00_Data :INotifyPropertyChanged, IExportDataSource
+        public class Service_FD00_Data :BTCommonMetaData, IExportDataSource
         {
             // Template is ServiceDataGroups
-            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
-            public DateTimeOffset TimestampMostRecent 
-            {
-                get { return _TimestampMostRecent; }
-                set 
-                    { 
-                        if (value == _TimestampMostRecent) return; 
-                        _TimestampMostRecent = value; 
-                        OnPropertyChanged(); 
-                        OnPropertyChanged("TimestamptMostRecentDT"); 
-                    }
-            }
-            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
             private byte[] _Unknown0 = null;
             public byte[] Unknown0 
             { 
@@ -736,7 +705,6 @@ namespace BluetoothProtocols
                         OnPropertyChanged();
                     }
             } // From Service_FD00 and FD1A
-
             public Service_FD00_Data Clone()
             {
                 return this.MemberwiseClone() as Service_FD00_Data;
@@ -772,14 +740,6 @@ namespace BluetoothProtocols
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Unknown0} {Unknown1} {Unknown2} {Unknown3}");
             }
-
-            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
         }
         public Service_FD00_Data CurrService_FD00_Data { get; set; } = new Service_FD00_Data();
 
@@ -989,25 +949,14 @@ namespace BluetoothProtocols
         #region Service_Battery
         // Service Battery 
         /// <summary>
-        /// Data from all of the characteristics in the Battery Service. 
+        /// Data from all of the characteristics in the Battery Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Battery_Data :INotifyPropertyChanged, IExportDataSource
+        public class Battery_Data :BTCommonMetaData, IExportDataSource
         {
             // Template is ServiceDataGroups
-            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
-            public DateTimeOffset TimestampMostRecent 
-            {
-                get { return _TimestampMostRecent; }
-                set 
-                    { 
-                        if (value == _TimestampMostRecent) return; 
-                        _TimestampMostRecent = value; 
-                        OnPropertyChanged(); 
-                        OnPropertyChanged("TimestamptMostRecentDT"); 
-                    }
-            }
-            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
             private byte[] _Unknown0 = null;
             public byte[] Unknown0 
             { 
@@ -1019,7 +968,6 @@ namespace BluetoothProtocols
                         OnPropertyChanged();
                     }
             } // From Battery and Battery Level
-
             public Battery_Data Clone()
             {
                 return this.MemberwiseClone() as Battery_Data;
@@ -1049,14 +997,6 @@ namespace BluetoothProtocols
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Unknown0}");
             }
-
-            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
         }
         public Battery_Data CurrBattery_Data { get; set; } = new Battery_Data();
 
@@ -1116,25 +1056,14 @@ namespace BluetoothProtocols
         #region Service_Device_Information
         // Service Device Information 
         /// <summary>
-        /// Data from all of the characteristics in the Device Information Service. 
+        /// Data from all of the characteristics in the Device Information Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Device_Information_Data :INotifyPropertyChanged, IExportDataSource
+        public class Device_Information_Data :BTCommonMetaData, IExportDataSource
         {
             // Template is ServiceDataGroups
-            private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
-            public DateTimeOffset TimestampMostRecent 
-            {
-                get { return _TimestampMostRecent; }
-                set 
-                    { 
-                        if (value == _TimestampMostRecent) return; 
-                        _TimestampMostRecent = value; 
-                        OnPropertyChanged(); 
-                        OnPropertyChanged("TimestamptMostRecentDT"); 
-                    }
-            }
-            public DateTime TimestampMostRecentDT {get { return TimestampMostRecent.DateTime; }  }
             private string _Manufacturer = "";
             public string Manufacturer 
             { 
@@ -1201,7 +1130,6 @@ namespace BluetoothProtocols
                         OnPropertyChanged();
                     }
             } // From Device Information and System ID
-
             public Device_Information_Data Clone()
             {
                 return this.MemberwiseClone() as Device_Information_Data;
@@ -1241,14 +1169,6 @@ namespace BluetoothProtocols
             {
                 return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Manufacturer} {ModelNumber} {HardwareRevision} {FirmwareRevision} {SoftwareRevision} {SystemID}");
             }
-
-            private void OnPropertyChanged([CallerMemberName]string propertyName = "")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
         }
         public Device_Information_Data CurrDevice_Information_Data { get; set; } = new Device_Information_Data();
 
