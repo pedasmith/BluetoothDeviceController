@@ -42,6 +42,8 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// Used for logging only
     /// </summary>
     private readonly string InternalDeviceType = "EnvironmentSensor";
+    string KnownDeviceName = "device";
+
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
@@ -251,6 +253,8 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         DataContextAsKnownDevice.Id = DataContextAsKnownDevice.Advertisement.AddressAsString; //  Device.ble.DeviceId ?? ""; // never null :-)
         //DataContextAsKnownDevice.BTLEDevice = Device.ble;
 
+        KnownDeviceName = DataContextAsKnownDevice.Advertisement.BestName;
+
 
         // Initialize data values. Somewhat ugly code :-(
         GoveeSensorType = Govee.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
@@ -367,7 +371,16 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         if (saveData == null) return;
 
         var name = saveData.GetUserName();
-        uiDeviceName.Text = name;
+        if (name != KnownDeviceName)
+        {
+            KnownDeviceName = name;
+            uiDeviceName.Text = KnownDeviceName;
+            CurrSensorUnits?.Name = KnownDeviceName;
+            foreach (var item in HistoricalSensorDataUnits.Data)
+            {
+                item.Name = KnownDeviceName;
+            }
+        }
 
         var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
         var brushes = new DeviceColorBrushes(colors);
@@ -491,7 +504,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         // Update to match the current preferred units. Will create a new CurrSensorUnits the first time
         // it's called
-        CurrSensorUnits = CurrSensor.CopyToAndUpdateUnits(CurrSensorUnits, CurrUserPrefs);
+        CurrSensorUnits = CurrSensor.CopyToAndUpdateUnits(CurrSensorUnits, CurrUserPrefs, KnownDeviceName);
 
         // Track the historical data
         switch (name)
@@ -600,26 +613,6 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         {
             Log($"Error: 20: unable to make PNG file; {ex.Message}");
         }
-#endif
-#if NEVER_EVER_DEFINED
-    public string ExportData(IExportData exporter)
-    {
-        string retval = "";
-        var data = HistoricalSensorDataUnits.Data;
-        if (data.Count == 0)
-        {
-            Log("No data to export.");
-            return retval;
-        }
-        data[0].ExportHeaders(exporter);
-        foreach (var row in data)
-        {
-            row.ExportRow(exporter);
-        }
-        var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        retval = exporter.Export($"Data from {name} at {now}");
-        return retval;
-    }
 #endif
     string name = "EnvironmentSensor";
     bool FirstCallWithIsValid = true;

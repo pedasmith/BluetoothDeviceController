@@ -50,30 +50,25 @@ namespace BluetoothProtocols
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
         }
 
-        public override void ExportHeaders(IExportData exporter)
+        public override string[] ExportGetHeaders(IExportData _)
         {
-            List<string> headers = new List<string>() { "Date", "Time", "Name" };
+            List<string> headers = new List<string>();
             if (IsSensorPresent.HasFlag(SensorPresent.Temperature)) headers.Add("Temperature");
             if (IsSensorPresent.HasFlag(SensorPresent.Pressure)) headers.Add("Pressure");
             if (IsSensorPresent.HasFlag(SensorPresent.Humidity)) headers.Add("Humidity");
             if (IsSensorPresent.HasFlag(SensorPresent.PM25)) headers.Add("PM25");
             if (IsSensorPresent.HasFlag(SensorPresent.Battery)) headers.Add("Battery");
 
-            exporter.HeadersSet(headers.ToArray());
+            return headers.ToArray();
         }
 
         public override void ExportRow(IExportData exporter)
         {
-            exporter.RowStart();
-            exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-            exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-            exporter.CellSet(Name);
             if (IsSensorPresent.HasFlag(SensorPresent.Temperature)) exporter.CellSet(Temperature);
             if (IsSensorPresent.HasFlag(SensorPresent.Pressure)) exporter.CellSet(Pressure);
             if (IsSensorPresent.HasFlag(SensorPresent.Humidity)) exporter.CellSet(Humidity);
             if (IsSensorPresent.HasFlag(SensorPresent.PM25)) exporter.CellSet(PM25);
             if (IsSensorPresent.HasFlag(SensorPresent.Battery)) exporter.CellSet(BatteryInPercent);
-            exporter.RowEnd();
         }
 
 

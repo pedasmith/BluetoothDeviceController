@@ -40,10 +40,17 @@ namespace BluetoothProtocols
             return this.MemberwiseClone() as SensorPro;
         }
 
-        public SensorPro CopyToAndUpdateUnits(SensorPro dest, UserPreferences CurrUserPrefs)
+        public SensorPro CopyToAndUpdateUnits(SensorPro dest, UserPreferences CurrUserPrefs, string knownDeviceName)
         {
-            dest ??= this.Clone();
-            base.CopyToAndUpdateUnits(dest, CurrUserPrefs);
+            if (dest == null)
+            {
+                dest = this.Clone();
+                dest.Name = knownDeviceName;
+                // the protocol Name is the "SupportedDevice" name. It's not unique to each one.
+                // What we need for our data is the name that the user might have given the 
+                // device (the "known device" name). It's set in the UpdateUX from SaveData
+            }
+            base.CopyToAndUpdateUnits(dest, CurrUserPrefs, knownDeviceName);
 
             dest.IsValid = IsValid;
             dest.CompanyId = CompanyId;

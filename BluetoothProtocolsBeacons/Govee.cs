@@ -39,10 +39,17 @@ namespace BluetoothProtocols
             return this.MemberwiseClone() as Govee;
         }
 
-        public Govee CopyAndUpdateUnits(Govee source, Govee dest, UserPreferences CurrUserPrefs)
+        public Govee CopyAndUpdateUnits(Govee source, Govee dest, UserPreferences CurrUserPrefs, string knownDeviceName)
         {
-            dest ??= source.Clone();
-            base.CopyToAndUpdateUnits(dest, CurrUserPrefs);
+            if (dest == null)
+            {
+                dest = source.Clone();
+                dest.Name = knownDeviceName;
+                // the protocol Name is the "SupportedDevice" name. It's not unique to each one.
+                // What we need for our data is the name that the user might have given the 
+                // device (the "known device" name). It's set in the UpdateUX from SaveData
+            }
+            base.CopyToAndUpdateUnits(dest, CurrUserPrefs, knownDeviceName);
 
             dest.IsValid = IsValid;
             dest.CompanyId= CompanyId;

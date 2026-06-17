@@ -12,7 +12,7 @@ namespace BluetoothProtocols
 {
     public interface IBTCommonMetaData
     {
-        void ExportHeaders(IExportData exporter);
+        string[] ExportGetHeaders(IExportData exporter);
         void ExportRow(IExportData exporter);
         DateTimeOffset TimestampMostRecent { get; set; }
         DateTime TimestampMostRecentDT { get; }
@@ -28,7 +28,7 @@ namespace BluetoothProtocols
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public abstract void ExportHeaders(IExportData exporter);
+        public abstract string[] ExportGetHeaders(IExportData exporter);
 
         public abstract void ExportRow(IExportData exporter);
 

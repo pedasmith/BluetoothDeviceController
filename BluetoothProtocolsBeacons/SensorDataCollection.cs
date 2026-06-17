@@ -32,8 +32,16 @@ namespace BluetoothProtocols
             Name = value.Name;
         }
 
-        public virtual CopyableSensorDataRecord CopyToAndUpdateUnits(CopyableSensorDataRecord dest, UserPreferences CurrUserPrefs)
+        public virtual CopyableSensorDataRecord CopyToAndUpdateUnits(CopyableSensorDataRecord dest, UserPreferences CurrUserPrefs, string knownDeviceName)
         {
+            if (dest == null)
+            {
+                dest = this.Clone();
+                dest.Name = knownDeviceName;
+                // the protocol Name is the "SupportedDevice" name. It's not unique to each one.
+                // What we need for our data is the name that the user might have given the 
+                // device (the "known device" name). It's set in the UpdateUX from SaveData
+            }
             dest ??= this.Clone();
             dest.TimestampMostRecent = TimestampMostRecent;
             dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(

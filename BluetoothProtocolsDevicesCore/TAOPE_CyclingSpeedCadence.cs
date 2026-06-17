@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-06-16::16:44
+    /// This class was automatically generated 2026-06-17::09:35
     /// </summary>
 
     public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged
@@ -41,19 +41,21 @@ namespace BluetoothProtocols
         /* Service and Characteristics summary for the device BK6
 
         Cycling Speed and Cadence service Guid=1816
-            Cycling Speed and Cadence_Data (DataGroup record)
+            SpeedCadence_Data (DataGroup record)
                 CSC Measurement characteristic has Flags (Byte-->double) RevolutionWheel (UInt32-->double) TimeWheel (UInt16-->double) RevolutionCrank (UInt16-->double) TimeCrank (UInt16-->double)  Guid=2a5b
+
+            Feature_Data (DataGroup record)
                 CSC Feature characteristic has FeatureFlags (UInt16-->double)  Guid=2a5c
                 Sensor Location characteristic has SensorLocation (Byte-->double)  Guid=2a5d
                 SC Control Point characteristic has Unknown3 (Bytes-->string)  Guid=2a55
 
 
-        Service_FD00 service Guid=fd00
-            Service_FD00_Data (DataGroup record)
-                FD09 characteristic has Unknown0 (Bytes-->string)  Guid=fd09
-                FD0A characteristic has Unknown1 (Bytes-->string)  Guid=fd0a
-                FD19 characteristic has Unknown2 (Bytes-->string)  Guid=fd19
-                FD1A characteristic has Unknown3 (Bytes-->string)  Guid=fd1a
+        Service_FD00_OTA service Guid=fd00
+            Service_FD00_OTA_Data (DataGroup record)
+                FD09_OTA_Notify characteristic has Unknown0 (Bytes-->string)  Guid=fd09
+                FD0A_OTA_Write characteristic has Unknown1 (Bytes-->string)  Guid=fd0a
+                FD19_Notify characteristic has Unknown2 (Bytes-->string)  Guid=fd19
+                FD1A_Write characteristic has Unknown3 (Bytes-->string)  Guid=fd1a
 
 
         Battery service Guid=180f
@@ -75,10 +77,10 @@ namespace BluetoothProtocols
         public const string CSC_FeaturePropertyChangedName = "CSC_Feature";
         public const string Sensor_LocationPropertyChangedName = "Sensor_Location";
         public const string SC_Control_PointPropertyChangedName = "SC_Control_Point";
-        public const string FD09PropertyChangedName = "FD09";
-        public const string FD0APropertyChangedName = "FD0A";
-        public const string FD19PropertyChangedName = "FD19";
-        public const string FD1APropertyChangedName = "FD1A";
+        public const string FD09_OTA_NotifyPropertyChangedName = "FD09_OTA_Notify";
+        public const string FD0A_OTA_WritePropertyChangedName = "FD0A_OTA_Write";
+        public const string FD19_NotifyPropertyChangedName = "FD19_Notify";
+        public const string FD1A_WritePropertyChangedName = "FD1A_Write";
         public const string Battery_LevelPropertyChangedName = "Battery_Level";
         public const string Manufacturer_Name_StringPropertyChangedName = "Manufacturer_Name_String";
         public const string Model_Number_StringPropertyChangedName = "Model_Number_String";
@@ -100,7 +102,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Cycling_Speed_and_Cadence_Data :BTCommonMetaData //, IExportDataSource
+        public class SpeedCadence_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _Flags = 0;
@@ -148,6 +150,52 @@ namespace BluetoothProtocols
                 get { return _TimeCrank; }
                 set { if (value == _TimeCrank) return; _TimeCrank = value; OnPropertyChanged();}
             }
+            public SpeedCadence_Data Clone()
+            {
+                return this.MemberwiseClone() as SpeedCadence_Data;
+            }
+
+            public void CopyFrom(SpeedCadence_Data value)
+            {
+                this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
+                this.Flags = value.Flags;
+                this.RevolutionWheel = value.RevolutionWheel;
+                this.TimeWheel = value.TimeWheel;
+                this.RevolutionCrank = value.RevolutionCrank;
+                this.TimeCrank = value.TimeCrank;
+            }
+
+            public override string[] ExportGetHeaders(IExportData _)
+            {
+                return ["Flags", "RevolutionWheel", "TimeWheel", "RevolutionCrank", "TimeCrank"];
+            }
+
+            public override void ExportRow(IExportData exporter)
+            {
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
+                exporter.CellSet(Flags);
+                exporter.CellSet(RevolutionWheel);
+                exporter.CellSet(TimeWheel);
+                exporter.CellSet(RevolutionCrank);
+                exporter.CellSet(TimeCrank);                
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Flags} {RevolutionWheel} {TimeWheel} {RevolutionCrank} {TimeCrank}");
+            }
+        }
+        /// <summary>
+        /// Data from all of the characteristics in the Cycling Speed and Cadence Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// </summary>
+        public class Feature_Data :BTCommonMetaData //, IExportDataSource
+        {
+            // Template is ServiceDataGroups
             private double _FeatureFlags = 0;
             /// <summary>
             /// From Cycling Speed and Cadence and CSC Feature
@@ -175,63 +223,52 @@ namespace BluetoothProtocols
                 get { return _Unknown3; }
                 set { if (value == _Unknown3) return; _Unknown3 = value; OnPropertyChanged();}
             }
-            public Cycling_Speed_and_Cadence_Data Clone()
+            public Feature_Data Clone()
             {
-                return this.MemberwiseClone() as Cycling_Speed_and_Cadence_Data;
+                return this.MemberwiseClone() as Feature_Data;
             }
 
-            public void CopyFrom(Cycling_Speed_and_Cadence_Data value)
+            public void CopyFrom(Feature_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Flags = value.Flags;
-                this.RevolutionWheel = value.RevolutionWheel;
-                this.TimeWheel = value.TimeWheel;
-                this.RevolutionCrank = value.RevolutionCrank;
-                this.TimeCrank = value.TimeCrank;
+                this.Name = value.Name;
                 this.FeatureFlags = value.FeatureFlags;
                 this.SensorLocation = value.SensorLocation;
                 this.Unknown3 = value.Unknown3;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "Flags", "RevolutionWheel", "TimeWheel", "RevolutionCrank", "TimeCrank", "FeatureFlags", "SensorLocation", "Unknown3"]);
+                return ["FeatureFlags", "SensorLocation", "Unknown3"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
-                exporter.CellSet(Flags);
-                exporter.CellSet(RevolutionWheel);
-                exporter.CellSet(TimeWheel);
-                exporter.CellSet(RevolutionCrank);
-                exporter.CellSet(TimeCrank);
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(FeatureFlags);
                 exporter.CellSet(SensorLocation);
                 exporter.CellSet(Unknown3);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Flags} {RevolutionWheel} {TimeWheel} {RevolutionCrank} {TimeCrank} {FeatureFlags} {SensorLocation} {Unknown3}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {FeatureFlags} {SensorLocation} {Unknown3}");
             }
         }
 //
         /// <summary>
-        /// Data from all of the characteristics in the Service_FD00 Service. Dervices from
+        /// Data from all of the characteristics in the Service_FD00_OTA Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Service_FD00_Data :BTCommonMetaData //, IExportDataSource
+        public class Service_FD00_OTA_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private byte[] _Unknown0 = null;
             /// <summary>
-            /// From Service_FD00 and FD09
+            /// From Service_FD00_OTA and FD09_OTA_Notify
             ///</summary>
             public byte[] Unknown0 
             { 
@@ -240,7 +277,7 @@ namespace BluetoothProtocols
             }
             private byte[] _Unknown1 = null;
             /// <summary>
-            /// From Service_FD00 and FD0A
+            /// From Service_FD00_OTA and FD0A_OTA_Write
             ///</summary>
             public byte[] Unknown1 
             { 
@@ -249,7 +286,7 @@ namespace BluetoothProtocols
             }
             private byte[] _Unknown2 = null;
             /// <summary>
-            /// From Service_FD00 and FD19
+            /// From Service_FD00_OTA and FD19_Notify
             ///</summary>
             public byte[] Unknown2 
             { 
@@ -258,42 +295,41 @@ namespace BluetoothProtocols
             }
             private byte[] _Unknown3 = null;
             /// <summary>
-            /// From Service_FD00 and FD1A
+            /// From Service_FD00_OTA and FD1A_Write
             ///</summary>
             public byte[] Unknown3 
             { 
                 get { return _Unknown3; }
                 set { if (value == _Unknown3) return; _Unknown3 = value; OnPropertyChanged();}
             }
-            public Service_FD00_Data Clone()
+            public Service_FD00_OTA_Data Clone()
             {
-                return this.MemberwiseClone() as Service_FD00_Data;
+                return this.MemberwiseClone() as Service_FD00_OTA_Data;
             }
 
-            public void CopyFrom(Service_FD00_Data value)
+            public void CopyFrom(Service_FD00_OTA_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.Unknown0 = value.Unknown0;
                 this.Unknown1 = value.Unknown1;
                 this.Unknown2 = value.Unknown2;
                 this.Unknown3 = value.Unknown3;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "Unknown0", "Unknown1", "Unknown2", "Unknown3"]);
+                return ["Unknown0", "Unknown1", "Unknown2", "Unknown3"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(Unknown0);
                 exporter.CellSet(Unknown1);
                 exporter.CellSet(Unknown2);
                 exporter.CellSet(Unknown3);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -328,21 +364,20 @@ namespace BluetoothProtocols
             public void CopyFrom(Battery_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.Unknown0 = value.Unknown0;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "Unknown0"]);
+                return ["Unknown0"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(Unknown0);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -422,6 +457,7 @@ namespace BluetoothProtocols
             public void CopyFrom(Device_Information_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.Manufacturer = value.Manufacturer;
                 this.ModelNumber = value.ModelNumber;
                 this.HardwareRevision = value.HardwareRevision;
@@ -430,23 +466,21 @@ namespace BluetoothProtocols
                 this.SystemID = value.SystemID;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "Manufacturer", "ModelNumber", "HardwareRevision", "FirmwareRevision", "SoftwareRevision", "SystemID"]);
+                return ["Manufacturer", "ModelNumber", "HardwareRevision", "FirmwareRevision", "SoftwareRevision", "SystemID"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(Manufacturer);
                 exporter.CellSet(ModelNumber);
                 exporter.CellSet(HardwareRevision);
                 exporter.CellSet(FirmwareRevision);
                 exporter.CellSet(SoftwareRevision);
                 exporter.CellSet(SystemID);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -466,7 +500,7 @@ namespace BluetoothProtocols
         enum ServiceIndex
         {
             Cycling_Speed_and_Cadence_index = 0,
-            Service_FD00_index = 1,
+            Service_FD00_OTA_index = 1,
             Battery_index = 2,
             Device_Information_index = 3,
         }
@@ -480,10 +514,10 @@ namespace BluetoothProtocols
             Cycling_Speed_and_Cadence_CSC_Feature_index = 1,     // GUID 00002a5c-0000-1000-8000-00805f9b34fb
             Cycling_Speed_and_Cadence_Sensor_Location_index = 2,     // GUID 00002a5d-0000-1000-8000-00805f9b34fb
             Cycling_Speed_and_Cadence_SC_Control_Point_index = 3,     // GUID 00002a55-0000-1000-8000-00805f9b34fb
-            Service_FD00_FD09_index = 4,     // GUID 0000fd09-0000-1000-8000-00805f9b34fb
-            Service_FD00_FD0A_index = 5,     // GUID 0000fd0a-0000-1000-8000-00805f9b34fb
-            Service_FD00_FD19_index = 6,     // GUID 0000fd19-0000-1000-8000-00805f9b34fb
-            Service_FD00_FD1A_index = 7,     // GUID 0000fd1a-0000-1000-8000-00805f9b34fb
+            Service_FD00_OTA_FD09_OTA_Notify_index = 4,     // GUID 0000fd09-0000-1000-8000-00805f9b34fb
+            Service_FD00_OTA_FD0A_OTA_Write_index = 5,     // GUID 0000fd0a-0000-1000-8000-00805f9b34fb
+            Service_FD00_OTA_FD19_Notify_index = 6,     // GUID 0000fd19-0000-1000-8000-00805f9b34fb
+            Service_FD00_OTA_FD1A_Write_index = 7,     // GUID 0000fd1a-0000-1000-8000-00805f9b34fb
             Battery_Battery_Level_index = 8,     // GUID 00002a19-0000-1000-8000-00805f9b34fb
             Device_Information_Manufacturer_Name_String_index = 9,     // GUID 00002a29-0000-1000-8000-00805f9b34fb
             Device_Information_Model_Number_String_index = 10,     // GUID 00002a24-0000-1000-8000-00805f9b34fb
@@ -499,7 +533,7 @@ namespace BluetoothProtocols
         List<Guid> Service_Guids = new List<Guid>()
         {
             Guid.Parse("00001816-0000-1000-8000-00805f9b34fb"), // #0 is Cycling Speed and Cadence
-            Guid.Parse("0000fd00-0000-1000-8000-00805f9b34fb"), // #1 is Service_FD00
+            Guid.Parse("0000fd00-0000-1000-8000-00805f9b34fb"), // #1 is Service_FD00_OTA
             Guid.Parse("0000180f-0000-1000-8000-00805f9b34fb"), // #2 is Battery
             Guid.Parse("0000180a-0000-1000-8000-00805f9b34fb"), // #3 is Device Information
         };
@@ -519,10 +553,10 @@ namespace BluetoothProtocols
             Guid.Parse("00002a5c-0000-1000-8000-00805f9b34fb"), // #1 is Cycling Speed and Cadence CSC Feature
             Guid.Parse("00002a5d-0000-1000-8000-00805f9b34fb"), // #2 is Cycling Speed and Cadence Sensor Location
             Guid.Parse("00002a55-0000-1000-8000-00805f9b34fb"), // #3 is Cycling Speed and Cadence SC Control Point
-            Guid.Parse("0000fd09-0000-1000-8000-00805f9b34fb"), // #4 is Service_FD00 FD09
-            Guid.Parse("0000fd0a-0000-1000-8000-00805f9b34fb"), // #5 is Service_FD00 FD0A
-            Guid.Parse("0000fd19-0000-1000-8000-00805f9b34fb"), // #6 is Service_FD00 FD19
-            Guid.Parse("0000fd1a-0000-1000-8000-00805f9b34fb"), // #7 is Service_FD00 FD1A
+            Guid.Parse("0000fd09-0000-1000-8000-00805f9b34fb"), // #4 is Service_FD00_OTA FD09_OTA_Notify
+            Guid.Parse("0000fd0a-0000-1000-8000-00805f9b34fb"), // #5 is Service_FD00_OTA FD0A_OTA_Write
+            Guid.Parse("0000fd19-0000-1000-8000-00805f9b34fb"), // #6 is Service_FD00_OTA FD19_Notify
+            Guid.Parse("0000fd1a-0000-1000-8000-00805f9b34fb"), // #7 is Service_FD00_OTA FD1A_Write
             Guid.Parse("00002a19-0000-1000-8000-00805f9b34fb"), // #8 is Battery Battery Level
             Guid.Parse("00002a29-0000-1000-8000-00805f9b34fb"), // #9 is Device Information Manufacturer Name String
             Guid.Parse("00002a24-0000-1000-8000-00805f9b34fb"), // #10 is Device Information Model Number String
@@ -669,7 +703,7 @@ namespace BluetoothProtocols
         #region Service_Cycling_Speed_and_Cadence
         // Service Cycling Speed and Cadence 
 
-        public Cycling_Speed_and_Cadence_Data CurrCycling_Speed_and_Cadence_Data { get; set; } = new Cycling_Speed_and_Cadence_Data();
+        public SpeedCadence_Data CurrSpeedCadence_Data { get; set; } = new SpeedCadence_Data();
 
         // Per-characteristics methods for Cycling_Speed_and_Cadence CSC_Measurement
         /// <summary>
@@ -692,14 +726,47 @@ namespace BluetoothProtocols
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrCycling_Speed_and_Cadence_Data.TimestampMostRecent = args.Timestamp;
-            CurrCycling_Speed_and_Cadence_Data.Flags = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.RevolutionWheel = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.TimeWheel = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.RevolutionCrank = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.TimeCrank = vr.GetNextDouble();
+            CurrSpeedCadence_Data.TimestampMostRecent = args.Timestamp;
+            CurrSpeedCadence_Data.Flags = vr.GetNextDouble();
+            CurrSpeedCadence_Data.RevolutionWheel = vr.GetNextDouble();
+            CurrSpeedCadence_Data.TimeWheel = vr.GetNextDouble();
+            CurrSpeedCadence_Data.RevolutionCrank = vr.GetNextDouble();
+            CurrSpeedCadence_Data.TimeCrank = vr.GetNextDouble();
             OnPropertyChanged(CSC_MeasurementPropertyChangedName); // "CSC_Measurement"
         }
+        /// Reads data
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>SpeedCadence_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<SpeedCadence_Data> ReadCSC_Measurement(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Cycling_Speed_and_Cadence_CSC_Measurement_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Cycling_Speed_and_Cadence_index, "Cycling Speed and Cadence", index, "CSC Measurement");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "CSC Measurement", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionWheel U16^1024_/|FIXED|TimeWheel| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionCrank U16^1024_/|FIXED|TimeCrank|");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrSpeedCadence_Data.Flags = vr.GetNextDouble();
+            CurrSpeedCadence_Data.RevolutionWheel = vr.GetNextDouble();
+            CurrSpeedCadence_Data.TimeWheel = vr.GetNextDouble();
+            CurrSpeedCadence_Data.RevolutionCrank = vr.GetNextDouble();
+            CurrSpeedCadence_Data.TimeCrank = vr.GetNextDouble();
+            OnPropertyChanged(CSC_MeasurementPropertyChangedName); // "CSC_Measurement"
+            return CurrSpeedCadence_Data;
+        }
+        // Service Cycling Speed and Cadence 
+
+        public Feature_Data CurrFeature_Data { get; set; } = new Feature_Data();
+
         // Per-characteristics methods for Cycling_Speed_and_Cadence CSC_Feature
         /// <summary>
         /// Sets up the notifications; 
@@ -721,8 +788,8 @@ namespace BluetoothProtocols
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrCycling_Speed_and_Cadence_Data.TimestampMostRecent = args.Timestamp;
-            CurrCycling_Speed_and_Cadence_Data.FeatureFlags = vr.GetNextDouble();
+            CurrFeature_Data.TimestampMostRecent = args.Timestamp;
+            CurrFeature_Data.FeatureFlags = vr.GetNextDouble();
             OnPropertyChanged(CSC_FeaturePropertyChangedName); // "CSC_Feature"
         }
         // Per-characteristics methods for Cycling_Speed_and_Cadence Sensor_Location
@@ -746,8 +813,8 @@ namespace BluetoothProtocols
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrCycling_Speed_and_Cadence_Data.TimestampMostRecent = args.Timestamp;
-            CurrCycling_Speed_and_Cadence_Data.SensorLocation = vr.GetNextDouble();
+            CurrFeature_Data.TimestampMostRecent = args.Timestamp;
+            CurrFeature_Data.SensorLocation = vr.GetNextDouble();
             OnPropertyChanged(Sensor_LocationPropertyChangedName); // "Sensor_Location"
         }
         // Per-characteristics methods for Cycling_Speed_and_Cadence SC_Control_Point
@@ -771,44 +838,15 @@ namespace BluetoothProtocols
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrCycling_Speed_and_Cadence_Data.TimestampMostRecent = args.Timestamp;
-            CurrCycling_Speed_and_Cadence_Data.Unknown3 = vr.GetNextByteArray();
+            CurrFeature_Data.TimestampMostRecent = args.Timestamp;
+            CurrFeature_Data.Unknown3 = vr.GetNextByteArray();
             OnPropertyChanged(SC_Control_PointPropertyChangedName); // "SC_Control_Point"
         }
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Cycling_Speed_and_Cadence_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Cycling_Speed_and_Cadence_Data> ReadCSC_Measurement(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            var index = CharacteristicIndex.Cycling_Speed_and_Cadence_CSC_Measurement_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Cycling_Speed_and_Cadence_index, "Cycling Speed and Cadence", index, "CSC Measurement");
-            var ch = Characteristics[(int)index];
-            if (ch == null)
-            {
-                return null;
-            }
-
-            IBuffer result = await ReadAsync(ch, "CSC Measurement", cacheMode);
-            if (result == null) return null;
-
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionWheel U16^1024_/|FIXED|TimeWheel| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionCrank U16^1024_/|FIXED|TimeCrank|");
-            var vr = ValueParsers[(int)index];
-
-            vr.Initialize(result.ToArray());
-            CurrCycling_Speed_and_Cadence_Data.Flags = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.RevolutionWheel = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.TimeWheel = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.RevolutionCrank = vr.GetNextDouble();
-            CurrCycling_Speed_and_Cadence_Data.TimeCrank = vr.GetNextDouble();
-            OnPropertyChanged(CSC_MeasurementPropertyChangedName); // "CSC_Measurement"
-            return CurrCycling_Speed_and_Cadence_Data;
-        }
-        /// Reads data
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Cycling_Speed_and_Cadence_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Cycling_Speed_and_Cadence_Data> ReadCSC_Feature(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Feature_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Feature_Data> ReadCSC_Feature(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             var index = CharacteristicIndex.Cycling_Speed_and_Cadence_CSC_Feature_index;
             await Ensure_Characteristic_Async(ServiceIndex.Cycling_Speed_and_Cadence_index, "Cycling Speed and Cadence", index, "CSC Feature");
@@ -825,15 +863,15 @@ namespace BluetoothProtocols
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrCycling_Speed_and_Cadence_Data.FeatureFlags = vr.GetNextDouble();
+            CurrFeature_Data.FeatureFlags = vr.GetNextDouble();
             OnPropertyChanged(CSC_FeaturePropertyChangedName); // "CSC_Feature"
-            return CurrCycling_Speed_and_Cadence_Data;
+            return CurrFeature_Data;
         }
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Cycling_Speed_and_Cadence_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Cycling_Speed_and_Cadence_Data> ReadSensor_Location(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Feature_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Feature_Data> ReadSensor_Location(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             var index = CharacteristicIndex.Cycling_Speed_and_Cadence_Sensor_Location_index;
             await Ensure_Characteristic_Async(ServiceIndex.Cycling_Speed_and_Cadence_index, "Cycling Speed and Cadence", index, "Sensor Location");
@@ -850,15 +888,15 @@ namespace BluetoothProtocols
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrCycling_Speed_and_Cadence_Data.SensorLocation = vr.GetNextDouble();
+            CurrFeature_Data.SensorLocation = vr.GetNextDouble();
             OnPropertyChanged(Sensor_LocationPropertyChangedName); // "Sensor_Location"
-            return CurrCycling_Speed_and_Cadence_Data;
+            return CurrFeature_Data;
         }
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Cycling_Speed_and_Cadence_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Cycling_Speed_and_Cadence_Data> ReadSC_Control_Point(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Feature_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Feature_Data> ReadSC_Control_Point(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             var index = CharacteristicIndex.Cycling_Speed_and_Cadence_SC_Control_Point_index;
             await Ensure_Characteristic_Async(ServiceIndex.Cycling_Speed_and_Cadence_index, "Cycling Speed and Cadence", index, "SC Control Point");
@@ -875,19 +913,19 @@ namespace BluetoothProtocols
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrCycling_Speed_and_Cadence_Data.Unknown3 = vr.GetNextByteArray();
+            CurrFeature_Data.Unknown3 = vr.GetNextByteArray();
             OnPropertyChanged(SC_Control_PointPropertyChangedName); // "SC_Control_Point"
-            return CurrCycling_Speed_and_Cadence_Data;
+            return CurrFeature_Data;
         }
 
         #endregion
 //
-        #region Service_Service_FD00
-        // Service Service_FD00 
+        #region Service_Service_FD00_OTA
+        // Service Service_FD00_OTA 
 
-        public Service_FD00_Data CurrService_FD00_Data { get; set; } = new Service_FD00_Data();
+        public Service_FD00_OTA_Data CurrService_FD00_OTA_Data { get; set; } = new Service_FD00_OTA_Data();
 
-        // Per-characteristics methods for Service_FD00 FD09
+        // Per-characteristics methods for Service_FD00_OTA FD09_OTA_Notify
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -895,24 +933,24 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyFD09Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyFD09_OTA_NotifyAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("FD09", ServiceIndex.Service_FD00_index, "Service_FD00", CharacteristicIndex.Service_FD00_FD09_index, NotifyFD09Callback, notifyType);
+            var retval = await SetupNotifyAsync("FD09_OTA_Notify", ServiceIndex.Service_FD00_OTA_index, "Service_FD00_OTA", CharacteristicIndex.Service_FD00_OTA_FD09_OTA_Notify_index, NotifyFD09_OTA_NotifyCallback, notifyType);
             return retval;
         }
 
-        private void NotifyFD09Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyFD09_OTA_NotifyCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Service_FD00_FD09_index;
+            var index = (int)CharacteristicIndex.Service_FD00_OTA_FD09_OTA_Notify_index;
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|Unknown0");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_FD00_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_FD00_Data.Unknown0 = vr.GetNextByteArray();
-            OnPropertyChanged(FD09PropertyChangedName); // "FD09"
+            CurrService_FD00_OTA_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_FD00_OTA_Data.Unknown0 = vr.GetNextByteArray();
+            OnPropertyChanged(FD09_OTA_NotifyPropertyChangedName); // "FD09_OTA_Notify"
         }
-        // Per-characteristics methods for Service_FD00 FD0A
+        // Per-characteristics methods for Service_FD00_OTA FD0A_OTA_Write
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -920,24 +958,24 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyFD0AAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyFD0A_OTA_WriteAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("FD0A", ServiceIndex.Service_FD00_index, "Service_FD00", CharacteristicIndex.Service_FD00_FD0A_index, NotifyFD0ACallback, notifyType);
+            var retval = await SetupNotifyAsync("FD0A_OTA_Write", ServiceIndex.Service_FD00_OTA_index, "Service_FD00_OTA", CharacteristicIndex.Service_FD00_OTA_FD0A_OTA_Write_index, NotifyFD0A_OTA_WriteCallback, notifyType);
             return retval;
         }
 
-        private void NotifyFD0ACallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyFD0A_OTA_WriteCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Service_FD00_FD0A_index;
+            var index = (int)CharacteristicIndex.Service_FD00_OTA_FD0A_OTA_Write_index;
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|Unknown1");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_FD00_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_FD00_Data.Unknown1 = vr.GetNextByteArray();
-            OnPropertyChanged(FD0APropertyChangedName); // "FD0A"
+            CurrService_FD00_OTA_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_FD00_OTA_Data.Unknown1 = vr.GetNextByteArray();
+            OnPropertyChanged(FD0A_OTA_WritePropertyChangedName); // "FD0A_OTA_Write"
         }
-        // Per-characteristics methods for Service_FD00 FD19
+        // Per-characteristics methods for Service_FD00_OTA FD19_Notify
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -945,24 +983,24 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyFD19Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyFD19_NotifyAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("FD19", ServiceIndex.Service_FD00_index, "Service_FD00", CharacteristicIndex.Service_FD00_FD19_index, NotifyFD19Callback, notifyType);
+            var retval = await SetupNotifyAsync("FD19_Notify", ServiceIndex.Service_FD00_OTA_index, "Service_FD00_OTA", CharacteristicIndex.Service_FD00_OTA_FD19_Notify_index, NotifyFD19_NotifyCallback, notifyType);
             return retval;
         }
 
-        private void NotifyFD19Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyFD19_NotifyCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Service_FD00_FD19_index;
+            var index = (int)CharacteristicIndex.Service_FD00_OTA_FD19_Notify_index;
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|Unknown2");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_FD00_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_FD00_Data.Unknown2 = vr.GetNextByteArray();
-            OnPropertyChanged(FD19PropertyChangedName); // "FD19"
+            CurrService_FD00_OTA_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_FD00_OTA_Data.Unknown2 = vr.GetNextByteArray();
+            OnPropertyChanged(FD19_NotifyPropertyChangedName); // "FD19_Notify"
         }
-        // Per-characteristics methods for Service_FD00 FD1A
+        // Per-characteristics methods for Service_FD00_OTA FD1A_Write
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -970,122 +1008,122 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyFD1AAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyFD1A_WriteAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("FD1A", ServiceIndex.Service_FD00_index, "Service_FD00", CharacteristicIndex.Service_FD00_FD1A_index, NotifyFD1ACallback, notifyType);
+            var retval = await SetupNotifyAsync("FD1A_Write", ServiceIndex.Service_FD00_OTA_index, "Service_FD00_OTA", CharacteristicIndex.Service_FD00_OTA_FD1A_Write_index, NotifyFD1A_WriteCallback, notifyType);
             return retval;
         }
 
-        private void NotifyFD1ACallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyFD1A_WriteCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Service_FD00_FD1A_index;
+            var index = (int)CharacteristicIndex.Service_FD00_OTA_FD1A_Write_index;
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|Unknown3");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_FD00_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_FD00_Data.Unknown3 = vr.GetNextByteArray();
-            OnPropertyChanged(FD1APropertyChangedName); // "FD1A"
+            CurrService_FD00_OTA_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_FD00_OTA_Data.Unknown3 = vr.GetNextByteArray();
+            OnPropertyChanged(FD1A_WritePropertyChangedName); // "FD1A_Write"
         }
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_FD00_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_FD00_Data> ReadFD09(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Service_FD00_OTA_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_FD00_OTA_Data> ReadFD09_OTA_Notify(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Service_FD00_FD09_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_FD00_index, "Service_FD00", index, "FD09");
+            var index = CharacteristicIndex.Service_FD00_OTA_FD09_OTA_Notify_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_FD00_OTA_index, "Service_FD00_OTA", index, "FD09_OTA_Notify");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "FD09", cacheMode);
+            IBuffer result = await ReadAsync(ch, "FD09_OTA_Notify", cacheMode);
             if (result == null) return null;
 
             if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|Unknown0");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrService_FD00_Data.Unknown0 = vr.GetNextByteArray();
-            OnPropertyChanged(FD09PropertyChangedName); // "FD09"
-            return CurrService_FD00_Data;
+            CurrService_FD00_OTA_Data.Unknown0 = vr.GetNextByteArray();
+            OnPropertyChanged(FD09_OTA_NotifyPropertyChangedName); // "FD09_OTA_Notify"
+            return CurrService_FD00_OTA_Data;
         }
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_FD00_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_FD00_Data> ReadFD0A(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Service_FD00_OTA_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_FD00_OTA_Data> ReadFD0A_OTA_Write(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Service_FD00_FD0A_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_FD00_index, "Service_FD00", index, "FD0A");
+            var index = CharacteristicIndex.Service_FD00_OTA_FD0A_OTA_Write_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_FD00_OTA_index, "Service_FD00_OTA", index, "FD0A_OTA_Write");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "FD0A", cacheMode);
+            IBuffer result = await ReadAsync(ch, "FD0A_OTA_Write", cacheMode);
             if (result == null) return null;
 
             if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|Unknown1");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrService_FD00_Data.Unknown1 = vr.GetNextByteArray();
-            OnPropertyChanged(FD0APropertyChangedName); // "FD0A"
-            return CurrService_FD00_Data;
+            CurrService_FD00_OTA_Data.Unknown1 = vr.GetNextByteArray();
+            OnPropertyChanged(FD0A_OTA_WritePropertyChangedName); // "FD0A_OTA_Write"
+            return CurrService_FD00_OTA_Data;
         }
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_FD00_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_FD00_Data> ReadFD19(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Service_FD00_OTA_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_FD00_OTA_Data> ReadFD19_Notify(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Service_FD00_FD19_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_FD00_index, "Service_FD00", index, "FD19");
+            var index = CharacteristicIndex.Service_FD00_OTA_FD19_Notify_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_FD00_OTA_index, "Service_FD00_OTA", index, "FD19_Notify");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "FD19", cacheMode);
+            IBuffer result = await ReadAsync(ch, "FD19_Notify", cacheMode);
             if (result == null) return null;
 
             if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|Unknown2");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrService_FD00_Data.Unknown2 = vr.GetNextByteArray();
-            OnPropertyChanged(FD19PropertyChangedName); // "FD19"
-            return CurrService_FD00_Data;
+            CurrService_FD00_OTA_Data.Unknown2 = vr.GetNextByteArray();
+            OnPropertyChanged(FD19_NotifyPropertyChangedName); // "FD19_Notify"
+            return CurrService_FD00_OTA_Data;
         }
         /// Reads data
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_FD00_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_FD00_Data> ReadFD1A(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Service_FD00_OTA_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_FD00_OTA_Data> ReadFD1A_Write(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Service_FD00_FD1A_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_FD00_index, "Service_FD00", index, "FD1A");
+            var index = CharacteristicIndex.Service_FD00_OTA_FD1A_Write_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_FD00_OTA_index, "Service_FD00_OTA", index, "FD1A_Write");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "FD1A", cacheMode);
+            IBuffer result = await ReadAsync(ch, "FD1A_Write", cacheMode);
             if (result == null) return null;
 
             if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|Unknown3");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrService_FD00_Data.Unknown3 = vr.GetNextByteArray();
-            OnPropertyChanged(FD1APropertyChangedName); // "FD1A"
-            return CurrService_FD00_Data;
+            CurrService_FD00_OTA_Data.Unknown3 = vr.GetNextByteArray();
+            OnPropertyChanged(FD1A_WritePropertyChangedName); // "FD1A_Write"
+            return CurrService_FD00_OTA_Data;
         }
 
         #endregion

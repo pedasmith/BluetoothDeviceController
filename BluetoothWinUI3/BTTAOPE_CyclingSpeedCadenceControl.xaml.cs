@@ -54,18 +54,20 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
     /// </summary>
     private readonly string InternalDeviceType = "TOAPE_Cycle";
     TAOPE_CyclingSpeedCadence Device;
+    string KnownDeviceName = "device";
+
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public Cycling_Speed_and_Cadence_DataCollection HistoricalSpeed_and_Cadence_DataUnits { get; } = new Cycling_Speed_and_Cadence_DataCollection(); // CHANGE:
+    public SpeedCadence_DataCollection HistoricalSpeed_and_Cadence_DataUnits { get; } = new SpeedCadence_DataCollection(); // CHANGE:
     public IReadOnlyList<IBTCommonMetaData> GetData() { return HistoricalSpeed_and_Cadence_DataUnits.Data; }
     /// <summary>
     /// Similar to CurrBattery_Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalBattery_DataUnits collection.
     /// </summary>
-    Cycling_Speed_and_Cadence_Data CurrSpeed_and_Cadence_Data = null;
-    Cycling_Speed_and_Cadence_Data CurrSpeed_and_Cadence_DataUnits = null;
+    SpeedCadence_Data CurrSpeed_and_Cadence_Data = null;
+    SpeedCadence_Data CurrSpeed_and_Cadence_DataUnits = null;
 
 
 
@@ -132,9 +134,16 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
         uiTableView.ItemsSource = HistoricalSpeed_and_Cadence_DataUnits.Data;
     }
 
-    private Cycling_Speed_and_Cadence_Data CopyAndUpdateUnits(Cycling_Speed_and_Cadence_Data source, Cycling_Speed_and_Cadence_Data dest)
+    private SpeedCadence_Data CopyAndUpdateUnits(SpeedCadence_Data source, SpeedCadence_Data dest)
     {
-        dest ??= source.Clone();
+        if (dest == null)
+        {
+            dest = source.Clone();
+            dest.Name = KnownDeviceName;
+            // the protocol Name is the "SupportedDevice" name. It's not unique to each one.
+            // What we need for our data is the name that the user might have given the 
+            // device (the "known device" name). It's set in the UpdateUX from SaveData
+        }
         // CHANGE: You might be tempted to use the dest.CopyFrom(source) at this point. But that will 
         // copy all the fields without updating the units (and will therefore trigger a bunch of INPC callbacks)
         // An easy way to fill this is in:
@@ -153,9 +162,6 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
         dest.TimeWheel = source.TimeWheel;
         dest.RevolutionCrank = source.RevolutionCrank;
         dest.TimeCrank = source.TimeCrank;
-        dest.FeatureFlags = source.FeatureFlags;
-        dest.SensorLocation = source.SensorLocation;
-        dest.Unknown3 = source.Unknown3;
         return dest;
     }
 
@@ -415,8 +421,16 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
         if (saveData == null) return;
 
         var name = saveData.GetUserName();
-        uiDeviceName.Text = name;
-
+        if (name != KnownDeviceName)
+        {
+            KnownDeviceName = name;
+            uiDeviceName.Text = KnownDeviceName;
+            CurrSpeed_and_Cadence_DataUnits?.Name = KnownDeviceName;
+            foreach (var item in HistoricalSpeed_and_Cadence_DataUnits.Data)
+            {
+                item.Name = KnownDeviceName;
+            }
+        }
         var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
         var brushes = new DeviceColorBrushes(colors);
         DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
@@ -550,7 +564,7 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
     private void UpdateDeviceDataUX(string name)
     {
         if (Device == null) return;
-        CurrSpeed_and_Cadence_Data = Device.CurrCycling_Speed_and_Cadence_Data;
+        CurrSpeed_and_Cadence_Data = Device.CurrSpeedCadence_Data;
 
         // name is from e.PropertyName when the Device does a PropertyChanged.
 
@@ -626,13 +640,13 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
                 }
 
                 var deltaInSeconds = CurrSpeed_and_Cadence_Data.TimestampMostRecent.Subtract(HistoricalSpeed_and_Cadence_DataUnits.TimestampMostRecentAdd).TotalSeconds;
-                var verb = (deltaInSeconds > 5) ? Cycling_Speed_and_Cadence_DataCollection.Verb.Add : Cycling_Speed_and_Cadence_DataCollection.Verb.ReplaceMostRecent;
+                var verb = (deltaInSeconds > 5) ? SpeedCadence_DataCollection.Verb.Add : SpeedCadence_DataCollection.Verb.ReplaceMostRecent;
                 HistoricalSpeed_and_Cadence_DataUnits.Update(CurrSpeed_and_Cadence_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
                 // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
                 //
-                if (verb == Cycling_Speed_and_Cadence_DataCollection.Verb.Add && HistoricalSpeed_and_Cadence_DataUnits.Count == 2)
+                if (verb == SpeedCadence_DataCollection.Verb.Add && HistoricalSpeed_and_Cadence_DataUnits.Count == 2)
                 {
                     // DOC: Can't have the axes start off invisible because then they can't be switched back on
                     if (CurrWindowSize == MainWindow.WindowSize.Normal)
@@ -696,26 +710,6 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
         }
     }
 
-#if NEVER_EVER_DEFINED
-    public string ExportData(IExportData exporter)
-    {
-        string retval = "";
-        var data = HistoricalSpeed_and_Cadence_DataUnits.Data;
-        if (data.Count == 0)
-        {
-            Log("No data to export.");
-            return retval;
-        }
-        data[0].ExportHeaders(exporter);
-        foreach (var row in data)
-        {
-            row.ExportRow(exporter);
-        }
-        var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        retval = exporter.Export($"Data from {Device.Name} at {now}");
-        return retval;
-    }
-#endif
 
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {

@@ -365,21 +365,20 @@ This is the primary section of the code.
             public void CopyFrom([[DataGroupName.dotNet]] value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
 [[CharacteristicDataFieldsCopyFrom]]
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", [[CharacteristicDataFieldsHeaders]]]);
+                return [[[CharacteristicDataFieldsHeaders]]];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
 [[CharacteristicDataFieldsRow]]                
-                exporter.RowEnd();
             }
 
             public override string ToString()

@@ -19,22 +19,22 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
     /// <summary>
     /// .
-    /// This code was automatically generated 2026-06-16::16:44
+    /// This code was automatically generated 2026-06-17::09:35
     /// </summary>
 
     ///<summary>
     ///TODO:
-    ///Cycling Speed and Cadence_DataCollection contains lists of data, one list per property value for all
-    ///of the characteristics groupled in the Cycling Speed and Cadence_Data group from Cycling Speed and Cadence.
+    ///SpeedCadence_DataCollection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the SpeedCadence_Data group from Cycling Speed and Cadence.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class Cycling_Speed_and_Cadence_DataCollection 
+    public class SpeedCadence_DataCollection 
     {
         public enum Verb {  Add, ReplaceMostRecent };
 
         public int Count { get { return  Timestamps.Count; } } 
 
-        public void Update(TAOPE_CyclingSpeedCadence.Cycling_Speed_and_Cadence_Data value, Verb verb)
+        public void Update(TAOPE_CyclingSpeedCadence.SpeedCadence_Data value, Verb verb)
         {
             if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
             {
@@ -47,7 +47,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             }
         }
 
-        public void Add(TAOPE_CyclingSpeedCadence.Cycling_Speed_and_Cadence_Data value)
+        public void Add(TAOPE_CyclingSpeedCadence.SpeedCadence_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
@@ -58,11 +58,8 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             TimeWheel.Add (value.TimeWheel);
             RevolutionCrank.Add (value.RevolutionCrank);
             TimeCrank.Add (value.TimeCrank);
-            FeatureFlags.Add (value.FeatureFlags);
-            SensorLocation.Add (value.SensorLocation);
-            Unknown3.Add (value.Unknown3);
         }
-        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.Cycling_Speed_and_Cadence_Data value)
+        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.SpeedCadence_Data value)
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
@@ -72,9 +69,6 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             TimeWheel[index] = value.TimeWheel;
             RevolutionCrank[index] = value.RevolutionCrank;
             TimeCrank[index] = value.TimeCrank;
-            FeatureFlags[index] = value.FeatureFlags;
-            SensorLocation[index] = value.SensorLocation;
-            Unknown3[index] = value.Unknown3;
         }
 
         ///<summary>
@@ -91,27 +85,21 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
         public ObservableCollection<double> TimeWheel { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> RevolutionCrank { get; } = new ObservableCollection<double>();
         public ObservableCollection<double> TimeCrank { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic CSC Feature
-        public ObservableCollection<double> FeatureFlags { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Sensor Location
-        public ObservableCollection<double> SensorLocation { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic SC Control Point
-        public ObservableCollection<byte[]> Unknown3 { get; } = new ObservableCollection<byte[]>();
-        public ObservableCollection<TAOPE_CyclingSpeedCadence.Cycling_Speed_and_Cadence_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.Cycling_Speed_and_Cadence_Data>();
+        public ObservableCollection<TAOPE_CyclingSpeedCadence.SpeedCadence_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.SpeedCadence_Data>();
     }
     ///<summary>
     ///TODO:
-    ///Service_FD00_DataCollection contains lists of data, one list per property value for all
-    ///of the characteristics groupled in the Service_FD00_Data group from Service_FD00.
+    ///Feature_DataCollection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the Feature_Data group from Cycling Speed and Cadence.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class Service_FD00_DataCollection 
+    public class Feature_DataCollection 
     {
         public enum Verb {  Add, ReplaceMostRecent };
 
         public int Count { get { return  Timestamps.Count; } } 
 
-        public void Update(TAOPE_CyclingSpeedCadence.Service_FD00_Data value, Verb verb)
+        public void Update(TAOPE_CyclingSpeedCadence.Feature_Data value, Verb verb)
         {
             if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
             {
@@ -124,7 +112,68 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             }
         }
 
-        public void Add(TAOPE_CyclingSpeedCadence.Service_FD00_Data value)
+        public void Add(TAOPE_CyclingSpeedCadence.Feature_Data value)
+        {
+            TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value.Clone());
+            Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            FeatureFlags.Add (value.FeatureFlags);
+            SensorLocation.Add (value.SensorLocation);
+            Unknown3.Add (value.Unknown3);
+        }
+        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.Feature_Data value)
+        {
+            var index = Timestamps.Count - 1;
+            Timestamps[index] = value.TimestampMostRecent;
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
+            FeatureFlags[index] = value.FeatureFlags;
+            SensorLocation[index] = value.SensorLocation;
+            Unknown3[index] = value.Unknown3;
+        }
+
+        ///<summary>
+        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
+        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
+        ///frequently than the UI updates
+        ///</summary>
+        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
+        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // Data values (properties) from characteristic CSC Feature
+        public ObservableCollection<double> FeatureFlags { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic Sensor Location
+        public ObservableCollection<double> SensorLocation { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic SC Control Point
+        public ObservableCollection<byte[]> Unknown3 { get; } = new ObservableCollection<byte[]>();
+        public ObservableCollection<TAOPE_CyclingSpeedCadence.Feature_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.Feature_Data>();
+    }
+    ///<summary>
+    ///TODO:
+    ///Service_FD00_OTA_DataCollection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the Service_FD00_OTA_Data group from Service_FD00_OTA.
+    ///The lists are used when displaying historical graphs of the data.
+    ///</summary>
+    public class Service_FD00_OTA_DataCollection 
+    {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update(TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data value, Verb verb)
+        {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
+        public void Add(TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
@@ -135,7 +184,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             Unknown2.Add (value.Unknown2);
             Unknown3.Add (value.Unknown3);
         }
-        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.Service_FD00_Data value)
+        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data value)
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
@@ -154,15 +203,15 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
         public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
         public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic FD09
+        // Data values (properties) from characteristic FD09_OTA_Notify
         public ObservableCollection<byte[]> Unknown0 { get; } = new ObservableCollection<byte[]>();
-        // Data values (properties) from characteristic FD0A
+        // Data values (properties) from characteristic FD0A_OTA_Write
         public ObservableCollection<byte[]> Unknown1 { get; } = new ObservableCollection<byte[]>();
-        // Data values (properties) from characteristic FD19
+        // Data values (properties) from characteristic FD19_Notify
         public ObservableCollection<byte[]> Unknown2 { get; } = new ObservableCollection<byte[]>();
-        // Data values (properties) from characteristic FD1A
+        // Data values (properties) from characteristic FD1A_Write
         public ObservableCollection<byte[]> Unknown3 { get; } = new ObservableCollection<byte[]>();
-        public ObservableCollection<TAOPE_CyclingSpeedCadence.Service_FD00_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.Service_FD00_Data>();
+        public ObservableCollection<TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data>();
     }
     ///<summary>
     ///TODO:

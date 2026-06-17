@@ -100,6 +100,8 @@
             {
               "UUID": "00002a5b-0000-1000-8000-00805f9b34fb",
               "Name": "CSC Measurement",
+              "DataGroupName": "SpeedCadence_Data",
+
               "Suppress": false,
               "Type": "U8|HEX|Flags OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionWheel U16^1024_/|FIXED|TimeWheel| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionCrank U16^1024_/|FIXED|TimeCrank|",
               "IsRead": false,
@@ -114,6 +116,7 @@
             {
               "UUID": "00002a5c-0000-1000-8000-00805f9b34fb",
               "Name": "CSC Feature",
+              "DataGroupName": "Feature_Data",
               "Suppress": false,
               "Type": "U16|HEX|FeatureFlags",
               "IsRead": true,
@@ -131,6 +134,7 @@
             {
               "UUID": "00002a5d-0000-1000-8000-00805f9b34fb",
               "Name": "Sensor Location",
+              "DataGroupName": "Feature_Data",
               "Suppress": false,
               "Type": "U8|HEX|SensorLocation",
               "IsRead": true,
@@ -148,6 +152,7 @@
             {
               "UUID": "00002a55-0000-1000-8000-00805f9b34fb",
               "Name": "SC Control Point",
+              "DataGroupName": "Feature_Data",
               "Suppress": false,
               "Type": "BYTES|HEX|Unknown3",
               "IsRead": false,
@@ -163,11 +168,11 @@
         },
         {
           "UUID": "0000fd00-0000-1000-8000-00805f9b34fb",
-          "Name":"Service_FD00",
+          "Name":"Service_FD00_OTA",
           "Characteristics": [
             {
               "UUID": "0000fd09-0000-1000-8000-00805f9b34fb",
-              "Name": "FD09",
+              "Name": "FD09_OTA_Notify",
               "Suppress": false,
               "Type": "BYTES|HEX|Unknown0",
               "IsRead": false,
@@ -181,7 +186,7 @@
             },
             {
               "UUID": "0000fd0a-0000-1000-8000-00805f9b34fb",
-              "Name": "FD0A",
+              "Name": "FD0A_OTA_Write",
               "Suppress": false,
               "Type": "BYTES|HEX|Unknown1",
               "IsRead": false,
@@ -195,7 +200,7 @@
             },
             {
               "UUID": "0000fd19-0000-1000-8000-00805f9b34fb",
-              "Name": "FD19",
+              "Name": "FD19_Notify",
               "Suppress": false,
               "Type": "BYTES|HEX|Unknown2",
               "IsRead": false,
@@ -209,7 +214,7 @@
             },
             {
               "UUID": "0000fd1a-0000-1000-8000-00805f9b34fb",
-              "Name": "FD1A",
+              "Name": "FD1A_Write",
               "Suppress": false,
               "Type": "BYTES|HEX|Unknown3",
               "IsRead": false,

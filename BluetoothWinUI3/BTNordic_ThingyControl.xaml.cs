@@ -57,6 +57,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     private readonly string InternalDeviceType = "Nordic_Thingy";
     Nordic_Thingy Device;
+    string KnownDeviceName = "device";
+
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
@@ -143,7 +145,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     private Nordic_Thingy.Environment_Data CopyAndUpdateUnits(Nordic_Thingy.Environment_Data source, Nordic_Thingy.Environment_Data dest)
     {
-        dest ??= source.Clone();
+        if (dest == null)
+        {
+            dest = source.Clone();
+            dest.Name = KnownDeviceName; 
+            // the protocol Name is the "SupportedDevice" name. It's not unique to each one.
+            // What we need for our data is the name that the user might have given the 
+            // device (the "known device" name). It's set in the UpdateUX from SaveData
+        }
         dest.TimestampMostRecent = source.TimestampMostRecent;
         dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(source.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
         dest.Pressure = BluetoothWatcher.Units.Pressure.Convert(source.Pressure, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, CurrUserPrefs.Pressure);
@@ -457,7 +466,16 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         if (saveData == null) return;
 
         var name = saveData.GetUserName();
-        uiDeviceName.Text = name;
+        if (name != KnownDeviceName)
+        {
+            KnownDeviceName = name;
+            uiDeviceName.Text = KnownDeviceName;
+            CurrEnvironment_DataUnits?.Name = KnownDeviceName;
+            foreach (var item in HistoricalEnvironment_DataUnits.Data)
+            {
+                item.Name = KnownDeviceName;
+            }
+        }
 
         var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
         var brushes = new DeviceColorBrushes(colors);
@@ -742,26 +760,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             Log($"Error: 20: unable to make PNG file; {ex.Message}");
         }
 #endif
-#if NEVER_EVER_DEFINED
-    public string ExportData(IExportData exporter)
-    {
-        string retval = "";
-        var data = HistoricalEnvironment_DataUnits.Data;
-        if (data.Count == 0)
-        {
-            Log("No data to export.");
-            return retval;
-        }
-        data[0].ExportHeaders(exporter);
-        foreach (var row in data)
-        {
-            row.ExportRow(exporter);
-        }
-        var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        retval = exporter.Export($"Data from {Device.Name} at {now}");
-        return retval;
-    }
-#endif
+
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {
         return "Internal error: no details are available";

@@ -105,7 +105,7 @@ namespace BluetoothWinUI3
             Id.AdvertisementName = knownDevice.Advertisement?.BestName ?? "";
             Id.ConnectAddress = knownDevice.BTLEDevice?.BluetoothAddress ?? 0;
             Id.ConnectName = knownDevice.BTLEDevice?.Name ?? "";
-            Id.DeviceId = knownDevice.BTLEDevice?.DeviceId ?? "";
+            Id.DeviceId = knownDevice.BTLEDevice?.DeviceId ?? knownDevice.Id;
         }
 
         /// <summary>

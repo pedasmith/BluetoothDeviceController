@@ -44,6 +44,8 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// </summary>
     private readonly string InternalDeviceType = "BTStandard_Demo";
     BTStandard_Demo Device;
+    string KnownDeviceName = "device";
+
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
@@ -130,7 +132,14 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
 
     private BTStandard_Demo.Battery_Data CopyAndUpdateUnits(BTStandard_Demo.Battery_Data source, BTStandard_Demo.Battery_Data dest)
     {
-        dest ??= source.Clone();
+        if (dest == null)
+        {
+            dest = source.Clone();
+            dest.Name = KnownDeviceName;
+            // the protocol Name is the "SupportedDevice" name. It's not unique to each one.
+            // What we need for our data is the name that the user might have given the 
+            // device (the "known device" name). It's set in the UpdateUX from SaveData
+        }
         // CHANGE: You might be tempted to use the dest.CopyFrom(source) at this point. But that will 
         // copy all the fields without updating the units (and will therefore trigger a bunch of INPC callbacks)
         // An easy way to fill this is in:
@@ -428,7 +437,16 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         if (saveData == null) return;
 
         var name = saveData.GetUserName();
-        uiDeviceName.Text = name;
+        if (name != KnownDeviceName)
+        {
+            KnownDeviceName = name;
+            uiDeviceName.Text = KnownDeviceName;
+            CurrBattery_DataUnits?.Name = KnownDeviceName;
+            foreach (var item in HistoricalBattery_DataUnits.Data)
+            {
+                item.Name = KnownDeviceName;
+            }
+        }
 
         var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
         var brushes = new DeviceColorBrushes(colors);
@@ -658,25 +676,6 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         }
     }
 
-
-    public string ExportData(IExportData exporter)
-    {
-        string retval = "";
-        var data = HistoricalBattery_DataUnits.Data;
-        if (data.Count == 0)
-        {
-            Log("No data to export.");
-            return retval;
-        }
-        data[0].ExportHeaders(exporter);
-        foreach (var row in data)
-        {
-            row.ExportRow(exporter);
-        }
-        var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        retval = exporter.Export($"Data from {Device.Name} at {now}");
-        return retval;
-    }
 
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {

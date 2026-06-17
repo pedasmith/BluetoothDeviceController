@@ -30,7 +30,7 @@ namespace BluetoothProtocols
     /// </summary>
     public interface IExportDataSource
     {
-        void ExportHeaders(IExportData exporter);
+        string[] ExportGetHeaders(IExportData exporter);
         void ExportRow(IExportData exporter);
     }
 }

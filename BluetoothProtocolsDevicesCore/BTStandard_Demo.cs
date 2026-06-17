@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This class was automatically generated 2026-06-16::16:44
+    /// This class was automatically generated 2026-06-17::09:35
     /// </summary>
 
     public  class BTStandard_Demo : INotifyPropertyChanged
@@ -124,6 +124,7 @@ namespace BluetoothProtocols
             public void CopyFrom(Common_Configuration_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.Device_Name = value.Device_Name;
                 this.Interval_Min = value.Interval_Min;
                 this.Interval_Max = value.Interval_Max;
@@ -131,22 +132,20 @@ namespace BluetoothProtocols
                 this.Timeout = value.Timeout;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "Device_Name", "Interval_Min", "Interval_Max", "Latency", "Timeout"]);
+                return ["Device_Name", "Interval_Min", "Interval_Max", "Latency", "Timeout"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(Device_Name);
                 exporter.CellSet(Interval_Min);
                 exporter.CellSet(Interval_Max);
                 exporter.CellSet(Latency);
                 exporter.CellSet(Timeout);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -181,21 +180,20 @@ namespace BluetoothProtocols
             public void CopyFrom(Battery_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.BatteryLevel = value.BatteryLevel;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "BatteryLevel"]);
+                return ["BatteryLevel"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(BatteryLevel);                
-                exporter.RowEnd();
             }
 
             public override string ToString()

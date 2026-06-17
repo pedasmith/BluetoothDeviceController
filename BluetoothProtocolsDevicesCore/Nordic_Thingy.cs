@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-06-16::16:44
+    /// This class was automatically generated 2026-06-17::09:35
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -174,6 +174,7 @@ namespace BluetoothProtocols
             public void CopyFrom(Environment_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.Temperature = value.Temperature;
                 this.Pressure = value.Pressure;
                 this.Humidity = value.Humidity;
@@ -181,22 +182,20 @@ namespace BluetoothProtocols
                 this.TVOC = value.TVOC;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "Temperature", "Pressure", "Humidity", "eCOS", "TVOC"]);
+                return ["Temperature", "Pressure", "Humidity", "eCOS", "TVOC"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(Temperature);
                 exporter.CellSet(Pressure);
                 exporter.CellSet(Humidity);
                 exporter.CellSet(eCOS);
                 exporter.CellSet(TVOC);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -257,27 +256,26 @@ namespace BluetoothProtocols
             public void CopyFrom(EnvironmentColor_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.Red = value.Red;
                 this.Green = value.Green;
                 this.Blue = value.Blue;
                 this.Clear = value.Clear;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "Red", "Green", "Blue", "Clear"]);
+                return ["Red", "Green", "Blue", "Clear"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(Red);
                 exporter.CellSet(Green);
                 exporter.CellSet(Blue);
                 exporter.CellSet(Clear);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -374,6 +372,7 @@ namespace BluetoothProtocols
             public void CopyFrom(EnvironmentConfiguration_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.TempInterval = value.TempInterval;
                 this.PressureInterval = value.PressureInterval;
                 this.HumidityInterval = value.HumidityInterval;
@@ -384,16 +383,15 @@ namespace BluetoothProtocols
                 this.BlueCalibration = value.BlueCalibration;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "TempInterval", "PressureInterval", "HumidityInterval", "ColorInterval", "GasMode", "RedCalibration", "GreenCalibration", "BlueCalibration"]);
+                return ["TempInterval", "PressureInterval", "HumidityInterval", "ColorInterval", "GasMode", "RedCalibration", "GreenCalibration", "BlueCalibration"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(TempInterval);
                 exporter.CellSet(PressureInterval);
                 exporter.CellSet(HumidityInterval);
@@ -402,7 +400,6 @@ namespace BluetoothProtocols
                 exporter.CellSet(RedCalibration);
                 exporter.CellSet(GreenCalibration);
                 exporter.CellSet(BlueCalibration);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -464,27 +461,26 @@ namespace BluetoothProtocols
             public void CopyFrom(Common_Configuration_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.Device_Name = value.Device_Name;
                 this.Appearance = value.Appearance;
                 this.ConnectionParameter = value.ConnectionParameter;
                 this.AddressResolutionSupported = value.AddressResolutionSupported;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "Device_Name", "Appearance", "ConnectionParameter", "AddressResolutionSupported"]);
+                return ["Device_Name", "Appearance", "ConnectionParameter", "AddressResolutionSupported"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(Device_Name);
                 exporter.CellSet(Appearance);
                 exporter.CellSet(ConnectionParameter);
                 exporter.CellSet(AddressResolutionSupported);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -528,23 +524,22 @@ namespace BluetoothProtocols
             public void CopyFrom(Generic_Service_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.StartRange = value.StartRange;
                 this.EndRange = value.EndRange;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "StartRange", "EndRange"]);
+                return ["StartRange", "EndRange"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(StartRange);
                 exporter.CellSet(EndRange);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -579,21 +574,20 @@ namespace BluetoothProtocols
             public void CopyFrom(Battery_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.BatteryLevel = value.BatteryLevel;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "BatteryLevel"]);
+                return ["BatteryLevel"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(BatteryLevel);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
@@ -754,6 +748,7 @@ namespace BluetoothProtocols
             public void CopyFrom(Configuration_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
+                this.Name = value.Name;
                 this.DeviceName = value.DeviceName;
                 this.Interval = value.Interval;
                 this.Timeout = value.Timeout;
@@ -771,16 +766,15 @@ namespace BluetoothProtocols
                 this.NFCTag = value.NFCTag;
             }
 
-            public override void ExportHeaders(IExportData exporter)
+            public override string[] ExportGetHeaders(IExportData _)
             {
-                exporter.HeadersSet(["Date", "Time", "DeviceName", "Interval", "Timeout", "MinInterval", "MaxInterval", "Latency", "SupervisionTimeout", "Eddystone", "CloudToken", "Major", "Minor", "Patch", "param0", "param1", "NFCTag"]);
+                return ["DeviceName", "Interval", "Timeout", "MinInterval", "MaxInterval", "Latency", "SupervisionTimeout", "Eddystone", "CloudToken", "Major", "Minor", "Patch", "param0", "param1", "NFCTag"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
-                exporter.RowStart();
-                exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
-                exporter.CellSet(TimestampMostRecentDT.ToString("HH:mm:ss"));
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
                 exporter.CellSet(DeviceName);
                 exporter.CellSet(Interval);
                 exporter.CellSet(Timeout);
@@ -796,7 +790,6 @@ namespace BluetoothProtocols
                 exporter.CellSet(param0);
                 exporter.CellSet(param1);
                 exporter.CellSet(NFCTag);                
-                exporter.RowEnd();
             }
 
             public override string ToString()
