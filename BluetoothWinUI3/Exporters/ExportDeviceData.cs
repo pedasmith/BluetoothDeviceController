@@ -25,11 +25,14 @@ namespace Exporters
                 //Log("No data to export.");
                 return retval;
             }
-            var headers = data[0].ExportGetHeaders(exporter).ToList();
-            headers.Insert(0, "Date");
-            headers.Insert(1, "Time");
-            headers.Insert(2, "Name");
-            exporter.HeadersSet(headers.ToArray());
+
+            // Add in all the headers for the one control
+            exporter.HeadersStart();
+            exporter.HeadersAppend(["Date", "Time", "Name"]);
+            var headers = data[0].ExportGetHeaders(exporter);
+            exporter.HeadersAppend(headers);
+            exporter.HeadersEnd();
+
             foreach (var row in data)
             {
                 exporter.RowStart();

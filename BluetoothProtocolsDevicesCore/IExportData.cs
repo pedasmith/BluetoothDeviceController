@@ -11,7 +11,9 @@ namespace BluetoothProtocols
     /// </summary>
     public interface IExportData
     {
-        public void HeadersSet(string[] headers);
+        public void HeadersStart();
+        public void HeadersAppend(string[] headers);
+        public void HeadersEnd();
         public void RowStart();
         public void RowEnd();
         public void CellSet(string value);

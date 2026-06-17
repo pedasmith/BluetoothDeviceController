@@ -9,7 +9,9 @@ namespace Exporters
     /// </summary>
     public class ExportCsv : IExportData
     {
-        StringBuilder sb = new();
+        StringBuilder currHeaders = new StringBuilder();
+        StringBuilder currRow = new StringBuilder();
+        StringBuilder allRows = new StringBuilder();
         public ExportCsv() { }
 
         /// <summary>
@@ -38,15 +40,13 @@ namespace Exporters
             return Retval;
         }
 
-        bool isFirstCellInRow = true;
         public void CellSet(string value)
         {
-            if (!isFirstCellInRow)
+            if (currRow.Length > 0)
             {
-                sb.Append(",");
+                currRow.Append(",");
             }
-            isFirstCellInRow = false;
-            sb.Append($"{Escape(value)}");
+            currRow.Append($"{Escape(value)}");
         }
 
         public void CellSet(double value)
@@ -58,44 +58,61 @@ namespace Exporters
 
         public void CellSet(byte[] value)
         {
-            StringBuilder sb = new();
+            StringBuilder cellsb = new();
             foreach (byte b in value ?? new byte[] { })
             {
-                sb.Append($"{b:X2} ");
+                cellsb.Append($"{b:X2} ");
             }
-            string strval = sb.ToString().TrimEnd();
+            string strval = cellsb.ToString().TrimEnd();
             CellSet(strval); // on the off change the the float needs to be escaped...
         }
 
-        public string Export(string _) // description is not used in CSV exports
+        public string Export(string description)
         {
-            return sb.ToString();
+            var retval = MakeInitial(description)
+                + currHeaders.ToString()
+                + allRows.ToString()
+                + MakeFinal();
+            return retval;
         }
 
-
-        public void HeadersSet(string[] headers)
+        public void HeadersStart()
         {
-            bool isFirst = true;
+            currHeaders = new StringBuilder();
+        }
+        public void HeadersAppend(string[] headers)
+        {
             foreach (var header in headers)
             {
-                if (!isFirst)
+                if (currHeaders.Length > 0)
                 {
-                    sb.Append(",");
+                    currHeaders.Append(",");
                 }
-                isFirst = false;
-                sb.Append($"{Escape(header)}");
+                currHeaders.Append($"{Escape(header)}");
             }
-            sb.Append("\n");
+        }
+        public void HeadersEnd()
+        {
+            currHeaders.Append("\n");
+        }
+        public string MakeFinal()
+        {
+            return "";
+        }
+        public string MakeInitial(string description)
+        {
+            return "";
         }
 
         public void RowEnd()
         {
-            sb.Append("\n");
+            currRow.Append("\n");
+            allRows.Append(currRow.ToString());
         }
 
         public void RowStart()
         {
-            isFirstCellInRow = true;
+            currRow = new StringBuilder();
         }
     }
 }

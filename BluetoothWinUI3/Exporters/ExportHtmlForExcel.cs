@@ -1,5 +1,6 @@
 ﻿using BluetoothProtocols;
 using System.Text;
+using System.Threading;
 
 namespace Exporters
 {
@@ -8,7 +9,10 @@ namespace Exporters
     /// </summary>
     public class ExportHtmlForExcel : IExportData
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder currHeaders = new StringBuilder();
+        StringBuilder currRow = new StringBuilder();
+        StringBuilder allRows = new StringBuilder();
+
         public ExportHtmlForExcel() { }
 
         private string Escape(string value)
@@ -20,12 +24,12 @@ namespace Exporters
 
         public void CellSet(string value)
         {
-            sb.Append($"<td>{Escape(value)}</td>");
+            currRow.Append($"<td>{Escape(value)}</td>");
         }
 
         public void CellSet(double value)
         {
-            sb.Append($"<td>{Escape(value.ToString("F2"))}</td>");
+            currRow.Append($"<td>{Escape(value.ToString("F2"))}</td>");
         }
 
         public void CellSet(byte[] value)
@@ -36,32 +40,65 @@ namespace Exporters
                 cellsb.Append($"{b:X2} ");
             }
             string strval = cellsb.ToString().TrimEnd();
-            sb.Append($"<td>{Escape(strval)}</td>");
+            currRow.Append($"<td>{Escape(strval)}</td>");
         }
 
         public string Export(string description)
         {
-            return "<!DOCTYPE html>\n<html><head>\n<title>" + Escape(description) + "</title>\n</head>\n<body><table>\n" + sb.ToString() + "\n</table></body></html>";
+            var retval = MakeInitial(description)
+                + currHeaders.ToString()
+                + allRows.ToString()
+                + MakeFinal();
+            return retval;
         }
 
-        public void HeadersSet(string[] headers)
+        private void HeadersSet(string[] headers)
         {
-            sb.Append("<tr>");
+            currHeaders = new StringBuilder();
+            currHeaders.Append("<tr>");
             foreach (var header in headers)
             {
-                sb.Append($"<th><b>{Escape(header)}</b></th>");
+                currHeaders.Append($"<th><b>{Escape(header)}</b></th>");
             }
-            sb.Append("</tr>\n");
+        }
+
+        public void HeadersStart()
+        {
+            currHeaders = new StringBuilder();
+            currHeaders.Append("<tr>");
+        }
+        public void HeadersAppend(string[] headers)
+        {
+            foreach (var header in headers)
+            {
+                currHeaders.Append($"<th><b>{Escape(header)}</b></th>");
+            }
+        }
+        public void HeadersEnd()
+        {
+            currHeaders.Append("</tr>\n");
+        }
+
+        public string MakeFinal()
+        {
+            // The last row will already have the \n
+            return "</table></body></html>";
+        }
+        public string MakeInitial (string description)
+        {
+            return "<!DOCTYPE html>\n<html><head>\n<title>" + Escape(description) + "</title>\n</head>\n<body><table>\n";
         }
 
         public void RowEnd()
         {
-            sb.Append("</tr>\n");
+            currRow.Append("</tr>\n");
+            allRows.Append(currRow);
         }
 
         public void RowStart()
         {
-            sb.Append("<tr>");
+            currRow = new StringBuilder();
+            currRow.Append("<tr>");
         }
     }
 }
