@@ -50,7 +50,7 @@ namespace BluetoothProtocols
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
         }
 
-        public void ExportHeaders(IExportData exporter)
+        public override void ExportHeaders(IExportData exporter)
         {
             List<string> headers = new List<string>() { "Date", "Time", "Name" };
             if (IsSensorPresent.HasFlag(SensorPresent.Temperature)) headers.Add("Temperature");
@@ -62,7 +62,7 @@ namespace BluetoothProtocols
             exporter.HeadersSet(headers.ToArray());
         }
 
-        public void ExportRow(IExportData exporter)
+        public override void ExportRow(IExportData exporter)
         {
             exporter.RowStart();
             exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));

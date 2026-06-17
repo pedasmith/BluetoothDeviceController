@@ -62,6 +62,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
     public Environment_DataCollection HistoricalEnvironment_DataUnits { get;  } = new Environment_DataCollection();
+    public IReadOnlyList<IBTCommonMetaData> GetData() { return HistoricalEnvironment_DataUnits.Data; }
     /// <summary>
     /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
     /// always in the 'native' units (e.g., always celcius for temperature).
@@ -741,7 +742,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             Log($"Error: 20: unable to make PNG file; {ex.Message}");
         }
 #endif
-
+#if NEVER_EVER_DEFINED
     public string ExportData(IExportData exporter)
     {
         string retval = "";
@@ -760,7 +761,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         retval = exporter.Export($"Data from {Device.Name} at {now}");
         return retval;
     }
-
+#endif
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {
         return "Internal error: no details are available";
@@ -772,6 +773,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         NotifyDeviceControlChangesWindows = mainWindow;
     }
 
-    #endregion 
+#endregion
 
 } // end of class BTNordic_ThingyControl

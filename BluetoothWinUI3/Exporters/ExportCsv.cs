@@ -59,7 +59,7 @@ namespace Exporters
         public void CellSet(byte[] value)
         {
             StringBuilder sb = new();
-            foreach (byte b in value)
+            foreach (byte b in value ?? new byte[] { })
             {
                 sb.Append($"{b:X2} ");
             }

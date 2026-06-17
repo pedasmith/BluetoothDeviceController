@@ -1,6 +1,7 @@
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWatcher.Units;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
+using Exporters;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -57,6 +58,7 @@ namespace BluetoothWinUI3
             UIThreadHelper.DQueue = this.DispatcherQueue;
             AdvertisementWatcher.WatcherEvent += AdvertisementWatcher_WatcherEvent;
             InitializeComponent();
+
             // Activated is completely the wrong thing! this.Activated += MainWindow_Activated;
             rootPanel.Loaded += MainWindow_Loaded; // but it works for now. TODO: find a better way to trigger the autostart of the watcher after the window is ready.
             this.Closed += MainWindow_Closed;
@@ -511,7 +513,8 @@ namespace BluetoothWinUI3
 
 
             var exporter = new Exporters.ExportHtmlForExcel();
-            var data = selected.ExportData(exporter);
+            var data = ExportDeviceData.ExportData(selected, exporter);
+            //var data = selected.ExportData(exporter);
 
             try
             {
@@ -537,7 +540,8 @@ namespace BluetoothWinUI3
 
 
             var exporter = new Exporters.ExportCsv();
-            var data = selected.ExportData(exporter);
+            var data = ExportDeviceData.ExportData(selected, exporter);
+            //var data = selected.ExportData(exporter);
 
             try
             {

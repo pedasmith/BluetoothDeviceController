@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This class was automatically generated 2026-06-16::12:34
+    /// This class was automatically generated 2026-06-16::16:44
     /// </summary>
 
     public  class BTStandard_Demo : INotifyPropertyChanged
@@ -68,7 +68,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Common_Configuration_Data :BTCommonMetaData, IExportDataSource
+        public class Common_Configuration_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private string _Device_Name = "";
@@ -131,12 +131,12 @@ namespace BluetoothProtocols
                 this.Timeout = value.Timeout;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "Device_Name", "Interval_Min", "Interval_Max", "Latency", "Timeout"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -161,7 +161,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Battery_Data :BTCommonMetaData, IExportDataSource
+        public class Battery_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _BatteryLevel = 0;
@@ -184,12 +184,12 @@ namespace BluetoothProtocols
                 this.BatteryLevel = value.BatteryLevel;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "BatteryLevel"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));

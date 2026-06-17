@@ -10,6 +10,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 
 using Utilities;
@@ -46,6 +47,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
     public SensorDataCollection HistoricalSensorDataUnits { get; } = new SensorDataCollection();
+    public IReadOnlyList<IBTCommonMetaData> GetData() { return HistoricalSensorDataUnits.Data ; }
     /// <summary>
     /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
     /// always in the 'native' units (e.g., always celcius for temperature).
@@ -599,7 +601,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             Log($"Error: 20: unable to make PNG file; {ex.Message}");
         }
 #endif
-
+#if NEVER_EVER_DEFINED
     public string ExportData(IExportData exporter)
     {
         string retval = "";
@@ -618,7 +620,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         retval = exporter.Export($"Data from {name} at {now}");
         return retval;
     }
-
+#endif
     string name = "EnvironmentSensor";
     bool FirstCallWithIsValid = true;
 
@@ -764,6 +766,6 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         NotifyDeviceControlChangesWindows = mainWindow;
     }
 
-    #endregion
+#endregion
 
 } // end of class BTCommon_EnvironmentalControl

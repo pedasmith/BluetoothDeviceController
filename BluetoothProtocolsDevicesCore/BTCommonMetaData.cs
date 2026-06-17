@@ -10,7 +10,16 @@ using System.Text;
 
 namespace BluetoothProtocols
 {
-    public class BTCommonMetaData : INotifyPropertyChanged
+    public interface IBTCommonMetaData
+    {
+        void ExportHeaders(IExportData exporter);
+        void ExportRow(IExportData exporter);
+        DateTimeOffset TimestampMostRecent { get; set; }
+        DateTime TimestampMostRecentDT { get; }
+        string Name { get; set; }
+    }
+
+    public abstract class BTCommonMetaData : IBTCommonMetaData, IExportDataSource, INotifyPropertyChanged
     {
         // For the INPC INotifyPropertyChanged values
         public event PropertyChangedEventHandler PropertyChanged;
@@ -18,6 +27,11 @@ namespace BluetoothProtocols
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public abstract void ExportHeaders(IExportData exporter);
+
+        public abstract void ExportRow(IExportData exporter);
+
         private DateTimeOffset _TimestampMostRecent = DateTimeOffset.MinValue;
         public DateTimeOffset TimestampMostRecent
         {

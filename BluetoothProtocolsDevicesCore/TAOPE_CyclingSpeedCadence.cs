@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-06-16::12:34
+    /// This class was automatically generated 2026-06-16::16:44
     /// </summary>
 
     public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged
@@ -100,7 +100,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Cycling_Speed_and_Cadence_Data :BTCommonMetaData, IExportDataSource
+        public class Cycling_Speed_and_Cadence_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _Flags = 0;
@@ -193,12 +193,12 @@ namespace BluetoothProtocols
                 this.Unknown3 = value.Unknown3;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "Flags", "RevolutionWheel", "TimeWheel", "RevolutionCrank", "TimeCrank", "FeatureFlags", "SensorLocation", "Unknown3"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -226,7 +226,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Service_FD00_Data :BTCommonMetaData, IExportDataSource
+        public class Service_FD00_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private byte[] _Unknown0 = null;
@@ -279,12 +279,12 @@ namespace BluetoothProtocols
                 this.Unknown3 = value.Unknown3;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "Unknown0", "Unknown1", "Unknown2", "Unknown3"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -308,7 +308,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Battery_Data :BTCommonMetaData, IExportDataSource
+        public class Battery_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private byte[] _Unknown0 = null;
@@ -331,12 +331,12 @@ namespace BluetoothProtocols
                 this.Unknown0 = value.Unknown0;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "Unknown0"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -357,7 +357,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Device_Information_Data :BTCommonMetaData, IExportDataSource
+        public class Device_Information_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private string _Manufacturer = "";
@@ -430,12 +430,12 @@ namespace BluetoothProtocols
                 this.SystemID = value.SystemID;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "Manufacturer", "ModelNumber", "HardwareRevision", "FirmwareRevision", "SoftwareRevision", "SystemID"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));

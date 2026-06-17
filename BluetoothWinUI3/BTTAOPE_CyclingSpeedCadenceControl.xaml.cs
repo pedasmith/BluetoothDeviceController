@@ -40,7 +40,7 @@ using static BluetoothProtocols.TAOPE_CyclingSpeedCadence;
 namespace BluetoothWinUI3;
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDeviceControlBasic, IDeviceControlDevice
+public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, IDeviceControlBasic, IDeviceControlDevice
 {
     /// <summary>
     /// Standard: Panel size. Set in UpdateUX from MainWindow.
@@ -59,7 +59,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
     public Cycling_Speed_and_Cadence_DataCollection HistoricalSpeed_and_Cadence_DataUnits { get; } = new Cycling_Speed_and_Cadence_DataCollection(); // CHANGE:
-
+    public IReadOnlyList<IBTCommonMetaData> GetData() { return HistoricalSpeed_and_Cadence_DataUnits.Data; }
     /// <summary>
     /// Similar to CurrBattery_Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalBattery_DataUnits collection.
@@ -69,7 +69,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
 
 
 
-    public TAOPE_CyclingSpeedCadenceControl()
+    public BTTAOPE_CyclingSpeedCadenceControl()
     {
         InitializeComponent();
         this.Loaded += TAOPE_CyclingSpeedCadenceControl_Loaded;
@@ -696,7 +696,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         }
     }
 
-
+#if NEVER_EVER_DEFINED
     public string ExportData(IExportData exporter)
     {
         string retval = "";
@@ -715,6 +715,7 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         retval = exporter.Export($"Data from {Device.Name} at {now}");
         return retval;
     }
+#endif
 
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {
@@ -727,6 +728,6 @@ public sealed partial class TAOPE_CyclingSpeedCadenceControl : UserControl, IDev
         NotifyDeviceControlChangesWindows = mainWindow;
     }
 
-    #endregion
+#endregion
 
 } // end of class TAOPE_CyclingSpeedCadenceControl

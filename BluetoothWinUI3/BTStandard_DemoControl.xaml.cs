@@ -49,6 +49,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
     public Battery_DataCollection HistoricalBattery_DataUnits { get; } = new Battery_DataCollection(); // CHANGE:
+    public IReadOnlyList<IBTCommonMetaData> GetData() { return HistoricalBattery_DataUnits.Data; }
     /// <summary>
     /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
     /// always in the 'native' units (e.g., always celcius for temperature).

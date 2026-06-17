@@ -353,7 +353,7 @@ This is the primary section of the code.
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class [[DataGroupName.dotNet]] :BTCommonMetaData, IExportDataSource
+        public class [[DataGroupName.dotNet]] :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
 [[CharacteristicDataFields]]
@@ -368,12 +368,12 @@ This is the primary section of the code.
 [[CharacteristicDataFieldsCopyFrom]]
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", [[CharacteristicDataFieldsHeaders]]]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));

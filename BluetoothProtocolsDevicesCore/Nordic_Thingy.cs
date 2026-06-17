@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-06-16::12:34
+    /// This class was automatically generated 2026-06-16::16:44
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -118,7 +118,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Environment_Data :BTCommonMetaData, IExportDataSource
+        public class Environment_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _Temperature = 0.0;
@@ -181,12 +181,12 @@ namespace BluetoothProtocols
                 this.TVOC = value.TVOC;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "Temperature", "Pressure", "Humidity", "eCOS", "TVOC"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -210,7 +210,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class EnvironmentColor_Data :BTCommonMetaData, IExportDataSource
+        public class EnvironmentColor_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _Red = 0;
@@ -263,12 +263,12 @@ namespace BluetoothProtocols
                 this.Clear = value.Clear;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "Red", "Green", "Blue", "Clear"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -291,7 +291,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class EnvironmentConfiguration_Data :BTCommonMetaData, IExportDataSource
+        public class EnvironmentConfiguration_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _TempInterval = 0;
@@ -384,12 +384,12 @@ namespace BluetoothProtocols
                 this.BlueCalibration = value.BlueCalibration;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "TempInterval", "PressureInterval", "HumidityInterval", "ColorInterval", "GasMode", "RedCalibration", "GreenCalibration", "BlueCalibration"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -417,7 +417,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Common_Configuration_Data :BTCommonMetaData, IExportDataSource
+        public class Common_Configuration_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private string _Device_Name = "";
@@ -470,12 +470,12 @@ namespace BluetoothProtocols
                 this.AddressResolutionSupported = value.AddressResolutionSupported;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "Device_Name", "Appearance", "ConnectionParameter", "AddressResolutionSupported"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -499,7 +499,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Generic_Service_Data :BTCommonMetaData, IExportDataSource
+        public class Generic_Service_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _StartRange = 0;
@@ -532,12 +532,12 @@ namespace BluetoothProtocols
                 this.EndRange = value.EndRange;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "StartRange", "EndRange"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -559,7 +559,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Battery_Data :BTCommonMetaData, IExportDataSource
+        public class Battery_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _BatteryLevel = 0;
@@ -582,12 +582,12 @@ namespace BluetoothProtocols
                 this.BatteryLevel = value.BatteryLevel;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "BatteryLevel"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));
@@ -608,7 +608,7 @@ namespace BluetoothProtocols
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// </summary>
-        public class Configuration_Data :BTCommonMetaData, IExportDataSource
+        public class Configuration_Data :BTCommonMetaData //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private string _DeviceName = "";
@@ -771,12 +771,12 @@ namespace BluetoothProtocols
                 this.NFCTag = value.NFCTag;
             }
 
-            public void ExportHeaders(IExportData exporter)
+            public override void ExportHeaders(IExportData exporter)
             {
                 exporter.HeadersSet(["Date", "Time", "DeviceName", "Interval", "Timeout", "MinInterval", "MaxInterval", "Latency", "SupervisionTimeout", "Eddystone", "CloudToken", "Major", "Minor", "Patch", "param0", "param1", "NFCTag"]);
             }
 
-            public void ExportRow(IExportData exporter)
+            public override void ExportRow(IExportData exporter)
             {
                 exporter.RowStart();
                 exporter.CellSet(TimestampMostRecentDT.ToString("yyyy-MM-dd"));

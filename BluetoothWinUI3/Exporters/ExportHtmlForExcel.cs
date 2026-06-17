@@ -30,12 +30,12 @@ namespace Exporters
 
         public void CellSet(byte[] value)
         {
-            StringBuilder sb = new();
-            foreach (byte b in value)
+            StringBuilder cellsb = new();
+            foreach (byte b in value ?? new byte[] { })
             {
-                sb.Append($"{b:X2} ");
+                cellsb.Append($"{b:X2} ");
             }
-            string strval = sb.ToString().TrimEnd();
+            string strval = cellsb.ToString().TrimEnd();
             sb.Append($"<td>{Escape(strval)}</td>");
         }
 

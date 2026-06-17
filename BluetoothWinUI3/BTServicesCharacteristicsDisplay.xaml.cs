@@ -51,7 +51,7 @@ namespace BluetoothWinUI3
         /// </summary>
         private SortedDictionary<ulong, string> AllAdvertisementHistory = new SortedDictionary<ulong, string>();
         private SortedDictionary<ulong, string> AllAdvertisementManufacturerDataHistory = new SortedDictionary<ulong, string>();
-
+        public IReadOnlyList<IBTCommonMetaData> GetData() { return null; } // TODO: is this correct?
 
         private async void UiConnectionControl_ConnectionChanged(object sender, ConnectionChangedEventArgs e)
         {
@@ -241,11 +241,6 @@ namespace BluetoothWinUI3
 
         public void ExportGraphAsPng()
         {
-        }
-
-        public string ExportData(IExportData exporter)
-        {
-            return string.Empty;
         }
 
         /// <summary>

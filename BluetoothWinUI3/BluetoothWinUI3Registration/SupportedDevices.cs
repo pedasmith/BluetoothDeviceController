@@ -69,7 +69,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("TP359*", typeof(BTCommon_EnvironmentalControl)),
 
             // Bike Cycle Cadence and Speed
-            new SupportedDevice("BK6*", typeof(TAOPE_CyclingSpeedCadenceControl)),
+            new SupportedDevice("BK6*", typeof(BTTAOPE_CyclingSpeedCadenceControl)),
 
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
