@@ -51,7 +51,8 @@ namespace BluetoothWinUI3
         /// </summary>
         private SortedDictionary<ulong, string> AllAdvertisementHistory = new SortedDictionary<ulong, string>();
         private SortedDictionary<ulong, string> AllAdvertisementManufacturerDataHistory = new SortedDictionary<ulong, string>();
-        public IReadOnlyList<IBTCommonMetaData> GetData() { return null; } // TODO: is this correct?
+        public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return null; } // TODO: is this correct?
+        public IBTCommonMetaData GetDataMostRecent() { return null; }
 
         private async void UiConnectionControl_ConnectionChanged(object sender, ConnectionChangedEventArgs e)
         {

@@ -63,8 +63,10 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public Environment_DataCollection HistoricalEnvironment_DataUnits { get;  } = new Environment_DataCollection();
-    public IReadOnlyList<IBTCommonMetaData> GetData() { return HistoricalEnvironment_DataUnits.Data; }
+    public Environment_DataCollection HistoricalDataUnits { get;  } = new Environment_DataCollection();
+    public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
+    public IBTCommonMetaData GetDataMostRecent() 
+        { return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count-1]; }
     /// <summary>
     /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
     /// always in the 'native' units (e.g., always celcius for temperature).
@@ -96,7 +98,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             if (series is LineSeries lineSeries)
             {
-                lineSeries.ItemsSource = HistoricalEnvironment_DataUnits.Data; //DOC:
+                lineSeries.ItemsSource = HistoricalDataUnits.Data; //DOC:
             }
         }
         uiOxyPlot.Model = OxyPlotModel;
@@ -140,7 +142,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         if (uiTableView.ItemsSource != null) return;
-        uiTableView.ItemsSource = HistoricalEnvironment_DataUnits.Data;
+        uiTableView.ItemsSource = HistoricalDataUnits.Data;
     }
 
     private Nordic_Thingy.Environment_Data CopyAndUpdateUnits(Nordic_Thingy.Environment_Data source, Nordic_Thingy.Environment_Data dest)
@@ -471,7 +473,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             KnownDeviceName = name;
             uiDeviceName.Text = KnownDeviceName;
             CurrEnvironment_DataUnits?.Name = KnownDeviceName;
-            foreach (var item in HistoricalEnvironment_DataUnits.Data)
+            foreach (var item in HistoricalDataUnits.Data)
             {
                 item.Name = KnownDeviceName;
             }
@@ -500,7 +502,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         CurrUserPrefs = newPrefs;
 
         // Update the saved data in the HistoricalEnvironment_DataUnits to match the new user preferences.
-        foreach (var data in HistoricalEnvironment_DataUnits.Data)
+        foreach (var data in HistoricalDataUnits.Data)
         {
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
@@ -642,14 +644,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                     break;
                 }
 
-                var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalEnvironment_DataUnits.TimestampMostRecentAdd).TotalSeconds;
+                var deltaInSeconds = CurrEnvironment_Data.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
                 var verb = (deltaInSeconds > 5) ? Environment_DataCollection.Verb.Add : Environment_DataCollection.Verb.ReplaceMostRecent;
-                HistoricalEnvironment_DataUnits.Update(CurrEnvironment_DataUnits, verb); // Will add or replace the data and will copy as needed.
+                HistoricalDataUnits.Update(CurrEnvironment_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
                 // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
                 //
-                if (verb == Environment_DataCollection.Verb.Add && HistoricalEnvironment_DataUnits.Count == 2)
+                if (verb == Environment_DataCollection.Verb.Add && HistoricalDataUnits.Count == 2)
                 {
                     // DOC: Can't have the axes start off invisible because then they can't be switched back on
                     if (CurrWindowSize == MainWindow.WindowSize.Normal)

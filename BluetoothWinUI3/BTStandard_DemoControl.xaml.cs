@@ -50,8 +50,10 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public Battery_DataCollection HistoricalBattery_DataUnits { get; } = new Battery_DataCollection(); // CHANGE:
-    public IReadOnlyList<IBTCommonMetaData> GetData() { return HistoricalBattery_DataUnits.Data; }
+    public Battery_DataCollection HistoricalDataUnits { get; } = new Battery_DataCollection(); // CHANGE:
+    public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
+    public IBTCommonMetaData GetDataMostRecent()
+    { return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1]; }
     /// <summary>
     /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
     /// always in the 'native' units (e.g., always celcius for temperature).
@@ -81,7 +83,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         {
             if (series is LineSeries lineSeries)
             {
-                lineSeries.ItemsSource = HistoricalBattery_DataUnits.Data; //DOC:
+                lineSeries.ItemsSource = HistoricalDataUnits.Data; //DOC:
             }
         }
         uiOxyPlot.Model = OxyPlotModel;
@@ -127,7 +129,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         // We only want to do work the first time.
 
         if (uiTableView.ItemsSource != null) return;
-        uiTableView.ItemsSource = HistoricalBattery_DataUnits.Data;
+        uiTableView.ItemsSource = HistoricalDataUnits.Data;
     }
 
     private BTStandard_Demo.Battery_Data CopyAndUpdateUnits(BTStandard_Demo.Battery_Data source, BTStandard_Demo.Battery_Data dest)
@@ -442,7 +444,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
             KnownDeviceName = name;
             uiDeviceName.Text = KnownDeviceName;
             CurrBattery_DataUnits?.Name = KnownDeviceName;
-            foreach (var item in HistoricalBattery_DataUnits.Data)
+            foreach (var item in HistoricalDataUnits.Data)
             {
                 item.Name = KnownDeviceName;
             }
@@ -471,7 +473,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         CurrUserPrefs = newPrefs;
 
         // Update the saved data in the HistoricalEnvironment_DataUnits to match the new user preferences.
-        foreach (var data in HistoricalBattery_DataUnits.Data)
+        foreach (var data in HistoricalDataUnits.Data)
         {
             // CHANGE: demonstrate how to change what the user sees based on unit preferences.
             // For the BTStandard_Demo, there are no units to change
@@ -600,14 +602,14 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
                 uiBattery.Text = CurrBattery_Data.BatteryLevel.ToString("F2");
 
 
-                var deltaInSeconds = CurrBattery_Data.TimestampMostRecent.Subtract(HistoricalBattery_DataUnits.TimestampMostRecentAdd).TotalSeconds;
+                var deltaInSeconds = CurrBattery_Data.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
                 var verb = (deltaInSeconds > 5) ? Battery_DataCollection.Verb.Add : Battery_DataCollection.Verb.ReplaceMostRecent;
-                HistoricalBattery_DataUnits.Update(CurrBattery_DataUnits, verb); // Will add or replace the data and will copy as needed.
+                HistoricalDataUnits.Update(CurrBattery_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
                 // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
                 //
-                if (verb == Battery_DataCollection.Verb.Add && HistoricalBattery_DataUnits.Count == 2)
+                if (verb == Battery_DataCollection.Verb.Add && HistoricalDataUnits.Count == 2)
                 {
                     // DOC: Can't have the axes start off invisible because then they can't be switched back on
                     if (CurrWindowSize == MainWindow.WindowSize.Normal)

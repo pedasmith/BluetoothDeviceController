@@ -51,6 +51,8 @@ namespace BluetoothWinUI3
         int NAdvertisements = 0;
         UserPreferences CurrUserPrefs = new UserPreferences();
 
+        SmartExportManager SmartExportManager = new SmartExportManager();
+
         public enum WindowSize { Normal, Large } // Normal is 400x400 large is 600x800 (HxW)
         public MainWindow()
         {
@@ -198,11 +200,16 @@ namespace BluetoothWinUI3
                     if (supportedDevice != null)
                     {
                         var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
-                        AddControl(e, control, supportedDevice); // will add to KnownDevices and updated UX and ...
+                        known = AddControl(e, control, supportedDevice); // will add to KnownDevices and updated UX and ...
                                                                  // a control is, e.g., a BTNordic_ThingyControl. AddControl will add to the Known Device list
+
+                        SmartExportManager.HandleNewKnownDevice(known);
                     }
                 }
-                else if (known.Control is IHandleMyBTAdvertisements handleMy)
+                // known will be null when it's not a known device and the "known" wasn't created 
+                // (most likely because it's not a supported device).
+
+                if (known != null && known.Control is IHandleMyBTAdvertisements handleMy)
                 {
                     handleMy.HandleMyAdvertisement(e);
                 }
@@ -232,7 +239,7 @@ namespace BluetoothWinUI3
             });
         }
 
-        private void AddControl(WatcherData e, UserControl control, SupportedDevice supportedDevice)
+        private KnownDevice AddControl(WatcherData e, UserControl control, SupportedDevice supportedDevice)
         {
             var userControl = control as IDeviceControlBasic;
 
@@ -250,6 +257,7 @@ namespace BluetoothWinUI3
                 // Select it!
                 uiKnownDevices.SelectedIndex = 0;
             }
+            return known;
         }
 
         private void OnAdvertisementStart(object sender, RoutedEventArgs e)
@@ -905,6 +913,27 @@ namespace BluetoothWinUI3
             AddControl(null, ctrl, null);
             // null means no watcher data
             // null means not a supported device (since the supported device is determined from the watcher data)
+        }
+
+        private void OnDebugSmartExport(object sender, RoutedEventArgs e)
+        {
+            var data = SmartExportManager.Export();
+
+            try
+            {
+                var dataPackage = new DataPackage()
+                {
+                    RequestedOperation = DataPackageOperation.Copy
+                };
+                dataPackage.SetText(data);
+                Clipboard.SetContent(dataPackage);
+                Clipboard.Flush();
+            }
+            catch (Exception ex)
+            {
+                Log($"Error: unable to make export data for the clipboard; {ex.Message}");
+            }
+
         }
 
         private void OnDebugSetFilterRssiDb(object sender, RoutedEventArgs e)

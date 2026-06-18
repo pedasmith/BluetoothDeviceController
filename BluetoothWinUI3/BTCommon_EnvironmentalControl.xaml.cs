@@ -48,8 +48,10 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public SensorDataCollection HistoricalSensorDataUnits { get; } = new SensorDataCollection();
-    public IReadOnlyList<IBTCommonMetaData> GetData() { return HistoricalSensorDataUnits.Data ; }
+    public SensorDataCollection HistoricalDataUnits { get; } = new SensorDataCollection();
+    public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data ; }
+    public IBTCommonMetaData GetDataMostRecent()
+    { return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1]; }
     /// <summary>
     /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
     /// always in the 'native' units (e.g., always celcius for temperature).
@@ -163,7 +165,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             DataFieldX = "TimestampMostRecentDT",
             DataFieldY = key,
             YAxisKey = key,
-            ItemsSource = HistoricalSensorDataUnits.Data,
+            ItemsSource = HistoricalDataUnits.Data,
         };
 
         oxyPlotModel.Axes.Add(axis);
@@ -376,7 +378,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             KnownDeviceName = name;
             uiDeviceName.Text = KnownDeviceName;
             CurrSensorUnits?.Name = KnownDeviceName;
-            foreach (var item in HistoricalSensorDataUnits.Data)
+            foreach (var item in HistoricalDataUnits.Data)
             {
                 item.Name = KnownDeviceName;
             }
@@ -405,7 +407,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         CurrUserPrefs = newPrefs;
 
         // Update the saved data in the HistoricalSensorDataUnits to match the new user preferences.
-        foreach (var data in HistoricalSensorDataUnits.Data)
+        foreach (var data in HistoricalDataUnits.Data)
         {
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
@@ -515,14 +517,14 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             case SensorDataRecord.HumidityPropertyChangedName:
                 // Unlike the Nordic_Thingy52 where the different values come in at different
                 // time, the sensor data comes in all at once.
-                var deltaInSeconds = CurrSensor.TimestampMostRecent.Subtract(HistoricalSensorDataUnits.TimestampMostRecentAdd).TotalSeconds;
+                var deltaInSeconds = CurrSensor.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
                 var verb = (deltaInSeconds > 5) ? SensorDataCollection.Verb.Add : SensorDataCollection.Verb.ReplaceMostRecent;
-                HistoricalSensorDataUnits.Update(CurrSensorUnits, verb); // Will add or replace the data and will copy as needed.
+                HistoricalDataUnits.Update(CurrSensorUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
                 // Update the OxyPlot because it doesn't tracked the INotifyCollectionChanged
                 //
-                if (verb == SensorDataCollection.Verb.Add && HistoricalSensorDataUnits.Count == 2)
+                if (verb == SensorDataCollection.Verb.Add && HistoricalDataUnits.Count == 2)
                 {
                     // DOC: Can't have the axes start off invisible because then they can't be switched back on
                     if (CurrWindowSize == MainWindow.WindowSize.Normal)
@@ -734,7 +736,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         //
         // Initialize the table
         //
-        uiTableView.ItemsSource = HistoricalSensorDataUnits.Data;
+        uiTableView.ItemsSource = HistoricalDataUnits.Data;
     }
 
     /// <summary>

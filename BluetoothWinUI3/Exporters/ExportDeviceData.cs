@@ -9,17 +9,12 @@ using System.Text;
 
 namespace Exporters
 {
-    public class ExportDeviceData
+    public static class ExportDeviceData
     {
-        public ExportDeviceData()
-        {
-
-        }
-
         public static string ExportData(IDeviceControlBasic control, IExportData exporter)
         {
             string retval = "";
-            var data = control.GetData();
+            var data = control.GetDataAll();
             if (data == null || data.Count == 0)
             {
                 //Log("No data to export.");

@@ -56,7 +56,13 @@ namespace BluetoothWinUI3
         // TODO: make the Png exporter like the IExportData? So that all that awful code is in one place?
         void ExportGraphAsPng();
         // Gone! ExportData is now in ExportDeviceData() and uses the GetData() for export! string ExportData(IExportData exporter);
-        IReadOnlyList<IBTCommonMetaData> GetData();
+        IReadOnlyList<IBTCommonMetaData> GetDataAll();
+
+        /// <summary>
+        /// Returns NULL if there's no data yet
+        /// </summary>
+        /// <returns></returns>
+        IBTCommonMetaData GetDataMostRecent();
 
         enum DetailsType {  Normal, All, }
         string GetDetails(DetailsType detailsType);
@@ -95,6 +101,7 @@ namespace BluetoothWinUI3
     {
         void HandleAdvertisement(WatcherData data);
     }
+
 
     /// <summary>
     /// The DeviceControl wants all of the advertisements for the specific (known) device based on 

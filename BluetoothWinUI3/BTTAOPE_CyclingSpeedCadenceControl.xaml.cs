@@ -60,8 +60,10 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public SpeedCadence_DataCollection HistoricalSpeed_and_Cadence_DataUnits { get; } = new SpeedCadence_DataCollection(); // CHANGE:
-    public IReadOnlyList<IBTCommonMetaData> GetData() { return HistoricalSpeed_and_Cadence_DataUnits.Data; }
+    public SpeedCadence_DataCollection HistoricalDataUnits { get; } = new SpeedCadence_DataCollection(); // CHANGE:
+    public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
+    public IBTCommonMetaData GetDataMostRecent()
+    { return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1]; }
     /// <summary>
     /// Similar to CurrBattery_Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalBattery_DataUnits collection.
@@ -85,7 +87,7 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
         {
             if (series is LineSeries lineSeries)
             {
-                lineSeries.ItemsSource = HistoricalSpeed_and_Cadence_DataUnits.Data; //DOC:
+                lineSeries.ItemsSource = HistoricalDataUnits.Data; //DOC:
             }
         }
         uiOxyPlot.Model = OxyPlotModel;
@@ -131,7 +133,7 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
         // We only want to do work the first time.
 
         if (uiTableView.ItemsSource != null) return;
-        uiTableView.ItemsSource = HistoricalSpeed_and_Cadence_DataUnits.Data;
+        uiTableView.ItemsSource = HistoricalDataUnits.Data;
     }
 
     private SpeedCadence_Data CopyAndUpdateUnits(SpeedCadence_Data source, SpeedCadence_Data dest)
@@ -426,7 +428,7 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
             KnownDeviceName = name;
             uiDeviceName.Text = KnownDeviceName;
             CurrSpeed_and_Cadence_DataUnits?.Name = KnownDeviceName;
-            foreach (var item in HistoricalSpeed_and_Cadence_DataUnits.Data)
+            foreach (var item in HistoricalDataUnits.Data)
             {
                 item.Name = KnownDeviceName;
             }
@@ -455,7 +457,7 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
 
         // Update the saved data in the HistoricalEnvironment_DataUnits to match the new user preferences.
         // TODO: eventually there will be a speed in MPH or KPH!
-        foreach (var data in HistoricalSpeed_and_Cadence_DataUnits.Data)
+        foreach (var data in HistoricalDataUnits.Data)
         {
             // CHANGE: demonstrate how to change what the user sees based on unit preferences.
             // For the TAOPE_CyclingSpeedCadence, there are no units to change
@@ -639,14 +641,14 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
                     LastRevolutionCrank = CurrSpeed_and_Cadence_Data.RevolutionCrank;
                 }
 
-                var deltaInSeconds = CurrSpeed_and_Cadence_Data.TimestampMostRecent.Subtract(HistoricalSpeed_and_Cadence_DataUnits.TimestampMostRecentAdd).TotalSeconds;
+                var deltaInSeconds = CurrSpeed_and_Cadence_Data.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
                 var verb = (deltaInSeconds > 5) ? SpeedCadence_DataCollection.Verb.Add : SpeedCadence_DataCollection.Verb.ReplaceMostRecent;
-                HistoricalSpeed_and_Cadence_DataUnits.Update(CurrSpeed_and_Cadence_DataUnits, verb); // Will add or replace the data and will copy as needed.
+                HistoricalDataUnits.Update(CurrSpeed_and_Cadence_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
                 // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
                 //
-                if (verb == SpeedCadence_DataCollection.Verb.Add && HistoricalSpeed_and_Cadence_DataUnits.Count == 2)
+                if (verb == SpeedCadence_DataCollection.Verb.Add && HistoricalDataUnits.Count == 2)
                 {
                     // DOC: Can't have the axes start off invisible because then they can't be switched back on
                     if (CurrWindowSize == MainWindow.WindowSize.Normal)
