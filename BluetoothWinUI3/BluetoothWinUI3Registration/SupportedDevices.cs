@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,17 +24,39 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
     {
         public SupportedDevice(string match, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type factory)
         {
-            MatchingName = match;
+            Guid guid;
+            var isguid = Guid.TryParse(match, out guid);
+            if (isguid)
+            {
+                MatchingServiceGuid = guid;
+            }
+            else
+            {
+                MatchingName = match;
+            }
             FactoryInterface = factory;
         }
         public string MatchingName { get; set; } = "Thingy*"; // For example 
+        public Guid MatchingServiceGuid { get; set; } = Guid.Empty;
 
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
         public Type FactoryInterface { get; set; } = null;
         public bool Matches(WatcherData advertisement)
         {
-            var name = advertisement.BestName;
-            var retval = name.StarMatch(MatchingName);
+            var retval = false;
+            if (MatchingServiceGuid != Guid.Empty)
+            {
+                retval = advertisement.ServiceUuids.Contains(MatchingServiceGuid);
+                if (retval)
+                {
+                    ; // handy place for a debugger
+                }
+            }
+            else
+            {
+                var name = advertisement.BestName;
+                retval = name.StarMatch(MatchingName);
+            }
             return retval;
         }
     }
@@ -69,7 +92,8 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("TP359*", typeof(BTCommon_EnvironmentalControl)),
 
             // Bike Cycle Cadence and Speed
-            new SupportedDevice("BK6*", typeof(BTTAOPE_CyclingSpeedCadenceControl)),
+            //new SupportedDevice("BK6*", typeof(BTTAOPE_CyclingSpeedCadenceControl)),
+            new SupportedDevice("00001816-0000-1000-8000-00805F9B34FB", typeof(BTTAOPE_CyclingSpeedCadenceControl)),
 
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)

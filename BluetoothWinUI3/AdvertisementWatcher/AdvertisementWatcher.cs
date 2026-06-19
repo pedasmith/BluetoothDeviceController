@@ -10,6 +10,7 @@ using Windows.Storage.Streams;
 
 using BluetoothConversions;
 using Utilities;
+using Microsoft.UI.Xaml.Controls;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -108,6 +109,54 @@ namespace BluetoothWatcher.AdvertismentWatcher
                     case AdvertisementDataSectionParser.DataTypeValue.TxPowerLevel:
                         watcherData.TransmitPower = AdvertisementDataSectionParser.ParseTxPowerLevel(section);
                         break;
+
+                    case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf16BitServiceUuids: // 0x02
+                    case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf16BitServiceUuids: // 0x03
+                        {
+                            var dr = DataReader.FromBuffer(section.Data);
+                            dr.ByteOrder = ByteOrder.LittleEndian;
+                            while (dr.UnconsumedBufferLength >= 2)
+                            {
+                                var addr0 = dr.ReadUInt16();
+                                //var service = $"{addr7:X04}{addr6:X04}-{addr5:X04}-{addr4:X04}-{addr3:X04}-{addr2:X04}{addr1:X04}{addr0:X04}";
+                                var service = BluetoothServiceUuid16Bit.Encode(addr0);
+                                Guid guid;
+                                var isguid = Guid.TryParse(service, out guid);
+                                if (isguid)
+                                {
+                                    watcherData.ServiceUuids.Add(guid);
+                                }
+                            }
+                        }
+                        break;
+
+                    case AdvertisementDataSectionParser.DataTypeValue.IncompleteListOf128BitServiceUuids: // 0x06
+                    case AdvertisementDataSectionParser.DataTypeValue.CompleteListOf128BitServiceUuids: // 0x07
+                        {
+                            var dr = DataReader.FromBuffer(section.Data);
+                            dr.ByteOrder = ByteOrder.LittleEndian;
+                            while (dr.UnconsumedBufferLength >= 16)
+                            {
+                                var addr0 = dr.ReadUInt16();
+                                var addr1 = dr.ReadUInt16();
+                                var addr2 = dr.ReadUInt16();
+                                var addr3 = dr.ReadUInt16();
+                                var addr4 = dr.ReadUInt16();
+                                var addr5 = dr.ReadUInt16();
+                                var addr6 = dr.ReadUInt16();
+                                var addr7 = dr.ReadUInt16();
+                                var service = $"{addr7:X04}{addr6:X04}-{addr5:X04}-{addr4:X04}-{addr3:X04}-{addr2:X04}{addr1:X04}{addr0:X04}";
+                                Guid guid;
+                                var isguid = Guid.TryParse(service, out guid);
+                                if (isguid)
+                                {
+                                    watcherData.ServiceUuids.Add(guid);
+                                }
+                            }
+                        }
+
+                        break;
+
                 }
             }
             if (string.IsNullOrEmpty(watcherData.BestName) && havePreviousAdvert)

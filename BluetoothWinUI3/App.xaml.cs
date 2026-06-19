@@ -1,4 +1,5 @@
-﻿using IotNumberFormats;
+﻿using BluetoothConversions;
+using IotNumberFormats;
 using Microsoft.UI.Xaml;
 using System;
 using System.Runtime.InteropServices;
@@ -36,6 +37,7 @@ namespace BluetoothWinUI3
         static int TestAll()
         {
             int nerror = 0;
+            nerror += BluetoothServiceUuid16Bit.Test();
             nerror += Utilities.StringUtilities.TestStarMatch();
             nerror += ValueToStringTest.Test();
             nerror += BluetoothWatcher.Units.Temperature.Test();

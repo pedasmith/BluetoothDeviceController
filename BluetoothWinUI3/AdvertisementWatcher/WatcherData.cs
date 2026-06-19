@@ -63,6 +63,15 @@ namespace BluetoothWatcher.AdvertismentWatcher
         public ulong Addr {  get { return OriginalAdvertisement?.BluetoothAddress ?? 0; } }
         public string AddressAsString { get { return BluetoothAddress.AsString(Addr); } }
 
+        /// <summary>
+        /// List of service UUIDs in the advertisement. 
+        /// </summary>
+        public List<Guid> ServiceUuids = new List<Guid>();
+
+        // NOTE: Temporary while the whole infra
+        public static Guid CyclingSpeed_and_Cadence = Guid.Parse(BluetoothServiceUuid16Bit.Encode(0x1816));
+        public bool HasCyclingSpeed_And_Cadence {  get { return ServiceUuids.Contains(CyclingSpeed_and_Cadence);  } }
+
         public string TimeStampHHmmssfff
         {  
             get

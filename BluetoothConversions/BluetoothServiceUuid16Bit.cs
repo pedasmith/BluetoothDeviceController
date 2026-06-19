@@ -8,6 +8,43 @@ namespace BluetoothConversions
 {
     static class BluetoothServiceUuid16Bit
     {
+        public static string Encode(UInt16 value)
+        {
+            // 00000000-0000-1000-8000-00805F9B34FB
+            var valuestr = $"{value:X4}";
+            var retval = "0000" + valuestr + "-0000-1000-8000-00805F9B34FB";
+            return retval;
+        }
+
+		private static void Log(string str)
+		{
+			System.Diagnostics.Debug.WriteLine(str);
+			Console.WriteLine(str);
+		}
+		private static int TestOneEncode(UInt16 input, string expected)
+		{
+			int nerror = 0;
+			string actual = Encode(input);
+			if (actual != expected)
+			{
+				Log($"ERROR: Guid16: {input:X4} expected={expected} actual={actual}");
+			}
+			return nerror;
+		}
+		public static int Test()
+		{
+			int nerror = 0;
+			nerror += TestOneEncode(0x1802, "00001802-0000-1000-8000-00805F9B34FB");
+			return nerror;
+		}
+        public static string Encode(UInt32 value)
+        {
+            // 00000000-0000-1000-8000-00805F9B34FB
+            var valuestr = $"{value:X8}";
+            var retval = "" + valuestr + "-0000-1000-8000-00805F9B34FB";
+            return retval;
+        }
+
         // From https://btprodspecificationrefs.blob.core.windows.net/assigned-values/16-bit%20UUID%20Numbers%20Document.pdf
         // the items marked GATT Service
         // Maybe https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/uuids/service_uuids.yaml
