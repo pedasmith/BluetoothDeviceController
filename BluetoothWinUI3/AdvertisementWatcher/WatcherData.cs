@@ -64,13 +64,11 @@ namespace BluetoothWatcher.AdvertismentWatcher
         public string AddressAsString { get { return BluetoothAddress.AsString(Addr); } }
 
         /// <summary>
-        /// List of service UUIDs in the advertisement. 
+        /// List of service UUIDs in the advertisement. Include the 16-bit ones and the 32-bit
+        /// (although that code hasn't been tested)
         /// </summary>
         public List<Guid> ServiceUuids = new List<Guid>();
 
-        // NOTE: Temporary while the whole infra
-        public static Guid CyclingSpeed_and_Cadence = Guid.Parse(BluetoothServiceUuid16Bit.Encode(0x1816));
-        public bool HasCyclingSpeed_And_Cadence {  get { return ServiceUuids.Contains(CyclingSpeed_and_Cadence);  } }
 
         public string TimeStampHHmmssfff
         {  

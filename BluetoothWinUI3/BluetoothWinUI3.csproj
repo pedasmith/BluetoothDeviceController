@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\About_BluetoothWinUI3_dev.md" />
+    <Content Remove="Assets\HelpFiles\Planning.md" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="AppDictionary.xaml" />

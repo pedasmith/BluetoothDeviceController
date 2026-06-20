@@ -10,7 +10,6 @@ using Windows.Storage.Streams;
 
 using BluetoothConversions;
 using Utilities;
-using Microsoft.UI.Xaml.Controls;
 
 #if NET8_0_OR_GREATER
 #nullable disable

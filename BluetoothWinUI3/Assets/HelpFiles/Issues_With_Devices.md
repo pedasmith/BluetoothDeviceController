@@ -6,7 +6,7 @@ The ThermPro 357 is a small, AAA powered device with an LCD screen. When put int
 
 The Bluetooth advertisements don't meet the SIG requirements (or the Bluetooth Accessory Guidelines, either). In the Manufacturer's specific data area, they don't include a manufacturer ID; they just use those two bytes for their own protocol.
 
-In the example data, the column marked ?? changes (02 to 00), but the cause is unknown.
+(In the example data, the column marked ?? changes (02 to 00), but the cause is unknown.)
 
 
 ### Example data
