@@ -8,6 +8,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Windows.Devices.Bluetooth;
 using Windows.UI;
 
 
@@ -19,7 +20,7 @@ namespace BluetoothWinUI3
 {
     public static class AllSaveData
     {
-        public static List<SaveData> AllDevices = new List<SaveData>();
+        private static List<SaveData> AllDevices = new List<SaveData>();
 
         /// <summary>
         /// Saves the AllDevices into a .devices JSON file. This will be tucked into the Documents/BluetoothDevices 
@@ -87,10 +88,70 @@ namespace BluetoothWinUI3
             return null;
         }
 
+        /// <summary>
+        /// The advertisement address is from the device advertisement
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static SaveData FindWithAdvertisementAddress(ulong address)
+        {
+            foreach (var device in AllDevices)
+            {
+                if (device.Id.AdvertisementAddress == address)
+                {
+                    return device;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// The ID is the BluetoothLEDevice.DeviceId and is assigned by Windows. The device
+        /// id is the primary ID and the address is the fallback.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static SaveData FindWithIdOrAdvertisementAddress(string id, ulong address)
+        {
+            SaveData foundViaAdvertisement = null;
+            foreach (var device in AllDevices)
+            {
+                if (device.MatchesDeviceId(id))
+                {
+                    return device;
+                }
+                if (device.Id.AdvertisementAddress == address)
+                {
+                    foundViaAdvertisement = device;
+                }
+            }
+
+            return foundViaAdvertisement;
+        }
+
         public static void Insert(SaveData data)
         {
             AllDevices.Add(data);
             return;
+        }
+
+        public static SaveData GetOrCreateSaveData(KnownDevice knownDevice)
+        {
+            var saveData = AllSaveData.FindWithId(knownDevice.Id);
+            if (saveData == null)
+            {
+                saveData = AllSaveData.FindWithAdvertisementAddress(knownDevice.Advertisement.Addr);
+            }
+
+            if (saveData == null)
+            {
+                // Must create a new SaveData.
+                saveData = new SaveData(knownDevice);
+                AllSaveData.Insert(saveData);
+                AllSaveData.Save(); // quick update
+            }
+            return saveData;
         }
     }
 
@@ -106,6 +167,37 @@ namespace BluetoothWinUI3
             Id.ConnectAddress = knownDevice.BTLEDevice?.BluetoothAddress ?? 0;
             Id.ConnectName = knownDevice.BTLEDevice?.Name ?? "";
             Id.DeviceId = knownDevice.BTLEDevice?.DeviceId ?? knownDevice.Id;
+        }
+
+
+        /// <summary>
+        /// The first SaveData is created using just the advertisement address.
+        /// Update when connected 
+        /// </summary>
+        /// <param name="knownDevice"></param>
+        public void UpdateWithDevice(KnownDevice knownDevice)
+        {
+            if (knownDevice.Advertisement != null)
+            {
+                Id.AdvertisementAddress = knownDevice.Advertisement.Addr;
+                Id.AdvertisementName = knownDevice.Advertisement.BestName;
+            }
+            if (knownDevice.BTLEDevice != null)
+            {
+                Id.ConnectAddress = knownDevice.BTLEDevice.BluetoothAddress;
+                if (!string.IsNullOrEmpty(knownDevice.BTLEDevice.Name))
+                {
+                    Id.ConnectName = knownDevice.BTLEDevice.Name;
+                }
+                if (!string.IsNullOrEmpty(Id.DeviceId) && Id.DeviceId != knownDevice.BTLEDevice?.DeviceId)
+                {
+                    ; // handy place for a debugger
+                }
+                if (string.IsNullOrEmpty(Id.DeviceId))
+                {
+                    Id.DeviceId = knownDevice.BTLEDevice?.DeviceId ?? knownDevice.Id;
+                }
+            }
         }
 
         /// <summary>
@@ -310,15 +402,59 @@ namespace BluetoothWinUI3
 
     }
 
-    // TODO: fill all this in!
+    /// <summary>
+    /// Contains the advertisement / connection / data history of the device.
+    /// </summary>
     public class DeviceHistory
     {
-        public DateTimeOffset FirstAdvertisement { get; set; }
-        public DateTimeOffset FirstConnection { get; set;  }
-        public DateTimeOffset FirstData { get; set; }
-        public DateTimeOffset MostRecentAdvertisement { get; set; }
-        public DateTimeOffset MostRecentConnection { get; set; }
-        public DateTimeOffset MostRecentData { get; set; }
+        public void UpdateAdvertisementHistory(DateTimeOffset dto)
+        {
+            if (FirstAdvertisement == DateTimeOffset.MinValue) FirstAdvertisement = dto;
+            MostRecentAdvertisement = dto;
+        }
+
+        public void UpdateConnectionHistory(DateTimeOffset dto, BluetoothConnectionStatus status)
+        {
+            switch (status)
+            {
+                case BluetoothConnectionStatus.Connected:
+                    UpdateConnectionOkHistory(dto);
+                    break;
+                default:
+                case BluetoothConnectionStatus.Disconnected:
+                    UpdateConnectionFailedHistory(dto);
+                    break;
+            }
+        }
+
+        
+        private void UpdateConnectionOkHistory(DateTimeOffset dto)
+        {
+            if (FirstConnectionOk == DateTimeOffset.MinValue) FirstConnectionOk = dto;
+            MostRecentConnectionOk = dto;
+        }
+
+        private void UpdateConnectionFailedHistory(DateTimeOffset dto)
+        {
+            if (FirstConnectionFailed == DateTimeOffset.MinValue) FirstConnectionFailed = dto;
+            MostRecentConnectionFailed = dto;
+        }
+
+        public void UpdateDataHistory(DateTimeOffset dto)
+        {
+            if (FirstData == DateTimeOffset.MinValue) FirstData = dto;
+            MostRecentData = dto;
+        }
+
+        public DateTimeOffset FirstAdvertisement { get; set; } = DateTimeOffset.MinValue;
+        public DateTimeOffset FirstConnectionOk { get; set; } = DateTimeOffset.MinValue;
+        public DateTimeOffset FirstConnectionFailed { get; set; } = DateTimeOffset.MinValue;
+        public DateTimeOffset FirstData { get; set; } = DateTimeOffset.MinValue;
+
+        public DateTimeOffset MostRecentAdvertisement { get; set; } = DateTimeOffset.MinValue;
+        public DateTimeOffset MostRecentConnectionOk { get; set; } = DateTimeOffset.MinValue;
+        public DateTimeOffset MostRecentConnectionFailed { get; set; } = DateTimeOffset.MinValue;
+        public DateTimeOffset MostRecentData { get; set; } = DateTimeOffset.MinValue;
     }
 
 

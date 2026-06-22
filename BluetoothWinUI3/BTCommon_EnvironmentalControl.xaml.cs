@@ -43,6 +43,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// </summary>
     private readonly string InternalDeviceType = "EnvironmentSensor";
     string KnownDeviceName = "device";
+    SaveData CurrSaveData = null;
 
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
@@ -237,6 +238,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         }
 
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
+        CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // might return null for the first connection
+        // Specific to the Common_EnvironmentalControl: since this control works via advertisements, we're 
+        // guaranteed to always get a CurrSaveData at this point.
 
         // In the Nordic_Thingy, setting the DataContext to a KnownDevice is the trigger
         // for connecting via BluetoothLE to a device. But this Sensor display is driven
@@ -652,6 +656,8 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                 Log($"ERROR: unable to parse sensor data for sensor type {CurrSensorFamily}");
                 return;
             }
+            CurrSaveData.History.UpdateAdvertisementHistory(data.MostRecentAdvertisement.Timestamp);
+            CurrSaveData.History.UpdateDataHistory(data.MostRecentAdvertisement.Timestamp);
             CurrSensor.Name = name;
             CurrSensor.TimestampMostRecent = data.MostRecentAdvertisement.Timestamp;
             if (CurrSensor.IsValid)
@@ -659,6 +665,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                 if (FirstCallWithIsValid)
                 {
                     SetupOnFirstValidData();
+                    // Advertisements aren't really "connected".
+                    CurrSaveData.History.UpdateConnectionHistory(data.MostRecentAdvertisement.Timestamp, BluetoothConnectionStatus.Connected);
+
                     FirstCallWithIsValid = false;
                 }
                 UpdateDeviceDataUX("*"); // Update all the data!

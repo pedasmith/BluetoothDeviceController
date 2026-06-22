@@ -113,7 +113,8 @@ namespace Exporters
                     continue; // skip this device
                 }
                 var basic = device.Control as IDeviceControlBasic;
-                var row = basic.GetDataMostRecent(); // row is guarnatee to exist per check in BuildHeaders
+                var row = basic.GetDataMostRecent(); // row is guaranteed to exist per check in BuildHeaders
+                if (row == null) continue;
                 // These have to match the header we added earier
                 Exporter.CellSet(row.TimestampMostRecentDT.ToString("yyyy-MM-dd"));
                 Exporter.CellSet(row.TimestampMostRecentDT.ToString("HH:mm:ss"));

@@ -45,6 +45,8 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     private readonly string InternalDeviceType = "BTStandard_Demo";
     BTStandard_Demo Device;
     string KnownDeviceName = "device";
+    SaveData CurrSaveData = null;
+    ulong OriginalBTAddr = 0xFFFFFFFF_FFFFFFFF;
 
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
@@ -254,7 +256,6 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     }
 
 
-    ulong OriginalBTAddr = 0xFFFFFFFF_FFFFFFFF;
     /// <summary>
     /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
     /// trigger looking up the SaveData and change more things. And it will actually connect to the device.
@@ -281,6 +282,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         }
         OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
         uiAddress.Text = BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr);
+        CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // might return null for the first connection
 
         Device = new BTStandard_Demo()
         {
@@ -289,23 +291,19 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         if (Device.ble == null)
         {
             Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
+            CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
             return;
         }
         // It's critical to set these!
         DataContextAsKnownDevice.Id = Device.ble.DeviceId ?? ""; // never null :-)
         DataContextAsKnownDevice.BTLEDevice = Device.ble;
+        CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id); // now it's "guaranteed" to exist. Use the stable form of the device id.
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
         InitializeKeyLineColorsFromDefaultOxyPlot();
 
-
-        var saveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id);
-        if (saveData != null)
-        {
-            UpdateUX(saveData);
-        }
-
+        UpdateUX(CurrSaveData); // Shouldn't be null, but also handles null gracefully.
 
         Device.PropertyChanged += Device_PropertyChanged;
         await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
@@ -335,6 +333,9 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         await Device.ReadDevice_Name(BluetoothCacheMode.Cached);
         await Device.ReadConnection_Parameter(BluetoothCacheMode.Cached);
 
+        // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
+        // connect. Once we do the notify and reads the device will be connected or not.
+        CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
     }
 
     public IDeviceControlBasic.Visibility GetDataGridVisibility()
@@ -532,6 +533,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         UIThreadHelper.CallOnUIThread(() =>
         {
             if (!IsLoaded) return;
+            CurrSaveData?.History.UpdateDataHistory(DateTimeOffset.Now);
             UpdateDeviceDataUX(e.PropertyName);
         });
     }

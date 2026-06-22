@@ -58,6 +58,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     private readonly string InternalDeviceType = "Nordic_Thingy";
     Nordic_Thingy Device;
     string KnownDeviceName = "device";
+    SaveData CurrSaveData = null;
+    ulong OriginalBTAddr = 0xFFFFFFFF_FFFFFFFF;
 
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
@@ -327,8 +329,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {args.NewValue.GetType()}");
             return;
         }
-
+        if (OriginalBTAddr != 0xFFFFFFFF_FFFFFFFF)
+        {
+            ; // duplicate call!
+            return;
+        }
+        OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
         uiAddress.Text = BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr);
+        CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // might return null for the first connection
 
         Device = new Nordic_Thingy()
         {
@@ -337,23 +345,20 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         if (Device.ble == null)
         {
             Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
+            CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
             return;
         }
         // It's critical to set these!
         DataContextAsKnownDevice.Id = Device.ble.DeviceId ?? ""; // never null :-)
         DataContextAsKnownDevice.BTLEDevice = Device.ble;
+        CurrSaveData?.UpdateWithDevice(DataContextAsKnownDevice);
+        CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id); // now it's "guaranteed" to exist. Use the stable form of the device id.
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
         InitializeKeyLineColorsFromDefaultOxyPlot();
 
-
-        var saveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id);
-        if (saveData != null)
-        {
-            UpdateUX(saveData);
-        }
-
+        UpdateUX(CurrSaveData); // Shouldn't be null, but also handles null gracefully.
 
         Device.PropertyChanged += Device_PropertyChanged;
         await Device.NotifyBatteryLevelAsync();
@@ -364,6 +369,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         await Device.NotifyColor_RGB_ClearAsync();
         await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
 
+        // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
+        // connect. Once we do the notify and reads the device will be connected or not.
+        CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
     }
 
     public IDeviceControlBasic.Visibility GetDataGridVisibility()
@@ -558,10 +566,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     {
         UIThreadHelper.CallOnUIThread(() =>
         {
-            if (this.IsLoaded) // Won't be loaded when we exit the app!
-            {
-                UpdateDeviceDataUX(e.PropertyName);
-            }
+            if (!IsLoaded) return;
+            CurrSaveData?.History.UpdateDataHistory(DateTimeOffset.Now);
+            UpdateDeviceDataUX(e.PropertyName);
         });
     }
 

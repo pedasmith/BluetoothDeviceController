@@ -52,6 +52,7 @@ namespace BluetoothWinUI3
         UserPreferences CurrUserPrefs = new UserPreferences();
 
         SmartExportManager SmartExportManager = new SmartExportManager();
+        SaveDataRunner SaveDataRunner = new SaveDataRunner();
 
         public enum WindowSize { Normal, Large } // Normal is 400x400 large is 600x800 (HxW)
         public MainWindow()
@@ -88,6 +89,8 @@ namespace BluetoothWinUI3
             {
                 AdvertisementWatcher.Start();
             }
+
+            SaveDataRunner.Start();
         }
 
         // Code is From https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.windowing.appwindow.seticon?view=windows-app-sdk-1.8#Microsoft_UI_Windowing_AppWindow_SetIcon_System_String_
@@ -162,9 +165,9 @@ namespace BluetoothWinUI3
         Dictionary<string, string> UniqueAdvertisements = new Dictionary<string, string>();
         Dictionary<string, string> UniqueBTAddresses = new Dictionary<string, string>();
         /// <summary>
-        /// List of all of the controls (like BTServicesCharacteristicsDisplay) that can do something with all of the 
-        /// advertisements that are seen. Is added to in e.g., OnDebugShowAdvertisements and is used by the
-        /// AdvertisementWatcher_WatcherEvent.
+        /// List of all of the controls (like BTServicesCharacteristicsDisplay) that can do something 
+        /// with all of the advertisements that are seen. Is added to in e.g., OnDebugShowAdvertisements 
+        /// and is used by the AdvertisementWatcher_WatcherEvent.
         /// </summary>
         IList<IHandleBTAdvertisements> BTAdvertisementHandlers = new List<IHandleBTAdvertisements>();
 
@@ -200,12 +203,21 @@ namespace BluetoothWinUI3
                     if (supportedDevice != null)
                     {
                         var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
-                        known = AddControl(e, control, supportedDevice); // will add to KnownDevices and updated UX and ...
-                                                                 // a control is, e.g., a BTNordic_ThingyControl. AddControl will add to the Known Device list
+                        known = AddControl(e, control, supportedDevice); 
+                        // will add to KnownDevices and updated UX and ...  a control is, e.g., a
+                        // BTNordic_ThingyControl. AddControl will add to the Known Device list
 
                         SmartExportManager.HandleNewKnownDevice(known);
                     }
                 }
+
+                if (known != null)
+                {
+                    // Track the advertisement history
+                    var saveData = AllSaveData.FindWithIdOrAdvertisementAddress(known.Id, e.Addr);
+                    saveData?.History.UpdateAdvertisementHistory(e.MostRecentAdvertisement.Timestamp);
+                }
+
                 // known will be null when it's not a known device and the "known" wasn't created 
                 // (most likely because it's not a supported device).
 
@@ -214,23 +226,7 @@ namespace BluetoothWinUI3
                     handleMy.HandleMyAdvertisement(e);
                 }
 
-#if NEVER_EVER_DEFINED
-                var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
-                if (supportedDevice != null)
-                {
-                    var known = KnownDevices.Get(e);
-                    if (known == null) // not known (e.g.: this specific one hasn't been seen before in this session)
-                    {
-                        var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
-                        AddControl(e, control, supportedDevice); // will add to KnownDevices and updated UX and ...
-                        // a control is, e.g., a BTNordic_ThingyControl. AddControl will add to the Known Device list
-                    }
-                    else if (known.Control is IHandleMyBTAdvertisements handleMy)
-                    {
-                        handleMy.HandleMyAdvertisement(e);
-                    }
-                }
-#endif
+
 
                 foreach (var handler in BTAdvertisementHandlers)
                 {
@@ -249,6 +245,7 @@ namespace BluetoothWinUI3
 
             var known = KnownDevices.Add(e, control, zoomControl, supportedDevice);
             userControl?.SetNotifyDeviceControlChanges(this);
+            AllSaveData.GetOrCreateSaveData(known);
             control.DataContext = known;
             userControl?.UpdateUX(CurrUserPrefs, null);
 
@@ -374,18 +371,7 @@ namespace BluetoothWinUI3
             return knownDevice;
         }
 
-        private SaveData GetOrCreateSaveData(KnownDevice knownDevice)
-        {
-            var saveData = AllSaveData.FindWithId(knownDevice.Id);
-            if (saveData == null)
-            {
-                // Must create a new SaveData.
-                saveData = new SaveData(knownDevice);
-                AllSaveData.Insert(saveData);
-                AllSaveData.Save(); // quick update
-            }
-            return saveData;
-        }
+
 
         private async void OnBTColorBackground(object sender, RoutedEventArgs e)
         {
@@ -406,7 +392,7 @@ namespace BluetoothWinUI3
             if (selected == null) return;
             var knownDevice = await GetKnownDevice(selected, verb);
             if (knownDevice == null) return;
-            var saveData = GetOrCreateSaveData(knownDevice);
+            var saveData = AllSaveData.GetOrCreateSaveData(knownDevice);
 
             var colorsSave = saveData.GetDeviceColors(Application.Current.RequestedTheme);
             var colors = new DeviceColorBrushes(colorsSave);
@@ -447,7 +433,7 @@ namespace BluetoothWinUI3
             if (selected == null) return;
             var knownDevice = await GetKnownDevice(selected, verb);
             if (knownDevice == null) return;
-            var saveData = GetOrCreateSaveData(knownDevice);
+            var saveData = AllSaveData.GetOrCreateSaveData(knownDevice);
 
 
             var dlg = uiDialogRenameDevice;
@@ -806,7 +792,7 @@ namespace BluetoothWinUI3
             if (selected == null) return;
             var knownDevice = await GetKnownDevice(selected, verb);
             if (knownDevice == null) return;
-            var saveData = GetOrCreateSaveData(knownDevice);
+            var saveData = AllSaveData.GetOrCreateSaveData(knownDevice);
 
             var colorsSave = saveData.GetDeviceColors(Application.Current.RequestedTheme);
 
