@@ -94,7 +94,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
 
             // Bike Cycle Cadence and Speed
             //new SupportedDevice("BK6*", typeof(BTTAOPE_CyclingSpeedCadenceControl)),
-            new SupportedDevice("00001816-0000-1000-8000-00805F9B34FB", typeof(BTTAOPE_CyclingSpeedCadenceControl)),
+            new SupportedDevice("00001816-0000-1000-8000-00805F9B34FB", typeof(BTStandard_CyclingSpeedCadenceControl)),
             new SupportedDevice("0000180d-0000-1000-8000-00805F9B34FB", typeof(BTStandard_HeartRateControl)),
 
         };

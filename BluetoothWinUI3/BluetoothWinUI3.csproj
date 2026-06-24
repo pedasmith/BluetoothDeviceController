@@ -35,6 +35,7 @@
     <None Remove="BTBlank_BlankControl.xaml" />
     <None Remove="BTNordic_ThingyControl.xaml" />
     <None Remove="BTServicesCharacteristicsDisplay.xaml" />
+    <None Remove="BTStandard_CyclingSpeedCadence.xaml" />
     <None Remove="BTStandard_HeartRate.xaml" />
     <None Remove="MarkdownHelpSystem.xaml" />
     <None Remove="TestUserControl.xaml" />
@@ -169,6 +170,9 @@
     <Content Update="Assets\HelpFiles\Device_Nordic_Thingy.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Page Update="BTStandard_CyclingSpeedCadence.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="BTStandard_HeartRate.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

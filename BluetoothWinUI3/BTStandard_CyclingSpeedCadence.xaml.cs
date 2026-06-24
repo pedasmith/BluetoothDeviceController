@@ -1,5 +1,6 @@
 using BluetoothProtocols;
 using BluetoothProtocols.NS_BTStandard_Demo;
+using BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
@@ -26,13 +27,14 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
-using DeviceSpecificType = BTStandard_Demo; // Change: pick your device, not BTStandard_Demo
-using DeviceSpecificSensorData = BTStandard_Demo.Battery_Data; // Change: 
-using DeviceSpecificSensorSecondaryData = BTStandard_Demo.Common_Configuration_Data; // Change: pick secondary sensor if needed
-using DeviceSpecificDataCollection = Battery_DataCollection; // Change: pick your data
+using DeviceSpecificType = TAOPE_CyclingSpeedCadence; // Change: pick your device, not BTStandard_Demo
+using DeviceSpecificSensorData = TAOPE_CyclingSpeedCadence.SpeedCadence_Data; // Change: 
+using DeviceSpecificSensorSecondaryData = TAOPE_CyclingSpeedCadence.Feature_Data; // Change: pick secondary sensor if needed
+using DeviceSpecificBatteryData = TAOPE_CyclingSpeedCadence.Battery_Data; // FIX: add battery data! Change: pick secondary sensor if needed
+using DeviceSpecificDataCollection = SpeedCadence_DataCollection; // Change: pick your data
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Change: rename BTStandard_DemoControl
+public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Change: rename BTStandard_DemoControl
 {
     bool HasData = true; // Data is the BatteryLevel data. But it might not exist.
 
@@ -46,9 +48,9 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "BTStandard_Demo"; // Change: BTStandard_Demo
+    private readonly string InternalDeviceType = "CyclingSpeedCadence"; // Change: BTStandard_Demo
 
-    DeviceSpecificType Device; 
+    DeviceSpecificType Device;
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
     ulong OriginalBTAddr = 0xFFFFFFFF_FFFFFFFF;
@@ -57,11 +59,11 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public DeviceSpecificDataCollection HistoricalDataUnits { get; } = new ();
+    public DeviceSpecificDataCollection HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
     public IBTCommonMetaData GetDataMostRecent()
-    { 
-        return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1]; 
+    {
+        return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];
     }
 
     // This control show two kinds of data. 
@@ -106,7 +108,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
 
 
 
-    public BTStandard_DemoControl() // CHANGE:
+    public BTStandard_CyclingSpeedCadenceControl() // CHANGE:
     {
         InitializeComponent();
         this.Loaded += Control_Loaded;
@@ -174,8 +176,8 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         // Change: set the right sparkles
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            ( DeviceSpecificType.BatteryLevelPropertyChangedName, uiBatteryLevelChange),
-            ( DeviceSpecificType.Connection_ParameterPropertyChangedName, uiConnection_ParametersChange),
+            ( DeviceSpecificType.CSC_MeasurementPropertyChangedName, uiRevolutionWheelChange),
+            ( DeviceSpecificType.CSC_MeasurementPropertyChangedName, uiRevolutionCrankChange),
         };
     }
 
@@ -193,8 +195,8 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     // so the main window menus get updated.
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    List<string> _LineNames = new List<string>() { "Battery" }; // CHANGE:
-    public List<string> LineNames { get { return _LineNames; } } 
+    List<string> _LineNames = new List<string>() { "TimeWheel" }; // CHANGE:
+    public List<string> LineNames { get { return _LineNames; } }
 
     /// <summary>
     /// The DataContext is a WinUI3 (and the rest of XAML) thing, and is just an object. And it can be
@@ -215,8 +217,8 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// </summary>
     // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; }
-        = OxyPlotUtilities.MakeOxyPlotModelSimple("Battery Data", 10, 30, "Battery", "BatteryLevel");
-        // CHANGE: set up the graph
+        = OxyPlotUtilities.MakeOxyPlotModelSimple("Crank", 1, 100, "Crank", "TimeCrank");
+    // CHANGE: set up the graph
 
 
 
@@ -262,7 +264,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         uiAddress.Text = BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr);
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // might return null for the first connection
 
-        Device = new DeviceSpecificType() 
+        Device = new DeviceSpecificType()
         {
             ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
         };
@@ -287,33 +289,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
         var battery = await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
 
-        // CHANGE: for your particular device, the battery might always be present
-        // the battery will never be null.
-        if (battery == null)
-        {
-            // Happens when the device doesn't report a battery level (e.g., JBL Pro 4 Speakers, but lots of others)
-            // BTW: if you know your device will never have a battery level but there is a connection control,
-            // you should just set the visibility to collapsed in the OnLoaded event.
-
-            HasData = false;
-        }
-
-        if (!HasData) // Some devices are wonky about actually having a sensor
-        {
-            LineNames.Clear();
-            uiDeviceDataList.Items.Remove(uiDeviceDataBattery);
-            uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
-            uiOxyPlot.Visibility = Visibility.Collapsed;
-            uiTableView.Visibility = Visibility.Visible;
-
-            // Notify MainWindow that the UX capabilities have changed. This might change
-            // the UX (e.g., device> show graph/table might be removed)
-            // Will also trigger redoing the graph line names via LineNames, which
-            // technically isn't quite in accordance with the name.
-            NotifyDeviceControlChangesWindows?.OnGetUXCapabilitiesChanged(this, GetUXCapabilities());
-        }
-        await Device.ReadDevice_Name(BluetoothCacheMode.Cached);
-        await Device.ReadConnection_Parameter(BluetoothCacheMode.Cached);
+        await Device.NotifyCSC_MeasurementAsync();
 
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
@@ -473,7 +449,25 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
             }
         }
     }
+    double LastTimeWheel = -1.0;
+    double LastRevolutionWheel = 0.0;
 
+    double LastTimeCrank = 0.0;
+    double LastRevolutionCrank = 0.0;
+
+    private string CadenceFlagsToString(int ssflags)
+    {
+        var retval = "";
+        if ((ssflags & 0x01) != 0)
+        {
+            retval += "Wheel ";
+        }
+        if ((ssflags & 0x02) != 0)
+        {
+            retval += "Crank ";
+        }
+        return retval.TrimEnd();
+    }
 
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
@@ -483,8 +477,8 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     private void UpdateDeviceDataUX(string name)
     {
         if (Device == null) return;
-        CurrSensor_Data = Device.CurrBattery_Data; // Change: select the right data
-        CurrSensorSecondary_Data = Device.CurrCommon_Configuration_Data; // Change: pick secondary data as appropriate
+        CurrSensor_Data = Device.CurrSpeedCadence_Data; // Change: select the right data
+        CurrSensorSecondary_Data = Device.CurrFeature_Data; // Change: pick secondary data as appropriate
         CurrBattery_Data = Device.CurrBattery_Data; // Change: if your device doesn't have a battery, remove battery stuff!
 
         // name is from e.PropertyName when the Device does a PropertyChanged.
@@ -493,7 +487,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         // Update data from the device to match the current preferred units. Will create the values as needed.
         CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToOrClone(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        CurrBattery_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Update this historical data; this will automatically update the table and graph.
         //
@@ -503,22 +497,65 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         // Track the historical data
         switch (name)
         {
-            case DeviceSpecificType.Device_NamePropertyChangedName:
-                uiName.Text = CurrSensorSecondary_DataUnits.Device_Name;
-                break;
+            //case DeviceSpecificType.Device_NamePropertyChangedName:
+            //    uiName.Text = CurrSensorSecondary_DataUnits.Device_Name;
+            //    break;
 
-            case DeviceSpecificType.Connection_ParameterPropertyChangedName: // Change: update the UX as appropriate
-                uiInterval_Min.Text = CurrSensorSecondary_DataUnits.Interval_Min.ToString("F2");
-                uiInterval_Max.Text = CurrSensorSecondary_DataUnits.Interval_Max.ToString("F2");
-                uiLatency.Text = CurrSensorSecondary_DataUnits.Latency.ToString("F2");
-                uiTimeout.Text = CurrSensorSecondary_DataUnits.Timeout.ToString("F2");
-                break;
+            case DeviceSpecificType.CSC_MeasurementPropertyChangedName: // Change: update the UX as appropriate
+                var iflags = (int)CurrSensor_DataUnits.Flags;
+                var flags = CadenceFlagsToString(iflags);
+                uiFlags.Text = flags;
+                if ((iflags & 0x01) != 0) // Has wheel data
+                {
+                    // The time values are just U16 in 1024th (2^^10) of a second. That means they
+                    // roll over in 2^^6 seconds = 64 seconds!
+                    if (LastTimeWheel == -1.0)
+                    {
+                        LastTimeWheel = CurrSensor_DataUnits.TimeWheel;
+                    }
+                    else
+                    {
+                        var deltaTimeWheel = CurrSensor_DataUnits.TimeWheel - LastTimeWheel;
+                        if (deltaTimeWheel < 0) deltaTimeWheel += 64.00; // rollover is exactly every 64 seconds
+                        uiTimeWheel.Text = deltaTimeWheel.ToString("F3"); // Time is in seconds
 
+                        var deltaRevolutionWheel = CurrSensor_DataUnits.RevolutionWheel - LastRevolutionWheel;
+                        var rps = deltaRevolutionWheel * (1.0 / deltaTimeWheel);
+                        uiRpsWheel.Text = double.IsNaN(rps) ? "--" : rps.ToString("F1"); // Time is in seconds
 
-            case "*": // never used, but here so it matches the Govee code.
-            case DeviceSpecificType.BatteryLevelPropertyChangedName:
-                uiBattery.Text = CurrSensor_DataUnits.BatteryLevel.ToString("F2"); // Change: update the UX as appropriate
+                        LastTimeWheel = CurrSensor_DataUnits.TimeWheel;
+                    }
+                    uiRevolutionWheel.Text = CurrSensor_DataUnits.RevolutionWheel.ToString("F0");
+                    LastRevolutionWheel = CurrSensor_DataUnits.RevolutionWheel;
+                }
 
+                if ((iflags & 0x02) != 0) // Has crank data
+                {
+
+                    // Same thing, but for the crank. The crank revolutions rolls over at 2^^16
+                    if (LastTimeCrank == -1.0)
+                    {
+                        LastTimeCrank = CurrSensor_DataUnits.TimeCrank;
+                    }
+                    else
+                    {
+                        var deltaTimeCrank = CurrSensor_DataUnits.TimeCrank - LastTimeCrank;
+                        if (deltaTimeCrank < 0) deltaTimeCrank += 64.00; // rollover is exactly every 64 seconds
+                        uiTimeCrank.Text = deltaTimeCrank.ToString("F3"); // Time is in seconds
+
+                        var deltaRevolutionCrank = CurrSensor_DataUnits.RevolutionCrank - LastRevolutionCrank;
+                        if (deltaRevolutionCrank < 0)
+                        {
+                            deltaRevolutionCrank += Math.Pow(2, 16);
+                        }
+                        var rps = deltaRevolutionCrank * (1.0 / deltaTimeCrank);
+                        uiRpsCrank.Text = double.IsNaN(rps) ? "--" : rps.ToString("F1"); // Time is in seconds
+
+                        LastTimeCrank = CurrSensor_DataUnits.TimeCrank;
+                    }
+                    uiRevolutionCrank.Text = CurrSensor_DataUnits.RevolutionCrank.ToString("F0");
+                    LastRevolutionCrank = CurrSensor_DataUnits.RevolutionCrank;
+                }
 
                 var deltaInSeconds = CurrSensor_Data.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
                 var verb = (deltaInSeconds > 5) ? DeviceSpecificDataCollection.Verb.Add : DeviceSpecificDataCollection.Verb.ReplaceMostRecent;
@@ -538,6 +575,13 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
                 }
                 uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
                 break;
+
+
+            //case "*": // never used, but here so it matches the Govee code.
+            //case DeviceSpecificType.BatteryLevelPropertyChangedName:
+            //    uiBattery.Text = CurrSensor_DataUnits.BatteryLevel.ToString("F2"); // Change: update the UX as appropriate
+
+
         }
 
         //
