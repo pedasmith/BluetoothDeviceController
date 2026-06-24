@@ -10,6 +10,12 @@ namespace BluetoothCodeGenerator
 {
     internal static class BtJsonToMacro
     {
+        /// <summary>
+        /// True when the item is like "OEL" or "OEB" or any other "O" field.
+        /// Will also return True when the name ends with "Unused" or "Internal"
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         static private bool ItemIsSuppressed(ParserField item)
         {
             bool retval = false;
@@ -624,6 +630,7 @@ namespace BluetoothCodeGenerator
                     TemplateSnippet.AddMacroList(prlist, "DefaultValueCSharp", defaultValueCSharp);
                     TemplateSnippet.AddMacroList(prlist, "DEFAULT+VALUE", defaultValue);
                     TemplateSnippet.AddMacroList(prlist, "ReplaceValueDetectCSharp", replaceValueDetectCSharp);
+                    TemplateSnippet.AddMacroList(prlist, "DataUnits", item.UnitsPrimary);
 
                     TemplateSnippet.AddMacroList(prlist, "IS+READ+ONLY", isReadOnly ? "True" : "False");
                 }

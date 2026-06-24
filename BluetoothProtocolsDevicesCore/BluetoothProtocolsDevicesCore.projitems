@@ -14,10 +14,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_Demo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_DemoCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTCommonMetaData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BTStandard_HeartRate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BTStandard_HeartRateCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IExportData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_ThingyCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TAOPE_CyclingSpeedCadence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TAOPE_CyclingSpeedCadenceCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UnitConverterDelegate.cs" />
   </ItemGroup>
 </Project>

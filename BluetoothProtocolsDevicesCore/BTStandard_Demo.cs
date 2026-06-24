@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This class was automatically generated 2026-06-17::09:35
+    /// This class was automatically generated 2026-06-23::19:15
     /// </summary>
 
     public  class BTStandard_Demo : INotifyPropertyChanged
@@ -116,9 +116,14 @@ namespace BluetoothProtocols
                 get { return _Timeout; }
                 set { if (value == _Timeout) return; _Timeout = value; OnPropertyChanged();}
             }
-            public Common_Configuration_Data Clone()
+            public Common_Configuration_Data Clone(string name = null)
             {
-                return this.MemberwiseClone() as Common_Configuration_Data;
+                var retval = this.MemberwiseClone() as Common_Configuration_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
             }
 
             public void CopyFrom(Common_Configuration_Data value)
@@ -130,6 +135,23 @@ namespace BluetoothProtocols
                 this.Interval_Max = value.Interval_Max;
                 this.Latency = value.Latency;
                 this.Timeout = value.Timeout;
+            }
+
+            // CopyFrom, but convert the doubles as appropriate
+            public static Common_Configuration_Data CopyToOrClone(Common_Configuration_Data source, Common_Configuration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.Device_Name = source.Device_Name;
+                dest.Interval_Min = convert(source.Interval_Min, "ms");
+                dest.Interval_Max = convert(source.Interval_Max, "ms");
+                dest.Latency = convert(source.Latency, "ms");
+                dest.Timeout = convert(source.Timeout, "ms");
+                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
@@ -172,9 +194,14 @@ namespace BluetoothProtocols
                 get { return _BatteryLevel; }
                 set { if (value == _BatteryLevel) return; _BatteryLevel = value; OnPropertyChanged();}
             }
-            public Battery_Data Clone()
+            public Battery_Data Clone(string name = null)
             {
-                return this.MemberwiseClone() as Battery_Data;
+                var retval = this.MemberwiseClone() as Battery_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
             }
 
             public void CopyFrom(Battery_Data value)
@@ -182,6 +209,19 @@ namespace BluetoothProtocols
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
                 this.BatteryLevel = value.BatteryLevel;
+            }
+
+            // CopyFrom, but convert the doubles as appropriate
+            public static Battery_Data CopyToOrClone(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.BatteryLevel = convert(source.BatteryLevel, "%");
+                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)

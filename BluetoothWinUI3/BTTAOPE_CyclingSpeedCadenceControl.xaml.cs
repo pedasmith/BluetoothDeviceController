@@ -1,6 +1,7 @@
 using BluetoothProtocols;
 using BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
+using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -78,7 +79,7 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
     public BTTAOPE_CyclingSpeedCadenceControl()
     {
         InitializeComponent();
-        this.Loaded += TAOPE_CyclingSpeedCadenceControl_Loaded;
+        this.Loaded += Control_Loaded;
         this.DataContextChanged += TAOPE_CyclingSpeedCadenceControl_DataContextChanged;
 
         //
@@ -127,8 +128,10 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
 
     }
 
+    // List of controls that have the 'data updated' sparkles
+    List<(string, Microsoft.UI.Xaml.Documents.Run)> ControlsWithSparkles = null;
 
-    private void TAOPE_CyclingSpeedCadenceControl_Loaded(object sender, RoutedEventArgs e)
+    private void Control_Loaded(object sender, RoutedEventArgs e)
     {
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
@@ -136,37 +139,14 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
 
         if (uiTableView.ItemsSource != null) return;
         uiTableView.ItemsSource = HistoricalDataUnits.Data;
-    }
 
-    private SpeedCadence_Data CopyAndUpdateUnits(SpeedCadence_Data source, SpeedCadence_Data dest)
-    {
-        if (dest == null)
+        // Change: set the right sparkles
+        ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            dest = source.Clone();
-            dest.Name = KnownDeviceName;
-            // the protocol Name is the "SupportedDevice" name. It's not unique to each one.
-            // What we need for our data is the name that the user might have given the 
-            // device (the "known device" name). It's set in the UpdateUX from SaveData
-        }
-        // CHANGE: You might be tempted to use the dest.CopyFrom(source) at this point. But that will 
-        // copy all the fields without updating the units (and will therefore trigger a bunch of INPC callbacks)
-        // An easy way to fill this is in:
-        // 1. Copy the dest.CopyFrom() method, changing "this" to dest and "value" to source.
-        // 2. Each field that's a unit with user preferences needs to be changed to use
-        //    the BluetoothWatcher.Units.(type).Convert
-        //    Example (from Nordic_thingy.xaml.cs):
-        //        dest.Temperature = BluetoothWatcher.Units.Temperature.Convert(source.Temperature, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, CurrUserPrefs.Temperature);
-        // The starting units is always the units of the raw protocol. For the Nordic, the temperature
-        // is always in Celcius. 
-        // For this, the raw battery level is always in percent, and there's no user adjustment.
+            ( TAOPE_CyclingSpeedCadence.CSC_MeasurementPropertyChangedName, uiRevolutionWheelChange),
+            ( TAOPE_CyclingSpeedCadence.CSC_MeasurementPropertyChangedName, uiRevolutionCrankChange),
+        };
 
-        dest.TimestampMostRecent = source.TimestampMostRecent;
-        dest.Flags = source.Flags;
-        dest.RevolutionWheel = source.RevolutionWheel;
-        dest.TimeWheel = source.TimeWheel;
-        dest.RevolutionCrank = source.RevolutionCrank;
-        dest.TimeCrank = source.TimeCrank;
-        return dest;
     }
 
     // If you have to update these dynamically, be sure to call 
@@ -314,7 +294,7 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
 
         Device.PropertyChanged += Device_PropertyChanged;
         await Device.NotifyCSC_MeasurementAsync(); // CHANGE: and the next lines
-        var battery = await Device.NotifyBattery_LevelAsync(); // I'm happy getting unchanged data? TODO: think about this more. 
+        var battery = await Device.NotifyBatteryLevelAsync(); // I'm happy getting unchanged data? TODO: think about this more. 
 
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
@@ -523,7 +503,6 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
 
 
     Dictionary<string, int> NPropertyChanges { get; } = [];
-    //List<string> Sparkles = new List<string>() { "\u00A0", "*" }; // ✨", "💫", "🌟", "⚡", "🔥", "💥" };
     readonly List<string> Sparkles = ["╺", "╼", "╾", "╸", "╾", "╼"];
 
     private void UpdateSparkles(string name)
@@ -531,13 +510,15 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
         // In practice, name is never "*". The code is set up this way to match the Govee code.
         if (name == "") return;
         NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
-
-        if (name == TAOPE_CyclingSpeedCadence.CSC_MeasurementPropertyChangedName || name == "*")
+        foreach ((string potentialMatchName, Microsoft.UI.Xaml.Documents.Run run) in ControlsWithSparkles)
         {
-            uiRevolutionWheelChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-            uiRevolutionCrankChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+            if (potentialMatchName == name || name == "*")
+            {
+                run.Text = Sparkles[NPropertyChanges[potentialMatchName] % Sparkles.Count];
+            }
         }
     }
+
 
     double LastTimeWheel = -1.0;
     double LastRevolutionWheel = 0.0;
@@ -575,7 +556,7 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
 
         // Update to match the current preferred units. Will create a new CurrEnvironment_DataUnits the first time
         // it's called
-        CurrSpeed_and_Cadence_DataUnits = CopyAndUpdateUnits(CurrSpeed_and_Cadence_Data, CurrSpeed_and_Cadence_DataUnits);
+        CurrSpeed_and_Cadence_DataUnits = SpeedCadence_Data.CopyToOrClone(CurrSpeed_and_Cadence_Data, CurrSpeed_and_Cadence_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Update this historical data; this will automatically update the table and graph.
         //

@@ -139,8 +139,12 @@ namespace BluetoothWinUI3
         public static SaveData GetOrCreateSaveData(KnownDevice knownDevice)
         {
             var saveData = AllSaveData.FindWithId(knownDevice.Id);
-            if (saveData == null)
+            if (saveData == null && knownDevice.Advertisement != null)
             {
+                // TODO: this is actually hard. When the known device is created, it's
+                // not yet associated with an advertisement. This is always the case with
+                // the services and characteristics control which is created by the 
+                // user, not with an advertisement.
                 saveData = AllSaveData.FindWithAdvertisementAddress(knownDevice.Advertisement.Addr);
             }
 

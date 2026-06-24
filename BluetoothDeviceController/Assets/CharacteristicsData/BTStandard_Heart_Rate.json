@@ -3,13 +3,76 @@
 {
   "AllDevices": [
     {
-      "Name": "BK6",
-      "ClassName": "TAOPE_CyclingSpeedCadence",
+      "Name": "Powrlabs_0759864",
+      "ClassName": "BTStandard_HeartRate",
       "CompletionStatus": 0,
       "Links": [
       ],
 
       "IgnoredServices": [
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "GATT",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changed",
+              "Suppress": false,
+              "Type": "BYTES|HEX|ServiceChanged",
+              "IsRead": false,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": true,
+              "Verbs": ":Indicate:RdInNo:InNo:"
+            }
+          ]
+        }
+
+      ],
+      "Services": [
+        {
+          "UUID": "0000180d-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Heart Rate",
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "00002a37-0000-1000-8000-00805f9b34fb",
+              "Name": "Heart Rate Measurement",
+              "Suppress": false,
+              "Type": "U8|HEX|Flags OSKIP^1^$Flags_GN_1_AN U8|DEC|PulseRate|bpm OSKIP^1^$Flags_GN_1_AN_NT U16|DEC|PulseRateHighRes|bpm OSKIP^1^$Flags_GN_8_AN_NT U16|DEC|EnergyExpended|Joules OSKIP^1^$Flags_GN_16_AN_NT U16|DEC|RRInterval",
+              "IsRead": false,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "Verbs": ":Notify:RdInNo:InNo:"
+            },
+            {
+              "UUID": "00002a38-0000-1000-8000-00805f9b34fb",
+              "Name": "Body Sensor Location",
+              "Suppress": false,
+              "Type": "BYTES|HEX|Unknown1",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "01"
+              ]
+            }
+          ]
+        },
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",
           "RegistrationOwner": "Bluetooth Standard",
@@ -19,7 +82,7 @@
               "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
               "Name": "Device Name",
               "Suppress": false,
-              "Type": "STRING|ASCII|Name",
+              "Type": "STRING|ASCII|DeviceName",
               "IsRead": true,
               "IsWrite": true,
               "SuppressRead": false,
@@ -69,166 +132,6 @@
           ]
         },
         {
-          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
-          "RegistrationOwner": "Bluetooth Standard",
-          "Name": "GATT",
-          "Characteristics": [
-            {
-              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
-              "Name": "Service Changed",
-              "Suppress": false,
-              "Type": "BYTES|HEX|ServiceChanged",
-              "IsRead": false,
-              "IsWrite": false,
-              "SuppressRead": false,
-              "SuppressWrite": false,
-              "IsWriteWithoutResponse": false,
-              "IsNotify": false,
-              "IsIndicate": true,
-              "Verbs": ":Indicate:RdInNo:InNo:"
-            }
-          ]
-        }
-
-      ],
-      "Services": [
-        {
-          "UUID": "00001816-0000-1000-8000-00805f9b34fb",
-          "Name": "Cycling Speed and Cadence",
-          "Priority": 10,
-          "Characteristics": [
-            {
-              "UUID": "00002a5b-0000-1000-8000-00805f9b34fb",
-              "Name": "CSC Measurement",
-              "DataGroupName": "SpeedCadence_Data",
-
-              "Suppress": false,
-              "Type": "U8|HEX|Flags OSKIP^2^$Flags_GN_1_AN_NT U32|HEX|RevolutionWheel U16^1024_/|FIXED|TimeWheel| OSKIP^2^$Flags_GN_2_AN_NT U16|DEC|RevolutionCrank U16^1024_/|FIXED|TimeCrank|",
-              "IsRead": false,
-              "IsWrite": false,
-              "SuppressRead": false,
-              "SuppressWrite": false,
-              "IsWriteWithoutResponse": false,
-              "IsNotify": true,
-              "IsIndicate": false,
-              "Verbs": ":Notify:RdInNo:InNo:"
-            },
-            {
-              "UUID": "00002a5c-0000-1000-8000-00805f9b34fb",
-              "Name": "CSC Feature",
-              "DataGroupName": "Feature_Data",
-              "Suppress": false,
-              "Type": "U16|HEX|FeatureFlags",
-              "IsRead": true,
-              "IsWrite": false,
-              "SuppressRead": false,
-              "SuppressWrite": false,
-              "IsWriteWithoutResponse": false,
-              "IsNotify": false,
-              "IsIndicate": false,
-              "Verbs": ":Read:RdInNo:",
-              "ExampleData": [
-                "01 00"
-              ]
-            },
-            {
-              "UUID": "00002a5d-0000-1000-8000-00805f9b34fb",
-              "Name": "Sensor Location",
-              "DataGroupName": "Feature_Data",
-              "Suppress": false,
-              "Type": "U8|HEX|SensorLocation",
-              "IsRead": true,
-              "IsWrite": false,
-              "SuppressRead": false,
-              "SuppressWrite": false,
-              "IsWriteWithoutResponse": false,
-              "IsNotify": false,
-              "IsIndicate": false,
-              "Verbs": ":Read:RdInNo:",
-              "ExampleData": [
-                "06"
-              ]
-            },
-            {
-              "UUID": "00002a55-0000-1000-8000-00805f9b34fb",
-              "Name": "SC Control Point",
-              "DataGroupName": "Feature_Data",
-              "Suppress": false,
-              "Type": "BYTES|HEX|Unknown3",
-              "IsRead": false,
-              "IsWrite": true,
-              "SuppressRead": false,
-              "SuppressWrite": false,
-              "IsWriteWithoutResponse": false,
-              "IsNotify": false,
-              "IsIndicate": true,
-              "Verbs": ":Write:Indicate:RdInNo:InNo:WrWw:"
-            }
-          ]
-        },
-        {
-          "UUID": "0000fd00-0000-1000-8000-00805f9b34fb",
-          "Name":"Service_FD00_OTA",
-          "Characteristics": [
-            {
-              "UUID": "0000fd09-0000-1000-8000-00805f9b34fb",
-              "Name": "FD09_OTA_Notify",
-              "Suppress": false,
-              "Type": "BYTES|HEX|Unknown0",
-              "IsRead": false,
-              "IsWrite": false,
-              "SuppressRead": false,
-              "SuppressWrite": false,
-              "IsWriteWithoutResponse": false,
-              "IsNotify": true,
-              "IsIndicate": false,
-              "Verbs": ":Notify:RdInNo:InNo:"
-            },
-            {
-              "UUID": "0000fd0a-0000-1000-8000-00805f9b34fb",
-              "Name": "FD0A_OTA_Write",
-              "Suppress": false,
-              "Type": "BYTES|HEX|Unknown1",
-              "IsRead": false,
-              "IsWrite": false,
-              "SuppressRead": false,
-              "SuppressWrite": false,
-              "IsWriteWithoutResponse": true,
-              "IsNotify": false,
-              "IsIndicate": false,
-              "Verbs": ":WriteWithoutResponse:WrWw:"
-            },
-            {
-              "UUID": "0000fd19-0000-1000-8000-00805f9b34fb",
-              "Name": "FD19_Notify",
-              "Suppress": false,
-              "Type": "BYTES|HEX|Unknown2",
-              "IsRead": false,
-              "IsWrite": false,
-              "SuppressRead": false,
-              "SuppressWrite": false,
-              "IsWriteWithoutResponse": false,
-              "IsNotify": true,
-              "IsIndicate": false,
-              "Verbs": ":Notify:RdInNo:InNo:"
-            },
-            {
-              "UUID": "0000fd1a-0000-1000-8000-00805f9b34fb",
-              "Name": "FD1A_Write",
-              "Suppress": false,
-              "Type": "BYTES|HEX|Unknown3",
-              "IsRead": false,
-              "IsWrite": false,
-              "SuppressRead": false,
-              "SuppressWrite": false,
-              "IsWriteWithoutResponse": true,
-              "IsNotify": false,
-              "IsIndicate": false,
-              "Verbs": ":WriteWithoutResponse:WrWw:"
-            }
-          ]
-        },
-        {
           "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
           "Name": "Battery",
           "Characteristics": [
@@ -250,6 +153,7 @@
             }
           ]
         },
+
         {
           "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
           "RegistrationOwner": "Bluetooth Standard",

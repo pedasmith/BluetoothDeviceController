@@ -1,4 +1,4 @@
-﻿// Collections to support TAOPE_CyclingSpeedCadence data
+﻿// Collections to support BTStandard_HeartRate data
 //From template: Protocol_Core_Body v2026-04-21 11:40
 
 using System;
@@ -14,7 +14,7 @@ using System.Runtime.InteropServices.WindowsRuntime; // Needed for IBuffer.ToArr
 #endif
 
 
-namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
+namespace BluetoothProtocols.NS_BTStandard_HeartRate
 {
 
     /// <summary>
@@ -24,17 +24,17 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
     ///<summary>
     ///TODO:
-    ///SpeedCadence_DataCollection contains lists of data, one list per property value for all
-    ///of the characteristics groupled in the SpeedCadence_Data group from Cycling Speed and Cadence.
+    ///Heart Rate_DataCollection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the Heart Rate_Data group from Heart Rate.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class SpeedCadence_DataCollection 
+    public class Heart_Rate_DataCollection 
     {
         public enum Verb {  Add, ReplaceMostRecent };
 
         public int Count { get { return  Timestamps.Count; } } 
 
-        public void Update(TAOPE_CyclingSpeedCadence.SpeedCadence_Data value, Verb verb)
+        public void Update(BTStandard_HeartRate.Heart_Rate_Data value, Verb verb)
         {
             if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
             {
@@ -47,152 +47,30 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             }
         }
 
-        public void Add(TAOPE_CyclingSpeedCadence.SpeedCadence_Data value)
+        public void Add(BTStandard_HeartRate.Heart_Rate_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
             Timestamps.Add (value.TimestampMostRecent);
             TimestampsDT.Add (value.TimestampMostRecent.DateTime);
             Flags.Add (value.Flags);
-            RevolutionWheel.Add (value.RevolutionWheel);
-            TimeWheel.Add (value.TimeWheel);
-            RevolutionCrank.Add (value.RevolutionCrank);
-            TimeCrank.Add (value.TimeCrank);
+            PulseRate.Add (value.PulseRate);
+            PulseRateHighRes.Add (value.PulseRateHighRes);
+            EnergyExpended.Add (value.EnergyExpended);
+            RRInterval.Add (value.RRInterval);
+            Unknown1.Add (value.Unknown1);
         }
-        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.SpeedCadence_Data value)
+        public void ReplaceMostRecent(BTStandard_HeartRate.Heart_Rate_Data value)
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
             Flags[index] = value.Flags;
-            RevolutionWheel[index] = value.RevolutionWheel;
-            TimeWheel[index] = value.TimeWheel;
-            RevolutionCrank[index] = value.RevolutionCrank;
-            TimeCrank[index] = value.TimeCrank;
-        }
-
-        ///<summary>
-        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
-        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
-        ///frequently than the UI updates
-        ///</summary>
-        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic CSC Measurement
-        public ObservableCollection<double> Flags { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> RevolutionWheel { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> TimeWheel { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> RevolutionCrank { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> TimeCrank { get; } = new ObservableCollection<double>();
-        public ObservableCollection<TAOPE_CyclingSpeedCadence.SpeedCadence_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.SpeedCadence_Data>();
-    }
-    ///<summary>
-    ///TODO:
-    ///Feature_DataCollection contains lists of data, one list per property value for all
-    ///of the characteristics groupled in the Feature_Data group from Cycling Speed and Cadence.
-    ///The lists are used when displaying historical graphs of the data.
-    ///</summary>
-    public class Feature_DataCollection 
-    {
-        public enum Verb {  Add, ReplaceMostRecent };
-
-        public int Count { get { return  Timestamps.Count; } } 
-
-        public void Update(TAOPE_CyclingSpeedCadence.Feature_Data value, Verb verb)
-        {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
-            {
-                verb = Verb.Add; // Can't replace
-            }
-            switch (verb)
-            {
-                case Verb.Add: Add(value); break;
-                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
-            }
-        }
-
-        public void Add(TAOPE_CyclingSpeedCadence.Feature_Data value)
-        {
-            TimestampMostRecentAdd = value.TimestampMostRecent;
-            Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            FeatureFlags.Add (value.FeatureFlags);
-            SensorLocation.Add (value.SensorLocation);
-            Unknown3.Add (value.Unknown3);
-        }
-        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.Feature_Data value)
-        {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
-            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            FeatureFlags[index] = value.FeatureFlags;
-            SensorLocation[index] = value.SensorLocation;
-            Unknown3[index] = value.Unknown3;
-        }
-
-        ///<summary>
-        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
-        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
-        ///frequently than the UI updates
-        ///</summary>
-        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic CSC Feature
-        public ObservableCollection<double> FeatureFlags { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Sensor Location
-        public ObservableCollection<double> SensorLocation { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic SC Control Point
-        public ObservableCollection<byte[]> Unknown3 { get; } = new ObservableCollection<byte[]>();
-        public ObservableCollection<TAOPE_CyclingSpeedCadence.Feature_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.Feature_Data>();
-    }
-    ///<summary>
-    ///TODO:
-    ///Service_FD00_OTA_DataCollection contains lists of data, one list per property value for all
-    ///of the characteristics groupled in the Service_FD00_OTA_Data group from Service_FD00_OTA.
-    ///The lists are used when displaying historical graphs of the data.
-    ///</summary>
-    public class Service_FD00_OTA_DataCollection 
-    {
-        public enum Verb {  Add, ReplaceMostRecent };
-
-        public int Count { get { return  Timestamps.Count; } } 
-
-        public void Update(TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data value, Verb verb)
-        {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
-            {
-                verb = Verb.Add; // Can't replace
-            }
-            switch (verb)
-            {
-                case Verb.Add: Add(value); break;
-                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
-            }
-        }
-
-        public void Add(TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data value)
-        {
-            TimestampMostRecentAdd = value.TimestampMostRecent;
-            Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            Unknown0.Add (value.Unknown0);
-            Unknown1.Add (value.Unknown1);
-            Unknown2.Add (value.Unknown2);
-            Unknown3.Add (value.Unknown3);
-        }
-        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data value)
-        {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
-            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            Unknown0[index] = value.Unknown0;
+            PulseRate[index] = value.PulseRate;
+            PulseRateHighRes[index] = value.PulseRateHighRes;
+            EnergyExpended[index] = value.EnergyExpended;
+            RRInterval[index] = value.RRInterval;
             Unknown1[index] = value.Unknown1;
-            Unknown2[index] = value.Unknown2;
-            Unknown3[index] = value.Unknown3;
         }
 
         ///<summary>
@@ -203,15 +81,76 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
         public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
         public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic FD09_OTA_Notify
-        public ObservableCollection<byte[]> Unknown0 { get; } = new ObservableCollection<byte[]>();
-        // Data values (properties) from characteristic FD0A_OTA_Write
+        // Data values (properties) from characteristic Heart Rate Measurement
+        public ObservableCollection<double> Flags { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> PulseRate { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> PulseRateHighRes { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> EnergyExpended { get; } = new ObservableCollection<double>();
+        public ObservableCollection<double> RRInterval { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic Body Sensor Location
         public ObservableCollection<byte[]> Unknown1 { get; } = new ObservableCollection<byte[]>();
-        // Data values (properties) from characteristic FD19_Notify
-        public ObservableCollection<byte[]> Unknown2 { get; } = new ObservableCollection<byte[]>();
-        // Data values (properties) from characteristic FD1A_Write
-        public ObservableCollection<byte[]> Unknown3 { get; } = new ObservableCollection<byte[]>();
-        public ObservableCollection<TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.Service_FD00_OTA_Data>();
+        public ObservableCollection<BTStandard_HeartRate.Heart_Rate_Data> Data { get; } = new ObservableCollection<BTStandard_HeartRate.Heart_Rate_Data>();
+    }
+    ///<summary>
+    ///TODO:
+    ///GAP_DataCollection contains lists of data, one list per property value for all
+    ///of the characteristics groupled in the GAP_Data group from GAP.
+    ///The lists are used when displaying historical graphs of the data.
+    ///</summary>
+    public class GAP_DataCollection 
+    {
+        public enum Verb {  Add, ReplaceMostRecent };
+
+        public int Count { get { return  Timestamps.Count; } } 
+
+        public void Update(BTStandard_HeartRate.GAP_Data value, Verb verb)
+        {
+            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            {
+                verb = Verb.Add; // Can't replace
+            }
+            switch (verb)
+            {
+                case Verb.Add: Add(value); break;
+                case Verb.ReplaceMostRecent: ReplaceMostRecent(value); break;
+            }
+        }
+
+        public void Add(BTStandard_HeartRate.GAP_Data value)
+        {
+            TimestampMostRecentAdd = value.TimestampMostRecent;
+            Data.Add (value.Clone());
+            Timestamps.Add (value.TimestampMostRecent);
+            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            DeviceName.Add (value.DeviceName);
+            Appearance.Add (value.Appearance);
+            ConnectionParameters.Add (value.ConnectionParameters);
+        }
+        public void ReplaceMostRecent(BTStandard_HeartRate.GAP_Data value)
+        {
+            var index = Timestamps.Count - 1;
+            Timestamps[index] = value.TimestampMostRecent;
+            Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
+            DeviceName[index] = value.DeviceName;
+            Appearance[index] = value.Appearance;
+            ConnectionParameters[index] = value.ConnectionParameters;
+        }
+
+        ///<summary>
+        ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
+        ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more
+        ///frequently than the UI updates
+        ///</summary>
+        public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
+        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // Data values (properties) from characteristic Device Name
+        public ObservableCollection<string> DeviceName { get; } = new ObservableCollection<string>();
+        // Data values (properties) from characteristic Appearance
+        public ObservableCollection<double> Appearance { get; } = new ObservableCollection<double>();
+        // Data values (properties) from characteristic Peripheral Preferred Connection Parameters
+        public ObservableCollection<byte[]> ConnectionParameters { get; } = new ObservableCollection<byte[]>();
+        public ObservableCollection<BTStandard_HeartRate.GAP_Data> Data { get; } = new ObservableCollection<BTStandard_HeartRate.GAP_Data>();
     }
     ///<summary>
     ///TODO:
@@ -225,7 +164,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
         public int Count { get { return  Timestamps.Count; } } 
 
-        public void Update(TAOPE_CyclingSpeedCadence.Battery_Data value, Verb verb)
+        public void Update(BTStandard_HeartRate.Battery_Data value, Verb verb)
         {
             if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
             {
@@ -238,7 +177,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             }
         }
 
-        public void Add(TAOPE_CyclingSpeedCadence.Battery_Data value)
+        public void Add(BTStandard_HeartRate.Battery_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
@@ -247,7 +186,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             TransmitPower.Add (value.TransmitPower);
             BatteryLevel.Add (value.BatteryLevel);
         }
-        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.Battery_Data value)
+        public void ReplaceMostRecent(BTStandard_HeartRate.Battery_Data value)
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
@@ -268,7 +207,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
         public ObservableCollection<double> TransmitPower { get; } = new ObservableCollection<double>();
         // Data values (properties) from characteristic BatteryLevel
         public ObservableCollection<double> BatteryLevel { get; } = new ObservableCollection<double>();
-        public ObservableCollection<TAOPE_CyclingSpeedCadence.Battery_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.Battery_Data>();
+        public ObservableCollection<BTStandard_HeartRate.Battery_Data> Data { get; } = new ObservableCollection<BTStandard_HeartRate.Battery_Data>();
     }
     ///<summary>
     ///TODO:
@@ -282,7 +221,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
 
         public int Count { get { return  Timestamps.Count; } } 
 
-        public void Update(TAOPE_CyclingSpeedCadence.Device_Information_Data value, Verb verb)
+        public void Update(BTStandard_HeartRate.Device_Information_Data value, Verb verb)
         {
             if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
             {
@@ -295,7 +234,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             }
         }
 
-        public void Add(TAOPE_CyclingSpeedCadence.Device_Information_Data value)
+        public void Add(BTStandard_HeartRate.Device_Information_Data value)
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
@@ -308,7 +247,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
             SoftwareRevision.Add (value.SoftwareRevision);
             SystemID.Add (value.SystemID);
         }
-        public void ReplaceMostRecent(TAOPE_CyclingSpeedCadence.Device_Information_Data value)
+        public void ReplaceMostRecent(BTStandard_HeartRate.Device_Information_Data value)
         {
             var index = Timestamps.Count - 1;
             Timestamps[index] = value.TimestampMostRecent;
@@ -341,7 +280,7 @@ namespace BluetoothProtocols.NS_TAOPE_CyclingSpeedCadence
         public ObservableCollection<string> SoftwareRevision { get; } = new ObservableCollection<string>();
         // Data values (properties) from characteristic System ID
         public ObservableCollection<byte[]> SystemID { get; } = new ObservableCollection<byte[]>();
-        public ObservableCollection<TAOPE_CyclingSpeedCadence.Device_Information_Data> Data { get; } = new ObservableCollection<TAOPE_CyclingSpeedCadence.Device_Information_Data>();
+        public ObservableCollection<BTStandard_HeartRate.Device_Information_Data> Data { get; } = new ObservableCollection<BTStandard_HeartRate.Device_Information_Data>();
     }
 
 }

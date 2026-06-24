@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-06-17::09:35
+    /// This class was automatically generated 2026-06-23::19:15
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -166,9 +166,14 @@ namespace BluetoothProtocols
                 get { return _TVOC; }
                 set { if (value == _TVOC) return; _TVOC = value; OnPropertyChanged();}
             }
-            public Environment_Data Clone()
+            public Environment_Data Clone(string name = null)
             {
-                return this.MemberwiseClone() as Environment_Data;
+                var retval = this.MemberwiseClone() as Environment_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
             }
 
             public void CopyFrom(Environment_Data value)
@@ -180,6 +185,23 @@ namespace BluetoothProtocols
                 this.Humidity = value.Humidity;
                 this.eCOS = value.eCOS;
                 this.TVOC = value.TVOC;
+            }
+
+            // CopyFrom, but convert the doubles as appropriate
+            public static Environment_Data CopyToOrClone(Environment_Data source, Environment_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.Temperature = convert(source.Temperature, "C");
+                dest.Pressure = convert(source.Pressure, "hPA");
+                dest.Humidity = convert(source.Humidity, "%");
+                dest.eCOS = convert(source.eCOS, "ppm");
+                dest.TVOC = convert(source.TVOC, "ppb");
+                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
@@ -248,9 +270,14 @@ namespace BluetoothProtocols
                 get { return _Clear; }
                 set { if (value == _Clear) return; _Clear = value; OnPropertyChanged();}
             }
-            public EnvironmentColor_Data Clone()
+            public EnvironmentColor_Data Clone(string name = null)
             {
-                return this.MemberwiseClone() as EnvironmentColor_Data;
+                var retval = this.MemberwiseClone() as EnvironmentColor_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
             }
 
             public void CopyFrom(EnvironmentColor_Data value)
@@ -261,6 +288,22 @@ namespace BluetoothProtocols
                 this.Green = value.Green;
                 this.Blue = value.Blue;
                 this.Clear = value.Clear;
+            }
+
+            // CopyFrom, but convert the doubles as appropriate
+            public static EnvironmentColor_Data CopyToOrClone(EnvironmentColor_Data source, EnvironmentColor_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.Red = convert(source.Red, "");
+                dest.Green = convert(source.Green, "");
+                dest.Blue = convert(source.Blue, "");
+                dest.Clear = convert(source.Clear, "");
+                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
@@ -364,9 +407,14 @@ namespace BluetoothProtocols
                 get { return _BlueCalibration; }
                 set { if (value == _BlueCalibration) return; _BlueCalibration = value; OnPropertyChanged();}
             }
-            public EnvironmentConfiguration_Data Clone()
+            public EnvironmentConfiguration_Data Clone(string name = null)
             {
-                return this.MemberwiseClone() as EnvironmentConfiguration_Data;
+                var retval = this.MemberwiseClone() as EnvironmentConfiguration_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
             }
 
             public void CopyFrom(EnvironmentConfiguration_Data value)
@@ -381,6 +429,26 @@ namespace BluetoothProtocols
                 this.RedCalibration = value.RedCalibration;
                 this.GreenCalibration = value.GreenCalibration;
                 this.BlueCalibration = value.BlueCalibration;
+            }
+
+            // CopyFrom, but convert the doubles as appropriate
+            public static EnvironmentConfiguration_Data CopyToOrClone(EnvironmentConfiguration_Data source, EnvironmentConfiguration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.TempInterval = convert(source.TempInterval, "ms");
+                dest.PressureInterval = convert(source.PressureInterval, "ms");
+                dest.HumidityInterval = convert(source.HumidityInterval, "ms");
+                dest.ColorInterval = convert(source.ColorInterval, "ms");
+                dest.GasMode = convert(source.GasMode, "");
+                dest.RedCalibration = convert(source.RedCalibration, "");
+                dest.GreenCalibration = convert(source.GreenCalibration, "");
+                dest.BlueCalibration = convert(source.BlueCalibration, "");
+                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
@@ -453,9 +521,14 @@ namespace BluetoothProtocols
                 get { return _AddressResolutionSupported; }
                 set { if (value == _AddressResolutionSupported) return; _AddressResolutionSupported = value; OnPropertyChanged();}
             }
-            public Common_Configuration_Data Clone()
+            public Common_Configuration_Data Clone(string name = null)
             {
-                return this.MemberwiseClone() as Common_Configuration_Data;
+                var retval = this.MemberwiseClone() as Common_Configuration_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
             }
 
             public void CopyFrom(Common_Configuration_Data value)
@@ -466,6 +539,22 @@ namespace BluetoothProtocols
                 this.Appearance = value.Appearance;
                 this.ConnectionParameter = value.ConnectionParameter;
                 this.AddressResolutionSupported = value.AddressResolutionSupported;
+            }
+
+            // CopyFrom, but convert the doubles as appropriate
+            public static Common_Configuration_Data CopyToOrClone(Common_Configuration_Data source, Common_Configuration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.Device_Name = source.Device_Name;
+                dest.Appearance = convert(source.Appearance, "");
+                dest.ConnectionParameter = source.ConnectionParameter;
+                dest.AddressResolutionSupported = convert(source.AddressResolutionSupported, "");
+                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
@@ -516,9 +605,14 @@ namespace BluetoothProtocols
                 get { return _EndRange; }
                 set { if (value == _EndRange) return; _EndRange = value; OnPropertyChanged();}
             }
-            public Generic_Service_Data Clone()
+            public Generic_Service_Data Clone(string name = null)
             {
-                return this.MemberwiseClone() as Generic_Service_Data;
+                var retval = this.MemberwiseClone() as Generic_Service_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
             }
 
             public void CopyFrom(Generic_Service_Data value)
@@ -527,6 +621,20 @@ namespace BluetoothProtocols
                 this.Name = value.Name;
                 this.StartRange = value.StartRange;
                 this.EndRange = value.EndRange;
+            }
+
+            // CopyFrom, but convert the doubles as appropriate
+            public static Generic_Service_Data CopyToOrClone(Generic_Service_Data source, Generic_Service_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.StartRange = convert(source.StartRange, "");
+                dest.EndRange = convert(source.EndRange, "");
+                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
@@ -566,9 +674,14 @@ namespace BluetoothProtocols
                 get { return _BatteryLevel; }
                 set { if (value == _BatteryLevel) return; _BatteryLevel = value; OnPropertyChanged();}
             }
-            public Battery_Data Clone()
+            public Battery_Data Clone(string name = null)
             {
-                return this.MemberwiseClone() as Battery_Data;
+                var retval = this.MemberwiseClone() as Battery_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
             }
 
             public void CopyFrom(Battery_Data value)
@@ -576,6 +689,19 @@ namespace BluetoothProtocols
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
                 this.BatteryLevel = value.BatteryLevel;
+            }
+
+            // CopyFrom, but convert the doubles as appropriate
+            public static Battery_Data CopyToOrClone(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.BatteryLevel = convert(source.BatteryLevel, "%");
+                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
@@ -740,9 +866,14 @@ namespace BluetoothProtocols
                 get { return _NFCTag; }
                 set { if (value == _NFCTag) return; _NFCTag = value; OnPropertyChanged();}
             }
-            public Configuration_Data Clone()
+            public Configuration_Data Clone(string name = null)
             {
-                return this.MemberwiseClone() as Configuration_Data;
+                var retval = this.MemberwiseClone() as Configuration_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
             }
 
             public void CopyFrom(Configuration_Data value)
@@ -764,6 +895,33 @@ namespace BluetoothProtocols
                 this.param0 = value.param0;
                 this.param1 = value.param1;
                 this.NFCTag = value.NFCTag;
+            }
+
+            // CopyFrom, but convert the doubles as appropriate
+            public static Configuration_Data CopyToOrClone(Configuration_Data source, Configuration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.DeviceName = source.DeviceName;
+                dest.Interval = convert(source.Interval, "ms");
+                dest.Timeout = convert(source.Timeout, "s");
+                dest.MinInterval = convert(source.MinInterval, "");
+                dest.MaxInterval = convert(source.MaxInterval, "");
+                dest.Latency = convert(source.Latency, "");
+                dest.SupervisionTimeout = convert(source.SupervisionTimeout, "10ms");
+                dest.Eddystone = source.Eddystone;
+                dest.CloudToken = source.CloudToken;
+                dest.Major = convert(source.Major, "");
+                dest.Minor = convert(source.Minor, "");
+                dest.Patch = convert(source.Patch, "");
+                dest.param0 = convert(source.param0, "");
+                dest.param1 = convert(source.param1, "");
+                dest.NFCTag = source.NFCTag;
+                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
