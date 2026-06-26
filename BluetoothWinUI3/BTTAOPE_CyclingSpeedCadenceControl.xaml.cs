@@ -514,7 +514,7 @@ public sealed partial class BTTAOPE_CyclingSpeedCadenceControl : UserControl, ID
         {
             if (potentialMatchName == name || name == "*")
             {
-                run.Text = Sparkles[NPropertyChanges[potentialMatchName] % Sparkles.Count];
+                run.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
             }
         }
     }

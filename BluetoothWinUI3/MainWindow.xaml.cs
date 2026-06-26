@@ -673,6 +673,13 @@ namespace BluetoothWinUI3
 
         private async void OnViewToggleTable(object sender, RoutedEventArgs e)
         {
+            // Can be called either because the user clicked it (and it changed), or because
+            // we moved the selected control and we have to update the menu.
+            // That is, if the old control had the table visible, and the new one doesn't, we
+            // have to flip the "show table" menu from checked to unchecked. But that will
+            // cause this method to be called.
+            // If the control is already in the correct state, bypass calling the SetDataGridVisibility
+
             string verb = "View Table";
             var selectedContainer = await GetZoomableSelectedAsync(verb);
             if (selectedContainer == null) return;
@@ -681,9 +688,12 @@ namespace BluetoothWinUI3
             if (selected == null) return; // should never happen
 
             var isChecked = (sender as ToggleMenuFlyoutItem).IsChecked;
-            //var currVisibility = selected.GetDataGridVisibility();
+            var currVisibility = selected.GetDataGridVisibility();
             var newVisibility = (isChecked) ? IDeviceControlDevice.Visibility.Visible : IDeviceControlDevice.Visibility.Collapsed;
-            selected.SetDataGridVisibility(newVisibility);
+            if (currVisibility != newVisibility)
+            {
+                selected.SetDataGridVisibility(newVisibility);
+            }
         }
 
         WindowSize CurrSelectedWindowSize = WindowSize.Normal;
@@ -782,6 +792,16 @@ namespace BluetoothWinUI3
             uimBTColorBackground.IsEnabled = selectedDevice != null;
             uimBTColorText.IsEnabled = selectedDevice != null;
 
+            var viewShowTableVisibleShouldBeChecked = selected.GetDataGridVisibility() == IDeviceControlBasic.Visibility.Visible;
+            var mustChangeViewShowTableVisible = viewShowTableVisibleShouldBeChecked != uimViewShowTable.IsChecked;
+            if (mustChangeViewShowTableVisible)
+            {
+                // Note that this will cause the OnViewToggleTable callback to be called
+                // even though it won't have anything to do. We're just updating the menu to 
+                // match the actual state of the control.
+                uimViewShowTable.IsChecked = viewShowTableVisibleShouldBeChecked;
+            }
+            uimViewShowTable.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanShowTable);
         }
         private async void OnChangeGraphColor(object sender, RoutedEventArgs e)
         {

@@ -170,30 +170,6 @@ internal static class UtilitiesWinUI3
         }
     }
 
-    public static void TableView_AutoGeneratingColumn_FixupDateTime(object sender, TableViewAutoGeneratingColumnEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case "TimestampMostRecent":
-                var col = e.Column as TableViewDateColumn;
-                if (col == null)
-                {
-                    // Log($"Error: TimestampMostRecent is not a TableViewDateColumn.");
-                    return;
-                }
-                col.IsReadOnly = true;
-                // DateFormat is from the DateTimeFormatter which is completely different from the 
-                // normal format from DateTimeOffset.ToString().
-                // https://learn.microsoft.com/en-us/uwp/api/windows.globalization.datetimeformatting.datetimeformatter?view=winrt-28000
-                col.DateFormat = "{hour.integer}:{minute.integer(2)}:{second.integer(2)}";
-                col.Header = "Time";
-                break;
-            case "TimestampMostRecentDT":
-                e.Cancel = true; // Don't generate a column for this property because it's not user friendly. 
-                break;
-        }
-    }
-
     public static void SetDataGridVisibility(PlotView uiOxyPlot, Grid uiDataGridPanel, IDeviceControlBasic.Visibility visibility)
     {
         switch (visibility)

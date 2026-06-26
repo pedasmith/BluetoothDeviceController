@@ -118,34 +118,16 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         //
         //uiTableView.CornerButtonMode = TableViewCornerButtonMode.None;
         //uiTableView.SelectionMode = ListViewSelectionMode.None;
-        uiTableView.AutoGeneratingColumn += (s, e) =>
-        {
-            switch (e.PropertyName)
-            {
-                case "TimestampMostRecent":
-                    var col = e.Column as TableViewDateColumn;
-                    if (col == null)
-                    {
-                        Log($"Error: TimestampMostRecent is not a TableViewDateColumn.");
-                        return;
-                    }
-                    col.IsReadOnly = true;
-                    // DateFormat is from the DateTimeFormatter which is completely different from the 
-                    // normal format from DateTimeOffset.ToString().
-                    // https://learn.microsoft.com/en-us/uwp/api/windows.globalization.datetimeformatting.datetimeformatter?view=winrt-28000
-                    col.DateFormat = "{hour.integer}:{minute.integer(2)}:{second.integer(2)}";
-                    col.Header = "Time";
-                    break;
-                case "TimestampMostRecentDT":
-                    e.Cancel = true; // Don't generate a column for this property because it's not user friendly. 
-                    break;
-            }
-        };
-
+        uiTableView.AutoGeneratingColumn += CurrTableCustomization.TableView_AutoGeneratingColumn_UseCustomization;
     }
 
     // List of controls that have the 'data updated' sparkles
     List<(string, Microsoft.UI.Xaml.Documents.Run)> ControlsWithSparkles = null;
+
+    /// <summary>
+    /// Customization for the TableView.
+    /// </summary>
+    TableViewColumnCustomization CurrTableCustomization = new TableViewColumnCustomization();
 
 
     private void Control_Loaded(object sender, RoutedEventArgs e)
@@ -587,7 +569,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             if (potentialMatchName == name || name == "*")
             {
-                run.Text = Sparkles[NPropertyChanges[potentialMatchName] % Sparkles.Count];
+                run.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
             }
         }
     }

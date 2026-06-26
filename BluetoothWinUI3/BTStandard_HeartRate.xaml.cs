@@ -86,7 +86,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         // https://w-ahmad.dev/WinUI.TableView/index.html
         // https://github.com/w-ahmad/WinUI.TableView
         //
-        uiTableView.AutoGeneratingColumn += UtilitiesWinUI3.UtilitiesWinUI3.TableView_AutoGeneratingColumn_FixupDateTime;
+        uiTableView.AutoGeneratingColumn += CurrTableCustomization.TableView_AutoGeneratingColumn_UseCustomization;
     }
 
     #region Instance value for a device
@@ -148,6 +148,11 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// Set in the Control_Loaded.
     /// </summary>
     List<(string, Microsoft.UI.Xaml.Documents.Run)> ControlsWithSparkles = null;
+
+    /// <summary>
+    /// Customization for the TableView.
+    /// </summary>
+    TableViewColumnCustomization CurrTableCustomization = new TableViewColumnCustomization();
     #endregion
 
     private void Control_Loaded(object sender, RoutedEventArgs e)
@@ -431,7 +436,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         {
             if (potentialMatchName == name || name == "*")
             {
-                run.Text = Sparkles[NPropertyChanges[potentialMatchName] % Sparkles.Count];
+                run.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
             }
         }
     }

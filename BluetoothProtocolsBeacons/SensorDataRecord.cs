@@ -69,6 +69,23 @@ namespace BluetoothProtocols
             this.Humidity = value.Humidity;
             this.PM25 = value.PM25;
         }
+
+        // CopyFrom, but convert the doubles as appropriate
+        public static SensorDataRecord CopyToOrClone(SensorDataRecord source, SensorDataRecord dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+        {
+            if (dest == null)
+            {
+                dest = source.Clone(name);
+            }
+            dest.TimestampMostRecent = source.TimestampMostRecent;
+            dest.Name = source.Name;
+            dest.Temperature = convert(source.Temperature, "C");
+            dest.Pressure = convert(source.Pressure, "hPA");
+            dest.Humidity = convert(source.Humidity, "%");
+            dest.PM25 = convert(source.PM25, "ppm");
+            return dest;
+        }
+
         public override string[] ExportGetHeaders(IExportData _)
         {
             List<string> headers = new List<string>();

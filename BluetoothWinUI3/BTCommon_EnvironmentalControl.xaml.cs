@@ -1,10 +1,10 @@
 using BluetoothProtocols;
+using BluetoothProtocolsDevicesCore;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
+using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Shapes;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -14,9 +14,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 
 using Utilities;
-using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
-using Windows.Storage.Streams;
 using WinUI.TableView;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,22 +24,51 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
+#region Set these to match your device
+using DeviceSpecificSensorData = SensorDataRecord; // Change: 
+#endregion
 
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDeviceControlBasic, IDeviceControlDevice, IHandleMyBTAdvertisements
 {
-
-    /// <summary>
-    /// Standard: Panel size. Set in UpdateUX from MainWindow.
-    /// </summary>
-
-    MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
-
+    #region Settings that must be updated for a new device
     /// <summary>
     /// Used for logging only
     /// </summary>
     private readonly string InternalDeviceType = "EnvironmentSensor";
+    #endregion
+
+    #region Advanced settings and values
+    /// <summary>
+    /// Every use case might have a different point of view about how frequently to update
+    /// the historical data (the data displayed in the graph + shown in the table view
+    /// + exported). A good default is 5 seconds.
+    /// </summary>
+    const double HistoricalDataUpdateRateInSeconds = 5.0;
+    #endregion
+
+    public BTCommon_EnvironmentalControl()
+    {
+        InitializeComponent();
+        this.Loaded += Control_Loaded;
+        this.DataContextChanged += Control_DataContextChanged;
+
+
+        // Setting up the OxyPlotModel is moved to SetupOnFirstValidData(). 
+        // That's because the model can only be set up when we have the first
+        // data, and sometimes that's delayed (the adverisement that triggers
+        // making this control might not include the environment data)
+
+        //
+        // Set up the uiTableView
+        // https://w-ahmad.dev/WinUI.TableView/index.html
+        // https://github.com/w-ahmad/WinUI.TableView
+        //
+        uiTableView.AutoGeneratingColumn += CurrTableCustomization.TableView_AutoGeneratingColumn_UseCustomization;
+    }
+
+    #region Instance value for a device
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
 
@@ -49,81 +76,56 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public SensorDataCollection HistoricalDataUnits { get; } = new SensorDataCollection();
-    public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data ; }
-    public IBTCommonMetaData GetDataMostRecent()
-    { return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1]; }
+    public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
+    public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
+    public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
+    {
+        return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];
+    }
+
     /// <summary>
-    /// The current environment data directly from the sensor (it's the original data, not a copy). The data is 
-    /// always in the 'native' units (e.g., always celcius for temperature).
+    /// Current sensor data from the Device. For the demo, it's battery level.
     /// </summary>
-    CopyableSensorDataRecord CurrSensor = null;
-    enum SensorFamily {  Govee, SensorPro, ThermPro};
+    DeviceSpecificSensorData CurrSensor_Data = null;
+    enum SensorFamily { Govee, SensorPro, ThermPro };
     SensorFamily CurrSensorFamily = SensorFamily.Govee;
 
     /// <summary>
-    /// Similar to CurrGoveeData , but the values are converted to the user's preferred units. 
-    /// This is what gets added to the HistoricalSensorDataUnits collection.
+    /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
+    /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
-    CopyableSensorDataRecord CurrSensorUnits = null;
+    DeviceSpecificSensorData CurrSensor_DataUnits = null;
 
 
     /// <summary>
     /// There are multiple sensors that this one control can handle. They are all initialized to 'NotThisSensorFamily'
     /// </summary>
-    Govee.SensorType GoveeSensorType = Govee.SensorType.NotThisSensorFamily; 
-    SensorPro.SensorType SensorProSensorType = SensorPro.SensorType.NotThisSensorFamily; 
-    ThermPro.SensorType ThermProSensorType = ThermPro.SensorType.NotThisSensorFamily; 
-    List<string> TableColumns = new();
+    Govee.SensorType GoveeSensorType = Govee.SensorType.NotThisSensorFamily;
+    SensorPro.SensorType SensorProSensorType = SensorPro.SensorType.NotThisSensorFamily;
+    ThermPro.SensorType ThermProSensorType = ThermPro.SensorType.NotThisSensorFamily;
+    #endregion
 
-    public BTCommon_EnvironmentalControl()
-    {
-        InitializeComponent();
-        this.Loaded += BTCommon_EnvironmentalControl_Loaded;
-        this.DataContextChanged += BTCommon_EnvironmentalControl_DataContextChanged;
+    #region Instance values for the UX
+    /// <summary>
+    /// Standard: Panel size. Set in UpdateUX from MainWindow.
+    /// </summary>
+    MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
 
 
+    /// <summary>
+    /// List of the controls that have the little 'data has been updated' sparkles.
+    /// Set in the Control_Loaded.
+    /// </summary>
+    List<(string, Microsoft.UI.Xaml.Documents.Run)> ControlsWithSparkles = null;
 
-        //
-        // Set up the uiTableView
-        // https://w-ahmad.dev/WinUI.TableView/index.html
-        // https://github.com/w-ahmad/WinUI.TableView
-        //
-        uiTableView.AutoGeneratingColumn += (s, e) =>
-        {
-            switch (e.PropertyName)
-            {
-                case "TimestampMostRecent":
-                    var col = e.Column as TableViewDateColumn;
-                    if (col == null)
-                    {
-                        Log($"Error: TimestampMostRecent is not a TableViewDateColumn.");
-                        return;
-                    }
-                    col.IsReadOnly = true;
-                    // DateFormat is from the DateTimeFormatter which is completely different from the 
-                    // normal format from DateTimeOffset.ToString().
-                    // https://learn.microsoft.com/en-us/uwp/api/windows.globalization.datetimeformatting.datetimeformatter?view=winrt-28000
-                    col.DateFormat = "{hour.integer}:{minute.integer(2)}:{second.integer(2)}";
-                    col.Header = "Time";
-                    break;
-                case "TimestampMostRecentDT":
-                    e.Cancel = true; // Don't generate a column for this property because it's not user friendly. 
-                    break;
-                default:
-                    if (!TableColumns.Contains(e.PropertyName))
-                    {
-                        // The sensor has a bunch of fields (e.g., "TagType") which should not be part of the data grid.
-                        e.Cancel = true;
-                    }
-                    break;
-            }
-        };
-
-    }
+    /// <summary>
+    /// Customization for the TableView.
+    /// </summary>
+    TableViewColumnCustomization CurrTableCustomization = new TableViewColumnCustomization();
+    #endregion
 
     bool FirstLoad = true;
-    private void BTCommon_EnvironmentalControl_Loaded(object sender, RoutedEventArgs e)
+    private void Control_Loaded(object sender, RoutedEventArgs e)
     {
         // Loaded gets called first when it's first loaded an then each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
@@ -135,12 +137,29 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             case SensorFamily.SensorPro: uiDeviceName.Text = "Sensor " + SensorProSensorType.ToString(); break;
             case SensorFamily.ThermPro: uiDeviceName.Text = "Sensor " + ThermProSensorType.ToString(); break;
         }
+
+        // Change: set the right sparkles
+        ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
+        {
+            ( SensorDataRecord.TemperaturePropertyChangedName, uiTemperatureChange),
+            ( SensorDataRecord.PM25PropertyChangedName, uiPM25Change),
+            ( SensorDataRecord.HumidityPropertyChangedName, uiHumidityChange),
+        };
     }
 
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    public List<string> LineNames { get { return ["Temperature", "Humidity", "PM25",]; }  }
+    List<string> _LineNames = new List<string>() { "Temperature", "Humidity", "PM25", }; // CHANGE:
+    public List<string> LineNames { get { return _LineNames; }  }
 
+    /// <summary>
+    /// The DataContext is a WinUI3 (and the rest of XAML) thing, and is just an object. And it can be
+    /// set by anyone, at any time, to any value. The Bluetooth controls generally require that the 
+    /// DataContext be a KnownDevice (which is turn is a bunch of data: the SupportedDevice, the
+    /// WatcherData / Bluetooth advertisement that triggered this control being created, etc.)
+    /// 
+    /// DataContextAsKnownDevice is either a real KnownDevice or it's null.
+    /// </summary>
     public KnownDevice DataContextAsKnownDevice { get { return DataContext as KnownDevice; } }
 
     int NLeftAxis = 0;
@@ -203,17 +222,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// <returns></returns>
     public uint GetGraphColor(string name)
     {
-        foreach (var series in OxyPlotModel.Series)
-        {
-            if (series is LineSeries lineSeries)
-            {
-                if (lineSeries.DataFieldY == name)
-                {
-                    return UtilitiesOxyColor.OxyColorToUint(lineSeries.Color);
-                }
-            }
-        }
-        return UtilitiesOxyColor.OxyColorToUint(OxyColors.Undefined);
+        return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(name, OxyPlotModel);
     }
 
 
@@ -224,13 +233,14 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
     /// used by other bits of the system.
     /// </summary>
-    private async void BTCommon_EnvironmentalControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    private async void Control_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
-        // FYI: by the time this method is called, the DataContext is already set
+        // FYI: by the time this method is called, the DataContext in the object is already set
 
         if (args.NewValue == null) return; // just bogus; ignore.
 
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
+        // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
         if (DataContextAsKnownDevice == null)
         {
             Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {args.NewValue.GetType()}");
@@ -275,6 +285,10 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         HandleMyAdvertisement(DataContextAsKnownDevice.Advertisement);
     }
 
+
+    /// <summary>
+    /// Called from MainWindow to find out whether the display is the graph or the table.
+    /// </summary>
     public IDeviceControlBasic.Visibility GetDataGridVisibility()
     {
         var retval = (uiDataGridPanel.Visibility == Visibility.Visible)
@@ -282,45 +296,17 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         return retval;
     }
 
-    public void SetDataGridVisibility(IDeviceControlBasic.Visibility visibility)
-    {
-        switch (visibility)
-        {
-            case IDeviceControlBasic.Visibility.Collapsed:
-                uiOxyPlot.Visibility = Visibility.Visible;
-                uiDataGridPanel.Visibility = Visibility.Collapsed;
-                break;
-            case IDeviceControlBasic.Visibility.Visible:
-            default:
-                uiOxyPlot.Visibility = Visibility.Collapsed;
-                uiDataGridPanel.Visibility = Visibility.Visible;
-                break;
-        }
-    }
-
 
     /// <summary>
-    /// Sets the line colors for the keys based on the OxyPlotModel values.
+    /// When visibility is Visible, display the table of data. When collapsed, display
+    /// the grid. Is called from MainWindow based on user selection.
     /// </summary>
-    private void InitializeKeyLineColorsFromDefaultOxyPlot()
+    /// <param name="visibility"></param>
+    public void SetDataGridVisibility(IDeviceControlBasic.Visibility visibility)
     {
-        foreach (var series in OxyPlotModel.Series)
-        {
-            if (series is LineSeries lineSeries)
-            {
-                var name = lineSeries.DataFieldY;
-                if (!String.IsNullOrEmpty(name))
-                {
-                    if (lineSeries.Color != OxyColors.Automatic
-                        && lineSeries.Color != OxyColors.Undefined)
-                    {
-                        var color = UtilitiesOxyColor.OxyColorToUint(lineSeries.Color);
-                        SetLineKeyColor(name, color);
-                    }
-                }
-            }
-        }
+        UtilitiesWinUI3.UtilitiesWinUI3.SetDataGridVisibility(uiOxyPlot, uiDataGridPanel, visibility);
     }
+
 
     /// <summary>
     /// Updates the OxyPlot line with a given name (e.g., "Temperature"). Is called from MainWindow when the
@@ -328,45 +314,11 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// </summary>
     /// <param name="lineName"></param>
     /// <param name="color"></param>
-
     public void UpdateGraphColor(string lineName, uint color)
     {
-        foreach (var series in OxyPlotModel.Series)
-        {
-            if (series is LineSeries lseries)
-            {
-                if (lseries.DataFieldY == lineName)
-                {
-                    lseries.Color = OxyColor.FromUInt32((uint)color);
-                    OxyPlotModel.InvalidatePlot(false); //DOC: false is just the axes, true is everything.
-                    break;
-                }
-            }
-        }
-        SetLineKeyColor(lineName, color);
+        UtilitiesWinUI3.UtilitiesWinUI3.UpdateGraphColor(OxyPlotModel, rootPanel, lineName, color);
     }
 
-    /// <summary>
-    /// The "line" here are the key lines that are generally placed below the data. For example, there's a block 
-    /// with the most recent Temperature data, plus a little title, plus a line that gets colored with the same
-    /// color as the graph line.
-    /// </summary>
-    /// <param name="lineName"></param>
-    /// <param name="color"></param>
-    private void SetLineKeyColor(string lineName, uint color)
-    {
-        foreach (Line line in UtilitiesWinUI3.UtilitiesWinUI3.FindVisualChildren<Line>(rootPanel))
-        {
-            if ((line.Tag as string) == lineName + "Color") // e.g., Tag="TemperatureColor"
-            {
-                byte a = 0xFF;
-                byte r = (byte)((color >> 16) & 0xFF);
-                byte g = (byte)((color >> 8) & 0xFF);
-                byte b = (byte)((color >> 0) & 0xFF);
-                line.Stroke = new SolidColorBrush(Windows.UI.Color.FromArgb(a, r, g, b));
-            }
-        }
-    }
 
     /// <summary>
     /// SaveData is per-device and includes the display name (e.g., a "Thingy" might have a preferred name of "Living Room")
@@ -381,7 +333,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         {
             KnownDeviceName = name;
             uiDeviceName.Text = KnownDeviceName;
-            CurrSensorUnits?.Name = KnownDeviceName;
+            CurrSensor_DataUnits?.Name = KnownDeviceName;
             foreach (var item in HistoricalDataUnits.Data)
             {
                 item.Name = KnownDeviceName;
@@ -429,25 +381,15 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// <summary>
     /// Standard: the normal way to resize the control. 
     /// </summary>
+    /// <param name="windowSize"></param>
+    /// <param name="largeActualSize"></param>
 
     public void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize)
     {
         CurrWindowSize = windowSize;
-        switch (CurrWindowSize)
-        {
-            default:
-            case MainWindow.WindowSize.Normal:
-                rootPanel.Width = 380;
-                rootPanel.Height = 380;
-                SetAxesVisibility(false);
-                break;
-            case MainWindow.WindowSize.Large:
-                rootPanel.Width = largeActualSize.Width;
-                rootPanel.Height = largeActualSize.Height;
-                SetAxesVisibility(true);
-                break;
-        }
+        UtilitiesWinUI3.UtilitiesWinUI3.UpdateUXWindowSize(windowSize, largeActualSize, rootPanel, OxyPlotModel, uiOxyPlot);
     }
+
 
     /// <summary>
     /// User preferences as set by the UpdateUX call
@@ -461,39 +403,25 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         Console.WriteLine(str);
     }
 
-#if NEVER_EVER_DEFINED
-    private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        UIThreadHelper.CallOnUIThread(() =>
-        {
-            if (!IsLoaded) return;
-            UpdateDeviceDataUX(e.PropertyName);
-        });
-    }
-#endif
 
     Dictionary<string, int> NPropertyChanges { get; } = [];
-    //List<string> Sparkles = new List<string>() { "\u00A0", "*" }; // ✨", "💫", "🌟", "⚡", "🔥", "💥" };
     readonly List<string> Sparkles = ["╺", "╼", "╾", "╸", "╾", "╼"];
 
     private void UpdateSparkles(string name)
     {
+        // In practice, name is never "*". The code is set up this way to match the Govee code.
         if (name == "") return;
         NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
-
-        if (name == SensorDataRecord.TemperaturePropertyChangedName || name == "*")
+        foreach ((string potentialMatchName, Microsoft.UI.Xaml.Documents.Run run) in ControlsWithSparkles)
         {
-            uiTemperatureChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-        }
-        if (name == SensorDataRecord.PM25PropertyChangedName || name == "*")
-        {
-            uiPM25Change.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-        }
-        if (name == SensorDataRecord.HumidityPropertyChangedName || name == "*")
-        {
-            uiHumidityChange.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+            if (potentialMatchName == name || name == "*")
+            {
+                run.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
+            }
         }
     }
+
+
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. For the Govee and ThermPro, there's never just one piece of data; we either get it all 
@@ -502,15 +430,13 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// <param name="name"></param>
     private void UpdateDeviceDataUX(string name)
     {
-        if (CurrSensor == null) return;
+        if (CurrSensor_Data == null) return;
 
         // name is from e.PropertyName when the Device does a PropertyChanged.
-
         UpdateSparkles(name);
 
-        // Update to match the current preferred units. Will create a new CurrSensorUnits the first time
-        // it's called
-        CurrSensorUnits = CurrSensor.CopyToAndUpdateUnits(CurrSensorUnits, CurrUserPrefs, KnownDeviceName);
+        // Update data from the device to match the current preferred units. Will create the values as needed.
+        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Track the historical data
         switch (name)
@@ -519,25 +445,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             case SensorDataRecord.TemperaturePropertyChangedName:
             case SensorDataRecord.PM25PropertyChangedName:
             case SensorDataRecord.HumidityPropertyChangedName:
-                // Unlike the Nordic_Thingy52 where the different values come in at different
-                // time, the sensor data comes in all at once.
-                var deltaInSeconds = CurrSensor.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
-                var verb = (deltaInSeconds > 5) ? SensorDataCollection.Verb.Add : SensorDataCollection.Verb.ReplaceMostRecent;
-                HistoricalDataUnits.Update(CurrSensorUnits, verb); // Will add or replace the data and will copy as needed.
-
-                //
-                // Update the OxyPlot because it doesn't tracked the INotifyCollectionChanged
-                //
-                if (verb == SensorDataCollection.Verb.Add && HistoricalDataUnits.Count == 2)
-                {
-                    // DOC: Can't have the axes start off invisible because then they can't be switched back on
-                    if (CurrWindowSize == MainWindow.WindowSize.Normal)
-                    {
-                        // Just in case the user quick set to large.
-                        SetAxesVisibility(false);
-                    }
-                }
-                uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
+                UpdateHistoricalDataAndGraph();
                 break;
         }
 
@@ -545,20 +453,49 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         if (name == SensorDataRecord.TemperaturePropertyChangedName || name == "" || name == "*")
         {
-            uiTemperature.Text = BluetoothWatcher.Units.Temperature.AsString(CurrSensorUnits.Temperature, CurrUserPrefs.Temperature);
+            uiTemperature.Text = BluetoothWatcher.Units.Temperature.AsString(CurrSensor_DataUnits.Temperature, CurrUserPrefs.Temperature);
         }
         if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
         {
-            uiPM25.Text = CurrSensor.PM25.ToString("0.0");
+            uiPM25.Text = CurrSensor_Data.PM25.ToString("0.0");
         }
         if (name == SensorDataRecord.HumidityPropertyChangedName || name == "" || name == "*")
         {
-            uiHumidity.Text = CurrSensor.Humidity.ToString("0.0") + "%";
+            uiHumidity.Text = CurrSensor_Data.Humidity.ToString("0.0") + "%";
         }
         if (name == SensorDataRecord.BatteryPropertyChangedName || name == "" || name == "*") 
         {
-            uiBTConnectionControl.SetBatteryLevel(CurrSensor.BatteryInPercent);
+            uiBTConnectionControl.SetBatteryLevel(CurrSensor_Data.BatteryInPercent);
         }
+    }
+
+
+    /// <summary>
+    /// Helper code to update historical data. The sensor might send a lot of data; the history only
+    /// saves a portion of the data. Technicaly, every time there's new data we either update
+    /// the most recent entry OR we add a new entry.
+    /// </summary>
+    private void UpdateHistoricalDataAndGraph()
+    {
+        var deltaInSeconds = CurrSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
+        var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
+            ? DataCollection<DeviceSpecificSensorData>.Verb.Add : DataCollection<DeviceSpecificSensorData>.Verb.ReplaceMostRecent;
+        HistoricalDataUnits.Update(CurrSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
+
+        //
+        // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
+        //
+        if (verb == DataCollection<DeviceSpecificSensorData>.Verb.Add && HistoricalDataUnits.Count == 2)
+        {
+            // DOC: Can't have the axes start off invisible because then they can't be switched back on
+            if (CurrWindowSize == MainWindow.WindowSize.Normal)
+            {
+                // Just in case the user quick set to large.
+                OxyPlotModel.SetAxesVisibility(uiOxyPlot, false);
+            }
+        }
+
+        uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
     }
 
     #region Exporters
@@ -580,46 +517,10 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
     public async void ExportGraphAsPng()
     {
-        try
-        {
-            var exporter = new Exporters.ExportControlAsPng();
-            var outputStream = await exporter.ExportAsync(uiOxyPlot, rootPanel.Background);
-            var dataPackage = new DataPackage()
-            {
-                RequestedOperation = DataPackageOperation.Copy
-            };
-            outputStream.Seek(0);
-            var streamref = RandomAccessStreamReference.CreateFromStream(outputStream);
-            dataPackage.SetBitmap(streamref);
-            Clipboard.SetContent(dataPackage);
-            Clipboard.Flush();
-        }
-        catch (Exception ex)
-        {
-            Log($"Error: unable to make PNG data for the clipboard; {ex.Message}");
-        }
+        await UtilitiesWinUI3.UtilitiesWinUI3.ExportGraphAsPngAsync(uiOxyPlot, rootPanel.Background, Log);
     }
 
 
-    /* Code to write to a file. Note that AFAICT the BinaryReader, when it goes out of scope, takes the
-     * outputStream with it, so this code is the last code that can use the outputStream.
-     * This code works fine, but it's not needed for my app. That's why it's commented out.
-     */
-#if TURN_ON_GRAPH_TO_FILE_TEST_CODE
-        try
-        {
-            outputStream.Seek(0);
-            using (var reader = new BinaryReader(outputStream.AsStreamForRead()))
-            {
-                var bytes = reader.ReadBytes((int)outputStream.Size);
-                System.IO.File.WriteAllBytes("c:\\temp\\2026\\junkgraph.png", bytes); 
-            }
-        }
-        catch (Exception ex)
-        {
-            Log($"Error: 20: unable to make PNG file; {ex.Message}");
-        }
-#endif
     string name = "EnvironmentSensor";
     bool FirstCallWithIsValid = true;
 
@@ -639,16 +540,16 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             switch (CurrSensorFamily)
             {
                 case SensorFamily.Govee:
-                    CurrSensor = Govee.Parse(GoveeSensorType, data, CurrSensor as Govee);
+                    CurrSensor_Data = Govee.Parse(GoveeSensorType, data, CurrSensor_Data as Govee);
                     break;
                 case SensorFamily.SensorPro:
-                    CurrSensor = SensorPro.Parse(SensorProSensorType, data, CurrSensor as SensorPro);
+                    CurrSensor_Data = SensorPro.Parse(SensorProSensorType, data, CurrSensor_Data as SensorPro);
                     break;
                 case SensorFamily.ThermPro:
-                    CurrSensor = ThermPro.Parse(ThermProSensorType, data, CurrSensor as ThermPro);
+                    CurrSensor_Data = ThermPro.Parse(ThermProSensorType, data, CurrSensor_Data as ThermPro);
                     break;
             }
-            if (CurrSensor == null)
+            if (CurrSensor_Data == null)
             {
                 // Lots of reasons it might be invalid. For example, we get an advert that includes a 
                 // name (and creates this control), but the advert doesn't include the data because
@@ -658,9 +559,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             }
             CurrSaveData.History.UpdateAdvertisementHistory(data.MostRecentAdvertisement.Timestamp);
             CurrSaveData.History.UpdateDataHistory(data.MostRecentAdvertisement.Timestamp);
-            CurrSensor.Name = name;
-            CurrSensor.TimestampMostRecent = data.MostRecentAdvertisement.Timestamp;
-            if (CurrSensor.IsValid)
+            CurrSensor_Data.Name = name;
+            CurrSensor_Data.TimestampMostRecent = data.MostRecentAdvertisement.Timestamp;
+            if (true) // was: CurrSensor_Data.IsValid
             {
                 if (FirstCallWithIsValid)
                 {
@@ -680,7 +581,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     {
         // Set up the Connect button and Battery visibility
         uiBTConnectionControl.SetConnectVisibility(Visibility.Collapsed);
-        if (!CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Battery))
+        if (!CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Battery))
         {
             uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
         }
@@ -688,40 +589,40 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // Note: you have to remove the sensor from the uiDeviceDataList entirely. You can't just
         // set it to invisible because the items will still show up
 
-        if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature))
+        if (CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature))
         {
             AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Left, "Temperature", "Temperature", OxyColors.DarkBlue);
-            TableColumns.Add("Temperature");
+            CurrTableCustomization.TableColumns.Add("Temperature");
         }
         else
         {
             uiDeviceDataList.Items.Remove(uiDeviceDataTemperature);
         }
 
-        if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity))
+        if (CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity))
         {
             AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Left, "Humidity", "Humidity", OxyColors.Violet);
-            TableColumns.Add("Humidity");
+            CurrTableCustomization.TableColumns.Add("Humidity");
         }
         else
         {
             uiDeviceDataList.Items.Remove(uiDeviceDataHumidity);
         }
 
-        if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.PM25))
+        if (CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.PM25))
         {
             AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Right, "PM25", "PM25", OxyColors.Gray);
-            TableColumns.Add("PM25");
+            CurrTableCustomization.TableColumns.Add("PM25");
         }
         else
         {
             uiDeviceDataList.Items.Remove(uiDeviceDataPM25);
         }
 
-        if (CurrSensor.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Pressure))
+        if (CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Pressure))
         {
             AddPlotAxisAndSeries(OxyPlotModel, AxisPosition.Right, "Pressure", "Pressure", OxyColors.LightBlue);
-            TableColumns.Add("Pressure");
+            CurrTableCustomization.TableColumns.Add("Pressure");
         }
         else
         {
@@ -734,7 +635,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
-        InitializeKeyLineColorsFromDefaultOxyPlot();
+        UtilitiesWinUI3.UtilitiesWinUI3.InitializeKeyLineColorsFromDefaultOxyPlot(OxyPlotModel, rootPanel);
 
         var saveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id);
         if (saveData != null)
@@ -754,7 +655,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
     private void AdjustSensorVisibility(Panel panel, SensorDataRecord.SensorPresent flag)
     {
-        var visibility = (CurrSensor.IsSensorPresent.HasFlag(flag)) ? Visibility.Visible : Visibility.Collapsed;
+        var visibility = (CurrSensor_Data.IsSensorPresent.HasFlag(flag)) ? Visibility.Visible : Visibility.Collapsed;
         // e.g., SensorDataRecord.SensorPresent.Temperature
         panel.Visibility = visibility;
     }
