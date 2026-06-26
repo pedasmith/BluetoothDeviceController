@@ -13,7 +13,7 @@ using static BluetoothProtocols.Nordic_Thingy;
 
 namespace BluetoothProtocols
 {
-    public class SensorDataRecord : BTCommonMetaData
+    public partial class SensorDataRecord : BTCommonMetaData<SensorDataRecord>
     {
         /* Adding more fields? Here's a quick guide:
          * 1. When you add a new field, you must also bump the .All value. Do a search in the code
@@ -50,6 +50,25 @@ namespace BluetoothProtocols
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
         }
 
+        public override SensorDataRecord Clone(string name = null)
+        {
+            var retval = this.MemberwiseClone() as SensorDataRecord;
+            if (name != null)
+            {
+                retval.Name = name;
+            }
+            return retval;
+        }
+
+        public override void CopyFrom(SensorDataRecord value)
+        {
+            this.TimestampMostRecent = value.TimestampMostRecent;
+            this.Name = value.Name;
+            this.Temperature = value.Temperature;
+            this.Pressure = value.Pressure;
+            this.Humidity = value.Humidity;
+            this.PM25 = value.PM25;
+        }
         public override string[] ExportGetHeaders(IExportData _)
         {
             List<string> headers = new List<string>();

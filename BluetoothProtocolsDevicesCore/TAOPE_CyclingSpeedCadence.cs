@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-06-23::19:15
+    /// This class was automatically generated 2026-06-25::17:39
     /// </summary>
 
     public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged
@@ -103,8 +103,9 @@ namespace BluetoothProtocols
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class SpeedCadence_Data :BTCommonMetaData //, IExportDataSource
+        public class SpeedCadence_Data :BTCommonMetaData<SpeedCadence_Data> //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _Flags = 0;
@@ -152,7 +153,7 @@ namespace BluetoothProtocols
                 get { return _TimeCrank; }
                 set { if (value == _TimeCrank) return; _TimeCrank = value; OnPropertyChanged();}
             }
-            public SpeedCadence_Data Clone(string name = null)
+            public override SpeedCadence_Data Clone(string name = null)
             {
                 var retval = this.MemberwiseClone() as SpeedCadence_Data;
                 if (name != null)
@@ -162,7 +163,7 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public void CopyFrom(SpeedCadence_Data value)
+            public override void CopyFrom(SpeedCadence_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
@@ -216,8 +217,9 @@ namespace BluetoothProtocols
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class Feature_Data :BTCommonMetaData //, IExportDataSource
+        public class Feature_Data :BTCommonMetaData<Feature_Data> //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _FeatureFlags = 0;
@@ -247,7 +249,7 @@ namespace BluetoothProtocols
                 get { return _Unknown3; }
                 set { if (value == _Unknown3) return; _Unknown3 = value; OnPropertyChanged();}
             }
-            public Feature_Data Clone(string name = null)
+            public override Feature_Data Clone(string name = null)
             {
                 var retval = this.MemberwiseClone() as Feature_Data;
                 if (name != null)
@@ -257,7 +259,7 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public void CopyFrom(Feature_Data value)
+            public override void CopyFrom(Feature_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
@@ -306,8 +308,9 @@ namespace BluetoothProtocols
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class Service_FD00_OTA_Data :BTCommonMetaData //, IExportDataSource
+        public class Service_FD00_OTA_Data :BTCommonMetaData<Service_FD00_OTA_Data> //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private byte[] _Unknown0 = null;
@@ -346,7 +349,7 @@ namespace BluetoothProtocols
                 get { return _Unknown3; }
                 set { if (value == _Unknown3) return; _Unknown3 = value; OnPropertyChanged();}
             }
-            public Service_FD00_OTA_Data Clone(string name = null)
+            public override Service_FD00_OTA_Data Clone(string name = null)
             {
                 var retval = this.MemberwiseClone() as Service_FD00_OTA_Data;
                 if (name != null)
@@ -356,7 +359,7 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public void CopyFrom(Service_FD00_OTA_Data value)
+            public override void CopyFrom(Service_FD00_OTA_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
@@ -408,8 +411,9 @@ namespace BluetoothProtocols
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class Battery_Data :BTCommonMetaData //, IExportDataSource
+        public class Battery_Data :BTCommonMetaData<Battery_Data> //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _TransmitPower = 0;
@@ -430,7 +434,7 @@ namespace BluetoothProtocols
                 get { return _BatteryLevel; }
                 set { if (value == _BatteryLevel) return; _BatteryLevel = value; OnPropertyChanged();}
             }
-            public Battery_Data Clone(string name = null)
+            public override Battery_Data Clone(string name = null)
             {
                 var retval = this.MemberwiseClone() as Battery_Data;
                 if (name != null)
@@ -440,7 +444,7 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public void CopyFrom(Battery_Data value)
+            public override void CopyFrom(Battery_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
@@ -486,8 +490,9 @@ namespace BluetoothProtocols
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class Device_Information_Data :BTCommonMetaData //, IExportDataSource
+        public class Device_Information_Data :BTCommonMetaData<Device_Information_Data> //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private string _Manufacturer = "";
@@ -544,7 +549,7 @@ namespace BluetoothProtocols
                 get { return _SystemID; }
                 set { if (value == _SystemID) return; _SystemID = value; OnPropertyChanged();}
             }
-            public Device_Information_Data Clone(string name = null)
+            public override Device_Information_Data Clone(string name = null)
             {
                 var retval = this.MemberwiseClone() as Device_Information_Data;
                 if (name != null)
@@ -554,7 +559,7 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public void CopyFrom(Device_Information_Data value)
+            public override void CopyFrom(Device_Information_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
@@ -854,7 +859,8 @@ namespace BluetoothProtocols
             CurrSpeedCadence_Data.TimeCrank = vr.GetNextDouble();
             OnPropertyChanged(CSC_MeasurementPropertyChangedName); // "CSC_Measurement"
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from CSC Measurement and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>SpeedCadence_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -880,6 +886,7 @@ namespace BluetoothProtocols
             CurrSpeedCadence_Data.TimeWheel = vr.GetNextDouble();
             CurrSpeedCadence_Data.RevolutionCrank = vr.GetNextDouble();
             CurrSpeedCadence_Data.TimeCrank = vr.GetNextDouble();
+            CurrSpeedCadence_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(CSC_MeasurementPropertyChangedName); // "CSC_Measurement"
             return CurrSpeedCadence_Data;
         }
@@ -962,7 +969,8 @@ namespace BluetoothProtocols
             CurrFeature_Data.Unknown3 = vr.GetNextByteArray();
             OnPropertyChanged(SC_Control_PointPropertyChangedName); // "SC_Control_Point"
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from CSC Feature and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Feature_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -984,10 +992,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrFeature_Data.FeatureFlags = vr.GetNextDouble();
+            CurrFeature_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(CSC_FeaturePropertyChangedName); // "CSC_Feature"
             return CurrFeature_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from Sensor Location and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Feature_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1009,10 +1019,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrFeature_Data.SensorLocation = vr.GetNextDouble();
+            CurrFeature_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Sensor_LocationPropertyChangedName); // "Sensor_Location"
             return CurrFeature_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from SC Control Point and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Feature_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1034,6 +1046,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrFeature_Data.Unknown3 = vr.GetNextByteArray();
+            CurrFeature_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(SC_Control_PointPropertyChangedName); // "SC_Control_Point"
             return CurrFeature_Data;
         }
@@ -1145,7 +1158,8 @@ namespace BluetoothProtocols
             CurrService_FD00_OTA_Data.Unknown3 = vr.GetNextByteArray();
             OnPropertyChanged(FD1A_WritePropertyChangedName); // "FD1A_Write"
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from FD09_OTA_Notify and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Service_FD00_OTA_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1167,10 +1181,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrService_FD00_OTA_Data.Unknown0 = vr.GetNextByteArray();
+            CurrService_FD00_OTA_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(FD09_OTA_NotifyPropertyChangedName); // "FD09_OTA_Notify"
             return CurrService_FD00_OTA_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from FD0A_OTA_Write and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Service_FD00_OTA_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1192,10 +1208,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrService_FD00_OTA_Data.Unknown1 = vr.GetNextByteArray();
+            CurrService_FD00_OTA_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(FD0A_OTA_WritePropertyChangedName); // "FD0A_OTA_Write"
             return CurrService_FD00_OTA_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from FD19_Notify and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Service_FD00_OTA_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1217,10 +1235,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrService_FD00_OTA_Data.Unknown2 = vr.GetNextByteArray();
+            CurrService_FD00_OTA_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(FD19_NotifyPropertyChangedName); // "FD19_Notify"
             return CurrService_FD00_OTA_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from FD1A_Write and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Service_FD00_OTA_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1242,6 +1262,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrService_FD00_OTA_Data.Unknown3 = vr.GetNextByteArray();
+            CurrService_FD00_OTA_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(FD1A_WritePropertyChangedName); // "FD1A_Write"
             return CurrService_FD00_OTA_Data;
         }
@@ -1303,7 +1324,8 @@ namespace BluetoothProtocols
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
             OnPropertyChanged(BatteryLevelPropertyChangedName); // "BatteryLevel"
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from Transmit Power and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Battery_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1325,10 +1347,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrBattery_Data.TransmitPower = vr.GetNextDouble();
+            CurrBattery_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Transmit_PowerPropertyChangedName); // "Transmit_Power"
             return CurrBattery_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from BatteryLevel and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Battery_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1350,6 +1374,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
+            CurrBattery_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(BatteryLevelPropertyChangedName); // "BatteryLevel"
             return CurrBattery_Data;
         }
@@ -1511,7 +1536,8 @@ namespace BluetoothProtocols
             CurrDevice_Information_Data.SystemID = vr.GetNextByteArray();
             OnPropertyChanged(System_IDPropertyChangedName); // "System_ID"
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from Manufacturer Name String and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Device_Information_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1533,10 +1559,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrDevice_Information_Data.Manufacturer = vr.GetNextString();
+            CurrDevice_Information_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Manufacturer_Name_StringPropertyChangedName); // "Manufacturer_Name_String"
             return CurrDevice_Information_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from Model Number String and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Device_Information_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1558,10 +1586,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrDevice_Information_Data.ModelNumber = vr.GetNextString();
+            CurrDevice_Information_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Model_Number_StringPropertyChangedName); // "Model_Number_String"
             return CurrDevice_Information_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from Hardware Revision String and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Device_Information_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1583,10 +1613,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrDevice_Information_Data.HardwareRevision = vr.GetNextString();
+            CurrDevice_Information_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Hardware_Revision_StringPropertyChangedName); // "Hardware_Revision_String"
             return CurrDevice_Information_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from Firmware Revision String and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Device_Information_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1608,10 +1640,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrDevice_Information_Data.FirmwareRevision = vr.GetNextString();
+            CurrDevice_Information_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Firmware_Revision_StringPropertyChangedName); // "Firmware_Revision_String"
             return CurrDevice_Information_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from Software Revision String and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Device_Information_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1633,10 +1667,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrDevice_Information_Data.SoftwareRevision = vr.GetNextString();
+            CurrDevice_Information_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Software_Revision_StringPropertyChangedName); // "Software_Revision_String"
             return CurrDevice_Information_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from System ID and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Device_Information_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -1658,6 +1694,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrDevice_Information_Data.SystemID = vr.GetNextByteArray();
+            CurrDevice_Information_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(System_IDPropertyChangedName); // "System_ID"
             return CurrDevice_Information_Data;
         }

@@ -352,12 +352,13 @@ This is the primary section of the code.
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class [[DataGroupName.dotNet]] :BTCommonMetaData //, IExportDataSource
+        public class [[DataGroupName.dotNet]] :BTCommonMetaData<[[DataGroupName.dotNet]]> //, IExportDataSource
         {
             // Template is ServiceDataGroups
 [[CharacteristicDataFields]]
-            public [[DataGroupName.dotNet]] Clone(string name = null)
+            public override [[DataGroupName.dotNet]] Clone(string name = null)
             {
                 var retval = this.MemberwiseClone() as [[DataGroupName.dotNet]];
                 if (name != null)
@@ -367,7 +368,7 @@ This is the primary section of the code.
                 return retval;
             }
 
-            public void CopyFrom([[DataGroupName.dotNet]] value)
+            public override void CopyFrom([[DataGroupName.dotNet]] value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
@@ -539,7 +540,8 @@ Individual data fields for the nice ToString()
 The read method for each characteristic.
 
 ```
-        /// Reads data
+        /// <summary>
+        /// Reads data from [[CharacteristicName]] and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>[[DataGroupName.dotNet]] of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -561,6 +563,7 @@ The read method for each characteristic.
 
             vr.Initialize(result.ToArray());
 [[CharacteristicPropertyReadField]][[CharacteristicPropertyReadFieldReplace]]
+            Curr[[DataGroupName.dotNet]].TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged([[CharacteristicName.dotNet]]PropertyChangedName); // "[[CharacteristicName.dotNet]]"
             return Curr[[DataGroupName.dotNet]];
         }
@@ -962,6 +965,7 @@ using System.Collections.Generic;
 using System.ComponentModel; // Needed for INotifyPropertyChanged
 using System.Runtime.CompilerServices; // Needed for CallerMemberNameAttribute
 using System.Runtime.InteropServices.WindowsRuntime; // Needed for IBuffer.ToArray extension method
+using BluetoothProtocolsDevicesCore;  // Needed for DataCollection
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -985,20 +989,22 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
 
 ```
     ///<summary>
-    ///TODO:
     ///[[DataGroupName]]Collection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the [[DataGroupName]] group from [[ServiceName]].
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class [[DataGroupName.dotNet]]Collection 
+    public class [[DataGroupName.dotNet]]Collection : DataCollection<[[CLASSNAME]].[[DataGroupName.dotNet]]>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update([[CLASSNAME]].[[DataGroupName.dotNet]] value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -1013,16 +1019,18 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-[[DataGroupMemberCollectionAdd]]
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent([[CLASSNAME]].[[DataGroupName.dotNet]] value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-[[DataGroupMemberCollectionReplaceMostRecent]]
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -1031,12 +1039,14 @@ namespace BluetoothProtocols.NS_[[CLASSNAME]]
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-[[DataGroupMemberCollection]]
         public ObservableCollection<[[CLASSNAME]].[[DataGroupName.dotNet]]> Data { get; } = new ObservableCollection<[[CLASSNAME]].[[DataGroupName.dotNet]]>();
-    }
 
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
 ```
 
 

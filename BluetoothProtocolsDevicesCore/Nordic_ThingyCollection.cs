@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel; // Needed for INotifyPropertyChanged
 using System.Runtime.CompilerServices; // Needed for CallerMemberNameAttribute
 using System.Runtime.InteropServices.WindowsRuntime; // Needed for IBuffer.ToArray extension method
+using BluetoothProtocolsDevicesCore;  // Needed for DataCollection
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -19,24 +20,26 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
 
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This code was automatically generated 2026-06-23::19:15
+    /// This code was automatically generated 2026-06-25::17:39
     /// </summary>
 
     ///<summary>
-    ///TODO:
     ///Environment_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the Environment_Data group from Environment.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class Environment_DataCollection 
+    public class Environment_DataCollection : DataCollection<Nordic_Thingy.Environment_Data>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update(Nordic_Thingy.Environment_Data value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -51,24 +54,18 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            Temperature.Add (value.Temperature);
-            Pressure.Add (value.Pressure);
-            Humidity.Add (value.Humidity);
-            eCOS.Add (value.eCOS);
-            TVOC.Add (value.TVOC);
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent(Nordic_Thingy.Environment_Data value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            Temperature[index] = value.Temperature;
-            Pressure[index] = value.Pressure;
-            Humidity[index] = value.Humidity;
-            eCOS[index] = value.eCOS;
-            TVOC[index] = value.TVOC;
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -77,34 +74,31 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic Temperature (c)
-        public ObservableCollection<double> Temperature { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Pressure (hpa)
-        public ObservableCollection<double> Pressure { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Humidity (%)
-        public ObservableCollection<double> Humidity { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Air Quality eCOS TVOC
-        public ObservableCollection<double> eCOS { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> TVOC { get; } = new ObservableCollection<double>();
         public ObservableCollection<Nordic_Thingy.Environment_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Environment_Data>();
-    }
+
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
     ///<summary>
-    ///TODO:
     ///EnvironmentColor_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the EnvironmentColor_Data group from Environment.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class EnvironmentColor_DataCollection 
+    public class EnvironmentColor_DataCollection : DataCollection<Nordic_Thingy.EnvironmentColor_Data>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update(Nordic_Thingy.EnvironmentColor_Data value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -119,22 +113,18 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            Red.Add (value.Red);
-            Green.Add (value.Green);
-            Blue.Add (value.Blue);
-            Clear.Add (value.Clear);
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent(Nordic_Thingy.EnvironmentColor_Data value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            Red[index] = value.Red;
-            Green[index] = value.Green;
-            Blue[index] = value.Blue;
-            Clear[index] = value.Clear;
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -143,30 +133,31 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic Color RGB+Clear
-        public ObservableCollection<double> Red { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Green { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Blue { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Clear { get; } = new ObservableCollection<double>();
         public ObservableCollection<Nordic_Thingy.EnvironmentColor_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.EnvironmentColor_Data>();
-    }
+
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
     ///<summary>
-    ///TODO:
     ///EnvironmentConfiguration_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the EnvironmentConfiguration_Data group from Environment.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class EnvironmentConfiguration_DataCollection 
+    public class EnvironmentConfiguration_DataCollection : DataCollection<Nordic_Thingy.EnvironmentConfiguration_Data>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update(Nordic_Thingy.EnvironmentConfiguration_Data value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -181,30 +172,18 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            TempInterval.Add (value.TempInterval);
-            PressureInterval.Add (value.PressureInterval);
-            HumidityInterval.Add (value.HumidityInterval);
-            ColorInterval.Add (value.ColorInterval);
-            GasMode.Add (value.GasMode);
-            RedCalibration.Add (value.RedCalibration);
-            GreenCalibration.Add (value.GreenCalibration);
-            BlueCalibration.Add (value.BlueCalibration);
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent(Nordic_Thingy.EnvironmentConfiguration_Data value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            TempInterval[index] = value.TempInterval;
-            PressureInterval[index] = value.PressureInterval;
-            HumidityInterval[index] = value.HumidityInterval;
-            ColorInterval[index] = value.ColorInterval;
-            GasMode[index] = value.GasMode;
-            RedCalibration[index] = value.RedCalibration;
-            GreenCalibration[index] = value.GreenCalibration;
-            BlueCalibration[index] = value.BlueCalibration;
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -213,34 +192,31 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic Environment Configuration
-        public ObservableCollection<double> TempInterval { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> PressureInterval { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> HumidityInterval { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> ColorInterval { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> GasMode { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> RedCalibration { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> GreenCalibration { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> BlueCalibration { get; } = new ObservableCollection<double>();
         public ObservableCollection<Nordic_Thingy.EnvironmentConfiguration_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.EnvironmentConfiguration_Data>();
-    }
+
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
     ///<summary>
-    ///TODO:
     ///Common Configuration_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the Common Configuration_Data group from Common Configuration.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class Common_Configuration_DataCollection 
+    public class Common_Configuration_DataCollection : DataCollection<Nordic_Thingy.Common_Configuration_Data>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update(Nordic_Thingy.Common_Configuration_Data value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -255,22 +231,18 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            Device_Name.Add (value.Device_Name);
-            Appearance.Add (value.Appearance);
-            ConnectionParameter.Add (value.ConnectionParameter);
-            AddressResolutionSupported.Add (value.AddressResolutionSupported);
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent(Nordic_Thingy.Common_Configuration_Data value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            Device_Name[index] = value.Device_Name;
-            Appearance[index] = value.Appearance;
-            ConnectionParameter[index] = value.ConnectionParameter;
-            AddressResolutionSupported[index] = value.AddressResolutionSupported;
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -279,33 +251,31 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic Device Name
-        public ObservableCollection<string> Device_Name { get; } = new ObservableCollection<string>();
-        // Data values (properties) from characteristic Appearance
-        public ObservableCollection<double> Appearance { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Connection Parameter
-        public ObservableCollection<byte[]> ConnectionParameter { get; } = new ObservableCollection<byte[]>();
-        // Data values (properties) from characteristic Central Address Resolution
-        public ObservableCollection<double> AddressResolutionSupported { get; } = new ObservableCollection<double>();
         public ObservableCollection<Nordic_Thingy.Common_Configuration_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Common_Configuration_Data>();
-    }
+
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
     ///<summary>
-    ///TODO:
     ///Generic Service_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the Generic Service_Data group from Generic Service.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class Generic_Service_DataCollection 
+    public class Generic_Service_DataCollection : DataCollection<Nordic_Thingy.Generic_Service_Data>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update(Nordic_Thingy.Generic_Service_Data value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -320,18 +290,18 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            StartRange.Add (value.StartRange);
-            EndRange.Add (value.EndRange);
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent(Nordic_Thingy.Generic_Service_Data value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            StartRange[index] = value.StartRange;
-            EndRange[index] = value.EndRange;
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -340,28 +310,31 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic Service Changes
-        public ObservableCollection<double> StartRange { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> EndRange { get; } = new ObservableCollection<double>();
         public ObservableCollection<Nordic_Thingy.Generic_Service_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Generic_Service_Data>();
-    }
+
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
     ///<summary>
-    ///TODO:
     ///Battery_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the Battery_Data group from Battery.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class Battery_DataCollection 
+    public class Battery_DataCollection : DataCollection<Nordic_Thingy.Battery_Data>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update(Nordic_Thingy.Battery_Data value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -376,16 +349,18 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            BatteryLevel.Add (value.BatteryLevel);
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent(Nordic_Thingy.Battery_Data value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            BatteryLevel[index] = value.BatteryLevel;
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -394,27 +369,31 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic BatteryLevel
-        public ObservableCollection<double> BatteryLevel { get; } = new ObservableCollection<double>();
         public ObservableCollection<Nordic_Thingy.Battery_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Battery_Data>();
-    }
+
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
     ///<summary>
-    ///TODO:
     ///Configuration_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the Configuration_Data group from Configuration.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class Configuration_DataCollection 
+    public class Configuration_DataCollection : DataCollection<Nordic_Thingy.Configuration_Data>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update(Nordic_Thingy.Configuration_Data value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -429,44 +408,18 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            DeviceName.Add (value.DeviceName);
-            Interval.Add (value.Interval);
-            Timeout.Add (value.Timeout);
-            MinInterval.Add (value.MinInterval);
-            MaxInterval.Add (value.MaxInterval);
-            Latency.Add (value.Latency);
-            SupervisionTimeout.Add (value.SupervisionTimeout);
-            Eddystone.Add (value.Eddystone);
-            CloudToken.Add (value.CloudToken);
-            Major.Add (value.Major);
-            Minor.Add (value.Minor);
-            Patch.Add (value.Patch);
-            param0.Add (value.param0);
-            param1.Add (value.param1);
-            NFCTag.Add (value.NFCTag);
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent(Nordic_Thingy.Configuration_Data value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            DeviceName[index] = value.DeviceName;
-            Interval[index] = value.Interval;
-            Timeout[index] = value.Timeout;
-            MinInterval[index] = value.MinInterval;
-            MaxInterval[index] = value.MaxInterval;
-            Latency[index] = value.Latency;
-            SupervisionTimeout[index] = value.SupervisionTimeout;
-            Eddystone[index] = value.Eddystone;
-            CloudToken[index] = value.CloudToken;
-            Major[index] = value.Major;
-            Minor[index] = value.Minor;
-            Patch[index] = value.Patch;
-            param0[index] = value.param0;
-            param1[index] = value.param1;
-            NFCTag[index] = value.NFCTag;
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -475,32 +428,13 @@ namespace BluetoothProtocols.NS_Nordic_Thingy
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic Configuration Device Name
-        public ObservableCollection<string> DeviceName { get; } = new ObservableCollection<string>();
-        // Data values (properties) from characteristic Advertising Parameter
-        public ObservableCollection<double> Interval { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Timeout { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Connection parameters
-        public ObservableCollection<double> MinInterval { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> MaxInterval { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Latency { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> SupervisionTimeout { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic Eddystone URL
-        public ObservableCollection<string> Eddystone { get; } = new ObservableCollection<string>();
-        // Data values (properties) from characteristic Cloud Token
-        public ObservableCollection<byte[]> CloudToken { get; } = new ObservableCollection<byte[]>();
-        // Data values (properties) from characteristic Firmware Version
-        public ObservableCollection<double> Major { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Minor { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Patch { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic MTU Request
-        public ObservableCollection<double> param0 { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> param1 { get; } = new ObservableCollection<double>();
-        // Data values (properties) from characteristic NFC Tag
-        public ObservableCollection<string> NFCTag { get; } = new ObservableCollection<string>();
         public ObservableCollection<Nordic_Thingy.Configuration_Data> Data { get; } = new ObservableCollection<Nordic_Thingy.Configuration_Data>();
-    }
+
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
 
 }

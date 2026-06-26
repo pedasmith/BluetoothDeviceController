@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel; // Needed for INotifyPropertyChanged
 using System.Runtime.CompilerServices; // Needed for CallerMemberNameAttribute
 using System.Runtime.InteropServices.WindowsRuntime; // Needed for IBuffer.ToArray extension method
+using BluetoothProtocolsDevicesCore;  // Needed for DataCollection
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -19,24 +20,26 @@ namespace BluetoothProtocols.NS_BTStandard_Demo
 
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This code was automatically generated 2026-06-23::19:15
+    /// This code was automatically generated 2026-06-25::17:39
     /// </summary>
 
     ///<summary>
-    ///TODO:
     ///Common Configuration_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the Common Configuration_Data group from Common Configuration.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class Common_Configuration_DataCollection 
+    public class Common_Configuration_DataCollection : DataCollection<BTStandard_Demo.Common_Configuration_Data>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update(BTStandard_Demo.Common_Configuration_Data value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -51,24 +54,18 @@ namespace BluetoothProtocols.NS_BTStandard_Demo
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            Device_Name.Add (value.Device_Name);
-            Interval_Min.Add (value.Interval_Min);
-            Interval_Max.Add (value.Interval_Max);
-            Latency.Add (value.Latency);
-            Timeout.Add (value.Timeout);
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent(BTStandard_Demo.Common_Configuration_Data value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            Device_Name[index] = value.Device_Name;
-            Interval_Min[index] = value.Interval_Min;
-            Interval_Max[index] = value.Interval_Max;
-            Latency[index] = value.Latency;
-            Timeout[index] = value.Timeout;
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -77,32 +74,31 @@ namespace BluetoothProtocols.NS_BTStandard_Demo
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic Device Name
-        public ObservableCollection<string> Device_Name { get; } = new ObservableCollection<string>();
-        // Data values (properties) from characteristic Connection Parameter
-        public ObservableCollection<double> Interval_Min { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Interval_Max { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Latency { get; } = new ObservableCollection<double>();
-        public ObservableCollection<double> Timeout { get; } = new ObservableCollection<double>();
         public ObservableCollection<BTStandard_Demo.Common_Configuration_Data> Data { get; } = new ObservableCollection<BTStandard_Demo.Common_Configuration_Data>();
-    }
+
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
     ///<summary>
-    ///TODO:
     ///Battery_DataCollection contains lists of data, one list per property value for all
     ///of the characteristics groupled in the Battery_Data group from Battery.
     ///The lists are used when displaying historical graphs of the data.
     ///</summary>
-    public class Battery_DataCollection 
+    public class Battery_DataCollection : DataCollection<BTStandard_Demo.Battery_Data>
     {
+    }
+
+    #if NEVER_EVER_DEFINED
         public enum Verb {  Add, ReplaceMostRecent };
 
-        public int Count { get { return  Timestamps.Count; } } 
+        public int Count { get { return  Data.Count; } } 
 
         public void Update(BTStandard_Demo.Battery_Data value, Verb verb)
         {
-            if (verb == Verb.ReplaceMostRecent && Timestamps.Count == 0)
+            if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
             {
                 verb = Verb.Add; // Can't replace
             }
@@ -117,16 +113,18 @@ namespace BluetoothProtocols.NS_BTStandard_Demo
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add (value.Clone());
-            Timestamps.Add (value.TimestampMostRecent);
-            TimestampsDT.Add (value.TimestampMostRecent.DateTime);
-            BatteryLevel.Add (value.BatteryLevel);
+            // Timestamps.Add (value.TimestampMostRecent);
+            // TimestampsDT.Add (value.TimestampMostRecent.DateTime);
+            // Old code: used to include all the elements as their own array.
+            // and everything from [ [ DataGroupMemberCollectionAdd ] ]
         }
         public void ReplaceMostRecent(BTStandard_Demo.Battery_Data value)
         {
-            var index = Timestamps.Count - 1;
-            Timestamps[index] = value.TimestampMostRecent;
+            var index = Data.Count - 1;
             Data[index].CopyFrom (value);  // was value.Clone(); switching to reduce flickering.
-            BatteryLevel[index] = value.BatteryLevel;
+            // Old code: used to include all the elements as their own array.
+            // Timestamps[index] = value.TimestampMostRecent;
+            // and everything from  [ [ DataGroupMemberCollectionReplaceMostRecent ] ]
         }
 
         ///<summary>
@@ -135,11 +133,13 @@ namespace BluetoothProtocols.NS_BTStandard_Demo
         ///frequently than the UI updates
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
-        public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
-        public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
-        // Data values (properties) from characteristic BatteryLevel
-        public ObservableCollection<double> BatteryLevel { get; } = new ObservableCollection<double>();
         public ObservableCollection<BTStandard_Demo.Battery_Data> Data { get; } = new ObservableCollection<BTStandard_Demo.Battery_Data>();
-    }
+
+        // Old code: used to include all the elements as their own array.
+        // public ObservableCollection<DateTimeOffset> Timestamps { get; } = new ObservableCollection<DateTimeOffset>();
+        // public ObservableCollection<DateTime> TimestampsDT { get; } = new ObservableCollection<DateTime>();
+        // and everything from [ [ DataGroupMemberCollection ] ]
+
+        #endif
 
 }

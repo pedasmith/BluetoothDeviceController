@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This class was automatically generated 2026-06-23::19:15
+    /// This class was automatically generated 2026-06-25::17:39
     /// </summary>
 
     public  class BTStandard_Demo : INotifyPropertyChanged
@@ -67,8 +67,9 @@ namespace BluetoothProtocols
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class Common_Configuration_Data :BTCommonMetaData //, IExportDataSource
+        public class Common_Configuration_Data :BTCommonMetaData<Common_Configuration_Data> //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private string _Device_Name = "";
@@ -116,7 +117,7 @@ namespace BluetoothProtocols
                 get { return _Timeout; }
                 set { if (value == _Timeout) return; _Timeout = value; OnPropertyChanged();}
             }
-            public Common_Configuration_Data Clone(string name = null)
+            public override Common_Configuration_Data Clone(string name = null)
             {
                 var retval = this.MemberwiseClone() as Common_Configuration_Data;
                 if (name != null)
@@ -126,7 +127,7 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public void CopyFrom(Common_Configuration_Data value)
+            public override void CopyFrom(Common_Configuration_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
@@ -181,8 +182,9 @@ namespace BluetoothProtocols
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class Battery_Data :BTCommonMetaData //, IExportDataSource
+        public class Battery_Data :BTCommonMetaData<Battery_Data> //, IExportDataSource
         {
             // Template is ServiceDataGroups
             private double _BatteryLevel = 0;
@@ -194,7 +196,7 @@ namespace BluetoothProtocols
                 get { return _BatteryLevel; }
                 set { if (value == _BatteryLevel) return; _BatteryLevel = value; OnPropertyChanged();}
             }
-            public Battery_Data Clone(string name = null)
+            public override Battery_Data Clone(string name = null)
             {
                 var retval = this.MemberwiseClone() as Battery_Data;
                 if (name != null)
@@ -204,7 +206,7 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public void CopyFrom(Battery_Data value)
+            public override void CopyFrom(Battery_Data value)
             {
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
@@ -483,7 +485,8 @@ namespace BluetoothProtocols
             CurrCommon_Configuration_Data.Timeout = vr.GetNextDouble();
             OnPropertyChanged(Connection_ParameterPropertyChangedName); // "Connection_Parameter"
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from Device Name and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Common_Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -505,10 +508,12 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrCommon_Configuration_Data.Device_Name = vr.GetNextString();
+            CurrCommon_Configuration_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Device_NamePropertyChangedName); // "Device_Name"
             return CurrCommon_Configuration_Data;
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from Connection Parameter and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Common_Configuration_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -533,6 +538,7 @@ namespace BluetoothProtocols
             CurrCommon_Configuration_Data.Interval_Max = vr.GetNextDouble();
             CurrCommon_Configuration_Data.Latency = vr.GetNextDouble();
             CurrCommon_Configuration_Data.Timeout = vr.GetNextDouble();
+            CurrCommon_Configuration_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Connection_ParameterPropertyChangedName); // "Connection_Parameter"
             return CurrCommon_Configuration_Data;
         }
@@ -569,7 +575,8 @@ namespace BluetoothProtocols
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
             OnPropertyChanged(BatteryLevelPropertyChangedName); // "BatteryLevel"
         }
-        /// Reads data
+        /// <summary>
+        /// Reads data from BatteryLevel and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Battery_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
@@ -591,6 +598,7 @@ namespace BluetoothProtocols
 
             vr.Initialize(result.ToArray());
             CurrBattery_Data.BatteryLevel = vr.GetNextDouble();
+            CurrBattery_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(BatteryLevelPropertyChangedName); // "BatteryLevel"
             return CurrBattery_Data;
         }

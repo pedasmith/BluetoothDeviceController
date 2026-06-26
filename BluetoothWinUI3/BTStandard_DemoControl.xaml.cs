@@ -4,8 +4,6 @@ using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Shapes;
 using OxyPlot;
 using OxyPlot.Series;
 using System;
@@ -13,10 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 
 using Utilities;
-using UtilitiesWinUI3;
-using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
-using Windows.Storage.Streams;
 using WinUI.TableView;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,29 +21,78 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
+
+#region Set these to match your device
 using DeviceSpecificType = BTStandard_Demo; // Change: pick your device, not BTStandard_Demo
 using DeviceSpecificSensorData = BTStandard_Demo.Battery_Data; // Change: 
 using DeviceSpecificSensorSecondaryData = BTStandard_Demo.Common_Configuration_Data; // Change: pick secondary sensor if needed
+using DeviceSpecificBatteryData = BTStandard_Demo.Battery_Data; // Change: many device support battery
 using DeviceSpecificDataCollection = Battery_DataCollection; // Change: pick your data
+#endregion
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Change: rename BTStandard_DemoControl
 {
-    bool HasData = true; // Data is the BatteryLevel data. But it might not exist.
-
-    /// <summary>
-    /// Standard: Panel size. Set in UpdateUX from MainWindow.
-    /// </summary>
-
-    MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
-
-
+    #region Settings that must be updated for a new device
     /// <summary>
     /// Used for logging only
     /// </summary>
     private readonly string InternalDeviceType = "BTStandard_Demo"; // Change: BTStandard_Demo
+    #endregion
 
-    DeviceSpecificType Device; 
+    #region Advanced settings and values
+    /// <summary>
+    /// Most developer never need to change this from 'true'!
+    /// Ususually a device always has their sensor data. But some devices are might not. 
+    /// For the BTStandard_DemoControl, the "sensor" is just the battery level. That was
+    /// picked because so many devices include a battery level. But in case it doesn't,
+    /// there's a way to tell the MainWindow that the device doesn't have a sensor.
+    /// </summary>
+    bool HasSensorData = true;
+
+    /// <summary>
+    /// Normally we can just read cached data and that's good enough. Some advanced cases
+    /// might require reading non-cached data.
+    /// </summary>
+    BluetoothCacheMode DefaultCacheMode = BluetoothCacheMode.Cached;
+
+    /// <summary>
+    /// Every use case might have a different point of view about how frequently to update
+    /// the historical data (the data displayed in the graph + shown in the table view
+    /// + exported). A good default is 5 seconds.
+    /// </summary>
+    const double HistoricalDataUpdateRateInSeconds = 5.0;
+    #endregion
+
+    public BTStandard_DemoControl() // CHANGE:
+    {
+        InitializeComponent();
+        this.Loaded += Control_Loaded;
+        this.DataContextChanged += Control_DataContextChanged;
+
+        // TODO: make this a utility and move the call to the loaded?
+        // Set up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
+        // This can't be done at initialization time because of C#: it won't let me use a regular
+        // field when doing an initialization.
+        foreach (var series in OxyPlotModel.Series)
+        {
+            if (series is LineSeries lineSeries)
+            {
+                lineSeries.ItemsSource = HistoricalDataUnits.Data; //DOC:
+            }
+        }
+        uiOxyPlot.Model = OxyPlotModel;
+
+        //
+        // Set up the uiTableView
+        // https://w-ahmad.dev/WinUI.TableView/index.html
+        // https://github.com/w-ahmad/WinUI.TableView
+        //
+        uiTableView.AutoGeneratingColumn += UtilitiesWinUI3.UtilitiesWinUI3.TableView_AutoGeneratingColumn_FixupDateTime;
+    }
+
+    #region Instance value for a device
+    DeviceSpecificType Device;
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
     ulong OriginalBTAddr = 0xFFFFFFFF_FFFFFFFF;
@@ -57,11 +101,11 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public DeviceSpecificDataCollection HistoricalDataUnits { get; } = new ();
+    public DeviceSpecificDataCollection HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
-    public IBTCommonMetaData GetDataMostRecent()
-    { 
-        return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1]; 
+    public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
+    {
+        return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];
     }
 
     // This control show two kinds of data. 
@@ -103,68 +147,25 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
     DeviceSpecificSensorSecondaryData CurrSensorSecondary_DataUnits = null;
+    #endregion
+
+    #region Instance values for the UX
+    /// <summary>
+    /// Standard: Panel size. Set in UpdateUX from MainWindow.
+    /// </summary>
+    MainWindow.WindowSize CurrWindowSize = MainWindow.WindowSize.Normal; // Normal is 400x400
 
 
-
-    public BTStandard_DemoControl() // CHANGE:
-    {
-        InitializeComponent();
-        this.Loaded += Control_Loaded;
-        this.DataContextChanged += Control_DataContextChanged;
-
-        //
-        // Set up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
-        // This can't be done at initialization time because of C#: it won't let me use a regular
-        // field when doing an initialization.
-        foreach (var series in OxyPlotModel.Series)
-        {
-            if (series is LineSeries lineSeries)
-            {
-                lineSeries.ItemsSource = HistoricalDataUnits.Data; //DOC:
-            }
-        }
-        uiOxyPlot.Model = OxyPlotModel;
-
-        //
-        // Set up the uiTableView
-        // https://w-ahmad.dev/WinUI.TableView/index.html
-        // https://github.com/w-ahmad/WinUI.TableView
-        //
-        //uiTableView.CornerButtonMode = TableViewCornerButtonMode.None;
-        //uiTableView.SelectionMode = ListViewSelectionMode.None;
-        uiTableView.AutoGeneratingColumn += (s, e) =>
-        {
-            switch (e.PropertyName)
-            {
-                case "TimestampMostRecent":
-                    var col = e.Column as TableViewDateColumn;
-                    if (col == null)
-                    {
-                        Log($"Error: TimestampMostRecent is not a TableViewDateColumn.");
-                        return;
-                    }
-                    col.IsReadOnly = true;
-                    // DateFormat is from the DateTimeFormatter which is completely different from the 
-                    // normal format from DateTimeOffset.ToString().
-                    // https://learn.microsoft.com/en-us/uwp/api/windows.globalization.datetimeformatting.datetimeformatter?view=winrt-28000
-                    col.DateFormat = "{hour.integer}:{minute.integer(2)}:{second.integer(2)}";
-                    col.Header = "Time";
-                    break;
-                case "TimestampMostRecentDT":
-                    e.Cancel = true; // Don't generate a column for this property because it's not user friendly. 
-                    break;
-            }
-        };
-
-    }
-
-    // List of controls that have the 'data updated' sparkles
+    /// <summary>
+    /// List of the controls that have the little 'data has been updated' sparkles.
+    /// Set in the Control_Loaded.
+    /// </summary>
     List<(string, Microsoft.UI.Xaml.Documents.Run)> ControlsWithSparkles = null;
-
+    #endregion
 
     private void Control_Loaded(object sender, RoutedEventArgs e)
     {
-        // Loaded gets called first when it's first loaded an then each time it's 
+        // Loaded gets called both when it's first loaded and also each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         // We only want to do work the first time.
 
@@ -194,7 +195,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
     List<string> _LineNames = new List<string>() { "Battery" }; // CHANGE:
-    public List<string> LineNames { get { return _LineNames; } } 
+    public List<string> LineNames { get { return _LineNames; } }
 
     /// <summary>
     /// The DataContext is a WinUI3 (and the rest of XAML) thing, and is just an object. And it can be
@@ -262,7 +263,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         uiAddress.Text = BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr);
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // might return null for the first connection
 
-        Device = new DeviceSpecificType() 
+        Device = new DeviceSpecificType()
         {
             ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
         };
@@ -285,20 +286,20 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         Device.PropertyChanged += Device_PropertyChanged;
 
         await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
-        var battery = await Device.ReadBatteryLevel(BluetoothCacheMode.Cached); // I'm happy getting unchanged data? TODO: think about this more. 
+        var sensordata = await Device.ReadBatteryLevel(DefaultCacheMode);  
 
         // CHANGE: for your particular device, the battery might always be present
         // the battery will never be null.
-        if (battery == null)
+        if (sensordata == null)
         {
             // Happens when the device doesn't report a battery level (e.g., JBL Pro 4 Speakers, but lots of others)
             // BTW: if you know your device will never have a battery level but there is a connection control,
             // you should just set the visibility to collapsed in the OnLoaded event.
 
-            HasData = false;
+            HasSensorData = false;
         }
 
-        if (!HasData) // Some devices are wonky about actually having a sensor
+        if (!HasSensorData) // Some devices are wonky about actually having a sensor
         {
             LineNames.Clear();
             uiDeviceDataList.Items.Remove(uiDeviceDataBattery);
@@ -312,14 +313,18 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
             // technically isn't quite in accordance with the name.
             NotifyDeviceControlChangesWindows?.OnGetUXCapabilitiesChanged(this, GetUXCapabilities());
         }
-        await Device.ReadDevice_Name(BluetoothCacheMode.Cached);
-        await Device.ReadConnection_Parameter(BluetoothCacheMode.Cached);
+        await Device.ReadDevice_Name(DefaultCacheMode);
+        await Device.ReadConnection_Parameter(DefaultCacheMode);
 
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
         CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
     }
 
+
+    /// <summary>
+    /// Called from MainWindow to find out whether the display is the graph or the table.
+    /// </summary>
     public IDeviceControlBasic.Visibility GetDataGridVisibility()
     {
         var retval = (uiDataGridPanel.Visibility == Visibility.Visible)
@@ -327,20 +332,15 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         return retval;
     }
 
+
+    /// <summary>
+    /// When visibility is Visible, display the table of data. When collapsed, display
+    /// the grid. Is called from MainWindow based on user selection.
+    /// </summary>
+    /// <param name="visibility"></param>
     public void SetDataGridVisibility(IDeviceControlBasic.Visibility visibility)
     {
-        switch (visibility)
-        {
-            case IDeviceControlBasic.Visibility.Collapsed:
-                uiOxyPlot.Visibility = Visibility.Visible;
-                uiDataGridPanel.Visibility = Visibility.Collapsed;
-                break;
-            case IDeviceControlBasic.Visibility.Visible:
-            default:
-                uiOxyPlot.Visibility = Visibility.Collapsed;
-                uiDataGridPanel.Visibility = Visibility.Visible;
-                break;
-        }
+        UtilitiesWinUI3.UtilitiesWinUI3.SetDataGridVisibility(uiOxyPlot, uiDataGridPanel, visibility);
     }
 
 
@@ -493,7 +493,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         // Update data from the device to match the current preferred units. Will create the values as needed.
         CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToOrClone(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        CurrBattery_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Update this historical data; this will automatically update the table and graph.
         //
@@ -519,24 +519,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
             case DeviceSpecificType.BatteryLevelPropertyChangedName:
                 uiBattery.Text = CurrSensor_DataUnits.BatteryLevel.ToString("F2"); // Change: update the UX as appropriate
 
-
-                var deltaInSeconds = CurrSensor_Data.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
-                var verb = (deltaInSeconds > 5) ? DeviceSpecificDataCollection.Verb.Add : DeviceSpecificDataCollection.Verb.ReplaceMostRecent;
-                HistoricalDataUnits.Update(CurrSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
-
-                //
-                // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
-                //
-                if (verb == DeviceSpecificDataCollection.Verb.Add && HistoricalDataUnits.Count == 2)
-                {
-                    // DOC: Can't have the axes start off invisible because then they can't be switched back on
-                    if (CurrWindowSize == MainWindow.WindowSize.Normal)
-                    {
-                        // Just in case the user quick set to large.
-                        OxyPlotModel.SetAxesVisibility(uiOxyPlot, false);
-                    }
-                }
-                uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
+                UpdateHistoricalDataAndGraph();
                 break;
         }
 
@@ -553,6 +536,35 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         }
     }
 
+
+    /// <summary>
+    /// Helper code to update historical data. The sensor might send a lot of data; the history only
+    /// saves a portion of the data. Technicaly, every time there's new data we either update
+    /// the most recent entry OR we add a new entry.
+    /// </summary>
+    private void UpdateHistoricalDataAndGraph()
+    {
+        var deltaInSeconds = CurrSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
+        var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
+            ? DeviceSpecificDataCollection.Verb.Add : DeviceSpecificDataCollection.Verb.ReplaceMostRecent;
+        HistoricalDataUnits.Update(CurrSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
+
+        //
+        // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
+        //
+        if (verb == DeviceSpecificDataCollection.Verb.Add && HistoricalDataUnits.Count == 2)
+        {
+            // DOC: Can't have the axes start off invisible because then they can't be switched back on
+            if (CurrWindowSize == MainWindow.WindowSize.Normal)
+            {
+                // Just in case the user quick set to large.
+                OxyPlotModel.SetAxesVisibility(uiOxyPlot, false);
+            }
+        }
+
+       uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
+    }
+
     #region Exporters
 
     /// <summary>
@@ -564,7 +576,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     {
 
         var retval = IDeviceControlBasic.UXCapabilities.CanRename;
-        if (HasData)
+        if (HasSensorData)
         {
             retval |=
             IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
@@ -590,4 +602,4 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
 
     #endregion
 
-} // end of class BTStandard_DemoControl
+} // end of class BTStandard_DemoControl // CHANGE:

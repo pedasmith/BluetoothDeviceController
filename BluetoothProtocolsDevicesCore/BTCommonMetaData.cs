@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using static BluetoothProtocols.BTStandard_HeartRate;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -19,7 +20,7 @@ namespace BluetoothProtocols
         string Name { get; set; }
     }
 
-    public abstract class BTCommonMetaData : IBTCommonMetaData, IExportDataSource, INotifyPropertyChanged
+    public abstract class BTCommonMetaData<Tself> : IBTCommonMetaData, IExportDataSource, INotifyPropertyChanged
     {
         // For the INPC INotifyPropertyChanged values
         public event PropertyChangedEventHandler PropertyChanged;
@@ -27,6 +28,9 @@ namespace BluetoothProtocols
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public abstract Tself Clone(string name = null);
+        public abstract void CopyFrom(Tself value);
 
         public abstract string[] ExportGetHeaders(IExportData exporter);
 

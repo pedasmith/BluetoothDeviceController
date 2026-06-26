@@ -26,7 +26,7 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
-using Battery_Data = BTStandard_HeartRate.Battery_Data;
+using DeviceSpecificBatteryData = BTStandard_HeartRate.Battery_Data; // Change: many device support battery
 using ThisControlData = BTStandard_HeartRate.Heart_Rate_Data;
 using ThisControlDataCollection = Heart_Rate_DataCollection;
 using ThisControlDevice = BTStandard_HeartRate;
@@ -568,6 +568,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
         // Update to match the current preferred units. Will create a new CurrEnvironment_DataUnits the first time
         // it's called
+        CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrHeart_Rate_DataUnits = ThisControlData.CopyToOrClone(CurrHeart_Rate_Data, CurrHeart_Rate_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Update this historical data; this will automatically update the table and graph.
@@ -587,10 +588,10 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
                 uiFlags.Text = ((int)CurrHeart_Rate_DataUnits.Flags).ToString("X2");
                 uiBPM.Text = CurrHeart_Rate_DataUnits.PulseRate.ToString();
                 uiBPMHighRes.Text = CurrHeart_Rate_DataUnits.PulseRateHighRes.ToString();
-                uiRRInterval.Text = CurrHeart_Rate_Data.RRInterval.ToString();
+                uiRRInterval.Text = CurrHeart_Rate_DataUnits.RRInterval.ToString();
 
 
-                var deltaInSeconds = CurrBattery_Data.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
+                var deltaInSeconds = CurrHeart_Rate_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
                 var verb = (deltaInSeconds > 5) ? ThisControlDataCollection.Verb.Add : ThisControlDataCollection.Verb.ReplaceMostRecent;
                 HistoricalDataUnits.Update(CurrHeart_Rate_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
@@ -610,7 +611,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
                 break;
 
             case BTStandard_HeartRate.BatteryLevelPropertyChangedName:
-                uiBattery.Text = CurrBattery_Data.BatteryLevel.ToString("F2");
+                uiBattery.Text = CurrBattery_DataUnits.BatteryLevel.ToString("F2");
                 break;
         }
 
@@ -622,7 +623,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         {
             if (name == "BatteryLevel" || name == "")
             {
-                uiBTConnectionControl.SetBatteryLevel(CurrBattery_Data.BatteryLevel);
+                uiBTConnectionControl.SetBatteryLevel(CurrBattery_DataUnits.BatteryLevel);
             }
         }
     }
