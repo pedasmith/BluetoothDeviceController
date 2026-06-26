@@ -10,12 +10,10 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 
 using Utilities;
 using Windows.Devices.Bluetooth;
-using WinUI.TableView;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -147,6 +145,11 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         };
     }
 
+    IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
+    public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
+    {
+        NotifyDeviceControlChangesWindows = mainWindow;
+    }
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
     List<string> _LineNames = new List<string>() { "Temperature", "Humidity", "PM25", }; // CHANGE:
@@ -362,20 +365,22 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     {
         CurrUserPrefs = newPrefs;
 
-        // Update the saved data in the HistoricalSensorDataUnits to match the new user preferences.
+        // Update the saved data in the HistoricalDataUnits to match the new user preferences.
         foreach (var data in HistoricalDataUnits.Data)
         {
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
+                // Change: based on your knowledge of the sensor data, change the temperature readings.
                 data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, CurrUserPrefs.Temperature);
             }
             if (oldPrefs != null && newPrefs.Pressure != oldPrefs.Pressure)
             {
+                // Change: based on your knowledge of the sensor data, change the pressure readings.
                 data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, CurrUserPrefs.Pressure);
             }
         }
 
-        UpdateDeviceDataUX(""); // the graph is changed, but not the data
+        UpdateDeviceDataUX(""); // all of them.
     }
 
     /// <summary>
@@ -389,6 +394,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         CurrWindowSize = windowSize;
         UtilitiesWinUI3.UtilitiesWinUI3.UpdateUXWindowSize(windowSize, largeActualSize, rootPanel, OxyPlotModel, uiOxyPlot);
     }
+
 
 
     /// <summary>
@@ -424,8 +430,8 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
-    /// needs to be updated. For the Govee and ThermPro, there's never just one piece of data; we either get it all 
-    /// or just the one.
+    /// needs to be updated. 
+    /// For the Govee and ThermPro, we either get all the sensor data or nothing
     /// </summary>
     /// <param name="name"></param>
     private void UpdateDeviceDataUX(string name)
@@ -649,28 +655,11 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         uiTableView.ItemsSource = HistoricalDataUnits.Data;
     }
 
-    /// <summary>
-    /// Update the visibility for each of the data block (e.g., the block that says "Temperature")
-    /// </summary>
-
-    private void AdjustSensorVisibility(Panel panel, SensorDataRecord.SensorPresent flag)
-    {
-        var visibility = (CurrSensor_Data.IsSensorPresent.HasFlag(flag)) ? Visibility.Visible : Visibility.Collapsed;
-        // e.g., SensorDataRecord.SensorPresent.Temperature
-        panel.Visibility = visibility;
-    }
 
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {
         return "Internal error: no details are available";
     }
-
-    IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
-    public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
-    {
-        NotifyDeviceControlChangesWindows = mainWindow;
-    }
-
-#endregion
+    #endregion
 
 } // end of class BTCommon_EnvironmentalControl

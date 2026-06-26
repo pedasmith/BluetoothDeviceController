@@ -120,7 +120,7 @@ namespace BluetoothProtocols
                     switch (dtv)
                     {
                         case DataTypeValue.ManufacturerData:
-                            retval = Parse(sensorType, section, source);
+                            retval = Parse(sensorType, section, retval);
                             break;
                     }
                 }
