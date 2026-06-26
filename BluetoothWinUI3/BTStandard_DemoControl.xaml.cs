@@ -1,5 +1,6 @@
 using BluetoothProtocols;
 using BluetoothProtocols.NS_BTStandard_Demo;
+using BluetoothProtocolsDevicesCore;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
@@ -12,7 +13,6 @@ using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMe
 
 using Utilities;
 using Windows.Devices.Bluetooth;
-using WinUI.TableView;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -27,7 +27,6 @@ using DeviceSpecificType = BTStandard_Demo; // Change: pick your device, not BTS
 using DeviceSpecificSensorData = BTStandard_Demo.Battery_Data; // Change: 
 using DeviceSpecificSensorSecondaryData = BTStandard_Demo.Common_Configuration_Data; // Change: pick secondary sensor if needed
 using DeviceSpecificBatteryData = BTStandard_Demo.Battery_Data; // Change: many device support battery
-using DeviceSpecificDataCollection = Battery_DataCollection; // Change: pick your data
 #endregion
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -101,7 +100,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public DeviceSpecificDataCollection HistoricalDataUnits { get; } = new();
+    public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
     public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
     {
@@ -286,7 +285,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         Device.PropertyChanged += Device_PropertyChanged;
 
         await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
-        var sensordata = await Device.ReadBatteryLevel(DefaultCacheMode);  
+        var sensordata = await Device.ReadBatteryLevel(DefaultCacheMode);
 
         // CHANGE: for your particular device, the battery might always be present
         // the battery will never be null.
@@ -401,7 +400,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     {
         CurrUserPrefs = newPrefs;
 
-        // Update the saved data in the HistoricalEnvironment_DataUnits to match the new user preferences.
+        // Update the saved data in the HistoricalDataUnits to match the new user preferences.
         foreach (var data in HistoricalDataUnits.Data)
         {
             // For the BTStandard_Demo, there are no units to change
@@ -546,13 +545,13 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     {
         var deltaInSeconds = CurrSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
         var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
-            ? DeviceSpecificDataCollection.Verb.Add : DeviceSpecificDataCollection.Verb.ReplaceMostRecent;
+            ? DataCollection<DeviceSpecificSensorData>.Verb.Add : DataCollection<DeviceSpecificSensorData>.Verb.ReplaceMostRecent;
         HistoricalDataUnits.Update(CurrSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
         //
         // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
         //
-        if (verb == DeviceSpecificDataCollection.Verb.Add && HistoricalDataUnits.Count == 2)
+        if (verb == DataCollection<DeviceSpecificSensorData>.Verb.Add && HistoricalDataUnits.Count == 2)
         {
             // DOC: Can't have the axes start off invisible because then they can't be switched back on
             if (CurrWindowSize == MainWindow.WindowSize.Normal)
@@ -562,7 +561,7 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
             }
         }
 
-       uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
+        uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
     }
 
     #region Exporters
@@ -571,10 +570,8 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// Called from MainWindow when the user asks for, e.g., exported data or graphs. Most sensors will 
     /// support all these options.
     /// </summary>
-    /// <returns></returns>
     public IDeviceControlBasic.UXCapabilities GetUXCapabilities()
     {
-
         var retval = IDeviceControlBasic.UXCapabilities.CanRename;
         if (HasSensorData)
         {
@@ -597,9 +594,6 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     {
         return "Internal error: no details are available";
     }
-
-
-
     #endregion
 
 } // end of class BTStandard_DemoControl // CHANGE:

@@ -1,5 +1,6 @@
 using BluetoothProtocols;
 using BluetoothProtocols.NS_Nordic_Thingy;
+using BluetoothProtocolsDevicesCore;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
@@ -26,7 +27,6 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
-using DeviceSpecificDataCollection = Environment_DataCollection; // Change: pick your data
 using DeviceSpecificSensorData = Nordic_Thingy.Environment_Data; // Change: 
 using DeviceSpecificSensorSecondaryData = Nordic_Thingy.EnvironmentColor_Data; // Change: pick secondary sensor if needed
 using DeviceSpecificType = Nordic_Thingy; // Change: pick your device, not BTStandard_Demo
@@ -71,7 +71,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the colleciton.
     /// </summary>
-    public DeviceSpecificDataCollection HistoricalDataUnits { get;  } = new DeviceSpecificDataCollection();
+    public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get;  } = new DataCollection<DeviceSpecificSensorData>();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
     public IBTCommonMetaData GetDataMostRecent() 
         { return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count-1]; }
@@ -674,13 +674,13 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 }
 
                 var deltaInSeconds = CurrSensor_Data.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
-                var verb = (deltaInSeconds > 5) ? DeviceSpecificDataCollection.Verb.Add : DeviceSpecificDataCollection.Verb.ReplaceMostRecent;
+                var verb = (deltaInSeconds > 5) ? DataCollection<DeviceSpecificSensorData>.Verb.Add : DataCollection<DeviceSpecificSensorData>.Verb.ReplaceMostRecent;
                 HistoricalDataUnits.Update(CurrSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
                 //
                 // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
                 //
-                if (verb == DeviceSpecificDataCollection.Verb.Add && HistoricalDataUnits.Count == 2)
+                if (verb == DataCollection<DeviceSpecificSensorData>.Verb.Add && HistoricalDataUnits.Count == 2)
                 {
                     // DOC: Can't have the axes start off invisible because then they can't be switched back on
                     if (CurrWindowSize == MainWindow.WindowSize.Normal)
