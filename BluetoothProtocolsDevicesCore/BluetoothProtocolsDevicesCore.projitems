@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IExportData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_ThingyCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy_Extension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TAOPE_CyclingSpeedCadence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TAOPE_CyclingSpeedCadenceCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UnitConverterDelegate.cs" />

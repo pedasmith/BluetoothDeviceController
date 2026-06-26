@@ -38,7 +38,7 @@ internal static class OxyPlotUtilities
                 new LineSeries // CHANGE:
                 {
                     Title = axisTitle,
-                    Color = OxyColors.DarkBlue,
+                    Color = PreferredPlotColors[0], // OxyColors.DarkBlue
                     StrokeThickness = 0.75,
                     MarkerType = MarkerType.None,
                     DataFieldX = "TimestampMostRecentDT", // All sensor data has a TimestampMostRecentDT
@@ -50,6 +50,76 @@ internal static class OxyPlotUtilities
         };
         return retval;
     }
+    public static List<OxyColor> PreferredPlotColors = new List<OxyColor>()
+    {
+        OxyColors.DarkBlue, OxyColors.LightBlue, OxyColors.Violet, OxyColors.Black, OxyColors.Gray,
+    };
+
+    /// <summary>
+    /// Stackable way to add additional lines to the oxyplot. Returns the PlotModel, so you can 
+    /// </summary>
+    public static PlotModel AddLine (this PlotModel retval, int step, int range, string axisTitle, string propertyName, double minimum = double.NaN, AxisPosition position = AxisPosition.Left)
+    {
+        var tier = retval.NInPosition(position);
+        var colorIndex = (retval.Series.Count + 1) % PreferredPlotColors.Count;
+        var axis = new LinearAxis()
+        {
+            Position = position,
+            PositionTier = tier, // PositionTier=0 is the innermost tier. //DOC:
+            //MajorGridlineColor = OxyColors.Black, // Not set for additional lines. Only the first axis gets a grid!
+            //MajorGridlineStyle = LineStyle.Solid,
+            //MajorGridlineThickness = 1,
+            //MajorStep = step, // 1 hpa
+            //MinimumRange = range,
+            Title = axisTitle,
+            Key = propertyName,
+        };
+        if (!double.IsNaN(minimum))
+        {
+            axis.Minimum = minimum;
+        }
+        var series = new LineSeries
+        {
+            Title = axisTitle,
+            Color = PreferredPlotColors[colorIndex],
+            StrokeThickness = 0.75,
+            MarkerType = MarkerType.None,
+            DataFieldX = "TimestampMostRecentDT",
+            DataFieldY = propertyName,
+            YAxisKey = axisTitle,
+        };
+
+        retval.Axes.Add(axis);
+        retval.Series.Add(series);
+        return retval;
+    }
+
+    private static int NInPosition(this PlotModel value, AxisPosition position)
+    {
+        int retval = 0;
+        foreach (var item in value.Axes)
+        {
+            if (item.Position == position)
+            {
+                retval++;
+            }
+        }
+        return retval;
+    }
+
+    private static int NLeft(this PlotModel value)
+    {
+        int retval = 0;
+        foreach (var item in value.Axes)
+        {
+            if (item.Position == AxisPosition.Left)
+            {
+                retval++;
+            }
+        }
+        return retval;
+    }
+
 
     /// <summary>
     /// Set all of the axes to either visible or invisible. 
