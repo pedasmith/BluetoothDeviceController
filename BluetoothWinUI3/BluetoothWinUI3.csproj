@@ -176,9 +176,6 @@
     <Page Update="BTStandard_HeartRate.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="BTTAOPE_CyclingSpeedCadenceControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="BTStandard_DemoControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

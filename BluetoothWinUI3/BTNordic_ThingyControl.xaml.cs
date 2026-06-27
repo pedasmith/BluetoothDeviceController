@@ -1,5 +1,4 @@
 using BluetoothProtocols;
-using BluetoothProtocols.NS_Nordic_Thingy;
 using BluetoothProtocolsDevicesCore;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
