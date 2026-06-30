@@ -56,13 +56,16 @@ namespace BluetoothCodeGenerator
         private static string ShortFormat(string format)
         {
             var firstchar = format.Substring(0, 1);
+            var lastchar = format.Substring(format.Length - 1, 1);
             switch (firstchar)
             {
                 case "/":
                 case "F":
-                case "I":
                 case "Q":
+                    return firstchar;
+                case "I":
                 case "U":
+                    if (lastchar == "S") return format;
                     return firstchar;
             }
             return format;
@@ -82,6 +85,8 @@ namespace BluetoothCodeGenerator
                 case "U24": return "UInt32";
                 case "I32": return "Int32";
                 case "U32": return "UInt32";
+                case "I16S": return "Int16";
+                case "U16S": return "UInt16";
                 case "BYTES": return "Bytes";
                 case "STRING": return "String";
             }
@@ -109,6 +114,8 @@ namespace BluetoothCodeGenerator
                 case "I32": return $"Int32";
                 case "U32": return $"UInt32";
                 case "F32": return $"float";
+                case "I16S": return $"Int16[]";
+                case "U16S": return $"UInt16[]";
             }
             return $"X47_UNKNOWN_TYPE_{format}";
         }
@@ -121,6 +128,9 @@ namespace BluetoothCodeGenerator
                 case "BYTES": 
                     return "GetNextByteArray";
                 case "STRING": return "GetNextString";
+                case "I16S":
+                case "U16S":
+                    return "GetNextDoubleArray"; // technically a list :-)
                 case "/": 
                 case "Q": 
                 case "I": 
@@ -174,6 +184,8 @@ namespace BluetoothCodeGenerator
                     return "0";
                 case "BYTES": return "null";
                 case "STRING": return "\"\"";
+                case "I16S": return "new()";
+                case "U16S": return "new()";
             }
             Error($"ByteFormatToCSharpDefault: unknown format {format}");
             return $"OtherType{format}";
@@ -194,6 +206,8 @@ namespace BluetoothCodeGenerator
             {
                 case "BYTES": return "AsString";
                 case "STRING": return "AsString";
+                case "I16S": return "AsString";
+                case "U16S": return "AsString";
             }
             return $"AsDouble";
         }
@@ -204,6 +218,8 @@ namespace BluetoothCodeGenerator
             {
                 case "BYTES": return "string";
                 case "STRING": return "string";
+                case "I16S": return "string";
+                case "U16S": return "string";
             }
             return $"double";
         }
@@ -213,6 +229,8 @@ namespace BluetoothCodeGenerator
             {
                 case "BYTES": return "byte[]";
                 case "STRING": return "string";
+                case "I16S": return "List<double>";
+                case "U16S": return "List<double>";
             }
             return $"double";
         }

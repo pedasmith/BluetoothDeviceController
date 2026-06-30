@@ -97,7 +97,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
 
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
-    /// The units are set right before the data is added to the colleciton.
+    /// The units are set right before the data is added to the collection.
     /// </summary>
     public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }

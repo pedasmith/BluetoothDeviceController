@@ -9,7 +9,7 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-
+using System.Text;
 using Utilities;
 using Windows.Devices.Bluetooth;
 // To learn more about WinUI, the WinUI project structure,
@@ -20,6 +20,8 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
+// TODO: set the name
+// TODO: what should I do with the RR data?
 
 #region Set these to match your device
 using DeviceSpecificType = BTStandard_HeartRate; // Change: pick your device, not BTStandard_Demo
@@ -96,7 +98,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
     /// <summary>
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
-    /// The units are set right before the data is added to the colleciton.
+    /// The units are set right before the data is added to the collection.
     /// </summary>
     public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
@@ -185,7 +187,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     // so the main window menus get updated.
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    List<string> _LineNames = new List<string>() { "PulseRate" }; // CHANGE:
+    List<string> _LineNames = new List<string>() { "PulseRateLowRange" }; // CHANGE:
     public List<string> LineNames { get { return _LineNames; } }
 
     /// <summary>
@@ -207,7 +209,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// </summary>
     // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; }
-        = OxyPlotUtilities.MakeOxyPlotModelSimple("Heart Rate", 10, 30, "Pulse Rate", "PulseRate");
+        = OxyPlotUtilities.MakeOxyPlotModelSimple("Heart Rate", 5, 30, "Pulse Rate", "PulseRateLowRange");
         // CHANGE: set up the graph
 
 
@@ -277,9 +279,16 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         Device.PropertyChanged += Device_PropertyChanged;
 
         await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
-        var sensordata = await Device.ReadBatteryLevel(DefaultCacheMode);
+        await Device.ReadBatteryLevel(DefaultCacheMode);
 
+        await Device.ReadManufacturer_Name_String(DefaultCacheMode);
+        await Device.ReadModel_Number_String(DefaultCacheMode);
+        await Device.ReadHardware_Revision_String(DefaultCacheMode);
+        await Device.ReadFirmware_Revision_String(DefaultCacheMode);
+        await Device.ReadSoftware_Revision_String(DefaultCacheMode);
+        await Device.ReadSystem_ID(DefaultCacheMode);
         await Device.ReadDevice_Name(DefaultCacheMode);
+
         await Device.NotifyHeart_Rate_MeasurementAsync();
 
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
@@ -474,16 +483,47 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
             case "*": // never used, but here so it matches the Govee code.
             case DeviceSpecificType.Heart_Rate_MeasurementPropertyChangedName:
-                uiFlags.Text = ((int)CurrSensor_DataUnits.Flags).ToString("X2");
-                uiBPM.Text = CurrSensor_DataUnits.PulseRate.ToString();
-                uiBPMHighRes.Text = CurrSensor_DataUnits.PulseRateHighRes.ToString();
-                uiRRInterval.Text = CurrSensor_DataUnits.RRInterval.ToString();
-
+                uiBPM.Text = CurrSensor_DataUnits.GetPulseRate().ToString();
+                if (CurrSensor_Data.RRInterval == null)
+                {
+                    if (uiRRInterval.Text == "")
+                    {
+                        uiRRInterval.Text = "[]";
+                    }
+                }
+                else if (CurrSensor_Data.RRInterval.Count == 0)
+                {
+                    ; // do nothing
+                }
+                else
+                {
+                    // TODO: update sparkles
+                    var rr = new StringBuilder();
+                    foreach (var value in CurrSensor_Data.RRInterval)
+                    {
+                        if (rr.Length != 0)
+                        {
+                            rr.Append(", ");
+                        }
+                        rr.Append(value.ToString());
+                    }
+                    uiRRInterval.Text = "[" + rr.ToString() + "]";
+                }
                 UpdateHistoricalDataAndGraph();
                 break;
 
             case DeviceSpecificType.BatteryLevelPropertyChangedName:
                 uiBattery.Text = CurrBattery_DataUnits.BatteryLevel.ToString("F2");
+                break;
+
+            case DeviceSpecificType.Device_NamePropertyChangedName:
+                uiName.Text = Device.CurrGAP_Data.DeviceName;
+                Log($"HeartRate: Manufacturer: {Device.CurrDevice_Information_Data.Manufacturer}");
+                Log($"HeartRate: Model: {Device.CurrDevice_Information_Data.ModelNumber}");
+                Log($"HeartRate: HardwareRevision: {Device.CurrDevice_Information_Data.HardwareRevision}");
+                Log($"HeartRate: FirmwareRevision: {Device.CurrDevice_Information_Data.FirmwareRevision}");
+                Log($"HeartRate: SoftwareRevision: {Device.CurrDevice_Information_Data.SoftwareRevision}");
+                Log($"HeartRate: SystemID: {Device.CurrDevice_Information_Data.SystemID}");
                 break;
         }
 

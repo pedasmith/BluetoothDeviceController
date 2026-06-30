@@ -28,11 +28,11 @@ In the example, the device has two services (the *Common Configuration* service 
 
 The JSON file is converted to the Protocol and collection file using the tool in BluetoothDeviceController\BluetoothCodeGeneratordotNetCore. 
 
-## Include the JSON file and Potocol files
+## Include the JSON file and Protocol files in the project (as linked)
 
 The JSON file lives in another directory but should be included in the project. Add the JSON file to the project's *Assets\CharacteristicsData* **as a link**. Do not copy the file; make sure it's linked.
 
-Update the file so it's Build Action is *Content* and the Copy to Output Directory is *Copy When Newer*.
+Update the Project file so the JSON file Build Action is *Content* and the Copy to Output Directory is *Copy When Newer*.
 
 
 ## Make the User Control

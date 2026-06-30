@@ -208,6 +208,12 @@ namespace IotNumberFormats
             return byteArrayValue;
         }
 
+        public List<Double> GetNextDoubleArray()
+        {
+            GetNext();
+            return doubleValues;
+        }
+
         private int NToSkip = 0; // Set by OSKIP
         private double SkipReturnValue = 0.0; // not set anywhere
 
@@ -288,6 +294,10 @@ namespace IotNumberFormats
             }
             else
             {
+                if (command.NamePrimary == "RRInterval")
+                {
+                    ; // handy place to set a breakpoint
+                }
 
                 try
                 {
@@ -526,7 +536,15 @@ namespace IotNumberFormats
                                         doubleValues = new List<double>();
                                         while ((dr.UnconsumedBufferLength - skip) >= 2)
                                         {
-                                            doubleValue = dr.ReadInt16();
+                                            switch (readcmd)
+                                            {
+                                                case "I16S":
+                                                    doubleValue = dr.ReadInt16();
+                                                    break;
+                                                case "U16S":
+                                                    doubleValue = dr.ReadUInt16();
+                                                    break;
+                                            }
                                             doubleValues.Add(doubleValue);
 
                                             var intstr = DoubleToString(doubleValue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
@@ -680,6 +698,51 @@ namespace IotNumberFormats
                                         Variables.SetCurrDouble(command.NamePrimary, doubleValue);
                                     }
                                     break;
+                                case "U16S": // Array of U16
+                                    {
+                                        if (displayFormat == "") displayFormat = "HEX";
+                                        string floatFormat = "F2";
+                                        string intFormat = "X4";
+
+                                        int skip = command.MaxBytesRemaining;
+                                        if (skip == -1)
+                                        {
+                                            skip = 0;
+                                        }
+                                        else if (skip <= -2)
+                                        {
+                                            CurrError = ValueParserResult.CreateError(logstr, $"Unable to get MaxBytesRemaining for {readcmd}");
+                                            return false;
+                                        }
+
+                                        resultState = ResultState.IsDoubleArray;
+                                        doubleValues = new List<double>();
+                                        while ((dr.UnconsumedBufferLength - skip) >= 2)
+                                        {
+                                            switch (readcmd)
+                                            {
+                                                case "I16S":
+                                                    doubleValue = dr.ReadInt16();
+                                                    break;
+                                                case "U16S":
+                                                    doubleValue = dr.ReadUInt16();
+                                                    break;
+                                            }
+                                            doubleValues.Add(doubleValue);
+
+                                            var intstr = DoubleToString(doubleValue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
+                                            if (intstr == null)
+                                            {
+                                                CurrError = ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
+                                                return false;
+                                            }
+
+                                            if (stringValue != "") stringValue += " ";
+                                            stringValue += intstr;
+                                        } // end while loop
+                                    }
+                                    break;
+
                                 default:
                                     CurrError = ValueParserResult.CreateError(logstr, $"UInteger command unrecognized;\nshould be U8/U16/U24/U32 not {readcmd}");
                                     return false;

@@ -22,6 +22,10 @@ Firmware and software should generally be different (or only one included)
 
 # Devices
 
+## Heart Rate improvements
+
+Make the 
+
 ## The cycle speed and cadence should show normal bike data instead of weird data. 
 
 Make seperate Crank and Wheel? 

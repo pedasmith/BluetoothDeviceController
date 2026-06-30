@@ -1,4 +1,5 @@
 ﻿using BluetoothProtocols;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
@@ -64,6 +65,17 @@ namespace Exporters
                 cellsb.Append($"{b:X2} ");
             }
             string strval = cellsb.ToString().TrimEnd();
+            CellSet(strval); // on the off change the the float needs to be escaped...
+        }
+
+        public void CellSet(List<double> value)
+        {
+            StringBuilder cellsb = new();
+            foreach (byte b in value ?? new ())
+            {
+                cellsb.Append($"{b:X2} ");
+            }
+            string strval = "[" + cellsb.ToString().TrimEnd() + "]";
             CellSet(strval); // on the off change the the float needs to be escaped...
         }
 

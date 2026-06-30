@@ -2,7 +2,7 @@
   "profiles": {
     "BluetoothCodeGeneratordotNetCore": {
       "commandName": "Project",
-      "commandLineArgs": " -inputJsonFile \"C:\\Users\\toomr\\source\\repos\\pedasmith\\BluetoothDeviceController\\BluetoothDeviceController\\Assets\\CharacteristicsData\\Nordic_Thingy.json\" -inputTemplates Templates -output output -inputTemplateFile CSharp_Core_BT_template.md\r\n",
+      "commandLineArgs": " -inputJsonFile \"C:\\Users\\toomr\\source\\repos\\pedasmith\\BluetoothDeviceController\\BluetoothDeviceController\\Assets\\CharacteristicsData\\BTStandard_Heart_Rate.json\" -inputTemplates Templates -output output -inputTemplateFile CSharp_Core_BT_template.md\r\n",
       "workingDirectory": "C:\\Users\\toomr\\source\\repos\\pedasmith\\BluetoothDeviceController\\BluetoothCodeGeneratordotNetCore",
       "remoteDebugEnabled": true
     }

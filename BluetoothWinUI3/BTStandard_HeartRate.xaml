@@ -52,16 +52,9 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>BPM (hr)</Run><Run Text="&#160;"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiBPMHighRes"/></TextBlock>
-                    </StackPanel>
-
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>RR</Run><Run Text="&#160;"/>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRRInterval"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiRRInterval"/></TextBlock>
                     </StackPanel>
 
 

@@ -281,4 +281,5 @@
   <Import Project="..\BluetoothProtocolsDevicesCore\BluetoothProtocolsDevicesCore.projitems" Label="Shared" />
   <Import Project="..\UtilitiesWinUI3\UtilitiesWinUI3.projitems" Label="Shared" />
   <Import Project="..\BluetoothProtocolsNames\BluetoothProtocolsNames.projitems" Label="Shared" />
+  <Import Project="..\BluetoothProtocolsDevicesCoreExtensions\BluetoothProtocolsDevicesCoreExtensions.projitems" Label="Shared" />
 </Project>

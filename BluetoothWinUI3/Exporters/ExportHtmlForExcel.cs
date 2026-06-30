@@ -1,4 +1,5 @@
 ﻿using BluetoothProtocols;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
@@ -40,6 +41,17 @@ namespace Exporters
                 cellsb.Append($"{b:X2} ");
             }
             string strval = cellsb.ToString().TrimEnd();
+            currRow.Append($"<td>{Escape(strval)}</td>");
+        }
+
+        public void CellSet(List<double> value)
+        {
+            StringBuilder cellsb = new();
+            foreach (byte b in value ?? new())
+            {
+                cellsb.Append($"{b:X2} ");
+            }
+            string strval = "[" + cellsb.ToString().TrimEnd() + "]";
             currRow.Append($"<td>{Escape(strval)}</td>");
         }
 

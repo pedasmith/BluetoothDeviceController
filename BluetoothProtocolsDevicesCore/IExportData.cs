@@ -19,6 +19,7 @@ namespace BluetoothProtocols
         public void CellSet(string value);
         public void CellSet(double value);
         public void CellSet(byte[] value);
+        public void CellSet(List<double> value);
 
         /// <summary>
         /// Get the final data

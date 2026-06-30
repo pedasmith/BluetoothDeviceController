@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-06-25::17:39
+    /// This class was automatically generated 2026-06-28::10:05
     /// </summary>
 
     public  class BTStandard_HeartRate : INotifyPropertyChanged
@@ -42,7 +42,7 @@ namespace BluetoothProtocols
 
         Heart Rate service Guid=180d
             Heart Rate_Data (DataGroup record)
-                Heart Rate Measurement characteristic has Flags (Byte-->double) PulseRate (Byte-->double) PulseRateHighRes (UInt16-->double) EnergyExpended (UInt16-->double) RRInterval (UInt16-->double)  Guid=2a37
+                Heart Rate Measurement characteristic has Flags (Byte-->double) PulseRateLowRange (Byte-->double) PulseRateHighRange (UInt16-->double) EnergyExpended (UInt16-->double) RRInterval (UInt16-->string)  Guid=2a37
                 Body Sensor Location characteristic has Unknown1 (Bytes-->string)  Guid=2a38
 
 
@@ -109,23 +109,23 @@ namespace BluetoothProtocols
                 get { return _Flags; }
                 set { if (value == _Flags) return; _Flags = value; OnPropertyChanged();}
             } 
-            private double _PulseRate = 0;
+            private double _PulseRateLowRange = 0;
             /// <summary>
             /// From Heart Rate and Heart Rate Measurement
             ///</summary>
-            public double PulseRate 
+            public double PulseRateLowRange 
             { 
-                get { return _PulseRate; }
-                set { if (value == _PulseRate) return; _PulseRate = value; OnPropertyChanged();}
+                get { return _PulseRateLowRange; }
+                set { if (value == _PulseRateLowRange) return; _PulseRateLowRange = value; OnPropertyChanged();}
             } 
-            private double _PulseRateHighRes = 0;
+            private double _PulseRateHighRange = 0;
             /// <summary>
             /// From Heart Rate and Heart Rate Measurement
             ///</summary>
-            public double PulseRateHighRes 
+            public double PulseRateHighRange 
             { 
-                get { return _PulseRateHighRes; }
-                set { if (value == _PulseRateHighRes) return; _PulseRateHighRes = value; OnPropertyChanged();}
+                get { return _PulseRateHighRange; }
+                set { if (value == _PulseRateHighRange) return; _PulseRateHighRange = value; OnPropertyChanged();}
             } 
             private double _EnergyExpended = 0;
             /// <summary>
@@ -136,11 +136,11 @@ namespace BluetoothProtocols
                 get { return _EnergyExpended; }
                 set { if (value == _EnergyExpended) return; _EnergyExpended = value; OnPropertyChanged();}
             } 
-            private double _RRInterval = 0;
+            private List<double> _RRInterval = new();
             /// <summary>
             /// From Heart Rate and Heart Rate Measurement
             ///</summary>
-            public double RRInterval 
+            public List<double> RRInterval 
             { 
                 get { return _RRInterval; }
                 set { if (value == _RRInterval) return; _RRInterval = value; OnPropertyChanged();}
@@ -169,8 +169,8 @@ namespace BluetoothProtocols
                 this.TimestampMostRecent = value.TimestampMostRecent;
                 this.Name = value.Name;
                 this.Flags = value.Flags;
-                this.PulseRate = value.PulseRate;
-                this.PulseRateHighRes = value.PulseRateHighRes;
+                this.PulseRateLowRange = value.PulseRateLowRange;
+                this.PulseRateHighRange = value.PulseRateHighRange;
                 this.EnergyExpended = value.EnergyExpended;
                 this.RRInterval = value.RRInterval;
                 this.Unknown1 = value.Unknown1;
@@ -186,17 +186,16 @@ namespace BluetoothProtocols
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = source.Name;
                 dest.Flags = convert(source.Flags, "");
-                dest.PulseRate = convert(source.PulseRate, "bpm");
-                dest.PulseRateHighRes = convert(source.PulseRateHighRes, "bpm");
-                dest.EnergyExpended = convert(source.EnergyExpended, "Joules");
-                dest.RRInterval = convert(source.RRInterval, "");
+                dest.PulseRateLowRange = convert(source.PulseRateLowRange, "bpm");
+                dest.PulseRateHighRange = convert(source.PulseRateHighRange, "bpm");
+                dest.EnergyExpended = convert(source.EnergyExpended, "Joules");                dest.RRInterval = source.RRInterval;
                 dest.Unknown1 = source.Unknown1;
                 return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
             {
-                return ["Flags", "PulseRate", "PulseRateHighRes", "EnergyExpended", "RRInterval", "Unknown1"];
+                return ["Flags", "PulseRateLowRange", "PulseRateHighRange", "EnergyExpended", "RRInterval", "Unknown1"];
             }
 
             public override void ExportRow(IExportData exporter)
@@ -204,8 +203,8 @@ namespace BluetoothProtocols
                 // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
                 // RowEnd and add in the timestamps
                 exporter.CellSet(Flags);
-                exporter.CellSet(PulseRate);
-                exporter.CellSet(PulseRateHighRes);
+                exporter.CellSet(PulseRateLowRange);
+                exporter.CellSet(PulseRateHighRange);
                 exporter.CellSet(EnergyExpended);
                 exporter.CellSet(RRInterval);
                 exporter.CellSet(Unknown1);                
@@ -213,7 +212,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Flags} {PulseRate} {PulseRateHighRes} {EnergyExpended} {RRInterval} {Unknown1}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Flags} {PulseRateLowRange} {PulseRateHighRange} {EnergyExpended} {RRInterval} {Unknown1}");
             }
         }
 //
@@ -743,16 +742,16 @@ namespace BluetoothProtocols
         private void NotifyHeart_Rate_MeasurementCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Heart_Rate_Heart_Rate_Measurement_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OSKIP^1^$Flags_GN_1_AN U8|DEC|PulseRate|bpm OSKIP^1^$Flags_GN_1_AN_NT U16|DEC|PulseRateHighRes|bpm OSKIP^1^$Flags_GN_8_AN_NT U16|DEC|EnergyExpended|Joules OSKIP^1^$Flags_GN_16_AN_NT U16|DEC|RRInterval");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OSKIP^1^$Flags_GN_1_AN U8|DEC|PulseRateLowRange|bpm OSKIP^1^$Flags_GN_1_AN_NT U16|DEC|PulseRateHighRange|bpm OSKIP^1^$Flags_GN_8_AN_NT U16|DEC|EnergyExpended|Joules OSKIP^1^$Flags_GN_16_AN_NT U16S|DEC|RRInterval");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrHeart_Rate_Data.TimestampMostRecent = args.Timestamp;
             CurrHeart_Rate_Data.Flags = vr.GetNextDouble();
-            CurrHeart_Rate_Data.PulseRate = vr.GetNextDouble();
-            CurrHeart_Rate_Data.PulseRateHighRes = vr.GetNextDouble();
+            CurrHeart_Rate_Data.PulseRateLowRange = vr.GetNextDouble();
+            CurrHeart_Rate_Data.PulseRateHighRange = vr.GetNextDouble();
             CurrHeart_Rate_Data.EnergyExpended = vr.GetNextDouble();
-            CurrHeart_Rate_Data.RRInterval = vr.GetNextDouble();
+            CurrHeart_Rate_Data.RRInterval = vr.GetNextDoubleArray();
             OnPropertyChanged(Heart_Rate_MeasurementPropertyChangedName); // "Heart_Rate_Measurement"
         }
         // Per-characteristics methods for Heart_Rate Body_Sensor_Location
@@ -798,15 +797,15 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Heart Rate Measurement", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OSKIP^1^$Flags_GN_1_AN U8|DEC|PulseRate|bpm OSKIP^1^$Flags_GN_1_AN_NT U16|DEC|PulseRateHighRes|bpm OSKIP^1^$Flags_GN_8_AN_NT U16|DEC|EnergyExpended|Joules OSKIP^1^$Flags_GN_16_AN_NT U16|DEC|RRInterval");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Flags OSKIP^1^$Flags_GN_1_AN U8|DEC|PulseRateLowRange|bpm OSKIP^1^$Flags_GN_1_AN_NT U16|DEC|PulseRateHighRange|bpm OSKIP^1^$Flags_GN_8_AN_NT U16|DEC|EnergyExpended|Joules OSKIP^1^$Flags_GN_16_AN_NT U16S|DEC|RRInterval");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
             CurrHeart_Rate_Data.Flags = vr.GetNextDouble();
-            CurrHeart_Rate_Data.PulseRate = vr.GetNextDouble();
-            CurrHeart_Rate_Data.PulseRateHighRes = vr.GetNextDouble();
+            CurrHeart_Rate_Data.PulseRateLowRange = vr.GetNextDouble();
+            CurrHeart_Rate_Data.PulseRateHighRange = vr.GetNextDouble();
             CurrHeart_Rate_Data.EnergyExpended = vr.GetNextDouble();
-            CurrHeart_Rate_Data.RRInterval = vr.GetNextDouble();
+            CurrHeart_Rate_Data.RRInterval = vr.GetNextDoubleArray();
             CurrHeart_Rate_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Heart_Rate_MeasurementPropertyChangedName); // "Heart_Rate_Measurement"
             return CurrHeart_Rate_Data;
