@@ -27,6 +27,7 @@ namespace BluetoothWinUI3;
 using DeviceSpecificType = BTStandard_HeartRate; // Change: pick your device, not BTStandard_Demo
 using DeviceSpecificSensorData = BTStandard_HeartRate.Heart_Rate_Data; // Change: 
 using DeviceSpecificBatteryData = BTStandard_HeartRate.Battery_Data; // Change: many device support battery
+using DeviceSpecificSensorDataFacade = Heart_Rate_Data_Facade; // Change: 
 #endregion
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -100,7 +101,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the collection.
     /// </summary>
-    public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
+    public DataCollection<DeviceSpecificSensorDataFacade> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
     public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
     {
@@ -122,7 +123,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
-    DeviceSpecificSensorData CurrSensor_DataUnits = null;
+    DeviceSpecificSensorDataFacade CurrSensor_DataUnits = null;
 
     /// <summary>
     /// Making a battery value that's seperate from the Sensor. This lets the programmer
@@ -280,6 +281,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
         await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
         await Device.ReadBatteryLevel(DefaultCacheMode);
+        await Device.ReadBody_Sensor_Location(DefaultCacheMode);
 
         await Device.ReadManufacturer_Name_String(DefaultCacheMode);
         await Device.ReadModel_Number_String(DefaultCacheMode);
@@ -466,7 +468,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         UpdateSparkles(name);
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
-        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrSensor_DataUnits = DeviceSpecificSensorDataFacade.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Update this historical data; this will automatically update the table and graph.
@@ -483,15 +485,16 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
             case "*": // never used, but here so it matches the Govee code.
             case DeviceSpecificType.Heart_Rate_MeasurementPropertyChangedName:
-                uiBPM.Text = CurrSensor_DataUnits.GetPulseRate().ToString();
-                if (CurrSensor_Data.RRInterval == null)
+                uiBPM.Text = CurrSensor_DataUnits.PulseRate.ToString();
+                uiFlags.Text = CurrSensor_DataUnits.CurrFlagsDecoded.ToString();
+                if (CurrSensor_DataUnits.RRInterval == null)
                 {
                     if (uiRRInterval.Text == "")
                     {
                         uiRRInterval.Text = "[]";
                     }
                 }
-                else if (CurrSensor_Data.RRInterval.Count == 0)
+                else if (CurrSensor_DataUnits.RRInterval.Count == 0)
                 {
                     ; // do nothing
                 }
@@ -499,7 +502,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
                 {
                     // TODO: update sparkles
                     var rr = new StringBuilder();
-                    foreach (var value in CurrSensor_Data.RRInterval)
+                    foreach (var value in CurrSensor_DataUnits.RRInterval)
                     {
                         if (rr.Length != 0)
                         {
@@ -508,6 +511,16 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
                         rr.Append(value.ToString());
                     }
                     uiRRInterval.Text = "[" + rr.ToString() + "]";
+                }
+                if (CurrSensor_DataUnits.CurrFlagsDecoded.HasFlag(DeviceSpecificSensorDataFacade.FlagsDecoded.SensorContactSupported))
+                {
+                    var icon = CurrSensor_DataUnits.CurrFlagsDecoded.HasFlag(DeviceSpecificSensorDataFacade.FlagsDecoded.SensorContactDetected)
+                        ? "yes" : "x"; // 
+                    uiSensor.Text = icon;
+                }
+                else
+                {
+                    uiSensor.Text = "--"; // device doesn't know if it's connected
                 }
                 UpdateHistoricalDataAndGraph();
                 break;
@@ -550,13 +563,13 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     {
         var deltaInSeconds = CurrSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
         var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
-            ? DataCollection<DeviceSpecificSensorData>.Verb.Add : DataCollection<DeviceSpecificSensorData>.Verb.ReplaceMostRecent;
+            ? DataCollection<DeviceSpecificSensorDataFacade>.Verb.Add : DataCollection<DeviceSpecificSensorDataFacade>.Verb.ReplaceMostRecent;
         HistoricalDataUnits.Update(CurrSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
         //
         // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
         //
-        if (verb == DataCollection<DeviceSpecificSensorData>.Verb.Add && HistoricalDataUnits.Count == 2)
+        if (verb == DataCollection<DeviceSpecificSensorDataFacade>.Verb.Add && HistoricalDataUnits.Count == 2)
         {
             // DOC: Can't have the axes start off invisible because then they can't be switched back on
             if (CurrWindowSize == MainWindow.WindowSize.Normal)

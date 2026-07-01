@@ -57,6 +57,12 @@
                         <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiRRInterval"/></TextBlock>
                     </StackPanel>
 
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Sensor</Run><Run Text="&#160;"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiSensor"/></TextBlock>
+                    </StackPanel>
 
 
                     <!-- This StackPanel has a name because it might be removed from the display (not ever

@@ -58,7 +58,7 @@
               "UUID": "00002a38-0000-1000-8000-00805f9b34fb",
               "Name": "Body Sensor Location",
               "Suppress": false,
-              "Type": "BYTES|HEX|Unknown1",
+              "Type": "U8|DEC|SensorLocation",
               "IsRead": true,
               "IsWrite": false,
               "SuppressRead": false,
@@ -68,7 +68,8 @@
               "IsIndicate": false,
               "Verbs": ":Read:RdInNo:",
               "ExampleData": [
-                "01"
+                "01",
+                "0=other 1=chest 2=wrist 3=finger 4=hand 5=ear lobe 6=foot"
               ]
             }
           ]
