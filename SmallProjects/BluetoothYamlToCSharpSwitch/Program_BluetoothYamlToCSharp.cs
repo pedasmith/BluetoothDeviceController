@@ -52,9 +52,60 @@ namespace BluetoothYamlToCSharpSwitch
                 string noleading = value;
                 if (noleading.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) noleading = noleading.Substring(2);
                 var ishex = uint.TryParse(noleading, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out asdecimal);
+                if (value.Contains("FF"))
+                {
+                    ; // handy place for a debugger.
+                }
+                if (value.Contains("–") || value.Contains ("-") )
+                {
+                    // – EN DASH U+2013 found in e.g. org.bluetooth.characteristic.body_sensor_location.yaml
+                    // for example, org.bluetooth.characteristic.body_sensor_location.yaml has a
+                    // value which is 0x7--0xFF
+                    return $"default: /* case {value} */ return $\"{name.RemoveQuotes()} ({{value:X2}})\";";
+
+                }
                 return $"case {value}: /* {asdecimal} */ return \"{name.RemoveQuotes()}\";";
             }
         }
+
+        class BTValueDescription : NameValue
+        {
+            public string value { get; set; }
+            public string name { get; set; }
+            public string description { get { return name; } set { name = value; } } // "value" here is the parameter, not the value field :-)
+            public override string ToString()
+            {
+                uint asdecimal = 0xFFF0;
+                string noleading = value;
+                if (noleading.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) noleading = noleading.Substring(2);
+                var ishex = uint.TryParse(noleading, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out asdecimal);
+                if (value.Contains("FF"))
+                {
+                    ; // handy place for a debugger.
+                }
+                if (value.Contains("–") || value.Contains("-"))
+                {
+                    // – EN DASH U+2013 found in e.g. org.bluetooth.characteristic.body_sensor_location.yaml
+                    // for example, org.bluetooth.characteristic.body_sensor_location.yaml has a
+                    // value which is 0x7--0xFF
+                    return $"default: /* case {value} */ return $\"{name.RemoveQuotes()} ({{value:X2}})\";";
+                }
+                return $"case {value}: /* {asdecimal} */ return \"{name.RemoveQuotes()}\";";
+            }
+        }
+
+        class BTNameDescriptionValues 
+        {
+            public string name { get; set; }
+            public string description { get; set; }
+            public List<BTValueDescription> values { get; set; } = new();
+            public override string ToString()
+            {
+                return $"// {name} {description} count={values.Count}";
+            }
+        }
+
+
 
         interface Root
         {
@@ -63,22 +114,35 @@ namespace BluetoothYamlToCSharpSwitch
         class BTuuids_Root : Root
         {
             public List<NameValue> values {  get { return uuids.Cast<NameValue>().ToList();  } }
-            public List<BTUnit> uuids { get; set; } = new List<BTUnit>();
+            public List<BTUnit> uuids { get; set; } = new ();
         }
 
         class BTad_types_Root : Root
         {
             public List<NameValue> values { get { return ad_types.Cast<NameValue>().ToList(); } }
-            public List<BTUnit> ad_types { get; set; } = new List<BTUnit>();
+            public List<BTUnit> ad_types { get; set; } = new ();
         }
 
 
         class BTcompany_identifiers_Root : Root
         {
             public List<NameValue> values { get { return company_identifiers.Cast<NameValue>().ToList(); } }
-            public List<BTValueName> company_identifiers { get; set; } = new List<BTValueName>();
+            public List<BTValueName> company_identifiers { get; set; } = new ();
         }
 
+        class BTfields_Root : Root
+        {
+            public List<NameValue> values { get { return fields[0].values.Cast<NameValue>().ToList(); } }
+            public string name { get; set; }
+            public string description { get; set; }
+            public List<BTNameDescriptionValues> fields { get; set; } = new (); // always a list of one :-)
+        }
+
+        class BTcharacteristic_fields_Root : Root
+        {
+            public BTfields_Root characteristic { get; set; }
+            public List<NameValue> values { get { return characteristic.fields[0].values.Cast<NameValue>().ToList(); } }
+        }
 
 
         class UserOptions
@@ -88,6 +152,7 @@ namespace BluetoothYamlToCSharpSwitch
             public enum RunEnum { makecase, updatefile }
             public RunEnum RunType { get; set; } = RunEnum.makecase;
             public string Filename = @"c:\temp\2026\BluetoothSpecs\units.yaml";
+            public string OutputDir = ""; // blank means write to STDOUT. Most common is "output"
 
             private static void Err(string s)
             {
@@ -113,6 +178,20 @@ namespace BluetoothYamlToCSharpSwitch
                                 Environment.Exit(1);
                             }
                             break;
+                        case "--outputdir":
+                            if (i + 1 < args.Length)
+                            {
+                                var value = args[++i];
+                                retval.OutputDir = value;
+                            }
+                            else
+                            {
+                                Err("Error: Missing directory after --outputdir");
+                                Err($"Expected --outputdir output");
+                                Environment.Exit(1);
+                            }
+                            break;
+
                         case "--type":
                             if (i + 1 < args.Length)
                             {
@@ -182,6 +261,9 @@ namespace BluetoothYamlToCSharpSwitch
             var company_identifiers = YamlSerializer.Deserialize<BTcompany_identifiers_Root>(yaml);
             if (company_identifiers != null && company_identifiers.values != null && company_identifiers.values.Count > 0) return company_identifiers.values;
 
+            var characteristic_fields = YamlSerializer.Deserialize<BTcharacteristic_fields_Root>(yaml);
+            if (characteristic_fields != null && characteristic_fields.values != null && characteristic_fields.values.Count > 0) return characteristic_fields.values;
+
             return null;
         }
 
@@ -204,7 +286,16 @@ namespace BluetoothYamlToCSharpSwitch
             {
                 result += $"\t\t\t\t{value}\r\n";
             }
-            Console.WriteLine(result);
+            if (string.IsNullOrEmpty(options.OutputDir))
+            {
+                Console.WriteLine(result);
+            }
+            else
+            {
+                var fname = System.IO.Path.GetFileName(options.Filename);
+                var outf = $"{options.OutputDir}\\{fname}";
+                System.IO.File.WriteAllText(outf, result);
+            }
         }
 
         enum UpdateStates {  Copy, InUpdateFile }
@@ -311,9 +402,18 @@ namespace BluetoothYamlToCSharpSwitch
                 }
             }
             Console.Error.WriteLine($"Processed file {options.Filename} nline={source.Length} result nline={results.Count}");
-            foreach (var result in results)
+            if (string.IsNullOrEmpty(options.OutputDir))
             {
-                Console.WriteLine(result);
+                foreach (var result in results)
+                {
+                    Console.WriteLine(result);
+                }
+            }
+            else
+            {
+                var fname = System.IO.Path.GetFileName(options.Filename);
+                var outf = $"{options.OutputDir}\\{fname}";
+                System.IO.File.WriteAllLines(outf, results);
             }
         }
         static void Main(string[] args)

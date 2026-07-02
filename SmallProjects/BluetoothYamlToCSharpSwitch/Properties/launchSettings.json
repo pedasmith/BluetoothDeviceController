@@ -2,7 +2,7 @@
   "profiles": {
     "BluetoothYamlToCSharpSwitch": {
       "commandName": "Project",
-      "commandLineArgs": "--type updatefile --file \"..\\..\\BluetoothConversions\\Ad_types.cs\" --updatewith file > output\\Ad_types.cs",
+      "commandLineArgs": "--type updatefile --updatewith file --outputdir output --file  \"..\\\\..\\\\BluetoothConversions\\\\BluetoothBodySensorLocation.cs\"",
       "workingDirectory": "C:\\Users\\toomr\\source\\repos\\pedasmith\\BluetoothDeviceController\\SmallProjects\\BluetoothYamlToCSharpSwitch"
     }
   }

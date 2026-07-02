@@ -1,5 +1,68 @@
 company_identifiers:
 
+  - value: 0x10E1
+    name: 'Neurable, Inc'
+
+  - value: 0x10E0
+    name: 'Arnold & Richter Cine Technik GmbH & Co. Betriebs KG'
+
+  - value: 0x10DF
+    name: 'Hawkeye Surgical Lighting LLC'
+
+  - value: 0x10DE
+    name: 'Gastron Co.,Ltd'
+
+  - value: 0x10DD
+    name: 'Triumph Designs Ltd'
+
+  - value: 0x10DC
+    name: 'Spectra Precision (Kaiserslautern) GmbH'
+
+  - value: 0x10DB
+    name: 'SZ Avinox Innovation Co., Ltd.'
+
+  - value: 0x10DA
+    name: 'SKAIChips Co.,Ltd'
+
+  - value: 0x10D9
+    name: 'Liebherr-Hausgeraete GmbH'
+
+  - value: 0x10D8
+    name: 'Westfalen Aktiengesellschaft'
+
+  - value: 0x10D7
+    name: 'Arashi Vision Inc.'
+
+  - value: 0x10D6
+    name: 'UltronSMART Inc.'
+
+  - value: 0x10D5
+    name: 'IntelliDesign Pty Ltd'
+
+  - value: 0x10D4
+    name: 'Victor Hasselblad AB'
+
+  - value: 0x10D3
+    name: 'AGCO Corporation'
+
+  - value: 0x10D2
+    name: 'Hehku Company Oy'
+
+  - value: 0x10D1
+    name: 'Acer Inc.'
+
+  - value: 0x10D0
+    name: 'Band24, LLC'
+
+  - value: 0x10CF
+    name: 'Tempur World, LLC'
+
+  - value: 0x10CE
+    name: 'Inito Health Inc.'
+
+  - value: 0x10CD
+    name: 'Kumho Tire'
+
   - value: 0x10CC
     name: 'Linde GmbH'
 
@@ -1591,7 +1654,7 @@ company_identifiers:
     name: 'New Cosmos Electric Co., Ltd.'
 
   - value: 0x0E54
-    name: 'Relief Technologies AS'
+    name: 'After Technologies AS'
 
   - value: 0x0E53
     name: 'MINIRIG'
@@ -8086,7 +8149,7 @@ company_identifiers:
     name: 'Beghelli Spa'
 
   - value: 0x0563
-    name: 'Steinel Vertrieb GmbH'
+    name: 'Steinel GmbH'
 
   - value: 0x0562
     name: 'Thalmic Labs Inc.'
@@ -10672,7 +10735,7 @@ company_identifiers:
     name: 'Cochlear Bone Anchored Solutions AB'
 
   - value: 0x01BA
-    name: 'Stages Cycling LLC'
+    name: 'SPIA Cycling Inc.'
 
   - value: 0x01B9
     name: 'HANA Micron'

@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Ad_types.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothAppearance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothBodySensorLocation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothCharacteristic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothCompanyIdentifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothServiceUuid16Bit.cs" />

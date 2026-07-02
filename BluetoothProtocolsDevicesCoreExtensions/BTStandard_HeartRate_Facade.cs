@@ -44,6 +44,19 @@ namespace BluetoothProtocols
         public FlagsDecoded CurrFlagsDecoded {  get { return (FlagsDecoded)Flags; } }
         public bool PulseRateIsHighRange {  get { return CurrFlagsDecoded.HasFlag(FlagsDecoded.HeartRateValueFormatHighRange); } }
 
+        /// <summary>
+        /// Returns the SensorLocation as a string per the YAML description from the 
+        /// Bluetooth SIG.
+        /// </summary>
+        public string SensorLocationAsString
+        {
+            get
+            {
+                var retval = BluetoothConversions.BluetoothBodySensorLocation.Decode((byte)SensorLocation);
+                return retval;
+            }
+        }
+
         private double _PulseRate = 0;
         /// <summary>
         /// From Heart Rate and Heart Rate Measurement
