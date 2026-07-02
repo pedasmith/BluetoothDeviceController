@@ -19,7 +19,20 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="uiDeviceName" Grid.Row="0" Text="Heart Rate" Style="{StaticResource sDeviceTitle}"/>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <!-- ✓ Check Mark U+2713 -->
+                <!-- ✗ Ballot X U+2717 -->
+                <TextBlock x:Name="uiDeviceName" Grid.Column="0" Text="Heart Rate" Style="{StaticResource sDeviceTitle}"/>
+                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                    <TextBlock x:Name="uiSensorConnection" Text="--" Style="{StaticResource sDeviceData}"/>
+                    <TextBlock x:Name="uiSensorLocation" Text="--" Style="{StaticResource sDeviceData}"/>
+                </StackPanel>
+
+            </Grid>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
@@ -40,7 +53,7 @@
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Flags</Run><Run Text="&#160;"/><Run x:Name="uiFlagsChange" Text="┄"/>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiFlags"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDeviceData}" TextWrapping="Wrap"><Run x:Name="uiFlags"/></TextBlock>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
@@ -55,13 +68,6 @@
                         <Run>RR</Run><Run Text="&#160;"/>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiRRInterval"/></TextBlock>
-                    </StackPanel>
-
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Sensor</Run><Run Text="&#160;"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiSensor"/></TextBlock>
                     </StackPanel>
 
 

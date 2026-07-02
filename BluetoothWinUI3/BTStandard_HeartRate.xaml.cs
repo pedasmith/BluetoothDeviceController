@@ -188,7 +188,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     // so the main window menus get updated.
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    List<string> _LineNames = new List<string>() { "PulseRateLowRange" }; // CHANGE:
+    List<string> _LineNames = new List<string>() { "PulseRate" }; // CHANGE:
     public List<string> LineNames { get { return _LineNames; } }
 
     /// <summary>
@@ -210,7 +210,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// </summary>
     // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; }
-        = OxyPlotUtilities.MakeOxyPlotModelSimple("Heart Rate", 5, 30, "Pulse Rate", "PulseRateLowRange");
+        = OxyPlotUtilities.MakeOxyPlotModelSimple("Heart Rate", 5, 30, "Pulse Rate", "PulseRate");
         // CHANGE: set up the graph
 
 
@@ -515,14 +515,19 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
                 if (CurrSensor_DataUnits.CurrFlagsDecoded.HasFlag(DeviceSpecificSensorDataFacade.FlagsDecoded.SensorContactSupported))
                 {
                     var icon = CurrSensor_DataUnits.CurrFlagsDecoded.HasFlag(DeviceSpecificSensorDataFacade.FlagsDecoded.SensorContactDetected)
-                        ? "yes" : "x"; // 
-                    uiSensor.Text = icon;
+                        ? "✓" : "✗"; // 
+                    uiSensorConnection.Text = icon;
                 }
                 else
                 {
-                    uiSensor.Text = "--"; // device doesn't know if it's connected
+                    uiSensorConnection.Text = "--"; // device doesn't know if it's connected TODO: correct icon?
                 }
                 UpdateHistoricalDataAndGraph();
+                break;
+
+            case DeviceSpecificType.Body_Sensor_LocationPropertyChangedName:
+                // The check box is set by the 
+                uiSensorLocation.Text = CurrSensor_DataUnits.SensorLocationAsString;
                 break;
 
             case DeviceSpecificType.BatteryLevelPropertyChangedName:
