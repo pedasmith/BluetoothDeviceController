@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BluetoothWinUI3;
+using BluetoothWinUI3.BluetoothWinUI3Registration;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,10 +13,14 @@ namespace Exporters
     /// <summary>
     /// Simple class that lists all of the existing SmartExporters and then on a timer
     /// will call ExportNew
+    /// Will also take the list of AllKnownDevices and on the same period, after all the
+    /// smart exports, call ClearAccumulatedData. 
     /// </summary>
     internal class SmartExportRunner
     {
         private List<SmartExporter> Exporters = new List<SmartExporter>();
+        public List<IDeviceControlBasic> AllDeviceControlBasicDevices { get; } = new ();
+
         const int DEFAULT_PERIOD = 5_000; // every 5 seconds
         System.Timers.Timer PeriodicTimer;
         System.Threading.Lock Lock = new System.Threading.Lock();
@@ -33,6 +39,11 @@ namespace Exporters
                 {
                     exporter.ExportRowMostRecentData();
                 }
+                foreach (var device in AllDeviceControlBasicDevices)
+                {
+                    device.ClearAccumulatedFineGrainedData();
+                }
+
             }
         }
 

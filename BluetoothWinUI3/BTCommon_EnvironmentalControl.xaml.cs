@@ -76,6 +76,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// </summary>
     public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
+    public void ClearAccumulatedFineGrainedData() {;  } // do nothing
     public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
     {
         return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];

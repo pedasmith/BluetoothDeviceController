@@ -25,6 +25,10 @@ namespace BluetoothWinUI3
         void OnGetUXCapabilitiesChanged(UserControl deviceControl, IDeviceControlBasic.UXCapabilities newCapabilities);
     }
 
+    /// <summary>
+    /// Many (but not all) of the UserControls that get displayed will also implement
+    /// IDeviceControlBasic for the most common methods that need to be handled.
+    /// </summary>
     public interface IDeviceControlBasic
     {
         /// <summary>
@@ -57,6 +61,16 @@ namespace BluetoothWinUI3
         void ExportGraphAsPng();
         // Gone! ExportData is now in ExportDeviceData() and uses the GetData() for export! string ExportData(IExportData exporter);
         IReadOnlyList<IBTCommonMetaData> GetDataAll();
+        /// <summary>
+        /// Most controls do not have any fine grained data
+        /// Clears the accumulated data. Is called by the SmartExportRunner about every 5 seconds.
+        /// This is useful when data comes in quicker than the normal smart export frequency 
+        /// and we want all that data. For example, the heart rate control keeps the most recent
+        /// pulse data (which is fine) but also there's a much finer grained RRInterval data. We want
+        /// to save all the RRInterval data with no duplicates on the smart export.
+        /// </summary>
+        void ClearAccumulatedFineGrainedData();
+
 
         /// <summary>
         /// Returns NULL if there's no data yet

@@ -37,7 +37,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "BTStandard_Demo"; // Change: BTStandard_Demo
+    private readonly string InternalDeviceType = "BTStandard_HeartRate"; // Change: BTStandard_Demo
     #endregion
 
     #region Advanced settings and values
@@ -103,6 +103,12 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// </summary>
     public DataCollection<DeviceSpecificSensorDataFacade> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
+    public void ClearAccumulatedFineGrainedData()
+    {
+        // Only the RRInterval data is fine grained.
+        CurrSensor_DataUnits?.CurrRRRecent?.DoClearAccumulatedFineGrainedData();
+    }
+
     public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
     {
         return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];
@@ -116,7 +122,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     //
 
     /// <summary>
-    /// Current sensor data from the Device. For the demo, it's battery level.
+    /// Current sensor data from the Device. 
     /// </summary>
     DeviceSpecificSensorData CurrSensor_Data = null;
     /// <summary>
@@ -154,7 +160,10 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// <summary>
     /// Customization for the TableView.
     /// </summary>
-    TableViewColumnCustomization CurrTableCustomization = new TableViewColumnCustomization();
+    TableViewColumnCustomization CurrTableCustomization = new TableViewColumnCustomization()
+    {
+        TableColumnsToExclude = ["CurrFlagsDecoded", "Flags", "RRInterval", "SensorLocation"],
+    };
     #endregion
 
     private void Control_Loaded(object sender, RoutedEventArgs e)
@@ -169,8 +178,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         // Change: set the right sparkles
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            ( DeviceSpecificType.BatteryLevelPropertyChangedName, uiBatteryLevelChange),
-            ( DeviceSpecificType.Heart_Rate_MeasurementPropertyChangedName, uiFlagsChange),
+            ( DeviceSpecificType.Heart_Rate_MeasurementPropertyChangedName, uiBpmChange),
         };
     }
 
@@ -188,7 +196,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     // so the main window menus get updated.
 
     // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    List<string> _LineNames = new List<string>() { "PulseRate" }; // CHANGE:
+    List<string> _LineNames = new List<string>() { "HeartRate" }; // CHANGE:
     public List<string> LineNames { get { return _LineNames; } }
 
     /// <summary>
@@ -210,7 +218,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// </summary>
     // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; }
-        = OxyPlotUtilities.MakeOxyPlotModelSimple("Heart Rate", 5, 30, "Pulse Rate", "PulseRate");
+        = OxyPlotUtilities.MakeOxyPlotModelSimple("Heart Rate", 10, 50, "Heart Rate", "HeartRate");
         // CHANGE: set up the graph
 
 
@@ -283,6 +291,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         await Device.ReadBatteryLevel(DefaultCacheMode);
         await Device.ReadBody_Sensor_Location(DefaultCacheMode);
 
+        // Tons of GAP stuff to test out more reads
         await Device.ReadManufacturer_Name_String(DefaultCacheMode);
         await Device.ReadModel_Number_String(DefaultCacheMode);
         await Device.ReadHardware_Revision_String(DefaultCacheMode);
@@ -485,7 +494,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
             case "*": // never used, but here so it matches the Govee code.
             case DeviceSpecificType.Heart_Rate_MeasurementPropertyChangedName:
-                uiBPM.Text = CurrSensor_DataUnits.PulseRate.ToString();
+                uiBpm.Text = CurrSensor_DataUnits.HeartRate.ToString();
                 uiFlags.Text = CurrSensor_DataUnits.CurrFlagsDecoded.ToString();
                 if (CurrSensor_DataUnits.RRInterval == null)
                 {
@@ -500,7 +509,8 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
                 }
                 else
                 {
-                    // TODO: update sparkles
+                    CurrSensor_DataUnits.CurrRRRecent.AddRRData(CurrSensor_DataUnits.TimestampMostRecent, CurrSensor_DataUnits.RRInterval);
+
                     var rr = new StringBuilder();
                     foreach (var value in CurrSensor_DataUnits.RRInterval)
                     {
@@ -527,12 +537,9 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
             case DeviceSpecificType.Body_Sensor_LocationPropertyChangedName:
                 // The check box is set by the 
-                uiSensorLocation.Text = CurrSensor_DataUnits.SensorLocationAsString;
+                uiSensorLocation.Text = CurrSensor_DataUnits.Sensor;
                 break;
 
-            case DeviceSpecificType.BatteryLevelPropertyChangedName:
-                uiBattery.Text = CurrBattery_DataUnits.BatteryLevel.ToString("F2");
-                break;
 
             case DeviceSpecificType.Device_NamePropertyChangedName:
                 uiName.Text = Device.CurrGAP_Data.DeviceName;

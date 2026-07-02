@@ -44,7 +44,7 @@
               "UUID": "00002a37-0000-1000-8000-00805f9b34fb",
               "Name": "Heart Rate Measurement",
               "Suppress": false,
-              "Type": "U8|HEX|Flags OSKIP^1^$Flags_GN_1_AN U8|DEC|PulseRateLowRange|bpm OSKIP^1^$Flags_GN_1_AN_NT U16|DEC|PulseRateHighRange|bpm OSKIP^1^$Flags_GN_8_AN_NT U16|DEC|EnergyExpended|Joules OSKIP^1^$Flags_GN_16_AN_NT U16S|DEC|RRInterval",
+              "Type": "U8|HEX|Flags OSKIP^1^$Flags_GN_1_AN U8|DEC|HeartRateLowRange|bpm OSKIP^1^$Flags_GN_1_AN_NT U16|DEC|HeartRateHighRange|bpm OSKIP^1^$Flags_GN_8_AN_NT U16|DEC|EnergyExpended|Joules OSKIP^1^$Flags_GN_16_AN_NT U16S|DEC|RRInterval",
               "IsRead": false,
               "IsWrite": false,
               "SuppressRead": false,

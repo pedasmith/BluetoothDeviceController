@@ -41,6 +41,11 @@ namespace Exporters
         {
             // TODO: here!here pick which SmartExporters will handle this
             AllKnownDevices.AddDevice(knownDevice);
+            if (knownDevice.Control is IDeviceControlBasic basic)
+            {
+                Runner.AllDeviceControlBasicDevices.Add(basic);
+            }
+
             if (!Runner.IsStarted)
             {
                 Runner.Start();
@@ -48,7 +53,7 @@ namespace Exporters
         }
 
         /// <summary>
-        /// Fake routine for right now: just does the export for the AllDevices
+        /// Fake routine for right now: just does the export for the AllDevices TODO:
         /// </summary>
         /// <returns></returns>
         public string Export()

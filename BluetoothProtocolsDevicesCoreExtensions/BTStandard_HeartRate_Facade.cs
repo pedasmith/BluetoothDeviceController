@@ -20,8 +20,8 @@ namespace BluetoothProtocols
         [Flags]
         public enum FlagsDecoded { 
             /// <summary>
-            /// 0=pulse uses the 1-byte format and is in the range 0..255
-            /// 1=pulse uses 2-bytes format and is 256 or higher
+            /// 0=heart rate uses the 1-byte format and is in the range 0..255
+            /// 1=heart rate uses 2-bytes format and is 256 or higher
             /// </summary>
             HeartRateValueFormatHighRange = 0x01, 
             /// <summary>
@@ -42,13 +42,13 @@ namespace BluetoothProtocols
             RRIntervalStatus = 0x10,
         }
         public FlagsDecoded CurrFlagsDecoded {  get { return (FlagsDecoded)Flags; } }
-        public bool PulseRateIsHighRange {  get { return CurrFlagsDecoded.HasFlag(FlagsDecoded.HeartRateValueFormatHighRange); } }
+        private bool HeartRateIsHighRange {  get { return CurrFlagsDecoded.HasFlag(FlagsDecoded.HeartRateValueFormatHighRange); } }
 
         /// <summary>
         /// Returns the SensorLocation as a string per the YAML description from the 
         /// Bluetooth SIG.
         /// </summary>
-        public string SensorLocationAsString
+        public string Sensor
         {
             get
             {
@@ -57,21 +57,74 @@ namespace BluetoothProtocols
             }
         }
 
-        private double _PulseRate = 0;
+        private double _HeartRate = 0;
         /// <summary>
         /// From Heart Rate and Heart Rate Measurement
         ///</summary>
-        public double PulseRate
+        public double HeartRate
         {
-            get { return _PulseRate; }
-            set { if (value == _PulseRate) return; _PulseRate = value; OnPropertyChanged(); }
+            get { return _HeartRate; }
+            set { if (value == _HeartRate) return; _HeartRate = value; OnPropertyChanged(); }
         }
 
+        public RRRecent CurrRRRecent { get; set; } = new RRRecent();
+        public class RRRecent
+        {
+            DateTimeOffset MostRecentUpdate = DateTimeOffset.MinValue;
 
+            /// <summary>
+            /// The newData's last value is the most recent, and started at the updateTime
+            /// minus the number of milliseconds
+            /// </summary>
+            public void AddRRData(DateTimeOffset updateTime, List<double> newData)
+            {
+                if (MostRecentUpdate == updateTime)
+                {
+                    ; // handy place for a debugger
+                    // Is a duplicate; ignore it.
+                    return;
+                }
+                MostRecentUpdate = updateTime;
+                DateTimeOffset curr = updateTime;
+                for (int i=newData.Count-1; i>= 0; i--)
+                {
+                    double milliseconds = newData[i];
+                    curr = curr.AddMilliseconds(-milliseconds); // subtract is "add the negative"
+                    RRData.Add((curr, milliseconds));
+                }
+            }
+
+            public void DoClearAccumulatedFineGrainedData()
+            {
+                RRData.Clear();
+            }
+
+
+            public string RRAsString()
+            {
+                if (RRData.Count == 0) return "[]";
+                StringBuilder retval = new();
+                foreach (var item in RRData)
+                {
+                    if (retval.Length != 0) retval.Append(", ");
+                    retval.Append(item.RR.ToString());
+                }
+                return "[" + retval.ToString() + "]";
+            }
+
+            public override string ToString()
+            {
+                return RRAsString();
+            }
+
+            private List<(DateTimeOffset Time, double RR)> RRData = new();
+        }
+
+        #region From_Heart_Rate_Data
         //
         // copy-pasted from Heart_Rate_Data and then updated Clone, CopyFrom, CopyToOrClone
         // and radically change CopyToOrClone
-        // and changed PulseRateLowRange and PulseRateHighRange to private
+        // and changed HeartRateLowRange and HeartRateHighRange to private
 
 
         // Template is ServiceDataGroups
@@ -127,7 +180,7 @@ namespace BluetoothProtocols
             this.TimestampMostRecent = value.TimestampMostRecent;
             this.Name = value.Name;
             this.Flags = value.Flags;
-            this.PulseRate = value.PulseRate;
+            this.HeartRate = value.HeartRate;
             this.EnergyExpended = value.EnergyExpended;
             this.RRInterval = value.RRInterval;
             this.SensorLocation = value.SensorLocation;
@@ -143,8 +196,8 @@ namespace BluetoothProtocols
             dest.TimestampMostRecent = source.TimestampMostRecent;
             dest.Name = source.Name;
             dest.Flags = convert(source.Flags, "");
-            var pulse = dest.CurrFlagsDecoded.HasFlag(FlagsDecoded.HeartRateValueFormatHighRange) ? source.PulseRateHighRange : source.PulseRateLowRange;
-            dest.PulseRate = convert(pulse, "bpm");
+            var heartRate = dest.CurrFlagsDecoded.HasFlag(FlagsDecoded.HeartRateValueFormatHighRange) ? source.HeartRateHighRange : source.HeartRateLowRange;
+            dest.HeartRate = convert(heartRate, "bpm");
             dest.EnergyExpended = convert(source.EnergyExpended, "Joules"); dest.RRInterval = source.RRInterval;
             dest.SensorLocation = convert(source.SensorLocation, "");
             return dest;
@@ -152,23 +205,24 @@ namespace BluetoothProtocols
 
         public override string[] ExportGetHeaders(IExportData _)
         {
-            return ["Flags", "PulseRateLowRange", "PulseRateHighRange", "EnergyExpended", "RRInterval", "SensorLocation"];
+            return ["Sensor", "HeartRate", "RRInterval", "EnergyExpended"];
         }
 
         public override void ExportRow(IExportData exporter)
         {
             // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
             // RowEnd and add in the timestamps
-            exporter.CellSet(CurrFlagsDecoded.ToString());
-            exporter.CellSet(PulseRate);
+            exporter.CellSet(Sensor);
+            exporter.CellSet(HeartRate);
+            exporter.CellSet(this?.CurrRRRecent?.RRAsString() ?? "[]");
             exporter.CellSet(EnergyExpended);
-            exporter.CellSet(RRInterval);
-            exporter.CellSet(SensorLocation);
         }
 
         public override string ToString()
         {
-            return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {CurrFlagsDecoded} {PulseRate} {EnergyExpended} {RRInterval} {SensorLocation}");
+            return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {CurrFlagsDecoded} {HeartRate} {EnergyExpended} {RRInterval} {SensorLocation}");
         }
+
+        #endregion
     }
 }
