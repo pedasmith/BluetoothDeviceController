@@ -48,7 +48,9 @@
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiBpm"/></TextBlock>
                     </StackPanel>
-                    
+
+                    <StackPanel Orientation="Horizontal" Visibility="Collapsed">
+                        
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Name</Run><Run Text="&#160;"/><Run x:Name="uiNameChange" Text="┄"/>
@@ -70,6 +72,8 @@
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiRRInterval"/></TextBlock>
                     </StackPanel>
+                    </StackPanel>
+
 
 
                 </GridView>
