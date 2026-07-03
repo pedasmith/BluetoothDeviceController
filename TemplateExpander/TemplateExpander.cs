@@ -28,6 +28,10 @@ namespace TemplateExpander
             {
                 retval = $"ERROR: too many macro expansions at {startIndex}\n" + retval;
             }
+            if (retval.Contains("dest.RRInterval"))
+            {
+                ; // handy place for a debugger
+            }
             return retval;
         }
         
@@ -52,7 +56,7 @@ namespace TemplateExpander
             }
             else
             {
-                bool hasMacro = macros.Macros.TryGetValue(macro, out retval);
+                bool hasMacro = macros.MacrosTryGetValue(macro, out retval);
                 if (!hasMacro)
                 {
                     var parent = macros.Parent;
@@ -62,7 +66,7 @@ namespace TemplateExpander
                         {
                             ; // DBG: handy breakpoint while I debug a problem.
                         }
-                        hasMacro = parent.Macros.TryGetValue(macro, out retval);
+                        hasMacro = parent.MacrosTryGetValue(macro, out retval);
                         parent = parent.Parent;
                     }
                 }
@@ -145,9 +149,9 @@ namespace TemplateExpander
             // We're at the bottom of the sourceList, so do the expansion for real.
             int childCount = 0;
             int childCountAll = 0;
-            if (data.Macros.Count > 0)
+            if (data.MacrosCount > 0)
             {
-                foreach (var item in data.Macros)
+                foreach (var item in data.MacrosMacros)
                 {
                     macros.AddMacro("NAME", item.Key);
                     macros.AddMacro("TEXT", item.Value);
@@ -155,10 +159,10 @@ namespace TemplateExpander
                     if (expand != "") expand += template.CodeListSeparator;
                     expand += itemExpand;
                 }
-                count += data.Macros.Count;
-                countAll += data.Macros.Count;
-                childCount += data.Macros.Count;
-                childCountAll += data.Macros.Count;
+                count += data.MacrosCount;
+                countAll += data.MacrosCount;
+                childCount += data.MacrosCount;
+                childCountAll += data.MacrosCount;
             }
             else // Loop through the children, not the macros
             {
@@ -264,6 +268,10 @@ namespace TemplateExpander
                 {
                     expand = expand.TrimEnd(['\r', '\n', ' ']);
                 }
+                if (expand.Contains("dest.RRInterval"))
+                {
+                    ;// handy place for a debugger
+                }
                 macros.AddMacro(template.Name, expand);
                 expand = ""; // reset it
             }
@@ -351,6 +359,10 @@ namespace TemplateExpander
                             if (child.OptionTrim == TemplateSnippet.OptionTrimOption.TrimEndCR)
                             {
                                 expand = expand.TrimEnd(['\r', '\n', ' ']);
+                                if (expand.Contains("dest.RRInterval"))
+                                {
+                                    ; // handy place for a debugger
+                                }
                             }
                             if (!string.IsNullOrEmpty(child.OptionIf) && child.OptionListOutput == TemplateSnippet.TypeOfListOutput.Parent)
                             {

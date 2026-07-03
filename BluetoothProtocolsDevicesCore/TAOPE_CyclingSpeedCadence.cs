@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-06-26::21:55
+    /// This class was automatically generated 2026-07-03::12:29
     /// </summary>
 
     public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged

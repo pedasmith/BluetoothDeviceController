@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-07-02::10:00
+    /// This class was automatically generated 2026-07-03::12:29
     /// </summary>
 
     public  class BTStandard_HeartRate : INotifyPropertyChanged
@@ -42,7 +42,7 @@ namespace BluetoothProtocols
 
         Heart Rate service Guid=180d
             Heart Rate_Data (DataGroup record)
-                Heart Rate Measurement characteristic has Flags (Byte-->double) HeartRateLowRange (Byte-->double) HeartRateHighRange (UInt16-->double) EnergyExpended (UInt16-->double) RRInterval (UInt16-->string)  Guid=2a37
+                Heart Rate Measurement characteristic has Flags (Byte-->double) HeartRateLowRange (Byte-->double) HeartRateHighRange (UInt16-->double) EnergyExpended (UInt16-->double) RRInterval (UInt16-->double[])  Guid=2a37
                 Body Sensor Location characteristic has SensorLocation (Byte-->double)  Guid=2a38
 
 
@@ -188,7 +188,13 @@ namespace BluetoothProtocols
                 dest.Flags = convert(source.Flags, "");
                 dest.HeartRateLowRange = convert(source.HeartRateLowRange, "bpm");
                 dest.HeartRateHighRange = convert(source.HeartRateHighRange, "bpm");
-                dest.EnergyExpended = convert(source.EnergyExpended, "Joules");                dest.RRInterval = source.RRInterval;
+                dest.EnergyExpended = convert(source.EnergyExpended, "Joules");
+                dest.RRInterval = new List<double>();
+                foreach (var value in source.RRInterval)
+                {
+                    double newvalue = convert(value, "");
+                    dest.RRInterval.Add(newvalue);
+                }
                 dest.SensorLocation = convert(source.SensorLocation, "");
                 return dest;
             }

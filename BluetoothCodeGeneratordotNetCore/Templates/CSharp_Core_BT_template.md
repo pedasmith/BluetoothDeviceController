@@ -384,8 +384,7 @@ This is the primary section of the code.
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = source.Name;
-[[CharacteristicDataFieldsCopyFromConvert]]
-                return dest;
+[[CharacteristicDataFieldsCopyToConvert]]                return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
@@ -452,22 +451,34 @@ This is the primary section of the code.
                 this.[[DataName.dotNet]] = value.[[DataName.dotNet]];
 ```
 
-## CharacteristicDataFieldsCopyFromConvert Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
+## CharacteristicDataFieldsCopyToConvert Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics CodeListSubZero=""
 ```
-[[CharacteristicPropertyDataFieldsCopyFromConvert]][[CharacteristicPropertyDataFieldsCopyFromConvertNo]]
+[[CharacteristicPropertyDataFieldsCopyToConvertDouble]][[CharacteristicPropertyDataFieldsCopyToConvertDoubleArray]][[CharacteristicPropertyDataFieldsCopyToConvertString]]
 ```
 
 
-## CharacteristicPropertyDataFieldsCopyFromConvert Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] contains double"
+## CharacteristicPropertyDataFieldsCopyToConvertDouble Type=list ListOutput=parent Trim=false Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] == double"
 
 ```
                 dest.[[DataName.dotNet]] = convert(source.[[DataName.dotNet]], "[[DataUnits]]");
 ```
 
-## CharacteristicPropertyDataFieldsCopyFromConvertNo Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] !contains double"
+
+## CharacteristicPropertyDataFieldsCopyToConvertString Type=list ListOutput=parent Trim=false Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] == string"
 
 ```
                 dest.[[DataName.dotNet]] = source.[[DataName.dotNet]];
+```
+
+## CharacteristicPropertyDataFieldsCopyToConvertDoubleArray Type=list ListOutput=parent Trim=false Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] == double[]"
+
+```
+                dest.[[DataName.dotNet]] = new List<double>();
+                foreach (var value in source.[[DataName.dotNet]])
+                {
+                    double newvalue = convert(value, "[[DataUnits]]");
+                    dest.[[DataName.dotNet]].Add(newvalue);
+                }
 ```
 
 

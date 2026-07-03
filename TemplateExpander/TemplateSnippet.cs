@@ -77,7 +77,28 @@ namespace TemplateExpander
         public TypeOfListOutput OptionListOutput { get; internal set; } = TypeOfListOutput.Global;
 
 
-        public Dictionary<string, string> Macros { get; } = new Dictionary<string, string>();
+        private Dictionary<string, string> Macros { get; } = new Dictionary<string, string>();
+        public void MacrosAdd(string key, string value) { Macros.Add(key, value); }
+        public int MacrosCount { get { return Macros.Count; } }
+        public bool MacrosTryGetValue(string key, out string retval) 
+        { 
+            var status = Macros.TryGetValue(key, out retval);
+            if (status == true && retval != null && retval.Contains("dest.RRInterval = source.RRInterval"))
+            {
+                ; // Handy place for a debugger
+            }
+            return status;
+        }
+        public string MacrosGet(string key) 
+        {
+            var retval = Macros[key];
+            if (retval != null && retval.Contains("dest.RRInterval = source.RRInterval"))
+            {
+                ; // Handy place for a debugger
+            }
+            return retval; 
+        }
+        public Dictionary<string, string> MacrosMacros {  get { return Macros; } }
         public Dictionary<string, TemplateSnippet> Children { get; }  = new Dictionary<string, TemplateSnippet>();
         public void AddChildViaMacro(TemplateSnippet child, string childId="UUID")
         {
