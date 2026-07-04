@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-07-03::12:29
+    /// This class was automatically generated 2026-07-03::21:06
     /// </summary>
 
     public  class BTStandard_HeartRate : INotifyPropertyChanged
@@ -94,60 +94,60 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Heart Rate Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Heart_Rate_Data :BTCommonMetaData<Heart_Rate_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _Flags = 0;
             /// <summary>
-            /// From Heart Rate and Heart Rate Measurement
+            /// Flags (U8 ) from Service=Heart Rate and Characteristic=Heart Rate Measurement
             ///</summary>
             public double Flags 
             { 
                 get { return _Flags; }
                 set { if (value == _Flags) return; _Flags = value; OnPropertyChanged();}
-            } 
+            }
             private double _HeartRateLowRange = 0;
             /// <summary>
-            /// From Heart Rate and Heart Rate Measurement
+            /// HeartRateLowRange (U8 bpm) from Service=Heart Rate and Characteristic=Heart Rate Measurement
             ///</summary>
             public double HeartRateLowRange 
             { 
                 get { return _HeartRateLowRange; }
                 set { if (value == _HeartRateLowRange) return; _HeartRateLowRange = value; OnPropertyChanged();}
-            } 
+            }
             private double _HeartRateHighRange = 0;
             /// <summary>
-            /// From Heart Rate and Heart Rate Measurement
+            /// HeartRateHighRange (U16 bpm) from Service=Heart Rate and Characteristic=Heart Rate Measurement
             ///</summary>
             public double HeartRateHighRange 
             { 
                 get { return _HeartRateHighRange; }
                 set { if (value == _HeartRateHighRange) return; _HeartRateHighRange = value; OnPropertyChanged();}
-            } 
+            }
             private double _EnergyExpended = 0;
             /// <summary>
-            /// From Heart Rate and Heart Rate Measurement
+            /// EnergyExpended (U16 Joules) from Service=Heart Rate and Characteristic=Heart Rate Measurement
             ///</summary>
             public double EnergyExpended 
             { 
                 get { return _EnergyExpended; }
                 set { if (value == _EnergyExpended) return; _EnergyExpended = value; OnPropertyChanged();}
-            } 
+            }
             private List<double> _RRInterval = new();
             /// <summary>
-            /// From Heart Rate and Heart Rate Measurement
+            /// RRInterval (U16S ) from Service=Heart Rate and Characteristic=Heart Rate Measurement
             ///</summary>
             public List<double> RRInterval 
             { 
                 get { return _RRInterval; }
                 set { if (value == _RRInterval) return; _RRInterval = value; OnPropertyChanged();}
             }
+
             private double _SensorLocation = 0;
             /// <summary>
-            /// From Heart Rate and Body Sensor Location
+            /// SensorLocation (U8 ) from Service=Heart Rate and Characteristic=Body Sensor Location
             ///</summary>
             public double SensorLocation 
             { 
@@ -171,12 +171,11 @@ namespace BluetoothProtocols
                 this.Flags = value.Flags;
                 this.HeartRateLowRange = value.HeartRateLowRange;
                 this.HeartRateHighRange = value.HeartRateHighRange;
-                this.EnergyExpended = value.EnergyExpended;
-                this.RRInterval = value.RRInterval;
+                this.EnergyExpended = value.EnergyExpended;                this.RRInterval = new List<double>(value.RRInterval);
                 this.SensorLocation = value.SensorLocation;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Heart_Rate_Data CopyToOrClone(Heart_Rate_Data source, Heart_Rate_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -184,16 +183,19 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Flags = convert(source.Flags, "");
                 dest.HeartRateLowRange = convert(source.HeartRateLowRange, "bpm");
                 dest.HeartRateHighRange = convert(source.HeartRateHighRange, "bpm");
                 dest.EnergyExpended = convert(source.EnergyExpended, "Joules");
-                dest.RRInterval = new List<double>();
-                foreach (var value in source.RRInterval)
+                if (source.RRInterval != null)
                 {
-                    double newvalue = convert(value, "");
-                    dest.RRInterval.Add(newvalue);
+                    dest.RRInterval = new List<double>();
+                    foreach (var value in source.RRInterval)
+                    {
+                        double newvalue = convert(value, "");
+                        dest.RRInterval.Add(newvalue);
+                    }
                 }
                 dest.SensorLocation = convert(source.SensorLocation, "");
                 return dest;
@@ -226,33 +228,34 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the GAP Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class GAP_Data :BTCommonMetaData<GAP_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private string _DeviceName = "";
             /// <summary>
-            /// From GAP and Device Name
+            /// DeviceName (STRING ) from Service=GAP and Characteristic=Device Name
             ///</summary>
             public string DeviceName 
             { 
                 get { return _DeviceName; }
                 set { if (value == _DeviceName) return; _DeviceName = value; OnPropertyChanged();}
             }
+
             private double _Appearance = 0;
             /// <summary>
-            /// From GAP and Appearance
+            /// Appearance (U16 ) from Service=GAP and Characteristic=Appearance
             ///</summary>
             public double Appearance 
             { 
                 get { return _Appearance; }
                 set { if (value == _Appearance) return; _Appearance = value; OnPropertyChanged();}
             }
+
             private byte[] _ConnectionParameters = null;
             /// <summary>
-            /// From GAP and Peripheral Preferred Connection Parameters
+            /// ConnectionParameters (BYTES ) from Service=GAP and Characteristic=Peripheral Preferred Connection Parameters
             ///</summary>
             public byte[] ConnectionParameters 
             { 
@@ -278,7 +281,7 @@ namespace BluetoothProtocols
                 this.ConnectionParameters = value.ConnectionParameters;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static GAP_Data CopyToOrClone(GAP_Data source, GAP_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -286,7 +289,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.DeviceName = source.DeviceName;
                 dest.Appearance = convert(source.Appearance, "");
                 dest.ConnectionParameters = source.ConnectionParameters;
@@ -317,24 +320,24 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Battery Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Battery_Data :BTCommonMetaData<Battery_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _TransmitPower = 0;
             /// <summary>
-            /// From Battery and Transmit Power
+            /// TransmitPower (I8 db) from Service=Battery and Characteristic=Transmit Power
             ///</summary>
             public double TransmitPower 
             { 
                 get { return _TransmitPower; }
                 set { if (value == _TransmitPower) return; _TransmitPower = value; OnPropertyChanged();}
             }
+
             private double _BatteryLevel = 0;
             /// <summary>
-            /// From Battery and BatteryLevel
+            /// BatteryLevel (I8 %) from Service=Battery and Characteristic=BatteryLevel
             ///</summary>
             public double BatteryLevel 
             { 
@@ -359,7 +362,7 @@ namespace BluetoothProtocols
                 this.BatteryLevel = value.BatteryLevel;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Battery_Data CopyToOrClone(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -367,7 +370,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.TransmitPower = convert(source.TransmitPower, "db");
                 dest.BatteryLevel = convert(source.BatteryLevel, "%");
                 return dest;
@@ -396,60 +399,64 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Device Information Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Device_Information_Data :BTCommonMetaData<Device_Information_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private string _Manufacturer = "";
             /// <summary>
-            /// From Device Information and Manufacturer Name String
+            /// Manufacturer (STRING ) from Service=Device Information and Characteristic=Manufacturer Name String
             ///</summary>
             public string Manufacturer 
             { 
                 get { return _Manufacturer; }
                 set { if (value == _Manufacturer) return; _Manufacturer = value; OnPropertyChanged();}
             }
+
             private string _ModelNumber = "";
             /// <summary>
-            /// From Device Information and Model Number String
+            /// ModelNumber (STRING ) from Service=Device Information and Characteristic=Model Number String
             ///</summary>
             public string ModelNumber 
             { 
                 get { return _ModelNumber; }
                 set { if (value == _ModelNumber) return; _ModelNumber = value; OnPropertyChanged();}
             }
+
             private string _HardwareRevision = "";
             /// <summary>
-            /// From Device Information and Hardware Revision String
+            /// HardwareRevision (STRING ) from Service=Device Information and Characteristic=Hardware Revision String
             ///</summary>
             public string HardwareRevision 
             { 
                 get { return _HardwareRevision; }
                 set { if (value == _HardwareRevision) return; _HardwareRevision = value; OnPropertyChanged();}
             }
+
             private string _FirmwareRevision = "";
             /// <summary>
-            /// From Device Information and Firmware Revision String
+            /// FirmwareRevision (STRING ) from Service=Device Information and Characteristic=Firmware Revision String
             ///</summary>
             public string FirmwareRevision 
             { 
                 get { return _FirmwareRevision; }
                 set { if (value == _FirmwareRevision) return; _FirmwareRevision = value; OnPropertyChanged();}
             }
+
             private string _SoftwareRevision = "";
             /// <summary>
-            /// From Device Information and Software Revision String
+            /// SoftwareRevision (STRING ) from Service=Device Information and Characteristic=Software Revision String
             ///</summary>
             public string SoftwareRevision 
             { 
                 get { return _SoftwareRevision; }
                 set { if (value == _SoftwareRevision) return; _SoftwareRevision = value; OnPropertyChanged();}
             }
+
             private byte[] _SystemID = null;
             /// <summary>
-            /// From Device Information and System ID
+            /// SystemID (BYTES ) from Service=Device Information and Characteristic=System ID
             ///</summary>
             public byte[] SystemID 
             { 
@@ -478,7 +485,7 @@ namespace BluetoothProtocols
                 this.SystemID = value.SystemID;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Device_Information_Data CopyToOrClone(Device_Information_Data source, Device_Information_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -486,7 +493,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Manufacturer = source.Manufacturer;
                 dest.ModelNumber = source.ModelNumber;
                 dest.HardwareRevision = source.HardwareRevision;

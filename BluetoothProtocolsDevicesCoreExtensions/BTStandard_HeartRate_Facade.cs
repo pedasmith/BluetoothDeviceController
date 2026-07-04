@@ -182,24 +182,35 @@ namespace BluetoothProtocols
             this.Flags = value.Flags;
             this.HeartRate = value.HeartRate;
             this.EnergyExpended = value.EnergyExpended;
-            this.RRInterval = value.RRInterval;
+            this.RRInterval = new List<double>(value.RRInterval);
             this.SensorLocation = value.SensorLocation;
         }
 
-        // CopyFrom, but convert the doubles as appropriate
+        // List CopyFrom, but convert the doubles as appropriate
         public static Heart_Rate_Data_Facade CopyToOrClone(Heart_Rate_Data source, Heart_Rate_Data_Facade dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
         {
             if (dest == null)
             {
-                dest = new(); // was: source.Clone(name);
+                dest = new();
             }
+            var heartRate = dest.CurrFlagsDecoded.HasFlag(FlagsDecoded.HeartRateValueFormatHighRange) ? source.HeartRateHighRange : source.HeartRateLowRange; 
+
             dest.TimestampMostRecent = source.TimestampMostRecent;
-            dest.Name = source.Name;
+            dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
             dest.Flags = convert(source.Flags, "");
-            var heartRate = dest.CurrFlagsDecoded.HasFlag(FlagsDecoded.HeartRateValueFormatHighRange) ? source.HeartRateHighRange : source.HeartRateLowRange;
             dest.HeartRate = convert(heartRate, "bpm");
-            dest.EnergyExpended = convert(source.EnergyExpended, "Joules"); dest.RRInterval = source.RRInterval;
+            dest.EnergyExpended = convert(source.EnergyExpended, "Joules");
+            if (source.RRInterval != null)
+            {
+                dest.RRInterval = new List<double>();
+                foreach (var value in source.RRInterval)
+                {
+                    double newvalue = convert(value, "");
+                    dest.RRInterval.Add(newvalue);
+                }
+            }
             dest.SensorLocation = convert(source.SensorLocation, "");
+
             return dest;
         }
 

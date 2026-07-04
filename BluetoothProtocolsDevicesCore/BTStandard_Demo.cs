@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This class was automatically generated 2026-07-03::12:29
+    /// This class was automatically generated 2026-07-03::21:06
     /// </summary>
 
     public  class BTStandard_Demo : INotifyPropertyChanged
@@ -66,51 +66,51 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Common Configuration Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Common_Configuration_Data :BTCommonMetaData<Common_Configuration_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private string _Device_Name = "";
             /// <summary>
-            /// From Common Configuration and Device Name
+            /// Device_Name (STRING ) from Service=Common Configuration and Characteristic=Device Name
             ///</summary>
             public string Device_Name 
             { 
                 get { return _Device_Name; }
                 set { if (value == _Device_Name) return; _Device_Name = value; OnPropertyChanged();}
             }
+
             private double _Interval_Min = 0;
             /// <summary>
-            /// From Common Configuration and Connection Parameter
+            /// Interval_Min (U16 ms) from Service=Common Configuration and Characteristic=Connection Parameter
             ///</summary>
             public double Interval_Min 
             { 
                 get { return _Interval_Min; }
                 set { if (value == _Interval_Min) return; _Interval_Min = value; OnPropertyChanged();}
-            } 
+            }
             private double _Interval_Max = 0;
             /// <summary>
-            /// From Common Configuration and Connection Parameter
+            /// Interval_Max (U16 ms) from Service=Common Configuration and Characteristic=Connection Parameter
             ///</summary>
             public double Interval_Max 
             { 
                 get { return _Interval_Max; }
                 set { if (value == _Interval_Max) return; _Interval_Max = value; OnPropertyChanged();}
-            } 
+            }
             private double _Latency = 0;
             /// <summary>
-            /// From Common Configuration and Connection Parameter
+            /// Latency (U16 ms) from Service=Common Configuration and Characteristic=Connection Parameter
             ///</summary>
             public double Latency 
             { 
                 get { return _Latency; }
                 set { if (value == _Latency) return; _Latency = value; OnPropertyChanged();}
-            } 
+            }
             private double _Timeout = 0;
             /// <summary>
-            /// From Common Configuration and Connection Parameter
+            /// Timeout (U16 ms) from Service=Common Configuration and Characteristic=Connection Parameter
             ///</summary>
             public double Timeout 
             { 
@@ -138,7 +138,7 @@ namespace BluetoothProtocols
                 this.Timeout = value.Timeout;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Common_Configuration_Data CopyToOrClone(Common_Configuration_Data source, Common_Configuration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -146,7 +146,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Device_Name = source.Device_Name;
                 dest.Interval_Min = convert(source.Interval_Min, "ms");
                 dest.Interval_Max = convert(source.Interval_Max, "ms");
@@ -181,15 +181,14 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Battery Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Battery_Data :BTCommonMetaData<Battery_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _BatteryLevel = 0;
             /// <summary>
-            /// From Battery and BatteryLevel
+            /// BatteryLevel (I8 %) from Service=Battery and Characteristic=BatteryLevel
             ///</summary>
             public double BatteryLevel 
             { 
@@ -213,7 +212,7 @@ namespace BluetoothProtocols
                 this.BatteryLevel = value.BatteryLevel;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Battery_Data CopyToOrClone(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -221,7 +220,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.BatteryLevel = convert(source.BatteryLevel, "%");
                 return dest;
             }

@@ -629,6 +629,7 @@ namespace BluetoothCodeGenerator
                     TemplateSnippet.AddMacroList(prlist, "VariableTypeParam", ByteFormatToCSharpParam(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VariableTypeDS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VariableTypeDsb", ByteFormatToCSharpStringOrDoubleOrBytes(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "ByteFormatPrimary", item.ByteFormatPrimary);
 
                     TemplateSnippet.AddMacroList(prlist, "VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));

@@ -356,13 +356,14 @@ namespace TemplateExpander
                             var countAll = 0;
                             expand = ExpandListRecursive(sourceList, 0, child, macros, ref count, ref countAll);
 
+                            if (expand.Contains("dest.RRInterval"))
+                            {
+                                ; // handy place for a debugger
+                            }
+
                             if (child.OptionTrim == TemplateSnippet.OptionTrimOption.TrimEndCR)
                             {
                                 expand = expand.TrimEnd(['\r', '\n', ' ']);
-                                if (expand.Contains("dest.RRInterval"))
-                                {
-                                    ; // handy place for a debugger
-                                }
                             }
                             if (!string.IsNullOrEmpty(child.OptionIf) && child.OptionListOutput == TemplateSnippet.TypeOfListOutput.Parent)
                             {

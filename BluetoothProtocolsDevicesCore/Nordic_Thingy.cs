@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The Nordic Thingy:52™ is an easy-to-use prototyping platform, designed to help in building prototypes and demos, without the need to build hardware or even write firmware. It is built around the nRF52832 Bluetooth 5 SoC.
-    /// This class was automatically generated 2026-07-03::12:29
+    /// This class was automatically generated 2026-07-03::21:06
     /// </summary>
 
     public  class Nordic_Thingy : INotifyPropertyChanged
@@ -116,51 +116,53 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Environment Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Environment_Data :BTCommonMetaData<Environment_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _Temperature = 0.0;
             /// <summary>
-            /// From Environment and Temperature (c)
+            /// Temperature (/I8/P8 C) from Service=Environment and Characteristic=Temperature (c)
             ///</summary>
             public double Temperature 
             { 
                 get { return _Temperature; }
                 set { if (value == _Temperature) return; _Temperature = value; OnPropertyChanged();}
             }
+
             private double _Pressure = 0.0;
             /// <summary>
-            /// From Environment and Pressure (hpa)
+            /// Pressure (/I32/P8 hPA) from Service=Environment and Characteristic=Pressure (hpa)
             ///</summary>
             public double Pressure 
             { 
                 get { return _Pressure; }
                 set { if (value == _Pressure) return; _Pressure = value; OnPropertyChanged();}
             }
+
             private double _Humidity = 0;
             /// <summary>
-            /// From Environment and Humidity (%)
+            /// Humidity (U8 %) from Service=Environment and Characteristic=Humidity (%)
             ///</summary>
             public double Humidity 
             { 
                 get { return _Humidity; }
                 set { if (value == _Humidity) return; _Humidity = value; OnPropertyChanged();}
             }
+
             private double _eCOS = 390;
             /// <summary>
-            /// From Environment and Air Quality eCOS TVOC
+            /// eCOS (U16 ppm) from Service=Environment and Characteristic=Air Quality eCOS TVOC
             ///</summary>
             public double eCOS 
             { 
                 get { return _eCOS; }
                 set { if (value == _eCOS) return; _eCOS = value; OnPropertyChanged();}
-            } 
+            }
             private double _TVOC = 0;
             /// <summary>
-            /// From Environment and Air Quality eCOS TVOC
+            /// TVOC (U16 ppb) from Service=Environment and Characteristic=Air Quality eCOS TVOC
             ///</summary>
             public double TVOC 
             { 
@@ -188,7 +190,7 @@ namespace BluetoothProtocols
                 this.TVOC = value.TVOC;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Environment_Data CopyToOrClone(Environment_Data source, Environment_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -196,7 +198,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Temperature = convert(source.Temperature, "C");
                 dest.Pressure = convert(source.Pressure, "hPA");
                 dest.Humidity = convert(source.Humidity, "%");
@@ -230,42 +232,41 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Environment Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class EnvironmentColor_Data :BTCommonMetaData<EnvironmentColor_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _Red = 0;
             /// <summary>
-            /// From Environment and Color RGB+Clear
+            /// Red (U16 ) from Service=Environment and Characteristic=Color RGB+Clear
             ///</summary>
             public double Red 
             { 
                 get { return _Red; }
                 set { if (value == _Red) return; _Red = value; OnPropertyChanged();}
-            } 
+            }
             private double _Green = 0;
             /// <summary>
-            /// From Environment and Color RGB+Clear
+            /// Green (U16 ) from Service=Environment and Characteristic=Color RGB+Clear
             ///</summary>
             public double Green 
             { 
                 get { return _Green; }
                 set { if (value == _Green) return; _Green = value; OnPropertyChanged();}
-            } 
+            }
             private double _Blue = 0;
             /// <summary>
-            /// From Environment and Color RGB+Clear
+            /// Blue (U16 ) from Service=Environment and Characteristic=Color RGB+Clear
             ///</summary>
             public double Blue 
             { 
                 get { return _Blue; }
                 set { if (value == _Blue) return; _Blue = value; OnPropertyChanged();}
-            } 
+            }
             private double _Clear = 0;
             /// <summary>
-            /// From Environment and Color RGB+Clear
+            /// Clear (U16 ) from Service=Environment and Characteristic=Color RGB+Clear
             ///</summary>
             public double Clear 
             { 
@@ -292,7 +293,7 @@ namespace BluetoothProtocols
                 this.Clear = value.Clear;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static EnvironmentColor_Data CopyToOrClone(EnvironmentColor_Data source, EnvironmentColor_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -300,7 +301,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Red = convert(source.Red, "");
                 dest.Green = convert(source.Green, "");
                 dest.Blue = convert(source.Blue, "");
@@ -332,78 +333,77 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Environment Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class EnvironmentConfiguration_Data :BTCommonMetaData<EnvironmentConfiguration_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _TempInterval = 0;
             /// <summary>
-            /// From Environment and Environment Configuration
+            /// TempInterval (U16 ms) from Service=Environment and Characteristic=Environment Configuration
             ///</summary>
             public double TempInterval 
             { 
                 get { return _TempInterval; }
                 set { if (value == _TempInterval) return; _TempInterval = value; OnPropertyChanged();}
-            } 
+            }
             private double _PressureInterval = 0;
             /// <summary>
-            /// From Environment and Environment Configuration
+            /// PressureInterval (U16 ms) from Service=Environment and Characteristic=Environment Configuration
             ///</summary>
             public double PressureInterval 
             { 
                 get { return _PressureInterval; }
                 set { if (value == _PressureInterval) return; _PressureInterval = value; OnPropertyChanged();}
-            } 
+            }
             private double _HumidityInterval = 0;
             /// <summary>
-            /// From Environment and Environment Configuration
+            /// HumidityInterval (U16 ms) from Service=Environment and Characteristic=Environment Configuration
             ///</summary>
             public double HumidityInterval 
             { 
                 get { return _HumidityInterval; }
                 set { if (value == _HumidityInterval) return; _HumidityInterval = value; OnPropertyChanged();}
-            } 
+            }
             private double _ColorInterval = 0;
             /// <summary>
-            /// From Environment and Environment Configuration
+            /// ColorInterval (U16 ms) from Service=Environment and Characteristic=Environment Configuration
             ///</summary>
             public double ColorInterval 
             { 
                 get { return _ColorInterval; }
                 set { if (value == _ColorInterval) return; _ColorInterval = value; OnPropertyChanged();}
-            } 
+            }
             private double _GasMode = 0;
             /// <summary>
-            /// From Environment and Environment Configuration
+            /// GasMode (U8 ) from Service=Environment and Characteristic=Environment Configuration
             ///</summary>
             public double GasMode 
             { 
                 get { return _GasMode; }
                 set { if (value == _GasMode) return; _GasMode = value; OnPropertyChanged();}
-            } 
+            }
             private double _RedCalibration = 0;
             /// <summary>
-            /// From Environment and Environment Configuration
+            /// RedCalibration (U8 ) from Service=Environment and Characteristic=Environment Configuration
             ///</summary>
             public double RedCalibration 
             { 
                 get { return _RedCalibration; }
                 set { if (value == _RedCalibration) return; _RedCalibration = value; OnPropertyChanged();}
-            } 
+            }
             private double _GreenCalibration = 0;
             /// <summary>
-            /// From Environment and Environment Configuration
+            /// GreenCalibration (U8 ) from Service=Environment and Characteristic=Environment Configuration
             ///</summary>
             public double GreenCalibration 
             { 
                 get { return _GreenCalibration; }
                 set { if (value == _GreenCalibration) return; _GreenCalibration = value; OnPropertyChanged();}
-            } 
+            }
             private double _BlueCalibration = 0;
             /// <summary>
-            /// From Environment and Environment Configuration
+            /// BlueCalibration (U8 ) from Service=Environment and Characteristic=Environment Configuration
             ///</summary>
             public double BlueCalibration 
             { 
@@ -434,7 +434,7 @@ namespace BluetoothProtocols
                 this.BlueCalibration = value.BlueCalibration;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static EnvironmentConfiguration_Data CopyToOrClone(EnvironmentConfiguration_Data source, EnvironmentConfiguration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -442,7 +442,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.TempInterval = convert(source.TempInterval, "ms");
                 dest.PressureInterval = convert(source.PressureInterval, "ms");
                 dest.HumidityInterval = convert(source.HumidityInterval, "ms");
@@ -483,42 +483,44 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Common Configuration Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Common_Configuration_Data :BTCommonMetaData<Common_Configuration_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private string _Device_Name = "";
             /// <summary>
-            /// From Common Configuration and Device Name
+            /// Device_Name (STRING ) from Service=Common Configuration and Characteristic=Device Name
             ///</summary>
             public string Device_Name 
             { 
                 get { return _Device_Name; }
                 set { if (value == _Device_Name) return; _Device_Name = value; OnPropertyChanged();}
             }
+
             private double _Appearance = 0;
             /// <summary>
-            /// From Common Configuration and Appearance
+            /// Appearance (U16 ) from Service=Common Configuration and Characteristic=Appearance
             ///</summary>
             public double Appearance 
             { 
                 get { return _Appearance; }
                 set { if (value == _Appearance) return; _Appearance = value; OnPropertyChanged();}
             }
+
             private byte[] _ConnectionParameter = null;
             /// <summary>
-            /// From Common Configuration and Connection Parameter
+            /// ConnectionParameter (BYTES ) from Service=Common Configuration and Characteristic=Connection Parameter
             ///</summary>
             public byte[] ConnectionParameter 
             { 
                 get { return _ConnectionParameter; }
                 set { if (value == _ConnectionParameter) return; _ConnectionParameter = value; OnPropertyChanged();}
             }
+
             private double _AddressResolutionSupported = 0;
             /// <summary>
-            /// From Common Configuration and Central Address Resolution
+            /// AddressResolutionSupported (U8 ) from Service=Common Configuration and Characteristic=Central Address Resolution
             ///</summary>
             public double AddressResolutionSupported 
             { 
@@ -545,7 +547,7 @@ namespace BluetoothProtocols
                 this.AddressResolutionSupported = value.AddressResolutionSupported;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Common_Configuration_Data CopyToOrClone(Common_Configuration_Data source, Common_Configuration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -553,7 +555,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Device_Name = source.Device_Name;
                 dest.Appearance = convert(source.Appearance, "");
                 dest.ConnectionParameter = source.ConnectionParameter;
@@ -586,24 +588,23 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Generic Service Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Generic_Service_Data :BTCommonMetaData<Generic_Service_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _StartRange = 0;
             /// <summary>
-            /// From Generic Service and Service Changes
+            /// StartRange (U16 ) from Service=Generic Service and Characteristic=Service Changes
             ///</summary>
             public double StartRange 
             { 
                 get { return _StartRange; }
                 set { if (value == _StartRange) return; _StartRange = value; OnPropertyChanged();}
-            } 
+            }
             private double _EndRange = 0;
             /// <summary>
-            /// From Generic Service and Service Changes
+            /// EndRange (U16 ) from Service=Generic Service and Characteristic=Service Changes
             ///</summary>
             public double EndRange 
             { 
@@ -628,7 +629,7 @@ namespace BluetoothProtocols
                 this.EndRange = value.EndRange;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Generic_Service_Data CopyToOrClone(Generic_Service_Data source, Generic_Service_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -636,7 +637,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.StartRange = convert(source.StartRange, "");
                 dest.EndRange = convert(source.EndRange, "");
                 return dest;
@@ -665,15 +666,14 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Battery Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Battery_Data :BTCommonMetaData<Battery_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _BatteryLevel = 0;
             /// <summary>
-            /// From Battery and BatteryLevel
+            /// BatteryLevel (I8 %) from Service=Battery and Characteristic=BatteryLevel
             ///</summary>
             public double BatteryLevel 
             { 
@@ -697,7 +697,7 @@ namespace BluetoothProtocols
                 this.BatteryLevel = value.BatteryLevel;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Battery_Data CopyToOrClone(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -705,7 +705,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.BatteryLevel = convert(source.BatteryLevel, "%");
                 return dest;
             }
@@ -732,141 +732,147 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Configuration Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Configuration_Data :BTCommonMetaData<Configuration_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private string _DeviceName = "";
             /// <summary>
-            /// From Configuration and Configuration Device Name
+            /// DeviceName (STRING ) from Service=Configuration and Characteristic=Configuration Device Name
             ///</summary>
             public string DeviceName 
             { 
                 get { return _DeviceName; }
                 set { if (value == _DeviceName) return; _DeviceName = value; OnPropertyChanged();}
             }
+
             private double _Interval = 0;
             /// <summary>
-            /// From Configuration and Advertising Parameter
+            /// Interval (U16 ms) from Service=Configuration and Characteristic=Advertising Parameter
             ///</summary>
             public double Interval 
             { 
                 get { return _Interval; }
                 set { if (value == _Interval) return; _Interval = value; OnPropertyChanged();}
-            } 
+            }
             private double _Timeout = 0;
             /// <summary>
-            /// From Configuration and Advertising Parameter
+            /// Timeout (U8 s) from Service=Configuration and Characteristic=Advertising Parameter
             ///</summary>
             public double Timeout 
             { 
                 get { return _Timeout; }
                 set { if (value == _Timeout) return; _Timeout = value; OnPropertyChanged();}
             }
+
             private double _MinInterval = 0;
             /// <summary>
-            /// From Configuration and Connection parameters
+            /// MinInterval (U16 ) from Service=Configuration and Characteristic=Connection parameters
             ///</summary>
             public double MinInterval 
             { 
                 get { return _MinInterval; }
                 set { if (value == _MinInterval) return; _MinInterval = value; OnPropertyChanged();}
-            } 
+            }
             private double _MaxInterval = 0;
             /// <summary>
-            /// From Configuration and Connection parameters
+            /// MaxInterval (U16 ) from Service=Configuration and Characteristic=Connection parameters
             ///</summary>
             public double MaxInterval 
             { 
                 get { return _MaxInterval; }
                 set { if (value == _MaxInterval) return; _MaxInterval = value; OnPropertyChanged();}
-            } 
+            }
             private double _Latency = 0;
             /// <summary>
-            /// From Configuration and Connection parameters
+            /// Latency (U16 ) from Service=Configuration and Characteristic=Connection parameters
             ///</summary>
             public double Latency 
             { 
                 get { return _Latency; }
                 set { if (value == _Latency) return; _Latency = value; OnPropertyChanged();}
-            } 
+            }
             private double _SupervisionTimeout = 0;
             /// <summary>
-            /// From Configuration and Connection parameters
+            /// SupervisionTimeout (U16 10ms) from Service=Configuration and Characteristic=Connection parameters
             ///</summary>
             public double SupervisionTimeout 
             { 
                 get { return _SupervisionTimeout; }
                 set { if (value == _SupervisionTimeout) return; _SupervisionTimeout = value; OnPropertyChanged();}
             }
+
             private string _Eddystone = "";
             /// <summary>
-            /// From Configuration and Eddystone URL
+            /// Eddystone (STRING ) from Service=Configuration and Characteristic=Eddystone URL
             ///</summary>
             public string Eddystone 
             { 
                 get { return _Eddystone; }
                 set { if (value == _Eddystone) return; _Eddystone = value; OnPropertyChanged();}
             }
+
             private byte[] _CloudToken = null;
             /// <summary>
-            /// From Configuration and Cloud Token
+            /// CloudToken (BYTES ) from Service=Configuration and Characteristic=Cloud Token
             ///</summary>
             public byte[] CloudToken 
             { 
                 get { return _CloudToken; }
                 set { if (value == _CloudToken) return; _CloudToken = value; OnPropertyChanged();}
             }
+
             private double _Major = 0;
             /// <summary>
-            /// From Configuration and Firmware Version
+            /// Major (U8 ) from Service=Configuration and Characteristic=Firmware Version
             ///</summary>
             public double Major 
             { 
                 get { return _Major; }
                 set { if (value == _Major) return; _Major = value; OnPropertyChanged();}
-            } 
+            }
             private double _Minor = 0;
             /// <summary>
-            /// From Configuration and Firmware Version
+            /// Minor (U8 ) from Service=Configuration and Characteristic=Firmware Version
             ///</summary>
             public double Minor 
             { 
                 get { return _Minor; }
                 set { if (value == _Minor) return; _Minor = value; OnPropertyChanged();}
-            } 
+            }
             private double _Patch = 0;
             /// <summary>
-            /// From Configuration and Firmware Version
+            /// Patch (U8 ) from Service=Configuration and Characteristic=Firmware Version
             ///</summary>
             public double Patch 
             { 
                 get { return _Patch; }
                 set { if (value == _Patch) return; _Patch = value; OnPropertyChanged();}
             }
+
             private double _param0 = 0;
             /// <summary>
-            /// From Configuration and MTU Request
+            /// param0 (U8 ) from Service=Configuration and Characteristic=MTU Request
             ///</summary>
             public double param0 
             { 
                 get { return _param0; }
                 set { if (value == _param0) return; _param0 = value; OnPropertyChanged();}
-            } 
+            }
             private double _param1 = 0;
             /// <summary>
-            /// From Configuration and MTU Request
+            /// param1 (U16 ) from Service=Configuration and Characteristic=MTU Request
             ///</summary>
             public double param1 
             { 
                 get { return _param1; }
                 set { if (value == _param1) return; _param1 = value; OnPropertyChanged();}
             }
+
             private string _NFCTag = "";
             /// <summary>
-            /// From Configuration and NFC Tag
+            /// NFCTag (STRING ) from Service=Configuration and Characteristic=NFC Tag
             ///</summary>
             public string NFCTag 
             { 
@@ -904,7 +910,7 @@ namespace BluetoothProtocols
                 this.NFCTag = value.NFCTag;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Configuration_Data CopyToOrClone(Configuration_Data source, Configuration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -912,7 +918,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.DeviceName = source.DeviceName;
                 dest.Interval = convert(source.Interval, "ms");
                 dest.Timeout = convert(source.Timeout, "s");

@@ -280,12 +280,13 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         // It's critical to set these!
         DataContextAsKnownDevice.Id = Device.ble.DeviceId ?? ""; // never null :-)
         DataContextAsKnownDevice.BTLEDevice = Device.ble;
-        CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id); // now it's "guaranteed" to exist. Use the stable form of the device id.
+        CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id); // Use the stable form of the device id.
+        // CurrSaveData won't exist if the user hasn't made any changes
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
         UtilitiesWinUI3.UtilitiesWinUI3.InitializeKeyLineColorsFromDefaultOxyPlot(OxyPlotModel, rootPanel);
-        UpdateUX(CurrSaveData); // Shouldn't be null, but also handles null gracefully.
+        UpdateUX(CurrSaveData); // Will be null if no changes have been made
 
         Device.PropertyChanged += Device_PropertyChanged;
 

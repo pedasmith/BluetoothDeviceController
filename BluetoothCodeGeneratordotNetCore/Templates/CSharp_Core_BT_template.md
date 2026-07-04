@@ -351,12 +351,11 @@ This is the primary section of the code.
         /// Data from all of the characteristics in the [[ServiceName]] Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class [[DataGroupName.dotNet]] :BTCommonMetaData<[[DataGroupName.dotNet]]> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
 [[CharacteristicDataFields]]
             public override [[DataGroupName.dotNet]] Clone(string name = null)
             {
@@ -375,7 +374,7 @@ This is the primary section of the code.
 [[CharacteristicDataFieldsCopyFrom]]
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static [[DataGroupName.dotNet]] CopyToOrClone([[DataGroupName.dotNet]] source, [[DataGroupName.dotNet]] dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -383,7 +382,7 @@ This is the primary section of the code.
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
 [[CharacteristicDataFieldsCopyToConvert]]                return dest;
             }
 
@@ -425,30 +424,37 @@ This is the primary section of the code.
 ```
 
 
-## CharacteristicPropertyDataFields Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
+## CharacteristicPropertyDataFields Type=list ListOutput=parent Trim=false Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
 
 ```
             private [[VariableTypeDsb]] _[[DataName.dotNet]] = [[DefaultValueCSharp]];
             /// <summary>
-            /// From [[ServiceName]] and [[CharacteristicName]]
+            /// [[DataName]] ([[ByteFormatPrimary]] [[DataUnits]]) from Service=[[ServiceName]] and Characteristic=[[CharacteristicName]]
             ///</summary>
             public [[VariableTypeDsb]] [[DataName.dotNet]] 
             { 
                 get { return _[[DataName.dotNet]]; }
                 set { if (value == _[[DataName.dotNet]]) return; _[[DataName.dotNet]] = value; OnPropertyChanged();}
-            } 
+            }
+
 ```
 
 ## CharacteristicDataFieldsCopyFrom Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
 ```
-[[CharacteristicPropertyDataFieldsCopyFrom]]
+[[CharacteristicPropertyDataFieldsCopyFromAssignment]][[CharacteristicPropertyDataFieldsCopyFromNewList]]
 ```
 
 
-## CharacteristicPropertyDataFieldsCopyFrom Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero=""
+## CharacteristicPropertyDataFieldsCopyFromAssignment Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] != double[]"
 
 ```
                 this.[[DataName.dotNet]] = value.[[DataName.dotNet]];
+```
+
+## CharacteristicPropertyDataFieldsCopyFromNewList Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] == double[]"
+
+```
+                this.[[DataName.dotNet]] = new List<double>(value.[[DataName.dotNet]]);
 ```
 
 ## CharacteristicDataFieldsCopyToConvert Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics CodeListSubZero=""
@@ -473,11 +479,14 @@ This is the primary section of the code.
 ## CharacteristicPropertyDataFieldsCopyToConvertDoubleArray Type=list ListOutput=parent Trim=false Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] == double[]"
 
 ```
-                dest.[[DataName.dotNet]] = new List<double>();
-                foreach (var value in source.[[DataName.dotNet]])
+                if (source.[[DataName.dotNet]] != null)
                 {
-                    double newvalue = convert(value, "[[DataUnits]]");
-                    dest.[[DataName.dotNet]].Add(newvalue);
+                    dest.[[DataName.dotNet]] = new List<double>();
+                    foreach (var value in source.[[DataName.dotNet]])
+                    {
+                        double newvalue = convert(value, "[[DataUnits]]");
+                        dest.[[DataName.dotNet]].Add(newvalue);
+                    }
                 }
 ```
 

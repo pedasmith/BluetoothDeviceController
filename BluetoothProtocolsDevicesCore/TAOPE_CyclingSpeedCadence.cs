@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-07-03::12:29
+    /// This class was automatically generated 2026-07-03::21:06
     /// </summary>
 
     public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged
@@ -102,51 +102,50 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Cycling Speed and Cadence Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class SpeedCadence_Data :BTCommonMetaData<SpeedCadence_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _Flags = 0;
             /// <summary>
-            /// From Cycling Speed and Cadence and CSC Measurement
+            /// Flags (U8 ) from Service=Cycling Speed and Cadence and Characteristic=CSC Measurement
             ///</summary>
             public double Flags 
             { 
                 get { return _Flags; }
                 set { if (value == _Flags) return; _Flags = value; OnPropertyChanged();}
-            } 
+            }
             private double _RevolutionWheel = 0;
             /// <summary>
-            /// From Cycling Speed and Cadence and CSC Measurement
+            /// RevolutionWheel (U32 ) from Service=Cycling Speed and Cadence and Characteristic=CSC Measurement
             ///</summary>
             public double RevolutionWheel 
             { 
                 get { return _RevolutionWheel; }
                 set { if (value == _RevolutionWheel) return; _RevolutionWheel = value; OnPropertyChanged();}
-            } 
+            }
             private double _TimeWheel = 0;
             /// <summary>
-            /// From Cycling Speed and Cadence and CSC Measurement
+            /// TimeWheel (U16 ) from Service=Cycling Speed and Cadence and Characteristic=CSC Measurement
             ///</summary>
             public double TimeWheel 
             { 
                 get { return _TimeWheel; }
                 set { if (value == _TimeWheel) return; _TimeWheel = value; OnPropertyChanged();}
-            } 
+            }
             private double _RevolutionCrank = 0;
             /// <summary>
-            /// From Cycling Speed and Cadence and CSC Measurement
+            /// RevolutionCrank (U16 ) from Service=Cycling Speed and Cadence and Characteristic=CSC Measurement
             ///</summary>
             public double RevolutionCrank 
             { 
                 get { return _RevolutionCrank; }
                 set { if (value == _RevolutionCrank) return; _RevolutionCrank = value; OnPropertyChanged();}
-            } 
+            }
             private double _TimeCrank = 0;
             /// <summary>
-            /// From Cycling Speed and Cadence and CSC Measurement
+            /// TimeCrank (U16 ) from Service=Cycling Speed and Cadence and Characteristic=CSC Measurement
             ///</summary>
             public double TimeCrank 
             { 
@@ -174,7 +173,7 @@ namespace BluetoothProtocols
                 this.TimeCrank = value.TimeCrank;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static SpeedCadence_Data CopyToOrClone(SpeedCadence_Data source, SpeedCadence_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -182,7 +181,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Flags = convert(source.Flags, "");
                 dest.RevolutionWheel = convert(source.RevolutionWheel, "");
                 dest.TimeWheel = convert(source.TimeWheel, "");
@@ -216,33 +215,34 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Cycling Speed and Cadence Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Feature_Data :BTCommonMetaData<Feature_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _FeatureFlags = 0;
             /// <summary>
-            /// From Cycling Speed and Cadence and CSC Feature
+            /// FeatureFlags (U16 ) from Service=Cycling Speed and Cadence and Characteristic=CSC Feature
             ///</summary>
             public double FeatureFlags 
             { 
                 get { return _FeatureFlags; }
                 set { if (value == _FeatureFlags) return; _FeatureFlags = value; OnPropertyChanged();}
             }
+
             private double _SensorLocation = 0;
             /// <summary>
-            /// From Cycling Speed and Cadence and Sensor Location
+            /// SensorLocation (U8 ) from Service=Cycling Speed and Cadence and Characteristic=Sensor Location
             ///</summary>
             public double SensorLocation 
             { 
                 get { return _SensorLocation; }
                 set { if (value == _SensorLocation) return; _SensorLocation = value; OnPropertyChanged();}
             }
+
             private byte[] _Unknown3 = null;
             /// <summary>
-            /// From Cycling Speed and Cadence and SC Control Point
+            /// Unknown3 (BYTES ) from Service=Cycling Speed and Cadence and Characteristic=SC Control Point
             ///</summary>
             public byte[] Unknown3 
             { 
@@ -268,7 +268,7 @@ namespace BluetoothProtocols
                 this.Unknown3 = value.Unknown3;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Feature_Data CopyToOrClone(Feature_Data source, Feature_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -276,7 +276,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.FeatureFlags = convert(source.FeatureFlags, "");
                 dest.SensorLocation = convert(source.SensorLocation, "");
                 dest.Unknown3 = source.Unknown3;
@@ -307,42 +307,44 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Service_FD00_OTA Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Service_FD00_OTA_Data :BTCommonMetaData<Service_FD00_OTA_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private byte[] _Unknown0 = null;
             /// <summary>
-            /// From Service_FD00_OTA and FD09_OTA_Notify
+            /// Unknown0 (BYTES ) from Service=Service_FD00_OTA and Characteristic=FD09_OTA_Notify
             ///</summary>
             public byte[] Unknown0 
             { 
                 get { return _Unknown0; }
                 set { if (value == _Unknown0) return; _Unknown0 = value; OnPropertyChanged();}
             }
+
             private byte[] _Unknown1 = null;
             /// <summary>
-            /// From Service_FD00_OTA and FD0A_OTA_Write
+            /// Unknown1 (BYTES ) from Service=Service_FD00_OTA and Characteristic=FD0A_OTA_Write
             ///</summary>
             public byte[] Unknown1 
             { 
                 get { return _Unknown1; }
                 set { if (value == _Unknown1) return; _Unknown1 = value; OnPropertyChanged();}
             }
+
             private byte[] _Unknown2 = null;
             /// <summary>
-            /// From Service_FD00_OTA and FD19_Notify
+            /// Unknown2 (BYTES ) from Service=Service_FD00_OTA and Characteristic=FD19_Notify
             ///</summary>
             public byte[] Unknown2 
             { 
                 get { return _Unknown2; }
                 set { if (value == _Unknown2) return; _Unknown2 = value; OnPropertyChanged();}
             }
+
             private byte[] _Unknown3 = null;
             /// <summary>
-            /// From Service_FD00_OTA and FD1A_Write
+            /// Unknown3 (BYTES ) from Service=Service_FD00_OTA and Characteristic=FD1A_Write
             ///</summary>
             public byte[] Unknown3 
             { 
@@ -369,7 +371,7 @@ namespace BluetoothProtocols
                 this.Unknown3 = value.Unknown3;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Service_FD00_OTA_Data CopyToOrClone(Service_FD00_OTA_Data source, Service_FD00_OTA_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -377,7 +379,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Unknown0 = source.Unknown0;
                 dest.Unknown1 = source.Unknown1;
                 dest.Unknown2 = source.Unknown2;
@@ -410,24 +412,24 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Battery Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Battery_Data :BTCommonMetaData<Battery_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private double _TransmitPower = 0;
             /// <summary>
-            /// From Battery and Transmit Power
+            /// TransmitPower (I8 db) from Service=Battery and Characteristic=Transmit Power
             ///</summary>
             public double TransmitPower 
             { 
                 get { return _TransmitPower; }
                 set { if (value == _TransmitPower) return; _TransmitPower = value; OnPropertyChanged();}
             }
+
             private double _BatteryLevel = 0;
             /// <summary>
-            /// From Battery and BatteryLevel
+            /// BatteryLevel (I8 %) from Service=Battery and Characteristic=BatteryLevel
             ///</summary>
             public double BatteryLevel 
             { 
@@ -452,7 +454,7 @@ namespace BluetoothProtocols
                 this.BatteryLevel = value.BatteryLevel;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Battery_Data CopyToOrClone(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -460,7 +462,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.TransmitPower = convert(source.TransmitPower, "db");
                 dest.BatteryLevel = convert(source.BatteryLevel, "%");
                 return dest;
@@ -489,60 +491,64 @@ namespace BluetoothProtocols
         /// Data from all of the characteristics in the Device Information Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
-        /// Template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
         public class Device_Information_Data :BTCommonMetaData<Device_Information_Data> //, IExportDataSource
         {
-            // Template is ServiceDataGroups
             private string _Manufacturer = "";
             /// <summary>
-            /// From Device Information and Manufacturer Name String
+            /// Manufacturer (STRING ) from Service=Device Information and Characteristic=Manufacturer Name String
             ///</summary>
             public string Manufacturer 
             { 
                 get { return _Manufacturer; }
                 set { if (value == _Manufacturer) return; _Manufacturer = value; OnPropertyChanged();}
             }
+
             private string _ModelNumber = "";
             /// <summary>
-            /// From Device Information and Model Number String
+            /// ModelNumber (STRING ) from Service=Device Information and Characteristic=Model Number String
             ///</summary>
             public string ModelNumber 
             { 
                 get { return _ModelNumber; }
                 set { if (value == _ModelNumber) return; _ModelNumber = value; OnPropertyChanged();}
             }
+
             private string _HardwareRevision = "";
             /// <summary>
-            /// From Device Information and Hardware Revision String
+            /// HardwareRevision (STRING ) from Service=Device Information and Characteristic=Hardware Revision String
             ///</summary>
             public string HardwareRevision 
             { 
                 get { return _HardwareRevision; }
                 set { if (value == _HardwareRevision) return; _HardwareRevision = value; OnPropertyChanged();}
             }
+
             private string _FirmwareRevision = "";
             /// <summary>
-            /// From Device Information and Firmware Revision String
+            /// FirmwareRevision (STRING ) from Service=Device Information and Characteristic=Firmware Revision String
             ///</summary>
             public string FirmwareRevision 
             { 
                 get { return _FirmwareRevision; }
                 set { if (value == _FirmwareRevision) return; _FirmwareRevision = value; OnPropertyChanged();}
             }
+
             private string _SoftwareRevision = "";
             /// <summary>
-            /// From Device Information and Software Revision String
+            /// SoftwareRevision (STRING ) from Service=Device Information and Characteristic=Software Revision String
             ///</summary>
             public string SoftwareRevision 
             { 
                 get { return _SoftwareRevision; }
                 set { if (value == _SoftwareRevision) return; _SoftwareRevision = value; OnPropertyChanged();}
             }
+
             private byte[] _SystemID = null;
             /// <summary>
-            /// From Device Information and System ID
+            /// SystemID (BYTES ) from Service=Device Information and Characteristic=System ID
             ///</summary>
             public byte[] SystemID 
             { 
@@ -571,7 +577,7 @@ namespace BluetoothProtocols
                 this.SystemID = value.SystemID;
             }
 
-            // CopyFrom, but convert the doubles as appropriate
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
             public static Device_Information_Data CopyToOrClone(Device_Information_Data source, Device_Information_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
@@ -579,7 +585,7 @@ namespace BluetoothProtocols
                     dest = source.Clone(name);
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
-                dest.Name = source.Name;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Manufacturer = source.Manufacturer;
                 dest.ModelNumber = source.ModelNumber;
                 dest.HardwareRevision = source.HardwareRevision;
