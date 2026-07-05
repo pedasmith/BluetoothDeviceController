@@ -71,8 +71,9 @@ namespace WinUI3Controls
             // Testing the Save code
             App.UP.Restore();
 
-            uiSimpleMapV1.MapData = MapData;
-            uiSimpleMapLeaflet.MapData = MapData;
+            uiSimpleMapV1.MapDataList = MapDataList;
+            uiSimpleMapV1.CurrMapUXState = CurrMapUXState;
+            uiSimpleMapLeaflet.MapDataList = MapDataList;
             AllMaps.Add(uiSimpleMapV1);
             AllMaps.Add(uiSimpleMapLeaflet);
             uiSimpleMapLeaflet.UserMapPrivacyPreferences = App.UP.UserMapPrivacyPreferences;
@@ -582,21 +583,21 @@ namespace WinUI3Controls
 
         private async void OnMenuDeveloperAddSamplePoints(object sender, RoutedEventArgs e)
         {
-            var lines = SampleNmea[CurrSettings.CurrSampleNmea % SampleNmea.Length].Split("\r\n");
+            var lines = SampleNmea[CurrMapUXState.CurrSampleNmea % SampleNmea.Length].Split("\r\n");
             foreach (var line in lines)
             {
                 var gprc = new GPRMC_Data(line);
-                gprc.Latitude.LatitudeMinutesDecimal += (CurrSettings.CurrSampleNmea * 50);
+                gprc.Latitude.LatitudeMinutesDecimal += (CurrMapUXState.CurrSampleNmea * 50);
                 await AddNmeaCombined(gprc, LogLevel.None);
             }
 
             // Boop the index so next time the button is pressed we get the next set of data.
-            Log($"Add sample points: {CurrSettings.CurrSampleNmea}");
-            CurrSettings.CurrSampleNmea += 1;
+            Log($"Add sample points: {CurrMapUXState.CurrSampleNmea}");
+            CurrMapUXState.CurrSampleNmea += 1;
         }
 
         const double GROUPING_DISTANCE = 0.0005 / 60.0; // about 5*1.8 meters
-        List<MapDataItem> MapData = new List<MapDataItem>();
+        List<MapDataItem> MapDataList = new List<MapDataItem>();
         /// <summary>
         /// Add an NMEA GPRMS data item to the map.
         /// </summary>
@@ -608,11 +609,11 @@ namespace WinUI3Controls
             {
                 case Nmea_Gps_Parser.ParseResult.Ok:
                     var data = new MapDataItem(gprc);
-                    if (MapData.Count >= 1)
+                    if (MapDataList.Count >= 1)
                     {
                         // The 0.0001 is a ten-thousandth of a minute. But the distances
                         // are in DD, so I need something a good bit smaller.
-                        var prev = MapData[MapData.Count - 1];
+                        var prev = MapDataList[MapDataList.Count - 1];
                         var distance = prev.Distance(data);
                         Log($"AddNmea: calculating new point distance={distance} (grouping distance is {GROUPING_DISTANCE})");
                         if (distance < GROUPING_DISTANCE)
@@ -625,7 +626,7 @@ namespace WinUI3Controls
                         }
                         else // new last point
                         {
-                            MapData.Add(data);
+                            MapDataList.Add(data);
                             foreach (var map in AllMaps)
                             {
                                 await map.MapDataAddedNewItem(data, logLevel);
@@ -635,7 +636,7 @@ namespace WinUI3Controls
                     }
                     else // is first point
                     {
-                        MapData.Add(data);
+                        MapDataList.Add(data);
                         foreach (var map in AllMaps)
                         {
                             await map.MapDataAddedFirstItem(data, logLevel);
@@ -658,11 +659,25 @@ namespace WinUI3Controls
 
 
 
-        class UserSettings
+        public class MapUXState
         {
+            /// <summary>
+            /// Index into the NMEA sample data sets for which data is to be drawn. It's allowed to go beyond the number of data sets, 
+            /// so when it's used, it has to be modulo the Nmea sample size.
+            /// </summary>
             public int CurrSampleNmea{ get; set; } = 0; // Index into SampleNmea
+
+            /// <summary>
+            /// Which MapDataItem is currently highlighted. -1 means none.
+            /// </summary>
+            public int HighlightedMapDataItemIndex = -1;
+            /// <summary>
+            /// Which item in the highlighted MapDataItem's GroupedNmea list is currently being displayed. 0 means the first item.
+            /// </summary>
+            public int HighlightedMapDataItemGroupIndex = 0; // Which item to display in the highlight panel.
+
         }
-        UserSettings CurrSettings = new UserSettings();
+        MapUXState CurrMapUXState = new MapUXState();
 
         private string[] SampleNmea = new string[] {
             @"$GPRMC,184446.000,A,4321.6036,N,12345.4008,W,000.0,338.7,200625,,,A",

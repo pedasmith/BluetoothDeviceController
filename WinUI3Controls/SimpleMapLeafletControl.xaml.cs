@@ -50,7 +50,7 @@ namespace WinUI3Controls
         String UserHasBlockedAllMapsPage = "ms-appx:///UserHasBlockedAllMaps.html";
         String AssetLocation = "Assets/SimpleMapLeaflet";
 
-        public List<MapDataItem> MapData = null;
+        public List<MapDataItem> MapDataList = null;
 
         public UserMapPrivacyPreferences UserMapPrivacyPreferences { get; set; } = null;
         public SimpleMapLeafletControl()
@@ -133,21 +133,24 @@ namespace WinUI3Controls
         {
             public string key { get; set; } // "Alt" for the Alt key.
         }
+
+        JsonSerializerOptions jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
         private async void UiWebView_WebMessageReceived(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs args)
         {
-            var webevent = JsonSerializer.Deserialize<WebEvent>(args.WebMessageAsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var webevent = JsonSerializer.Deserialize<WebEvent>(args.WebMessageAsJson, jsonOptions);
             switch (webevent.eventName)
             {
                 case "OnClick":
-                    var clickEvent = JsonSerializer.Deserialize<WebClickEvent>(args.WebMessageAsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var clickEvent = JsonSerializer.Deserialize<WebClickEvent>(args.WebMessageAsJson, jsonOptions);
                     Log($"OSM: Web click event: lat={clickEvent.lat} lng={clickEvent.lng}");
 
                     if (uiWebView.CoreWebView2 != null)
                     {
-                        var closestIndex = MapDataItem.GetClosestIndex(MapData, clickEvent.lat, clickEvent.lng); 
+                        var closestIndex = MapDataItem.GetClosestIndex(MapDataList, clickEvent.lat, clickEvent.lng); 
                         if (closestIndex >= 0)
                         {
-                            var closest = MapData[closestIndex];
+                            var closest = MapDataList[closestIndex];
                             string summary = closestIndex + " " + closest.SummaryString;
                             string script = $"showMarkerPopup({closest.Latitude.AsDecimal}, {closest.Longitude.AsDecimal}, \"{summary}\");";
                             // Log($"Leaflet: script={script}");
@@ -164,12 +167,12 @@ namespace WinUI3Controls
                     break;
 
                 case "OnKeyDown":
-                    var keyDownEvent = JsonSerializer.Deserialize<WebKeyDownEvent>(args.WebMessageAsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var keyDownEvent = JsonSerializer.Deserialize<WebKeyDownEvent>(args.WebMessageAsJson, jsonOptions);
                     Log($"OSM: Web key down event: key={keyDownEvent.key}");
                     break;
 
                 case "OnAltKeyDown":
-                    var altKeyDownEvent = JsonSerializer.Deserialize<WebAltKeyDownEvent>(args.WebMessageAsJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var altKeyDownEvent = JsonSerializer.Deserialize<WebAltKeyDownEvent>(args.WebMessageAsJson, jsonOptions);
                     Log($"OSM: Web alt key down event: key={altKeyDownEvent.key}");
                     // This is a workaround for the WebView2 bug that doesn't allow Alt key events to be handled by the parent control.
 

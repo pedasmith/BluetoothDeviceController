@@ -26,6 +26,7 @@ Work item: add start + end point (and do what?)
 Work item: when clicking a link, open a new window in a browser! (like the links for OSM)
 Work item: using arrow keys to navigate among the points
 
+DONE: 2025-08-22: Work item: fixed the beep on [ALT key problem](https://sunriseprogrammer.blogspot.com/2025/08/weird-issues-with-winui3-and-alt-key-so.html) 
 DONE: 2025-08-21: Work item: add a clear button
 DONE 2025-08-15: Work item: unified MapData list: Leaflet groups marker size; show group items; arrow keys to navigate; Fix the ALT key problem (WebView2 swallows the ALT key so it can't be used for the Menus)
 DONE 2025-08-07: Work item: allow for zooming in a little more.

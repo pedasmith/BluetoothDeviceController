@@ -74,7 +74,14 @@ namespace WinUI3Controls
         static Brush PositionLineEndingBrush = new SolidColorBrush(Colors.DarkCyan);
         static Brush PositionLineBrush3 = new SolidColorBrush(Colors.Red);
 
-        public List<MapDataItem> MapData = null;
+        /// <summary>
+        /// List of map points. Is set from the GpsControl.xaml.cs file when it loads.
+        /// </summary>
+        public List<MapDataItem> MapDataList = null;
+        /// <summary>
+        /// Various state values for the map including the NmeaSample index and the currently highlighted point.
+        /// </summary>
+        public GpsControl.MapUXState CurrMapUXState = null;
         DrawingState DS = new DrawingState();
 
         // Used internally
@@ -117,13 +124,13 @@ namespace WinUI3Controls
                 // Log($"SimpleMapControl: LayoutUpdated called: Random={RandomValue} NLayoutUpdate={NLayoutUpdate} ActualWidth={uiMapCanvas.ActualWidth}");
                 return;
             }
-            if (MapData == null || MapData.Count == 0)
+            if (MapDataList == null || MapDataList.Count == 0)
             {
                 Log($"SimpleMapControl: LayoutUpdated called: Random={RandomValue} NLayoutUpdate={NLayoutUpdate} ActualWidth={uiMapCanvas.ActualWidth} but no MapData");
                 return;
             }
             var index = 0;
-            var data = MapData[index];
+            var data = MapDataList[index];
             var p = CenterOnData(data);
         }
 
@@ -201,7 +208,7 @@ namespace WinUI3Controls
                 var nsegment = RedrawAllLines(LogLevel.None);
                 Canvas.SetLeft(uiMapItemCanvas, newStartLeft);
                 Canvas.SetTop(uiMapItemCanvas, newStartTop);
-                // ?? the highlighted item should not be updated here? DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex, DS.HighlightedMapDataItemGroupIndex);
+                // ?? the highlighted item should not be updated here? DisplayHighlightByIndex(CurrMapUXState.HighlightedMapDataItemIndex, CurrMapUXState.HighlightedMapDataItemGroupIndex);
                 Log($"Manipulation Complete: scale={DS.ScaleFactor:F2} delta={newscaledelta:F2} start lat={startLat:F2} x={startLeft:F2} newX={newStartLeft:F2} nsegment={nsegment}");
             }
             else
@@ -247,7 +254,7 @@ namespace WinUI3Controls
             var nsegment = RedrawAllLines(LogLevel.None);
             Canvas.SetLeft(uiMapItemCanvas, newStartLeft);
             Canvas.SetTop(uiMapItemCanvas, newStartTop);
-            // the selected item isn't changed by this method! DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex, DS.HighlightedMapDataItemGroupIndex);
+            // the selected item isn't changed by this method! DisplayHighlightByIndex(CurrMapUXState.HighlightedMapDataItemIndex, CurrMapUXState.HighlightedMapDataItemGroupIndex);
             Log($"Pointer Complete: mwd={mwd} scale={DS.ScaleFactor:F2} delta={newscaledelta:F2} start lat={startLat:F2} x={startLeft:F2} newX={newStartLeft:F2} nsegment={nsegment}");
         }
 
@@ -276,16 +283,16 @@ namespace WinUI3Controls
                 // DS.StartingLatitude-y/(DS.ScaleFactor * 60 * 10000) = latitude
 
 
-                if (MapData.Count >= 1)
+                if (MapDataList.Count >= 1)
                 {
 
                     var lon0 = touchPosition.X / (DS.ScaleFactor * 60 * 10000) + DS.StartingLongitude;
                     var lat0 = -(touchPosition.Y / (DS.ScaleFactor * 60 * 10000)) + DS.StartingLatitude;
                     int minIndex = 0;
-                    double minDistance = MapData[minIndex].Distance(lat0, lon0);
-                    for (int i = 1; i < MapData.Count; i++)
+                    double minDistance = MapDataList[minIndex].Distance(lat0, lon0);
+                    for (int i = 1; i < MapDataList.Count; i++)
                     {
-                        double d = MapData[i].Distance(lat0, lon0);
+                        double d = MapDataList[i].Distance(lat0, lon0);
                         if (d < minDistance)
                         {
                             minIndex = i;
@@ -303,11 +310,11 @@ namespace WinUI3Controls
 
         private void OnPointInfoMultiLeft(object sender, RoutedEventArgs e)
         {
-            DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex, DS.HighlightedMapDataItemGroupIndex-1);
+            DisplayHighlightByIndex(CurrMapUXState.HighlightedMapDataItemIndex, CurrMapUXState.HighlightedMapDataItemGroupIndex-1);
         }
         private void OnPointInfoMultiRight(object sender, RoutedEventArgs e)
         {
-            DisplayHighlightByIndex(DS.HighlightedMapDataItemIndex, DS.HighlightedMapDataItemGroupIndex + 1);
+            DisplayHighlightByIndex(CurrMapUXState.HighlightedMapDataItemIndex, CurrMapUXState.HighlightedMapDataItemGroupIndex + 1);
         }
 
 
@@ -320,11 +327,11 @@ namespace WinUI3Controls
                     break;
                 case '.':
                     Log($"Character: Character=DOT");
-                    if (DS.HighlightedMapDataItemIndex >= 0)
+                    if (CurrMapUXState.HighlightedMapDataItemIndex >= 0)
                     {
-                        var data = MapData[DS.HighlightedMapDataItemIndex];
+                        var data = MapDataList[CurrMapUXState.HighlightedMapDataItemIndex];
                         var p = CenterOnData(data);
-                        Log($"KEY: '.' will set center to highlighted {DS.HighlightedMapDataItemIndex} left={p.X}");
+                        Log($"KEY: '.' will set center to highlighted {CurrMapUXState.HighlightedMapDataItemIndex} left={p.X}");
                     }
                     break;
                 case '<':
@@ -372,16 +379,16 @@ namespace WinUI3Controls
         /// </summary>
         private void DisplayHighlightByIndexDelta(int indexDelta, int groupIndexDelta)
         {
-            int index = DS.HighlightedMapDataItemIndex;
-            int groupIndex = DS.HighlightedMapDataItemGroupIndex;
+            int index = CurrMapUXState.HighlightedMapDataItemIndex;
+            int groupIndex = CurrMapUXState.HighlightedMapDataItemGroupIndex;
             if (index == -1)
             {
                 // We're just initializing.
                 if (indexDelta < 0 || groupIndexDelta < 0)
                 {
                     // If we're going backwards, then we need to start at the end.
-                    index = MapData.Count - 1;
-                    groupIndex = MapData[index].GroupedNmea.Count - 1; // wrap around to the last group.
+                    index = MapDataList.Count - 1;
+                    groupIndex = MapDataList[index].GroupedNmea.Count - 1; // wrap around to the last group.
                 }
                 else
                 {
@@ -398,14 +405,14 @@ namespace WinUI3Controls
                     index--;
                     if (index < 0)
                     {
-                        index = MapData.Count - 1; // wrap around to the end.
+                        index = MapDataList.Count - 1; // wrap around to the end.
                     }
-                    groupIndex = MapData[index].GroupedNmea.Count - 1; // wrap around to the last group.
+                    groupIndex = MapDataList[index].GroupedNmea.Count - 1; // wrap around to the last group.
                 }
-                else if (groupIndex >= MapData[index].GroupedNmea.Count)
+                else if (groupIndex >= MapDataList[index].GroupedNmea.Count)
                 {
                     index++;
-                    if (index > MapData.Count - 1)
+                    if (index > MapDataList.Count - 1)
                     {
                         index = 0; // wrap around to the start.
                     }
@@ -417,10 +424,10 @@ namespace WinUI3Controls
                 index += indexDelta;
                 if (index < 0)
                 {
-                    index = MapData.Count - 1;
-                    groupIndex = MapData[index].GroupedNmea.Count - 1; // wrap around to the last group.
+                    index = MapDataList.Count - 1;
+                    groupIndex = MapDataList[index].GroupedNmea.Count - 1; // wrap around to the last group.
                 }
-                else if (index >= MapData.Count)
+                else if (index >= MapDataList.Count)
                 {
                     index = 0; // wrap around to the start.
                     groupIndex = 0; // wrap around to the first group.
@@ -431,18 +438,18 @@ namespace WinUI3Controls
 
         private void DisplayHighlightByIndex(int newIndex, int newGroupIndex)
         {
-            var ischanged = DS.HighlightedMapDataItemIndex != newIndex;
+            var ischanged = CurrMapUXState.HighlightedMapDataItemIndex != newIndex;
 
-            if (newIndex >= MapData.Count)
+            if (newIndex >= MapDataList.Count)
             {
-                newIndex = MapData.Count - 1;
+                newIndex = MapDataList.Count - 1;
             }
             if (newIndex < 0)
             {
                 newIndex = 0;
             }
 
-            var data = MapData[newIndex];
+            var data = MapDataList[newIndex];
 
             if (newGroupIndex >= data.GroupedNmea.Count)
             {
@@ -454,14 +461,14 @@ namespace WinUI3Controls
             }
             var nmea = data.GroupedNmea[newGroupIndex];
 
-            DS.HighlightedMapDataItemIndex = newIndex;
-            DS.HighlightedMapDataItemGroupIndex = newGroupIndex;
+            CurrMapUXState.HighlightedMapDataItemIndex = newIndex;
+            CurrMapUXState.HighlightedMapDataItemGroupIndex = newGroupIndex;
 
 
             var p = ToPoint(data);
             if (ischanged)
             {
-                Log($"Highlight: setting highlighted x={p.X} long0={data.Longitude.AsDecimalFromZero} index={DS.HighlightedMapDataItemIndex}");
+                Log($"Highlight: setting highlighted x={p.X} long0={data.Longitude.AsDecimalFromZero} index={CurrMapUXState.HighlightedMapDataItemIndex}");
             }
 
             // Move the little circle highlight to be over the point.
@@ -476,12 +483,12 @@ namespace WinUI3Controls
             if (data.GroupedNmea.Count <= 1)
             {
                 uiPointInfoMultiPanel.Visibility = Visibility.Collapsed;
-                DS.HighlightedMapDataItemGroupIndex = 0;
+                CurrMapUXState.HighlightedMapDataItemGroupIndex = 0;
             }
             else
             {
                 uiPointInfoMultiPanel.Visibility = Visibility.Visible;
-                uiPointInfoMultiIndex.Text = (DS.HighlightedMapDataItemGroupIndex + 1).ToString(); // Users prefer 1-based indexes.
+                uiPointInfoMultiIndex.Text = (CurrMapUXState.HighlightedMapDataItemGroupIndex + 1).ToString(); // Users prefer 1-based indexes.
                 uiPointMultiCount.Text = data.GroupedNmea.Count.ToString();
             }
             if (uiPointInfoBorder.Visibility == Visibility.Collapsed)
@@ -514,22 +521,22 @@ namespace WinUI3Controls
             int nendsegments = 0;
             int i;
 
-            if (MapData.Count == 0) return 0; // nothing to redraw.
+            if (MapDataList.Count == 0) return 0; // nothing to redraw.
 
             MapDataItem data;
 
             // Set the StartingLatitude and StartingLongitude in a consistant way.
-            data = MapData[0];
+            data = MapDataList[0];
             DS.StartingLatitude = data.Latitude.AsDecimalFromZero; // Value is 0...180
             DS.StartingLongitude = data.Longitude.AsDecimalFromZero; // Value is 0..360  
             DS.IsFirstPointOfMap = false; // otherwise the first point that we set will be the starting point, which is wrong.
 
             var nmapdataitem = 0;
-            for (i = MapData.Count - 1; i >= 0 && nendsegments < MAX_ENDING_SEGMENTS; i--)
+            for (i = MapDataList.Count - 1; i >= 0 && nendsegments < MAX_ENDING_SEGMENTS; i--)
             {
-                data = MapData[i];
+                data = MapDataList[i];
                 var pflag = PointTypeFlag.Normal;
-                if (i == MapData.Count - 1) pflag |= PointTypeFlag.IsLastPoint;
+                if (i == MapDataList.Count - 1) pflag |= PointTypeFlag.IsLastPoint;
                 if (i == 0) pflag |= PointTypeFlag.IsFirstPoint;
                 nendsegments += DrawMapDataItem(data, LineType.EndingLine, pflag, logLevel);
                 nmapdataitem++;
@@ -540,7 +547,7 @@ namespace WinUI3Controls
             DS.EarliestPointOfLastSegment = DS.LastPoint;
             for (i = 0; i<= EarliestEndMapItemIndex; i++)
             {
-                data = MapData[i];
+                data = MapDataList[i];
                 var pflag = PointTypeFlag.Normal;
                 if (i == 0) pflag |= PointTypeFlag.IsFirstPoint;
                 nstartsegments += DrawMapDataItem(data, LineType.StartingLine, pflag, logLevel);
@@ -548,10 +555,10 @@ namespace WinUI3Controls
                 if (nstartsegments > MAX_STARTING_SEGMENTS) break;
             }
             // Draw the connector
-            if (nmapdataitem < MapData.Count)
+            if (nmapdataitem < MapDataList.Count)
             {
                 DS.LastPoint = DS.EarliestPointOfLastSegment; // reset the "last point"
-                nstartsegments += DrawMapDataItem(MapData[i], LineType.ConnectingLine, PointTypeFlag.Normal, logLevel);
+                nstartsegments += DrawMapDataItem(MapDataList[i], LineType.ConnectingLine, PointTypeFlag.Normal, logLevel);
             }
 
             return nendsegments + nstartsegments;
@@ -621,7 +628,7 @@ namespace WinUI3Controls
         {
             // TODO: these needs to be top-down, from the GpsControl
             DoClear();
-            MapData.Clear();
+            MapDataList.Clear();
             DS.ResetScale();
             Canvas.SetLeft(uiMapItemCanvas, uiMapCanvas.ActualWidth / 2.0);
             Canvas.SetTop(uiMapItemCanvas, uiMapCanvas.ActualHeight / 2.0);
@@ -665,13 +672,7 @@ namespace WinUI3Controls
             /// UX value (set by the user) for how much the map is zoomed in.
             /// </summary>
             public double ScaleFactor = SCALEFACTOR_INIT;
-            /// <summary>
-            /// Says which of the NMEA sample data sets is to be drawn. It's allowed to go beyond the number of data sets, 
-            /// so when it's used, it has to be modulo the Nmea sample size.
-            /// </summary>
-            public int CurrSampleNmea = 0;
-            public int HighlightedMapDataItemIndex = -1;
-            public int HighlightedMapDataItemGroupIndex = 0; // Which item to display in the highlight panel.
+
 
 
             private DoubleCollection GetDash(LineType lineType)
