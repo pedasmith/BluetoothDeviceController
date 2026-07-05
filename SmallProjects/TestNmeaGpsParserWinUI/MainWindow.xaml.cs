@@ -127,9 +127,13 @@ var selected = await picker.PickSingleDeviceAsync(new Rect(50, 200, 10, 10)); //
                 }
                 Log($"List complete. N. Match={nMatch} Not matching={nNotMatch}");
 
+                // Artificial pause when no device is selected. Otherwise the user can't see that we've 
+                // updated the UX at all.
+
                 // Now let's try to connect
                 if (deviceInfoSelected == null)
                 {
+                    await Task.Delay(3_000);
                     terminal.SetDeviceStatusEx(ConnectionState.ScanningForDevices, ConnectionSubstate.SfdNoDeviceFound);
                     return;
                 }

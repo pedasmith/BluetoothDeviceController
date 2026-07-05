@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
 
 namespace BCBasic
 {

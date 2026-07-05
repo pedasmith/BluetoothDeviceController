@@ -1,15 +1,21 @@
-﻿using BluetoothDeviceController.BleEditor;
-using BluetoothDeviceController.Names;
+﻿using BluetoothDeviceController.Names;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using TemplateExpander;
 using BluetoothProtocols.IotNumberFormats;
+// See https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/ for details
 
 namespace BluetoothCodeGenerator
 {
     internal static class BtJsonToMacro
     {
+        /// <summary>
+        /// True when the item is like "OEL" or "OEB" or any other "O" field.
+        /// Will also return True when the name ends with "Unused" or "Internal"
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         static private bool ItemIsSuppressed(ParserField item)
         {
             bool retval = false;
@@ -46,6 +52,25 @@ namespace BluetoothCodeGenerator
             }
             return name;
         }
+
+        private static string ShortFormat(string format)
+        {
+            var firstchar = format.Substring(0, 1);
+            var lastchar = format.Substring(format.Length - 1, 1);
+            switch (firstchar)
+            {
+                case "/":
+                case "F":
+                case "Q":
+                    return firstchar;
+                case "I":
+                case "U":
+                    if (lastchar == "S") return format;
+                    return firstchar;
+            }
+            return format;
+        }
+
         private static string ByteFormatToCSharp(string format)
         {
             switch (format)
@@ -60,6 +85,8 @@ namespace BluetoothCodeGenerator
                 case "U24": return "UInt32";
                 case "I32": return "Int32";
                 case "U32": return "UInt32";
+                case "I16S": return "Int16";
+                case "U16S": return "UInt16";
                 case "BYTES": return "Bytes";
                 case "STRING": return "String";
             }
@@ -87,10 +114,33 @@ namespace BluetoothCodeGenerator
                 case "I32": return $"Int32";
                 case "U32": return $"UInt32";
                 case "F32": return $"float";
+                case "I16S": return $"Int16[]";
+                case "U16S": return $"UInt16[]";
             }
             return $"X47_UNKNOWN_TYPE_{format}";
         }
+        private static string ByteFormatToGetNextCall(string format)
+        {
+            var shortFormat = ShortFormat(format);
+            switch (shortFormat)
+            {
+                case "":
+                case "BYTES": 
+                    return "GetNextByteArray";
+                case "STRING": return "GetNextString";
+                case "I16S":
+                case "U16S":
+                    return "GetNextDoubleArray"; // technically a list :-)
+                case "/": 
+                case "Q": 
+                case "I": 
+                case "U": 
+                case "F": 
+                    return "GetNextDouble";
+            }
+            return $"GetNext_X82_UNKNOWN_TYPE_{format}";
 
+        }
         private static string ByteFormatToDataWriterCall(string format)
         {
             switch (format)
@@ -122,24 +172,20 @@ namespace BluetoothCodeGenerator
 
         private static string ByteFormatToCSharpDefault(string format)
         {
-            switch (format)
+            var shortFormat = ShortFormat(format);
+            switch (shortFormat)
             {
-                case "F32": return "0.0";
-                case "F64": return "0.0";
-                case "I8": return "0";
-                case "U8": return "0";
-                case "I16": return "0";
-                case "U16": return "0";
-                case "I24": return "0";
-                case "U24": return "0";
-                case "I32": return "0";
-                case "U32": return "0";
+                case "/": 
+                case "F": 
+                case "Q": 
+                    return "0.0";
+                case "I": 
+                case "U": 
+                    return "0";
                 case "BYTES": return "null";
                 case "STRING": return "\"\"";
-            }
-            if (format.StartsWith("/") || format.StartsWith("Q"))
-            {
-                return "0.0";
+                case "I16S": return "new()";
+                case "U16S": return "new()";
             }
             Error($"ByteFormatToCSharpDefault: unknown format {format}");
             return $"OtherType{format}";
@@ -160,6 +206,8 @@ namespace BluetoothCodeGenerator
             {
                 case "BYTES": return "AsString";
                 case "STRING": return "AsString";
+                case "I16S": return "AsString";
+                case "U16S": return "AsString";
             }
             return $"AsDouble";
         }
@@ -170,83 +218,136 @@ namespace BluetoothCodeGenerator
             {
                 case "BYTES": return "string";
                 case "STRING": return "string";
+                case "I16S": return "double[]";
+                case "U16S": return "double[]";
             }
             return $"double";
+        }
+        private static string ByteFormatToCSharpStringOrDoubleOrBytes(string format)
+        {
+            switch (format)
+            {
+                case "BYTES": return "byte[]";
+                case "STRING": return "string";
+                case "I16S": return "List<double>";
+                case "U16S": return "List<double>";
+            }
+            return $"double";
+        }
+
+        private static void CharacteristicToTemplateSnippet(NameCharacteristic btCharacteristic, TemplateSnippet chs, TemplateSnippet ch)
+        {
+            ch.MacrosAdd("UUID", btCharacteristic.UUID);
+            ch.MacrosAdd("UuidShort", btCharacteristic.UUID.AsShortestUuid());
+            ch.MacrosAdd("Name", btCharacteristic.Name);
+            ch.MacrosAdd("CharacteristicName", btCharacteristic.Name);
+            ch.MacrosAdd("CharacteristicName.dotNet", btCharacteristic.Name.DotNetSafe());
+            ch.MacrosAdd("Name.dotNet", btCharacteristic.Name.DotNetSafe());
+            ch.MacrosAdd("CharacteristicDescription", btCharacteristic.Description);
+            ch.MacrosAdd("DataGroupName", btCharacteristic.DataGroupName);
+            ch.MacrosAdd("DataGroupName.dotNet", btCharacteristic.DataGroupName.DotNetSafe());
+
+            ch.MacrosAdd("Type", btCharacteristic.Type); // is the e.g. "U8 U8"
+            ch.MacrosAdd("CharacteristicType", btCharacteristic.Type);
+            ch.MacrosAdd("Verbs", btCharacteristic.Verbs);
+            ch.MacrosAdd("TableType", btCharacteristic.UI?.tableType ?? "");
+            ch.MacrosAdd("AutoNotify", btCharacteristic.AutoNotify ? "true" : "false");
+            ch.MacrosAdd("CHARACTERISTICTYPE", btCharacteristic.Type);
+            ch.MacrosAdd("UICHARTCOMMAND", btCharacteristic.UI?.chartCommand ?? "");
+
+            var UI_AsCSharp = btCharacteristic.UI?.AsCSharpString() ?? "";
+            ch.MacrosAdd("UISPECS", UI_AsCSharp);
+            if (btCharacteristic.UI != null)
+            {
+                ch.MacrosAdd("UI.ExpandChart", btCharacteristic.UI.Expand ? "true" : "false");
+                ch.MacrosAdd("UI.TitleSuffix", btCharacteristic.UI.TitleSuffix);
+            }
+
+            if (UI_AsCSharp.Contains("[[CHARACTERISTICNAME]]"))
+            {
+                // Just a little bit of weirdness here :-)
+                ch.MacrosAdd("CHARACTERISTICNAME", btCharacteristic.Name.DotNetSafe());
+            }
+            ch.MacrosAdd("READCONVERT", btCharacteristic.ReadConvert ?? "");
+            ch.MacrosAdd("NOTIFYCONVERT", btCharacteristic.NotifyConvert ?? "");
+            ch.MacrosAdd("NOTIFYCONFIGURE", btCharacteristic.NotifyConfigure ?? "");
+
+            var isReadOnly = true;
+
+            // For devices with both Write and WriteWithoutResponse, I prefer
+            // using plain WriteWithoutResponse because it's faster.
+            // Only set the macro for writable ones.
+            if (btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse)
+            {
+                ch.MacrosAdd("WRITEMODE", btCharacteristic.IsWriteWithoutResponse
+                    ? "GattWriteOption.WriteWithoutResponse"
+                    : "GattWriteOption.WriteWithResponse");
+                isReadOnly = false;
+            }
+
+            chs.AddChildViaMacro(ch); // uses the UUID to add correctly
+            ch.MacrosAdd("IS+READ+ONLY", isReadOnly ? "True" : "False");
+            AddVerbButtons(ch, btCharacteristic);
+
+            AddButtonUIAndEnum(ch, btCharacteristic);
+            AddUIList(ch, btCharacteristic);
+            AddPropertiesPerCharacteristic(ch, btCharacteristic, isReadOnly);
+            AddCommands(ch, btCharacteristic);
         }
 
         private static TemplateSnippet ServiceToTemplateSnippet(NameService btService)
         {
             var service = new TemplateSnippet(btService.Name);
-            service.Macros.Add("Name", btService.Name); // [[SERVICENAMEUSER]
-            service.Macros.Add("Name.dotNet", btService.Name.DotNetSafe()); // [[SERVICENAME]]
-            service.Macros.Add("ServiceName", btService.Name); // Preferred name to "Name"
-            service.Macros.Add("SERVICENAME", btService.Name.DotNetSafe()); // BAD: [[SERVICENAME]] in TI 1350 and 2541 for NOTIFYCONFIGURE
-            service.Macros.Add("ServiceIsExpanded", (btService.Priority >= 10) ? "true" : "false");
-            service.Macros.Add("ServiceDescription", btService.Description);
-            service.Macros.Add("UUID", btService.UUID);
-            service.Macros.Add("UuidShort", btService.UUID.AsShortestUuid());
+            service.MacrosAdd("Name", btService.Name); // [[SERVICENAMEUSER]
+            service.MacrosAdd("Name.dotNet", btService.Name.DotNetSafe()); // [[SERVICENAME]]
+            service.MacrosAdd("ServiceName", btService.Name); // Preferred name to "Name"
+            service.MacrosAdd("SERVICENAME", btService.Name.DotNetSafe()); // BAD: [[SERVICENAME]] in TI 1350 and 2541 for NOTIFYCONFIGURE
+            service.MacrosAdd("ServiceName.dotNet", btService.Name.DotNetSafe()); // BAD: [[SERVICENAME]] in TI 1350 and 2541 for NOTIFYCONFIGURE
+            service.MacrosAdd("ServiceIsExpanded", (btService.Priority >= 10) ? "true" : "false");
+            service.MacrosAdd("ServiceDescription", btService.Description);
+            service.MacrosAdd("UUID", btService.UUID);
+            service.MacrosAdd("Uuid", btService.UUID);
+            service.MacrosAdd("UuidShort", btService.UUID.AsShortestUuid());
 
-            var chs = new TemplateSnippet("Characteristics");
+            var chs = new TemplateSnippet("Characteristics"); // Addding Services/Characteristics
             service.AddChild("Characteristics", chs);
+
+            var dgs = new TemplateSnippet("DataGroups"); // Adding Services/DataGroups
+            service.AddChild("DataGroups", dgs);
+            var dataGroups = new Dictionary<string, TemplateSnippet>();
 
             foreach (var btCharacteristic in btService.Characteristics)
             {
                 if (btCharacteristic.Suppress) continue;
 
+                if (string.IsNullOrEmpty(btCharacteristic.DataGroupName))
+                {
+                    btCharacteristic.DataGroupName = btService.Name + "_Data";
+                }
+                var dgn = btCharacteristic.DataGroupName;
+                TemplateSnippet dgss = null;
+                TemplateSnippet dgchs = null;
+                if (!dataGroups.ContainsKey(dgn))
+                {
+                    dgss = new TemplateSnippet(dgn);
+                    dgs.AddChild(dgn, dgss);
+                    dataGroups[dgn] = dgss;
+                    dgss.MacrosAdd("DataGroupName", dgn);
+                    dgss.MacrosAdd("DataGroupName.dotNet", dgn.DotNetSafe());
+
+                    dgchs = new TemplateSnippet("Characteristics"); // Adding Services/DataGroups/Characteristics
+                    dgss.AddChild("Characteristics", dgchs);
+                }
+                dgss = dataGroups[dgn];
+                dgchs = dgss.Children["Characteristics"];
+
                 var ch = new TemplateSnippet(btCharacteristic.Name);
-                ch.Macros.Add("UUID", btCharacteristic.UUID);
-                ch.Macros.Add("UuidShort", btCharacteristic.UUID.AsShortestUuid());
-                ch.Macros.Add("Name", btCharacteristic.Name);
-                ch.Macros.Add("CharacteristicName", btCharacteristic.Name);
-                ch.Macros.Add("CharacteristicName.dotNet", btCharacteristic.Name.DotNetSafe());
-                ch.Macros.Add("Name.dotNet", btCharacteristic.Name.DotNetSafe());
-                ch.Macros.Add("CharacteristicDescription", btCharacteristic.Description);
+                CharacteristicToTemplateSnippet(btCharacteristic, chs, ch); // Add to service/Characteristics
 
-                ch.Macros.Add("Type", btCharacteristic.Type);
-                ch.Macros.Add("CHARACTERISTICTYPE", btCharacteristic.Type);
-                ch.Macros.Add("Verbs", btCharacteristic.Verbs);
-                ch.Macros.Add("TableType", btCharacteristic.UI?.tableType ?? "");
-                ch.Macros.Add("AutoNotify", btCharacteristic.AutoNotify ? "true" : "false");
-                ch.Macros.Add("UICHARTCOMMAND", btCharacteristic.UI?.chartCommand ?? "");
-
-                var UI_AsCSharp = btCharacteristic.UI?.AsCSharpString() ?? "";
-                ch.Macros.Add("UISPECS", UI_AsCSharp);
-                if (btCharacteristic.UI != null)
-                {
-                    ch.Macros.Add("UI.ExpandChart", btCharacteristic.UI.Expand ? "true" : "false");
-                    ch.Macros.Add("UI.TitleSuffix", btCharacteristic.UI.TitleSuffix);
-                }
-
-                if (UI_AsCSharp.Contains ("[[CHARACTERISTICNAME]]"))
-                {
-                    // Just a little bit of weirdness here :-)
-                    ch.Macros.Add("CHARACTERISTICNAME", btCharacteristic.Name.DotNetSafe());
-                }
-                ch.Macros.Add("READCONVERT", btCharacteristic.ReadConvert ?? "");
-                ch.Macros.Add("NOTIFYCONVERT", btCharacteristic.NotifyConvert ?? "");
-                ch.Macros.Add("NOTIFYCONFIGURE", btCharacteristic.NotifyConfigure ?? "");
-
-                var isReadOnly = true;
-
-                // For devices with both Write and WriteWithoutResponse, I prefer
-                // using plain WriteWithoutResponse because it's faster.
-                // Only set the macro for writable ones.
-                if (btCharacteristic.IsWrite || btCharacteristic.IsWriteWithoutResponse)
-                {
-                    ch.Macros.Add("WRITEMODE", btCharacteristic.IsWriteWithoutResponse
-                        ? "GattWriteOption.WriteWithoutResponse"
-                        : "GattWriteOption.WriteWithResponse");
-                    isReadOnly = false;
-                }
-
-                chs.AddChildViaMacro(ch); // uses the UUID to add correctly
-                ch.Macros.Add("IS+READ+ONLY", isReadOnly ? "True" : "False");
-                AddVerbButtons(ch, btCharacteristic);
-
-                AddButtonUIAndEnum(ch, btCharacteristic);
-                AddUIList(ch, btCharacteristic);
-                AddPropertiesPerCharacteristic(ch, btCharacteristic, isReadOnly);
-                AddCommands(ch, btCharacteristic);
+                // Make a copy of it. Arguably I could do a deep copy. And maybe a shallow copy, but
+                // I think they get modified...
+                ch = new TemplateSnippet(btCharacteristic.Name);
+                CharacteristicToTemplateSnippet(btCharacteristic, dgchs, ch); // Add to service/DataGroups/Characteristics
             }
             return service;
         }
@@ -294,6 +395,7 @@ namespace BluetoothCodeGenerator
                     else if (param.Max <= 255) variableType = $"{sbytestr}byte";
                     else if (param.Max <= 65535) variableType = $"{sintstr}short";
                     else variableType = $"{sintstr}int";
+                    paramts.AddMacro("VariableType", variableType);
                     paramts.AddMacro("VARIABLETYPE", variableType);
 
 
@@ -329,9 +431,9 @@ namespace BluetoothCodeGenerator
                 {
                     var singleEnum = new TemplateSnippet(enumname);
                     commandEnums.AddChild(enumname, singleEnum);
-                    singleEnum.Macros.Add("EnumCommandName", enumcommandname); // Maybe instead have a hierarchy?
-                    singleEnum.Macros.Add("EnumName", enumname);
-                    singleEnum.Macros.Add("EnumValue", enumvalue.ToString());
+                    singleEnum.MacrosAdd("EnumCommandName", enumcommandname); // Maybe instead have a hierarchy?
+                    singleEnum.MacrosAdd("EnumName", enumname);
+                    singleEnum.MacrosAdd("EnumValue", enumvalue.ToString());
                 }
             }
 
@@ -367,17 +469,17 @@ namespace BluetoothCodeGenerator
                         var enumValue = "";
                         foreach (var (name, macros) in enumList.Children) // n**2 FTW!
                         {
-                            if (macros.Macros["EnumCommandName"] == enumSource
-                                && macros.Macros["EnumName"] == button.Enum)
+                            if (macros.MacrosGet("EnumCommandName") == enumSource
+                                && macros.MacrosGet("EnumName") == button.Enum)
                             {
-                                enumValue = macros.Macros["EnumValue"];
+                                enumValue = macros.MacrosGet("EnumValue");
                             }
                         }
 
-                        singleEnum.Macros.Add("ButtonEnum", button.Enum);
-                        singleEnum.Macros.Add("ButtonEnumValue", enumValue);
-                        singleEnum.Macros.Add("ButtonLabel", button.Label);
-                        singleEnum.Macros.Add("ButtonType", button.Type.ToString()); // "Blank" or "Button"
+                        singleEnum.MacrosAdd("ButtonEnum", button.Enum);
+                        singleEnum.MacrosAdd("ButtonEnumValue", enumValue);
+                        singleEnum.MacrosAdd("ButtonLabel", button.Label);
+                        singleEnum.MacrosAdd("ButtonType", button.Type.ToString()); // "Blank" or "Button"
                         index++;
                     }
                 }
@@ -455,6 +557,8 @@ namespace BluetoothCodeGenerator
                 var dotNetDisplayFormat = "ToString()";
                 var isDouble = ByteFormatToCSharpAsDouble(item.ByteFormatPrimary) == "AsDouble";
                 var defaultValue = "*";
+                var defaultValueCSharp = ByteFormatToCSharpDefault(item.ByteFormatPrimary);
+                var replaceValueDetectCSharp = item.Get(4, 1); // e.g., Nordic Thingy eCOS is U16|DEC|eCOS|ppm|390^0 . This means that when the value from the sensor is 0, replace it with 390.
                 switch (item.DisplayFormatPrimary)
                 {
                     case "DEC":
@@ -477,9 +581,13 @@ namespace BluetoothCodeGenerator
 
                 if (item.DefaultValuePrimary != "")
                 {
-                    defaultValue = item.DefaultValuePrimary;
+                    defaultValue = item.DefaultValuePrimary.Replace("_", " "); // TODO: question: is this the right escape for spaces?
                 }
-                defaultValue = defaultValue.Replace("_", " "); // TODO: question: is this the right escape for spaces?
+                if (item.DefaultValuePrimary != "*" && item.DefaultValuePrimary != "") // the default is a * for some reason?
+                {
+                    var needsQuote = defaultValueCSharp.StartsWith("\""); // the default value might be 0, 0.0, or "";
+                    defaultValueCSharp = needsQuote ? "\"" + item.DefaultValuePrimary + "\"" : item.DefaultValuePrimary;
+                }
                 if (defaultValue == "UpdateXorAtEnd")
                 {
                     crc_xor_fixup = "CrcCalculations.UpdateXorAtEnd(command);";
@@ -516,6 +624,13 @@ namespace BluetoothCodeGenerator
                     TemplateSnippet.AddMacroList(prlist, "DataName.dotNet", dataname.DotNetSafe());
                     TemplateSnippet.AddMacroList(prlist, "DATANAMEUSER", dataname.Replace("_", " "));
 
+                    TemplateSnippet.AddMacroList(prlist, "GetNextType.dotNext", ByteFormatToGetNextCall(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "VariableType", ByteFormatToCSharp(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "VariableTypeParam", ByteFormatToCSharpParam(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "VariableTypeDS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "VariableTypeDsb", ByteFormatToCSharpStringOrDoubleOrBytes(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "ByteFormatPrimary", item.ByteFormatPrimary);
+
                     TemplateSnippet.AddMacroList(prlist, "VARIABLETYPE", ByteFormatToCSharp(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VARIABLETYPEPARAM", ByteFormatToCSharpParam(item.ByteFormatPrimary));
                     TemplateSnippet.AddMacroList(prlist, "VARIABLETYPE+DS", ByteFormatToCSharpStringOrDouble(item.ByteFormatPrimary));
@@ -526,11 +641,15 @@ namespace BluetoothCodeGenerator
 
                     TemplateSnippet.AddMacroList(prlist, "AS+DOUBLE+OR+STRING", ByteFormatToCSharpAsDouble(item.ByteFormatPrimary)); // e.g.  ".AsDouble";
                     TemplateSnippet.AddMacroList(prlist, "DOUBLE+OR+STRING+DEFAULT", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
+                    TemplateSnippet.AddMacroList(prlist, "DoubleOrStringDefault", ByteFormatToCSharpDefault(item.ByteFormatPrimary));
 
                     TemplateSnippet.AddMacroList(prlist, "PropertyIsHidden", item.IsHidden ? "true" : "false");
                     TemplateSnippet.AddMacroList(prlist, "DEC+OR+HEX", displayFormat);
                     TemplateSnippet.AddMacroList(prlist, "DataToString.dotNet", dotNetDisplayFormat);
+                    TemplateSnippet.AddMacroList(prlist, "DefaultValueCSharp", defaultValueCSharp);
                     TemplateSnippet.AddMacroList(prlist, "DEFAULT+VALUE", defaultValue);
+                    TemplateSnippet.AddMacroList(prlist, "ReplaceValueDetectCSharp", replaceValueDetectCSharp);
+                    TemplateSnippet.AddMacroList(prlist, "DataUnits", item.UnitsPrimary);
 
                     TemplateSnippet.AddMacroList(prlist, "IS+READ+ONLY", isReadOnly ? "True" : "False");
                 }
@@ -727,9 +846,9 @@ namespace BluetoothCodeGenerator
                     }
                 }
             }
-            retval.Macros.Add("EXTRAUI+XAML+NS", ns);
-            retval.Macros.Add("EXTRAUI+XAML+CS+INIT", init);
-            retval.Macros.Add("EXTRAUI+XAML+CONTROL", xaml);
+            retval.MacrosAdd("EXTRAUI+XAML+NS", ns);
+            retval.MacrosAdd("EXTRAUI+XAML+CS+INIT", init);
+            retval.MacrosAdd("EXTRAUI+XAML+CONTROL", xaml);
         }
 
 
@@ -770,20 +889,20 @@ namespace BluetoothCodeGenerator
             TemplateSnippet retval = new TemplateSnippet(bt.Name);
             retval.OptionSuppressFile = bt.SuppressFile;
 
-            retval.Macros.Add("DeviceName", bt.Name);
-            retval.Macros.Add("DeviceName.dotNet", bt.Name.DotNetSafe());
-            retval.Macros.Add("CLASSNAME", bt.ClassName ?? bt.Name?.DotNetSafe());
-            retval.Macros.Add("UserName", bt.GetUserName());
-            retval.Macros.Add("Description", bt.Description);
-            retval.Macros.Add("UsingTheDevice", bt.UsingTheDevice);
-            retval.Macros.Add("Maker", bt.Maker);
-            retval.Macros.Add("DeviceType", bt.DeviceType);
-            retval.Macros.Add("ShortDescription", bt.ShortDescription);
-            retval.Macros.Add("DefaultPin", bt.DefaultPin);
-            retval.Macros.Add("DESCRIPTION", bt.Description);
-            retval.Macros.Add("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::HH:mm"));
-            retval.Macros.Add("CLASSMODIFIERS", bt.ClassModifiers);
-            retval.Macros.Add("HasReadDeviceName", bt.HasReadDevice_Name() ? "true" : "false");
+            retval.MacrosAdd("DeviceName", bt.Name);
+            retval.MacrosAdd("DeviceName.dotNet", bt.Name.DotNetSafe());
+            retval.MacrosAdd("CLASSNAME", bt.ClassName ?? bt.Name?.DotNetSafe());
+            retval.MacrosAdd("UserName", bt.GetUserName());
+            retval.MacrosAdd("Description", bt.Description);
+            retval.MacrosAdd("UsingTheDevice", bt.UsingTheDevice);
+            retval.MacrosAdd("Maker", bt.Maker);
+            retval.MacrosAdd("DeviceType", bt.DeviceType);
+            retval.MacrosAdd("ShortDescription", bt.ShortDescription);
+            retval.MacrosAdd("DefaultPin", bt.DefaultPin);
+            retval.MacrosAdd("DESCRIPTION", bt.Description);
+            retval.MacrosAdd("CURRTIME", DateTime.Now.ToString("yyyy-MM-dd::HH:mm"));
+            retval.MacrosAdd("CLASSMODIFIERS", bt.ClassModifiers);
+            retval.MacrosAdd("HasReadDeviceName", bt.HasReadDevice_Name() ? "true" : "false");
 
             Add_ExtraUI_Xaml_NS(retval, bt);
 

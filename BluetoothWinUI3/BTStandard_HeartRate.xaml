@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="BluetoothWinUI3.BTStandard_HeartRateControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothWinUI3"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:oxyplot="using:OxyPlot"
+    xmlns:tv="using:WinUI.TableView"
+    mc:Ignorable="d"
+    >
+
+    <Border Style="{StaticResource sDeviceBorder}" x:Name="rootPanel">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <!-- ✓ Check Mark U+2713 -->
+                <!-- ✗ Ballot X U+2717 -->
+                <TextBlock x:Name="uiDeviceName" Grid.Column="0" Text="Heart Rate" Style="{StaticResource sDeviceTitle}"/>
+                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                    <TextBlock x:Name="uiSensorConnection" Text="--" Style="{StaticResource sDeviceData}"/>
+                    <TextBlock x:Name="uiSensorLocation" Text="--" Style="{StaticResource sDeviceData}"/>
+                </StackPanel>
+
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" x:Name="uiDeviceDataList">
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>BPM</Run><Run Text="&#160;"/><Run x:Name="uiBpmChange" Text="┄"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiBpm"/></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Visibility="Collapsed">
+                        
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Name</Run><Run Text="&#160;"/><Run x:Name="uiNameChange" Text="┄"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiName"/></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Flags</Run><Run Text="&#160;"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDeviceData}" TextWrapping="Wrap"><Run x:Name="uiFlags"/></TextBlock>
+                    </StackPanel>
+
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>RR</Run><Run Text="&#160;"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiRRInterval"/></TextBlock>
+                    </StackPanel>
+                    </StackPanel>
+
+
+
+                </GridView>
+                <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
+                <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
+                    <tv:TableView x:Name="uiTableView" IsReadOnly="True" />
+                </Grid>
+
+            </Grid>
+            <TextBlock Grid.Row="2" Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
+            <local:BTConnectionControl Grid.Row="3" x:Name="uiBTConnectionControl" />
+        </Grid>
+    </Border>
+</UserControl>

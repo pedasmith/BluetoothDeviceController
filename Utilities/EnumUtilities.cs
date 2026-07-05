@@ -6,6 +6,11 @@ using System.Runtime.CompilerServices;
 
 using Windows.UI.Xaml.Data;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
+
 #if NETCOREAPP
 using System.Runtime.InteropServices;
 using Windows.Foundation;
@@ -119,12 +124,30 @@ namespace enumUtilities
 
     public class EnumValueConverter<T> : IValueConverter
     {
+#if NET10_0_OR_GREATER
+
+        // Not available in .NET 10 and greater because those versions agressively trim unused code.
+        // An expert in the .NET TRIM system and types and generics might be able to make it work, 
+        // but those people are few and far between.
+
+        /// <summary>
+        /// Not implemented version of GetDisplayAttribute.
+        /// </summary>
+        /// <param name="vv"></param>
+        /// <returns></returns>
+        private string GetDisplayAttribute(T vv)
+        {
+            return null;
+        }
+
+#else
         // 
         // Generates a cached list of enum values; items with blank DisplayAttribute  
         // values are ignored. This item is placed here for convenience; you can put  
         // this value anywhere. 
         // 
         private IList<T> _EnumValues = null;
+
         private void MakeEnumValues()
         {
             if (_EnumValues != null) return;
@@ -143,7 +166,7 @@ namespace enumUtilities
                  .GetCustomAttribute<DisplayAttribute>();
             return cda?.Name;
         }
-
+#endif
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (value is T)

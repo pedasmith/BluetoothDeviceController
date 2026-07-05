@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="BluetoothWinUI3.BTServicesCharacteristicsDisplay"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothWinUI3"
+    xmlns:watcher="using:BluetoothWatcher.AdvertismentWatcher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Border Style="{StaticResource sDeviceBorder}" x:Name="rootPanel">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="372" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <Style x:Key="sPanelDisplay" TargetType="Panel">
+                    <Setter Property="VerticalAlignment" Value="Stretch" />
+                </Style>
+            </Grid.Resources>
+            <Grid x:Name="uiAdvertisementList" Grid.Row="1" Visibility="Visible" Style="{StaticResource sPanelDisplay}">
+                <ItemsView x:Name="uiAdvertisementListView" SelectionMode="Single" ItemsSource="{x:Bind WatcherDataList}"
+                           SelectionChanged="OnAdvertisementSelected"
+                       >
+                    <ItemsView.ItemTemplate>
+                        <DataTemplate x:DataType="watcher:WatcherData">
+                            <ItemContainer>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{x:Bind TimeStampHHmmssfff}" MinWidth="80" Style="{StaticResource sDeviceListDataCompressed}" />
+                                    <TextBlock Text="{x:Bind AddressAsString}" MinWidth="110" Style="{StaticResource sDeviceListDataCompressed}" />
+                                    <TextBlock Text="{x:Bind MostRecentAdvertisement.RawSignalStrengthInDBm}" MinWidth="20" Margin="4,0,0,0" Style="{StaticResource sDeviceListDataCompressed}" />
+                                    <TextBlock Text="{x:Bind BestName}" Margin="4,0,0,0" Style="{StaticResource sDeviceListDataCompressedPrimary}" />
+                                </StackPanel>
+                            </ItemContainer>
+                        </DataTemplate>
+                    </ItemsView.ItemTemplate>
+                </ItemsView>
+            </Grid>
+            <Grid x:Name="uiDetailsPane" Grid.Column="0" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+                <Grid x:Name="uiAdvertisementDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+                    <ScrollViewer x:Name="uiAdvertisementDetailScrollViewer">
+                        <TextBlock x:Name="uiAdvertisementDetailsTextBlock" Style="{StaticResource sAdvertisementData}" TextAlignment="Left" >Advertisement Details</TextBlock>
+                    </ScrollViewer>
+                </Grid>
+                <Grid x:Name="uiDeviceDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
+                    <ScrollViewer x:Name="uiDeviceDetailScrollViewer">
+                        <TextBlock x:Name="uiDeviceDetailsTextBlock" Style="{StaticResource sAdvertisementData}" >Device Details</TextBlock>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Row="2" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="uiLog" Grid.Row="0" Grid.Column="1" Style="{StaticResource sDeviceData}" MaxWidth="350" VerticalAlignment="Center" HorizontalAlignment="Left" >Advertisement Data</TextBlock>
+                <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+                    <Button x:Name="uiBack" Style="{StaticResource NavigationBackButtonSmallStyle}" Click="OnBackClicked" />
+                </StackPanel>
+                
+                <local:BTConnectionControl x:Name="uiConnectionControl" Grid.Row="1" Grid.ColumnSpan="2" />
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,125 @@
+﻿
+using IotNumberFormats;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
+
+namespace BluetoothProtocolsNames
+{
+    public class NameService
+    {
+        public NameService()
+        {
+
+        }
+        public NameService (GattDeviceService service, NameService defaultService, int count = -1)
+        {
+            var reg = BluetoothServiceRegistration.FindRegistration(service.Uuid);
+            UUID = service.Uuid.ToString("D"); // documented at https://docs.microsoft.com/en-us/dotnet/api/system.guid.tostring?view=netframework-4.8#System_Guid_ToString_System_String_
+            if (defaultService != null)
+            {
+                Name = defaultService.Name;
+                Suppress = defaultService.Suppress;
+                Description = defaultService.Description;
+                Priority = defaultService.Priority;
+                if (!string.IsNullOrEmpty(defaultService.RegistrationOwner))
+                {
+                    RegistrationOwner = defaultService.RegistrationOwner;
+                }
+                else if (reg != null)
+                {
+                    RegistrationOwner = reg.RegistrationOwner;
+                }
+            }
+            else
+            {
+                Name = count >= 0 ? $"Unknown{count}" : "Unknown";
+                if (reg != null)
+                {
+                    RegistrationOwner = reg.RegistrationOwner;
+                }
+            }
+        }
+        private string UuidRaw = "";
+        /// <summary>
+        /// Sets the UUID as a string. Will take in short version (like 1800) but will
+        /// always return full UUID values.
+        /// </summary>
+        public string UUID
+        {
+            get
+            {
+                return UuidRaw.AsFullUuid();
+            }
+            set
+            {
+                UuidRaw = value;
+            }
+        }
+        public string RegistrationOwner { get; set; } // what company is this service registered to?
+        public string Name { get; set; }
+        /// <summary>
+        /// When true, the UI for the service will be entirely suppressed.
+        /// </summary>
+        /// 
+        [DefaultValue(false)]
+        public bool Suppress { get; set; }
+
+        public string Description { get; set; } = null;
+
+        /// <summary>
+        /// From the ServiceType, a per-service value that's intended to define (with ODE=Option Define Element and ODR=Option Define Record) elements. This is passed in as the "global" ParserFieldList for each characteristic.
+        /// </summary>
+        string _ServiceType = "";
+        [DefaultValue("")]
+        public string ServiceType { get { return _ServiceType; } set { _ServiceType = value; ServiceTypePFL = ParserFieldList.ParseLine(value); } }
+
+        public ParserFieldList ServiceTypePFL = null;
+
+        /// <summary>
+        /// Display priority. Default is 0; max should be 10. Services with higher priorities are displayed first.
+        /// </summary>
+        [DefaultValue(0)]
+        public int Priority { get; set; } = 0;
+        public NameCharacteristic GetChacteristic (string uuid)
+        {
+            foreach (var characteristic in Characteristics)
+            {
+                if (string.Compare(characteristic.UUID, uuid, StringComparison.InvariantCultureIgnoreCase) == 0)
+                {
+                    return characteristic;
+                }
+            }
+            return null;
+        }
+
+        public IList<NameCharacteristic> Characteristics { get; } = new List<NameCharacteristic>();
+
+        [JsonIgnore]
+        public IList<string> DataGroupNames
+        {
+            get
+            {
+                var retval = new List<string>();
+                foreach (var characteristic in Characteristics)
+                {
+                    if (!string.IsNullOrEmpty(characteristic.DataGroupName) && !retval.Contains(characteristic.DataGroupName))
+                    {
+                        retval.Add(characteristic.DataGroupName);
+                    }
+                }   
+                return retval;
+            }
+        }
+        public override string ToString()
+        {
+            return $"{Name}:{UUID}";
+        }
+    }
+}

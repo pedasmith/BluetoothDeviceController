@@ -1,8 +1,14 @@
 ﻿using System;
+using System.Runtime;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using Windows.Foundation.Diagnostics;
+using Windows.Networking.BackgroundTransfer;
 using Windows.Storage.Streams;
+
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
 
 namespace Utilities
 {
@@ -40,12 +46,23 @@ namespace Utilities
                 buffer = dr.ReadBuffer(len).ToArray();
                 char[] outbuffer = new char [len * 50]; // should be big enough :-)
 
-                int bytesUsed = 0;
-                int charsUsed = 0;
-                bool completed = true;
-                Utf8NonThrowingDecoder.Convert(buffer, 0, buffer.Length, outbuffer, 0, outbuffer.Length, true, out bytesUsed, out charsUsed, out completed);
-                retval = new string(outbuffer, 0, charsUsed);
-                readStatus = retval.Contains(EncoderFallbackDetectionString) ? ReadStatus.Hex : ReadStatus.OK;
+                if (ArrayHasControlChars(buffer))
+                {
+                    readStatus = ReadStatus.Hex;
+                }
+                else
+                {
+                    int bytesUsed = 0;
+                    int charsUsed = 0;
+                    bool completed = true;
+                    Utf8NonThrowingDecoder.Convert(buffer, 0, buffer.Length, outbuffer, 0, outbuffer.Length, true, out bytesUsed, out charsUsed, out completed);
+                    retval = new string(outbuffer, 0, charsUsed);
+                    readStatus = retval.Contains(EncoderFallbackDetectionString) ? ReadStatus.Hex : ReadStatus.OK;
+                    if (retval.Length == 1)
+                    {
+                        readStatus = ReadStatus.Hex; // 1=char strings should be hex for e.g., battery levels.
+                    }
+                }
             }
             catch (Exception)
             {
@@ -70,6 +87,60 @@ namespace Utilities
         public static (string, ReadStatus) ReadStringEntire(DataReader dr)
         {
             return ReadString(dr, dr.UnconsumedBufferLength);
+        }
+
+        public static (string, ReadStatus) ReadStringEntire(byte[] value)
+        {
+            var dr = DataReader.FromBuffer(value.AsBuffer());
+            return ReadString(dr, dr.UnconsumedBufferLength);
+        }
+
+
+
+        /// <summary>
+        /// Returns true if the buffer has control chars (bytes with vaules 0..31 and 127=DEL) including NUL.
+        /// But not including tabs, newline, etc.
+        /// And if there's "enough" normal chars and then the buffer ends with NUL only, that's OK.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static bool ArrayHasControlChars(byte[] value)
+        {
+            int nnullAtEnd = 0;
+            int nnotcontrol = 0;
+            for (int i = 0; i < value.Length; i++)
+            {
+                var b = value[i];
+                switch (b)
+                {
+                    case 0:
+                        nnullAtEnd++;
+                        break;
+                    case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+                        return true;
+                    // 9=HT 10=LF
+                    case 11: case 12:
+                        return true;
+                    // 13=CR
+                    case 14: case 15: case 16: case 17: case 18: case 19: case 20:
+                    case 21: case 22: case 23: case 24: case 25: case 26:case 27: case 28: case 29:
+                    case 30: case 31:
+                        return true;
+                    case 127: //DEL
+                        return true;
+                    default:
+                        if (nnullAtEnd > 0)
+                        {
+                            // we got one or more NUL and then a regular ASCII char. That's
+                            // enough to declare that this isn't a real ascii string.
+                            return true;
+                        }
+                        nnotcontrol++;
+                        break;
+                }
+            }
+            var isOK = (nnullAtEnd == 0) || (nnotcontrol >= 4);
+            return !isOK;
         }
 
         private static void Log(string str)

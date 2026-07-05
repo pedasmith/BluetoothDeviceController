@@ -168,14 +168,23 @@ namespace BluetoothDeviceController.Names
                     // OK for the defaults to not have things specified.
                     if (item.Name != "##DEFAULT##")
                     {
+                        List<NameService> servicesToRemove = new List<NameService>();
                         foreach (var service in item.Services)
                         {
+                            if (service.Suppress)
+                            {
+                                servicesToRemove.Add(service);
+                                continue;
+                            }
+
                             foreach (var characteristic in service.Characteristics)
                             {
                                 if (characteristic.Type.Contains ("XR^EnvironmentData"))
                                 {
                                     ; // handy place for a debugger
                                 }
+                                if (characteristic.Suppress) continue;
+
                                 if (characteristic.TypePFL.Globals == null)
                                 {
                                     if (service.ServiceTypePFL != null)
@@ -197,6 +206,11 @@ namespace BluetoothDeviceController.Names
                                     }
                                 }
                             }
+                        }
+
+                        foreach (var service in servicesToRemove)
+                        {
+                            item.Services.Remove(service);
                         }
                     }
                     // Add in all of the values from the default

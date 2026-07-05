@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Graphics.Printing;
 // Location: BluetoothProtocols/Names
 namespace BluetoothDeviceController.Names
 {
@@ -277,6 +278,10 @@ namespace BluetoothDeviceController.Names
                     ; // handy place to put a debugger to verify it's being set.
                 }
             }
+            DataGroupName = service.Name + "_Data"; // Actually set in the BtJsonToMacro
+            // e.g., the Nordic Thingy has an "Environment" service with a bunch of characteristics
+            // like a temperature and pressure and humidity. These individual characteristics are
+            // all put into the same larger _data structure. But the JSON can override this.
             IsRead = characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read);
             if (SuppressRead) IsRead = false;
             IsWrite = characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Write);
@@ -335,6 +340,7 @@ namespace BluetoothDeviceController.Names
         }
 
         // These are used when generating C# classes
+        public string DataGroupName { get; set; }
         public bool IsRead { get; set; }
         public string ReadConvert { get; set; }
         public bool IsWrite { get; set; }

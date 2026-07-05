@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>5191b530-713c-47f1-94ab-c97ff2aa273a</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>BluetoothProtocolsNames</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BleNames.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothServiceRegistration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GuidGetCommon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NameAllBleDevices.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NameChacteristic.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NameDevice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NameService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NamesUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SerialConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemTextJsonCleaner.cs" />
+  </ItemGroup>
+</Project>

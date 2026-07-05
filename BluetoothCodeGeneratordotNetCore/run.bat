@@ -6,7 +6,8 @@ REM set REPODIR=%UserProfile%\source\repos
 
 set REPODIR=%CD%\..
 set JSONDIR=%REPODIR%\BluetoothDeviceController\Assets\CharacteristicsData
-set BIN= ".\bin\Debug\net6.0-windows10.0.19041.0\BluetoothCodeGeneratordotNetCore"
+REM set BIN= ".\bin\Debug\net6.0-windows10.0.19041.0\BluetoothCodeGeneratordotNetCore"
+set BIN= ".\bin\Debug\net10.0-windows10.0.19041.0\BluetoothCodeGeneratordotNetCore"
 if not exist output mkdir output
 
 REM
@@ -30,7 +31,8 @@ REM %BIN% -inputJsonFile "%JSONDIR%"\Govee_H6005.json -inputTemplates Templates 
 REM %BIN% -inputJsonFile "%JSONDIR%"\Bluetooth_CurrentTimeService.json -inputTemplates Templates -output output
 REM %BIN% -inputJsonFile "%JSONDIR%"\BtUnicodeKeyboard.json -inputTemplates Templates -output output
 REM %BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
+REM %BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\SensyOne-S1ProMultiSense.json -inputTemplates Templates -output output
 goto :EOF
 
 :SingleFile

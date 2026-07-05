@@ -349,3 +349,6 @@ healthchecksdb
 /BluetoothCodeGeneratordotNetCore/output
 /ZZZ.vs
 /BluetoothDeviceController/ZZZ.vs
+/SmallProjects/BluetoothYamlToCSharpSwitch/units.yaml
+/BluetoothCodeGeneratordotNetCore/junk.bat
+/BluetoothCodeGeneratordotNetCore/junkTemplates

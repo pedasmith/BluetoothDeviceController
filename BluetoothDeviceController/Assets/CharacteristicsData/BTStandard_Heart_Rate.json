@@ -1,0 +1,272 @@
+
+
+{
+  "AllDevices": [
+    {
+      "Name": "Powrlabs_0759864",
+      "ClassName": "BTStandard_HeartRate",
+      "CompletionStatus": 0,
+      "Links": [
+      ],
+
+      "IgnoredServices": [
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "GATT",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changed",
+              "Suppress": false,
+              "Type": "BYTES|HEX|ServiceChanged",
+              "IsRead": false,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": true,
+              "Verbs": ":Indicate:RdInNo:InNo:"
+            }
+          ]
+        }
+
+      ],
+      "Services": [
+        {
+          "UUID": "0000180d-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Heart Rate",
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "00002a37-0000-1000-8000-00805f9b34fb",
+              "Name": "Heart Rate Measurement",
+              "Suppress": false,
+              "Type": "U8|HEX|Flags OSKIP^1^$Flags_GN_1_AN U8|DEC|HeartRateLowRange|bpm OSKIP^1^$Flags_GN_1_AN_NT U16|DEC|HeartRateHighRange|bpm OSKIP^1^$Flags_GN_8_AN_NT U16|DEC|EnergyExpended|Joules OSKIP^1^$Flags_GN_16_AN_NT U16S|DEC|RRInterval",
+              "IsRead": false,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": true,
+              "IsIndicate": false,
+              "Verbs": ":Notify:RdInNo:InNo:"
+            },
+            {
+              "UUID": "00002a38-0000-1000-8000-00805f9b34fb",
+              "Name": "Body Sensor Location",
+              "Suppress": false,
+              "Type": "U8|DEC|SensorLocation",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "01",
+                "0=other 1=chest 2=wrist 3=finger 4=hand 5=ear lobe 6=foot"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "GAP",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Suppress": false,
+              "Type": "STRING|ASCII|DeviceName",
+              "IsRead": true,
+              "IsWrite": true,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "BK6 S-636843"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Suppress": false,
+              "Type": "U16|HEX|Appearance",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "83 04"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Peripheral Preferred Connection Parameters",
+              "Suppress": false,
+              "Type": "BYTES|HEX|ConnectionParameters",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "32 00 64 00 01 00 90 01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a07-0000-1000-8000-00805f9b34fb",
+              "Name": "Transmit Power",
+              "Type": "I8|DEC|TransmitPower|db"
+            },
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "BatteryLevel",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Battery: 88%",
+                "88"
+              ]
+            }
+          ]
+        },
+
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Device Information",
+          "Characteristics": [
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manufacturer Name String",
+              "Suppress": false,
+              "Type": "STRING|ASCII|Manufacturer",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "NULL"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number String",
+              "Suppress": false,
+              "Type": "STRING|ASCII|ModelNumber",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "2018-3-23"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision String",
+              "Suppress": false,
+              "Type": "STRING|ASCII|HardwareRevision",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "V1.2"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision String",
+              "Suppress": false,
+              "Type": "STRING|ASCII|FirmwareRevision",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "V0.6"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision String",
+              "Suppress": false,
+              "Type": "STRING|ASCII|SoftwareRevision",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "V3.4"
+              ]
+            },
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Suppress": false,
+              "Type": "BYTES|HEX|SystemID",
+              "IsRead": true,
+              "IsWrite": false,
+              "SuppressRead": false,
+              "SuppressWrite": false,
+              "IsWriteWithoutResponse": false,
+              "IsNotify": false,
+              "IsIndicate": false,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "56 34 12 00 00 03 02 01"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "TODO: line 190"
+    }
+  ]
+}
+

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="BluetoothWinUI3.BTNordic_ThingyControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothWinUI3"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:oxyplot="using:OxyPlot"
+    xmlns:tv="using:WinUI.TableView"
+    mc:Ignorable="d"
+    >
+
+    <Border Style="{StaticResource sDeviceBorder}" x:Name="rootPanel">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="uiDeviceName" Grid.Row="0" Text="Nordic Thingy 52" Style="{StaticResource sDeviceTitle}"/>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <GridView Grid.Row="0" x:Name="uiDeviceDataList" Style="{StaticResource sDeviceDataList}">
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Temperature</Run><Run Text="&#160;"/><Run x:Name="uiTemperature_cChange" Text="┄"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTemperature_c"/></TextBlock>
+                        <Line Tag="TemperatureColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Pressure</Run><Run Text="&#160;"/><Run x:Name="uiPressure_hpaChange" Text="┄"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPressure_hpa"/></TextBlock>
+                        <Line Tag="PressureColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Humidity</Run><Run Text="&#160;"/><Run x:Name="uiHumidityChange" Text="┄"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
+                        <Line Tag="HumidityColor" Style="{StaticResource sGraphLineKey}"/>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>eCOS</Run><Run Text=" "/><Run x:Name="uieCOSChange" Text=" "/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uieCOS"/></TextBlock>
+                        <Line Grid.Row="2" Grid.Column="0" Tag="eCOSColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>TVOC</Run><Run Text=" "/><Run x:Name="uiTVOCChange" Text=" "/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTVOC"/></TextBlock>
+                        <Line Tag="TVOCColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Color</Run><Run Text=" "/><Run x:Name="uiColorChange" Text=" "/>
+                        </TextBlock>
+                        <Border Height="30" Width="90" x:Name="uiColor" Background="White" />
+                    </StackPanel>
+                </GridView>
+                <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
+                <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
+                    <tv:TableView x:Name="uiTableView" IsReadOnly="True" />
+                    <!--
+                    2026-05-05 Trying out the DataGrid from the old Community Toolkit (7.1.2?)
+                    <controls:DataGrid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="uiDataGridGrid"
+                                       AutoGenerateColumns="True"
+                                       CanUserSortColumns="True"
+                                       CanUserResizeColumns="True"
+                                       SelectionMode="Single"
+                                       HeadersVisibility="Column"
+                                       />
+                    -->
+                </Grid>
+                
+            </Grid>
+            <TextBlock Grid.Row="2" Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
+            <local:BTConnectionControl Grid.Row="3" x:Name="uiBTConnectionControl" />
+        </Grid>
+    </Border>
+</UserControl>

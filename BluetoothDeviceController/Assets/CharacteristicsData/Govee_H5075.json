@@ -20,6 +20,17 @@
         "https://sunriseprogrammer.blogspot.com/2023/01/your-bluetooth-is-bad-january-2023.html"
       ],
       "SuppressFile": ":SuppressXAML:SuppressCSharpProtocol:",
+      "AdvertisementData": [
+        "88 EC 00 02 EF E0 0B 00",
+        "88 EC 00 02 EF E0 0B 00",
+        "4C 00 02 15 49 4E 54 45 4C 4C 49 5F 52 4F 43 4B 53 5F 48 57 50 75 F2 FF 0C",
+        "88 EC 00 02 EF DA 0B 00",
+        "4C 00 02 15 49 4E 54 45 4C 4C 49 5F 52 4F 43 4B 53 5F 48 57 50 75 F2 FF 0C",
+        "88 EC 00 02 EF DA 0B 00",
+        "4C 00 02 15 49 4E 54 45 4C 4C 49 5F 52 4F 43 4B 53 5F 48 57 50 75 F2 FF 0C",
+        "88 EC 00 02 EF DB 0B 00"
+      ],
+
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",

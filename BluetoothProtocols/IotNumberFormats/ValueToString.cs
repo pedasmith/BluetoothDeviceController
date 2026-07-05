@@ -380,6 +380,30 @@ namespace BluetoothDeviceController.BleEditor
                                 }
                                 break;
 
+                            case "U16S": // Array of U16
+                                {
+                                    if (displayFormat == "") displayFormat = "HEX";
+                                    string floatFormat = "F2";
+                                    string intFormat = "X6";
+
+                                    resultState = ResultState.IsDoubleArray;
+                                    dvalues = new List<double>();
+                                    while (dr.UnconsumedBufferLength >= 2)
+                                    {
+                                        dvalue = dr.ReadUInt16();
+                                        dvalues.Add(dvalue);
+
+                                        var intstr = DoubleToString(dvalue, displayFormat, displayFormatSecondary, floatFormat, intFormat);
+                                        if (intstr == null)
+                                        {
+                                            return ValueParserResult.CreateError(logstr, $"Integer display format command unrecognized; should be FIXED or HEX or DEC not {displayFormat} in {readcmd}");
+                                        }
+
+                                        if (stritem != "") stritem += " ";
+                                        stritem += intstr;
+                                    } // end while loop
+                                }
+                                break;
 
                             default:
                                 return ValueParserResult.CreateError(logstr, $"Integer command unrecognized; should be I8/16/24/32 not {readcmd}");

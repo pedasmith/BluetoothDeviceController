@@ -7,6 +7,19 @@
       "Links": [
         "https://nordicsemiconductor.github.io/Nordic-Thingy52-FW/documentation/firmware_architecture.html#fw_arch_ble_services"
       ],
+      "Advertisements": [
+        {
+          "RawAdvertisementLine1": "EB:5B:77:8A:84:4D\t14:49:07.9\t-61\tIsScannable\t\tThingy",
+          "RawadvertisementLine2": "LE General Discoverable Mode+BR/EDR Not Supported",
+          "RawAdvertisementLine3": "Service UUIDs (incomplete)EF680100-9B35-4933-9B10-52FFA9740042",
+          "RawResponseLine1": "EB:5B:77:8A:84:4D\t14:49:07.9\t-61\tScanResponse",
+          "RawResponseLine2": "Manufacturer: Nordic Semiconductor ASA: 1D EA C1 6D",
+          "ExampleAdvertisement":"2026-03-24 13:57:51.16,EB:5B:77:8A:84:4D,Thingy,Random,ConnectableUndirected,Connectable,-55,,3,Flags (0x01)=0x06,Incomplete List of 128-bit Service or Service Class UUIDs (0x06)=0x42 0x00 0x74 0xA9 0xFF 0x52 0x10 0x9B 0x33 0x49 0x35 0x9B 0x00 0x01 0x68 0xEF,Complete Local Name (0x09)=0x54 0x68 0x69 0x6E 0x67 0x79",
+
+
+          "MustMatchManufacturerName": "Nordic Semiconductor ASA"
+        }
+      ],
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",
@@ -92,7 +105,7 @@
               "Name": "Configuration Device Name",
               "IsRead": true,
               "IsWrite": true,
-              "Type": "STRING|ASCII|Name"
+              "Type": "STRING|ASCII|DeviceName"
             },
             {
               "UUID": "EF680102-9B35-4933-9B10-52FFA9740042",
@@ -192,7 +205,7 @@
             {
               "UUID": "EF680204-9B35-4933-9B10-52FFA9740042",
               "Name": "Air Quality eCOS TVOC",
-              "Type": "U16|DEC|eCOS|ppm U16|DEC|TVOC|ppb",
+              "Type": "U16|DEC|eCOS|ppm|390^0 U16|DEC|TVOC|ppb",
               "IsNotify": true,
               "REM": "Gas sensor is a CCS811",
               "UI": {
@@ -212,6 +225,7 @@
             {
               "UUID": "EF680205-9B35-4933-9B10-52FFA9740042",
               "Name": "Color RGB+Clear",
+              "DataGroupName": "EnvironmentColor_Data",
               "REM_alias": "Get LIGHT / LUMEN value",
               "Type": "U16|DEC|Red U16|DEC|Green U16|DEC|Blue U16|DEC|Clear",
               "IsNotify": true,
@@ -240,6 +254,7 @@
             {
               "UUID": "EF680206-9B35-4933-9B10-52FFA9740042",
               "Name": "Environment Configuration",
+              "DataGroupName": "EnvironmentConfiguration_Data",
               "Type": "U16|DEC|TempInterval|ms U16|DEC|PressureInterval|ms U16|DEC|HumidityInterval|ms U16|DEC|ColorInterval|ms U8|DEC|GasMode U8|DEC|RedCalibration U8|DEC|GreenCalibration U8|DEC|BlueCalibration",
               "REM": "TempInterval is 100..60K; PressureInterval is 50..60K; HumidityInterval is 100..60K; ColorInterval is 200..60K Gas mode is 1 (1 second), 2 (10 seconds) or 3 (1 minute)",
               "IsRead": true,
@@ -254,6 +269,7 @@
 
         {
           "UUID": "EF680300-9B35-4933-9B10-52FFA9740042",
+          "Suppress": true,
           "Name": "UI",
           "Priority": 5,
           "Characteristics": [
@@ -291,6 +307,7 @@
 
         {
           "UUID": "EF680400-9B35-4933-9B10-52FFA9740042",
+          "Suppress": true,
           "Name": "Motion",
           "Priority": 6,
           "Characteristics": [
@@ -383,6 +400,7 @@
 
         {
           "UUID": "EF680500-9B35-4933-9B10-52FFA9740042",
+          "Suppress": true,
           "Name": "Audio",
           "Priority": 3,
           "Characteristics": [

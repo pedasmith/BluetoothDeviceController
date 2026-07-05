@@ -41,7 +41,7 @@ namespace TemplateExpander
             // if the left is a number, calculate as a number;
             int leftVal, rightVal;
             bool leftIsNumber = int.TryParse(left, out leftVal);
-            bool rightIsNumber = int.TryParse(left, out rightVal);
+            bool rightIsNumber = int.TryParse(right, out rightVal);
             if (leftIsNumber && rightIsNumber)
             {
                 switch (Opcode)

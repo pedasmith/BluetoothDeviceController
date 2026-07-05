@@ -10,6 +10,8 @@ The Bluetooth Code Generator converts JSON descriptions of Bluetooth devices int
 
 The Bluetooth Code Generator is used in conjunction with the Bluetooth Device Controller program.
 
+See [Modern IOT Number Formats](https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/) for details of the little JSON language  for describing complex Bluetooth characteristics.
+
 Problems solved include:
 
 1. Bluetooth requires a lot of common "boilerplate" code; the Bluetooth Code Generator creates those for you
@@ -63,7 +65,7 @@ this code block will be ignored
 There are multiple ways expansion can work
 
 Type|Where placed|Details
------|-----|-----|-----
+-----|-----|-----|
 Global|top-level|This is the default and doesn't need any options
 Global-List|top-level|Done when Type=list and a Source is provided. Each child in the Source list will be visited and expanded, and the results all concatenated together. This is used by, e.g., the LINKS to make a single top-level (global) list of links.
 Parent-List|above the child|Done when Type=list and a Source is provided and ListOutput=parent
@@ -126,14 +128,14 @@ Opcode|Meaning
 !=|Not-equals
 contains|The left string contains the right string. Compare is case-insensitive
 !contains|The left string does not contain the right string. Compare is case-insensitive
-length\>|Length of left-hand macro is greater-than right hand value
+length\>|Length of left-hand macro is greater-than right hand value (e.g., If="[[Verb]] length\> 5")
 
 ### ListOutput=parent or child or global (default)
 
 Says where to place the result of expanding a Type=list expansion
 
 
-### Trim=true|false (d=false) says whether to trim the CR off of the template
+### Trim=true|false|endCR (d=false) says whether to trim the CR off of the template
 
 Sometimes the template expansion should include the CR at the and of the code block, and sometimes not. Use the Trim option to set the way you need it. The default is **false**, so it's often only applied when you need a Trim=true. 
 
@@ -151,3 +153,13 @@ COUNT|Current list element index (starting at 0)
 Child.Count|Current list element for just the bottom level of expansion
 
 If there's an If expression and it's false, the counts will not be incremented. 
+
+
+Helpful SOURCE values
+SOURCE|Notes
+-----|-----|
+Services|All services
+Services/DataGroups|
+
+
+

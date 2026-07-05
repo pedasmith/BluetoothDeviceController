@@ -28,7 +28,8 @@ namespace TemplateExpander
                 // The Markdown parser is a little wierd. It starts the code with the first line
                 // after the back-ticks, and doesn't include the \n before the last set of back-ticks.
                 // So "trim" is the default and I have to add a \n as needed.
-                if (OptionTrim) return Code;
+                if (OptionTrim == OptionTrimOption.TrimCR) return Code;
+                if (OptionTrim == OptionTrimOption.TrimEndCR) return Code + "\r\n";
                 return Code + "\r\n";
             }
         }
@@ -56,7 +57,9 @@ namespace TemplateExpander
         public string OptionDirName { get; internal set; } = "";
         public string OptionIf { get; internal set; }
         public string OptionElse { get; internal set; } = null; // null means not set; blank ("") means replace with nothing
-        public bool OptionTrim { get; internal set; } = false;
+
+        public enum OptionTrimOption {  NoTrim, TrimCR, TrimEndCR, }
+        public OptionTrimOption OptionTrim { get; internal set; } = OptionTrimOption.NoTrim;
         public bool OptionTrimWrap { get; internal set; } = false;
         public bool OptionTrimListSubZero { get; internal set; } = false;
         public enum TypeOfExpansion {  Normal, List};
@@ -74,7 +77,28 @@ namespace TemplateExpander
         public TypeOfListOutput OptionListOutput { get; internal set; } = TypeOfListOutput.Global;
 
 
-        public Dictionary<string, string> Macros { get; } = new Dictionary<string, string>();
+        private Dictionary<string, string> Macros { get; } = new Dictionary<string, string>();
+        public void MacrosAdd(string key, string value) { Macros.Add(key, value); }
+        public int MacrosCount { get { return Macros.Count; } }
+        public bool MacrosTryGetValue(string key, out string retval) 
+        { 
+            var status = Macros.TryGetValue(key, out retval);
+            if (status == true && retval != null && retval.Contains("dest.RRInterval = source.RRInterval"))
+            {
+                ; // Handy place for a debugger
+            }
+            return status;
+        }
+        public string MacrosGet(string key) 
+        {
+            var retval = Macros[key];
+            if (retval != null && retval.Contains("dest.RRInterval = source.RRInterval"))
+            {
+                ; // Handy place for a debugger
+            }
+            return retval; 
+        }
+        public Dictionary<string, string> MacrosMacros {  get { return Macros; } }
         public Dictionary<string, TemplateSnippet> Children { get; }  = new Dictionary<string, TemplateSnippet>();
         public void AddChildViaMacro(TemplateSnippet child, string childId="UUID")
         {
@@ -303,13 +327,16 @@ namespace TemplateExpander
                             switch (opts[1])
                             {
                                 case "true":
-                                    retval.OptionTrim = true;
+                                    retval.OptionTrim = OptionTrimOption.TrimCR;
                                     break;
                                 case "false":
-                                    retval.OptionTrim = false;
+                                    retval.OptionTrim = OptionTrimOption.NoTrim;
+                                    break;
+                                case "endCR":
+                                    retval.OptionTrim = OptionTrimOption.TrimEndCR;
                                     break;
                                 default:
-                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be true or false\n";
+                                    retval.Errors += $"ERROR: value {opts[0]}={opts[1]} should be true or false or endCR\n";
                                     break;
                             }
                             break;

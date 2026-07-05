@@ -4,6 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using enumUtilities;
+
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
+
 namespace BluetoothProtocols
 {
     public class SpeakMessageConverter : EnumValueConverter<Lionel_LionChief_Custom.SpeakMessage> { }

@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
 namespace BluetoothProtocols
 { 
     public partial class Elk_LedLight : Light

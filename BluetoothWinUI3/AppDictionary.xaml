@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothWinUI3">
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="sAllFonts_Foreground" Color="#FF5555FF" />
+            <SolidColorBrush x:Key="sDeviceBorder_BorderBrush" Color="DarkGray" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background" Color="#FF221155" />
+            <SolidColorBrush x:Key="sZoomableDeviceBorder_Background" Color="Gray" />
+        </ResourceDictionary>
+        
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="sAllFonts_Foreground" Color="DarkCyan" />
+            <SolidColorBrush x:Key="sDeviceBorder_BorderBrush" Color="Gray" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background" Color="LightBlue" />
+            <SolidColorBrush x:Key="sZoomableDeviceBorder_Background" Color="Gray" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+
+    <Style x:Key="sAllFonts" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Candara,Segoe Fluent Icons,Segoe MDL2 Assets" />
+        <Setter Property="Foreground" Value="{ThemeResource sAllFonts_Foreground}" />
+        <Setter Property="IsTextSelectionEnabled" Value="True" />
+    </Style>
+
+
+    <Style x:Key="sDeviceBorder" TargetType="Border">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="{ThemeResource sDeviceBorder_BorderBrush}" />
+        <Setter Property="Background" Value="{ThemeResource sDeviceBorder_Background}" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="CornerRadius" Value="10,10,10,10" />
+        <Setter Property="Height" Value="380" />
+        <Setter Property="Width" Value="380" />
+    </Style>
+
+    <Style x:Key="sDeviceDataList" TargetType="GridView">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="SelectionMode" Value="None" />
+    </Style>
+
+    <Style x:Key="sDeviceDataPanel" TargetType="StackPanel">
+        <Setter Property="Width" Value="120" />
+    </Style>
+
+    <Style x:Key="sZoomableDeviceBorder" TargetType="Border" BasedOn="{StaticResource sDeviceBorder}">
+        <Setter Property="Background" Value="{ThemeResource sZoomableDeviceBorder_Background}" />
+    </Style>
+    
+    <Style x:Key="sHelpPanel" TargetType="Border"  >
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#DDDDDD" />
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="5" />
+    </Style>
+
+    <Style x:Key="sTitle" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="24" />
+    </Style>
+
+
+    <!-- example: Thingy 52 -->
+    <Style x:Key="sDeviceTitle" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <!-- example: "temperature" -->
+    <Style x:Key="sDevicePrimaryTitle" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+    <!-- Example: 24.2C -->
+    <Style x:Key="sDevicePrimaryData" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="sAdvertisementData" TargetType="TextBlock" BasedOn="{StaticResource sDeviceListDataCompressed}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>    
+    <!-- Example: Battery percentage -->
+    <Style x:Key="sDeviceData" TargetType="TextBlock" BasedOn="{StaticResource sDevicePrimaryData}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="IsTextSelectionEnabled" Value="True" />
+    </Style>
+    <!-- Example: Battery percentage icon picture of little battery -->
+    <Style x:Key="sDeviceDataIcon" TargetType="TextBlock" BasedOn="{StaticResource sDevicePrimaryData}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="28" />
+    </Style>
+    <!-- Example: BT address -->
+    <Style x:Key="sDeviceMinorText" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="10" />
+    </Style>
+    <Style x:Key="sDeviceListDataCompressed" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+    </Style>
+    <Style x:Key="sDeviceListDataCompressedPrimary" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+    </Style>
+
+
+    <Style x:Key="sGraphLineKey" TargetType="Line">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="X1" Value="0" />
+        <Setter Property="X2" Value="100" />
+        <Setter Property="Y1" Value="0" />
+        <Setter Property="Y2" Value="0" />
+        <Setter Property="Stroke" Value="Transparent" />
+        <Setter Property="StrokeThickness" Value="4" />
+    </Style>
+
+
+</ResourceDictionary>

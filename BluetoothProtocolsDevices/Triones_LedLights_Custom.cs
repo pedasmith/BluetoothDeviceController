@@ -9,6 +9,10 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
 using enumUtilities;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
 namespace BluetoothProtocols
 {
     public class TrionesModesConverter : EnumValueConverter<Triones_LedLight_Custom.Modes> { }

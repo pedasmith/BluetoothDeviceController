@@ -12,6 +12,10 @@ namespace TemplateExpander
         /// </summary>
         public static string ExpandMacroAll(string text, TemplateSnippet macros)
         {
+            if (text.Contains ("TRACK:"))
+            {
+                ; // Handy place for a debugger
+            }
             var retval = text;
             int startIndex = 0;
             int nloop = 0;
@@ -23,6 +27,10 @@ namespace TemplateExpander
             if (nloop >= 5000)
             {
                 retval = $"ERROR: too many macro expansions at {startIndex}\n" + retval;
+            }
+            if (retval.Contains("dest.RRInterval"))
+            {
+                ; // handy place for a debugger
             }
             return retval;
         }
@@ -48,7 +56,7 @@ namespace TemplateExpander
             }
             else
             {
-                bool hasMacro = macros.Macros.TryGetValue(macro, out retval);
+                bool hasMacro = macros.MacrosTryGetValue(macro, out retval);
                 if (!hasMacro)
                 {
                     var parent = macros.Parent;
@@ -58,7 +66,7 @@ namespace TemplateExpander
                         {
                             ; // DBG: handy breakpoint while I debug a problem.
                         }
-                        hasMacro = parent.Macros.TryGetValue(macro, out retval);
+                        hasMacro = parent.MacrosTryGetValue(macro, out retval);
                         parent = parent.Parent;
                     }
                 }
@@ -123,8 +131,9 @@ namespace TemplateExpander
             var expand = "";
 
             var data = macros.Children[source];
+            bool isLast = sourceIndex == sourceList.Length - 1;
             // Not at the bottom; must keep going deeper (and will return from this code block)
-            if (sourceIndex < (sourceList.Length - 1))
+            if (!isLast)
             {
                 foreach (var item in data.Children)
                 {
@@ -133,15 +142,16 @@ namespace TemplateExpander
                     expand += itemExpand;
                 }
                 // If the non-bottom items have no expansion, that's neither an error nor wrapped.
+
                 return expand;
             }
 
             // We're at the bottom of the sourceList, so do the expansion for real.
             int childCount = 0;
             int childCountAll = 0;
-            if (data.Macros.Count > 0)
+            if (data.MacrosCount > 0)
             {
-                foreach (var item in data.Macros)
+                foreach (var item in data.MacrosMacros)
                 {
                     macros.AddMacro("NAME", item.Key);
                     macros.AddMacro("TEXT", item.Value);
@@ -149,20 +159,23 @@ namespace TemplateExpander
                     if (expand != "") expand += template.CodeListSeparator;
                     expand += itemExpand;
                 }
-                count += data.Macros.Count;
-                countAll += data.Macros.Count;
-                childCount += data.Macros.Count;
-                childCountAll += data.Macros.Count;
+                count += data.MacrosCount;
+                countAll += data.MacrosCount;
+                childCount += data.MacrosCount;
+                childCountAll += data.MacrosCount;
             }
             else // Loop through the children, not the macros
             {
                 foreach (var item in data.Children)
                 {
                     var childMacros = item.Value;
-                    childMacros.AddMacro("COUNT", count.ToString());
+                    childMacros.AddMacro("Count", count.ToString());
                     childMacros.AddMacro("Count.Child", childCount.ToString());
-                    childMacros.AddMacro("COUNTALL", countAll.ToString());
+                    childMacros.AddMacro("CountAll", countAll.ToString());
                     childMacros.AddMacro("CountAll.Child", childCountAll.ToString());
+
+                    childMacros.AddMacro("COUNT", count.ToString());
+                    childMacros.AddMacro("COUNTALL", countAll.ToString());
                     bool matchesIf = true;
 
                     var itemExpand = Expander.ExpandMacroAll(itemTemplate, childMacros);
@@ -251,6 +264,14 @@ namespace TemplateExpander
             // If this is a ListOutput=parent expansion, then add the expansion to the macro here.
             if (template.OptionListOutput == TemplateSnippet.TypeOfListOutput.Parent)
             {
+                if (template.OptionTrim == TemplateSnippet.OptionTrimOption.TrimEndCR)
+                {
+                    expand = expand.TrimEnd(['\r', '\n', ' ']);
+                }
+                if (expand.Contains("dest.RRInterval"))
+                {
+                    ;// handy place for a debugger
+                }
                 macros.AddMacro(template.Name, expand);
                 expand = ""; // reset it
             }
@@ -335,6 +356,15 @@ namespace TemplateExpander
                             var countAll = 0;
                             expand = ExpandListRecursive(sourceList, 0, child, macros, ref count, ref countAll);
 
+                            if (expand.Contains("dest.RRInterval"))
+                            {
+                                ; // handy place for a debugger
+                            }
+
+                            if (child.OptionTrim == TemplateSnippet.OptionTrimOption.TrimEndCR)
+                            {
+                                expand = expand.TrimEnd(['\r', '\n', ' ']);
+                            }
                             if (!string.IsNullOrEmpty(child.OptionIf) && child.OptionListOutput == TemplateSnippet.TypeOfListOutput.Parent)
                             {
                                 var exp = TemplateExpression.Parse(child.OptionIf);

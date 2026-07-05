@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
+// https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/
 namespace BluetoothProtocols.IotNumberFormats
 {
 
@@ -61,7 +62,7 @@ namespace BluetoothProtocols.IotNumberFormats
             if (index1 == 1 && index2 == 0) return DisplayFormatPrimary;
             if (index1 == 2 && index2 == 0) return NamePrimary;
             if (index1 == 3 && index2 == 0) return UnitsPrimary;
-            if (index2 == 4 && index2 == 0) return DefaultValuePrimary;
+            if (index1 == 4 && index2 == 0) return DefaultValuePrimary;
             if (index1 >= SplitData.Length) return "";
             if (index2 >= SplitData[index1].Length) return "";
             return SplitData[index1][index2];

@@ -2,6 +2,8 @@
 using System.Text;
 using TemplateExpander;
 
+// See https://shipwrecksoftware.wordpress.com/2019/10/13/modern-iot-number-formats/
+
 // See https://docs.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-enhance
 // See https://blogs.windows.com/windowsdeveloper/2020/09/03/calling-windows-apis-in-net5/
 namespace BluetoothCodeGenerator
@@ -61,6 +63,13 @@ namespace BluetoothCodeGenerator
                             ndevicesNotOk++;
                             continue; // unusable is not an error; lots of devices are unusable.
                         }
+
+                        nameDevice.Services.RemoveAll(service => service.Suppress);
+                        foreach (var service in nameDevice.Services)
+                        {
+                            service.Characteristics.RemoveAll(characteristic => characteristic.Suppress);
+                        }
+
                         step = "convert";
                         outputList.Add(BtJsonToMacro.Convert(nameDevice));
                         step = "convert-complete";
@@ -102,6 +111,7 @@ namespace BluetoothCodeGenerator
                     Log($"{NAME}");
                     Log("--help or /? for help");
                     Log("-inputTemplates <directory> to select directory with template files in Markdown format");
+                    Log("-inputTemplateFile <file> to select a single template file from the template directory");
                     Log("-inputBtFile <file> to select a single BT JSON file");
                     break;
                 case ProgramArgs.CommandType.Error:
@@ -110,14 +120,34 @@ namespace BluetoothCodeGenerator
                     break;
                 case ProgramArgs.CommandType.Run:
                     {
-                        IEnumerable<string> files = null;
+                        IEnumerable<string> potentialfiles = null;
+                        IEnumerable<string> files = new List<string>();
                         try
                         {
-                            files = Directory.EnumerateFiles(args.InputTemplateDirectory);
+                            potentialfiles = Directory.EnumerateFiles(args.InputTemplateDirectory);
                         }
                         catch (Exception)
                         {
                             Log($"Error: {NAME}: unable to get files from {args.InputTemplateDirectory}");
+                            nerror++;
+                            break;
+                        }
+                        foreach (var potentialfile in potentialfiles)
+                        {
+                            bool isSelected = args.InputTemplateFileMatches(potentialfile);
+                            if (isSelected)
+                            {
+                                files = files.Append(potentialfile);
+                            }
+                            else
+                            {
+                                Log($"Note: {NAME}: file {potentialfile} is not selected");
+
+                            }
+                        }
+                        if (files.Count() == 0 && args.InputTemplateFiles.Count > 0)
+                        {
+                            Log($"Error: {NAME}: no files found from {args.InputTemplateDirectory} matching the specified file list");
                             nerror++;
                             break;
                         }
