@@ -292,8 +292,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
         UtilitiesWinUI3.UtilitiesWinUI3.InitializeKeyLineColorsFromDefaultOxyPlot(OxyPlotModel, rootPanel);
-
-        UpdateUX(CurrSaveData); // Shouldn't be null, but also handles null gracefully.
+        UpdateUX(CurrSaveData); // Can be null when the user hasn't made any changes
+        if (CurrSaveData == null)
+        {
+            KnownDeviceName = DataContextAsKnownDevice.Advertisement?.BestName ?? KnownDeviceName;
+            uiKnownDeviceName.Text = KnownDeviceName;
+        }
 
         Device.PropertyChanged += Device_PropertyChanged;
         await Device.NotifyBatteryLevelAsync();
@@ -358,7 +362,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         if (name != KnownDeviceName)
         {
             KnownDeviceName = name;
-            uiDeviceName.Text = KnownDeviceName;
+            uiKnownDeviceName.Text = KnownDeviceName;
             CurrSensor_DataUnits?.Name = KnownDeviceName;
             foreach (var item in HistoricalDataUnits.Data)
             {

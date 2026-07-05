@@ -288,6 +288,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         if (CurrSaveData == null)
         {
             KnownDeviceName = DataContextAsKnownDevice.Advertisement?.BestName ?? KnownDeviceName;
+            uiKnownDeviceName.Text = KnownDeviceName;
         }
 
         Device.PropertyChanged += Device_PropertyChanged;
@@ -362,7 +363,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         if (name != KnownDeviceName)
         {
             KnownDeviceName = name;
-            uiDeviceName.Text = KnownDeviceName;
+            uiKnownDeviceName.Text = KnownDeviceName;
             CurrSensor_DataUnits?.Name = KnownDeviceName;
             foreach (var item in HistoricalDataUnits.Data)
             {

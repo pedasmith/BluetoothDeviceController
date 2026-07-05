@@ -191,7 +191,8 @@ namespace BluetoothProtocols
         {
             if (dest == null)
             {
-                dest = new();
+                dest = new(); // Can't clone from source because it's a different type.
+                // UpdateFacade: if the source changes to have more fields, must update this method.
             }
             var heartRate = dest.CurrFlagsDecoded.HasFlag(FlagsDecoded.HeartRateValueFormatHighRange) ? source.HeartRateHighRange : source.HeartRateLowRange; 
 

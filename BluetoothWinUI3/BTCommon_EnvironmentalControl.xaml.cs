@@ -130,12 +130,15 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // attached to somewhere else (e.g., when the control is made large and then small)
         if (!FirstLoad) return;
         FirstLoad = false;
-        switch (CurrSensorFamily)
-        {
-            case SensorFamily.Govee: uiDeviceName.Text = "Sensor " + GoveeSensorType.ToString(); break;
-            case SensorFamily.SensorPro: uiDeviceName.Text = "Sensor " + SensorProSensorType.ToString(); break;
-            case SensorFamily.ThermPro: uiDeviceName.Text = "Sensor " + ThermProSensorType.ToString(); break;
-        }
+
+        // Original display would show the sensor type. But the updated code prefers the advertisement
+        // name or the saved name
+        //switch (CurrSensorFamily)
+        //{
+        //    case SensorFamily.Govee: uiKnownDeviceName.Text = "Sensor " + GoveeSensorType.ToString(); break;
+        //    case SensorFamily.SensorPro: uiKnownDeviceName.Text = "Sensor " + SensorProSensorType.ToString(); break;
+        //    case SensorFamily.ThermPro: uiKnownDeviceName.Text = "Sensor " + ThermProSensorType.ToString(); break;
+        //}
 
         // Change: set the right sparkles
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
@@ -274,6 +277,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         //DataContextAsKnownDevice.BTLEDevice = Device.ble;
 
         KnownDeviceName = DataContextAsKnownDevice.Advertisement.BestName;
+        uiKnownDeviceName.Text = KnownDeviceName;
 
 
         // Initialize data values. Somewhat ugly code :-(
@@ -336,7 +340,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         if (name != KnownDeviceName)
         {
             KnownDeviceName = name;
-            uiDeviceName.Text = KnownDeviceName;
+            uiKnownDeviceName.Text = KnownDeviceName;
             CurrSensor_DataUnits?.Name = KnownDeviceName;
             foreach (var item in HistoricalDataUnits.Data)
             {
@@ -595,6 +599,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         // Note: you have to remove the sensor from the uiDeviceDataList entirely. You can't just
         // set it to invisible because the items will still show up
+        CurrTableCustomization.TableColumns.Add("Name"); // always show the nae
 
         if (CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature))
         {
@@ -643,11 +648,12 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
         UtilitiesWinUI3.UtilitiesWinUI3.InitializeKeyLineColorsFromDefaultOxyPlot(OxyPlotModel, rootPanel);
-
-        var saveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id);
-        if (saveData != null)
+        // Advertisement-based devices don't really have a device ID. CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id);
+        UpdateUX(CurrSaveData); // Can be null when the user hasn't made any changes
+        if (CurrSaveData == null)
         {
-            UpdateUX(saveData);
+            KnownDeviceName = DataContextAsKnownDevice.Advertisement?.BestName ?? KnownDeviceName;
+            uiKnownDeviceName.Text = KnownDeviceName;
         }
 
         //

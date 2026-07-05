@@ -26,7 +26,7 @@
                 </Grid.ColumnDefinitions>
                 <!-- ✓ Check Mark U+2713 -->
                 <!-- ✗ Ballot X U+2717 -->
-                <TextBlock x:Name="uiDeviceName" Grid.Column="0" Text="Heart Rate" Style="{StaticResource sDeviceTitle}"/>
+                <TextBlock x:Name="uiKnownDeviceName" Grid.Column="0" Text="Heart Rate" Style="{StaticResource sDeviceTitle}"/>
                 <StackPanel Orientation="Horizontal" Grid.Column="1">
                     <TextBlock x:Name="uiSensorConnection" Text="--" Style="{StaticResource sDeviceData}"/>
                     <TextBlock x:Name="uiSensorLocation" Text="--" Style="{StaticResource sDeviceData}"/>

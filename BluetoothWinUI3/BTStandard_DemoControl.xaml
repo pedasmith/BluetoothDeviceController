@@ -19,7 +19,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="uiDeviceName" Grid.Row="0" Text="Demonstation Display" Style="{StaticResource sDeviceTitle}"/>
+            <TextBlock x:Name="uiKnownDeviceName" Grid.Row="0" Text="Demonstation Display" Style="{StaticResource sDeviceTitle}"/>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
