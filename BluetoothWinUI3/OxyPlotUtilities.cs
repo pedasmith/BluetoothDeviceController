@@ -2,6 +2,7 @@
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,6 +11,24 @@ namespace BluetoothWinUI3;
 
 internal static class OxyPlotUtilities
 {
+    public static PlotModel MakeOxyPlotModel(string title)
+    {
+        PlotModel retval = new PlotModel
+        {
+            Title = title,
+            PlotAreaBorderColor = OxyColors.Transparent,
+            TextColor = OxyColors.Black,
+            Axes =
+            {
+                new DateTimeAxis { Position = AxisPosition.Bottom },
+            },
+            Series =
+            {
+            }
+        };
+        return retval;
+    }
+
     public static PlotModel MakeOxyPlotModelSimple(string title, int step, int range, string axisTitle, string propertyName)
     {
         PlotModel retval = new PlotModel
@@ -50,30 +69,36 @@ internal static class OxyPlotUtilities
         };
         return retval;
     }
+
     public static List<OxyColor> PreferredPlotColors = new List<OxyColor>()
     {
-        OxyColors.DarkBlue, OxyColors.LightBlue, OxyColors.Violet, OxyColors.Black, OxyColors.Gray,
+        OxyColors.DarkBlue, OxyColors.DarkGreen, OxyColors.Violet, OxyColors.Black, OxyColors.Gray,
     };
 
     /// <summary>
-    /// Stackable way to add additional lines to the oxyplot. Returns the PlotModel, so you can 
+    /// Stackable way to add additional lines to the oxyplot. 
+    /// Returns the PlotModel, so you can do a MakeOxyPlotSimple().AddLine().AddLine()
+    /// The step and range are only applied to the first line added
     /// </summary>
     public static PlotModel AddLine (this PlotModel retval, int step, int range, string axisTitle, string propertyName, double minimum = double.NaN, AxisPosition position = AxisPosition.Left)
     {
         var tier = retval.NInPosition(position);
-        var colorIndex = (retval.Series.Count + 1) % PreferredPlotColors.Count;
+        var colorIndex = (retval.Series.Count) % PreferredPlotColors.Count;
         var axis = new LinearAxis()
         {
             Position = position,
             PositionTier = tier, // PositionTier=0 is the innermost tier. //DOC:
-            //MajorGridlineColor = OxyColors.Black, // Not set for additional lines. Only the first axis gets a grid!
-            //MajorGridlineStyle = LineStyle.Solid,
-            //MajorGridlineThickness = 1,
-            //MajorStep = step, // 1 hpa
-            //MinimumRange = range,
             Title = axisTitle,
             Key = propertyName,
         };
+        if (retval.Axes.Count == 1)
+        {
+            axis.MajorGridlineColor = OxyColors.Black; // Not set for additional lines. Only the first axis gets a grid!
+            axis.MajorGridlineStyle = LineStyle.Solid;
+            axis.MajorGridlineThickness = 1;
+            axis.MajorStep = step; // 1 hpa
+            axis.MinimumRange = range;
+        }
         if (!double.IsNaN(minimum))
         {
             axis.Minimum = minimum;
@@ -118,6 +143,36 @@ internal static class OxyPlotUtilities
             }
         }
         return retval;
+    }
+
+    public static void InitializeLineNamesFromOxyPlotModel(List<string> dest, PlotModel oxyPlotModel)
+    {
+        foreach (var series in oxyPlotModel.Series)
+        {
+            var title = series.Title;
+            dest.Add(title);
+        }
+    }
+
+
+    /// <summary>
+    /// Sets up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
+    /// This is done in the control constructor. It can't be done at initialization time because of C#. 
+    /// C# doesn't let me use a regular field when doing an initialization.
+    /// </summary>
+    public static void InitializeOxyPlotData(PlotView uiOxyPlot, PlotModel oxyPlotModel, System.Collections.IEnumerable data)
+    {
+        // Set up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
+        // This can't be done at initialization time because of C#: it won't let me use a regular
+        // field when doing an initialization.
+        foreach (var series in oxyPlotModel.Series)
+        {
+            if (series is LineSeries lineSeries)
+            {
+                lineSeries.ItemsSource = data; //DOC:
+            }
+        }
+        uiOxyPlot.Model = oxyPlotModel;
     }
 
 

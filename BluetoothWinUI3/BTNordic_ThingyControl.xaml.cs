@@ -5,7 +5,6 @@ using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OxyPlot;
-using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
@@ -21,7 +20,7 @@ namespace BluetoothWinUI3;
 #endif
 
 
-#region Set these to match your device
+#region Change these to match your device
 using DeviceSpecificType = Nordic_Thingy; // Change: pick your device, not BTStandard_Demo
 using DeviceSpecificSensorData = Nordic_Thingy.Environment_Data; // Change: 
 using DeviceSpecificSensorSecondaryData = Nordic_Thingy.EnvironmentColor_Data; // Change: pick secondary sensor if needed
@@ -29,16 +28,16 @@ using DeviceSpecificBatteryData = Nordic_Thingy.Battery_Data; // Change: many de
 #endregion
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControlBasic, IDeviceControlDevice
+public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Change: change the name from BTStandard_DemoControl
 {
-    #region Settings that must be updated for a new device
+    #region Change these settings that must be updated for a new device
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "Nordic_Thingy"; // Change: BTStandard_Demo
+    private readonly string InternalDeviceType = "Nordic_Thingy"; // Change: change the BTStandard_Demo string to match your device. The exact name does not matter.
     #endregion
 
-    #region Advanced settings and values
+    #region Change these advanced settings only when needed (most devices won't change these)
     /// <summary>
     /// Most developer never need to change this from 'true'!
     /// Ususually a device always has their sensor data. But some devices are might not. 
@@ -62,34 +61,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     const double HistoricalDataUpdateRateInSeconds = 5.0;
     #endregion
 
-    public BTNordic_ThingyControl() // CHANGE:
+    public BTNordic_ThingyControl() // CHANGE: change the name to match the changed class name
     {
         InitializeComponent();
         this.Loaded += Control_Loaded;
         this.DataContextChanged += Control_DataContextChanged;
-
-        //
-        // Set up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
-        // This can't be done at initialization time because of C#: it won't let me use a regular
-        // field when doing an initialization.
-        foreach (var series in OxyPlotModel.Series)
-        {
-            if (series is LineSeries lineSeries)
-            {
-                lineSeries.ItemsSource = HistoricalDataUnits.Data; //DOC:
-            }
-        }
-        uiOxyPlot.Model = OxyPlotModel;
-
-        //
-        // Set up the uiTableView
-        // https://w-ahmad.dev/WinUI.TableView/index.html
-        // https://github.com/w-ahmad/WinUI.TableView
-        //
-        uiTableView.AutoGeneratingColumn += CurrTableCustomization.TableView_AutoGeneratingColumn_UseCustomization;
     }
 
-    #region Instance value for a device
+    #region Instance value for a device (not changed)
     DeviceSpecificType Device;
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
@@ -101,7 +80,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
-    public void ClearAccumulatedFineGrainedData() {; } // do nothing
+
+    // CHANGE: some devices (like the heart rate) also have fine grained data.
+    public void ClearAccumulatedFineGrainedData()
+    {
+        ;  // do nothing
+    }
     public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
     {
         return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];
@@ -148,7 +132,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     DeviceSpecificSensorSecondaryData CurrSensorSecondary_DataUnits = null;
     #endregion
 
-    #region Instance values for the UX
+    #region Instance values for the UX (not changed)
     /// <summary>
     /// Standard: Panel size. Set in UpdateUX from MainWindow.
     /// </summary>
@@ -164,19 +148,35 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// <summary>
     /// Customization for the TableView.
     /// </summary>
-    TableViewColumnCustomization CurrTableCustomization = new TableViewColumnCustomization();
+    TableViewColumnCustomization CurrTableCustomization = new TableViewColumnCustomization()
+    {
+    };
     #endregion
 
     private void Control_Loaded(object sender, RoutedEventArgs e)
+    {
+        InitializeUX();
+    }
+
+
+    bool InitializeUXCalled = false;
+    /// <summary>
+    /// Code to initialize the UX. Will be called both from Control_Loaded and from
+    /// DataContextChanged
+    /// </summary>
+    private void InitializeUX()
     {
         // Loaded gets called both when it's first loaded and also each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         // We only want to do work the first time.
 
-        if (uiTableView.ItemsSource != null) return;
-        uiTableView.ItemsSource = HistoricalDataUnits.Data;
+        if (InitializeUXCalled) return;
+        InitializeUXCalled = true;
 
-        // Change: set the right sparkles
+        #region Change to set up the sparkles and graph
+
+        // Change: set the right sparkles.
+        // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
             ( DeviceSpecificType.Temperature_cPropertyChangedName, uiTemperature_cChange),
@@ -186,12 +186,42 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             ( DeviceSpecificType.Air_Quality_eCOS_TVOCPropertyChangedName, uiTVOCChange),
             ( DeviceSpecificType.Color_RGB_ClearPropertyChangedName, uiColorChange),
         };
+
+        // Change: set up the graph by making an OxyPlotModel
+        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModelSimple("Environment", 10, 30, "Pressure", "Pressure")
+            .AddLine(10, 30, "Temperature", "Temperature")
+            .AddLine(10, 30, "Humidity", "Humidity")
+            .AddLine(10, 30, "eCOS", "eCOS", 380.0, OxyPlot.Axes.AxisPosition.Right)
+            .AddLine(10, 30, "TVOC", "TVOC", 0.0, OxyPlot.Axes.AxisPosition.Right)
+            ;
+        // "Sensor Data" is for the main graph title  and is human-readable
+        // "Battery" for the axis title and for the color settings in the menus and should be concise and human-readable
+        // "BatteryLevel" is the underlying sensor property name and must exactly match the C# name.
+        #endregion
+
+
+        // This oxyplot and table code is always the same and doesn't need to be changed.
+        OxyPlotUtilities.InitializeOxyPlotData(uiOxyPlot, OxyPlotModel, HistoricalDataUnits.Data);
+        OxyPlotUtilities.InitializeLineNamesFromOxyPlotModel(LineNames, OxyPlotModel);
+
+        //
+        // Set up the uiTableView
+        // https://w-ahmad.dev/WinUI.TableView/index.html
+        // https://github.com/w-ahmad/WinUI.TableView
+        //
+        uiTableView.AutoGeneratingColumn += CurrTableCustomization.TableView_AutoGeneratingColumn_UseCustomization;
+        uiTableView.ItemsSource = HistoricalDataUnits.Data;
     }
 
     // Allows the control to provide feedback to Windows about updates to the device capabilties.
     // For example, the device might not have a sensor, and so the user shouldn't be able 
     // see the table or graph.
     IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
+
+    /// <summary>
+    /// Called by MainWindow so this control knows who to contact based on device changes.
+    /// Often there are no changes
+    /// </summary>
     public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
     {
         NotifyDeviceControlChangesWindows = mainWindow;
@@ -201,8 +231,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     // NotifyDeviceControlChangesWindows.OnGetUXCapabilitiesChanged
     // so the main window menus get updated.
 
-    // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    List<string> _LineNames = new List<string>() { "Temperature", "Pressure", "Humidity", "eCOS", "TVOC" }; // CHANGE:
+    // The LineNames is set up in the Loaded from the call to OxyPlotUtilities.InitializeLineNamesFromOxyPlotModel
+    List<string> _LineNames = new() { };
+    /// <summary>
+    /// List of line names in the plot. This is set up directly from the OxyPlotModel. The line names
+    /// are needed so the MainWindow can set up the list of changeable line colors in the plot.
+    /// </summary>
     public List<string> LineNames { get { return _LineNames; } }
 
     /// <summary>
@@ -218,25 +252,16 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// <summary>
     /// The OxyPlotModel is the graph for the sensor data that we want to plot. It's of
     /// type "H.Oxyplot" which is a WinUI3 port of the original OxyPlot code.
-    /// CHANGE: you will want to set the Title and the list of Axes and LineSeries. In
-    /// general, each sensor type (e.g, on the Nordic Thingy there's a sensor for temperature,
-    /// dumidity, pressure, etc.) has its own Axis and its own LineSeries.
     /// </summary>
     // H.OxyPlot
-    private PlotModel OxyPlotModel { get; set; }
-        = OxyPlotUtilities.MakeOxyPlotModelSimple("Pressure", 10, 30, "Pressure", "Pressure")
-        .AddLine(10, 30, "Temperature", "Temperature")
-        .AddLine(10, 30, "Humidity", "Humidity")
-        .AddLine(10, 30, "eCOS", "eCOS", 380.0, OxyPlot.Axes.AxisPosition.Right)
-        .AddLine(10, 30, "TVOC", "TVOC", 0.0, OxyPlot.Axes.AxisPosition.Right)
-        ;
+    private PlotModel OxyPlotModel { get; set; } = null;
+
 
 
     /// <summary>
-    /// Loop through the LineSeries for where a matching DataFieldY
+    /// Loop through the LineSeries for where a matching DataFieldY. This is used by the MainWindow
+    /// when setting some stuff up.
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
     public uint GetGraphColor(string name)
     {
         return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(name, OxyPlotModel);
@@ -254,6 +279,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // FYI: by the time this method is called, the DataContext in the object is already set
 
         if (args.NewValue == null) return; // just bogus; ignore.
+        InitializeUX(); // ensure we're initialized.
 
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
         // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
@@ -268,9 +294,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             return;
         }
 
-
         OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
-        uiAddress.Text = BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr);
+        uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // might return null for the first connection
 
         Device = new DeviceSpecificType()
@@ -283,11 +308,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
             return;
         }
+
         // It's critical to set these!
         DataContextAsKnownDevice.Id = Device.ble.DeviceId ?? ""; // never null :-)
         DataContextAsKnownDevice.BTLEDevice = Device.ble;
-        CurrSaveData?.UpdateWithDevice(DataContextAsKnownDevice);
-        CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id); // now it's "guaranteed" to exist. Use the stable form of the device id.
+        CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id); // Use the stable form of the device id.
+        // CurrSaveData won't exist if the user hasn't made any changes
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
@@ -300,6 +326,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         }
 
         Device.PropertyChanged += Device_PropertyChanged;
+
+        #region Change so the device starts sending notifications for changed properties (data)
+
         await Device.NotifyBatteryLevelAsync();
         await Device.NotifyTemperature_cAsync();
         await Device.NotifyPressure_hpaAsync();
@@ -307,7 +336,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         await Device.NotifyAir_Quality_eCOS_TVOCAsync(); // both TVOC and eCOS
         await Device.NotifyColor_RGB_ClearAsync();
         await Device.ReadBatteryLevel(DefaultCacheMode);
+        #endregion
 
+        // The system tracks device changes
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
         CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
@@ -328,7 +359,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// When visibility is Visible, display the table of data. When collapsed, display
     /// the grid. Is called from MainWindow based on user selection.
     /// </summary>
-    /// <param name="visibility"></param>
     public void SetDataGridVisibility(IDeviceControlBasic.Visibility visibility)
     {
         UtilitiesWinUI3.UtilitiesWinUI3.SetDataGridVisibility(uiOxyPlot, uiDataGridPanel, visibility);
@@ -339,9 +369,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// Updates the OxyPlot line with a given name (e.g., "Temperature"). Is called from MainWindow when the
     /// user picks a new color.
     /// </summary>
-    /// <param name="lineName"></param>
-    /// <param name="color"></param>
-
     public void UpdateGraphColor(string lineName, uint color)
     {
         UtilitiesWinUI3.UtilitiesWinUI3.UpdateGraphColor(OxyPlotModel, rootPanel, lineName, color);
@@ -395,6 +422,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // Update the saved data in the HistoricalDataUnits to match the new user preferences.
         foreach (var data in HistoricalDataUnits.Data)
         {
+            #region Change to update the data based on user preferred units (e.g, C versus F)
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
                 // Change: based on your knowledge of the sensor data, change the temperature readings.
@@ -405,6 +433,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 // Change: based on your knowledge of the sensor data, change the pressure readings.
                 data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, CurrUserPrefs.Pressure);
             }
+            #endregion
         }
 
         UpdateDeviceDataUX(""); // all of them.
@@ -413,15 +442,11 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// <summary>
     /// Standard: the normal way to resize the control. 
     /// </summary>
-    /// <param name="windowSize"></param>
-    /// <param name="largeActualSize"></param>
-
     public void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize)
     {
         CurrWindowSize = windowSize;
         UtilitiesWinUI3.UtilitiesWinUI3.UpdateUXWindowSize(windowSize, largeActualSize, rootPanel, OxyPlotModel, uiOxyPlot);
     }
-
 
 
     /// <summary>
@@ -435,6 +460,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         System.Diagnostics.Debug.WriteLine(str);
         Console.WriteLine(str);
     }
+
 
     private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -450,6 +476,10 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     Dictionary<string, int> NPropertyChanges { get; } = [];
     readonly List<string> Sparkles = ["╺", "╼", "╾", "╸", "╾", "╼"];
 
+    /// <summary>
+    /// Updates the sparkles based on the changed property. Called from UpdateDeviceDataUX which is
+    /// called by Device_PropertyChanged when a device property changes.
+    /// </summary>
     private void UpdateSparkles(string name)
     {
         // In practice, name is never "*". The code is set up this way to match the Govee code.
@@ -465,32 +495,29 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     }
 
 
+    #region Change to update the UX when the device says there's new data
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
-    /// needs to be updated.
+    /// needs to be updated. Most often called from Device_PropertyChanged
     /// </summary>
-    /// <param name="name"></param>
     private void UpdateDeviceDataUX(string name)
     {
         if (Device == null) return;
+        UpdateSparkles(name); // name is from e.PropertyName when the Device does a PropertyChanged.
+
+
+        // Change: Always update these even though in practice they are only set once.
         CurrSensor_Data = Device.CurrEnvironment_Data; // Change: select the right data
         CurrSensorSecondary_Data = Device.CurrEnvironmentColor_Data; // Change: pick secondary data as appropriate
         CurrBattery_Data = Device.CurrBattery_Data; // Change: if your device doesn't have a battery, remove battery stuff!
 
-        // name is from e.PropertyName when the Device does a PropertyChanged.
-        UpdateSparkles(name);
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
         CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToOrClone(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
-        // Update this historical data; this will automatically update the table and graph.
-        //
-        // There's two kinds of sensors: ones like the Nordic_Thingy that send each bit of data separately,
-        // and ones that send all the data at once (like the Govee). 
-        //
-        // Track the historical data
+        // Change all this code to match your device and UX.
         switch (name)
         {
             case "*": // never used, but here so it matches the Govee code.
@@ -508,7 +535,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
                 {
                     break;
                 }
-                UpdateHistoricalDataAndGraph();
+                UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
                 break;
         }
 
@@ -557,18 +584,20 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
             }
         }
     }
+    #endregion
+
 
     /// <summary>
     /// Helper code to update historical data. The sensor might send a lot of data; the history only
     /// saves a portion of the data. Technicaly, every time there's new data we either update
     /// the most recent entry OR we add a new entry.
     /// </summary>
-    private void UpdateHistoricalDataAndGraph()
+    private void UpdateHistoricalDataAndGraph(DeviceSpecificSensorData currSensor_DataUnits)
     {
-        var deltaInSeconds = CurrSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
+        var deltaInSeconds = currSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
         var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
             ? DataCollection<DeviceSpecificSensorData>.Verb.Add : DataCollection<DeviceSpecificSensorData>.Verb.ReplaceMostRecent;
-        HistoricalDataUnits.Update(CurrSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
+        HistoricalDataUnits.Update(currSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
         //
         // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
@@ -586,7 +615,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
     }
 
-    #region Exporters
+    #region Exporters don't need to be changed
 
     /// <summary>
     /// Called from MainWindow when the user asks for, e.g., exported data or graphs. Most sensors will 
@@ -611,11 +640,15 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         await UtilitiesWinUI3.UtilitiesWinUI3.ExportGraphAsPngAsync(uiOxyPlot, rootPanel.Background, Log);
     }
 
-
+    /// <summary>
+    /// A small number of controls have this as a specialty value. For example, the 
+    /// BTServicesAndCharacteristics control uses it to "dump" all of the seen 
+    /// advertisements or the discovered services + characteristics to the clipboard.
+    /// </summary>
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {
         return "Internal error: no details are available";
     }
     #endregion
 
-} // end of class BTNordic_ThingyControl
+} // end of class BTNordic_ThingyControl // CHANGE: update the comment to match the class name

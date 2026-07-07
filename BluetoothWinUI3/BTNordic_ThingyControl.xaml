@@ -79,16 +79,6 @@
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
                     <tv:TableView x:Name="uiTableView" IsReadOnly="True" />
-                    <!--
-                    2026-05-05 Trying out the DataGrid from the old Community Toolkit (7.1.2?)
-                    <controls:DataGrid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="uiDataGridGrid"
-                                       AutoGenerateColumns="True"
-                                       CanUserSortColumns="True"
-                                       CanUserResizeColumns="True"
-                                       SelectionMode="Single"
-                                       HeadersVisibility="Column"
-                                       />
-                    -->
                 </Grid>
                 
             </Grid>

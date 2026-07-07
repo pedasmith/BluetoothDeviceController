@@ -9,10 +9,9 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-
+using System.Text;
 using Utilities;
 using Windows.Devices.Bluetooth;
-using WinUI.TableView;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -22,24 +21,24 @@ namespace BluetoothWinUI3;
 #endif
 
 
-#region Set these to match your device
-using DeviceSpecificType = TAOPE_CyclingSpeedCadence; // Change: pick your device, not BTStandard_Demo
-using DeviceSpecificSensorData = TAOPE_CyclingSpeedCadence.SpeedCadence_Data; // Change: 
-using DeviceSpecificSensorSecondaryData = TAOPE_CyclingSpeedCadence.Feature_Data; // Change: pick secondary sensor if needed
-using DeviceSpecificBatteryData = TAOPE_CyclingSpeedCadence.Battery_Data; // FIX: add battery data! Change: pick secondary sensor if needed
+#region Change these to match your device
+using DeviceSpecificType = BTStandard_HeartRate; // Change: pick your device, not BTStandard_Demo
+using DeviceSpecificSensorData = BTStandard_HeartRate.Heart_Rate_Data; // Change: 
+using DeviceSpecificBatteryData = BTStandard_HeartRate.Battery_Data; // Change: many device support battery
+using DeviceSpecificSensorDataFacade = Heart_Rate_Data_Facade; // Change: 
 #endregion
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Change: rename BTStandard_DemoControl
+public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Change: change the name from BTStandard_DemoControl
 {
-    #region Settings that must be updated for a new device
+    #region Change these settings that must be updated for a new device
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "CyclingSpeedCadence"; // Change: BTStandard_Demo
+    private readonly string InternalDeviceType = "BTStandard_HeartRate";  // Change: change the BTStandard_Demo string to match your device. The exact name does not matter.
     #endregion
 
-    #region Advanced settings and values
+    #region Change these advanced settings only when needed (most devices won't change these)
     /// <summary>
     /// Most developer never need to change this from 'true'!
     /// Ususually a device always has their sensor data. But some devices are might not. 
@@ -63,33 +62,14 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     const double HistoricalDataUpdateRateInSeconds = 5.0;
     #endregion
 
-    public BTStandard_CyclingSpeedCadenceControl() // CHANGE:
+    public BTStandard_HeartRateControl() // CHANGE: change the name to match the changed class name
     {
         InitializeComponent();
         this.Loaded += Control_Loaded;
         this.DataContextChanged += Control_DataContextChanged;
-
-        // Set up the OxyModel Series. Reminder that each series is, e.g., "Temperature" or "Pressure"
-        // This can't be done at initialization time because of C#: it won't let me use a regular
-        // field when doing an initialization.
-        foreach (var series in OxyPlotModel.Series)
-        {
-            if (series is LineSeries lineSeries)
-            {
-                lineSeries.ItemsSource = HistoricalDataUnits.Data; //DOC:
-            }
-        }
-        uiOxyPlot.Model = OxyPlotModel;
-
-        //
-        // Set up the uiTableView
-        // https://w-ahmad.dev/WinUI.TableView/index.html
-        // https://github.com/w-ahmad/WinUI.TableView
-        //
-        uiTableView.AutoGeneratingColumn += CurrTableCustomization.TableView_AutoGeneratingColumn_UseCustomization;
     }
 
-    #region Instance value for a device
+    #region Instance value for a device (not changed)
     DeviceSpecificType Device;
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
@@ -99,9 +79,16 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the collection.
     /// </summary>
-    public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
+    public DataCollection<DeviceSpecificSensorDataFacade> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
-    public void ClearAccumulatedFineGrainedData() {; } // do nothing
+
+    // CHANGE: some devices (like the heart rate) also have fine grained data.
+    public void ClearAccumulatedFineGrainedData()
+    {
+        // Only the RRInterval data is fine grained.
+        CurrSensor_DataUnits?.CurrRRRecent?.DoClearAccumulatedFineGrainedData();
+    }
+
     public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
     {
         return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];
@@ -122,7 +109,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
-    DeviceSpecificSensorData CurrSensor_DataUnits = null;
+    DeviceSpecificSensorDataFacade CurrSensor_DataUnits = null;
 
     /// <summary>
     /// Making a battery value that's seperate from the Sensor. This lets the programmer
@@ -135,20 +122,9 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// </summary>
     DeviceSpecificType.Battery_Data CurrBattery_DataUnits = null;
 
-    /// <summary>
-    /// Data directly from the device. It's always in the original units from the device
-    /// and isn't converted into the user's preferred units.
-    /// </summary>
-    DeviceSpecificSensorSecondaryData CurrSensorSecondary_Data = null;
-
-    /// <summary>
-    /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
-    /// This is what gets added to the HistoricalDataUnits collection.
-    /// </summary>
-    DeviceSpecificSensorSecondaryData CurrSensorSecondary_DataUnits = null;
     #endregion
 
-    #region Instance values for the UX
+    #region Instance values for the UX (not changed)
     /// <summary>
     /// Standard: Panel size. Set in UpdateUX from MainWindow.
     /// </summary>
@@ -164,30 +140,71 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// <summary>
     /// Customization for the TableView.
     /// </summary>
-    TableViewColumnCustomization CurrTableCustomization = new TableViewColumnCustomization();
+    TableViewColumnCustomization CurrTableCustomization = new TableViewColumnCustomization()
+    {
+        TableColumnsToExclude = ["CurrFlagsDecoded", "Flags", "RRInterval", "SensorLocation"],
+    };
     #endregion
 
     private void Control_Loaded(object sender, RoutedEventArgs e)
+    {
+        InitializeUX();
+    }
+
+
+    bool InitializeUXCalled = false;
+    /// <summary>
+    /// Code to initialize the UX. Will be called both from Control_Loaded and from
+    /// DataContextChanged
+    /// </summary>
+    private void InitializeUX()
     {
         // Loaded gets called both when it's first loaded and also each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         // We only want to do work the first time.
 
-        if (uiTableView.ItemsSource != null) return;
-        uiTableView.ItemsSource = HistoricalDataUnits.Data;
+        if (InitializeUXCalled) return;
+        InitializeUXCalled = true;
 
-        // Change: set the right sparkles
+        #region Change to set up the sparkles and graph
+
+        // Change: set the right sparkles.
+        // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            ( DeviceSpecificType.CSC_MeasurementPropertyChangedName, uiRevolutionWheelChange),
-            ( DeviceSpecificType.CSC_MeasurementPropertyChangedName, uiRevolutionCrankChange),
+            ( DeviceSpecificType.Heart_Rate_MeasurementPropertyChangedName, uiBpmChange),
         };
+
+        // Change: set up the graph by making an OxyPlotModel
+        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModelSimple("Heart Rate", 10, 50, "Heart Rate", "HeartRate");
+        // "Sensor Data" is for the main graph title  and is human-readable
+        // "Battery" for the axis title and for the color settings in the menus and should be concise and human-readable
+        // "BatteryLevel" is the underlying sensor property name and must exactly match the C# name.
+        #endregion
+
+
+        // This oxyplot and table code is always the same and doesn't need to be changed.
+        OxyPlotUtilities.InitializeOxyPlotData(uiOxyPlot, OxyPlotModel, HistoricalDataUnits.Data);
+        OxyPlotUtilities.InitializeLineNamesFromOxyPlotModel(LineNames, OxyPlotModel);
+
+        //
+        // Set up the uiTableView
+        // https://w-ahmad.dev/WinUI.TableView/index.html
+        // https://github.com/w-ahmad/WinUI.TableView
+        //
+        uiTableView.AutoGeneratingColumn += CurrTableCustomization.TableView_AutoGeneratingColumn_UseCustomization;
+        uiTableView.ItemsSource = HistoricalDataUnits.Data;
     }
 
     // Allows the control to provide feedback to Windows about updates to the device capabilties.
     // For example, the device might not have a sensor, and so the user shouldn't be able 
     // see the table or graph.
     IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
+
+    /// <summary>
+    /// Called by MainWindow so this control knows who to contact based on device changes.
+    /// Often there are no changes
+    /// </summary>
     public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
     {
         NotifyDeviceControlChangesWindows = mainWindow;
@@ -197,8 +214,12 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     // NotifyDeviceControlChangesWindows.OnGetUXCapabilitiesChanged
     // so the main window menus get updated.
 
-    // TODO: should these be discoverable? Maybe from the Model which already has the user friendly names?
-    List<string> _LineNames = new List<string>() { "TimeWheel" }; // CHANGE:
+    // The LineNames is set up in the Loaded from the call to OxyPlotUtilities.InitializeLineNamesFromOxyPlotModel
+    List<string> _LineNames = new() { };
+    /// <summary>
+    /// List of line names in the plot. This is set up directly from the OxyPlotModel. The line names
+    /// are needed so the MainWindow can set up the list of changeable line colors in the plot.
+    /// </summary>
     public List<string> LineNames { get { return _LineNames; } }
 
     /// <summary>
@@ -219,18 +240,14 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// dumidity, pressure, etc.) has its own Axis and its own LineSeries.
     /// </summary>
     // H.OxyPlot
-    private PlotModel OxyPlotModel { get; set; }
-        = OxyPlotUtilities.MakeOxyPlotModelSimple("Crank", 1, 100, "Crank", "TimeCrank");
-    // CHANGE: set up the graph
-
+    private PlotModel OxyPlotModel { get; set; } = null;
 
 
 
     /// <summary>
-    /// Loop through the LineSeries for where a matching DataFieldY
+    /// Loop through the LineSeries for where a matching DataFieldY. This is used by the MainWindow
+    /// when setting some stuff up.
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
     public uint GetGraphColor(string name)
     {
         return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(name, OxyPlotModel);
@@ -248,6 +265,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
         // FYI: by the time this method is called, the DataContext in the object is already set
 
         if (args.NewValue == null) return; // just bogus; ignore.
+        InitializeUX(); // ensure we're initialized.
 
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
         // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
@@ -262,9 +280,8 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
             return;
         }
 
-
         OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
-        uiAddress.Text = BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr);
+        uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // might return null for the first connection
 
         Device = new DeviceSpecificType()
@@ -277,10 +294,12 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
             CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
             return;
         }
+
         // It's critical to set these!
         DataContextAsKnownDevice.Id = Device.ble.DeviceId ?? ""; // never null :-)
         DataContextAsKnownDevice.BTLEDevice = Device.ble;
-        CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id); // now it's "guaranteed" to exist. Use the stable form of the device id.
+        CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id); // Use the stable form of the device id.
+        // CurrSaveData won't exist if the user hasn't made any changes
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
@@ -294,14 +313,59 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
 
         Device.PropertyChanged += Device_PropertyChanged;
 
-        await Device.NotifyBatteryLevelAsync(); // CHANGE: and the next lines
-        var battery = await Device.ReadBatteryLevel(DefaultCacheMode); // I'm happy getting unchanged data? TODO: think about this more. 
+        #region Change so the device starts sending notifications for changed properties (data)
 
-        await Device.NotifyCSC_MeasurementAsync();
+        // Change: tell the device to start sending sensor data back.
+        // The demo code uses the battery level as the sensor.
+        await Device.NotifyBatteryLevelAsync(); // CHANGE: set up the right notifications for your device.
+        await Device.ReadBody_Sensor_Location(DefaultCacheMode);
 
+        // TODO: Remove: Tons of GAP stuff to test out more reads
+        await Device.ReadManufacturer_Name_String(DefaultCacheMode);
+        await Device.ReadModel_Number_String(DefaultCacheMode);
+        await Device.ReadHardware_Revision_String(DefaultCacheMode);
+        await Device.ReadFirmware_Revision_String(DefaultCacheMode);
+        await Device.ReadSoftware_Revision_String(DefaultCacheMode);
+        await Device.ReadSystem_ID(DefaultCacheMode);
+        await Device.ReadDevice_Name(DefaultCacheMode);
+
+        await Device.NotifyHeart_Rate_MeasurementAsync();
+
+        // Verify that your device has a battery characteristic. If your device does not,
+        // just SetBatteryVisibility(Visibility.Collapsed); without further notice.
+        var batterydata = await Device.ReadBatteryLevel(DefaultCacheMode);
+        if (batterydata == null)
+        {
+            uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
+        }
+
+        // Some UX needs additional information
+        await Device.ReadDevice_Name(DefaultCacheMode);
+        #endregion
+
+        // The system tracks device changes
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
         CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
+    }
+
+    /// <summary>
+    /// Called from DataContextChanged when a device does not, in fact, have a sensor. This 
+    /// removes the grpah and table from the display (no sensor means no data) and tells
+    /// the MainWindow to update its UX accordingly.
+    /// </summary>
+    private void RemoveSensorDataUx()
+    {
+        uiDeviceDataList.Items.Remove(uiBpm);
+        LineNames.Clear();
+        uiOxyPlot.Visibility = Visibility.Collapsed;
+        uiTableView.Visibility = Visibility.Visible;
+
+        // Notify MainWindow that the UX capabilities have changed. This might change
+        // the UX (e.g., device> show graph/table might be removed)
+        // Will also trigger redoing the graph line names via LineNames, which
+        // technically isn't quite in accordance with the name.
+        NotifyDeviceControlChangesWindows?.OnGetUXCapabilitiesChanged(this, GetUXCapabilities());
     }
 
     /// <summary>
@@ -319,7 +383,6 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// When visibility is Visible, display the table of data. When collapsed, display
     /// the grid. Is called from MainWindow based on user selection.
     /// </summary>
-    /// <param name="visibility"></param>
     public void SetDataGridVisibility(IDeviceControlBasic.Visibility visibility)
     {
         UtilitiesWinUI3.UtilitiesWinUI3.SetDataGridVisibility(uiOxyPlot, uiDataGridPanel, visibility);
@@ -330,9 +393,6 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// Updates the OxyPlot line with a given name (e.g., "Temperature"). Is called from MainWindow when the
     /// user picks a new color.
     /// </summary>
-    /// <param name="lineName"></param>
-    /// <param name="color"></param>
-
     public void UpdateGraphColor(string lineName, uint color)
     {
         UtilitiesWinUI3.UtilitiesWinUI3.UpdateGraphColor(OxyPlotModel, rootPanel, lineName, color);
@@ -383,9 +443,10 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     {
         CurrUserPrefs = newPrefs;
 
-        // Update the saved data in the HistoricalEnvironment_DataUnits to match the new user preferences.
+        // Update the saved data in the HistoricalDataUnits to match the new user preferences.
         foreach (var data in HistoricalDataUnits.Data)
         {
+            #region Change to update the data based on user preferred units (e.g, C versus F)
             // For the BTStandard_Demo, there are no units to change
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
@@ -397,6 +458,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
                 // Change: based on your knowledge of the sensor data, change the pressure readings.
                 // data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, CurrUserPrefs.Pressure);
             }
+            #endregion
         }
 
         UpdateDeviceDataUX(""); // all of them.
@@ -405,15 +467,11 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// <summary>
     /// Standard: the normal way to resize the control. 
     /// </summary>
-    /// <param name="windowSize"></param>
-    /// <param name="largeActualSize"></param>
-
     public void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize)
     {
         CurrWindowSize = windowSize;
         UtilitiesWinUI3.UtilitiesWinUI3.UpdateUXWindowSize(windowSize, largeActualSize, rootPanel, OxyPlotModel, uiOxyPlot);
     }
-
 
 
     /// <summary>
@@ -427,6 +485,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
         System.Diagnostics.Debug.WriteLine(str);
         Console.WriteLine(str);
     }
+
 
     private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -442,6 +501,10 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     Dictionary<string, int> NPropertyChanges { get; } = [];
     readonly List<string> Sparkles = ["╺", "╼", "╾", "╸", "╾", "╼"];
 
+    /// <summary>
+    /// Updates the sparkles based on the changed property. Called from UpdateDeviceDataUX which is
+    /// called by Device_PropertyChanged when a device property changes.
+    /// </summary>
     private void UpdateSparkles(string name)
     {
         // In practice, name is never "*". The code is set up this way to match the Govee code.
@@ -455,122 +518,90 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
             }
         }
     }
-    double LastTimeWheel = -1.0;
-    double LastRevolutionWheel = 0.0;
 
-    double LastTimeCrank = 0.0;
-    double LastRevolutionCrank = 0.0;
 
-    private string CadenceFlagsToString(int ssflags)
-    {
-        var retval = "";
-        if ((ssflags & 0x01) != 0)
-        {
-            retval += "Wheel ";
-        }
-        if ((ssflags & 0x02) != 0)
-        {
-            retval += "Crank ";
-        }
-        return retval.TrimEnd();
-    }
-
+    #region Change to update the UX when the device says there's new data
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
-    /// needs to be updated.
+    /// needs to be updated. Most often called from Device_PropertyChanged
     /// </summary>
-    /// <param name="name"></param>
     private void UpdateDeviceDataUX(string name)
     {
         if (Device == null) return;
-        CurrSensor_Data = Device.CurrSpeedCadence_Data; // Change: select the right data
-        CurrSensorSecondary_Data = Device.CurrFeature_Data; // Change: pick secondary data as appropriate
+        UpdateSparkles(name); // name is from e.PropertyName when the Device does a PropertyChanged.
+
+
+        // Change: Always update these even though in practice they are only set once.
+        CurrSensor_Data = Device.CurrHeart_Rate_Data; // Change: select the right data
         CurrBattery_Data = Device.CurrBattery_Data; // Change: if your device doesn't have a battery, remove battery stuff!
 
-        // name is from e.PropertyName when the Device does a PropertyChanged.
-        UpdateSparkles(name);
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
-        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToOrClone(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrSensor_DataUnits = DeviceSpecificSensorDataFacade.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
-        // Update this historical data; this will automatically update the table and graph.
-        //
-        // There's two kinds of sensors: ones like the Nordic_Thingy that send each bit of data separately,
-        // and ones that send all the data at once (like the Govee). 
-        //
-        // Track the historical data
+        // Change all this code to match your device and UX.
         switch (name)
         {
-            //case DeviceSpecificType.Device_NamePropertyChangedName:
-            //    uiName.Text = CurrSensorSecondary_DataUnits.Device_Name;
-            //    break;
 
-            case DeviceSpecificType.CSC_MeasurementPropertyChangedName: // Change: update the UX as appropriate
-                var iflags = (int)CurrSensor_DataUnits.Flags;
-                var flags = CadenceFlagsToString(iflags);
-                uiFlags.Text = flags;
-                if ((iflags & 0x01) != 0) // Has wheel data
+            case "*": // never used, but here so it matches the Govee code.
+            case DeviceSpecificType.Heart_Rate_MeasurementPropertyChangedName:
+                uiBpm.Text = CurrSensor_DataUnits.HeartRate.ToString();
+                uiFlags.Text = CurrSensor_DataUnits.CurrFlagsDecoded.ToString();
+                if (CurrSensor_DataUnits.RRInterval == null)
                 {
-                    // The time values are just U16 in 1024th (2^^10) of a second. That means they
-                    // roll over in 2^^6 seconds = 64 seconds!
-                    if (LastTimeWheel == -1.0)
+                    if (uiRRInterval.Text == "")
                     {
-                        LastTimeWheel = CurrSensor_DataUnits.TimeWheel;
+                        uiRRInterval.Text = "[]";
                     }
-                    else
-                    {
-                        var deltaTimeWheel = CurrSensor_DataUnits.TimeWheel - LastTimeWheel;
-                        if (deltaTimeWheel < 0) deltaTimeWheel += 64.00; // rollover is exactly every 64 seconds
-                        uiTimeWheel.Text = deltaTimeWheel.ToString("F3"); // Time is in seconds
-
-                        var deltaRevolutionWheel = CurrSensor_DataUnits.RevolutionWheel - LastRevolutionWheel;
-                        var rps = deltaRevolutionWheel * (1.0 / deltaTimeWheel);
-                        uiRpsWheel.Text = double.IsNaN(rps) ? "--" : rps.ToString("F1"); // Time is in seconds
-
-                        LastTimeWheel = CurrSensor_DataUnits.TimeWheel;
-                    }
-                    uiRevolutionWheel.Text = CurrSensor_DataUnits.RevolutionWheel.ToString("F0");
-                    LastRevolutionWheel = CurrSensor_DataUnits.RevolutionWheel;
                 }
-
-                if ((iflags & 0x02) != 0) // Has crank data
+                else if (CurrSensor_DataUnits.RRInterval.Count == 0)
                 {
+                    ; // do nothing
+                }
+                else
+                {
+                    CurrSensor_DataUnits.CurrRRRecent.AddRRData(CurrSensor_DataUnits.TimestampMostRecent, CurrSensor_DataUnits.RRInterval);
 
-                    // Same thing, but for the crank. The crank revolutions rolls over at 2^^16
-                    if (LastTimeCrank == -1.0)
+                    var rr = new StringBuilder();
+                    foreach (var value in CurrSensor_DataUnits.RRInterval)
                     {
-                        LastTimeCrank = CurrSensor_DataUnits.TimeCrank;
-                    }
-                    else
-                    {
-                        var deltaTimeCrank = CurrSensor_DataUnits.TimeCrank - LastTimeCrank;
-                        if (deltaTimeCrank < 0) deltaTimeCrank += 64.00; // rollover is exactly every 64 seconds
-                        uiTimeCrank.Text = deltaTimeCrank.ToString("F3"); // Time is in seconds
-
-                        var deltaRevolutionCrank = CurrSensor_DataUnits.RevolutionCrank - LastRevolutionCrank;
-                        if (deltaRevolutionCrank < 0)
+                        if (rr.Length != 0)
                         {
-                            deltaRevolutionCrank += Math.Pow(2, 16);
+                            rr.Append(", ");
                         }
-                        var rps = deltaRevolutionCrank * (1.0 / deltaTimeCrank);
-                        uiRpsCrank.Text = double.IsNaN(rps) ? "--" : rps.ToString("F1"); // Time is in seconds
-
-                        LastTimeCrank = CurrSensor_DataUnits.TimeCrank;
+                        rr.Append(value.ToString());
                     }
-                    uiRevolutionCrank.Text = CurrSensor_DataUnits.RevolutionCrank.ToString("F0");
-                    LastRevolutionCrank = CurrSensor_DataUnits.RevolutionCrank;
+                    uiRRInterval.Text = "[" + rr.ToString() + "]";
                 }
-                UpdateHistoricalDataAndGraph();
+                if (CurrSensor_DataUnits.CurrFlagsDecoded.HasFlag(DeviceSpecificSensorDataFacade.FlagsDecoded.SensorContactSupported))
+                {
+                    var icon = CurrSensor_DataUnits.CurrFlagsDecoded.HasFlag(DeviceSpecificSensorDataFacade.FlagsDecoded.SensorContactDetected)
+                        ? "✓" : "✗"; // 
+                    uiSensorConnection.Text = icon;
+                }
+                else
+                {
+                    uiSensorConnection.Text = "--"; // device doesn't know if it's connected TODO: correct icon?
+                }
+                UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
+                break;
+
+            case DeviceSpecificType.Body_Sensor_LocationPropertyChangedName:
+                // The check box is set by the 
+                uiSensorLocation.Text = CurrSensor_DataUnits.Sensor;
                 break;
 
 
-            //case "*": // never used, but here so it matches the Govee code.
-            //case DeviceSpecificType.BatteryLevelPropertyChangedName:
-            //    uiBattery.Text = CurrSensor_DataUnits.BatteryLevel.ToString("F2"); // Change: update the UX as appropriate
-
-
+            case DeviceSpecificType.Device_NamePropertyChangedName:
+                uiName.Text = Device.CurrGAP_Data.DeviceName;
+                Log($"HeartRate: Manufacturer: {Device.CurrDevice_Information_Data.Manufacturer}");
+                Log($"HeartRate: Model: {Device.CurrDevice_Information_Data.ModelNumber}");
+                Log($"HeartRate: HardwareRevision: {Device.CurrDevice_Information_Data.HardwareRevision}");
+                Log($"HeartRate: FirmwareRevision: {Device.CurrDevice_Information_Data.FirmwareRevision}");
+                Log($"HeartRate: SoftwareRevision: {Device.CurrDevice_Information_Data.SoftwareRevision}");
+                Log($"HeartRate: SystemID: {Device.CurrDevice_Information_Data.SystemID}");
+                break;
         }
 
         //
@@ -585,6 +616,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
             }
         }
     }
+    #endregion
 
 
     /// <summary>
@@ -592,17 +624,17 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// saves a portion of the data. Technicaly, every time there's new data we either update
     /// the most recent entry OR we add a new entry.
     /// </summary>
-    private void UpdateHistoricalDataAndGraph()
+    private void UpdateHistoricalDataAndGraph(DeviceSpecificSensorDataFacade currSensor_DataUnits)
     {
-        var deltaInSeconds = CurrSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
+        var deltaInSeconds = currSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
         var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
-            ? DataCollection<DeviceSpecificSensorData>.Verb.Add : DataCollection<DeviceSpecificSensorData>.Verb.ReplaceMostRecent;
-        HistoricalDataUnits.Update(CurrSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
+            ? DataCollection<DeviceSpecificSensorDataFacade>.Verb.Add : DataCollection<DeviceSpecificSensorDataFacade>.Verb.ReplaceMostRecent;
+        HistoricalDataUnits.Update(currSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
         //
         // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
         //
-        if (verb == DataCollection<DeviceSpecificSensorData>.Verb.Add && HistoricalDataUnits.Count == 2)
+        if (verb == DataCollection<DeviceSpecificSensorDataFacade>.Verb.Add && HistoricalDataUnits.Count == 2)
         {
             // DOC: Can't have the axes start off invisible because then they can't be switched back on
             if (CurrWindowSize == MainWindow.WindowSize.Normal)
@@ -611,19 +643,18 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
                 OxyPlotModel.SetAxesVisibility(uiOxyPlot, false);
             }
         }
+
         uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
     }
 
-    #region Exporters
+    #region Exporters don't need to be changed
 
     /// <summary>
     /// Called from MainWindow when the user asks for, e.g., exported data or graphs. Most sensors will 
     /// support all these options.
     /// </summary>
-    /// <returns></returns>
     public IDeviceControlBasic.UXCapabilities GetUXCapabilities()
     {
-
         var retval = IDeviceControlBasic.UXCapabilities.CanRename;
         if (HasSensorData)
         {
@@ -641,14 +672,15 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
         await UtilitiesWinUI3.UtilitiesWinUI3.ExportGraphAsPngAsync(uiOxyPlot, rootPanel.Background, Log);
     }
 
-
+    /// <summary>
+    /// A small number of controls have this as a specialty value. For example, the 
+    /// BTServicesAndCharacteristics control uses it to "dump" all of the seen 
+    /// advertisements or the discovered services + characteristics to the clipboard.
+    /// </summary>
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {
         return "Internal error: no details are available";
     }
-
-
-
     #endregion
 
-} // end of class BTStandard_CyclingSpeedCadenceControl // CHANGE:
+} // end of class BTStandard_HeartRateControl // CHANGE: update the comment to match the class name
