@@ -417,7 +417,7 @@ namespace BluetoothWinUI3
             var result = await dialog.ShowAsync();
             if (result != ContentDialogResult.Primary) return;
 
-            var newcolor = DeviceColorBrushes.ConvertBackIgnoreA(colorPicker.Color);
+            var newcolor = UtilitiesWinUI3.UtilitiesWinUI3.ConvertBackIgnoreA(colorPicker.Color);
 
             // Save it and update colors!
             colorsSave.Set(colorType, newcolor);
@@ -805,7 +805,8 @@ namespace BluetoothWinUI3
         }
         private async void OnChangeGraphColor(object sender, RoutedEventArgs e)
         {
-            var tag = (sender as FrameworkElement)?.Tag as string; // e.g., "Temperature" or "Pressure"
+            var axisTitle = (sender as FrameworkElement)?.Tag as string; // e.g., "Temperature" or "Pressure" or "Heart Rate". 
+            // the tag is the user name (axisTitle) for the color, not the promptery name
 
             string verb = "color";
             var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
@@ -816,8 +817,8 @@ namespace BluetoothWinUI3
 
             var colorsSave = saveData.GetDeviceColors(Application.Current.RequestedTheme);
 
-            uint coloruint = selected.GetGraphColor(tag);
-            Windows.UI.Color color= Windows.UI.Color.FromArgb(
+            uint coloruint = selected.GetGraphColor(axisTitle);
+            Windows.UI.Color color = Windows.UI.Color.FromArgb(
                 0xFF, // always fully opaque for graph colors#
                 (byte)((coloruint >> 16) & 0xFF),
                 (byte)((coloruint >> 8) & 0xFF),
@@ -844,12 +845,12 @@ namespace BluetoothWinUI3
             var result = await dialog.ShowAsync();
             if (result != ContentDialogResult.Primary) return;
 
-            var newcolor = DeviceColorBrushes.ConvertBackIgnoreA(colorPicker.Color);
+            var newcolor = UtilitiesWinUI3.UtilitiesWinUI3.ConvertBackIgnoreA(colorPicker.Color);
 
             // Save it and update colors!
-            colorsSave.Set("Graph:" + tag, newcolor);
+            colorsSave.Set("Graph:" + axisTitle, newcolor);
             AllSaveData.Save();
-            selected.UpdateGraphColor(tag, newcolor);
+            selected.UpdateGraphColor(axisTitle, newcolor);
         }
 
 

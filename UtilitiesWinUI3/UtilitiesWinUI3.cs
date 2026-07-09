@@ -2,16 +2,22 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Shapes;
 using OxyPlot;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Streams;
-using WinUI.TableView;
+using Windows.UI;
+
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
 
 namespace UtilitiesWinUI3;
 
@@ -55,13 +61,14 @@ internal static class UtilitiesWinUI3
         }
     }
 
-    public static uint GetGraphColor(string name, PlotModel oxyPlotModel)
+    public static uint GetGraphColor(PlotModel oxyPlotModel, string axisTitle)
     {
+        var propertyName = PlotModelAxisTitleToPropertyName(oxyPlotModel, axisTitle);
         foreach (var series in oxyPlotModel.Series)
         {
             if (series is LineSeries lineSeries)
             {
-                if (lineSeries.DataFieldY == name)
+                if (lineSeries.DataFieldY == propertyName)
                 {
                     return UtilitiesOxyColor.OxyColorToUint(lineSeries.Color);
                 }
@@ -71,18 +78,17 @@ internal static class UtilitiesWinUI3
     }
 
     /// <summary>
-    /// Updates the OxyPlot line with a given name (e.g., "Temperature"). Is called from MainWindow when the
+    /// Updates the OxyPlot line with a given name (e.g., "Temperature" or "Heart Rate"). Is called from MainWindow when the
     /// user picks a new color.
     /// </summary>
-    /// <param name="lineName"></param>
-    /// <param name="color"></param>
-    public static void UpdateGraphColor(PlotModel OxyPlotModel, Border rootPanel, string lineName, uint color)
+    public static void UpdateGraphColor(PlotModel OxyPlotModel, Border rootPanel, string axisTitle, uint color)
     {
+        var propertyName = UtilitiesWinUI3.PlotModelAxisTitleToPropertyName(OxyPlotModel, axisTitle);
         foreach (var series in OxyPlotModel.Series)
         {
             if (series is LineSeries lseries)
             {
-                if (lseries.DataFieldY == lineName)
+                if (lseries.DataFieldY == propertyName)
                 {
                     lseries.Color = OxyColor.FromUInt32((uint)color);
                     OxyPlotModel.InvalidatePlot(false); //DOC: false is just the axes, true is everything.
@@ -94,7 +100,7 @@ internal static class UtilitiesWinUI3
         // Set the line key color
         foreach (Line line in UtilitiesWinUI3.FindVisualChildren<Line>(rootPanel))
         {
-            if ((line.Tag as string) == lineName + "Color") // e.g., Tag="TemperatureColor"
+            if ((line.Tag as string) == propertyName + "Color") // e.g., Tag="TemperatureColor"
             {
                 byte a = 0xFF;
                 byte r = (byte)((color >> 16) & 0xFF);
@@ -103,8 +109,25 @@ internal static class UtilitiesWinUI3
                 line.Stroke = new SolidColorBrush(Windows.UI.Color.FromArgb(a, r, g, b));
             }
         }
-        SetLineKeyColor(rootPanel, lineName, color);
+        SetLineKeyColor(rootPanel, propertyName, color);
+    }
 
+    /// <summary>
+    /// The user knows a name like "Heart Rate". But internally, it's "HeartRate"
+    /// </summary>
+    public static string PlotModelAxisTitleToPropertyName(PlotModel OxyPlotModel, string lineName)
+    {
+        foreach (var series in OxyPlotModel.Series)
+        {
+            if (series is LineSeries lseries)
+            {
+                if (lseries.Title == lineName)
+                {
+                    return lseries.DataFieldY;
+                }
+            }
+        }
+        return null;
     }
 
     /// <summary>
@@ -185,4 +208,77 @@ internal static class UtilitiesWinUI3
                 break;
         }
     }
+
+    /// <summary>
+    /// Given a uint color, make a Color struct with A, R, G, B fields. The uint has A as the high byte and B as the low byte.
+    /// </summary>
+    /// <param name="color"></param>
+    /// <returns></returns>
+    public static Color ConvertIgnoreA(uint color)
+    {
+        Color retval = new Color()
+        {
+            A = 0xFF, // ignore the A value completely: (byte)((color >> 24) & 0xff),
+            R = (byte)((color >> 16) & 0xff),
+            G = (byte)((color >> 8) & 0xff),
+            B = (byte)((color >> 0) & 0xff),
+        };
+        return retval;
+    }
+
+    /// <summary>
+    /// Given a Color struct with A, R, G, B values make an int ARGB where A is in the high byte and B in the low byte.
+    /// </summary>
+    public static uint ConvertBackIgnoreA(Color color)
+    {
+        byte a = 0xFF; // would be color.A, but that's set to 0???
+        uint retval = ((uint)a << 24) | ((uint)color.R << 16) | ((uint)color.G << 8) | ((uint)color.B << 0);
+        return retval;
+    }
+
+    /// <summary>
+    /// Given a SaveData type color
+    /// </summary>
+    /// <param name="color"></param>
+    /// <returns></returns>
+    public static SolidColorBrush GetBrush(uint color)
+    {
+        if (color == DeviceColors.ColorIsDefault) return default;
+        return new SolidColorBrush(ConvertIgnoreA(color));
+    }
+
+    public static void Recolor(this WriteableBitmap bmp, Color value)
+    {
+        var stream = bmp.PixelBuffer.AsStream();
+        byte[] pixels = new byte[stream.Length]; // Must copy all the bytes for no good reason.
+        var realLength = stream.Read(pixels, 0, pixels.Length);
+        if (realLength != pixels.Length)
+        {
+            // Can never fail in reality
+            return;
+        }
+        byte transparentA = 0;
+        for (int i = 0; i < realLength; i += 4)
+        {
+            byte b = pixels[i + 0];
+            byte g = pixels[i + 1];
+            byte r = pixels[i + 2];
+            byte a = pixels[i + 3];
+            if (i == 0)
+            {
+                transparentA = a;
+            }
+            if (a != transparentA)
+            {
+                pixels[i + 0] = value.B;
+                pixels[i + 1] = value.G;
+                pixels[i + 2] = value.R;
+            }
+        }
+        // Write it back.
+        stream.Position = 0;
+        stream.Write(pixels, 0, realLength);
+    }
+
+
 }

@@ -5,7 +5,6 @@ using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OxyPlot;
-using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
@@ -248,9 +247,9 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// Loop through the LineSeries for where a matching DataFieldY. This is used by the MainWindow
     /// when setting some stuff up.
     /// </summary>
-    public uint GetGraphColor(string name)
+    public uint GetGraphColor(string axisTitle)
     {
-        return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(name, OxyPlotModel);
+        return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(OxyPlotModel, axisTitle);
     }
 
 
@@ -266,6 +265,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
         if (args.NewValue == null) return; // just bogus; ignore.
         InitializeUX(); // ensure we're initialized.
+        await uiRRControl.InitializeAsync();
 
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
         // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
@@ -390,12 +390,20 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
 
     /// <summary>
-    /// Updates the OxyPlot line with a given name (e.g., "Temperature"). Is called from MainWindow when the
+    /// Updates the OxyPlot line with a given name (e.g., "Temperature" or "Heart Rate"). Is called from MainWindow when the
     /// user picks a new color.
     /// </summary>
-    public void UpdateGraphColor(string lineName, uint color)
+    public void UpdateGraphColor(string axisTitle, uint color)
     {
-        UtilitiesWinUI3.UtilitiesWinUI3.UpdateGraphColor(OxyPlotModel, rootPanel, lineName, color);
+        UtilitiesWinUI3.UtilitiesWinUI3.UpdateGraphColor(OxyPlotModel, rootPanel, axisTitle, color);
+
+        var propertyName = UtilitiesWinUI3.UtilitiesWinUI3.PlotModelAxisTitleToPropertyName(OxyPlotModel, axisTitle);
+        switch (propertyName)
+        {
+            case "HeartRate":
+                uiRRControl.UpdateGraphColor(propertyName, color);
+                break;
+        }
     }
 
 
@@ -521,6 +529,22 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
 
     #region Change to update the UX when the device says there's new data
+
+    static string RRIntervalToString(List<double> values)
+    {
+        var rr = new StringBuilder();
+        foreach (var value in values)
+        {
+            if (rr.Length != 0)
+            {
+                rr.Append(", ");
+            }
+            rr.Append(value.ToString());
+        }
+        return "[" + rr.ToString() + "]";
+    }
+
+
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. Most often called from Device_PropertyChanged
@@ -561,18 +585,14 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
                 }
                 else
                 {
-                    CurrSensor_DataUnits.CurrRRRecent.AddRRData(CurrSensor_DataUnits.TimestampMostRecent, CurrSensor_DataUnits.RRInterval);
-
-                    var rr = new StringBuilder();
                     foreach (var value in CurrSensor_DataUnits.RRInterval)
                     {
-                        if (rr.Length != 0)
-                        {
-                            rr.Append(", ");
-                        }
-                        rr.Append(value.ToString());
+                        uiRRControl.AddRRInterval(value);
                     }
-                    uiRRInterval.Text = "[" + rr.ToString() + "]";
+                    uiRRControl.AddRRIntervalText(RRIntervalToString(CurrSensor_DataUnits.RRInterval));
+
+                    CurrSensor_DataUnits.CurrRRRecent.AddRRData(CurrSensor_DataUnits.TimestampMostRecent, CurrSensor_DataUnits.RRInterval);
+                    uiRRInterval.Text = RRIntervalToString(CurrSensor_DataUnits.RRInterval);
                 }
                 if (CurrSensor_DataUnits.CurrFlagsDecoded.HasFlag(DeviceSpecificSensorDataFacade.FlagsDecoded.SensorContactSupported))
                 {

@@ -253,9 +253,9 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     /// Loop through the LineSeries for where a matching DataFieldY. This is used by the MainWindow
     /// when setting some stuff up.
     /// </summary>
-    public uint GetGraphColor(string name)
+    public uint GetGraphColor(string axisTitle)
     {
-        return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(name, OxyPlotModel);
+        return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(OxyPlotModel, axisTitle);
     }
 
 
@@ -398,12 +398,12 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
 
 
     /// <summary>
-    /// Updates the OxyPlot line with a given name (e.g., "Temperature"). Is called from MainWindow when the
+    /// Updates the OxyPlot line with a given name (e.g., "Temperature" or "Heart Rate"). Is called from MainWindow when the
     /// user picks a new color.
     /// </summary>
-    public void UpdateGraphColor(string lineName, uint color)
+    public void UpdateGraphColor(string axisTitle, uint color)
     {
-        UtilitiesWinUI3.UtilitiesWinUI3.UpdateGraphColor(OxyPlotModel, rootPanel, lineName, color);
+        UtilitiesWinUI3.UtilitiesWinUI3.UpdateGraphColor(OxyPlotModel, rootPanel, axisTitle, color);
     }
 
 
@@ -438,9 +438,9 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         OxyPlotModel.TextColor = oxyColorText;
 
         // Also set the graph line colors.
-        foreach (var (lineName, color) in colors.GraphColors)
+        foreach (var (axisTitle, color) in colors.GraphColors)
         {
-            UpdateGraphColor(lineName, color);
+            UpdateGraphColor(axisTitle, color);
         }
     }
 

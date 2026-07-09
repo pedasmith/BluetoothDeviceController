@@ -31,7 +31,6 @@
                     <TextBlock x:Name="uiSensorConnection" Text="--" Style="{StaticResource sDeviceData}"/>
                     <TextBlock x:Name="uiSensorLocation" Text="--" Style="{StaticResource sDeviceData}"/>
                 </StackPanel>
-
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
@@ -41,42 +40,49 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" x:Name="uiDeviceDataList">
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>BPM</Run><Run Text="&#160;"/><Run x:Name="uiBpmChange" Text="┄"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiBpm"/></TextBlock>
-                    </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Visibility="Collapsed">
-                        
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Name</Run><Run Text="&#160;"/><Run x:Name="uiNameChange" Text="┄"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiName"/></TextBlock>
-                    </StackPanel>
+                <Grid Grid.Row="0" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MaxWidth="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <local:HeartRate_RRInterval_Control Grid.Column="1" x:Name="uiRRControl" HorizontalAlignment="Right" />
 
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Flags</Run><Run Text="&#160;"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDeviceData}" TextWrapping="Wrap"><Run x:Name="uiFlags"/></TextBlock>
-                    </StackPanel>
+                    <GridView Style="{StaticResource sDeviceDataList}" x:Name="uiDeviceDataList">
+                        <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                            <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                            <Run>BPM</Run><Run Text="&#160;"/><Run x:Name="uiBpmChange" Text="┄"/>
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiBpm"/></TextBlock>
+                            <Line Tag="HeartRateColor" Style="{StaticResource sGraphLineKey}" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Visibility="Collapsed">
+                            <!-- Make all of these invisible -->
+                            <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                                <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                                <Run>Name</Run><Run Text="&#160;"/><Run x:Name="uiNameChange" Text="┄"/>
+                                </TextBlock>
+                                <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiName"/></TextBlock>
+                            </StackPanel>
+
+                            <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                                <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                                <Run>Flags</Run><Run Text="&#160;"/>
+                                </TextBlock>
+                                <TextBlock Style="{StaticResource sDeviceData}" TextWrapping="Wrap"><Run x:Name="uiFlags"/></TextBlock>
+                            </StackPanel>
 
 
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>RR</Run><Run Text="&#160;"/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiRRInterval"/></TextBlock>
-                    </StackPanel>
-                    </StackPanel>
-
-
-
-                </GridView>
+                            <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                                <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                                <Run>RR</Run><Run Text="&#160;"/>
+                                </TextBlock>
+                                <TextBlock Style="{StaticResource sDeviceData}"><Run x:Name="uiRRInterval"/></TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </GridView>
+                </Grid>
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
                     <tv:TableView x:Name="uiTableView" IsReadOnly="True" />

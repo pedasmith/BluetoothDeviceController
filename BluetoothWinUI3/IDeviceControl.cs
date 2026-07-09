@@ -94,16 +94,17 @@ namespace BluetoothWinUI3
         KnownDevice DataContextAsKnownDevice { get;  }
 
         /// <summary>
-        /// Get the list of graph name (e.g., "Temperature", "Pressure", "Humidity". This will be used by
-        /// e.g., the MainWindow to update the device menu display
+        /// Get the list of graph name (e.g., "Temperature", "Pressure", "Heart Rate". This will be used by
+        /// e.g., the MainWindow to update the device menu display.
+        /// These are the axisTitle values (for the human), not the internal property names.
         /// </summary>
         List<string> LineNames { get; }
-        uint GetGraphColor(string lineName); // OxyColor is a set of 4 bytes ARGB
+        uint GetGraphColor(string axisTitle); // OxyColor is a set of 4 bytes ARGB
 
         /// <summary>
         /// Update the color of a single line
         /// </summary>
-        void UpdateGraphColor(string lineName, uint color);
+        void UpdateGraphColor(string axisTitle, uint color);
     }
 
     /// <summary>

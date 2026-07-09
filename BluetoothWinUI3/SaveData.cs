@@ -313,8 +313,8 @@ namespace BluetoothWinUI3
     {
         public DeviceColorBrushes(DeviceColors colors)
         {
-            TextColorBrush = GetBrush(colors.TextColor);
-            BackgroundColorBrush = GetBrush(colors.BackgroundColor);
+            TextColorBrush = UtilitiesWinUI3.UtilitiesWinUI3.GetBrush(colors.TextColor);
+            BackgroundColorBrush = UtilitiesWinUI3.UtilitiesWinUI3.GetBrush(colors.BackgroundColor);
         }
         public SolidColorBrush TextColorBrush;
         public SolidColorBrush BackgroundColorBrush;
@@ -331,36 +331,6 @@ namespace BluetoothWinUI3
         }
 
 
-
-        private static Color ConvertIgnoreA(uint color)
-        {
-            Color retval = new Color()
-            {
-                A = 0xFF, // ignore the A value completely: (byte)((color >> 24) & 0xff),
-                R = (byte)((color >> 16) & 0xff),
-                G = (byte)((color >>  8) & 0xff),
-                B = (byte)((color >>  0) & 0xff),
-            };
-            return retval;
-        }
-
-        public static uint ConvertBackIgnoreA(Color color)
-        {
-            byte a = 0xFF; // would be color.A, but that's set to 0???
-            uint retval = ((uint)a << 24) | ((uint)color.R << 16) | ((uint)color.G << 8) | ((uint)color.B << 0);
-            return retval;
-        }
-
-        /// <summary>
-        /// Given a SaveData type color
-        /// </summary>
-        /// <param name="color"></param>
-        /// <returns></returns>
-        public static SolidColorBrush GetBrush(uint color)
-        {
-            if (color == DeviceColors.ColorIsDefault) return default;
-            return new SolidColorBrush(ConvertIgnoreA(color));
-        }
 
         /// <summary>
         /// Recursively sets the Foreground color for all TextBlocks inside a parent container.

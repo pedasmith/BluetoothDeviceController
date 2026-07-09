@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="BluetoothWinUI3.HeartRate_RRInterval_Control"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BluetoothWinUI3"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid MaxHeight="100">
+        <ScrollViewer x:Name="uiScroll" HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Visible" VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Disabled">
+            <StackPanel Orientation="Horizontal" x:Name="uiAllImages" VerticalAlignment="Stretch">
+            </StackPanel>
+        </ScrollViewer>
+        <TextBlock x:Name="uiRRText" HorizontalAlignment="Right" VerticalAlignment="Top" />
+        <Grid Visibility="Collapsed">
+            <Image x:Name="uiImageHeartRateR" Source="/Assets/GraphicalHelps/RR_Interval_HeartRate_R.png"/>
+            <Image x:Name="uiImageHeartRateCenter" Source="/Assets/GraphicalHelps/RR_Interval_HeartRate_Center.png"/>
+        </Grid>
+    </Grid>
+</UserControl>
