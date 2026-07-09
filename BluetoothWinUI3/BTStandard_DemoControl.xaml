@@ -68,7 +68,7 @@
                         <Run>Sensor</Run><Run Text=" "/><Run x:Name="uiSensorChange" Text=" "/>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiSensor"/></TextBlock>
-                        <Line Tag="BatteryLevel" Style="{StaticResource sGraphLineKey}" />
+                        <Line Tag="BatteryLevelColor" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
 
                 </GridView>

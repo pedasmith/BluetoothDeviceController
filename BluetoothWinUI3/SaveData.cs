@@ -157,6 +157,58 @@ namespace BluetoothWinUI3
             }
             return saveData;
         }
+
+        /// <summary>
+        /// When we first connect, there's a SaveData based on a BT advertisement address (one will have 
+        /// been created already as needed). But now that there's a connection, we should switch to the 
+        /// more correct DeviceId based on Device.ble.DeviceId.
+        /// 
+        /// Note that a device that changes the BT advertisement address (for privacy) will have a new,
+        /// blank CurrSaveData to begin with. The DeviceId is the stable address.
+        /// </summary>
+        public static SaveData SwitchToDeviceIdCurrSaveData(SaveData currSaveData, KnownDevice knownDevice)
+        {
+            var newSaveData = AllSaveData.FindWithId(knownDevice.Id); // Use the stable form of the device id.
+
+            if (newSaveData == null && currSaveData == null)
+            {
+                // Something catastrophic happened. Won't really be able to save anything,
+                // but at least we not crash while "working"
+                currSaveData = new SaveData(knownDevice);
+                return currSaveData;
+            }
+
+            if (newSaveData == currSaveData)
+            {
+                // If it's the same as the advertisement-based, we're all good. The device has (for now)
+                // a stable advertisement address.
+                return currSaveData;
+            }
+
+            if (newSaveData == null)
+            {
+                // The device ID doesn't exist, but the advertisement one does.
+                // We will keep on using it and update it with the device id.
+                // The race condition -- what if the BT advertisement address gets
+                // reused somehow, and we are stepping on some other device's
+                // data -- can only happen in deliberately contrived circumstances.
+                currSaveData.UpdateWithDevice(knownDevice);
+                return currSaveData;
+            }
+
+            // There's both an advertisement SaveData and a deviceId one, and they aren't
+            // merged. This will happen when the device changes it's advertisement address.
+            // We had made a new tmporary SaveData with the advertisement address, but when
+            // we finally do connect, there's a better permanent choice available. 
+            // Switch to the permanent one. 
+            // The temporary one will just be abandoned. Technically, it will hang around
+            // in the 
+            currSaveData.History.StatusInformation = "Temporary (reason A8.2)";
+            currSaveData = newSaveData;
+            currSaveData.UpdateWithDevice(knownDevice);
+            return currSaveData;
+        }
+
     }
 
 
@@ -429,6 +481,8 @@ namespace BluetoothWinUI3
         public DateTimeOffset MostRecentConnectionOk { get; set; } = DateTimeOffset.MinValue;
         public DateTimeOffset MostRecentConnectionFailed { get; set; } = DateTimeOffset.MinValue;
         public DateTimeOffset MostRecentData { get; set; } = DateTimeOffset.MinValue;
+
+        public string StatusInformation { get; set; } = "";
     }
 
 

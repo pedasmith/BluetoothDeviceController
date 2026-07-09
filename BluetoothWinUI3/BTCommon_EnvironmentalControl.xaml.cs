@@ -216,7 +216,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
         UtilitiesWinUI3.UtilitiesWinUI3.InitializeKeyLineColorsFromDefaultOxyPlot(OxyPlotModel, rootPanel);
-        // Advertisement-based devices don't really have a device ID. CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id);
+        // Advertisement-based devices don't really have a device ID.
+        // CurrSaveData = AllSaveData.SwitchToDeviceIdCurrSaveData(CurrSaveData, DataContextAsKnownDevice);
+
         UpdateUX(CurrSaveData); // Can be null when the user hasn't made any changes
         if (CurrSaveData == null)
         {
@@ -322,9 +324,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         }
 
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
-        CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // might return null for the first connection
-        // Specific to the Common_EnvironmentalControl: since this control works via advertisements, we're 
-        // guaranteed to always get a CurrSaveData at this point.
+        CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // Has already been saved, so will exist.
 
 
         // It's critical to set these!

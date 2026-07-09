@@ -296,7 +296,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
         OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
-        CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // might return null for the first connection
+        CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // Has already been saved, so will exist.
 
         Device = new DeviceSpecificType()
         {
@@ -312,18 +312,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // It's critical to set these!
         DataContextAsKnownDevice.Id = Device.ble.DeviceId ?? ""; // never null :-)
         DataContextAsKnownDevice.BTLEDevice = Device.ble;
-        CurrSaveData = AllSaveData.FindWithId(DataContextAsKnownDevice.Id); // Use the stable form of the device id.
-        // CurrSaveData won't exist if the user hasn't made any changes
+        CurrSaveData = AllSaveData.SwitchToDeviceIdCurrSaveData(CurrSaveData, DataContextAsKnownDevice);
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
         UtilitiesWinUI3.UtilitiesWinUI3.InitializeKeyLineColorsFromDefaultOxyPlot(OxyPlotModel, rootPanel);
         UpdateUX(CurrSaveData); // Can be null when the user hasn't made any changes
-        if (CurrSaveData == null)
-        {
-            KnownDeviceName = DataContextAsKnownDevice.Advertisement?.BestName ?? KnownDeviceName;
-            uiKnownDeviceName.Text = KnownDeviceName;
-        }
+        KnownDeviceName = DataContextAsKnownDevice.Advertisement?.BestName ?? KnownDeviceName;
+        uiKnownDeviceName.Text = KnownDeviceName;
 
         Device.PropertyChanged += Device_PropertyChanged;
 
