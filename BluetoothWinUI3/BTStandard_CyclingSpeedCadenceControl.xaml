@@ -19,7 +19,14 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="uiKnownDeviceName" Grid.Row="0" Text="Cycling Speed and Cadence" Style="{StaticResource sDeviceTitle}"/>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="uiKnownDeviceName" Grid.Column="0" Text="Cycling Speed and Cadence" Style="{StaticResource sDeviceTitle}"/>
+                <TextBlock x:Name="uiSensorPosition" Grid.Column="1" Text="--" Style="{StaticResource sDeviceTitle}"/>
+            </Grid>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
@@ -29,55 +36,24 @@
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
                 <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" x:Name="uiDeviceDataList">
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}" Tag="Wheel">
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Revolution</Run><Run Text="&#160;"/><Run x:Name="uiRevolutionWheelChange" Text="┄"/>
+                        <Run>RPS (smooth)</Run><Run Text="&#160;"/><Run x:Name="uiRpsSensorChange" Text="┄"/>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRevolutionWheel"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRpsSensorEwma"/></TextBlock>
                     </StackPanel>
 
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}" Tag="Wheel">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Time</TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTimeWheel"/></TextBlock>
-                    </StackPanel>
-
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}" Tag="Wheel">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">RPS</TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRpsWheel"/></TextBlock>
-                    </StackPanel>
-
-
-
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}" Tag="Crank">
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Revolution</Run><Run Text="&#160;"/><Run x:Name="uiRevolutionCrankChange" Text="┄"/>
+                        <Run>RPS</Run><Run Text="&#160;"/>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRevolutionCrank"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRpsSensor"/></TextBlock>
                     </StackPanel>
 
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}" Tag="Crank">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Time</TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTimeCrank"/></TextBlock>
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Revolutions</TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRevolutionSensor"/></TextBlock>
                     </StackPanel>
-
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}" Tag="Crank">
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">RPS</TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRpsCrank"/></TextBlock>
-                    </StackPanel>
-
-
-
-                    <!-- This StackPanel has a name because it might be removed from the display (not ever
-                         device has a Battery service (0000180f-0000-1000-8000-00805f9b34fb) and the
-                         \corresponding BatteryLevel characteristic (00002a19-0000-1000-8000-00805f9b34fb)
-                    -->
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}" >
-                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Flags</Run><Run Text=" "/><Run x:Name="uiFlagsChange" Text=" "/>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiFlags"/></TextBlock>
-                    </StackPanel>
-
                 </GridView>
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >

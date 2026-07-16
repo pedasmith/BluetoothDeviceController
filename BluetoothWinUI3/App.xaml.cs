@@ -1,4 +1,5 @@
 ﻿using BluetoothConversions;
+using BluetoothProtocols;
 using IotNumberFormats;
 using Microsoft.UI.Xaml;
 using System;
@@ -37,6 +38,7 @@ namespace BluetoothWinUI3
         static int TestAll()
         {
             int nerror = 0;
+            nerror += SpeedCadence_Data_Facade.Test();
             nerror += BluetoothServiceUuid16Bit.Test();
             nerror += Utilities.StringUtilities.TestStarMatch();
             nerror += ValueToStringTest.Test();

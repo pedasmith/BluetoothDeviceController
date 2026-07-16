@@ -9,6 +9,7 @@
     <Import_RootNamespace>BluetoothProtocolsDevicesCoreExtensions</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BTStandard_CyclingSpeedCadence_Facade.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_HeartRate_Facade.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy_Extension.cs" />
   </ItemGroup>

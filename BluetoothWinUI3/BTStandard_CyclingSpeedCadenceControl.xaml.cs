@@ -23,6 +23,7 @@ namespace BluetoothWinUI3;
 #region Change these to match your device
 using DeviceSpecificType = TAOPE_CyclingSpeedCadence; // Change: pick your device, not BTStandard_Demo
 using DeviceSpecificSensorData = TAOPE_CyclingSpeedCadence.SpeedCadence_Data; // Change: 
+using DeviceSpecificSensorDataFacade = SpeedCadence_Data_Facade; // Change: 
 using DeviceSpecificSensorSecondaryData = TAOPE_CyclingSpeedCadence.Feature_Data; // Change: pick secondary sensor if needed
 using DeviceSpecificBatteryData = TAOPE_CyclingSpeedCadence.Battery_Data; // Change: many device support battery
 #endregion
@@ -78,7 +79,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the collection.
     /// </summary>
-    public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
+    public DataCollection<DeviceSpecificSensorDataFacade> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
 
     // CHANGE: some devices (like the heart rate) also have fine grained data.
@@ -106,7 +107,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
-    DeviceSpecificSensorData CurrSensor_DataUnits = null;
+    DeviceSpecificSensorDataFacade CurrSensor_DataUnits = null;
 
     /// <summary>
     /// Making a battery value that's seperate from the Sensor. This lets the programmer
@@ -179,12 +180,11 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
         // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            (DeviceSpecificType.CSC_MeasurementPropertyChangedName, uiRevolutionWheelChange),
-            (DeviceSpecificType.CSC_MeasurementPropertyChangedName, uiRevolutionCrankChange),
+            (DeviceSpecificType.CSC_MeasurementPropertyChangedName, uiRpsSensorChange),
         };
 
         // Change: set up the graph by making an OxyPlotModel
-        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModelSimple("Bicycle Data", 1, 10, "Crank", "TimeCrank");
+        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModelSimple("Bicycle Data", 1, 10, "RPS", "RpsSensor");
         // "Sensor Data" is for the main graph title  and is human-readable
         // "Battery" for the axis title and for the color settings in the menus and should be concise and human-readable
         // "BatteryLevel" is the underlying sensor property name and must exactly match the C# name.
@@ -246,11 +246,6 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// </summary>
     // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; } = null;
-
-    //TODO:
-    //    = OxyPlotUtilities.MakeOxyPlotModelSimple("Crank", 1, 100, "Crank", "TimeCrank");
-    // CHANGE: set up the graph
-
 
 
 
@@ -522,26 +517,6 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
 
     #region Change to update the UX when the device says there's new data
 
-    double LastTimeWheel = -1.0;
-    double LastRevolutionWheel = 0.0;
-
-    double LastTimeCrank = 0.0;
-    double LastRevolutionCrank = 0.0;
-
-    private string CadenceFlagsToString(int ssflags)
-    {
-        var retval = "";
-        if ((ssflags & 0x01) != 0)
-        {
-            retval += "Wheel ";
-        }
-        if ((ssflags & 0x02) != 0)
-        {
-            retval += "Crank ";
-        }
-        return retval.TrimEnd();
-    }
-
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. Most often called from Device_PropertyChanged
@@ -559,7 +534,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
 
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
-        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrSensor_DataUnits = DeviceSpecificSensorDataFacade.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToOrClone(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
@@ -571,65 +546,15 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
             //    break;
 
             case DeviceSpecificType.CSC_MeasurementPropertyChangedName: // Change: update the UX as appropriate
-                var iflags = (int)CurrSensor_DataUnits.Flags;
-                var flags = CadenceFlagsToString(iflags);
-                uiFlags.Text = flags;
-                if ((iflags & 0x01) != 0) // Has wheel data
-                {
-                    // The time values are just U16 in 1024th (2^^10) of a second. That means they
-                    // roll over in 2^^6 seconds = 64 seconds!
-                    if (LastTimeWheel == -1.0)
-                    {
-                        LastTimeWheel = CurrSensor_DataUnits.TimeWheel;
-                    }
-                    else
-                    {
-                        var deltaTimeWheel = CurrSensor_DataUnits.TimeWheel - LastTimeWheel;
-                        if (deltaTimeWheel < 0) deltaTimeWheel += 64.00; // rollover is exactly every 64 seconds
-                        uiTimeWheel.Text = deltaTimeWheel.ToString("F3"); // Time is in seconds
-
-                        var deltaRevolutionWheel = CurrSensor_DataUnits.RevolutionWheel - LastRevolutionWheel;
-                        var rps = deltaRevolutionWheel * (1.0 / deltaTimeWheel);
-                        uiRpsWheel.Text = double.IsNaN(rps) ? "--" : rps.ToString("F1"); // Time is in seconds
-
-                        LastTimeWheel = CurrSensor_DataUnits.TimeWheel;
-                    }
-                    uiRevolutionWheel.Text = CurrSensor_DataUnits.RevolutionWheel.ToString("F0");
-                    LastRevolutionWheel = CurrSensor_DataUnits.RevolutionWheel;
-                }
-
-                if ((iflags & 0x02) != 0) // Has crank data
-                {
-
-                    // Same thing, but for the crank. The crank revolutions rolls over at 2^^16
-                    if (LastTimeCrank == -1.0)
-                    {
-                        LastTimeCrank = CurrSensor_DataUnits.TimeCrank;
-                    }
-                    else
-                    {
-                        var deltaTimeCrank = CurrSensor_DataUnits.TimeCrank - LastTimeCrank;
-                        if (deltaTimeCrank < 0) deltaTimeCrank += 64.00; // rollover is exactly every 64 seconds
-                        uiTimeCrank.Text = deltaTimeCrank.ToString("F3"); // Time is in seconds
-
-                        var deltaRevolutionCrank = CurrSensor_DataUnits.RevolutionCrank - LastRevolutionCrank;
-                        if (deltaRevolutionCrank < 0)
-                        {
-                            deltaRevolutionCrank += Math.Pow(2, 16);
-                        }
-                        var rps = deltaRevolutionCrank * (1.0 / deltaTimeCrank);
-                        uiRpsCrank.Text = double.IsNaN(rps) ? "--" : rps.ToString("F1"); // Time is in seconds
-
-                        LastTimeCrank = CurrSensor_DataUnits.TimeCrank;
-                    }
-                    uiRevolutionCrank.Text = CurrSensor_DataUnits.RevolutionCrank.ToString("F0");
-                    LastRevolutionCrank = CurrSensor_DataUnits.RevolutionCrank;
-                }
 
                 // Only the sensor data gets plotted as historical data. In the demo,
                 // other values are also read (e.g., the Interval_Min), but they aren't
                 // part of the sensor data that's plotted.
                 // The historical data is updated from the CurrSensor_DataUnits
+                uiSensorPosition.Text = CurrSensor_DataUnits.SensorPosition;
+                uiRpsSensor.Text = CurrSensor_DataUnits.RpsSensor.ToString("F1");
+                uiRpsSensorEwma.Text = CurrSensor_DataUnits.RpsSensorEwma.ToString("F1");
+                uiRevolutionSensor.Text = CurrSensor_DataUnits.RevolutionSensor.ToString(); // Integer value
                 UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
                 break;
 
@@ -661,17 +586,17 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// saves a portion of the data. Technicaly, every time there's new data we either update
     /// the most recent entry OR we add a new entry.
     /// </summary>
-    private void UpdateHistoricalDataAndGraph(DeviceSpecificSensorData currSensor_DataUnits)
+    private void UpdateHistoricalDataAndGraph(DeviceSpecificSensorDataFacade currSensor_DataUnits)
     {
         var deltaInSeconds = currSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
         var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
-            ? DataCollection<DeviceSpecificSensorData>.Verb.Add : DataCollection<DeviceSpecificSensorData>.Verb.ReplaceMostRecent;
+            ? DataCollection<DeviceSpecificSensorDataFacade>.Verb.Add : DataCollection<DeviceSpecificSensorDataFacade>.Verb.ReplaceMostRecent;
         HistoricalDataUnits.Update(currSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
         //
         // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
         //
-        if (verb == DataCollection<DeviceSpecificSensorData>.Verb.Add && HistoricalDataUnits.Count == 2)
+        if (verb == DataCollection<DeviceSpecificSensorDataFacade>.Verb.Add && HistoricalDataUnits.Count == 2)
         {
             // DOC: Can't have the axes start off invisible because then they can't be switched back on
             if (CurrWindowSize == MainWindow.WindowSize.Normal)
