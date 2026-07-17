@@ -4,7 +4,7 @@
   "AllDevices": [
     {
       "Name": "BK6",
-      "ClassName": "TAOPE_CyclingSpeedCadence",
+      "ClassName": "BTStandard_CyclingSpeedCadence",
       "CompletionStatus": 0,
       "Links": [
         "https://www.bluetooth.com/specifications/specs/html/?src=CSCP_v1.0.1/out/en/index-en.html",

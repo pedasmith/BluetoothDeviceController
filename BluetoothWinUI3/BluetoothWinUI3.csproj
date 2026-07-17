@@ -71,9 +71,6 @@
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Nordic_Thingy.json" Link="Assets\CharacteristicsData\Nordic_Thingy.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TOAPE_Cycling_Speed_Cadence.json" Link="Assets\CharacteristicsData\TOAPE_Cycling_Speed_Cadence.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json" Link="Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

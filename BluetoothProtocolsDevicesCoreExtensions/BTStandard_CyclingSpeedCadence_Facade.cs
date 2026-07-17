@@ -13,6 +13,9 @@ using static BluetoothProtocols.TAOPE_CyclingSpeedCadence;
 
 namespace BluetoothProtocols
 {
+    /// <summary>
+    /// The SpeedCadence_Data_Facade class supports the standard 
+    /// </summary>
     public class SpeedCadence_Data_Facade : BTCommonMetaData<SpeedCadence_Data_Facade> //, IExportDataSource
     {
         /// <summary>
