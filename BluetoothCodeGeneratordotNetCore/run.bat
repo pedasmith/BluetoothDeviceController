@@ -1,4 +1,4 @@
-@echo off
+REM @echo off
 
 REM Generate all of the protocol, etc., files from the JSON device
 echo Current directory=%CD%
@@ -32,7 +32,8 @@ REM %BIN% -inputJsonFile "%JSONDIR%"\Bluetooth_CurrentTimeService.json -inputTem
 REM %BIN% -inputJsonFile "%JSONDIR%"\BtUnicodeKeyboard.json -inputTemplates Templates -output output
 REM %BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Templates -output output
 REM %BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\SensyOne-S1ProMultiSense.json -inputTemplates Templates -output output
+REM %BIN% -inputJsonFile "%JSONDIR%"\SensyOne-S1ProMultiSense.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Cycling_Speed_Cadence.json -inputTemplates Templates -output output
 goto :EOF
 
 :SingleFile
@@ -48,5 +49,7 @@ goto :EOF
 @echo run -all to do all conversions
 @echo run -file ^<file^> to do a single conversion. File is in the normal %JSONDIR% directory.
 @echo run -debug to just convert a few active items
+@echo cls ^&^& del /s /q output ^&^& run -debug ^&^& copy /Y output\BluetoothProtocolsDevicesCore\* ..\BluetoothProtocolsDevicesCore
+
 
 

@@ -21,11 +21,11 @@ namespace BluetoothWinUI3;
 
 
 #region Change these to match your device
-using DeviceSpecificType = TAOPE_CyclingSpeedCadence; // Change: pick your device, not BTStandard_Demo
-using DeviceSpecificSensorData = TAOPE_CyclingSpeedCadence.SpeedCadence_Data; // Change: 
+using DeviceSpecificType = BTStandard_CyclingSpeedCadence; // Change: pick your device, not BTStandard_Demo
+using DeviceSpecificSensorData = BTStandard_CyclingSpeedCadence.SpeedCadence_Data; // Change: 
 using DeviceSpecificSensorDataFacade = SpeedCadence_Data_Facade; // Change: 
-using DeviceSpecificSensorSecondaryData = TAOPE_CyclingSpeedCadence.Feature_Data; // Change: pick secondary sensor if needed
-using DeviceSpecificBatteryData = TAOPE_CyclingSpeedCadence.Battery_Data; // Change: many device support battery
+using DeviceSpecificSensorSecondaryData = BTStandard_CyclingSpeedCadence.Feature_Data; // Change: pick secondary sensor if needed
+using DeviceSpecificBatteryData = BTStandard_CyclingSpeedCadence.Battery_Data; // Change: many device support battery
 #endregion
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]

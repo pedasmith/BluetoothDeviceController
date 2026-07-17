@@ -17,13 +17,14 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-07-03::21:06
+    /// This class was automatically generated 2026-07-17::11:47
     /// </summary>
 
-    public  class TAOPE_CyclingSpeedCadence : INotifyPropertyChanged
+    public  class BTStandard_CyclingSpeedCadence : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
-        // No links for this device
+        // Link: https://www.bluetooth.com/specifications/specs/html/?src=CSCP_v1.0.1/out/en/index-en.html
+        // Link: https://www.bluetooth.com/specifications/specs/cycling-speed-and-cadence-service/
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();

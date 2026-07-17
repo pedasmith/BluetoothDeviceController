@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Utilities;
 using Windows.Devices.Bluetooth.Background;
-using static BluetoothProtocols.TAOPE_CyclingSpeedCadence;
+using static BluetoothProtocols.BTStandard_CyclingSpeedCadence;
 
 #if NET8_0_OR_GREATER
 #nullable disable
