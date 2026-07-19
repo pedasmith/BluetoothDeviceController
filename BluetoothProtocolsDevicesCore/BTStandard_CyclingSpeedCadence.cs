@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-07-17::11:47
+    /// This class was automatically generated 2026-07-19::09:02
     /// </summary>
 
     public  class BTStandard_CyclingSpeedCadence : INotifyPropertyChanged
@@ -163,19 +163,28 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public override void CopyFrom(SpeedCadence_Data value)
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom(SpeedCadence_Data source)
             {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Name = value.Name;
-                this.Flags = value.Flags;
-                this.RevolutionWheel = value.RevolutionWheel;
-                this.TimeWheel = value.TimeWheel;
-                this.RevolutionCrank = value.RevolutionCrank;
-                this.TimeCrank = value.TimeCrank;
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.Flags = source.Flags;
+                dest.RevolutionWheel = source.RevolutionWheel;
+                dest.TimeWheel = source.TimeWheel;
+                dest.RevolutionCrank = source.RevolutionCrank;
+                dest.TimeCrank = source.TimeCrank;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
-            public static SpeedCadence_Data CopyToOrClone(SpeedCadence_Data source, SpeedCadence_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static SpeedCadence_Data CopyToWithConvertAndCreate(SpeedCadence_Data source, SpeedCadence_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
                 {
@@ -260,17 +269,26 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public override void CopyFrom(Feature_Data value)
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom(Feature_Data source)
             {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Name = value.Name;
-                this.FeatureFlags = value.FeatureFlags;
-                this.SensorLocation = value.SensorLocation;
-                this.Unknown3 = value.Unknown3;
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.FeatureFlags = source.FeatureFlags;
+                dest.SensorLocation = source.SensorLocation;
+                dest.Unknown3 = source.Unknown3;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
-            public static Feature_Data CopyToOrClone(Feature_Data source, Feature_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static Feature_Data CopyToWithConvertAndCreate(Feature_Data source, Feature_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
                 {
@@ -362,18 +380,27 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public override void CopyFrom(Service_FD00_OTA_Data value)
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom(Service_FD00_OTA_Data source)
             {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Name = value.Name;
-                this.Unknown0 = value.Unknown0;
-                this.Unknown1 = value.Unknown1;
-                this.Unknown2 = value.Unknown2;
-                this.Unknown3 = value.Unknown3;
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.Unknown0 = source.Unknown0;
+                dest.Unknown1 = source.Unknown1;
+                dest.Unknown2 = source.Unknown2;
+                dest.Unknown3 = source.Unknown3;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
-            public static Service_FD00_OTA_Data CopyToOrClone(Service_FD00_OTA_Data source, Service_FD00_OTA_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static Service_FD00_OTA_Data CopyToWithConvertAndCreate(Service_FD00_OTA_Data source, Service_FD00_OTA_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
                 {
@@ -447,16 +474,25 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public override void CopyFrom(Battery_Data value)
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom(Battery_Data source)
             {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Name = value.Name;
-                this.TransmitPower = value.TransmitPower;
-                this.BatteryLevel = value.BatteryLevel;
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.TransmitPower = source.TransmitPower;
+                dest.BatteryLevel = source.BatteryLevel;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
-            public static Battery_Data CopyToOrClone(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static Battery_Data CopyToWithConvertAndCreate(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
                 {
@@ -566,20 +602,29 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public override void CopyFrom(Device_Information_Data value)
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom(Device_Information_Data source)
             {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Name = value.Name;
-                this.Manufacturer = value.Manufacturer;
-                this.ModelNumber = value.ModelNumber;
-                this.HardwareRevision = value.HardwareRevision;
-                this.FirmwareRevision = value.FirmwareRevision;
-                this.SoftwareRevision = value.SoftwareRevision;
-                this.SystemID = value.SystemID;
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.Manufacturer = source.Manufacturer;
+                dest.ModelNumber = source.ModelNumber;
+                dest.HardwareRevision = source.HardwareRevision;
+                dest.FirmwareRevision = source.FirmwareRevision;
+                dest.SoftwareRevision = source.SoftwareRevision;
+                dest.SystemID = source.SystemID;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
-            public static Device_Information_Data CopyToOrClone(Device_Information_Data source, Device_Information_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static Device_Information_Data CopyToWithConvertAndCreate(Device_Information_Data source, Device_Information_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
                 {

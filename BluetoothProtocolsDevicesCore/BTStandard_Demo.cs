@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Used to demonstrate adding new Bluetooth devices that require connecting to a device.
-    /// This class was automatically generated 2026-07-03::21:06
+    /// This class was automatically generated 2026-07-19::09:02
     /// </summary>
 
     public  class BTStandard_Demo : INotifyPropertyChanged
@@ -127,19 +127,28 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public override void CopyFrom(Common_Configuration_Data value)
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom(Common_Configuration_Data source)
             {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Name = value.Name;
-                this.Device_Name = value.Device_Name;
-                this.Interval_Min = value.Interval_Min;
-                this.Interval_Max = value.Interval_Max;
-                this.Latency = value.Latency;
-                this.Timeout = value.Timeout;
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.Device_Name = source.Device_Name;
+                dest.Interval_Min = source.Interval_Min;
+                dest.Interval_Max = source.Interval_Max;
+                dest.Latency = source.Latency;
+                dest.Timeout = source.Timeout;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
-            public static Common_Configuration_Data CopyToOrClone(Common_Configuration_Data source, Common_Configuration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static Common_Configuration_Data CopyToWithConvertAndCreate(Common_Configuration_Data source, Common_Configuration_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
                 {
@@ -205,15 +214,24 @@ namespace BluetoothProtocols
                 return retval;
             }
 
-            public override void CopyFrom(Battery_Data value)
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom(Battery_Data source)
             {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Name = value.Name;
-                this.BatteryLevel = value.BatteryLevel;
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.BatteryLevel = source.BatteryLevel;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
-            public static Battery_Data CopyToOrClone(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static Battery_Data CopyToWithConvertAndCreate(Battery_Data source, Battery_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
                 {

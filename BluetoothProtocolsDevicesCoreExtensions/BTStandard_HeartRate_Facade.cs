@@ -122,8 +122,8 @@ namespace BluetoothProtocols
 
         #region From_Heart_Rate_Data
         //
-        // copy-pasted from Heart_Rate_Data and then updated Clone, CopyFrom, CopyToOrClone
-        // and radically change CopyToOrClone
+        // copy-pasted from Heart_Rate_Data and then updated Clone, CopyFrom, CopyToWithConvertAndCreate
+        // and radically change CopyToWithConvertAndCreate
         // and changed HeartRateLowRange and HeartRateHighRange to private
 
 
@@ -187,7 +187,7 @@ namespace BluetoothProtocols
         }
 
         // List CopyFrom, but convert the doubles as appropriate
-        public static Heart_Rate_Data_Facade CopyToOrClone(Heart_Rate_Data source, Heart_Rate_Data_Facade dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+        public static Heart_Rate_Data_Facade CopyToWithConvertAndCreate(Heart_Rate_Data source, Heart_Rate_Data_Facade dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
         {
             if (dest == null)
             {

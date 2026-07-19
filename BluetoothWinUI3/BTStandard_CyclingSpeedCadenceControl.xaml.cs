@@ -87,10 +87,11 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     {
         ;  // do nothing
     }
-    public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
+    public IBTCommonMetaData GetDataMostRecent()
     {
-        return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];
+        return HistoricalDataUnits.GetDataMostRecent();
     }
+
 
     // This control show two kinds of data. 
     // 1. Battery data is the "sensor data" which is the data to be graphed
@@ -444,6 +445,11 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
         {
             #region Change to update the data based on user preferred units (e.g, C versus F)
             // For the BTStandard_Demo, there are no units to change
+            if (oldPrefs != null && newPrefs.Distance != oldPrefs.Distance)
+            {
+                // Change: based on your knowledge of the sensor data, change the distance readings.
+                // data.Distance = BluetoothWatcher.Units.Distance.Convert(data.Distance, oldPrefs.Distance, CurrUserPrefs.Distance);
+            }
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
                 // Change: based on your knowledge of the sensor data, change the temperature readings.
@@ -532,11 +538,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
         CurrSensorSecondary_Data = Device.CurrFeature_Data; // Change: pick secondary data as appropriate
         CurrBattery_Data = Device.CurrBattery_Data; // Change: if your device doesn't have a battery, remove battery stuff!
 
-
-        // Update data from the device to match the current preferred units. Will create the values as needed.
-        CurrSensor_DataUnits = DeviceSpecificSensorDataFacade.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToOrClone(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        // TODO: moved the _units setting code to be per-name
 
         // Change all this code to match your device and UX.
         switch (name)
@@ -547,6 +549,10 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
 
             case DeviceSpecificType.CSC_MeasurementPropertyChangedName: // Change: update the UX as appropriate
 
+                // Update data from the device to match the current preferred units. Will create the values as needed.
+                CurrSensor_DataUnits = DeviceSpecificSensorDataFacade.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+                CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+
                 // Only the sensor data gets plotted as historical data. In the demo,
                 // other values are also read (e.g., the Interval_Min), but they aren't
                 // part of the sensor data that's plotted.
@@ -555,13 +561,20 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
                 uiRpsSensor.Text = CurrSensor_DataUnits.RpsSensor.ToString("F1");
                 uiRpsSensorEwma.Text = CurrSensor_DataUnits.RpsSensorEwma.ToString("F1");
                 uiRevolutionSensor.Text = CurrSensor_DataUnits.RevolutionSensor.ToString(); // Integer value
+                uiRideDistance.Text = CurrSensor_DataUnits.RideDistance.ToString("F2");
+                uiCurrSpeed.Text = CurrSensor_DataUnits.CurrSpeed.ToString("F2");
+                uiTotalDistance.Text = CurrSensor_DataUnits.TotalDistance.ToString("F2");
+
                 UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
                 break;
 
 
             //case "*": // never used, but here so it matches the Govee code.
-            //case DeviceSpecificType.BatteryLevelPropertyChangedName:
-            //    uiBattery.Text = CurrSensor_DataUnits.BatteryLevel.ToString("F2"); // Change: update the UX as appropriate
+            case DeviceSpecificType.BatteryLevelPropertyChangedName:
+                CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+                break;
+
+                //    uiBattery.Text = CurrSensor_DataUnits.BatteryLevel.ToString("F2"); // Change: update the UX as appropriate
 
 
         }

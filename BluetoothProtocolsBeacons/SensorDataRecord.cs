@@ -71,7 +71,7 @@ namespace BluetoothProtocols
         }
 
         // CopyFrom, but convert the doubles as appropriate
-        public static SensorDataRecord CopyToOrClone(SensorDataRecord source, SensorDataRecord dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+        public static SensorDataRecord CopyToWithConvertAndCreate(SensorDataRecord source, SensorDataRecord dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
         {
             if (dest == null)
             {

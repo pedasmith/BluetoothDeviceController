@@ -64,6 +64,10 @@
                         <RadioMenuFlyoutItem Text="PSI" Click="OnPreferencesPressure" Tag="PSI" x:Name="uiPreferencesPSI" GroupName="groupPressure" />
                         <RadioMenuFlyoutItem Text="Atmospheres" Click="OnPreferencesPressure" Tag="Atmosphere" x:Name="uiPreferencesAtmosphere" GroupName="groupPressure" />
                     </MenuFlyoutSubItem>
+                    <MenuFlyoutSubItem Text="Distance Units">
+                        <RadioMenuFlyoutItem Text="Kilometers" Click="OnPreferencesDistance" Tag="km" x:Name="uiPreferencesKilometers" GroupName="groupDistance" />
+                        <RadioMenuFlyoutItem Text="Miles" Click="OnPreferencesDistance" Tag="miles" x:Name="uiPreferencesMiles" GroupName="groupDistance" />
+                    </MenuFlyoutSubItem>
                 </MenuBarItem>
                 
                 <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">

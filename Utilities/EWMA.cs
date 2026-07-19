@@ -49,5 +49,12 @@ namespace Utilities
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public EWMA Clone()
+        {
+            var retval = this.MemberwiseClone() as EWMA;
+            return retval;
+        }
+
     }
 }

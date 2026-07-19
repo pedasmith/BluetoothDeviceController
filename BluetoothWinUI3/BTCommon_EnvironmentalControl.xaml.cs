@@ -76,9 +76,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     {
         ;  // do nothing
     }
-    public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
+    public IBTCommonMetaData GetDataMostRecent()
     {
-        return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];
+        return HistoricalDataUnits.GetDataMostRecent();
     }
 
     /// <summary>
@@ -428,6 +428,11 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         foreach (var data in HistoricalDataUnits.Data)
         {
             #region Change to update the data based on user preferred units (e.g, C versus F)
+            if (oldPrefs != null && newPrefs.Distance != oldPrefs.Distance)
+            {
+                // Change: based on your knowledge of the sensor data, change the distance readings.
+                // data.Distance = BluetoothWatcher.Units.Distance.Convert(data.Distance, oldPrefs.Distance, CurrUserPrefs.Distance);
+            }
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
                 // Change: based on your knowledge of the sensor data, change the temperature readings.
@@ -500,7 +505,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         UpdateSparkles(name); // name is from e.PropertyName when the Device does a PropertyChanged.
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
-        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Track the historical data
         switch (name)

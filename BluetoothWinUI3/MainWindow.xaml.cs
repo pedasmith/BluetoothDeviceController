@@ -121,6 +121,11 @@ namespace BluetoothWinUI3
 
         private void SetUxFromUserPreferences()
         {
+            switch (CurrUserPrefs.Distance)
+            {
+                case Distance.DistanceUnit.Kilometers: uiPreferencesKilometers.IsChecked = true; break;
+                case Distance.DistanceUnit.Miles: uiPreferencesMiles.IsChecked = true; break;
+            }
             switch (CurrUserPrefs.Pressure)
             {
                 case Pressure.PressureUnit.mmHg_Torr: uiPreferencesmmHg.IsChecked = true; break;
@@ -613,6 +618,19 @@ namespace BluetoothWinUI3
                 device.UpdateUX(currPrefs, oldPrefs);
             }
         }
+        private void OnPreferencesDistance(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            if (tag == null) return;
+            var oldPrefs = CurrUserPrefs.Clone();
+            switch (tag)
+            {
+                case "km": CurrUserPrefs.Distance = Distance.DistanceUnit.Kilometers; break;
+                case "miles": CurrUserPrefs.Distance = Distance.DistanceUnit.Miles; break;
+                default: CurrUserPrefs.Distance = Distance.DistanceUnit.Kilometers; break;
+            }
+            UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
+        }
 
         private void OnPreferencesPressure(object sender, RoutedEventArgs e)
         {
@@ -621,39 +639,16 @@ namespace BluetoothWinUI3
             var oldPrefs = CurrUserPrefs.Clone();
             switch (tag)
             {
-                case "mmHg":
-                    CurrUserPrefs.Pressure = Pressure.PressureUnit.mmHg_Torr;
-                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
-                    break;
-                case "inHg":
-                    CurrUserPrefs.Pressure = Pressure.PressureUnit.inHg;
-                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
-                    break;
-                case "mbar_hpa": // same as hPa
-                    CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar;
-                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
-                    break;
-                case "kiloPascal":
-                    CurrUserPrefs.Pressure = Pressure.PressureUnit.kiloPascal;
-                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
-                    break;
-                case "Pascal":
-                    CurrUserPrefs.Pressure = Pressure.PressureUnit.Pascal;
-                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
-                    break;
-                case "PSI":
-                    CurrUserPrefs.Pressure = Pressure.PressureUnit.PSI;
-                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
-                    break;
-                case "Atmosphere":
-                    CurrUserPrefs.Pressure = Pressure.PressureUnit.Atmosphere;
-                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
-                    break;
-                default:
-                    CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar;
-                    UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
-                    break;
+                case "mmHg": CurrUserPrefs.Pressure = Pressure.PressureUnit.mmHg_Torr; break;
+                case "inHg": CurrUserPrefs.Pressure = Pressure.PressureUnit.inHg; break;
+                case "mbar_hpa": CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar; break;
+                case "kiloPascal": CurrUserPrefs.Pressure = Pressure.PressureUnit.kiloPascal; break;
+                case "Pascal": CurrUserPrefs.Pressure = Pressure.PressureUnit.Pascal; break;
+                case "PSI": CurrUserPrefs.Pressure = Pressure.PressureUnit.PSI; break;
+                case "Atmosphere": CurrUserPrefs.Pressure = Pressure.PressureUnit.Atmosphere; break;
+                default: CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar; break;
             }
+            UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
         }
         private void OnPreferencesTemperature(object sender, RoutedEventArgs e)
         {

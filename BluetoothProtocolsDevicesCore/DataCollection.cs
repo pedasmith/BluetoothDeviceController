@@ -54,5 +54,13 @@ namespace BluetoothProtocolsDevicesCore
         ///</summary>
         public DateTimeOffset TimestampMostRecentAdd { get; internal set; } = DateTimeOffset.MinValue;
         public ObservableCollection<SensorData> Data { get; } = new ObservableCollection<SensorData>();
+
+        /// <summary>
+        /// Get the most recent data in the collection or null if there's no data.
+        /// </summary>
+        public IBTCommonMetaData GetDataMostRecent() 
+        {
+            return Count == 0 ? null : Data[Count - 1];
+        }
     }
 }

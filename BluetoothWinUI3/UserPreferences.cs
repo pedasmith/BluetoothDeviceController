@@ -12,6 +12,7 @@ namespace BluetoothWinUI3
 {
     public class UserPreferences
     {
+        public Distance.DistanceUnit Distance { get; set; } = BluetoothWatcher.Units.Distance.DistanceUnit.Kilometers;
         public Pressure.PressureUnit Pressure { get; set; } = BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar;
         public Temperature.TemperatureUnit Temperature { get; set; } = BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius;
         public bool AutostartAdvertisementWatcher { get; set; } = true;

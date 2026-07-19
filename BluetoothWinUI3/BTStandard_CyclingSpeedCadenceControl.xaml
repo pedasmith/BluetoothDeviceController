@@ -54,6 +54,21 @@
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Revolutions</TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRevolutionSensor"/></TextBlock>
                     </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Speed</TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiCurrSpeed"/></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Distance</TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRideDistance"/></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Odometer</TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTotalDistance"/></TextBlock>
+                    </StackPanel>
                 </GridView>
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >

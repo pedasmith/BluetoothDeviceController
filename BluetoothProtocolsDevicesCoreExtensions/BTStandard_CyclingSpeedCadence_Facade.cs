@@ -1,4 +1,5 @@
 ﻿using BluetoothProtocols;
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -39,7 +40,13 @@ namespace BluetoothProtocols
         public bool FlagsIsCrank { get { return CurrFlagsDecoded.HasFlag(FlagsDecoded.CrankRevolutionDataPresent); } }
         public string SensorPosition {  get { return FlagsIsWheel ? "Wheel" : "Crank"; } }
 
+        /// <summary>
+        /// Time since the last report for either the wheel or the crank
+        /// </summary>
         public double TimeSensor { get { return FlagsIsWheel ? TimeWheel : TimeCrank; } }
+        /// <summary>
+        /// Total revolutions since the sensor was last reset (generally since it was first powered on)
+        /// </summary>
         public double RevolutionSensor { get { return FlagsIsWheel ? RevolutionWheel : RevolutionCrank; } }
 
         double LastTimeSensor = -1.0;
@@ -59,11 +66,59 @@ namespace BluetoothProtocols
 
 
 
-        // TODO: make private
         /// <summary>
-        /// Time is from either WheelTime or CrankTime
+        /// Starting value for the RevolutionSensor.
         /// </summary>
-        public void UpdateData()
+        public double RideStartRevolutionSensor { get; internal set; } = double.NaN;
+
+        /// <summary>
+        /// Number of revolutions for this ride
+        /// </summary>
+        public double RideRevolutionSensor { get; internal set; } = 0;
+
+        /// <summary>
+        /// Initialized to the current time when the first data comes in. 
+        /// </summary>
+        public DateTimeOffset RideStartTime { get; internal set; } = DateTimeOffset.Now;
+
+        /// <summary>
+        /// Calculated current ride time in minutes. This is just now minutes the start time.
+        /// </summary>
+        public double CalculatedRideTimeInMinutes {  get { return DateTimeOffset.Now.Subtract(RideStartTime).TotalMinutes; } }
+
+        /// <summary>
+        /// Set up a reasonable default for most people.
+        /// A 700C tire has a "bead seat" diameter of 622mm. Add in another 25mm (twice) means the actual
+        /// diameter is 672mm. 672mm × 𝜋 ≅ 2.11 meters per revolution. 
+        /// </summary>
+        public double DistancePerRevolutionInMeters { get; set; } = 2.11;
+        /// <summary>
+        /// Calculated value of the current speed based on the distance per revolution and the curent RPS.
+        /// Set in the Update... call
+        /// </summary>
+        public double CurrSpeed { get; set; }
+        /// <summary>
+        /// Calculated value of the distance for this ride based on the distance per revolution and the current
+        /// delta revolutions. It's not the total distance.
+        /// </summary>
+        public double RideDistance { get; set; }
+
+        /// <summary>
+        /// Calculated value of the total distance since the sensor was reset.based on the distance per revolution and the current
+        /// delta revolutions. 
+        /// </summary>
+        public double TotalDistance { get; set; }
+
+
+        /// <summary>
+        /// Giant routine that updates the data based on either the wheel or crank data.
+        /// Also updates the facade properties like the times (start and ride time in minutes),
+        /// speed, and distance.
+        /// This is only used when the underlying sensor has new data -- among other things,
+        /// some of the calculated values like Speed will always be calculated in a standard
+        /// format (KPH)
+        /// </summary>
+        private void SetFacadeDataFromOriginalData()
         {
 
             // Both the wheel and crank times are UINT16
@@ -73,29 +128,59 @@ namespace BluetoothProtocols
 
             // The time values are just U16 in 1024th (2^^10) of a second. That means they
             // roll over in 2^^6 seconds = 64 seconds!
-            if (LastTimeSensor >= 0)
+            if (LastTimeSensor <= 0) // nothing is initialized
             {
-                var deltaTimeSensor = TimeSensor - LastTimeSensor;
-                if (deltaTimeSensor < 0) deltaTimeSensor += 64.00; // rollover is exactly every 64 seconds
+                RideStartRevolutionSensor = RevolutionSensor;
+            }
+            else
+            {
+                var deltaTimeSensorInSeconds = TimeSensor - LastTimeSensor;
+                if (deltaTimeSensorInSeconds < 0) deltaTimeSensorInSeconds += 64.00; // rollover is exactly every 64 seconds
 
-
-                var deltaRevolutionSensor = SubtractWithSmartRollover (RevolutionSensor, LastRevolutionSensor);
+                // Note that the crank can overflow during a ride, but the wheel
+                // is designed to outlive the lifetime of the sensor.
+                var deltaRevolutionSensor = SubtractWithSmartRollover(RevolutionSensor, LastRevolutionSensor);
                 if (deltaRevolutionSensor == 0)
                 {
                     RpsSensor = 0.0; // no change in revolution, so speed is zero
                 }
                 else
                 {
-                    var rps = (deltaTimeSensor != 0.0) ? deltaRevolutionSensor / deltaTimeSensor : double.NaN;
+                    var rps = (deltaTimeSensorInSeconds != 0.0) ? deltaRevolutionSensor / deltaTimeSensorInSeconds : double.NaN;
                     if (double.IsNaN(rps))
                     {
                         // Error? It means we got a revolution change with no time change.
                     }
                     else
-                    { 
+                    {
                         RpsSensor = rps; // only update with new data
                     }
                 }
+
+                // From my EE training: depending on a delta to increment the value is always
+                // a little dicey. You never know when "something" will happen such that a delta
+                // interval is somehow missed, or a counter goes negative.
+                // For the wheel, we use the more dependable value of just subtracting the
+                // initial value from the starting value. That works because the wheel counter
+                // has more bits in it than the crank.
+                // But for the crank, we have to rely on the delta approach.
+                if (FlagsIsCrank)
+                {
+                    RideRevolutionSensor += deltaRevolutionSensor;
+                }
+                else
+                {
+                    RideRevolutionSensor = RevolutionSensor - RideStartRevolutionSensor;
+                }
+                // TODO: Update speed and distance
+                // RideTotalDistance is always calculated in kilometers
+                RideDistance = RideRevolutionSensor * DistancePerRevolutionInMeters / 1000.0;
+                TotalDistance = RevolutionSensor * DistancePerRevolutionInMeters / 1000.0;
+
+                // CurrSpeed is in kilometers per hour
+                var distanceInKilometers = deltaRevolutionSensor * DistancePerRevolutionInMeters / 1000.0;
+                var timeInHours = deltaTimeSensorInSeconds / (60 * 60);
+                CurrSpeed = distanceInKilometers == 0 ? 0.0 : (distanceInKilometers / timeInHours);
             }
             LastTimeSensor = TimeSensor;
             LastRevolutionSensor = RevolutionSensor;
@@ -106,9 +191,6 @@ namespace BluetoothProtocols
         /// do a subtract. If the numbers rolled over, add either 2^^16 or 2^^32 to 
         /// make a positive number.
         /// </summary>
-        /// <param name="currValue"></param>
-        /// <param name="lastValue"></param>
-        /// <returns></returns>
         private static double SubtractWithSmartRollover(double currValue, double lastValue)
         {
             double retval = currValue - lastValue;
@@ -153,7 +235,7 @@ namespace BluetoothProtocols
             TimeCrank = time;
             RevolutionWheel = revolution;
             RevolutionCrank = revolution;
-            UpdateData();
+            SetFacadeDataFromOriginalData(); // Inside TestSet()
         }
         private static SpeedCadence_Data_Facade MakeTestStock()
         {
@@ -174,8 +256,8 @@ namespace BluetoothProtocols
 
         #region From_SpeedCadence_Data
         //
-        // copy-pasted from SpeedCadence_Data and then updated Clone, CopyFrom, CopyToOrClone
-        // and radically change CopyToOrClone
+        // copy-pasted from SpeedCadence_Data and then updated Clone, CopyFrom, CopyToWithConvertAndCreate
+        // and radically change CopyToWithConvertAndCreate
         // and changed all fields to private
         // and updated all calls to OnPropertyChanged to include new fields
 
@@ -242,24 +324,40 @@ namespace BluetoothProtocols
             return retval;
         }
 
-        public override void CopyFrom(SpeedCadence_Data_Facade value)
+        public override void CopyFrom(SpeedCadence_Data_Facade source)
         {
-            this.TimestampMostRecent = value.TimestampMostRecent;
-            this.Name = value.Name;
-            this.Flags = value.Flags;
-            this.RevolutionWheel = value.RevolutionWheel;
-            this.TimeWheel = value.TimeWheel;
-            this.RevolutionCrank = value.RevolutionCrank;
-            this.TimeCrank = value.TimeCrank;
+            var dest = this;
+
+            // All of the facade-specific values.
+            dest._RpsSensor = source._RpsSensor;
+            dest._RpsSensorEwma = source._RpsSensorEwma.Clone();
+            dest.RideStartRevolutionSensor = source.RideStartRevolutionSensor;
+            dest.RideRevolutionSensor = source.RideRevolutionSensor;
+            dest.RideStartTime = source.RideStartTime;
+            dest.DistancePerRevolutionInMeters = source.DistancePerRevolutionInMeters;
+            dest.CurrSpeed = source.CurrSpeed;
+            dest.RideDistance = source.RideDistance;
+
+
+            // From the original class
+            dest.TimestampMostRecent = source.TimestampMostRecent;
+            dest.Name = source.Name;
+            dest.Flags = source.Flags;
+            dest.RevolutionWheel = source.RevolutionWheel;
+            dest.TimeWheel = source.TimeWheel;
+            dest.RevolutionCrank = source.RevolutionCrank;
+            dest.TimeCrank = source.TimeCrank;
         }
 
         // Like CopyFrom, but convert the doubles as appropriate + sets name
-        public static SpeedCadence_Data_Facade CopyToOrClone(SpeedCadence_Data source, SpeedCadence_Data_Facade dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+        public static SpeedCadence_Data_Facade CopyToWithConvertAndCreate(SpeedCadence_Data source, SpeedCadence_Data_Facade dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
         {
             if (dest == null)
             {
                 dest = new();
             }
+
+            // From the original class
             dest.TimestampMostRecent = source.TimestampMostRecent;
             dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
             dest.Flags = convert(source.Flags, "");
@@ -268,7 +366,9 @@ namespace BluetoothProtocols
             dest.RevolutionCrank = convert(source.RevolutionCrank, "");
             dest.TimeCrank = convert(source.TimeCrank, "");
 
-            dest.UpdateData(); // will update the RPS
+            // Facade-specific values are set up in the UpdateData() method.
+            dest.SetFacadeDataFromOriginalData(); // will update the RPS, Speed, Distance, etc.
+
             return dest;
         }
 

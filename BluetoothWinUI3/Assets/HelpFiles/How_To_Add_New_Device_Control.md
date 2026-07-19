@@ -2,11 +2,21 @@
 
 The device controls are the 400x400 (approx) square(ish) panels. There is one per each instance of a device (e.g., if you have two Nordic Thingy:52s, there will be two panes visible).
 
-It's important to distinguish
+### Data type: Supported versus Known devices
+
+The code is littered with "Known" and "Supported" devices. These are different (but related) concepts, and you need to keep them clear.
+
+The code for SupportedDevice.cs and KnownDevice.cs is in directory *BluetoothWinUI3Registration*
 
 - **Supported** devices are like a Nordic Thingy:53. This code knows about the Nordic Thingy.
 - **Known** device are specific instances of a supported device. If you have several of them, you will have several instances. Each known device gets its own control in the  uiKnownDevices panel in MainWindow.
 
+Every Known device contains four important fields:
+
+- The corresponding Supported device
+- The Control (the 400x400 UserControl) 
+- The ZoomableDeviceContainer the control is placed in
+- The WatcherData (Advertisement) that triggered the creation of the control
 
 # The easy path: start with BTStandard_Demo
 
@@ -94,4 +104,28 @@ Bluetooth devices which are supported are listed in the *BluetoothWinUI3Registra
     }
 ```
 
+# Facades and Extensions for the JSON data
+
+Sometimes the JSON description-generated data classes aren't very convenient. When this happens, you might want to make either an extension or a facade class.
+
+Quick reminder: The JSON device description is converted into a BT parser and a handful of data classes (plus some lifetime BT code and more). The parser will stuff data into the correct data class. The data class directly corresponds to the different fields in the specific BT protocol.
+
+Quick reminder #2: the data from the device is (almost) always in a specific units (e.g., "Degrees Celcius"). But the user often has a preference for a different unit
+
+The problem is that sometimes the specific BT protocol isn't very convenient. For example, the Heart_Rate_Data from the HeartRate service (0x180D) includes a one-byte and a two-byte Heart Rate value. That's not very convenient; it would be better to have a single property. A *facade* is used make a more convenient data type.
+
+The Nordic Thingy has a different problem: the environment data is from different sensors that don't start up at the same time. That doesn't work well with the environment graph. An *extension* is used to include a property that says if the data has all of the environment data.
+
+## Why pick an extension versus a facade?
+
+If you just need to add an additional quick method (like the Nordic Thingy), use a C# Extension class. Put it into the *BluetoothProtocolsDevicesCoreExtensions* directory in its own file called *Manufacturer*_*Device*_Extension.cs.
+
+If you need to override some properties like the Heart Rate does, make a Facade. Put it into the *BluetoothProtocolsDevicesCoreExtensions* directory in its own file called *Manufacturer*_*Device*_Facade.cs.
+
+## Common "Gotchas" for facades
+
+1. You have to make a new class. You cannot subclass the facade class on top of the original data class. This is because the data classes use the "Curiously Recursing Template Pattern" (CRTP), and one of the limitations of that is you can't make a subclass.
+2. Your control will have to accept a generated data class as the data and then copy all of the data into the facade. 
+3. You will have to carefully duplicate the CopyFrom and CopyToWithConvertAndCreate
+4. Calculated property fields interact poorly with the user preferred units. For example, if you have a distance and a time data property already, and you want a speed property, you cannot just have a calculated property because then the user can't pick the units (usually MPH or KPH). Instead you have to do the calculation "by hand" in the CopyFrom and CopyToWithConvertAndCreate.
 

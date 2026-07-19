@@ -86,10 +86,11 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     {
         ;  // do nothing
     }
-    public IBTCommonMetaData GetDataMostRecent() // TODO: add this to the data collections!
+    public IBTCommonMetaData GetDataMostRecent()
     {
-        return HistoricalDataUnits.Count == 0 ? null : HistoricalDataUnits.Data[HistoricalDataUnits.Count - 1];
+        return HistoricalDataUnits.GetDataMostRecent();
     }
+
 
     // This control show two kinds of data. 
     // 1. Battery data is the "sensor data" which is the data to be graphed
@@ -419,6 +420,11 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         foreach (var data in HistoricalDataUnits.Data)
         {
             #region Change to update the data based on user preferred units (e.g, C versus F)
+            if (oldPrefs != null && newPrefs.Distance != oldPrefs.Distance)
+            {
+                // Change: based on your knowledge of the sensor data, change the distance readings.
+                // data.Distance = BluetoothWatcher.Units.Distance.Convert(data.Distance, oldPrefs.Distance, CurrUserPrefs.Distance);
+            }
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
                 // Change: based on your knowledge of the sensor data, change the temperature readings.
@@ -509,9 +515,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
-        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToOrClone(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToOrClone(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToOrClone(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Change all this code to match your device and UX.
         switch (name)

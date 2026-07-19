@@ -367,15 +367,24 @@ This is the primary section of the code.
                 return retval;
             }
 
-            public override void CopyFrom([[DataGroupName.dotNet]] value)
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom([[DataGroupName.dotNet]] source)
             {
-                this.TimestampMostRecent = value.TimestampMostRecent;
-                this.Name = value.Name;
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
 [[CharacteristicDataFieldsCopyFrom]]
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
-            public static [[DataGroupName.dotNet]] CopyToOrClone([[DataGroupName.dotNet]] source, [[DataGroupName.dotNet]] dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static [[DataGroupName.dotNet]] CopyToWithConvertAndCreate([[DataGroupName.dotNet]] source, [[DataGroupName.dotNet]] dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
                 {
@@ -448,13 +457,13 @@ This is the primary section of the code.
 ## CharacteristicPropertyDataFieldsCopyFromAssignment Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] != double[]"
 
 ```
-                this.[[DataName.dotNet]] = value.[[DataName.dotNet]];
+                dest.[[DataName.dotNet]] = source.[[DataName.dotNet]];
 ```
 
 ## CharacteristicPropertyDataFieldsCopyFromNewList Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" If="[[VariableTypeDS]] == double[]"
 
 ```
-                this.[[DataName.dotNet]] = new List<double>(value.[[DataName.dotNet]]);
+                dest.[[DataName.dotNet]] = new List<double>(source.[[DataName.dotNet]]);
 ```
 
 ## CharacteristicDataFieldsCopyToConvert Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics CodeListSubZero=""

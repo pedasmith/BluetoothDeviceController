@@ -34,6 +34,9 @@ REM %BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Template
 REM %BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
 REM %BIN% -inputJsonFile "%JSONDIR%"\SensyOne-S1ProMultiSense.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Cycling_Speed_Cadence.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Demo.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Heart_Rate.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Templates -output output
 goto :EOF
 
 :SingleFile
