@@ -561,9 +561,18 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
                 uiRpsSensor.Text = CurrSensor_DataUnits.RpsSensor.ToString("F1");
                 uiRpsSensorEwma.Text = CurrSensor_DataUnits.RpsSensorEwma.ToString("F1");
                 uiRevolutionSensor.Text = CurrSensor_DataUnits.RevolutionSensor.ToString(); // Integer value
+
                 uiRideDistance.Text = CurrSensor_DataUnits.RideDistance.ToString("F2");
                 uiCurrSpeed.Text = CurrSensor_DataUnits.CurrSpeed.ToString("F2");
                 uiTotalDistance.Text = CurrSensor_DataUnits.TotalDistance.ToString("F2");
+
+                uiRideTimeStart.Text = CurrSensor_DataUnits.RideStartTime.ToString("HH:mm:ss");
+                var currTimeInSeconds = CurrSensor_DataUnits.CalculatedRideTimeInMinutes * 60.0;
+                var ss = (int)(currTimeInSeconds % 60);
+                var mm = (int)Math.Floor(currTimeInSeconds / 60);
+                var mmss = $"{mm}:{ss:D2}";
+                uiRideTimeInMinutes.Text = mmss;
+                uiCurrentTime.Text = DateTimeOffset.Now.ToString("HH:mm:ss");
 
                 UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
                 break;

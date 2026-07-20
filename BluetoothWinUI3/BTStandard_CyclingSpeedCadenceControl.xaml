@@ -69,6 +69,12 @@
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">Odometer</TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiTotalDistance"/></TextBlock>
                     </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDeviceListDataCompressed}" Margin="0,-5,0,0" HorizontalAlignment="Right"><Run x:Name="uiRideTimeStart"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}" Margin="0,-5,0,0"><Run x:Name="uiRideTimeInMinutes"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDeviceListDataCompressed}" HorizontalAlignment="Right" Margin="0,-5,0,0"><Run x:Name="uiCurrentTime"/></TextBlock>
+                    </StackPanel>
                 </GridView>
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
