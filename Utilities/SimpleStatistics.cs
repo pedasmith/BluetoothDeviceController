@@ -1,16 +1,26 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
+using System.Text;
 
 #if NET8_0_OR_GREATER
 #nullable disable
 #endif
+
 namespace Utilities
 {
-    /// <summary>
-    /// Exponentially Weighted Moving Average (EWMA) class for calculating the moving average of a series of values with exponential weighting.
-    /// </summary>
-    public class EWMA : INotifyPropertyChanged
+    internal class SimpleStatistics
     {
+        int MaxCount = 1;
+        public SimpleStatistics(int maxCount)
+        {
+            MaxCount = maxCount;
+            Values = new(MaxCount);
+        }
+        Queue<double> Values;
+
         /// <summary>
         /// Alpha must be >0 and <=1. Larger value are "twitchier" and 1 is just the last value.
         /// </summary>
@@ -22,14 +32,19 @@ namespace Utilities
         /// </summary>
         public void Update(double value)
         {
-            if (double.IsNaN(_currentAverage))
+            if (Values.Count >= MaxCount)
             {
-                CurrentAverage = value;
+                Values.Dequeue();
             }
-            else
+            Values.Enqueue(value);
+
+            double total = 0.0;
+            foreach (double v in Values)
             {
-                CurrentAverage = Alpha * value + (1 - Alpha) * CurrentAverage;
+                total += v;
             }
+            var average = total / (double)Values.Count;
+            CurrentAverage = average;
         }
         /// <summary>
         /// The value to return when there's no value. Default is NaN
@@ -40,18 +55,8 @@ namespace Utilities
         /// </summary>
         public double CurrentAverage
         {
-            get { return double.IsNaN(_currentAverage) ? DefaultValue : _currentAverage;  }
-            internal set { if (value == _currentAverage) return; _currentAverage = value; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// In the case of the bike rotation sensor, if you go slow you can easily get a 'zero' value which
-        /// makes the display herky-jerky.
-        /// </summary>
-        /// <param name="value"></param>
-        public void ResetToUninitialized()
-        {
-            CurrentAverage = double.NaN;
+            get { return double.IsNaN(_currentAverage) ? DefaultValue : _currentAverage; }
+            set { if (value == _currentAverage) return; _currentAverage = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -64,11 +69,10 @@ namespace Utilities
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public EWMA Clone()
+        public SimpleStatistics Clone()
         {
-            var retval = this.MemberwiseClone() as EWMA;
+            var retval = this.MemberwiseClone() as SimpleStatistics;
             return retval;
         }
-
     }
 }

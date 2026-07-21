@@ -529,6 +529,24 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     /// </summary>
     private void UpdateDeviceDataUX(string name)
     {
+        // UpdateDeviceDataUX is called when the control is created. At that point, there might not be a device,
+        // but we still want to update the UX with the correct names.
+        if (name == "")
+        {
+            switch (CurrUserPrefs.Distance)
+            {
+                case BluetoothWatcher.Units.Distance.DistanceUnit.Kilometers:
+                    uiCurrSpeedTitle.Text = "KPH";
+                    uiRideDistanceTitle.Text = "Kilometers";
+                    break;
+
+                case BluetoothWatcher.Units.Distance.DistanceUnit.Miles:
+                    uiCurrSpeedTitle.Text = "MPH";
+                    uiRideDistanceTitle.Text = "Miles";
+                    break;
+            }
+        }
+
         if (Device == null) return;
         UpdateSparkles(name); // name is from e.PropertyName when the Device does a PropertyChanged.
 
@@ -538,7 +556,9 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
         CurrSensorSecondary_Data = Device.CurrFeature_Data; // Change: pick secondary data as appropriate
         CurrBattery_Data = Device.CurrBattery_Data; // Change: if your device doesn't have a battery, remove battery stuff!
 
-        // TODO: moved the _units setting code to be per-name
+        // TODO: moved the _units setting code to be per-name. But this messes up the units?
+
+
 
         // Change all this code to match your device and UX.
         switch (name)
@@ -559,7 +579,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
                 // The historical data is updated from the CurrSensor_DataUnits
                 uiSensorPosition.Text = CurrSensor_DataUnits.SensorPosition;
                 uiRpsSensor.Text = CurrSensor_DataUnits.RpsSensor.ToString("F1");
-                uiRpsSensorEwma.Text = CurrSensor_DataUnits.RpsSensorEwma.ToString("F1");
+                uiRpsSensorEwma.Text = CurrSensor_DataUnits.RpsSensorSmoothed.ToString("F1");
                 uiRevolutionSensor.Text = CurrSensor_DataUnits.RevolutionSensor.ToString(); // Integer value
 
                 uiRideDistance.Text = CurrSensor_DataUnits.RideDistance.ToString("F2");

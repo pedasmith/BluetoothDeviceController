@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)EnumUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EWMA.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IBufferExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SimpleStatistics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UIThreadHelper.cs" />
   </ItemGroup>
 </Project>

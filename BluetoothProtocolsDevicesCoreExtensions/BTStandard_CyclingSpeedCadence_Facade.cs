@@ -52,6 +52,7 @@ namespace BluetoothProtocols
         double LastTimeSensor = -1.0;
         double LastRevolutionSensor = 0.0;
 
+        int NZeroRpsSensorInARow = 0;
         private double _RpsSensor = 0;
         /// <summary>
         /// Speed of the wheel or crank. Updating will also update the Ewma
@@ -59,10 +60,29 @@ namespace BluetoothProtocols
         public double RpsSensor
         {
             get { return _RpsSensor; }
-            set { _RpsSensorEwma.Update(value); bool hasChange = (value != _RpsSensor); _RpsSensor = value; if (hasChange) OnPropertyChanged(); OnPropertyChanged("RpsSensorEwma"); }
+            set { 
+                _RpsSensorSmoothed.Update(value); 
+                bool hasChange = (value != _RpsSensor); 
+                _RpsSensor = value;
+                NZeroRpsSensorInARow = (value == 0) ? NZeroRpsSensorInARow + 1 : 0;
+                if (NZeroRpsSensorInARow == 2)
+                {
+                    _RpsSensorSmoothed.ResetToUninitialized();
+                }
+                if (hasChange) OnPropertyChanged(); 
+                OnPropertyChanged("RpsSensorSmoothed"); // Smoothed is always updated
+            }
         }
-        EWMA _RpsSensorEwma = new EWMA();
-        public double RpsSensorEwma { get { return _RpsSensorEwma.CurrentAverage; } }
+        EWMA _RpsSensorSmoothed = new() { Alpha = 0.5, DefaultValue = 0.0 }; 
+        // (3) means we average 3 values
+        // default alpha (0.25) is too smooth and makes the smoothed speed taper off too slowly
+        // Set the DefaultValue for uninitialized data to be zero to look nicer in the display
+        public double RpsSensorSmoothed { get { return _RpsSensorSmoothed.CurrentAverage; } }
+
+        // Things that make the RPS difficult.
+        // Goal #1: if the user stops, the display should stop fast
+        // Goal #2: if the device gives a single 'zero' value, that just means the user is going slow.
+        // 
 
 
 
@@ -178,9 +198,11 @@ namespace BluetoothProtocols
                 TotalDistance = RevolutionSensor * DistancePerRevolutionInMeters / 1000.0;
 
                 // CurrSpeed is in kilometers per hour
-                var distanceInKilometers = deltaRevolutionSensor * DistancePerRevolutionInMeters / 1000.0;
-                var timeInHours = deltaTimeSensorInSeconds / (60 * 60);
-                CurrSpeed = distanceInKilometers == 0 ? 0.0 : (distanceInKilometers / timeInHours);
+                // Too herky-jerky -- the sensor will happily report "no revolutions" every so often
+                //var distanceInKilometers = deltaRevolutionSensor * DistancePerRevolutionInMeters / 1000.0;
+                //var timeInHours = deltaTimeSensorInSeconds / (60 * 60);
+                //CurrSpeed = distanceInKilometers == 0 ? 0.0 : (distanceInKilometers / timeInHours);
+                CurrSpeed = (RpsSensorSmoothed * 60 * 60) * (DistancePerRevolutionInMeters / 1000.0);
             }
             LastTimeSensor = TimeSensor;
             LastRevolutionSensor = RevolutionSensor;
@@ -330,7 +352,7 @@ namespace BluetoothProtocols
 
             // All of the facade-specific values.
             dest._RpsSensor = source._RpsSensor;
-            dest._RpsSensorEwma = source._RpsSensorEwma.Clone();
+            dest._RpsSensorSmoothed = source._RpsSensorSmoothed.Clone();
             dest.RideStartRevolutionSensor = source.RideStartRevolutionSensor;
             dest.RideRevolutionSensor = source.RideRevolutionSensor;
             dest.RideStartTime = source.RideStartTime;
