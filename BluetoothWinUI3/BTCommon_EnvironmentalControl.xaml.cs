@@ -85,7 +85,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// Current sensor data from the Device. For the demo, it's battery level.
     /// </summary>
     DeviceSpecificSensorData CurrSensor_Data = null;
-    enum SensorFamily { Govee, SensorPro, ThermPro };
+    enum SensorFamily { Govee, Ruuvi_TagCSDR, SensorPro, ThermPro };
     SensorFamily CurrSensorFamily = SensorFamily.Govee;
 
     /// <summary>
@@ -99,6 +99,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// There are multiple sensors that this one control can handle. They are all initialized to 'NotThisSensorFamily'
     /// </summary>
     Govee.SensorType GoveeSensorType = Govee.SensorType.NotThisSensorFamily;
+    Ruuvi_TagCSDR.SensorType Ruuvi_TagCSDRSensorType = Ruuvi_TagCSDR.SensorType.NotThisSensorFamily;
     SensorPro.SensorType SensorProSensorType = SensorPro.SensorType.NotThisSensorFamily;
     ThermPro.SensorType ThermProSensorType = ThermPro.SensorType.NotThisSensorFamily;
     #endregion
@@ -339,6 +340,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         GoveeSensorType = Govee.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
         if (GoveeSensorType != Govee.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.Govee;
 
+        Ruuvi_TagCSDRSensorType = Ruuvi_TagCSDR.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
+        if (Ruuvi_TagCSDRSensorType != Ruuvi_TagCSDR.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.Ruuvi_TagCSDR;
+
         SensorProSensorType = SensorPro.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
         if (SensorProSensorType != SensorPro.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.SensorPro;
 
@@ -524,17 +528,37 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         {
             uiTemperature.Text = BluetoothWatcher.Units.Temperature.AsString(CurrSensor_DataUnits.Temperature, CurrUserPrefs.Temperature);
         }
-        if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
-        {
-            uiPM25.Text = CurrSensor_Data.PM25.ToString("0.0");
-        }
         if (name == SensorDataRecord.HumidityPropertyChangedName || name == "" || name == "*")
         {
-            uiHumidity.Text = CurrSensor_Data.Humidity.ToString("0.0") + "%";
+            uiHumidity.Text = CurrSensor_DataUnits.Humidity.ToString("0.0") + "%";
+        }
+        if (name == SensorDataRecord.PressurePropertyChangedName || name == "" || name == "*")
+        {
+            uiPressure.Text = BluetoothWatcher.Units.Pressure.AsString(CurrSensor_DataUnits.Pressure, CurrUserPrefs.Pressure);
+        }
+        if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
+        {
+            uiPM25.Text = CurrSensor_DataUnits.PM25.ToString("0.0");
+        }
+        if (name == SensorDataRecord.CO2PropertyChangedName || name == "" || name == "*")
+        {
+            uiCO2.Text = CurrSensor_DataUnits.CO2.ToString("0.0");
+        }
+        if (name == SensorDataRecord.VOCPropertyChangedName || name == "" || name == "*")
+        {
+            uiVOC.Text = CurrSensor_DataUnits.VOC.ToString("0.0");
+        }
+        if (name == SensorDataRecord.NOXPropertyChangedName || name == "" || name == "*")
+        {
+            uiNOX.Text = CurrSensor_DataUnits.NOX.ToString("0.0");
+        }
+        if (name == SensorDataRecord.LuminosityPropertyChangedName || name == "" || name == "*")
+        {
+            uiLuminosity.Text = CurrSensor_DataUnits.Luminosity.ToString("0.0");
         }
         if (name == SensorDataRecord.BatteryPropertyChangedName || name == "" || name == "*") 
         {
-            uiBTConnectionControl.SetBatteryLevel(CurrSensor_Data.BatteryInPercent);
+            uiBTConnectionControl.SetBatteryLevel(CurrSensor_DataUnits.BatteryInPercent);
         }
     }
     #endregion
@@ -610,6 +634,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             {
                 case SensorFamily.Govee:
                     CurrSensor_Data = Govee.Parse(GoveeSensorType, data, CurrSensor_Data as Govee);
+                    break;
+                case SensorFamily.Ruuvi_TagCSDR:
+                    CurrSensor_Data = Ruuvi_TagCSDR.Parse(Ruuvi_TagCSDRSensorType, data, CurrSensor_Data as Ruuvi_TagCSDR);
                     break;
                 case SensorFamily.SensorPro:
                     CurrSensor_Data = SensorPro.Parse(SensorProSensorType, data, CurrSensor_Data as SensorPro);

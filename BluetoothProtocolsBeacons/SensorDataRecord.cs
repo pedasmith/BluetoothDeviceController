@@ -1,10 +1,8 @@
-﻿using BluetoothWinUI3;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
-using static BluetoothProtocols.Nordic_Thingy;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -18,10 +16,16 @@ namespace BluetoothProtocols
         /* Adding more fields? Here's a quick guide:
          * 1. When you add a new field, you must also bump the .All value. Do a search in the code
          *    for .All; as of 2023-01-02, there's exactly one.
-         * 2. Update the RuuvitagPage.xaml.cs with the new value (about line 50, // SensorDataRecord: Update)
+         * 2. OBSOLETE: Update the RuuvitagPage.xaml.cs with the new value (about line 50, // SensorDataRecord: Update)
          */
         [Flags]
-        public enum SensorPresent {  None=0x00, Temperature = 0x01, Pressure = 0x02, Humidity = 0x04, PM25 = 0x08, Battery = 0x10, All=0x1F };
+        public enum SensorPresent 
+        {  
+            None=0x00, 
+            Temperature = 0x01, Pressure = 0x02, Humidity = 0x04, 
+            Battery = 0x80,
+            PM25 = 0x10, CO2 = 0x20, VOC = 0x40, NOX = 0x80, Luminosity = 0x100,
+            All=0x1FF };
         public SensorPresent IsSensorPresent { get; set; } = SensorPresent.All;
         public SensorDataRecord()
         {
@@ -29,6 +33,10 @@ namespace BluetoothProtocols
             Pressure = double.NaN;
             Humidity = double.NaN;
             PM25 = double.NaN;
+            CO2 = 390;
+            VOC = double.NaN;
+            NOX = double.NaN;
+            Luminosity = double.NaN;
             TimestampMostRecent = DateTimeOffset.Now;
         }
         public SensorDataRecord(double temperature, double pressure, double humidity, DateTimeOffset? eventTime)
@@ -37,6 +45,10 @@ namespace BluetoothProtocols
             Pressure = pressure;
             Humidity = humidity;
             PM25 = double.NaN;
+            CO2 = 390;
+            VOC = double.NaN;
+            NOX = double.NaN;
+            Luminosity = double.NaN;
             TimestampMostRecent = eventTime ?? DateTimeOffset.Now;
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity;
         }
@@ -46,6 +58,10 @@ namespace BluetoothProtocols
             Temperature = temperature;
             Humidity = humidity;
             PM25 = double.NaN;
+            CO2 = 390;
+            VOC = double.NaN;
+            NOX = double.NaN;
+            Luminosity = double.NaN;
             TimestampMostRecent = eventTime ?? DateTimeOffset.Now;
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
         }
@@ -68,6 +84,10 @@ namespace BluetoothProtocols
             this.Pressure = value.Pressure;
             this.Humidity = value.Humidity;
             this.PM25 = value.PM25;
+            this.CO2 = value.CO2;
+            this.VOC = value.VOC;
+            this.NOX = value.NOX;
+            this.Luminosity = value.Luminosity;
         }
 
         // CopyFrom, but convert the doubles as appropriate
@@ -83,6 +103,10 @@ namespace BluetoothProtocols
             dest.Pressure = convert(source.Pressure, "hPA");
             dest.Humidity = convert(source.Humidity, "%");
             dest.PM25 = convert(source.PM25, "ppm");
+            dest.CO2 = convert(source.CO2, ""); // TODO; what are the unit names? here and down to luminosity
+            dest.VOC = convert(source.VOC, "");
+            dest.NOX = convert(source.NOX, "");
+            dest.Luminosity = convert(source.Luminosity, "");
             return dest;
         }
 
@@ -93,6 +117,11 @@ namespace BluetoothProtocols
             if (IsSensorPresent.HasFlag(SensorPresent.Pressure)) headers.Add("Pressure");
             if (IsSensorPresent.HasFlag(SensorPresent.Humidity)) headers.Add("Humidity");
             if (IsSensorPresent.HasFlag(SensorPresent.PM25)) headers.Add("PM25");
+            if (IsSensorPresent.HasFlag(SensorPresent.CO2)) headers.Add("CO2");
+            if (IsSensorPresent.HasFlag(SensorPresent.VOC)) headers.Add("VOC");
+            if (IsSensorPresent.HasFlag(SensorPresent.NOX)) headers.Add("NOX");
+            if (IsSensorPresent.HasFlag(SensorPresent.Luminosity)) headers.Add("Luminosity");
+
             if (IsSensorPresent.HasFlag(SensorPresent.Battery)) headers.Add("Battery");
 
             return headers.ToArray();
@@ -104,6 +133,10 @@ namespace BluetoothProtocols
             if (IsSensorPresent.HasFlag(SensorPresent.Pressure)) exporter.CellSet(Pressure);
             if (IsSensorPresent.HasFlag(SensorPresent.Humidity)) exporter.CellSet(Humidity);
             if (IsSensorPresent.HasFlag(SensorPresent.PM25)) exporter.CellSet(PM25);
+            if (IsSensorPresent.HasFlag(SensorPresent.CO2)) exporter.CellSet(CO2);
+            if (IsSensorPresent.HasFlag(SensorPresent.VOC)) exporter.CellSet(VOC);
+            if (IsSensorPresent.HasFlag(SensorPresent.NOX)) exporter.CellSet(NOX);
+            if (IsSensorPresent.HasFlag(SensorPresent.Luminosity)) exporter.CellSet(Luminosity);
             if (IsSensorPresent.HasFlag(SensorPresent.Battery)) exporter.CellSet(BatteryInPercent);
         }
 
@@ -111,6 +144,10 @@ namespace BluetoothProtocols
 
         public const string TemperaturePropertyChangedName = "Temperature";
         public const string PM25PropertyChangedName = "PM25";
+        public const string CO2PropertyChangedName = "CO2";
+        public const string VOCPropertyChangedName = "VOC";
+        public const string NOXPropertyChangedName = "NOX";
+        public const string LuminosityPropertyChangedName = "Luminosity";
         public const string PressurePropertyChangedName = "Pressure";
         public const string HumidityPropertyChangedName = "Humidity";
         public const string BatteryPropertyChangedName = "BatteryInPercent";
@@ -122,20 +159,53 @@ namespace BluetoothProtocols
         /// </summary>
         public double Temperature { get { return _Temperature; } set { if (value == _Temperature) return; _Temperature = value; OnPropertyChanged(); } }
 
-        /// <summary>
-        /// Pressure in hPA
-        /// </summary>
         private double _Pressure;
+        /// <summary>
+        /// Pressure in hPA. To convert to Pascal, multiply by 100 (hPA = hecto pascal)
+        /// </summary>
         public double Pressure { get { return _Pressure; } set { if (value == _Pressure) return; _Pressure = value; OnPropertyChanged(); } }
 
         private double _Humidity;
+        /// <summary>
+        /// Humidity in percent
+        /// </summary>
         public double Humidity { get { return _Humidity; } set { if (value == _Humidity) return; _Humidity = value; OnPropertyChanged(); } }
 
+        private double _PM25;
         /// <summary>
         /// PM2.5 in ug/m3 µg/㎥
         /// </summary>
-        private double _PM25;
         public double PM25 { get { return _PM25; } set { if (value == _PM25) return; _PM25 = value; OnPropertyChanged(); } }
+
+
+        private double _CO2;
+        /// <summary>
+        /// PM2.5 in ug/m3 µg/㎥
+        /// </summary>
+        public double CO2 { get { return _CO2; } set { if (value == _CO2) return; _CO2 = value; OnPropertyChanged(); } }
+
+
+        private double _VOC;
+        /// <summary>
+        /// PM2.5 in ug/m3 µg/㎥
+        /// </summary>
+        public double VOC { get { return _VOC; } set { if (value == _VOC) return; _VOC = value; OnPropertyChanged(); } }
+
+
+        private double _NOX;
+        /// <summary>
+        /// PM2.5 in ug/m3 µg/㎥
+        /// </summary>
+        public double NOX { get { return _NOX; } set { if (value == _NOX) return; _NOX = value; OnPropertyChanged(); } }
+
+
+        private double _Luminosity;
+        /// <summary>
+        /// PM2.5 in ug/m3 µg/㎥
+        /// </summary>
+        public double Luminosity { get { return _Luminosity; } set { if (value == _Luminosity) return; _Luminosity = value; OnPropertyChanged(); } }
+
+
 
 
         private double _BatteryInPercent;
@@ -155,6 +225,10 @@ namespace BluetoothProtocols
             if (IsSensorPresent.HasFlag(SensorPresent.Pressure)) retval += " {Pressure}mb";
             if (IsSensorPresent.HasFlag(SensorPresent.Humidity)) retval += " {Humidity}%";
             if (IsSensorPresent.HasFlag(SensorPresent.PM25)) retval += " {PM25}µg/㎥";
+            if (IsSensorPresent.HasFlag(SensorPresent.CO2)) retval += " {CO2}"; // TODO: add units
+            if (IsSensorPresent.HasFlag(SensorPresent.VOC)) retval += " {VOC}";
+            if (IsSensorPresent.HasFlag(SensorPresent.NOX)) retval += " {NOX}";
+            if (IsSensorPresent.HasFlag(SensorPresent.Luminosity)) retval += " {Luminosity}";
             return retval;
         }
     }
