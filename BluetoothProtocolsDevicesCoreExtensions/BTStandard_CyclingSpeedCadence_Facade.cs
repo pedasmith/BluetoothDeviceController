@@ -232,7 +232,7 @@ namespace BluetoothProtocols
         public static int Test()
         {
             int nerror = 0;
-            nerror += TestOne(0, 0, 5, 10, 2.0); // 5 seconds 10 rotations = 2 RPS
+            nerror += TestOne(1, 0, 6, 10, 2.0); // 5 seconds 10 rotations = 2 RPS
             return nerror;
         }
 

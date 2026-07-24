@@ -637,6 +637,10 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                     break;
                 case SensorFamily.Ruuvi_TagCSDR:
                     CurrSensor_Data = Ruuvi_TagCSDR.Parse(Ruuvi_TagCSDRSensorType, data, CurrSensor_Data as Ruuvi_TagCSDR);
+                    if (CurrSensor_Data != null && CurrSensor_Data.Luminosity == 0)
+                    {
+                        ;// handy place to hang a debugger
+                    }
                     break;
                 case SensorFamily.SensorPro:
                     CurrSensor_Data = SensorPro.Parse(SensorProSensorType, data, CurrSensor_Data as SensorPro);
@@ -651,6 +655,18 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                 // name (and creates this control), but the advert doesn't include the data because
                 // we haven't gotten the BT advertisement response yet.
                 Log($"ERROR: unable to parse sensor data for sensor type {CurrSensorFamily}");
+                return;
+            }
+            // here!here -- check for is valid!
+            var copyable = CurrSensor_Data as CopyableSensorDataRecord;
+            if (copyable != null && !copyable.IsValid)
+            {
+                // 
+                ; // handy place for a debugger
+                // Lots of reasons it might be invalid. For example, we get an advert that includes a 
+                // name (and creates this control), but the advert doesn't include the data because
+                // we haven't gotten the BT advertisement response yet.
+                Log($"ERROR: unable to parse IsValid sensor data for sensor type {CurrSensorFamily}");
                 return;
             }
             InitializeUX(); // Will initialize the UX as appropriate

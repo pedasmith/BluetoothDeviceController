@@ -5,6 +5,9 @@ namespace BluetoothWatcher.Units
 {
     class DoubleApprox
     {
+        /// <summary>
+        /// Return TRUE if the two values are approximately equal.
+        /// </summary>
         public static bool Approx(double v1, double v2, double maxRatio = 0.000001)
         {
             if (v1 == v2) return true;

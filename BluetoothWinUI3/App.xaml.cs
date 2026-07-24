@@ -4,6 +4,7 @@ using IotNumberFormats;
 using Microsoft.UI.Xaml;
 using System;
 using System.Runtime.InteropServices;
+using UtilitiesWinUI3;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -38,6 +39,7 @@ namespace BluetoothWinUI3
         static int TestAll()
         {
             int nerror = 0;
+            nerror += Ruuvi_Tag.Test();
             nerror += SpeedCadence_Data_Facade.Test();
             nerror += BluetoothServiceUuid16Bit.Test();
             nerror += Utilities.StringUtilities.TestStarMatch();

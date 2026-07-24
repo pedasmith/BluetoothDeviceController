@@ -162,6 +162,7 @@ namespace BluetoothProtocols
                     default:
                         var rt = Ruuvi_Tag.Parse(section, 0); // No RSSI (and it's not used by Parse anyway?)
                         rt.ToSensorDataRecord(retval);
+                        retval.IsValid = rt.IsValid;
                         break;
                 }
             }
@@ -169,6 +170,10 @@ namespace BluetoothProtocols
             {
                 retval.EncodeMessage = $"Unable to parse Ruuvi: {ex.Message}";
                 retval.IsValid = false;
+            }
+            if (retval.Luminosity== 0)
+            {
+                ; // handy place for a debugger
             }
             return retval; // if there was an exception, the beacon is invalid...
         }

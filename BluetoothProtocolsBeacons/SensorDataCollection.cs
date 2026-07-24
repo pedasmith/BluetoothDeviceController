@@ -27,7 +27,7 @@ namespace BluetoothProtocols
             Temperature = value.Temperature;
             Pressure = value.Pressure;
             Humidity = value.Humidity; // Humidity is always in percent, so no conversion needed.
-            PM25 = value.PM25;
+            PM25 = value.PM25; // TODO: add in all other for Ruuvi Air!
             BatteryInPercent = value.BatteryInPercent;
             Name = value.Name;
         }
