@@ -6,6 +6,7 @@ using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OxyPlot;
+using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
@@ -130,11 +131,11 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // InitializeUX(); // For advertisement-based data, initialize the UX when we get the first data
     }
 
-    private void UpdateForSensor(SensorDataRecord.SensorPresent sensor, int step, int range, string title, string propertyName, StackPanel panel)
+    private void UpdateForSensor(SensorDataRecord.SensorPresent sensor, int step, int range, string title, string propertyName, StackPanel panel, AxisPosition axisPosition = AxisPosition.Left, string axisKey = null, string axisTitle = null)
     {
         if (CurrSensor_Data.IsSensorPresent.HasFlag(sensor))
         {
-            OxyPlotUtilities.AddLine(OxyPlotModel, step, range, title, propertyName);
+            OxyPlotUtilities.AddLine(OxyPlotModel, step, range, title, propertyName, axisPosition:axisPosition, axisKey:axisKey, axisTitle:axisTitle);
             CurrTableCustomization.TableColumns.Add(title);
         }
         else
@@ -185,13 +186,14 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         UpdateForSensor(SensorDataRecord.SensorPresent.Temperature, 5, 30, "Temperature", "Temperature", uiDeviceDataTemperature);
         UpdateForSensor(SensorDataRecord.SensorPresent.Humidity, 5, 20, "Humidity", "Humidity", uiDeviceDataHumidity);
         UpdateForSensor(SensorDataRecord.SensorPresent.Pressure, 5, 10, "Pressure", "Pressure", uiDeviceDataPressure);
-        UpdateForSensor(SensorDataRecord.SensorPresent.PM10, 5, 5, "PM10", "PM10", uiDeviceDataPM10);
-        UpdateForSensor(SensorDataRecord.SensorPresent.PM25, 5, 5, "PM25", "PM25", uiDeviceDataPM25);
-        UpdateForSensor(SensorDataRecord.SensorPresent.PM40, 5, 5, "PM40", "PM40", uiDeviceDataPM40);
-        UpdateForSensor(SensorDataRecord.SensorPresent.PM100, 5, 5, "PM100", "PM100", uiDeviceDataPM100);
-        UpdateForSensor(SensorDataRecord.SensorPresent.CO2, 10, 40, "CO2", "CO2", uiDeviceDataCO2);
-        UpdateForSensor(SensorDataRecord.SensorPresent.NOX, 10, 40, "NOX", "NOX", uiDeviceDataNOX);
-        UpdateForSensor(SensorDataRecord.SensorPresent.VOC, 10, 40, "VOC", "VOC", uiDeviceDataVOC);
+        UpdateForSensor(SensorDataRecord.SensorPresent.PM10, 5, 5, "PM10", "PM10", uiDeviceDataPM10, axisKey:"PMaxis", axisTitle:"PM", axisPosition:AxisPosition.Right);
+        UpdateForSensor(SensorDataRecord.SensorPresent.PM25, 5, 5, "PM25", "PM25", uiDeviceDataPM25, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
+        UpdateForSensor(SensorDataRecord.SensorPresent.PM40, 5, 5, "PM40", "PM40", uiDeviceDataPM40, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
+        UpdateForSensor(SensorDataRecord.SensorPresent.PM100, 5, 5, "PM100", "PM100", uiDeviceDataPM100, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
+        UpdateForSensor(SensorDataRecord.SensorPresent.CO2, 10, 40, "CO2", "CO2", uiDeviceDataCO2, axisPosition: AxisPosition.Right);
+        UpdateForSensor(SensorDataRecord.SensorPresent.NOX, 10, 40, "NOX", "NOX", uiDeviceDataNOX, axisPosition: AxisPosition.Right);
+        UpdateForSensor(SensorDataRecord.SensorPresent.VOC, 10, 40, "VOC", "VOC", uiDeviceDataVOC, axisPosition: AxisPosition.Right);
+        UpdateForSensor(SensorDataRecord.SensorPresent.Luminosity, 1000, 10000, "LUX", "Luminosity", uiDeviceDataLuminosity, axisPosition: AxisPosition.Right);
 
 
 

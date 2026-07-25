@@ -6,6 +6,10 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 
+#if NET8_0_OR_GREATER
+#nullable disable
+#endif
+
 namespace BluetoothWinUI3;
 
 
@@ -80,18 +84,35 @@ internal static class OxyPlotUtilities
     /// Returns the PlotModel, so you can do a MakeOxyPlotSimple().AddLine().AddLine()
     /// The step and range are only applied to the first line added
     /// </summary>
-    public static PlotModel AddLine (this PlotModel retval, int step, int range, string axisTitle, string propertyName, double minimum = double.NaN, AxisPosition position = AxisPosition.Left)
+    public static PlotModel AddLine(this PlotModel retval, int step, int range, string lineTitle, string propertyName, double minimum = double.NaN, AxisPosition axisPosition = AxisPosition.Left, string axisKey = null, string axisTitle = null)
     {
-        var tier = retval.NInPosition(position);
+        if (axisKey == null) axisKey = propertyName; // common case
+        if (axisTitle == null) axisTitle = lineTitle; // common case
+
+        var tier = retval.NInPosition(axisPosition);
         var colorIndex = (retval.Series.Count) % PreferredPlotColors.Count;
-        var axis = new LinearAxis()
+
+        LinearAxis axis = null;
+        bool hasAxis = false;
+        foreach (var item in retval.Axes)
         {
-            Position = position,
-            PositionTier = tier, // PositionTier=0 is the innermost tier. //DOC:
-            Title = axisTitle,
-            Key = propertyName,
-        };
-        if (retval.Axes.Count == 1)
+            if (item.Key == axisKey)
+            {
+                hasAxis = true;
+                break;
+            }
+        }
+        if (!hasAxis)
+        {
+            axis = new LinearAxis()
+            {
+                Position = axisPosition,
+                PositionTier = tier, // PositionTier=0 is the innermost tier. //DOC:
+                Title = axisTitle,
+                Key = axisKey,
+            };
+        }
+        if (axis != null && retval.Axes.Count == 1) // Reminder: The first axis (index 0) is the X axis
         {
             axis.MajorGridlineColor = OxyColors.Black; // Not set for additional lines. Only the first axis gets a grid!
             axis.MajorGridlineStyle = LineStyle.Solid;
@@ -99,22 +120,25 @@ internal static class OxyPlotUtilities
             axis.MajorStep = step; // 1 hpa
             axis.MinimumRange = range;
         }
-        if (!double.IsNaN(minimum))
+        if (axis != null && !double.IsNaN(minimum))
         {
             axis.Minimum = minimum;
         }
         var series = new LineSeries
         {
-            Title = axisTitle,
+            Title = lineTitle,
             Color = PreferredPlotColors[colorIndex],
             StrokeThickness = 0.75,
             MarkerType = MarkerType.None,
             DataFieldX = "TimestampMostRecentDT",
             DataFieldY = propertyName,
-            YAxisKey = axisTitle,
+            YAxisKey = axisKey,
         };
 
-        retval.Axes.Add(axis);
+        if (axis != null)
+        {
+            retval.Axes.Add(axis);
+        }
         retval.Series.Add(series);
         return retval;
     }

@@ -139,6 +139,10 @@ internal static class UtilitiesWinUI3
     /// <param name="color"></param>
     public static void SetLineKeyColor(Border rootPanel, string lineName, uint color)
     {
+        if (lineName.Contains("osity") || lineName.Contains("NOX"))
+        {
+            ; // handy place for a debugger
+        }
         foreach (Line line in UtilitiesWinUI3.FindVisualChildren<Line>(rootPanel))
         {
             if ((line.Tag as string) == lineName + "Color") // e.g., Tag="TemperatureColor"
