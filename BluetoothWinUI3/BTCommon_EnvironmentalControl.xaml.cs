@@ -130,7 +130,19 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // InitializeUX(); // For advertisement-based data, initialize the UX when we get the first data
     }
 
+    private void UpdateForSensor(SensorDataRecord.SensorPresent sensor, int step, int range, string title, string propertyName, StackPanel panel)
+    {
+        if (CurrSensor_Data.IsSensorPresent.HasFlag(sensor))
+        {
+            OxyPlotUtilities.AddLine(OxyPlotModel, step, range, title, propertyName);
+            CurrTableCustomization.TableColumns.Add(title);
+        }
+        else
+        {
+            uiDeviceDataList.Items.Remove(panel);
+        }
 
+    }
     bool InitializeUXCalled = false;
     /// <summary>
     /// Code to initialize the UX. Will be called both from Control_Loaded and from
@@ -152,7 +164,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
             ( SensorDataRecord.TemperaturePropertyChangedName, uiTemperatureChange),
-            ( SensorDataRecord.PM25PropertyChangedName, uiPM25Change),
+            ( SensorDataRecord.PressurePropertyChangedName, uiPressureChange),
             ( SensorDataRecord.HumidityPropertyChangedName, uiHumidityChange),
         };
 
@@ -170,45 +182,19 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // set it to invisible because the items will still show up
         CurrTableCustomization.TableColumns.Add("Name"); // always show the nae
 
-        if (CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Temperature))
-        {
-            OxyPlotUtilities.AddLine(OxyPlotModel, 5, 30, "Temperature", "Temperature");
-            CurrTableCustomization.TableColumns.Add("Temperature");
-        }
-        else
-        {
-            uiDeviceDataList.Items.Remove(uiDeviceDataTemperature);
-        }
+        UpdateForSensor(SensorDataRecord.SensorPresent.Temperature, 5, 30, "Temperature", "Temperature", uiDeviceDataTemperature);
+        UpdateForSensor(SensorDataRecord.SensorPresent.Humidity, 5, 20, "Humidity", "Humidity", uiDeviceDataHumidity);
+        UpdateForSensor(SensorDataRecord.SensorPresent.Pressure, 5, 10, "Pressure", "Pressure", uiDeviceDataPressure);
+        UpdateForSensor(SensorDataRecord.SensorPresent.PM10, 5, 5, "PM10", "PM10", uiDeviceDataPM10);
+        UpdateForSensor(SensorDataRecord.SensorPresent.PM25, 5, 5, "PM25", "PM25", uiDeviceDataPM25);
+        UpdateForSensor(SensorDataRecord.SensorPresent.PM40, 5, 5, "PM40", "PM40", uiDeviceDataPM40);
+        UpdateForSensor(SensorDataRecord.SensorPresent.PM100, 5, 5, "PM100", "PM100", uiDeviceDataPM100);
+        UpdateForSensor(SensorDataRecord.SensorPresent.CO2, 10, 40, "CO2", "CO2", uiDeviceDataCO2);
+        UpdateForSensor(SensorDataRecord.SensorPresent.NOX, 10, 40, "NOX", "NOX", uiDeviceDataNOX);
+        UpdateForSensor(SensorDataRecord.SensorPresent.VOC, 10, 40, "VOC", "VOC", uiDeviceDataVOC);
 
-        if (CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Humidity))
-        {
-            OxyPlotUtilities.AddLine(OxyPlotModel, 5, 20, "Humidity", "Humidity");
-            CurrTableCustomization.TableColumns.Add("Humidity");
-        }
-        else
-        {
-            uiDeviceDataList.Items.Remove(uiDeviceDataHumidity);
-        }
 
-        if (CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.PM25))
-        {
-            OxyPlotUtilities.AddLine(OxyPlotModel, 5, 5, "PM25", "PM25");
-            CurrTableCustomization.TableColumns.Add("PM25");
-        }
-        else
-        {
-            uiDeviceDataList.Items.Remove(uiDeviceDataPM25);
-        }
 
-        if (CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Pressure))
-        {
-            OxyPlotUtilities.AddLine(OxyPlotModel, 5, 10, "Pressure", "Pressure", double.NaN, OxyPlot.Axes.AxisPosition.Right);
-            CurrTableCustomization.TableColumns.Add("Pressure");
-        }
-        else
-        {
-            uiDeviceDataList.Items.Remove(uiDeviceDataPressure);
-        }
 
 
         //
@@ -536,9 +522,21 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         {
             uiPressure.Text = BluetoothWatcher.Units.Pressure.AsString(CurrSensor_DataUnits.Pressure, CurrUserPrefs.Pressure);
         }
+        if (name == SensorDataRecord.PM10PropertyChangedName || name == "" || name == "*")
+        {
+            uiPM10.Text = CurrSensor_DataUnits.PM10.ToString("0.0");
+        }
         if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
         {
             uiPM25.Text = CurrSensor_DataUnits.PM25.ToString("0.0");
+        }
+        if (name == SensorDataRecord.PM40PropertyChangedName || name == "" || name == "*")
+        {
+            uiPM40.Text = CurrSensor_DataUnits.PM40.ToString("0.0");
+        }
+        if (name == SensorDataRecord.PM100PropertyChangedName || name == "" || name == "*")
+        {
+            uiPM100.Text = CurrSensor_DataUnits.PM100.ToString("0.0");
         }
         if (name == SensorDataRecord.CO2PropertyChangedName || name == "" || name == "*")
         {
@@ -661,12 +659,15 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             var copyable = CurrSensor_Data as CopyableSensorDataRecord;
             if (copyable != null && !copyable.IsValid)
             {
-                // 
-                ; // handy place for a debugger
                 // Lots of reasons it might be invalid. For example, we get an advert that includes a 
                 // name (and creates this control), but the advert doesn't include the data because
                 // we haven't gotten the BT advertisement response yet.
-                Log($"ERROR: unable to parse IsValid sensor data for sensor type {CurrSensorFamily}");
+                if (!copyable.IsIgnored)
+                {
+                    // The Ruuvi Air sends an enormous number of unusable advertisements to
+                    // support backwards compatibility.
+                    Log($"ERROR: unable to parse IsValid sensor data for sensor type {CurrSensorFamily}");
+                }
                 return;
             }
             InitializeUX(); // Will initialize the UX as appropriate

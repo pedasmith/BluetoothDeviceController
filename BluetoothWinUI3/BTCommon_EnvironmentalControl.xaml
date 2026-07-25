@@ -53,17 +53,41 @@
                         <Line Height="5" Tag="PressureColor" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
 
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataPM10">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>PM10</Run><Run Text="&#160;"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPM10"/></TextBlock>
+                        <Line Height="5" Tag="PM10Color" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataPM25">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>PM25</Run><Run Text="&#160;"/><Run x:Name="uiPM25Change" Text="┄"/>
+                        <Run>PM25</Run><Run Text="&#160;"/>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPM25"/></TextBlock>
                         <Line Height="5" Tag="PM25Color" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
 
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataPM40">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>PM40</Run><Run Text="&#160;"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPM40"/></TextBlock>
+                        <Line Height="5" Tag="PM40Color" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataPM100">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>PM100</Run><Run Text="&#160;"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPM100"/></TextBlock>
+                        <Line Height="5" Tag="PM100Color" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataCO2">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>CO2</Run><Run Text="&#160;"/><Run x:Name="uiCO2Change" Text="┄"/>
+                        <Run>CO2</Run><Run Text="&#160;"/>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiCO2"/></TextBlock>
                         <Line Height="5" Tag="CO2Color" Style="{StaticResource sGraphLineKey}" />
@@ -71,7 +95,7 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataVOC">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>VOC</Run><Run Text="&#160;"/><Run x:Name="uiVOCChange" Text="┄"/>
+                        <Run>VOC</Run><Run Text="&#160;"/>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiVOC"/></TextBlock>
                         <Line Height="5" Tag="VOCColor" Style="{StaticResource sGraphLineKey}" />
@@ -79,7 +103,7 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataNOX">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>NOX</Run><Run Text="&#160;"/><Run x:Name="uiNOXChange" Text="┄"/>
+                        <Run>NOX</Run><Run Text="&#160;"/>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiNOX"/></TextBlock>
                         <Line Height="5" Tag="NOXColor" Style="{StaticResource sGraphLineKey}" />
@@ -87,7 +111,7 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataLuminosity">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Luminosity</Run><Run Text="&#160;"/><Run x:Name="uiLuminosityChange" Text="┄"/>
+                        <Run>Luminosity</Run><Run Text="&#160;"/>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiLuminosity"/></TextBlock>
                         <Line Height="5" Tag="LuminosityColor" Style="{StaticResource sGraphLineKey}" />

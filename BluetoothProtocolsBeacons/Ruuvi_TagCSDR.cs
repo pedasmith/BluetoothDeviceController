@@ -30,6 +30,17 @@ namespace BluetoothProtocols
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
+        /// <summary>
+        /// There's a subtle problem with the Ruuvi Air: if generates both low-res type 6 advertisements and 
+        /// high-res type E1 advertisements. The type E1 only get picked up on recent BT chips (really, all decent 
+        /// chips nowadays!). I can't just ignore the type 6 advertisements because then the app won't work
+        /// on old machines. But if the app can see the E1 advertisements, I want to use only those. 
+        /// </summary>
+        public int NAdvertisementsParsed = 0;
+        public int NType06Parsed = 0;
+        public int NTypeE1Parsed = 0;
+
+
 
 
         /// <summary>
@@ -131,7 +142,7 @@ namespace BluetoothProtocols
         /// Will parse a Ruuvi sensor. Must be given the sensor type which is from AdvertIsRuuvi (parsing depends on 
         /// the type)
         /// </summary>
-        public static Ruuvi_TagCSDR Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section, Ruuvi_TagCSDR source)
+        private static Ruuvi_TagCSDR Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section, Ruuvi_TagCSDR source)
         {
             var retval = source ?? new Ruuvi_TagCSDR();
             retval.TagType = sensorType;
@@ -161,8 +172,32 @@ namespace BluetoothProtocols
                 {
                     default:
                         var rt = Ruuvi_Tag.Parse(section, 0); // No RSSI (and it's not used by Parse anyway?)
-                        rt.ToSensorDataRecord(retval);
-                        retval.IsValid = rt.IsValid;
+                        bool allow = true;
+                        switch (rt.TagType)
+                        {
+                            case 0x06: 
+                                retval.NType06Parsed++;
+                                allow = retval.NType06Parsed >= 3 && retval.NTypeE1Parsed == 0;
+                                break;
+                            case 0xE1: 
+                                retval.NTypeE1Parsed++;
+                                allow = true; // always allow E1 records
+                                break;
+                            default:
+                                allow = true; // allow all other records.
+                                break;
+                        }
+                        if (allow)
+                        {
+                            rt.ToSensorDataRecord(retval);
+                            retval.IsValid = rt.IsValid; // ToSensorDataRecord can't set this because it's on the SensorDataRecord, not the Copyable
+                            retval.IsIgnored = false;
+                        }
+                        else
+                        {
+                            retval.IsValid = false;
+                            retval.IsIgnored = true; 
+                        }
                         break;
                 }
             }

@@ -29,6 +29,30 @@ namespace BluetoothProtocols
             Luminosity = 0x800,
             All=0xFFF };
         public SensorPresent IsSensorPresent { get; set; } = SensorPresent.All;
+
+        public int NPMSensors
+        {
+            get
+            {
+                int retval = 0;
+                if (IsSensorPresent.HasFlag(SensorPresent.PM10)) retval++;
+                if (IsSensorPresent.HasFlag(SensorPresent.PM25)) retval++;
+                if (IsSensorPresent.HasFlag(SensorPresent.PM40)) retval++;
+                if (IsSensorPresent.HasFlag(SensorPresent.PM100)) retval++;
+                return retval;
+            }
+        }
+        public int NGasSensors
+        {
+            get
+            {
+                int retval = 0;
+                if (IsSensorPresent.HasFlag(SensorPresent.CO2)) retval++;
+                if (IsSensorPresent.HasFlag(SensorPresent.NOX)) retval++;
+                if (IsSensorPresent.HasFlag(SensorPresent.VOC)) retval++;
+                return retval;
+            }
+        }
         public SensorDataRecord()
         {
             Temperature = double.NaN;
