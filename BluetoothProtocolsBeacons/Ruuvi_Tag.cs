@@ -292,7 +292,8 @@ namespace BluetoothProtocols
                             const double LUX_MAX_CODE = 254;
                             double LUX_DELTA = Math.Log(LUX_MAX_VALUE + 1) / LUX_MAX_CODE;
                             //double lux_code = Math.Round(Math.Log(luminosity + 1) / LUX_DELTA);
-                            retval.LuminosityRaw = Math.Exp((double)luminosityCode * LUX_DELTA) - 1;
+                            var luminosity = Math.Exp((double)luminosityCode * LUX_DELTA) - 1;
+                            retval.LuminosityRaw = luminosityCode == 255 ? 0 : luminosity;
                             byte r0 = dr.ReadByte();
                             byte seq = dr.ReadByte();
                             byte flags = dr.ReadByte();
@@ -321,8 +322,13 @@ namespace BluetoothProtocols
                             int voc = dr.ReadByte(); // Needs flag data, too
                             int nox = dr.ReadByte(); // Needs flag data, too
                             //int luminosity = dr.ReadByte(); // is lux in a logarithmic scale
-                            retval.LuminosityRaw = (double)((dr.ReadByte() << 16) + (dr.ReadByte() << 8) + (dr.ReadByte())) / 100.0; // In LUX
-                            byte r0 = dr.ReadByte();
+                            byte lum0 = dr.ReadByte();
+                            byte lum1 = dr.ReadByte();
+                            byte lum2 = dr.ReadByte();
+                            var luminosity = (double)((lum0 << 16) + (lum1 << 8) + (lum2)) / 100.0; // In LUX
+                            var luminosityInvalid = lum0 == 255 && lum1 == 255 && lum2 == 255;
+                            retval.LuminosityRaw = luminosityInvalid ? 0 : luminosity;
+                            byte r0 = dr.ReadByte(); // r0...etc are all reserved
                             byte r1 = dr.ReadByte();
                             byte r2 = dr.ReadByte();
                             var seq = (dr.ReadByte() << 16) + (dr.ReadByte() << 8) + (dr.ReadByte());

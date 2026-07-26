@@ -637,10 +637,6 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                     break;
                 case SensorFamily.Ruuvi_TagCSDR:
                     CurrSensor_Data = Ruuvi_TagCSDR.Parse(Ruuvi_TagCSDRSensorType, data, CurrSensor_Data as Ruuvi_TagCSDR);
-                    if (CurrSensor_Data != null && CurrSensor_Data.Luminosity == 0)
-                    {
-                        ;// handy place to hang a debugger
-                    }
                     break;
                 case SensorFamily.SensorPro:
                     CurrSensor_Data = SensorPro.Parse(SensorProSensorType, data, CurrSensor_Data as SensorPro);

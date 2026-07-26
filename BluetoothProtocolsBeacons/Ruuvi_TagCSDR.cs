@@ -41,8 +41,6 @@ namespace BluetoothProtocols
         public int NTypeE1Parsed = 0;
 
 
-
-
         /// <summary>
         /// Message created by the Parse method; it's a handy user-readable string for the temp / humidity
         /// </summary>
@@ -102,7 +100,8 @@ namespace BluetoothProtocols
             SensorType retval = SensorType.NotThisSensorFamily;
             if (name != null)
             {
-                if (name.StartsWith("Ruuvi")) retval = SensorType.Air; // TODO: correct name
+                if (name.StartsWith("RuuviAir ")) retval = SensorType.Air;
+                else if (name.StartsWith("Ruuvi")) retval = SensorType.Other; // TODO: check other sensors
             }
             return retval;
         }
@@ -133,7 +132,31 @@ namespace BluetoothProtocols
                     }
                 }
             }
+            switch (sensorType)
+            {
+                case SensorType.Air:
+                    if (retval.NTypeE1Parsed > 0)
+                    {
+                        retval.IsSensorPresent =
+                            SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity
+                            | SensorPresent.PM10 | SensorPresent.PM25 | SensorPresent.PM40 | SensorPresent.PM100
+                            | SensorPresent.CO2 | SensorPresent.NOX | SensorPresent.VOC;
+                    }
+                    else
+                    {
+                        retval.IsSensorPresent =
+                            SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity
+                            | SensorPresent.PM25
+                            | SensorPresent.CO2 | SensorPresent.NOX | SensorPresent.VOC;
 
+                    }
+                    break;
+                default:
+                    retval.IsSensorPresent =
+                        SensorPresent.Temperature | SensorPresent.Humidity
+                        | SensorPresent.Battery;
+                    break;
+            }
             return retval;
         }
 
@@ -218,7 +241,4 @@ namespace BluetoothProtocols
                 + $"Battery={BatteryInPercent}";
         }
     }
-
-
-
 }
