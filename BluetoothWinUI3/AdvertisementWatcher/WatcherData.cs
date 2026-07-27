@@ -82,6 +82,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
         /// </summary>
         public BluetoothLEAdvertisementReceivedEventArgs OriginalAdvertisement { get; set; }
         public BluetoothLEAdvertisementReceivedEventArgs ResponseAdvertisement { get; set; }
+        public int NResponseAdvertisement { get; set; } = 0;
         public BluetoothLEAdvertisementReceivedEventArgs MostRecentAdvertisement
             { get {  var retval = ResponseAdvertisement ?? OriginalAdvertisement; return retval;  } } 
         public List<BluetoothLEAdvertisementReceivedEventArgs> Advertisements

@@ -22,13 +22,15 @@ namespace BluetoothWatcher.AdvertismentWatcher
         public delegate void WatcherEventHandler(BluetoothLEAdvertisementWatcher sender, WatcherData e);
         public event WatcherEventHandler WatcherEvent;
         public double FilterRssiDb = -75; // filter out far away things because they are irritating.
+        public bool FilterExtendedAdvertisements = false; // Normally false. Setting to true will act like older BT chips for testing.
+        public int NExtendedAdvertisementsFiltered = 0;
 
         BluetoothLEAdvertisementWatcher BleAdvertisementWatcher = null;
 
         public void Start()
         {
             BleAdvertisementWatcher = new BluetoothLEAdvertisementWatcher();
-            BleAdvertisementWatcher.AllowExtendedAdvertisements = true;
+            BleAdvertisementWatcher.AllowExtendedAdvertisements = !FilterExtendedAdvertisements;
             BleAdvertisementWatcher.ScanningMode = BluetoothLEScanningMode.Active; // Required for Govee H5074
             BleAdvertisementWatcher.Received += BleAdvertisementWatcher_Received;
             BleAdvertisementWatcher.Start();
@@ -38,6 +40,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
             if (BleAdvertisementWatcher == null) return;
             BleAdvertisementWatcher.Received -= BleAdvertisementWatcher_Received;
             BleAdvertisementWatcher.Stop();
+            BleAdvertisementWatcher = null;
         }
 
         Dictionary<ulong, WatcherData> OriginalAdvertisements = new Dictionary<ulong, WatcherData>();
@@ -48,25 +51,42 @@ namespace BluetoothWatcher.AdvertismentWatcher
             WatcherData watcherData = null;
             bool havePreviousAdvert = false;
             WatcherData previousAdvert = null;
+            havePreviousAdvert = OriginalAdvertisements.TryGetValue(args.BluetoothAddress, out previousAdvert);
+            if (args.AdvertisementType == BluetoothLEAdvertisementType.Extended)
+            {
+                if (FilterExtendedAdvertisements)
+                {
+                    NExtendedAdvertisementsFiltered++;
+                    return;
+                }
+            }
             if (args.IsScanResponse)
             {
-                OriginalAdvertisements.TryGetValue(args.BluetoothAddress, out watcherData);
+                watcherData = previousAdvert;
                 if (watcherData != null) 
                 {
                     if (watcherData.ResponseAdvertisement != null)
                     {
-                        Log($"DBG: got a second response advertisement!");
+                        int nExtended = 0;
+                        nExtended += (args.AdvertisementType == BluetoothLEAdvertisementType.Extended) ? 1 : 0;
+                        nExtended += (watcherData.ResponseAdvertisement.AdvertisementType == BluetoothLEAdvertisementType.Extended) ? 1: 0;
+                        Log($"NOTE: got a second response advertisement! Name={watcherData.BestName} NExtended={nExtended} NResponse={watcherData.NResponseAdvertisement}");
+                        // After some analysis: I still don't know why this happens. Maybe we missed an advert?
                     }
                     watcherData.ResponseAdvertisement = args;
+                    watcherData.NResponseAdvertisement++;
                 }
+                // If I can't match this scan response with an original, then just ignore everything
+                // (will return early based on watcherData==null below)
             }
             else
             {
-                havePreviousAdvert = OriginalAdvertisements.TryGetValue(args.BluetoothAddress, out previousAdvert);
+                // Always make a new one!
                 watcherData = new WatcherData()
                 {
                     OriginalAdvertisement = args,
                     ResponseAdvertisement = null,
+                    NResponseAdvertisement = 0,
                 };
                 OriginalAdvertisements[args.BluetoothAddress] = watcherData;
             }

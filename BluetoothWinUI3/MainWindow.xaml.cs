@@ -319,10 +319,41 @@ namespace BluetoothWinUI3
             await uiDialogAbout.ShowAsync();
         }
 
+        private async void OnDebugDeleteDevice(object sender, RoutedEventArgs e)
+        {
+            // here!here
+            string verb = "remove";
+            var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
+            if (selected == null) return;
+            var knownDevice = await GetKnownDevice(selected, verb);
+            if (knownDevice == null) return;
+
+            // Remove from the uiKnownDevices
+            var selectedIndex = uiKnownDevices.SelectedIndex;
+            var zoom = knownDevice.Container;
+            var index = uiKnownDevices.Items.IndexOf(zoom);
+            if (index >= 0)
+            {
+                uiKnownDevices.Items.Remove(zoom);
+
+                // Update the selected index
+                var newIndex = selectedIndex - 1;
+                if (newIndex < 0) newIndex = 0;
+                if (newIndex < uiKnownDevices.Items.Count)
+                {
+                    uiKnownDevices.SelectedIndex = selectedIndex - 1;
+                }
+            }
+
+            // Remove from the KnownDevices list
+            KnownDevices.Remove(knownDevice);
+
+        }
+
+
         private void OnDebugLoadDevices(object sender, RoutedEventArgs e)
         {
             AllSaveData.Restore();
-
         }
 
         private void OnDebugSaveDevices(object sender, RoutedEventArgs e)
@@ -942,6 +973,16 @@ namespace BluetoothWinUI3
         {
             var isChecked = (sender as ToggleMenuFlyoutItem)?.IsChecked ?? false;
             AdvertisementWatcher.FilterRssiDb = isChecked ? -65 : -200;
+        }
+
+        private async void OnDebugSetFilterExtendedAdvertisements(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (sender as ToggleMenuFlyoutItem)?.IsChecked ?? false;
+            AdvertisementWatcher.FilterExtendedAdvertisements = isChecked;
+            AdvertisementWatcher.Stop();
+            await Task.Delay(100);
+            AdvertisementWatcher.Start();
+
         }
 
         public async void OnGetUXCapabilitiesChanged(UserControl deviceControl, IDeviceControlBasic.UXCapabilities newCapabilities)

@@ -74,6 +74,17 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             });
             return existing; // might be null when it cannot be found
         }
+
+        public static bool Remove(KnownDevice device)
+        {
+            var index = AllDevices.IndexOf(device);
+            if (index < 0)
+            {
+                return false;
+            }
+            AllDevices.RemoveAt(index);
+            return true;
+        }
         private static List<KnownDevice> AllDevices { get; } = new List<KnownDevice>();
     }
 }
