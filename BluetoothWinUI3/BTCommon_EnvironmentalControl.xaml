@@ -28,7 +28,7 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" x:Name="uiDeviceDataList">
+                <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" ItemContainerStyle="{StaticResource sDeviceDataListItem}" x:Name="uiDeviceDataList">
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataTemperature">
                         <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Temperature</Run><Run Text="&#160;"/><Run x:Name="uiTemperatureChange" Text="┄"/>
@@ -51,6 +51,23 @@
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPressure"/></TextBlock>
                         <Line Height="5" Tag="PressureColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataPMCombo">
+                        <TextBlock Style="{StaticResource sDeviceData4Row}">
+                            <Run>PM&#160;&#160;1.0 :&#160;&#160;</Run><Run x:Name="uiPM10Combo"/><LineBreak />
+                            <Run>PM&#160;&#160;2.5 :&#160;&#160;</Run><Run x:Name="uiPM25Combo"/><LineBreak />
+                            <Run>PM&#160;&#160;4.0 :&#160;&#160;</Run><Run x:Name="uiPM40Combo"/><LineBreak />
+                            <Run>PM&#160;10.0 :&#160;&#160;</Run><Run x:Name="uiPM100Combo"/>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataGasCombo">
+                        <TextBlock Style="{StaticResource sDeviceData4Row}">
+                            <Run>CO2  :&#160;&#160; </Run><Run x:Name="uiCO2Combo"/><LineBreak />
+                            <Run>VOC  :&#160;&#160; </Run><Run x:Name="uiVOCCombo"/><LineBreak />
+                            <Run>NOX  :&#160;&#160; </Run><Run x:Name="uiNOXCombo"/>
+                        </TextBlock>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataPM10">

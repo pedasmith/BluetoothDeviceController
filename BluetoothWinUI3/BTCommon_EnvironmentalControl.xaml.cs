@@ -13,6 +13,7 @@ using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMe
 
 using Utilities;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Enumeration;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -195,7 +196,30 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         UpdateForSensor(SensorDataRecord.SensorPresent.VOC, 10, 40, "VOC", "VOC", uiDeviceDataVOC, axisPosition: AxisPosition.Right);
         UpdateForSensor(SensorDataRecord.SensorPresent.Luminosity, 1000, 10000, "LUX", "Luminosity", uiDeviceDataLuminosity, axisPosition: AxisPosition.Right);
 
+        // Handle the PM data. If there's just one sensor, keep it.
+        // But if there are 4, use the combo
+        if (CurrSensor_Data.NPMSensors == 4) // As of 2026-07-27, just the Ruuvi Air
+        {
+            uiDeviceDataList.Items.Remove(uiDeviceDataPM10);
+            uiDeviceDataList.Items.Remove(uiDeviceDataPM25);
+            uiDeviceDataList.Items.Remove(uiDeviceDataPM40);
+            uiDeviceDataList.Items.Remove(uiDeviceDataPM100);
+        }
+        else
+        {
+            uiDeviceDataList.Items.Remove(uiDeviceDataPMCombo);
+        }
 
+        if (CurrSensor_Data.NGasSensors == 3) // As of 2026-07-27, just the Ruuvi Air
+        {
+            uiDeviceDataList.Items.Remove(uiDeviceDataCO2);
+            uiDeviceDataList.Items.Remove(uiDeviceDataNOX);
+            uiDeviceDataList.Items.Remove(uiDeviceDataVOC);
+        }
+        else
+        {
+            uiDeviceDataList.Items.Remove(uiDeviceDataGasCombo);
+        }
 
 
 
@@ -527,30 +551,37 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         if (name == SensorDataRecord.PM10PropertyChangedName || name == "" || name == "*")
         {
             uiPM10.Text = CurrSensor_DataUnits.PM10.ToString("0.0");
+            uiPM10Combo.Text = CurrSensor_DataUnits.PM10.ToString("0.0");
         }
         if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
         {
             uiPM25.Text = CurrSensor_DataUnits.PM25.ToString("0.0");
+            uiPM25Combo.Text = CurrSensor_DataUnits.PM25.ToString("0.0");
         }
         if (name == SensorDataRecord.PM40PropertyChangedName || name == "" || name == "*")
         {
             uiPM40.Text = CurrSensor_DataUnits.PM40.ToString("0.0");
+            uiPM40Combo.Text = CurrSensor_DataUnits.PM40.ToString("0.0");
         }
         if (name == SensorDataRecord.PM100PropertyChangedName || name == "" || name == "*")
         {
             uiPM100.Text = CurrSensor_DataUnits.PM100.ToString("0.0");
+            uiPM100Combo.Text = CurrSensor_DataUnits.PM100.ToString("0.0");
         }
         if (name == SensorDataRecord.CO2PropertyChangedName || name == "" || name == "*")
         {
             uiCO2.Text = CurrSensor_DataUnits.CO2.ToString("0.0");
+            uiCO2Combo.Text = CurrSensor_DataUnits.CO2.ToString("0.0");
         }
         if (name == SensorDataRecord.VOCPropertyChangedName || name == "" || name == "*")
         {
             uiVOC.Text = CurrSensor_DataUnits.VOC.ToString("0.0");
+            uiVOCCombo.Text = CurrSensor_DataUnits.VOC.ToString("0.0");
         }
         if (name == SensorDataRecord.NOXPropertyChangedName || name == "" || name == "*")
         {
             uiNOX.Text = CurrSensor_DataUnits.NOX.ToString("0.0");
+            uiNOXCombo.Text = CurrSensor_DataUnits.NOX.ToString("0.0");
         }
         if (name == SensorDataRecord.LuminosityPropertyChangedName || name == "" || name == "*")
         {

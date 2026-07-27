@@ -35,7 +35,7 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" x:Name="uiDeviceDataList">
+                <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" ItemContainerStyle="{StaticResource sDeviceDataListItem}" x:Name="uiDeviceDataList">
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>RPS (smooth)</Run><Run Text="&#160;"/><Run x:Name="uiRpsSensorChange" Text="┄"/>

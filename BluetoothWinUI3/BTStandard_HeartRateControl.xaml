@@ -48,7 +48,7 @@
                     </Grid.ColumnDefinitions>
                     <local:HeartRate_RRInterval_Control Grid.Column="1" x:Name="uiRRControl" HorizontalAlignment="Right" />
 
-                    <GridView Style="{StaticResource sDeviceDataList}" x:Name="uiDeviceDataList">
+                    <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" ItemContainerStyle="{StaticResource sDeviceDataListItem}" x:Name="uiDeviceDataList">
                         <StackPanel Style="{StaticResource sDeviceDataPanel}">
                             <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                             <Run>BPM</Run><Run Text="&#160;"/><Run x:Name="uiBpmChange" Text="┄"/>

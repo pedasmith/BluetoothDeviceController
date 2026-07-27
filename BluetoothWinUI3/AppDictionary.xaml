@@ -43,7 +43,15 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="SelectionMode" Value="None" />
     </Style>
-
+    
+    <!-- add a GridViewItem style to force top content alignment -->
+    <Style x:Key="sDeviceDataListItem" TargetType="GridViewItem">
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+    
     <Style x:Key="sDeviceDataPanel" TargetType="StackPanel">
         <Setter Property="Width" Value="120" />
     </Style>
@@ -96,6 +104,14 @@
         <Setter Property="FontSize" Value="18" />
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="IsTextSelectionEnabled" Value="True" />
+    </Style>
+    <Style x:Key="sDeviceData4Row" TargetType="TextBlock" BasedOn="{StaticResource sDevicePrimaryData}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontFamily" Value="Cascadia Mono" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="IsTextSelectionEnabled" Value="True" />
+        <Setter Property="TextAlignment" Value="Left" />
     </Style>
     <!-- Example: Battery percentage icon picture of little battery -->
     <Style x:Key="sDeviceDataIcon" TargetType="TextBlock" BasedOn="{StaticResource sDevicePrimaryData}">

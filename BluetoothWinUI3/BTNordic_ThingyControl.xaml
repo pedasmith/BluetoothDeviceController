@@ -28,7 +28,7 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <GridView Grid.Row="0" x:Name="uiDeviceDataList" Style="{StaticResource sDeviceDataList}">
+                <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" ItemContainerStyle="{StaticResource sDeviceDataListItem}" x:Name="uiDeviceDataList">
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Temperature</Run><Run Text="&#160;"/><Run x:Name="uiTemperature_cChange" Text="┄"/>
