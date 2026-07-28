@@ -39,7 +39,7 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataHumidity">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Humidity</Run><Run Text="&#160;"/><Run x:Name="uiHumidityChange" Text="┄"/>
+                        <Run>Humidity</Run>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
                         <Line Height="5" Tag="HumidityColor" Style="{StaticResource sGraphLineKey}"/>
@@ -47,7 +47,7 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataPressure">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Pressure</Run><Run Text="&#160;"/><Run x:Name="uiPressureChange" Text="┄"/>
+                        <Run>Pressure</Run>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPressure"/></TextBlock>
                         <Line Height="5" Tag="PressureColor" Style="{StaticResource sGraphLineKey}" />

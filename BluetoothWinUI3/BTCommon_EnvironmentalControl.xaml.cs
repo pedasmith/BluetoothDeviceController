@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 
 using Utilities;
+using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 // To learn more about WinUI, the WinUI project structure,
@@ -166,8 +167,6 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
             ( SensorDataRecord.TemperaturePropertyChangedName, uiTemperatureChange),
-            ( SensorDataRecord.PressurePropertyChangedName, uiPressureChange),
-            ( SensorDataRecord.HumidityPropertyChangedName, uiHumidityChange),
         };
 
         // Change: set up the graph by making an OxyPlotModel
@@ -245,7 +244,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         #endregion
 
 
-        // This oxyplot and table code is always the same and doesn't need to be changed.
+        // This sarkles, oxyplot, and table code is always the same and doesn't need to be changed.
+        SparklesHelper.InitializeSparkles(ControlsWithSparkles);
+
         OxyPlotUtilities.InitializeOxyPlotData(uiOxyPlot, OxyPlotModel, HistoricalDataUnits.Data);
         OxyPlotUtilities.InitializeLineNamesFromOxyPlotModel(LineNames, OxyPlotModel);
 
@@ -487,28 +488,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         Console.WriteLine(str);
     }
 
-
-    Dictionary<string, int> NPropertyChanges { get; } = [];
-    readonly List<string> Sparkles = ["╺", "╼", "╾", "╸", "╾", "╼"];
-
-    /// <summary>
-    /// Updates the sparkles based on the changed property. Called from UpdateDeviceDataUX which is
-    /// called by Device_PropertyChanged when a device property changes.
-    /// </summary>
-    private void UpdateSparkles(string name)
-    {
-        // In practice, name is never "*". The code is set up this way to match the Govee code.
-        if (name == "") return;
-        NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
-        foreach ((string potentialMatchName, Microsoft.UI.Xaml.Documents.Run run) in ControlsWithSparkles)
-        {
-            if (potentialMatchName == name || name == "*")
-            {
-                run.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-            }
-        }
-    }
-
+    SparklesHelper SparklesHelper = new();
 
     #region Change to update the UX when the device says there's new data
     /// <summary>
@@ -518,7 +498,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     private void UpdateDeviceDataUX(string name)
     {
         if (CurrSensor_Data == null) return;
-        UpdateSparkles(name); // name is from e.PropertyName when the Device does a PropertyChanged.
+        SparklesHelper.UpdateSparkles(ControlsWithSparkles, name);
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
         CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);

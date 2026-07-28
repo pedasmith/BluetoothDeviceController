@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 
 using Utilities;
+using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,10 +22,10 @@ namespace BluetoothWinUI3;
 
 
 #region Change these to match your device
-using DeviceSpecificType = Nordic_Thingy; // Change: pick your device, not BTStandard_Demo
+using DeviceSpecificBatteryData = Nordic_Thingy.Battery_Data; // Change: many device support battery
 using DeviceSpecificSensorData = Nordic_Thingy.Environment_Data; // Change: 
 using DeviceSpecificSensorSecondaryData = Nordic_Thingy.EnvironmentColor_Data; // Change: pick secondary sensor if needed
-using DeviceSpecificBatteryData = Nordic_Thingy.Battery_Data; // Change: many device support battery
+using DeviceSpecificType = Nordic_Thingy; // Change: pick your device, not BTStandard_Demo
 #endregion
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -201,7 +202,9 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         #endregion
 
 
-        // This oxyplot and table code is always the same and doesn't need to be changed.
+        // This sarkles, oxyplot, and table code is always the same and doesn't need to be changed.
+        SparklesHelper.InitializeSparkles(ControlsWithSparkles);
+
         OxyPlotUtilities.InitializeOxyPlotData(uiOxyPlot, OxyPlotModel, HistoricalDataUnits.Data);
         OxyPlotUtilities.InitializeLineNamesFromOxyPlotModel(LineNames, OxyPlotModel);
 
@@ -463,6 +466,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         Console.WriteLine(str);
     }
 
+    SparklesHelper SparklesHelper = new();
 
     private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -474,29 +478,6 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         });
     }
 
-
-    Dictionary<string, int> NPropertyChanges { get; } = [];
-    readonly List<string> Sparkles = ["╺", "╼", "╾", "╸", "╾", "╼"];
-
-    /// <summary>
-    /// Updates the sparkles based on the changed property. Called from UpdateDeviceDataUX which is
-    /// called by Device_PropertyChanged when a device property changes.
-    /// </summary>
-    private void UpdateSparkles(string name)
-    {
-        // In practice, name is never "*". The code is set up this way to match the Govee code.
-        if (name == "") return;
-        NPropertyChanges[name] = NPropertyChanges.GetValueOrDefault(name, 0) + 1;
-        foreach ((string potentialMatchName, Microsoft.UI.Xaml.Documents.Run run) in ControlsWithSparkles)
-        {
-            if (potentialMatchName == name || name == "*")
-            {
-                run.Text = Sparkles[NPropertyChanges[name] % Sparkles.Count];
-            }
-        }
-    }
-
-
     #region Change to update the UX when the device says there's new data
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
@@ -505,7 +486,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     private void UpdateDeviceDataUX(string name)
     {
         if (Device == null) return;
-        UpdateSparkles(name); // name is from e.PropertyName when the Device does a PropertyChanged.
+        SparklesHelper.UpdateSparkles(ControlsWithSparkles, name); // name is from e.PropertyName when the Device does a PropertyChanged.
 
 
         // Change: Always update these even though in practice they are only set once.

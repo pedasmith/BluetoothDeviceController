@@ -9,6 +9,7 @@
     <Import_RootNamespace>UtilitiesWinUI3</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)SparklesHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UtilitiesWinUI3.cs" />
   </ItemGroup>
 </Project>

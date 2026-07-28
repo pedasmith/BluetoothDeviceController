@@ -39,6 +39,7 @@ namespace BluetoothWinUI3
         static int TestAll()
         {
             int nerror = 0;
+            nerror += SparklesHelper.Test();
             nerror += Ruuvi_Tag.Test();
             nerror += SpeedCadence_Data_Facade.Test();
             nerror += BluetoothServiceUuid16Bit.Test();
