@@ -397,6 +397,14 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     }
 
 
+    /// <summary>
+    /// Updates the OxyPlit and highlights a given line OR clears the highlight if the
+    /// lineTag is !CLEAR
+    /// </summary>
+    public void HighlightGraphLine(string lineTag)
+    {
+        OxyPlotModel.DoHighlightGraphLine(uiOxyPlot, lineTag);
+    }
 
 
     /// <summary>
@@ -664,7 +672,6 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                 Log($"ERROR: unable to parse sensor data for sensor type {CurrSensorFamily}");
                 return;
             }
-            // here!here -- check for is valid!
             var copyable = CurrSensor_Data as CopyableSensorDataRecord;
             if (copyable != null && !copyable.IsValid)
             {
@@ -679,15 +686,25 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                 }
                 return;
             }
+
             InitializeUX(); // Will initialize the UX as appropriate
             CurrSaveData.History.UpdateAdvertisementHistory(data.MostRecentAdvertisement.Timestamp);
             CurrSaveData.History.UpdateDataHistory(data.MostRecentAdvertisement.Timestamp);
             CurrSensor_Data.Name = data.BestName;
             CurrSensor_Data.TimestampMostRecent = data.MostRecentAdvertisement.Timestamp;
             UpdateDeviceDataUX("*"); // Update all the data!
+
+            // here!here: tell the window about line names
+            if (!CalledOnGetUXCapabilities)
+            {
+                CalledOnGetUXCapabilities = true;
+                NotifyDeviceControlChangesWindows.OnGetUXCapabilitiesChanged(this, this.GetUXCapabilities());
+            }
         });
 
     }
+
+    bool CalledOnGetUXCapabilities = false;
 
 
 
@@ -697,5 +714,4 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         return "Internal error: no details are available";
     }
     #endregion
-
 } // end of class BTCommon_EnvironmentalControl // CHANGE: update the comment to match the class name

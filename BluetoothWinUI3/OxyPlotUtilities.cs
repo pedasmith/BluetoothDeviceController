@@ -28,13 +28,37 @@ internal static class OxyPlotUtilities
             },
             Series =
             {
+                new LineSeries
+                    {
+                        Color = OxyColor.FromAColor(0x80, OxyColors.Yellow),
+                        StrokeThickness = 10,
+                        MarkerType = MarkerType.None,
+                        DataFieldX = "TimestampMostRecentDT", // All sensor data has a TimestampMostRecentDT
+                    } 
             }
         };
         return retval;
     }
 
+#if OLD_CODE_TO_BE_DELETED
+    private static LineSeries MakeHighlightSeries()
+    {
+        var retval = new LineSeries
+        {
+            Color = OxyColor.FromAColor(0x80, OxyColors.Yellow),
+            StrokeThickness = 10,
+            MarkerType = MarkerType.None,
+            DataFieldX = "TimestampMostRecentDT", // All sensor data has a TimestampMostRecentDT
+        };
+        return retval;
+    }
+#endif
+
     public static PlotModel MakeOxyPlotModelSimple(string title, int step, int range, string axisTitle, string propertyName)
     {
+        PlotModel retval = MakeOxyPlotModel(title)
+            .AddLine(step, range, axisTitle, propertyName);
+#if ORIGINAL_OLD_CODE_TO_BE_DELETED
         PlotModel retval = new PlotModel
         {
             Title = title,
@@ -58,7 +82,8 @@ internal static class OxyPlotUtilities
             },
             Series =
             {
-                new LineSeries // CHANGE:
+                MakeHighlightSeries(),
+                new LineSeries
                 {
                     Title = axisTitle,
                     Color = PreferredPlotColors[0], // OxyColors.DarkBlue
@@ -71,6 +96,7 @@ internal static class OxyPlotUtilities
                 },
             }
         };
+#endif
         return retval;
     }
 
@@ -90,7 +116,8 @@ internal static class OxyPlotUtilities
         if (axisTitle == null) axisTitle = lineTitle; // common case
 
         var tier = retval.NInPosition(axisPosition);
-        var colorIndex = (retval.Series.Count) % PreferredPlotColors.Count;
+        var colorIndex = (retval.Series.Count - 1) % PreferredPlotColors.Count;
+        // subtract 1 because the first series is the highlight line.
 
         LinearAxis axis = null;
         bool hasAxis = false;
@@ -127,6 +154,7 @@ internal static class OxyPlotUtilities
         var series = new LineSeries
         {
             Title = lineTitle,
+            Tag = lineTitle,
             Color = PreferredPlotColors[colorIndex],
             StrokeThickness = 0.75,
             MarkerType = MarkerType.None,
@@ -174,7 +202,10 @@ internal static class OxyPlotUtilities
         foreach (var series in oxyPlotModel.Series)
         {
             var title = series.Title;
-            dest.Add(title);
+            if (!string.IsNullOrEmpty(title)) // Highlight line has no title
+            {
+                dest.Add(title);
+            }
         }
     }
 
@@ -197,6 +228,57 @@ internal static class OxyPlotUtilities
             }
         }
         uiOxyPlot.Model = oxyPlotModel;
+
+#if NEVER_EVER_DEFINED
+        // There's seemingly no way to figure out if the user has clicked on a particular 
+        // axis. Nuts!
+        // Instead I'll do highlights via the menu system.
+
+        //uiOxyPlot.Tapped += UiOxyPlot_Tapped;
+        var controller = new PlotController();
+        controller.BindMouseDown(OxyMouseButton.Left,
+            new DelegateViewCommand<OxyMouseDownEventArgs>(OnMouseDown));
+        uiOxyPlot.Controller = controller;
+        //oxyPlotModel.MouseDown += OxyPlotModel_MouseDown;
+#endif
+    }
+
+    private static void OnMouseDown(IView iview, IController controller, OxyMouseDownEventArgs e)
+    {
+        PlotView view = iview as PlotView;
+        PlotModel model = view?.ActualModel;
+        if (model == null) return;
+
+        // I was going to use the ScreenRectangle that OxyPlot exposes, but
+        // that only works for Wpf based version of OxyPlot.
+
+
+#if NEVER_EVER_DEFINED
+        // This code doesn't ever detect clicks on an axis
+        HitTestArguments args = new HitTestArguments(e.Position, 10.0);
+        var hits = model.HitTest(args);
+        if (hits == null) return;
+        foreach (var hit in hits)
+        {
+            if (hit.Element is Axis axis)
+            {
+                Log($"HIT: {axis.Title}");
+            }
+        }
+#endif
+    }
+
+    private static void Log(string str)
+    {
+        System.Diagnostics.Debug.WriteLine(str);
+        Console.WriteLine(str);
+    }
+
+    private static void UiOxyPlot_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    {
+        var plot = (sender as PlotView);
+        var model = plot?.Model;
+        if (plot == null || model == null) return;
     }
 
 
@@ -211,4 +293,40 @@ internal static class OxyPlotUtilities
         }
         uiOxyPlot.InvalidatePlot(false); // false means just update for the axis
     }
+
+    public static void DoHighlightGraphLine(this PlotModel oxyPlotModel, PlotView uiOxyPlot, string lineTag)
+    {
+        if (oxyPlotModel.Series.Count < 2) return; // it's not initialized yet
+
+        var series = oxyPlotModel.Series[0] as LineSeries;
+        bool clearHighlight = lineTag == "!CLEAR";
+
+        if (clearHighlight)
+        {
+            // unhighlight it
+            series.YAxisKey = null;
+            series.DataFieldY = null;
+            uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
+        }
+        else
+        {
+            LineSeries match = null;
+            foreach (var item in oxyPlotModel.Series)
+            {
+                if (item.Tag as string == lineTag)
+                {
+                    match = item as LineSeries;
+                }
+            }
+            if (match != null)
+            {
+                series.YAxisKey = match.YAxisKey;
+                series.DataFieldY = match.DataFieldY;
+                series.Selectable = false;
+                series.ItemsSource = match.ItemsSource;
+                uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
+            }
+        }
+    }
+
 }

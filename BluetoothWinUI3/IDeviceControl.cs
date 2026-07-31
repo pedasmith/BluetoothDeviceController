@@ -20,7 +20,10 @@ namespace BluetoothWinUI3
     {
         /// <summary>
         /// Says the the UXCapabilities have changed. Can also means that the LineNames have changed,
-        /// which is a little over-broad.
+        /// which is a little over-broad. 
+        /// The passed-in deviceControl is just the 'this' pointer from the device control (e.g., a NordicThingyControl). 
+        /// It's needed because all the controls might be updating, but only the one that's currently selected
+        /// should change the app's menus.
         /// </summary>
         void OnGetUXCapabilitiesChanged(UserControl deviceControl, IDeviceControlBasic.UXCapabilities newCapabilities);
     }
@@ -105,6 +108,10 @@ namespace BluetoothWinUI3
         /// Update the color of a single line
         /// </summary>
         void UpdateGraphColor(string axisTitle, uint color);
+        /// <summary>
+        /// Highlights a single line of the graph, !CLEAR means remove highlight.
+        /// </summary>
+        void HighlightGraphLine(string axisTitle);
     }
 
     /// <summary>

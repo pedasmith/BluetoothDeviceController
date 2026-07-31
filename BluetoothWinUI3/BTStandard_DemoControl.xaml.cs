@@ -408,6 +408,14 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
     }
 
 
+    /// <summary>
+    /// Updates the OxyPlit and highlights a given line OR clears the highlight if the
+    /// lineTag is !CLEAR
+    /// </summary>
+    public void HighlightGraphLine(string lineTag)
+    {
+        OxyPlotModel.DoHighlightGraphLine(uiOxyPlot, lineTag);
+    }
 
 
     /// <summary>

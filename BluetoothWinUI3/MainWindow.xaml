@@ -38,6 +38,7 @@
                     <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
                 </MenuBarItem>
                 <MenuBarItem Title="View" AccessKey="V">
+                    <MenuFlyoutSubItem Text="Highlight" x:Name="uimViewHighlightMenu" />
                     <ToggleMenuFlyoutItem Text="Set large" Click="OnViewWindowSize" AccessKey="L" />
                     <ToggleMenuFlyoutItem Text="Show Table" Click="OnViewToggleTable" AccessKey="T"  x:Name="uimViewShowTable"/>
                 </MenuBarItem>

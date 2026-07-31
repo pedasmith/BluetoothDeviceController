@@ -753,36 +753,50 @@ namespace BluetoothWinUI3
             // Don't have to do anything on failure (which can't really happen)
         }
 
+        /// <summary>
+        /// Updates uimBTGraphColorsMenu and also uimViewHighlightMenu based on the
+        /// lines in the graph.
+        /// </summary>
         private void UpdateGraphColorMenus(IDeviceControlDevice selectedDevice)
         {
             // Always clear even when selectedDevice is null (we might have gone 
-            // from a device that's a IDeviceControlDevice and are now 
-            // selecting something that isn't)
+            // from a device that's a IDeviceControlDevice and are now selecting
+            // something that isn't)
             uimBTGraphColorsMenu.Items.Clear();
+            uimViewHighlightMenu.Items.Clear();
 
             if (selectedDevice == null)
             {
                 uimBTGraphColorsMenu.IsEnabled = false;
+                uimViewHighlightMenu.IsEnabled = false;
                 return;
             }
 
             // In the menu, Update the set of graph line that can be colored
+            AddMenuHelper(uimViewHighlightMenu, "Clear", "!CLEAR", OnHighlightGraphLine);
+
             var linenames = selectedDevice.LineNames;
             foreach (var linename in linenames)
             {
-                var menu = new MenuFlyoutItem()
-                {
-                    Text = linename,
-                    Tag = linename,
-                };
-                menu.Click += OnChangeGraphColor;
-                uimBTGraphColorsMenu.Items.Add(menu);
+                AddMenuHelper(uimBTGraphColorsMenu, linename, linename, OnChangeGraphColor);
+                AddMenuHelper(uimViewHighlightMenu, linename, linename, OnHighlightGraphLine); // here!here highlight
             }
 
             var hasLineNames = linenames.Count > 0;
             uimBTGraphColorsMenu.IsEnabled = hasLineNames;
+            uimViewHighlightMenu.IsEnabled = hasLineNames;
         }
+        private void AddMenuHelper(MenuFlyoutSubItem parent, string userName, string tag, RoutedEventHandler fnc)
+        {
+            var menu = new MenuFlyoutItem()
+            {
+                Text = userName,
+                Tag = tag,
+            };
+            menu.Click += fnc;
+            parent.Items.Add(menu);
 
+        }
         /// <summary>
         /// Updates menus based on the selected device capabilities.
         /// Capabilities is from GetUXCapabilities() from a device that supports IDeviceControlBasic.
@@ -829,10 +843,15 @@ namespace BluetoothWinUI3
             }
             uimViewShowTable.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanShowTable);
         }
+
+
         private async void OnChangeGraphColor(object sender, RoutedEventArgs e)
         {
-            var axisTitle = (sender as FrameworkElement)?.Tag as string; // e.g., "Temperature" or "Pressure" or "Heart Rate". 
-            // the tag is the user name (axisTitle) for the color, not the promptery name
+            // Some graphs use the same axis for multiple graphs e.g. PM where PM10, PM25, PM40 PM100 all share
+            // a single PM axis (otherwise the graph is too complex)
+
+            var lineTitle = (sender as FrameworkElement)?.Tag as string; // e.g., "Temperature" or "Pressure" or "Heart Rate". 
+            // the tag is the user name (axisTitle) for the color, not the property name
 
             string verb = "color";
             var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
@@ -843,7 +862,7 @@ namespace BluetoothWinUI3
 
             var colorsSave = saveData.GetDeviceColors(Application.Current.RequestedTheme);
 
-            uint coloruint = selected.GetGraphColor(axisTitle);
+            uint coloruint = selected.GetGraphColor(lineTitle);
             Windows.UI.Color color = Windows.UI.Color.FromArgb(
                 0xFF, // always fully opaque for graph colors#
                 (byte)((coloruint >> 16) & 0xFF),
@@ -874,12 +893,23 @@ namespace BluetoothWinUI3
             var newcolor = UtilitiesWinUI3.UtilitiesWinUI3.ConvertBackIgnoreA(colorPicker.Color);
 
             // Save it and update colors!
-            colorsSave.Set("Graph:" + axisTitle, newcolor);
+            colorsSave.Set("Graph:" + lineTitle, newcolor);
             AllSaveData.Save();
-            selected.UpdateGraphColor(axisTitle, newcolor);
+            selected.UpdateGraphColor(lineTitle, newcolor);
         }
 
 
+        private async void OnHighlightGraphLine(object sender, RoutedEventArgs e)
+        {
+            var lineTitle = (sender as FrameworkElement)?.Tag as string; // e.g., "Temperature" or "Pressure" or "Heart Rate". 
+
+            string verb = "highlight";
+            var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
+            if (selected == null) return;
+            var knownDevice = await GetKnownDevice(selected, verb);
+            if (knownDevice == null) return;
+            selected.HighlightGraphLine(lineTitle);
+        }
 
 
         private async void OnHelpViewHelp(object sender, RoutedEventArgs e)
@@ -987,7 +1017,7 @@ namespace BluetoothWinUI3
 
         public async void OnGetUXCapabilitiesChanged(UserControl deviceControl, IDeviceControlBasic.UXCapabilities newCapabilities)
         {
-            // If the deviceControl is the currently selected on ..
+            // If the deviceControl is the currently selected one ..
             var dcb = deviceControl as IDeviceControlBasic;
             if (dcb == null) return;
             var bt = await GetBTSelectedAsync(null); // null means it won't show a notice 
