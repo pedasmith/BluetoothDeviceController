@@ -636,8 +636,68 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         await UtilitiesWinUI3.UtilitiesWinUI3.ExportGraphAsPngAsync(uiOxyPlot, rootPanel.Background, Log);
     }
 
+    private void HandleMyAdvertisementOnUIThread(WatcherData data)
+    {
+        // It's critical that this be a seperate function, not part of the HandleMyAdvertisement .. UIThreadHelper.CallOnUIThread
+        // lambda. If it's part of the lambda, Visual Studio (as of 2026-07-31) has the most truly
+        // attrocious gray gridded background that offends me to my very soul.
 
-    
+        if (!IsLoaded) return; // Won't be loaded when we exit the app!
+
+        switch (CurrSensorFamily)
+        {
+            case SensorFamily.Govee:
+                CurrSensor_Data = Govee.Parse(GoveeSensorType, data, CurrSensor_Data as Govee);
+                break;
+            case SensorFamily.Ruuvi_TagCSDR:
+                CurrSensor_Data = Ruuvi_TagCSDR.Parse(Ruuvi_TagCSDRSensorType, data, CurrSensor_Data as Ruuvi_TagCSDR);
+                break;
+            case SensorFamily.SensorPro:
+                CurrSensor_Data = SensorPro.Parse(SensorProSensorType, data, CurrSensor_Data as SensorPro);
+                break;
+            case SensorFamily.ThermPro:
+                CurrSensor_Data = ThermPro.Parse(ThermProSensorType, data, CurrSensor_Data as ThermPro);
+                break;
+        }
+        if (CurrSensor_Data == null)
+        {
+            // Lots of reasons it might be invalid. For example, we get an advert that includes a 
+            // name (and creates this control), but the advert doesn't include the data because
+            // we haven't gotten the BT advertisement response yet.
+            Log($"ERROR: unable to parse sensor data for sensor type {CurrSensorFamily}");
+            return;
+        }
+        var copyable = CurrSensor_Data as CopyableSensorDataRecord;
+        if (copyable != null && !copyable.IsValid)
+        {
+            // Lots of reasons it might be invalid. For example, we get an advert that includes a 
+            // name (and creates this control), but the advert doesn't include the data because
+            // we haven't gotten the BT advertisement response yet.
+            if (!copyable.IsIgnored)
+            {
+                // The Ruuvi Air sends an enormous number of unusable advertisements to
+                // support backwards compatibility.
+                Log($"ERROR: unable to parse IsValid sensor data for sensor type {CurrSensorFamily}");
+            }
+            return;
+        }
+
+        InitializeUX(); // Will initialize the UX as appropriate
+        CurrSaveData.History.UpdateAdvertisementHistory(data.MostRecentAdvertisement.Timestamp);
+        CurrSaveData.History.UpdateDataHistory(data.MostRecentAdvertisement.Timestamp);
+        CurrSensor_Data.Name = data.BestName;
+        CurrSensor_Data.TimestampMostRecent = data.MostRecentAdvertisement.Timestamp;
+        UpdateDeviceDataUX("*"); // Update all the data!
+
+        // here!here: tell the window about line names
+        if (!CalledOnGetUXCapabilities)
+        {
+            CalledOnGetUXCapabilities = true;
+            NotifyDeviceControlChangesWindows.OnGetUXCapabilitiesChanged(this, this.GetUXCapabilities());
+        }
+    }
+
+
     /// <summary>
     /// Called by MainWindow / Advertisement Watcher when a new advertisement from the specific (known)
     /// device is seen.
@@ -645,63 +705,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// <param name="data"></param>
     public void HandleMyAdvertisement(WatcherData data)
     {
-        UIThreadHelper.CallOnUIThread(() =>
-        {
-            if (!IsLoaded) return; // Won't be loaded when we exit the app!
-
-            switch (CurrSensorFamily)
-            {
-                case SensorFamily.Govee:
-                    CurrSensor_Data = Govee.Parse(GoveeSensorType, data, CurrSensor_Data as Govee);
-                    break;
-                case SensorFamily.Ruuvi_TagCSDR:
-                    CurrSensor_Data = Ruuvi_TagCSDR.Parse(Ruuvi_TagCSDRSensorType, data, CurrSensor_Data as Ruuvi_TagCSDR);
-                    break;
-                case SensorFamily.SensorPro:
-                    CurrSensor_Data = SensorPro.Parse(SensorProSensorType, data, CurrSensor_Data as SensorPro);
-                    break;
-                case SensorFamily.ThermPro:
-                    CurrSensor_Data = ThermPro.Parse(ThermProSensorType, data, CurrSensor_Data as ThermPro);
-                    break;
-            }
-            if (CurrSensor_Data == null)
-            {
-                // Lots of reasons it might be invalid. For example, we get an advert that includes a 
-                // name (and creates this control), but the advert doesn't include the data because
-                // we haven't gotten the BT advertisement response yet.
-                Log($"ERROR: unable to parse sensor data for sensor type {CurrSensorFamily}");
-                return;
-            }
-            var copyable = CurrSensor_Data as CopyableSensorDataRecord;
-            if (copyable != null && !copyable.IsValid)
-            {
-                // Lots of reasons it might be invalid. For example, we get an advert that includes a 
-                // name (and creates this control), but the advert doesn't include the data because
-                // we haven't gotten the BT advertisement response yet.
-                if (!copyable.IsIgnored)
-                {
-                    // The Ruuvi Air sends an enormous number of unusable advertisements to
-                    // support backwards compatibility.
-                    Log($"ERROR: unable to parse IsValid sensor data for sensor type {CurrSensorFamily}");
-                }
-                return;
-            }
-
-            InitializeUX(); // Will initialize the UX as appropriate
-            CurrSaveData.History.UpdateAdvertisementHistory(data.MostRecentAdvertisement.Timestamp);
-            CurrSaveData.History.UpdateDataHistory(data.MostRecentAdvertisement.Timestamp);
-            CurrSensor_Data.Name = data.BestName;
-            CurrSensor_Data.TimestampMostRecent = data.MostRecentAdvertisement.Timestamp;
-            UpdateDeviceDataUX("*"); // Update all the data!
-
-            // here!here: tell the window about line names
-            if (!CalledOnGetUXCapabilities)
-            {
-                CalledOnGetUXCapabilities = true;
-                NotifyDeviceControlChangesWindows.OnGetUXCapabilitiesChanged(this, this.GetUXCapabilities());
-            }
-        });
-
+        UIThreadHelper.CallOnUIThread(() => HandleMyAdvertisementOnUIThread(data));
     }
 
     bool CalledOnGetUXCapabilities = false;

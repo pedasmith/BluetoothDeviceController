@@ -23,7 +23,7 @@ namespace BluetoothProtocols
         {  
             None=0x00, 
             Temperature = 0x01, Pressure = 0x02, Humidity = 0x04, 
-            Battery = 0x80,
+            Battery = 0x08,
             PM10 = 0x10, PM25 = 0x20, PM40 = 0x40, PM100 = 0x80, 
             CO2 = 0x100, VOC = 0x200, NOX = 0x400, 
             Luminosity = 0x800,
