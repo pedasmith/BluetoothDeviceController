@@ -364,8 +364,8 @@ namespace BluetoothProtocols
         }
         public override string ToString()
         {
-            return $"Temperaure={TemperatureInDegreesC} Pressure={PressureInPascals} Humidity={HumidityInPercent}% "
-                + $"Acceleration=[{AccelerationInG[0]},{AccelerationInG[1]},{AccelerationInG[2]}]G Movement={MovementCounter},{MovementSequenceCounter} "
+            return $"Temperaure={TemperatureInDegreesC:F1} Pressure={PressureInPascals} Humidity={HumidityInPercent:F0}% "
+                + $"Movement={MovementCounter},{MovementSequenceCounter} "
                 + $"Battery={BatteryVoltage}V Tx={TransmitPowerInDb}db";
         }
     }
