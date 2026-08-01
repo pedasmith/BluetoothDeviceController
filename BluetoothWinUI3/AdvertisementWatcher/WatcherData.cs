@@ -124,8 +124,20 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 foreach (var section in advertisement.Advertisement.DataSections)
                 {
                     var dsname = AdvertisementSection_types.Decode(section.DataType);
-                    switch (section.DataType)
+                    switch ((AdvertisementDataSectionParser.DataTypeValue)section.DataType)
                     {
+                        case AdvertisementDataSectionParser.DataTypeValue.ServiceData:
+                            // Just in case it's an Eddystone beacon
+                            var eddystoneResult = Eddystone.ParseEddystoneUrlArgs(section.Data);
+                            if (eddystoneResult.Success)
+                            {
+                                retval += $",{dsname} (0x{section.DataType:X02})={section.Data.ToSsv()} EddystoneURL={eddystoneResult.Url}";
+                            }
+                            else
+                            {
+                                retval += $",{dsname} (0x{section.DataType:X02})={section.Data.ToSsv()}";
+                            }
+                            break;
                         default:
                             retval += $",{dsname} (0x{section.DataType:X02})={section.Data.ToSsv()}";
                             break;
@@ -188,11 +200,11 @@ namespace BluetoothWatcher.AdvertismentWatcher
             // And now, data directly from the advertisement!
             foreach (var advertisement in Advertisements)
             {
+                sbyte txPower = (sbyte)(advertisement.TransmitPowerLevelInDBm ?? 0);
                 foreach (var section in advertisement.Advertisement.DataSections)
                 {
-                    sbyte txPower = (sbyte)(args.TransmitPowerLevelInDBm ?? 0);
                     var mtype = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-                    var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, args.RawSignalStrengthInDBm, txPower, mtype, "");
+                    var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, advertisement.RawSignalStrengthInDBm, txPower, mtype, "");
                     retval += "Section: " + str;
                 }
             }

@@ -128,7 +128,7 @@
                         <TextBlock>N=</TextBlock>
                         <TextBlock x:Name="uiAdvertCount" />
                         <TextBlock>  | </TextBlock>
-                        <TextBlock x:Name="uiAdvertRaw" />
+                        <TextBlock x:Name="uiAdvertRaw" IsTextSelectionEnabled="True" />
                     </StackPanel>
                 </Grid>
 

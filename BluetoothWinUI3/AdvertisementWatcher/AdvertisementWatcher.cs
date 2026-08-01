@@ -10,6 +10,7 @@ using Windows.Storage.Streams;
 
 using BluetoothConversions;
 using Utilities;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -174,6 +175,17 @@ namespace BluetoothWatcher.AdvertismentWatcher
                             }
                         }
 
+                        break;
+
+                    case BluetoothProtocols.AdvertisementDataSectionParser.DataTypeValue.ServiceData: // 0x16 == 22=service data
+                        // Maybe it's an Eddystone URL?
+                        var eddystoneResult = Eddystone.ParseEddystoneUrlArgs(section.Data);
+                        if (eddystoneResult.Success)
+                        {
+                            // Add the URL but don't get rid of other useful data
+                            // 99.9% of the time, there is no other useful data.
+                            watcherData.ParsedCompanyData = "Eddystone: " + eddystoneResult.Url+ "\n" + watcherData.ParsedCompanyData;
+                        }
                         break;
 
                 }

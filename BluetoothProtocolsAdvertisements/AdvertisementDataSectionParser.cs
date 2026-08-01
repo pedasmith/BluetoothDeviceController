@@ -205,7 +205,7 @@ namespace BluetoothProtocols
                         var db = ParseTxPowerLevel(section);
                         str = $"{db}";
                         break;
-                    case DataTypeValue.ServiceData: // 0x16
+                    case DataTypeValue.ServiceData: // 0x16 = 22 Service Data
 #if SUPPORT_SWITCHBOT_PROTOCOL
                         SwitchBot switchbot = null;
                         switch (parseAs)
@@ -227,6 +227,14 @@ namespace BluetoothProtocols
                         // Section 1.11 Service Data - contains a 16-bit, 32-bit or 128-bit service and the associated data.
                         var servicedatastr = IotNumberFormats.ValueParser.Parse(section.Data.ToArray(), "U16|HEX BYTES|HEX");
                         str = $"{hexPrefix}section {dtv.ToString()} data={servicedatastr.AsString}\n";
+
+                        // Parse as Eddystone
+                        var eddystoneResult = Eddystone.ParseEddystoneUrlArgs(section.Data);
+                        if (eddystoneResult.Success)
+                        {
+                            str = eddystoneResult.Url;
+                            ;
+                        }
 #endif
                         break;
 

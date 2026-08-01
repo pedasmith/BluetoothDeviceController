@@ -176,6 +176,55 @@ namespace BluetoothWinUI3
         /// </summary>
         IList<IHandleBTAdvertisements> BTAdvertisementHandlers = new List<IHandleBTAdvertisements>();
 
+        private void AdvertisementWatcher_WatcherEventOnUIThread(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)
+        {
+            if (!rootPanel.IsLoaded) return;
+            uiAdvertCount.Text = NAdvertisements.ToString();
+            uiAdvertRaw.Text = e.ToString();
+
+            if (e.ToString().Contains("GVH"))
+            {
+                ; // handy place for a debugger
+            }
+
+            // If this is a new advert, see if it's a known type
+
+            var known = KnownDevices.Get(e);
+            if (known == null) // not known (e.g.: this specific one hasn't been seen before in this session)
+            {
+                var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
+                if (supportedDevice != null)
+                {
+                    var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
+                    known = AddControl(e, control, supportedDevice);
+                    // will add to KnownDevices and updated UX and ...  a control is, e.g., a
+                    // BTNordic_ThingyControl. AddControl will add to the Known Device list
+
+                    SmartExportManager.HandleNewKnownDevice(known);
+                }
+            }
+
+            if (known != null)
+            {
+                // Track the advertisement history
+                var saveData = AllSaveData.FindWithIdOrAdvertisementAddress(known.Id, e.Addr);
+                saveData?.History.UpdateAdvertisementHistory(e.MostRecentAdvertisement.Timestamp);
+            }
+
+            // known will be null when it's not a known device and the "known" wasn't created 
+            // (most likely because it's not a supported device).
+
+            if (known != null && known.Control is IHandleMyBTAdvertisements handleMy)
+            {
+                handleMy.HandleMyAdvertisement(e);
+            }
+
+
+            foreach (var handler in BTAdvertisementHandlers)
+            {
+                handler.HandleAdvertisement(e);
+            }
+        }
         private void AdvertisementWatcher_WatcherEvent(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)
         {
             // A little bit of logging and storing stuff for debugging
@@ -188,56 +237,7 @@ namespace BluetoothWinUI3
 
 
             // Update the UI as needed and create the next device
-            UIThreadHelper.CallOnUIThread(() =>
-            {
-                if (!rootPanel.IsLoaded) return;
-                uiAdvertCount.Text = NAdvertisements.ToString();
-                uiAdvertRaw.Text = e.ToString();
-
-                if(e.ToString().Contains("GVH"))
-                {
-                    ; // handy place for a debugger
-                }
-
-                // If this is a new advert, see if it's a known type
-
-                var known = KnownDevices.Get(e);
-                if (known == null) // not known (e.g.: this specific one hasn't been seen before in this session)
-                {
-                    var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
-                    if (supportedDevice != null)
-                    {
-                        var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
-                        known = AddControl(e, control, supportedDevice); 
-                        // will add to KnownDevices and updated UX and ...  a control is, e.g., a
-                        // BTNordic_ThingyControl. AddControl will add to the Known Device list
-
-                        SmartExportManager.HandleNewKnownDevice(known);
-                    }
-                }
-
-                if (known != null)
-                {
-                    // Track the advertisement history
-                    var saveData = AllSaveData.FindWithIdOrAdvertisementAddress(known.Id, e.Addr);
-                    saveData?.History.UpdateAdvertisementHistory(e.MostRecentAdvertisement.Timestamp);
-                }
-
-                // known will be null when it's not a known device and the "known" wasn't created 
-                // (most likely because it's not a supported device).
-
-                if (known != null && known.Control is IHandleMyBTAdvertisements handleMy)
-                {
-                    handleMy.HandleMyAdvertisement(e);
-                }
-
-
-
-                foreach (var handler in BTAdvertisementHandlers)
-                {
-                    handler.HandleAdvertisement(e);
-                }
-            });
+            UIThreadHelper.CallOnUIThread(() => { AdvertisementWatcher_WatcherEventOnUIThread(sender, e); });
         }
 
         private KnownDevice AddControl(WatcherData e, UserControl control, SupportedDevice supportedDevice)
