@@ -26,7 +26,8 @@ namespace BluetoothProtocols
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
         public UInt16 CompanyId { get; set; } // will by 0x0499==1177 for standard Ruuvi tags
-        public enum SensorType { Other, OriginalEddystone, Air, NotThisSensorFamily };
+        // RuuviTag2021 is the sensor marked "RuuviTag" but which uses the Type 5 data
+        public enum SensorType { Other, OriginalEddystone, RuuviTag2021, Air, NotThisSensorFamily };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -97,6 +98,24 @@ namespace BluetoothProtocols
             {
                 retval = NameToSensorType(wrapper.OriginalAdvertisement.Advertisement.LocalName);
             }
+            // Maybe it's the 2021 sensor which sends type 5
+            if (retval == SensorType.NotThisSensorFamily || retval == SensorType.Other)
+            {
+                byte mfgtype = (byte)AdvertisementDataSectionParser.DataTypeValue.ManufacturerData;
+                var mfglist = wrapper.OriginalAdvertisement.Advertisement.GetSectionsByType(mfgtype);
+                foreach (var section in mfglist)
+                {
+                    var rt = Ruuvi_Tag.Parse(section, 0); // No RSSI (and it's not used by Parse anyway?)
+                    if (rt.IsValid)
+                    {
+                        switch (rt.TagType)
+                        {
+                            case 0x03: retval = SensorType.RuuviTag2021; break;
+                            case 0x05: retval = SensorType.RuuviTag2021; break;
+                        }
+                    }
+                }
+            }
             return retval;
         }
 
@@ -106,7 +125,13 @@ namespace BluetoothProtocols
             if (name != null)
             {
                 if (name.StartsWith("RuuviAir ")) retval = SensorType.Air;
-                else if (name.StartsWith("Ruuvi")) retval = SensorType.Other; // TODO: check other sensors
+                else if (name.StartsWith("Ruuvi ")) retval = SensorType.Other; 
+                // Other sensors include:
+                // The original RuuviTag with EddyStone; it doesn't advertise a name. A name is artificially 
+                // generated based ("Ruuvi " + address)
+                // The 2021 RuuviTag using type 3 (or 5?) output also doesn't advertise a name and a name
+                // is artificially created using the same scheme.
+                
             }
             return retval;
         }
@@ -146,12 +171,6 @@ namespace BluetoothProtocols
                     retval.Temperature = ruuvi.Data.Temperature;
                     retval.Pressure = ruuvi.Data.Pressure;
                     retval.Humidity = ruuvi.Data.Humidity;
-#if NEVER_EVER_DEFINED
-                    if (retval.Name == "")
-                    {
-                        retval.Name = "RuuviTag " + wrapper.AddressAsString;
-                    }
-#endif
                     break;
             }
 
@@ -161,6 +180,11 @@ namespace BluetoothProtocols
                 case SensorType.OriginalEddystone:
                     retval.IsSensorPresent =
                         SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity;
+                    break;
+                case SensorType.RuuviTag2021:
+                    retval.IsSensorPresent =
+                        SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity
+                        | SensorPresent.Battery;
                     break;
                 case SensorType.Air:
                     if (retval.NTypeE1Parsed > 0)

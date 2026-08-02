@@ -256,11 +256,27 @@ namespace BluetoothProtocols
 
             try
             {
-                dr.ByteOrder = ByteOrder.BigEndian; // bluetooth might default to little endian, but Ruuvi is big-endian.
+                dr.ByteOrder = ByteOrder.LittleEndian; // Company ID is little endian per BT standard.
                 retval.CompanyId = dr.ReadUInt16(); // Will be 1177 == 0x0499 but that's explicitly not enforced here
+                dr.ByteOrder = ByteOrder.BigEndian; // bluetooth might default to little endian, but Ruuvi is big-endian.
                 retval.TagType = dr.ReadByte(); // will be type==5 for new tags type==6  or type==E1 for Air 2026
                 switch (retval.TagType)
                 {
+                    case 0x03: // https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_03.md
+                        {
+                            retval.HumidityInPercent = ((double)dr.ReadByte()) * 0.5; // 0..200 maps to 0..100%
+                            var tc = dr.ReadByte(); // TODO: is weird signed-value thing
+                            var tfrac = ((double)dr.ReadByte()) * 0.01;
+                            retval.TemperatureInDegreesC = tc + tfrac;
+                            retval.PressureInPascals = ((int)dr.ReadUInt16()) + 50000;
+                            // Already set to an array: retval.AccelerationInG = new double[3];
+                            retval.AccelerationInG[0] = ((double)dr.ReadInt16()) / 1000.0;
+                            retval.AccelerationInG[1] = ((double)dr.ReadInt16()) / 1000.0;
+                            retval.AccelerationInG[2] = ((double)dr.ReadInt16()) / 1000.0;
+                            retval.BatteryVoltage = ((double)dr.ReadInt16()) / 1000.0;
+                            retval.IsValid = true;
+                        }
+                        break;
                     case 0x05:
                         {
                             retval.TemperatureInDegreesC = ((double)dr.ReadInt16()) * 0.005;

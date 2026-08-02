@@ -100,6 +100,40 @@ namespace BluetoothWatcher.AdvertismentWatcher
         }
 
         public enum AdvertisementStringFormat { Full, CanCompare, AddressOnly };
+
+        public void FixupBestName()
+        {
+            foreach (var advertisement in Advertisements)
+            {
+                foreach (var section in advertisement.Advertisement.DataSections)
+                {
+                    var dsname = AdvertisementSection_types.Decode(section.DataType);
+                    switch ((AdvertisementDataSectionParser.DataTypeValue)section.DataType)
+                    {
+                        case AdvertisementDataSectionParser.DataTypeValue.ServiceData:
+                            // Just in case it's an Eddystone beacon
+                            var eddystoneResult = Eddystone.ParseEddystoneUrlArgs(section.Data);
+                            if (eddystoneResult.Success)
+                            {
+                                if (eddystoneResult.Url.Contains("https://ruu.vi/"))
+                                {
+                                    BestName = "RuuviTag " + AddressAsString;
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                var ruuvilist = advertisement.Advertisement.GetManufacturerDataByCompanyId(1177); // 1177 = 0x0499 is Ruuvi
+                if (BestName == "" && ruuvilist.Count > 0)
+                {
+                    BestName = "Ruuvi " + AddressAsString; // Artificially create this.
+                }
+            }
+        }
+
         public string ToStringFull(AdvertisementStringFormat format = AdvertisementStringFormat.Full)
         {
             if (format == AdvertisementStringFormat.AddressOnly)
@@ -135,10 +169,6 @@ namespace BluetoothWatcher.AdvertismentWatcher
                             if (eddystoneResult.Success)
                             {
                                 retval += $",{dsname} (0x{section.DataType:X02})={section.Data.ToSsv()} EddystoneURL={eddystoneResult.Url}";
-                                if (eddystoneResult.Url.Contains("https://ruu.vi/"))
-                                {
-                                    BestName = "RuuviTag " + AddressAsString;
-                                }
                             }
                             else
                             {

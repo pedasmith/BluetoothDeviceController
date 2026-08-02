@@ -51,6 +51,13 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             return retval;
         }
 
+        public static SupportedDevice MakeFromManufacturerId(int manufacturerId, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type factory)
+        {
+            var retval = new SupportedDevice(factory);
+            retval.MatchingManufacturerId = manufacturerId;
+            return retval;
+        }
+
         private SupportedDevice([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type factory)
         {
             FactoryInterface = factory;
@@ -58,6 +65,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         public string MatchingName { get; set; } = "Thingy*"; // For example 
         public Guid MatchingServiceGuid { get; set; } = Guid.Empty;
         public string MatchingEddystoneUrl { get; set; } = String.Empty;
+        public int MatchingManufacturerId { get; set; } = 0;
 
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
         public Type FactoryInterface { get; set; } = null;
@@ -75,6 +83,10 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             else if (MatchingEddystoneUrl != String.Empty)
             {
                 retval = advertisement.EddystoneUrl.StarMatch(MatchingEddystoneUrl);
+            }
+            else if (MatchingManufacturerId != 0)
+            {
+                retval = advertisement.CompanyId == MatchingManufacturerId;
             }
             else
             {
@@ -126,6 +138,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             SupportedDevice.MakeFromGuid("0000180d-0000-1000-8000-00805F9B34FB", typeof(BTStandard_HeartRateControl)),
 
             SupportedDevice.MakeFromEddystone("https://ruu.vi/*", typeof(BTCommon_EnvironmentalControl)),
+            SupportedDevice.MakeFromManufacturerId(1177, typeof(BTCommon_EnvironmentalControl)), // 1177=0x499 Ruuvi Innovations Ltd.
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {

@@ -227,13 +227,18 @@ namespace BluetoothWinUI3
         }
         private void AdvertisementWatcher_WatcherEvent(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)
         {
+            // Ruuvi devices often don't have a name that's transmitted. Fix up the name based on
+            // expert knowledge of specific devices
+            e.FixupBestName();
+
             // A little bit of logging and storing stuff for debugging
             NAdvertisements++;
-            AllAdvertisements.AppendLine($"{NAdvertisements}, " + e.ToStringFull());
+            var fullString = e.ToStringFull();
+            AllAdvertisements.AppendLine($"{NAdvertisements}, " + fullString);
             var fmt = WatcherData.AdvertisementStringFormat.CanCompare;
-            UniqueAdvertisements[e.ToStringFull(fmt)] = e.ToStringFull();
+            UniqueAdvertisements[e.ToStringFull(fmt)] = fullString;
             fmt = WatcherData.AdvertisementStringFormat.AddressOnly;
-            UniqueBTAddresses[e.ToStringFull(fmt)] = e.ToStringFull();
+            UniqueBTAddresses[e.ToStringFull(fmt)] = fullString;
 
 
             // Update the UI as needed and create the next device
