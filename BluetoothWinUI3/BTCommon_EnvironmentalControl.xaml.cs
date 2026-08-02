@@ -88,8 +88,8 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// Current sensor data from the Device. For the demo, it's battery level.
     /// </summary>
     DeviceSpecificSensorData CurrSensor_Data = null;
-    enum SensorFamily { Govee, Ruuvi_TagCSDR, SensorPro, ThermPro };
-    SensorFamily CurrSensorFamily = SensorFamily.Govee;
+    enum SensorFamily { Unknown, Govee, Ruuvi_TagCSDR, SensorPro, ThermPro };
+    SensorFamily CurrSensorFamily = SensorFamily.Unknown;
 
     /// <summary>
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
@@ -181,7 +181,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         // Note: you have to remove the sensor from the uiDeviceDataList entirely. You can't just
         // set it to invisible because the items will still show up
-        CurrTableCustomization.TableColumns.Add("Name"); // always show the nae
+        CurrTableCustomization.TableColumns.Add("Name"); // always show the name
 
         UpdateForSensor(SensorDataRecord.SensorPresent.Temperature, 5, 30, "Temperature", "Temperature", uiDeviceDataTemperature);
         UpdateForSensor(SensorDataRecord.SensorPresent.Humidity, 5, 20, "Humidity", "Humidity", uiDeviceDataHumidity);
@@ -685,7 +685,11 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         InitializeUX(); // Will initialize the UX as appropriate
         CurrSaveData.History.UpdateAdvertisementHistory(data.MostRecentAdvertisement.Timestamp);
         CurrSaveData.History.UpdateDataHistory(data.MostRecentAdvertisement.Timestamp);
-        CurrSensor_Data.Name = data.BestName;
+        if (!string.IsNullOrEmpty(data.BestName))
+        {
+            // RuuviTag Eddystone don't include a Name in their advertisement.
+            CurrSensor_Data.Name = data.BestName;
+        }
         CurrSensor_Data.TimestampMostRecent = data.MostRecentAdvertisement.Timestamp;
         UpdateDeviceDataUX("*"); // Update all the data!
 

@@ -185,6 +185,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                             // Add the URL but don't get rid of other useful data
                             // 99.9% of the time, there is no other useful data.
                             watcherData.ParsedCompanyData = "Eddystone: " + eddystoneResult.Url+ "\n" + watcherData.ParsedCompanyData;
+                            watcherData.EddystoneUrl = eddystoneResult.Url;
                         }
                         break;
 

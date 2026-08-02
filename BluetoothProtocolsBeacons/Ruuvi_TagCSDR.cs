@@ -26,7 +26,7 @@ namespace BluetoothProtocols
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
         public UInt16 CompanyId { get; set; } // will by 0x0499==1177 for standard Ruuvi tags
-        public enum SensorType { Other, Air, NotThisSensorFamily };
+        public enum SensorType { Other, OriginalEddystone, Air, NotThisSensorFamily };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -88,6 +88,11 @@ namespace BluetoothProtocols
         public static SensorType AdvertIsSensorFamily(WatcherData wrapper)
         {
             var retval = NameToSensorType(wrapper.BestName);
+            // Maybe it's one of the original RuuviTag with Eddystone
+            if (wrapper.EddystoneUrl.Contains("https://ruu.vi/"))
+            {
+                retval = SensorType.OriginalEddystone;
+            }
             if (retval == SensorType.NotThisSensorFamily && wrapper.OriginalAdvertisement != null)
             {
                 retval = NameToSensorType(wrapper.OriginalAdvertisement.Advertisement.LocalName);
@@ -118,6 +123,7 @@ namespace BluetoothProtocols
                 retval.IsValid = false;
                 return retval;
             }
+
             foreach (var advert in wrapper.Advertisements)
             {
                 if (advert == null) continue;
@@ -132,8 +138,30 @@ namespace BluetoothProtocols
                     }
                 }
             }
+            // Fixup for the original RuuviTag which used an Eddystone URL
             switch (sensorType)
             {
+                case SensorType.OriginalEddystone:
+                    var ruuvi = Ruuvi_Tag_v1_Helper.ParseRuuviTag(wrapper.EddystoneUrl);
+                    retval.Temperature = ruuvi.Data.Temperature;
+                    retval.Pressure = ruuvi.Data.Pressure;
+                    retval.Humidity = ruuvi.Data.Humidity;
+#if NEVER_EVER_DEFINED
+                    if (retval.Name == "")
+                    {
+                        retval.Name = "RuuviTag " + wrapper.AddressAsString;
+                    }
+#endif
+                    break;
+            }
+
+            // Set the IsSensorPresent based on the current advertisement.
+            switch (sensorType)
+            {
+                case SensorType.OriginalEddystone:
+                    retval.IsSensorPresent =
+                        SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity;
+                    break;
                 case SensorType.Air:
                     if (retval.NTypeE1Parsed > 0)
                     {

@@ -31,12 +31,15 @@ namespace BluetoothWatcher.AdvertismentWatcher
     {
         /// <summary>
         /// Advertisement CompleteLocalName (BT 0x09) or ShortenedLocalName (BT 0x08) or ""
+        /// OR RuuviTag ___ for Eddystone based RuuviTags
         /// </summary>
         public String BestName { get; set; } = "";
         /// <summary>
         /// Parsed manufacturer data from ManufacturerData (BT 0xFF).
         /// </summary>
         public String ParsedCompanyData { get; set; } = "";
+
+        public string EddystoneUrl { get; set; } = string.Empty;
         /// <summary>
         /// Same as ParsedCompanyData but doesn't incude CR
         /// </summary>
@@ -132,6 +135,10 @@ namespace BluetoothWatcher.AdvertismentWatcher
                             if (eddystoneResult.Success)
                             {
                                 retval += $",{dsname} (0x{section.DataType:X02})={section.Data.ToSsv()} EddystoneURL={eddystoneResult.Url}";
+                                if (eddystoneResult.Url.Contains("https://ruu.vi/"))
+                                {
+                                    BestName = "RuuviTag " + AddressAsString;
+                                }
                             }
                             else
                             {

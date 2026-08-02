@@ -36,8 +36,28 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             }
             FactoryInterface = factory;
         }
+        public static SupportedDevice MakeFromEddystone(string match, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type factory)
+        {
+            var retval = new SupportedDevice(factory);
+            retval.MatchingEddystoneUrl = match;
+            return retval;
+        }
+
+        public static SupportedDevice MakeFromGuid(string match, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type factory)
+        {
+            var retval = new SupportedDevice(factory);
+            Guid guid = Guid.Parse(match);
+            retval.MatchingServiceGuid = guid;
+            return retval;
+        }
+
+        private SupportedDevice([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type factory)
+        {
+            FactoryInterface = factory;
+        }
         public string MatchingName { get; set; } = "Thingy*"; // For example 
         public Guid MatchingServiceGuid { get; set; } = Guid.Empty;
+        public string MatchingEddystoneUrl { get; set; } = String.Empty;
 
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
         public Type FactoryInterface { get; set; } = null;
@@ -51,6 +71,10 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
                 {
                     ; // handy place for a debugger
                 }
+            }
+            else if (MatchingEddystoneUrl != String.Empty)
+            {
+                retval = advertisement.EddystoneUrl.StarMatch(MatchingEddystoneUrl);
             }
             else
             {
@@ -98,9 +122,10 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
 
             // Bike Cycle Cadence and Speed
             //new SupportedDevice("BK6*", typeof(BTTAOPE_CyclingSpeedCadenceControl)),
-            new SupportedDevice("00001816-0000-1000-8000-00805F9B34FB", typeof(BTStandard_CyclingSpeedCadenceControl)),
-            new SupportedDevice("0000180d-0000-1000-8000-00805F9B34FB", typeof(BTStandard_HeartRateControl)),
+            SupportedDevice.MakeFromGuid("00001816-0000-1000-8000-00805F9B34FB", typeof(BTStandard_CyclingSpeedCadenceControl)),
+            SupportedDevice.MakeFromGuid("0000180d-0000-1000-8000-00805F9B34FB", typeof(BTStandard_HeartRateControl)),
 
+            SupportedDevice.MakeFromEddystone("https://ruu.vi/*", typeof(BTCommon_EnvironmentalControl)),
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {
