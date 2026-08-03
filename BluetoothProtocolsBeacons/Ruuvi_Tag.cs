@@ -1,5 +1,6 @@
 ﻿using BluetoothProtocols;
 using BluetoothWatcher.Units;
+using BluetoothWinUI3.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,7 @@ namespace BluetoothProtocols
         public double VOC { get; set; } = 0.0;
         public double NOX { get; set; } = 0.0;
         public double LuminosityRaw { get; set; } = 0.0;
+        public BatteryVoltageToPercent.BatteryType TagBatteryType { get; set; }
 
         public SensorDataRecord ToSensorDataRecord(SensorDataRecord dest)
         {
@@ -46,7 +48,7 @@ namespace BluetoothProtocols
             {
                 dest = new SensorDataRecord();
             }
-            // TODO: dest.BatteryInPercent = source.BatteryVoltage; // ???
+            dest.BatteryInPercent = BatteryVoltageToPercent.GetPercent(source.TagBatteryType, source.BatteryVoltage, -1);
             dest.Humidity = source.HumidityInPercent;
             dest.Temperature = source.TemperatureInDegreesC;
             dest.Pressure = source.PressureInPascals / 100.0; // convert pascal to hPa (hecto-Pascal)
@@ -274,6 +276,7 @@ namespace BluetoothProtocols
                             retval.AccelerationInG[1] = ((double)dr.ReadInt16()) / 1000.0;
                             retval.AccelerationInG[2] = ((double)dr.ReadInt16()) / 1000.0;
                             retval.BatteryVoltage = ((double)dr.ReadInt16()) / 1000.0;
+                            retval.TagBatteryType = BatteryVoltageToPercent.BatteryType.CR2477; // early RuuviTag used 2477
                             retval.IsValid = true;
                         }
                         break;
@@ -291,6 +294,7 @@ namespace BluetoothProtocols
                             retval.TransmitPowerInDb = ((int)(power & 0x1F)) * 2 - 40;
                             retval.MovementCounter = dr.ReadByte();
                             retval.MovementSequenceCounter = dr.ReadUInt16();
+                            retval.TagBatteryType = BatteryVoltageToPercent.BatteryType.CR2477; // early RuuviTag used 2477
                             retval.IsValid = true;
                         }
                         break;
@@ -322,6 +326,7 @@ namespace BluetoothProtocols
 
                             retval.VOC = voc;
                             retval.NOX = nox;
+                            retval.TagBatteryType = BatteryVoltageToPercent.BatteryType.Unknown;
                             retval.IsValid = true;
                         }
                         break;
@@ -364,6 +369,7 @@ namespace BluetoothProtocols
 
                             retval.VOC = voc;
                             retval.NOX = nox;
+                            retval.TagBatteryType = BatteryVoltageToPercent.BatteryType.Unknown;
                             retval.IsValid = true;
                         }
                         break;

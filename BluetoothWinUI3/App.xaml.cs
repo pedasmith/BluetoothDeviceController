@@ -1,5 +1,6 @@
 ﻿using BluetoothConversions;
 using BluetoothProtocols;
+using BluetoothWinUI3.Units;
 using IotNumberFormats;
 using Microsoft.UI.Xaml;
 using System;
@@ -39,6 +40,7 @@ namespace BluetoothWinUI3
         static int TestAll()
         {
             int nerror = 0;
+            nerror += BatteryVoltageToPercent.Test();
             nerror += SparklesHelper.Test();
             nerror += Ruuvi_Tag.Test();
             nerror += SpeedCadence_Data_Facade.Test();

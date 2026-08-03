@@ -2,7 +2,7 @@
   "profiles": {
     "BluetoothWinUI3 (Package)": {
       "commandName": "MsixPackage",
-      "nativeDebugging": true
+      "nativeDebugging": false
     },
     "BluetoothWinUI3 (Unpackaged)": {
       "commandName": "Project",

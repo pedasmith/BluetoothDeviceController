@@ -152,7 +152,7 @@ namespace BluetoothWinUI3
         {
             var icon = BluetoothWinUI3.Units.BatteryLevelIcon.Icon(level);
             uiBatteryLevelIcon.Text = icon;
-            uiBatteryLevelPercent.Text = $"{level}%";
+            uiBatteryLevelPercent.Text = $"{level:F0}%";
         }
 
         private void UpdateIcon()
