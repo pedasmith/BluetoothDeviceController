@@ -81,11 +81,9 @@ namespace BluetoothProtocols
 
 
         /// <summary>
-        /// Returns true if the local name OR the original name matches Ruuvi_* TODO: correct name
+        /// Returns true if the local name OR the original name matches Ruuvi_* or RuuviAir*
         /// All of these parsers happen to have an AdvertIsSensorFamily :-)
         /// </summary>
-        /// <param name="wrapper"></param>
-        /// <returns></returns>
         public static SensorType AdvertIsSensorFamily(WatcherData wrapper)
         {
             var retval = NameToSensorType(wrapper.BestName);
@@ -112,9 +110,15 @@ namespace BluetoothProtocols
                         {
                             case 0x03: retval = SensorType.RuuviTag2021; break;
                             case 0x05: retval = SensorType.RuuviTag2021; break;
+                            case 0x06: retval = SensorType.Air; break;
+                            case 0xE1: retval = SensorType.Air; break;
                         }
                     }
                 }
+            }
+            if (retval != SensorType.Air)
+            {
+                ; // handy place for a debugger.
             }
             return retval;
         }

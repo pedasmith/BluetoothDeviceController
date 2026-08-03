@@ -38,7 +38,7 @@ namespace BluetoothProtocols
         public double CO2 { get; set; } = 390;
         public double VOC { get; set; } = 0.0;
         public double NOX { get; set; } = 0.0;
-        public double LuminosityRaw { get; set; } = 0.0;
+        public double LuminosityLux { get; set; } = 0.0;
         public BatteryVoltageToPercent.BatteryType TagBatteryType { get; set; }
 
         public SensorDataRecord ToSensorDataRecord(SensorDataRecord dest)
@@ -59,7 +59,7 @@ namespace BluetoothProtocols
             dest.CO2 = source.CO2;
             dest.VOC = source.VOC;
             dest.NOX = source.NOX;
-            dest.Luminosity = source.LuminosityRaw; // TODO: 
+            dest.Luminosity = source.LuminosityLux; 
             return dest;
         }
 
@@ -87,7 +87,7 @@ namespace BluetoothProtocols
                 CO2 = source.CO2,
                 VOC = source.VOC,
                 NOX = source.NOX,
-                LuminosityRaw = source.Luminosity, // TODO: correct units
+                LuminosityLux = source.Luminosity,
             };
             return retval;
         }
@@ -210,10 +210,10 @@ namespace BluetoothProtocols
                 nerror += 1;
                 Log($"Error: Ruuvi: NOX expected {expectedNOX} actual {ruuvi.NOX}");
             }
-            if (!DoubleApprox.Approx(ruuvi.LuminosityRaw, expectedLuminosity))
+            if (!DoubleApprox.Approx(ruuvi.LuminosityLux, expectedLuminosity))
             {
                 nerror += 1;
-                Log($"Error: Ruuvi: Luminosity expected {expectedLuminosity} actual {ruuvi.LuminosityRaw}");
+                Log($"Error: Ruuvi: Luminosity expected {expectedLuminosity} actual {ruuvi.LuminosityLux}");
             }
             return nerror;
         }
@@ -267,9 +267,14 @@ namespace BluetoothProtocols
                     case 0x03: // https://github.com/ruuvi/ruuvi-sensor-protocols/blob/master/dataformat_03.md
                         {
                             retval.HumidityInPercent = ((double)dr.ReadByte()) * 0.5; // 0..200 maps to 0..100%
-                            var tc = dr.ReadByte(); // TODO: is weird signed-value thing
+                            int tc = dr.ReadByte(); // TODO: check is weird signed-value thing
+                            if ((tc & 0x80) != 0) // handle weird sign bit
+                            {
+                                tc = -(tc & 0x7F);
+                            }
                             var tfrac = ((double)dr.ReadByte()) * 0.01;
-                            retval.TemperatureInDegreesC = tc + tfrac;
+                            double temp = tc < 0 ? (tc - tfrac) : (tc + tfrac);
+                            retval.TemperatureInDegreesC = temp;
                             retval.PressureInPascals = ((int)dr.ReadUInt16()) + 50000;
                             // Already set to an array: retval.AccelerationInG = new double[3];
                             retval.AccelerationInG[0] = ((double)dr.ReadInt16()) / 1000.0;
@@ -298,7 +303,7 @@ namespace BluetoothProtocols
                             retval.IsValid = true;
                         }
                         break;
-                    case 0x06: // Adding this 2026-07-21 TODO: not complete
+                    case 0x06: // Adding this 2026-07-21 
                         {
                             retval.TemperatureInDegreesC = ((double)dr.ReadInt16()) * 0.005;
                             retval.HumidityInPercent = ((double)dr.ReadUInt16()) * 0.0025;
@@ -313,7 +318,7 @@ namespace BluetoothProtocols
                             double LUX_DELTA = Math.Log(LUX_MAX_VALUE + 1) / LUX_MAX_CODE;
                             //double lux_code = Math.Round(Math.Log(luminosity + 1) / LUX_DELTA);
                             var luminosity = Math.Exp((double)luminosityCode * LUX_DELTA) - 1;
-                            retval.LuminosityRaw = luminosityCode == 255 ? 0 : luminosity;
+                            retval.LuminosityLux = luminosityCode == 255 ? 0 : luminosity;
                             byte r0 = dr.ReadByte();
                             byte seq = dr.ReadByte();
                             byte flags = dr.ReadByte();
@@ -330,7 +335,7 @@ namespace BluetoothProtocols
                             retval.IsValid = true;
                         }
                         break;
-                    case 0xE1: // Adding this 2026-07-21 TODO: not complete
+                    case 0xE1: // Adding this 2026-07-21 
                         {
                             retval.TemperatureInDegreesC = ((double)dr.ReadInt16()) * 0.005;
                             retval.HumidityInPercent = ((double)dr.ReadUInt16()) * 0.0025;
@@ -348,7 +353,7 @@ namespace BluetoothProtocols
                             byte lum2 = dr.ReadByte();
                             var luminosity = (double)((lum0 << 16) + (lum1 << 8) + (lum2)) / 100.0; // In LUX
                             var luminosityInvalid = lum0 == 255 && lum1 == 255 && lum2 == 255;
-                            retval.LuminosityRaw = luminosityInvalid ? 0 : luminosity;
+                            retval.LuminosityLux = luminosityInvalid ? 0 : luminosity;
                             byte r0 = dr.ReadByte(); // r0...etc are all reserved
                             byte r1 = dr.ReadByte();
                             byte r2 = dr.ReadByte();

@@ -2,9 +2,7 @@
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
-using System.Text;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -100,9 +98,52 @@ internal static class OxyPlotUtilities
         return retval;
     }
 
-    public static List<OxyColor> PreferredPlotColors = new List<OxyColor>()
+    const double WIDTH_PRIMARY = 1.4;
+    const double WIDTH_SECONDARY = 0.9;
+    class LineColorStyle
     {
-        OxyColors.DarkBlue, OxyColors.DarkGreen, OxyColors.Violet, OxyColors.Black, OxyColors.Gray,
+        public LineColorStyle (OxyColor color, LineStyle style=LineStyle.Solid, double width=WIDTH_PRIMARY)
+        {
+            Color = color;
+            LineStyle = style;
+            LineWidth = width;
+        }
+        public OxyColor Color;
+        public LineStyle LineStyle;
+        public double LineWidth;
+    }
+    private static Dictionary<string, LineColorStyle> StockColorStyles = new()
+    {
+        { "Pressure", new LineColorStyle(OxyColors.Gray)},
+        { "Temperature", new LineColorStyle(OxyColors.DarkOrange)},
+        { "Humidity", new LineColorStyle(OxyColors.DarkCyan)},
+
+        // Dark blue to Dark Violet per Copilot
+        { "PM10" , new LineColorStyle(OxyColor.FromRgb(0x0A, 0x1A, 0x6C), LineStyle.Dot, WIDTH_SECONDARY)},
+        { "PM25" , new LineColorStyle(OxyColor.FromRgb(0x2C, 0x23, 0x80), LineStyle.Dot, WIDTH_SECONDARY)},
+        { "PM40" , new LineColorStyle(OxyColor.FromRgb(0x4E, 0x2C, 0x94), LineStyle.Dot, WIDTH_SECONDARY)},
+        { "PM100", new LineColorStyle(OxyColor.FromRgb(0x6F, 0x35, 0xA8), LineStyle.Dot, WIDTH_SECONDARY)},
+
+        { "CO2" , new LineColorStyle(OxyColors.DarkGreen, LineStyle.Dash, WIDTH_SECONDARY)},
+        { "NOX" , new LineColorStyle(OxyColors.OrangeRed, LineStyle.Dash, WIDTH_SECONDARY)},
+        { "VOC" , new LineColorStyle(OxyColors.DarkMagenta, LineStyle.Dash, WIDTH_SECONDARY)},
+
+        // Same colors as CO2 and VOC. These are from Nordic Thingy
+        { "eCOS" , new LineColorStyle(OxyColors.DarkGreen, LineStyle.Dash, WIDTH_SECONDARY)},
+        { "TVOC" , new LineColorStyle(OxyColors.DarkMagenta, LineStyle.Dash, WIDTH_SECONDARY)},
+
+        { "RpsSensor", new LineColorStyle(OxyColors.White)},
+        { "HeartRate", new LineColorStyle(OxyColors.DarkRed)}, // Blood color :-)
+
+    };
+
+    private static List<LineColorStyle> BackupColorStyle = new ()
+    {
+        new LineColorStyle(OxyColors.LightGreen), 
+        new LineColorStyle(OxyColors.DarkGreen),
+        new LineColorStyle(OxyColors.Violet),
+        new LineColorStyle(OxyColors.Black),
+        new LineColorStyle(OxyColors.Gray),
     };
 
     /// <summary>
@@ -116,8 +157,6 @@ internal static class OxyPlotUtilities
         if (axisTitle == null) axisTitle = lineTitle; // common case
 
         var tier = retval.NInPosition(axisPosition);
-        var colorIndex = (retval.Series.Count - 1) % PreferredPlotColors.Count;
-        // subtract 1 because the first series is the highlight line.
 
         LinearAxis axis = null;
         bool hasAxis = false;
@@ -151,12 +190,23 @@ internal static class OxyPlotUtilities
         {
             axis.Minimum = minimum;
         }
+        LineColorStyle style = null;
+        var gotStyle = StockColorStyles.TryGetValue(propertyName, out style);
+        if (style == null || gotStyle == false)
+        {
+            var colorIndex = (retval.Series.Count - 1) % BackupColorStyle.Count;
+            // subtract 1 because the first series is the highlight line.
+            style = BackupColorStyle[colorIndex];
+        }
         var series = new LineSeries
         {
             Title = lineTitle,
             Tag = lineTitle,
-            Color = PreferredPlotColors[colorIndex],
-            StrokeThickness = 0.75,
+
+            Color = style.Color,
+            StrokeThickness = style.LineWidth,
+            LineStyle = style.LineStyle,
+
             MarkerType = MarkerType.None,
             DataFieldX = "TimestampMostRecentDT",
             DataFieldY = propertyName,
