@@ -35,6 +35,7 @@
                     <MenuFlyoutItem Text="Copy Data as CSV" Click="OnFileCopyDataAsCSV" x:Name="uimFileCopyDataAsCSV"  />
                     <MenuFlyoutItem Text="Copy Details" Click="OnFileCopyDetailsNormal" x:Name="uimFileCopyDetailsNormal"  />
                     <MenuFlyoutItem Text="Copy Details All" Click="OnFileCopyDetailsAll" x:Name="uimFileCopyDetailsAll"  />
+                    <MenuFlyoutItem Text="Clear data" Click="OnFileClearData" x:Name="uimFileClearData" />
                     <MenuFlyoutItem Text="Exit" Click="OnFileExit" AccessKey="x" />
                 </MenuBarItem>
                 <MenuBarItem Title="View" AccessKey="V">

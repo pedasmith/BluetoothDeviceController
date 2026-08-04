@@ -24,8 +24,8 @@ namespace BluetoothProtocols
             None=0x00, 
             Temperature = 0x01, Pressure = 0x02, Humidity = 0x04, 
             Battery = 0x08,
-            PM10 = 0x10, PM25 = 0x20, PM40 = 0x40, PM100 = 0x80, 
-            CO2 = 0x100, VOC = 0x200, NOX = 0x400, 
+            PM10 = 0x10, PM25 = 0x20, PM40 = 0x40, PM100 = 0x80, // PM 1.0, 2.5, 4.0 and 10.0
+            CO2 = 0x100, VOC = 0x200, NOXIndex = 0x400, // NOXIndex is like NOX but isn't calibrated to anything real
             Luminosity = 0x800,
             All=0xFFF };
         public SensorPresent IsSensorPresent { get; set; } = SensorPresent.All;
@@ -48,9 +48,21 @@ namespace BluetoothProtocols
             {
                 int retval = 0;
                 if (IsSensorPresent.HasFlag(SensorPresent.CO2)) retval++;
-                if (IsSensorPresent.HasFlag(SensorPresent.NOX)) retval++;
+                if (IsSensorPresent.HasFlag(SensorPresent.NOXIndex)) retval++;
                 if (IsSensorPresent.HasFlag(SensorPresent.VOC)) retval++;
                 return retval;
+            }
+        }
+        public int NAqiSensors
+        {
+            get
+            {
+                int retval = 0;
+                if (IsSensorPresent.HasFlag(SensorPresent.PM25)) retval++;
+                if (IsSensorPresent.HasFlag(SensorPresent.PM100)) retval++;
+                // if (IsSensorPresent.HasFlag(SensorPresent.NOXIndex)) retval++; // NOXIndex doesn't map to a real NOX value
+                return retval;
+
             }
         }
         public SensorDataRecord()
@@ -64,7 +76,7 @@ namespace BluetoothProtocols
             PM100 = double.NaN;
             CO2 = 390;
             VOC = double.NaN;
-            NOX = double.NaN;
+            NOXIndex = double.NaN;
             Luminosity = double.NaN;
             TimestampMostRecent = DateTimeOffset.Now;
         }
@@ -79,7 +91,7 @@ namespace BluetoothProtocols
             PM100 = double.NaN;
             CO2 = 390;
             VOC = double.NaN;
-            NOX = double.NaN;
+            NOXIndex = double.NaN;
             Luminosity = double.NaN;
             TimestampMostRecent = eventTime ?? DateTimeOffset.Now;
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity;
@@ -95,7 +107,7 @@ namespace BluetoothProtocols
             PM100 = double.NaN;
             CO2 = 390;
             VOC = double.NaN;
-            NOX = double.NaN;
+            NOXIndex = double.NaN;
             Luminosity = double.NaN;
             TimestampMostRecent = eventTime ?? DateTimeOffset.Now;
             IsSensorPresent = SensorPresent.Temperature | SensorPresent.Humidity;
@@ -124,7 +136,7 @@ namespace BluetoothProtocols
             this.PM100 = value.PM100;
             this.CO2 = value.CO2;
             this.VOC = value.VOC;
-            this.NOX = value.NOX;
+            this.NOXIndex = value.NOXIndex;
             this.Luminosity = value.Luminosity;
         }
 
@@ -146,7 +158,7 @@ namespace BluetoothProtocols
             dest.PM100 = convert(source.PM100, "ppm");
             dest.CO2 = convert(source.CO2, ""); // TODO; what are the unit names? here and down to luminosity
             dest.VOC = convert(source.VOC, "");
-            dest.NOX = convert(source.NOX, "");
+            dest.NOXIndex = convert(source.NOXIndex, "");
             dest.Luminosity = convert(source.Luminosity, "");
             return dest;
         }
@@ -163,7 +175,7 @@ namespace BluetoothProtocols
             if (IsSensorPresent.HasFlag(SensorPresent.PM100)) headers.Add("PM100");
             if (IsSensorPresent.HasFlag(SensorPresent.CO2)) headers.Add("CO2");
             if (IsSensorPresent.HasFlag(SensorPresent.VOC)) headers.Add("VOC");
-            if (IsSensorPresent.HasFlag(SensorPresent.NOX)) headers.Add("NOX");
+            if (IsSensorPresent.HasFlag(SensorPresent.NOXIndex)) headers.Add("NOX");
             if (IsSensorPresent.HasFlag(SensorPresent.Luminosity)) headers.Add("Luminosity");
 
             if (IsSensorPresent.HasFlag(SensorPresent.Battery)) headers.Add("Battery");
@@ -182,7 +194,7 @@ namespace BluetoothProtocols
             if (IsSensorPresent.HasFlag(SensorPresent.PM100)) exporter.CellSet(PM100);
             if (IsSensorPresent.HasFlag(SensorPresent.CO2)) exporter.CellSet(CO2);
             if (IsSensorPresent.HasFlag(SensorPresent.VOC)) exporter.CellSet(VOC);
-            if (IsSensorPresent.HasFlag(SensorPresent.NOX)) exporter.CellSet(NOX);
+            if (IsSensorPresent.HasFlag(SensorPresent.NOXIndex)) exporter.CellSet(NOXIndex);
             if (IsSensorPresent.HasFlag(SensorPresent.Luminosity)) exporter.CellSet(Luminosity);
             if (IsSensorPresent.HasFlag(SensorPresent.Battery)) exporter.CellSet(BatteryInPercent);
         }
@@ -196,7 +208,7 @@ namespace BluetoothProtocols
         public const string PM100PropertyChangedName = "PM100";
         public const string CO2PropertyChangedName = "CO2";
         public const string VOCPropertyChangedName = "VOC";
-        public const string NOXPropertyChangedName = "NOX";
+        public const string NOXIndexPropertyChangedName = "NOXIndex";
         public const string LuminosityPropertyChangedName = "Luminosity";
         public const string PressurePropertyChangedName = "Pressure";
         public const string HumidityPropertyChangedName = "Humidity";
@@ -258,21 +270,20 @@ namespace BluetoothProtocols
 
         private double _VOC;
         /// <summary>
-        /// PM2.5 in ug/m3 µg/㎥
         /// </summary>
         public double VOC { get { return _VOC; } set { if (value == _VOC) return; _VOC = value; OnPropertyChanged(); } }
 
 
-        private double _NOX;
+        private double _NOXIndex;
         /// <summary>
-        /// PM2.5 in ug/m3 µg/㎥
+        /// NOXIndex is a made-up index value with no direct physical meaning
         /// </summary>
-        public double NOX { get { return _NOX; } set { if (value == _NOX) return; _NOX = value; OnPropertyChanged(); } }
+        public double NOXIndex { get { return _NOXIndex; } set { if (value == _NOXIndex) return; _NOXIndex = value; OnPropertyChanged(); } }
 
 
         private double _Luminosity;
         /// <summary>
-        /// PM2.5 in ug/m3 µg/㎥
+        /// In LUX
         /// </summary>
         public double Luminosity { get { return _Luminosity; } set { if (value == _Luminosity) return; _Luminosity = value; OnPropertyChanged(); } }
 
@@ -301,7 +312,7 @@ namespace BluetoothProtocols
             if (IsSensorPresent.HasFlag(SensorPresent.PM100)) retval += " {PM100}µg/㎥";
             if (IsSensorPresent.HasFlag(SensorPresent.CO2)) retval += " {CO2}"; // TODO: add units
             if (IsSensorPresent.HasFlag(SensorPresent.VOC)) retval += " {VOC}";
-            if (IsSensorPresent.HasFlag(SensorPresent.NOX)) retval += " {NOX}";
+            if (IsSensorPresent.HasFlag(SensorPresent.NOXIndex)) retval += " {NOXIndex}";
             if (IsSensorPresent.HasFlag(SensorPresent.Luminosity)) retval += " {Luminosity}";
             return retval;
         }

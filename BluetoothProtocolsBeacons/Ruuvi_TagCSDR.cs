@@ -196,14 +196,14 @@ namespace BluetoothProtocols
                         retval.IsSensorPresent =
                             SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity
                             | SensorPresent.PM10 | SensorPresent.PM25 | SensorPresent.PM40 | SensorPresent.PM100
-                            | SensorPresent.CO2 | SensorPresent.NOX | SensorPresent.VOC;
+                            | SensorPresent.CO2 | SensorPresent.NOXIndex | SensorPresent.VOC;
                     }
                     else
                     {
                         retval.IsSensorPresent =
                             SensorPresent.Temperature | SensorPresent.Pressure | SensorPresent.Humidity
                             | SensorPresent.PM25
-                            | SensorPresent.CO2 | SensorPresent.NOX | SensorPresent.VOC;
+                            | SensorPresent.CO2 | SensorPresent.NOXIndex | SensorPresent.VOC;
 
                     }
                     break;

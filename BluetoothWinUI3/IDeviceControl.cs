@@ -74,6 +74,13 @@ namespace BluetoothWinUI3
         /// </summary>
         void ClearAccumulatedFineGrainedData();
 
+        /// <summary>
+        /// Clears the Historica data, which will also clear the graphs. Does not change the
+        /// numeric displays. Will clear the table and the exports, but does not change the
+        /// Smart Export.
+        /// </summary>
+        void ClearData();
+
 
         /// <summary>
         /// Returns NULL if there's no data yet

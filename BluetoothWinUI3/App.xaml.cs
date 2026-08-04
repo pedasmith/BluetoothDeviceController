@@ -40,6 +40,7 @@ namespace BluetoothWinUI3
         static int TestAll()
         {
             int nerror = 0;
+            nerror += AirQualityIndex.Test();
             nerror += BatteryVoltageToPercent.Test();
             nerror += SparklesHelper.Test();
             nerror += Ruuvi_Tag.Test();

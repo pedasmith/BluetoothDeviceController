@@ -37,7 +37,7 @@ namespace BluetoothProtocols
         public double PM100 { get; set; } = 0.0;
         public double CO2 { get; set; } = 390;
         public double VOC { get; set; } = 0.0;
-        public double NOX { get; set; } = 0.0;
+        public double NOXIndex { get; set; } = 0.0; // Ruuvi uses https://sensirion.com/media/documents/9F289B95/6294DFFC/Info_Note_NOx_Index.pdf which creates a NOX Index, not  direct measure.
         public double LuminosityLux { get; set; } = 0.0;
         public BatteryVoltageToPercent.BatteryType TagBatteryType { get; set; }
 
@@ -58,7 +58,7 @@ namespace BluetoothProtocols
             dest.PM100 = source.PM100;
             dest.CO2 = source.CO2;
             dest.VOC = source.VOC;
-            dest.NOX = source.NOX;
+            dest.NOXIndex = source.NOXIndex;
             dest.Luminosity = source.LuminosityLux; 
             return dest;
         }
@@ -86,7 +86,7 @@ namespace BluetoothProtocols
                 PM100 = source.PM100,
                 CO2 = source.CO2,
                 VOC = source.VOC,
-                NOX = source.NOX,
+                NOXIndex = source.NOXIndex,
                 LuminosityLux = source.Luminosity,
             };
             return retval;
@@ -205,10 +205,10 @@ namespace BluetoothProtocols
                 nerror += 1;
                 Log($"Error: Ruuvi: VOC expected {expectedVOC} actual {ruuvi.VOC}");
             }
-            if (!DoubleApprox.Approx(ruuvi.NOX, expectedNOX))
+            if (!DoubleApprox.Approx(ruuvi.NOXIndex, expectedNOX))
             {
                 nerror += 1;
-                Log($"Error: Ruuvi: NOX expected {expectedNOX} actual {ruuvi.NOX}");
+                Log($"Error: Ruuvi: NOX expected {expectedNOX} actual {ruuvi.NOXIndex}");
             }
             if (!DoubleApprox.Approx(ruuvi.LuminosityLux, expectedLuminosity))
             {
@@ -308,7 +308,10 @@ namespace BluetoothProtocols
                             retval.TemperatureInDegreesC = ((double)dr.ReadInt16()) * 0.005;
                             retval.HumidityInPercent = ((double)dr.ReadUInt16()) * 0.0025;
                             retval.PressureInPascals = ((int)dr.ReadUInt16()) + 50000;
+                            retval.PM10 = 0;
                             retval.PM25 = ((double)dr.ReadUInt16()) / 10.0;
+                            retval.PM40 = 0;
+                            retval.PM100 = 0;
                             retval.CO2 = dr.ReadUInt16();
                             int voc = dr.ReadByte(); // Needs flag data, too
                             int nox = dr.ReadByte(); // Needs flag data, too
@@ -330,7 +333,7 @@ namespace BluetoothProtocols
                             int mac = (dr.ReadByte() << 16) + (dr.ReadByte() << 8) + (dr.ReadByte());
 
                             retval.VOC = voc;
-                            retval.NOX = nox;
+                            retval.NOXIndex = nox;
                             retval.TagBatteryType = BatteryVoltageToPercent.BatteryType.Unknown;
                             retval.IsValid = true;
                         }
@@ -373,7 +376,7 @@ namespace BluetoothProtocols
                             int mac2 = (dr.ReadByte() << 16) + (dr.ReadByte() << 8) + (dr.ReadByte());
 
                             retval.VOC = voc;
-                            retval.NOX = nox;
+                            retval.NOXIndex = nox;
                             retval.TagBatteryType = BatteryVoltageToPercent.BatteryType.Unknown;
                             retval.IsValid = true;
                         }

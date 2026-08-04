@@ -73,7 +73,7 @@ namespace BluetoothProtocols
             dest.PM40 = PM40;
             dest.PM100 = PM100;
             dest.CO2 = CO2;
-            dest.NOX = NOX;
+            dest.NOXIndex = NOXIndex;
             dest.VOC = VOC;
             dest.Luminosity = Luminosity;
             dest.BatteryInPercent = BatteryInPercent;

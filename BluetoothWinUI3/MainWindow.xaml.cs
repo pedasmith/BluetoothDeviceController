@@ -594,6 +594,15 @@ namespace BluetoothWinUI3
             }
         }
 
+        private async void OnFileClearData(object sender, RoutedEventArgs e)
+        {
+            string verb = "clear data";
+            var selected = await GetBTSelectedAsync(verb);
+            if (selected == null) return;
+
+            selected.ClearData();
+        }
+
         private async void OnFileCopyDetailsAll(object sender, RoutedEventArgs e)
         {
             await DoFileCopyDetails(IDeviceControlBasic.DetailsType.All);
@@ -814,6 +823,7 @@ namespace BluetoothWinUI3
             uimFileCopyDataAsCSV.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetData);
             uimFileCopyDetailsAll.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetDetails);
             uimFileCopyDetailsNormal.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetDetails);
+            uimFileClearData.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanGetData);
 
             uimViewShowTable.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanShowTable);
             uimBTCanRename.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanRename);
@@ -1035,5 +1045,7 @@ namespace BluetoothWinUI3
                 UpdateGraphColorMenus(deviceControl as IDeviceControlDevice); // theoretically might be null. 
             }
         }
+
+
     }
 }

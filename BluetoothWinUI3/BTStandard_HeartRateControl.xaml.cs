@@ -89,6 +89,14 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         CurrSensor_DataUnits?.CurrRRRecent?.DoClearAccumulatedFineGrainedData();
     }
 
+    /// <summary>
+    /// Called from MainWindow when the user wants to clear their graph
+    /// </summary>
+    public void ClearData()
+    {
+        HistoricalDataUnits.Data.Clear();
+    }
+
     public IBTCommonMetaData GetDataMostRecent()
     {
         return HistoricalDataUnits.GetDataMostRecent();

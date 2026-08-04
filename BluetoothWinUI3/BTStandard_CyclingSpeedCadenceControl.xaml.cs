@@ -88,6 +88,15 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
     {
         ;  // do nothing
     }
+
+    /// <summary>
+    /// Called from MainWindow when the user wants to clear their graph
+    /// </summary>
+    public void ClearData()
+    {
+        HistoricalDataUnits.Data.Clear();
+    }
+
     public IBTCommonMetaData GetDataMostRecent()
     {
         return HistoricalDataUnits.GetDataMostRecent();

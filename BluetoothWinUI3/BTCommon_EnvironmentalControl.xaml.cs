@@ -3,6 +3,7 @@ using BluetoothProtocolsDevicesCore;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
+using BluetoothWinUI3.Units;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OxyPlot;
@@ -79,6 +80,15 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     {
         ;  // do nothing
     }
+
+    /// <summary>
+    /// Called from MainWindow when the user wants to clear their graph
+    /// </summary>
+    public void ClearData()
+    {
+        HistoricalDataUnits.Data.Clear();
+    }
+
     public IBTCommonMetaData GetDataMostRecent()
     {
         return HistoricalDataUnits.GetDataMostRecent();
@@ -191,7 +201,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         UpdateForSensor(SensorDataRecord.SensorPresent.PM40, 5, 5, "PM40", "PM40", uiDeviceDataPM40, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
         UpdateForSensor(SensorDataRecord.SensorPresent.PM100, 5, 5, "PM100", "PM100", uiDeviceDataPM100, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
         UpdateForSensor(SensorDataRecord.SensorPresent.CO2, 10, 40, "CO2", "CO2", uiDeviceDataCO2, axisPosition: AxisPosition.Right);
-        UpdateForSensor(SensorDataRecord.SensorPresent.NOX, 10, 40, "NOX", "NOX", uiDeviceDataNOX, axisPosition: AxisPosition.Right);
+        UpdateForSensor(SensorDataRecord.SensorPresent.NOXIndex, 10, 40, "NOX", "NOXIndex", uiDeviceDataNOXIndex, axisPosition: AxisPosition.Right);
         UpdateForSensor(SensorDataRecord.SensorPresent.VOC, 10, 40, "VOC", "VOC", uiDeviceDataVOC, axisPosition: AxisPosition.Right);
         UpdateForSensor(SensorDataRecord.SensorPresent.Luminosity, 1000, 10000, "LUX", "Luminosity", uiDeviceDataLuminosity, axisPosition: AxisPosition.Right);
 
@@ -212,7 +222,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         if (CurrSensor_Data.NGasSensors == 3) // As of 2026-07-27, just the Ruuvi Air
         {
             uiDeviceDataList.Items.Remove(uiDeviceDataCO2);
-            uiDeviceDataList.Items.Remove(uiDeviceDataNOX);
+            uiDeviceDataList.Items.Remove(uiDeviceDataNOXIndex);
             uiDeviceDataList.Items.Remove(uiDeviceDataVOC);
         }
         else
@@ -220,6 +230,14 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             uiDeviceDataList.Items.Remove(uiDeviceDataGasCombo);
         }
 
+        if (CurrSensor_Data.NAqiSensors >= 1) // 1 is kind of Meh for AQI
+        {
+            // don't have to do anything!
+        }
+        else
+        {
+            uiDeviceDataList.Items.Remove(uiDeviceDataAQI);
+        }
 
 
         //
@@ -566,10 +584,10 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             uiVOC.Text = CurrSensor_DataUnits.VOC.ToString("0.0");
             uiVOCCombo.Text = CurrSensor_DataUnits.VOC.ToString("0.0");
         }
-        if (name == SensorDataRecord.NOXPropertyChangedName || name == "" || name == "*")
+        if (name == SensorDataRecord.NOXIndexPropertyChangedName || name == "" || name == "*")
         {
-            uiNOX.Text = CurrSensor_DataUnits.NOX.ToString("0.0");
-            uiNOXCombo.Text = CurrSensor_DataUnits.NOX.ToString("0.0");
+            uiNOXIndex.Text = CurrSensor_DataUnits.NOXIndex.ToString("0.0");
+            uiNOXIndexCombo.Text = CurrSensor_DataUnits.NOXIndex.ToString("0.0");
         }
         if (name == SensorDataRecord.LuminosityPropertyChangedName || name == "" || name == "*")
         {
@@ -579,6 +597,11 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         {
             uiBTConnectionControl.SetBatteryLevel(CurrSensor_DataUnits.BatteryInPercent);
         }
+        var pm25 = CurrSensor_DataUnits.IsSensorPresent.HasFlag(DeviceSpecificSensorData.SensorPresent.PM25) ? CurrSensor_DataUnits.PM25 : -1;
+        var pm100 = CurrSensor_DataUnits.IsSensorPresent.HasFlag(DeviceSpecificSensorData.SensorPresent.PM100) ? CurrSensor_DataUnits.PM100 : -1;
+        //var nox = CurrSensor_DataUnits.IsSensorPresent.HasFlag(DeviceSpecificSensorData.SensorPresent.NOXIndex) ? CurrSensor_DataUnits.NOXIndex : -1;
+        var aqi = AirQualityIndex.Calculate(pm25, pm100, -1); // None of my sensor generates a real NOX value
+        uiAQI.Text = aqi.ToString("F0");
     }
     #endregion
 
@@ -608,7 +631,12 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             }
         }
 
-        uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
+        // If we're very far behind, skip updating the graph
+        var updateAgeInMinutes = DateTimeOffset.Now.Subtract(currSensor_DataUnits.TimestampMostRecent).TotalMinutes;
+        if (updateAgeInMinutes < 10)
+        {
+            uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines // TODO: don't do this in catch-up mode!
+        }
     }
 
     #region Exporters don't need to be changed

@@ -66,7 +66,7 @@
                         <TextBlock Style="{StaticResource sDeviceData4Row}">
                             <Run>CO2  :&#160;&#160; </Run><Run x:Name="uiCO2Combo"/><LineBreak />
                             <Run>VOC  :&#160;&#160; </Run><Run x:Name="uiVOCCombo"/><LineBreak />
-                            <Run>NOX  :&#160;&#160; </Run><Run x:Name="uiNOXCombo"/>
+                            <Run>NOX  :&#160;&#160; </Run><Run x:Name="uiNOXIndexCombo"/>
                         </TextBlock>
                     </StackPanel>
 
@@ -118,12 +118,20 @@
                         <Line Height="5" Tag="VOCColor" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
 
-                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataNOX">
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataNOXIndex">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>NOX</Run><Run Text="&#160;"/>
+                        <Run>NOXIndex</Run><Run Text="&#160;"/>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiNOX"/></TextBlock>
-                        <Line Height="5" Tag="NOXColor" Style="{StaticResource sGraphLineKey}" />
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiNOXIndex"/></TextBlock>
+                        <Line Height="5" Tag="NOXIndexColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataAQI">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>AQI</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiAQI"/></TextBlock>
+                        <Line Height="5" Tag="AQIColor" Style="{StaticResource sGraphLineKey}" /> <!-- TODO: make an AQI line?  -->
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataLuminosity">
