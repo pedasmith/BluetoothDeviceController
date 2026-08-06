@@ -2,6 +2,8 @@
 
 I won't complain that the original OxyPlot code doesn't work with WinUI3. It's a valid complaint, but they already know about it :-)
 
+The [H.OxyPlot](https://github.com/HavenDV/H.OxyPlot) library is a combination of the old UWP OxyPlot with the latest WPF OxyPlot, and set up to work with WinUI3 (and some others)
+
 ## No support for ObservableCollection
 
 It's super common to use the ObservableCollection and the coresponding ICollectionChanged (sp?) interface. These collections, when updated, will trigger an event. That event, in turn, could be used for automatically updated the plots.

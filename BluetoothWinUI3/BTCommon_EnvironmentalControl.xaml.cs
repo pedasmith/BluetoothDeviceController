@@ -6,6 +6,8 @@ using BluetoothWinUI3.BTDeviceUnitConverters;
 using BluetoothWinUI3.Units;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Shapes;
 using OxyPlot;
 using OxyPlot.Axes;
 using System;
@@ -602,6 +604,8 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         //var nox = CurrSensor_DataUnits.IsSensorPresent.HasFlag(DeviceSpecificSensorData.SensorPresent.NOXIndex) ? CurrSensor_DataUnits.NOXIndex : -1;
         var aqi = AirQualityIndex.Calculate(pm25, pm100, -1); // None of my sensor generates a real NOX value
         uiAQI.Text = aqi.ToString("F0");
+        var aqiColor = AirQualityIndex.AqiToColor(aqi);
+        uiAQIOfficial.Stroke = new SolidColorBrush(OxyPlotUtilities.WICFromUIntRGB(aqiColor)); // TODO: make a smll static array?
     }
     #endregion
 

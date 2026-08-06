@@ -379,4 +379,26 @@ internal static class OxyPlotUtilities
         }
     }
 
+    /// <summary>
+    /// Convert an RGB UInt with no A values into an OxyColor.
+    /// Is directly usable with the AirQualityIndex AQI AqiToColor static method.
+    /// </summary>
+    public static OxyColor FromUIntRGB(uint value)
+    {
+        byte r = (byte)((value >> 16) & 0xFF);
+        byte g = (byte)((value >> 8) & 0xFF);
+        byte b = (byte)(value & 0xFF);
+        var retval = OxyColor.FromRgb(r, g, b);
+        return retval;
+    }
+
+    public static Windows.UI.Color WICFromUIntRGB(uint value)
+    {
+        byte r = (byte)((value >> 16) & 0xFF);
+        byte g = (byte)((value >> 8) & 0xFF);
+        byte b = (byte)(value & 0xFF);
+        var retval = Windows.UI.Color.FromArgb(byte.MaxValue, r, g, b);
+        return retval;
+
+    }
 }
