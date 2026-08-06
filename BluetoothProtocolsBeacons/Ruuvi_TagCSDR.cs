@@ -256,7 +256,7 @@ namespace BluetoothProtocols
                         {
                             case 0x06: 
                                 retval.NType06Parsed++;
-                                allow = retval.NType06Parsed >= 3 && retval.NTypeE1Parsed == 0;
+                                allow = retval.NType06Parsed >= 4 && retval.NTypeE1Parsed == 0;
                                 break;
                             case 0xE1: 
                                 retval.NTypeE1Parsed++;
