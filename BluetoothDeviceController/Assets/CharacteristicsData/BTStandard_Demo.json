@@ -1,7 +1,7 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "BTStandardDemp",
+      "Name": "BTStandardDemo",
       "ClassName": "BTStandard_Demo",
       "Description": "Used to demonstrate adding new Bluetooth devices that require connecting to a device",
       "Links": [

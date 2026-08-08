@@ -13,6 +13,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -41,6 +42,11 @@ namespace BluetoothWinUI3
         }
     }
 
+    public interface IReconnectDevice
+    {
+        Task DoReconnect();
+    }
+
     public sealed partial class BTConnectionControl : UserControl
     {
         public enum ConnectionState
@@ -52,6 +58,8 @@ namespace BluetoothWinUI3
             Disconnecting,
             Disconnected,
         }
+
+        public IReconnectDevice ReconnectDevice { get; set; } = null;
 
         public event EventHandler<ConnectionChangedEventArgs> ConnectionChanged;
         public void OnConnectionChanged()

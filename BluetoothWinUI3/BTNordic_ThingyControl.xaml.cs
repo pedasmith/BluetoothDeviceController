@@ -317,6 +317,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         };
         if (Device.ble == null)
         {
+            // ConnectError:NoBLE
             Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
             CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
             return;
@@ -335,6 +336,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         uiKnownDeviceName.Text = KnownDeviceName;
 
         Device.PropertyChanged += Device_PropertyChanged;
+        Device.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
 
         #region Change so the device starts sending notifications for changed properties (data)
 
@@ -351,6 +353,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
         CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
+    }
+
+    private void Status_OnBluetoothStatus(object source, BluetoothCommunicationStatus status)
+    {
+        UIThreadHelper.CallOnUIThread(() => { Log($"Nordic: Status update: {status.AsStatusString}"); });
+        ;
     }
 
     /// <summary>

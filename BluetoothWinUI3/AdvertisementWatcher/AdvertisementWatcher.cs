@@ -120,7 +120,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                         var tx = watcherData.TransmitPower;
                         var rssi = watcherData.MostRecentAdvertisement.RawSignalStrengthInDBm;
                         var other = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-                        (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, rssi, tx, other);
+                        (watcherData.ParsedCompanyData, watcherData.ManufacturerType, watcherData.CompanyId, watcherData.SpecializedDecodedData) = BluetoothCompanyIdentifier.ParseManufacturerData(section, rssi, tx.GetValueOrDefault(), other);
                         if (watcherData.CompanyId == 18498)
                         {
                             ; // Handy hook for debugging.
@@ -209,7 +209,16 @@ namespace BluetoothWatcher.AdvertismentWatcher
             if (!ignoreForPrinting)
             {
                 // don't bother spiting out apple data; there's much too much of it
-                System.Diagnostics.Debug.WriteLine($"Bluetooth Event: addr={BluetoothAddress.AsString(args.BluetoothAddress)} rx={args.RawSignalStrengthInDBm} tx={watcherData.TransmitPower}  txarg={args.TransmitPowerLevelInDBm} name={watcherData.BestName} company {watcherData.CompanyId}={BluetoothCompanyIdentifier.GetBluetoothCompanyIdentifier(watcherData.CompanyId)} data={watcherData.ParsedCompanyDataTrim}");
+                var company = $"company {watcherData.CompanyId}={BluetoothCompanyIdentifier.GetBluetoothCompanyIdentifier(watcherData.CompanyId)} data={watcherData.ParsedCompanyDataTrim}";
+                if (watcherData.CompanyId == WatcherData.CompanyIdInvalidValue)
+                {
+                    company = "(no company data)";
+                    if (!string.IsNullOrEmpty(watcherData.ParsedCompanyDataTrim)) company = watcherData.ParsedCompanyDataTrim;
+                }
+                var name = String.IsNullOrEmpty(watcherData.BestName) ? "" : $"name={watcherData.BestName} ";
+                var tx = $"tx={watcherData.TransmitPower}  txarg={args.TransmitPowerLevelInDBm} ";
+                if (!args.TransmitPowerLevelInDBm.HasValue && watcherData.TransmitPower == null) tx = "";
+                System.Diagnostics.Debug.WriteLine($"Bluetooth Event: addr={BluetoothAddress.AsString(args.BluetoothAddress)} rx={args.RawSignalStrengthInDBm} {tx}{name}{company}");
             }
 
             WatcherEvent?.Invoke(sender, watcherData); // Often the MainPage.BleWatcher_WatcherEvent

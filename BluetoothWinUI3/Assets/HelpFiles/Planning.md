@@ -17,20 +17,20 @@ Firmware and software should generally be different (or only one included)
 ## Multi-hour running issues
 
 * The get all detail data for adverts becomes huge and barely works with notepad
-* Take a long time to catch up the adverts
+* Fixed! Take a long time to catch up the adverts
 * Thingy graph is out of chronological order
 
 # Devices
 
 ## Heart Rate improvements
 
-Make the 
+UX updates to look more like other heart monitors? 
 
 ## The cycle speed and cadence should show normal bike data instead of weird data. 
 
-Make seperate Crank and Wheel? 
+Done: Make seperate Crank and Wheel? Result: there's a new facde class to handle all of this.
 
-Actually: make a Crank, Wheel, and pulse/O2 health
+
 
 ## Air Lab has a protocol! And copilot knows about it
 

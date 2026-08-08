@@ -47,7 +47,8 @@ namespace BluetoothWatcher.AdvertismentWatcher
         /// <summary>
         /// From the ManufacturerData (BT 0xFF)
         /// </summary>
-        public ushort CompanyId { get; set; } = 65534; // is unknown. Is kind of a valid value? //TODO: make this nullable
+        public ushort CompanyId { get; set; } = 0xBABA; // is unknown. Is kind of a valid value? //TODO: make this nullable
+        public static ushort CompanyIdInvalidValue = 0xBABA;
         /// <summary>
         /// ManufacturerType is my interpretation of the CompanyId and only includes companies that I can parse.
         /// </summary>
@@ -55,7 +56,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
         /// <summary>
         /// From the TxPowerLevel field
         /// </summary>
-        public sbyte TransmitPower { get; set; } = 0;
+        public sbyte? TransmitPower { get; set; } = null;
         /// <summary>
         /// Can be one of many different possible objects including Apple_iBeacon or Ruuvi_Tag
         /// </summary>

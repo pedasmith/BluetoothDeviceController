@@ -308,6 +308,7 @@ public sealed partial class BTStandard_CyclingSpeedCadenceControl : UserControl,
         };
         if (Device.ble == null)
         {
+            // ConnectError:NoBLE
             Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
             CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
             return;

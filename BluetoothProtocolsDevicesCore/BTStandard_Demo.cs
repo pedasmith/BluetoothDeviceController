@@ -35,10 +35,10 @@ namespace BluetoothProtocols
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public string Name { get; } = "BTStandardDemp";
+        public string Name { get; } = "BTStandardDemo";
         public string Description { get; } = "Used to demonstrate adding new Bluetooth devices that require connecting to a device";
 
-        /* Service and Characteristics summary for the device BTStandardDemp
+        /* Service and Characteristics summary for the device BTStandardDemo
 
         Common Configuration service Guid=1800
             Common Configuration_Data (DataGroup record)

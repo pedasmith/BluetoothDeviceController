@@ -195,8 +195,7 @@ namespace BluetoothWinUI3
                 var supportedDevice = BluetoothWinUI3.BluetoothWinUI3Registration.SupportedDevices.GetSupported(e);
                 if (supportedDevice != null)
                 {
-                    var control = Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl;
-                    known = AddControl(e, control, supportedDevice);
+                    known = MakeControlAndAdd(e, supportedDevice);
                     // will add to KnownDevices and updated UX and ...  a control is, e.g., a
                     // BTNordic_ThingyControl. AddControl will add to the Known Device list
 
@@ -244,9 +243,9 @@ namespace BluetoothWinUI3
             // Update the UI as needed and create the next device
             UIThreadHelper.CallOnUIThread(() => { AdvertisementWatcher_WatcherEventOnUIThread(sender, e); });
         }
-
-        private KnownDevice AddControl(WatcherData e, UserControl control, SupportedDevice supportedDevice)
+        private KnownDevice MakeControlAndAdd(WatcherData e, SupportedDevice supportedDevice, UserControl defaultControl=null)
         {
+            var control = supportedDevice != null ? Activator.CreateInstance(supportedDevice.FactoryInterface) as UserControl : defaultControl;
             var userControl = control as IDeviceControlBasic;
 
             var zoomControl = new ZoomableDeviceControl();
@@ -988,7 +987,7 @@ namespace BluetoothWinUI3
         {
             var ctrl = new BTServicesCharacteristicsDisplay();
             BTAdvertisementHandlers.Add(ctrl);
-            AddControl(null, ctrl, null);
+            MakeControlAndAdd(null, null, ctrl);
             // null means no watcher data
             // null means not a supported device (since the supported device is determined from the watcher data)
         }
