@@ -12,17 +12,18 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="30" />
-            <ColumnDefinition Width="50" />
+            <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0" x:Name="uiConnectInfo">
+        <StackPanel Grid.Column="0" x:Name="uiConnectInfo" VerticalAlignment="Bottom">
             <TextBlock Width="25" x:Name="uiIcon"/>
             <Button Content="Connect" Click="OnConnect" />
         </StackPanel>
         <TextBlock Grid.Column="1" x:Name="uiStatus" Style="{StaticResource sAdvertisementData}" />
-        <TextBlock Grid.Column="2" x:Name="uiBatteryLevelIcon" Style="{StaticResource sDeviceDataIcon}" />
-        <TextBlock Grid.Column="3" x:Name="uiBatteryLevelPercent" Style="{StaticResource sDeviceData}" />
+        <StackPanel Grid.Column="2" VerticalAlignment="Bottom" Orientation="Horizontal" >
+            <TextBlock MinWidth="30" x:Name="uiBatteryLevelIcon" Style="{StaticResource sDeviceDataIcon}" VerticalAlignment="Bottom" Margin="0,0,0,-5" />
+            <TextBlock MinWidth="50" x:Name="uiBatteryLevelPercent" Style="{StaticResource sDeviceData}" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+        </StackPanel>
 
     </Grid>
 </UserControl>

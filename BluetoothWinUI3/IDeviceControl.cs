@@ -4,6 +4,7 @@ using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace BluetoothWinUI3
@@ -35,9 +36,15 @@ namespace BluetoothWinUI3
     public interface IDeviceControlBasic
     {
         /// <summary>
+        /// Called by e.g., the ConnectionControl when the user wants to reconnect to the device (sensor).
+        /// The initial connect is handled by the controls in Control_DataContextChanged() when the
+        /// control DataContexts is set
+        /// </summary>
+        Task ReconnectAsync();
+
+        /// <summary>
         /// updates the device control user interface base on the user preferences in SaveData.
         /// </summary>
-        /// <param name="saveData"></param>
         void UpdateUX(SaveData saveData);
 
         void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs);

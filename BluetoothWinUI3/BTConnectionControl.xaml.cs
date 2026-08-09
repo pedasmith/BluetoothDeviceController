@@ -1,3 +1,4 @@
+using BluetoothProtocols;
 using BluetoothWatcher.AdvertismentWatcher;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -14,6 +15,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Utilities;
+using Windows.ApplicationModel.Background;
 using Windows.Devices.Bluetooth;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -76,6 +79,34 @@ namespace BluetoothWinUI3
             internal set { if (value == _CurrState) return; _CurrState = value; UpdateIcon();  OnConnectionChanged(); } 
         }
 
+        public void SetState(BluetoothConnectionStatus value)
+        {
+            switch (value)
+            {
+                case BluetoothConnectionStatus.Connected:
+                    CurrState = ConnectionState.Connected;
+                    break;
+                case BluetoothConnectionStatus.Disconnected:
+                    CurrState = ConnectionState.Disconnected;
+                    break;
+            }
+        }
+
+        public void SetState(BluetoothCommunicationStatus value)
+        {
+            switch (value.Status)
+            {
+                case Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success:
+                    CurrState = ConnectionState.Connected;
+                    break;
+                default: // everything else is bad: Unreachable ProtocolError AccessDenied
+                    CurrState = ConnectionState.Disconnected;
+                    break;
+
+            }
+        }
+
+
         public void SetConnectVisibility(Visibility visibility)
         {
             uiConnectInfo.Visibility = visibility;
@@ -112,6 +143,23 @@ namespace BluetoothWinUI3
             CurrState = ConnectionState.FoundViaAdvertisement; // will trigger events
         }
 
+        private IDeviceControlBasic DeviceControlBasic = null;
+        public void SetDeviceControl(IDeviceControlBasic value)
+        {
+            DeviceControlBasic = value;
+        }
+
+        /// <summary>
+        /// Called by a device control when a device is disconnected. Disconnection is often 
+        /// discovered via Device.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged
+        /// TODO: hook this up??
+        /// </summary>
+        public async Task DeviceDisconnected()
+        {
+            CurrState = ConnectionState.Disconnected;
+        }
+
+
         /// <summary>
         /// Called by the Connect button and will start a connection.
         /// </summary>
@@ -142,6 +190,11 @@ namespace BluetoothWinUI3
                     CurrState = ConnectionState.Connected;
 
                     break;
+
+                case ConnectionState.Connected:
+                case ConnectionState.Disconnected:
+                    await DeviceControlBasic?.ReconnectAsync();
+                    break;
             }
         }
 
@@ -165,24 +218,27 @@ namespace BluetoothWinUI3
 
         private void UpdateIcon()
         {
-            switch (CurrState)
+            UIThreadHelper.CallOnUIThread(() =>
             {
-                case ConnectionState.FoundViaAdvertisement:
-                    uiIcon.Text = "Adv";
-                    break;
-                case ConnectionState.Connecting:
-                    uiIcon.Text = "..c";
-                    break;
-                case ConnectionState.Connected:
-                    uiIcon.Text = "Con";
-                    break;
-                case ConnectionState.Disconnecting:
-                    uiIcon.Text = "..d";
-                    break;
-                case ConnectionState.Disconnected:
-                    uiIcon.Text = "Dis";
-                    break;
-            }
+                switch (CurrState)
+                {
+                    case ConnectionState.FoundViaAdvertisement:
+                        uiIcon.Text = "Adv";
+                        break;
+                    case ConnectionState.Connecting:
+                        uiIcon.Text = "..c";
+                        break;
+                    case ConnectionState.Connected:
+                        uiIcon.Text = "Con";
+                        break;
+                    case ConnectionState.Disconnecting:
+                        uiIcon.Text = "..d";
+                        break;
+                    case ConnectionState.Disconnected:
+                        uiIcon.Text = "Dis";
+                        break;
+                }
+            });
         }
     }
 }

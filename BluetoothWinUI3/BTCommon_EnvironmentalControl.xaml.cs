@@ -13,7 +13,7 @@ using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-
+using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
@@ -347,13 +347,23 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         if (args.NewValue == null) return; // just bogus; ignore.
         //         InitializeUX(); // ensure we're initialized.
+        await ReconnectAsync();
+    }
 
-
+    /// <summary>
+    /// Called by e.g., the ConnectionControl when the user wants to reconnect to the device (sensor).
+    /// The initial connect is handled by the controls in Control_DataContextChanged() when the
+    /// control DataContexts is set
+    /// 
+    /// Also called by Control_DataContextsChanged for the first connect
+    /// </summary>
+    public async Task ReconnectAsync()
+    {
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
         // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
         if (DataContextAsKnownDevice == null)
         {
-            Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {args.NewValue.GetType()}");
+            Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {DataContext.GetType()}");
             return;
         }
 

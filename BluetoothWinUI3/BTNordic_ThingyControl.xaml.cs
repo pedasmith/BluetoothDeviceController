@@ -2,16 +2,19 @@ using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-
+using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
+using Windows.ApplicationModel.Background;
 using Windows.Devices.Bluetooth;
+using Windows.UI.ViewManagement;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -293,17 +296,28 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
         if (args.NewValue == null) return; // just bogus; ignore.
         InitializeUX(); // ensure we're initialized.
-
+        uiBTConnectionControl.SetDeviceControl(this);
+        if (OriginalBTAddr != 0xFFFFFFFF_FFFFFFFF)
+        {
+            ; // duplicate call!
+            return;
+        }
+        await ReconnectAsync();
+    }
+    /// <summary>
+    /// Called by e.g., the ConnectionControl when the user wants to reconnect to the device (sensor).
+    /// The initial connect is handled by the controls in Control_DataContextChanged() when the
+    /// control DataContexts is set
+    /// 
+    /// Also called by Control_DataContextsChanged for the first connect
+    /// </summary>
+    public async Task ReconnectAsync()
+    { 
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
         // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
         if (DataContextAsKnownDevice == null)
         {
-            Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {args.NewValue.GetType()}");
-            return;
-        }
-        if (OriginalBTAddr != 0xFFFFFFFF_FFFFFFFF)
-        {
-            ; // duplicate call!
+            Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {DataContext.GetType()}");
             return;
         }
 
@@ -337,27 +351,53 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
         Device.PropertyChanged += Device_PropertyChanged;
         Device.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
-
+        Device.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+        bool connectAllOk = true;
+        uiBTConnectionControl.CurrState = BTConnectionControl.ConnectionState.Connecting;
         #region Change so the device starts sending notifications for changed properties (data)
 
-        await Device.NotifyBatteryLevelAsync();
-        await Device.NotifyTemperature_cAsync();
-        await Device.NotifyPressure_hpaAsync();
-        await Device.NotifyHumidityAsync();
-        await Device.NotifyAir_Quality_eCOS_TVOCAsync(); // both TVOC and eCOS
-        await Device.NotifyColor_RGB_ClearAsync();
-        await Device.ReadBatteryLevel(DefaultCacheMode);
+        connectAllOk = connectAllOk && await Device.NotifyBatteryLevelAsync();
+        connectAllOk = connectAllOk && await Device.NotifyTemperature_cAsync();
+        connectAllOk = connectAllOk && await Device.NotifyPressure_hpaAsync();
+        connectAllOk = connectAllOk && await Device.NotifyHumidityAsync();
+        connectAllOk = connectAllOk && await Device.NotifyAir_Quality_eCOS_TVOCAsync(); // both TVOC and eCOS
+        connectAllOk = connectAllOk && await Device.NotifyColor_RGB_ClearAsync();
+        connectAllOk = connectAllOk && (await Device.ReadBatteryLevel(DefaultCacheMode)) != null;
         #endregion
 
         // The system tracks device changes
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
+        var statusMatch = (connectAllOk && Device.ble.ConnectionStatus == BluetoothConnectionStatus.Connected)
+            || (!connectAllOk && Device.ble.ConnectionStatus == BluetoothConnectionStatus.Disconnected);
+        if (!statusMatch)
+        {
+            Log($"{KnownDeviceName}: connect is inconsistent: connectAllOk={connectAllOk} but ble={Device.ble.ConnectionStatus}");
+        }
+        uiBTConnectionControl.SetState(Device.ble.ConnectionStatus);
         CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
     }
 
+    /// <summary>
+    /// Called when the BLE device connection status changes.
+    /// </summary>
+    private void Ble_ConnectionStatusChanged(BluetoothLEDevice sender, object args)
+    {
+        // TODO: do something smarter here this will drive a bunch of the control flow.
+        // Choices for ConnectionStatus is just Disconnected and Connected 
+        uiBTConnectionControl.SetState(sender.ConnectionStatus);
+        UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
+        ;
+    }
+
+    /// <summary>
+    /// Called from the protocol CS file when a read or notify (etc) happen. Will send a bunch
+    /// of OK / OK / OK alongn with an occassional Fail.
+    /// </summary>
     private void Status_OnBluetoothStatus(object source, BluetoothCommunicationStatus status)
     {
-        UIThreadHelper.CallOnUIThread(() => { Log($"Nordic: Status update: {status.AsStatusString}"); });
+        uiBTConnectionControl.SetState(status);
+        UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {status.AsStatusString}"); });
         ;
     }
 

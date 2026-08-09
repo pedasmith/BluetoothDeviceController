@@ -8,7 +8,7 @@ using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-
+using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
@@ -284,17 +284,30 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
 
         if (args.NewValue == null) return; // just bogus; ignore.
         InitializeUX(); // ensure we're initialized.
+        uiBTConnectionControl.SetDeviceControl(this);
+        if (OriginalBTAddr != 0xFFFFFFFF_FFFFFFFF)
+        {
+            ; // duplicate call!
+            return;
+        }
+        await ReconnectAsync();
+    }
+
+    /// <summary>
+    /// Called by e.g., the ConnectionControl when the user wants to reconnect to the device (sensor).
+    /// The initial connect is handled by the controls in Control_DataContextChanged() when the
+    /// control DataContexts is set
+    /// 
+    /// Also called by Control_DataContextsChanged for the first connect
+    /// </summary>
+    public async Task ReconnectAsync()
+    {
 
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
         // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
         if (DataContextAsKnownDevice == null)
         {
-            Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {args.NewValue.GetType()}");
-            return;
-        }
-        if (OriginalBTAddr != 0xFFFFFFFF_FFFFFFFF)
-        {
-            ; // duplicate call!
+            Log($"Impossible Error: {InternalDeviceType}: Data context change, but it's not a KnownDevice. Type is {DataContext.GetType()}");
             return;
         }
 
@@ -327,6 +340,10 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         uiKnownDeviceName.Text = KnownDeviceName;
 
         Device.PropertyChanged += Device_PropertyChanged;
+        Device.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
+        Device.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+        bool connectAllOk = true;
+        uiBTConnectionControl.CurrState = BTConnectionControl.ConnectionState.Connecting;
 
         #region Change so the device starts sending notifications for changed properties (data)
 
@@ -339,26 +356,25 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         {
             // Happens in the Demo code when the device doesn't report a battery level (e.g., JBL Pro 4 Speakers,
             // but lots of others). Usually sensordata is always present.
-            HasSensorData = false;
             RemoveSensorDataUx();
         }
 
 
         // Verify that your device has a battery characteristic. If your device does not,
         // just SetBatteryVisibility(Visibility.Collapsed); without further notice.
-        var batterydata = await Device.ReadBatteryLevel(DefaultCacheMode);
+        var batterydata = connectAllOk ? await Device.ReadBatteryLevel(DefaultCacheMode) : null;
         if (batterydata == null)
         {
             uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
         }
 
         // Some UX needs additional information
-        await Device.ReadDevice_Name(DefaultCacheMode);
+        connectAllOk = connectAllOk && (await Device.ReadDevice_Name(DefaultCacheMode)) != null;
         // How this works: when you call the Read call, in addition to returning data it will
         // also call the Device.PropertyChanged (INPC) callback. In my code, it's handy to just
         // have all the UX update code for handling changes in the same place, so I just
         // ignore the return value here.
-        await Device.ReadConnection_Parameter(DefaultCacheMode);
+        connectAllOk = connectAllOk && (await Device.ReadConnection_Parameter(DefaultCacheMode)) != null;
         #endregion
 
         // The system tracks device changes
@@ -385,6 +401,29 @@ public sealed partial class BTStandard_DemoControl : UserControl, IDeviceControl
         // Will also trigger redoing the graph line names via LineNames, which
         // technically isn't quite in accordance with the name.
         NotifyDeviceControlChangesWindows?.OnGetUXCapabilitiesChanged(this, GetUXCapabilities());
+    }
+
+    /// <summary>
+    /// Called when the BLE device connection status changes.
+    /// </summary>
+    private void Ble_ConnectionStatusChanged(BluetoothLEDevice sender, object args)
+    {
+        // TODO: do something smarter here this will drive a bunch of the control flow.
+        // Choices for ConnectionStatus is just Disconnected and Connected 
+        uiBTConnectionControl.SetState(sender.ConnectionStatus);
+        UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
+        ;
+    }
+
+    /// <summary>
+    /// Called from the protocol CS file when a read or notify (etc) happen. Will send a bunch
+    /// of OK / OK / OK alongn with an occassional Fail.
+    /// </summary>
+    private void Status_OnBluetoothStatus(object source, BluetoothCommunicationStatus status)
+    {
+        uiBTConnectionControl.SetState(status);
+        UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {status.AsStatusString}"); });
+        ;
     }
 
     /// <summary>

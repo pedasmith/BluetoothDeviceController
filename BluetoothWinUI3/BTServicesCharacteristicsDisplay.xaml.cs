@@ -79,6 +79,11 @@ namespace BluetoothWinUI3
             }
         }
 
+        // TODO: get this hooked up!
+        public async Task ReconnectAsync()
+        {
+            await Task.Delay(0);
+        }
         bool IsFirstLoad = true;
         private void BTServicesCharacteristicsDisplay_Loaded(object sender, RoutedEventArgs e)
         {
