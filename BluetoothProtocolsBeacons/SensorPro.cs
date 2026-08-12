@@ -13,7 +13,7 @@ using static BluetoothProtocols.AdvertisementDataSectionParser;
 
 namespace BluetoothProtocols
 {
-    public class SensorPro : CopyableSensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
+    public class SensorPro : SensorDataRecordCopyable // SensorDataRecord is INotifyPropertyChanged. 
     {
         /// <summary>
         /// CompanyId is from the advertisement in the manufacturer-specific section. SensorPro devices

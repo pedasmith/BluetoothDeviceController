@@ -18,7 +18,7 @@ namespace BluetoothProtocols
     /// Based on the older UWP Ruuvi_Tag (which is uses for parsing)
     /// </summary>
 
-    public class Ruuvi_TagCSDR : CopyableSensorDataRecord // SensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
+    public class Ruuvi_TagCSDR : SensorDataRecordCopyable // SensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
     {
         /// <summary>
         /// CompanyId is from the advertisement in the manufacturer-specific section. It's supposed to only be one of the values 

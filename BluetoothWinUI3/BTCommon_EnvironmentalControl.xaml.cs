@@ -723,7 +723,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
             Log($"ERROR: unable to parse sensor data for sensor type {CurrSensorFamily}");
             return;
         }
-        var copyable = CurrSensor_Data as CopyableSensorDataRecord;
+        var copyable = CurrSensor_Data as SensorDataRecordCopyable;
         if (copyable != null && !copyable.IsValid)
         {
             // Lots of reasons it might be invalid. For example, we get an advert that includes a 

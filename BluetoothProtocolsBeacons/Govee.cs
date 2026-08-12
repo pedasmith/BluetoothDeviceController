@@ -15,7 +15,7 @@ using static BluetoothProtocols.AdvertisementDataSectionParser;
 namespace BluetoothProtocols
 {
 
-    public class Govee : CopyableSensorDataRecord // SensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
+    public class Govee : SensorDataRecordCopyable // SensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
     {
         /// <summary>
         /// CompanyId is from the advertisement in the manufacturer-specific section. It's supposed to only be one of the values 

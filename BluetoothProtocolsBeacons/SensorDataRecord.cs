@@ -11,7 +11,7 @@ using System.Text;
 
 namespace BluetoothProtocols
 {
-    public partial class SensorDataRecord : BTCommonMetaData<SensorDataRecord>
+    public class SensorDataRecord : BTCommonMetaData<SensorDataRecord>
     {
         /* Adding more fields? Here's a quick guide:
          * 1. When you add a new field, you must also bump the .All value. Do a search in the code

@@ -13,7 +13,7 @@ using static BluetoothProtocols.AdvertisementDataSectionParser;
 
 namespace BluetoothProtocols
 {
-    public class ThermPro : CopyableSensorDataRecord // SensorDataRecord is INotifyPropertyChanged. 
+    public class ThermPro : SensorDataRecordCopyable // SensorDataRecord is INotifyPropertyChanged. 
     {
         /// <summary>
         /// CompanyId is from the advertisement in the manufacturer-specific section. ThermPro devices
