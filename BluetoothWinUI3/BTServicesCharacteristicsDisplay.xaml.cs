@@ -38,6 +38,12 @@ namespace BluetoothWinUI3
         /// </summary>
         private readonly string InternalDeviceType = "BT_Services";
 
+        /// <summary>
+        /// Tags for the device. This is used to categorize the different devices.
+        /// Common tags: environment exersise health cooking agriculture light
+        /// </summary>
+        public string Tags { get { return "#other"; } }
+
         public BTServicesCharacteristicsDisplay()
         {
             InitializeComponent();
@@ -78,6 +84,15 @@ namespace BluetoothWinUI3
                     break;
             }
         }
+        /// <summary>
+        /// If the device had become disconnected, the control uses this (via BTConnectionControl.GotAnotherAdvertisement)
+        /// to trigger a reconnect attempt. GotAnotherAdvertisement is smart and will only reconnect as appropriate.
+        /// </summary>
+        public async Task HandleMyAdvertisementAsync(WatcherData data)
+        {
+            await Task.Delay(0); // uiBTConnectionControl.GotAnotherAdvertisementAsync();
+        }
+
 
         // TODO: get this hooked up!
         public async Task ReconnectAsync()

@@ -39,6 +39,12 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// Used for logging only
     /// </summary>
     private readonly string InternalDeviceType = "EnvironmentSensor"; // Change: change the BTStandard_Demo string to match your device. The exact name does not matter.
+
+    /// <summary>
+    /// Tags for the device. This is used to categorize the different devices.
+    /// Common tags: environment exersise health cooking agriculture light
+    /// </summary>
+    public string Tags { get { return "#environment"; } }
     #endregion
 
     #region Change these advanced settings only when needed (most devices won't change these)
@@ -334,6 +340,14 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(OxyPlotModel, axisTitle);
     }
 
+    /// <summary>
+    /// If the device had become disconnected, the control uses this (via BTConnectionControl.GotAnotherAdvertisement)
+    /// to trigger a reconnect attempt. GotAnotherAdvertisement is smart and will only reconnect as appropriate.
+    /// </summary>
+    public async Task HandleMyAdvertisementAsync(WatcherData data)
+    {
+        await uiBTConnectionControl.GotAnotherAdvertisementAsync();
+    }
 
     /// <summary>
     /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will

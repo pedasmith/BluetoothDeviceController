@@ -2,11 +2,12 @@
 
 ## TODO list for the connection control
 
-- The connection control is ugly
-- Add a connect ring
+- DONE The connection control is ugly
+- DONE Add a connect ring
 - DONE On status failures, disconnect
 - DONE On device disconnect, set to disconnected
-- On timer, reconnect
+- DONE On timer, reconnect (really? if there's reconnect-on-advert, why bother?)
+- DONE If I get an advert for a disconnected device, reconnect!
 
 ## Code that sets status
 
@@ -15,6 +16,30 @@
 |BluetoothLEDevice.FromBluetoothAddressAsync|Control Initializing|NoBLE| ?? |Unlikely Total failure
 |ble.SetNotify*|Control Initializing|NoBLE| ?? |Unlikely total failure
 |ble.Read*|Control Initializing|NoBLE| ?? |Unlikely total failure
+
+## Why Ble_ConnectionStatusChanged isn't as useful as you'd want
+
+Device code needs to do two things:
+1. Set up the device (e.g., request that notifies are set up)
+2. Tell the user that everything is working
+
+When your app runs, the first connect of the session is simple
+1. You know you want to connect, so you set up the notifies
+2. The ConnectionStatusChanged is a great way to tell the user that it's all hooked up!
+
+
+But then when you lose connectivity, 
+1. ConnectionStatusChanged tells you to set up the notifies again
+2. You can tell the user everything is all set up again after #1 happens
+
+What happens with Ble_ConnectionStatusChanged depends entirely on your device history!
+
+In sum:
+
+1. The best way to flip the "connected" UX in your app is to wait until you've not only called the FromBluetoothAddressAsync but all the SetNotify bits all work
+2. The best way to decide to reconnect is when ConnectStatusChanged tells you that you're disconnected (and you've connected at least once)
+
+
 
 ## Sequence Diagram: connect and status flows
 

@@ -15,8 +15,8 @@
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0" x:Name="uiConnectInfo" VerticalAlignment="Bottom">
-            <TextBlock Width="25" x:Name="uiIcon"/>
+        <StackPanel Grid.Column="0" x:Name="uiConnectInfo" VerticalAlignment="Bottom" Orientation="Horizontal">
+            <TextBlock Width="25" x:Name="uiIcon" VerticalAlignment="Center" Margin="0,0,0,4"/>
             <Button Content="Connect" Click="OnConnect" />
         </StackPanel>
         <TextBlock Grid.Column="1" x:Name="uiStatus" Style="{StaticResource sAdvertisementData}" />
@@ -24,6 +24,7 @@
             <TextBlock MinWidth="30" x:Name="uiBatteryLevelIcon" Style="{StaticResource sDeviceDataIcon}" VerticalAlignment="Bottom" Margin="0,0,0,-5" />
             <TextBlock MinWidth="50" x:Name="uiBatteryLevelPercent" Style="{StaticResource sDeviceData}" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
         </StackPanel>
+        <ProgressRing Grid.Column="0" x:Name="uiConnectRing" IsActive="False" HorizontalAlignment="Left" Width="14" Height="14" />
 
     </Grid>
 </UserControl>

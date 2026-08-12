@@ -176,7 +176,7 @@ namespace BluetoothWinUI3
         /// </summary>
         IList<IHandleBTAdvertisements> BTAdvertisementHandlers = new List<IHandleBTAdvertisements>();
 
-        private void AdvertisementWatcher_WatcherEventOnUIThread(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)
+        private async void AdvertisementWatcher_WatcherEventOnUIThread(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)
         {
             if (!rootPanel.IsLoaded) return;
             uiAdvertCount.Text = NAdvertisements.ToString();
@@ -213,11 +213,10 @@ namespace BluetoothWinUI3
             // known will be null when it's not a known device and the "known" wasn't created 
             // (most likely because it's not a supported device).
 
-            if (known != null && known.Control is IHandleMyBTAdvertisements handleMy)
+            if (known != null && known.Control is IDeviceControlBasic handleMy)
             {
-                handleMy.HandleMyAdvertisement(e);
+                await handleMy.HandleMyAdvertisementAsync(e);
             }
-
 
             foreach (var handler in BTAdvertisementHandlers)
             {

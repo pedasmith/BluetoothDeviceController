@@ -1,5 +1,6 @@
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
+using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
@@ -37,6 +38,12 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// Used for logging only
     /// </summary>
     private readonly string InternalDeviceType = "BTStandard_HeartRate";  // Change: change the BTStandard_Demo string to match your device. The exact name does not matter.
+
+    /// <summary>
+    /// Tags for the device. This is used to categorize the different devices.
+    /// Common tags: environment exersize health cooking agriculture light
+    /// </summary>
+    public string Tags { get { return "#exercise #health"; } }
     #endregion
 
     #region Change these advanced settings only when needed (most devices won't change these)
@@ -265,6 +272,14 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(OxyPlotModel, axisTitle);
     }
 
+    /// <summary>
+    /// If the device had become disconnected, the control uses this (via BTConnectionControl.GotAnotherAdvertisement)
+    /// to trigger a reconnect attempt. GotAnotherAdvertisement is smart and will only reconnect as appropriate.
+    /// </summary>
+    public async Task HandleMyAdvertisementAsync(WatcherData data)
+    {
+        await uiBTConnectionControl.GotAnotherAdvertisementAsync();
+    }
 
     /// <summary>
     /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will

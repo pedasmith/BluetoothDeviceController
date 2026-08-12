@@ -1,5 +1,6 @@
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
+using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Composition;
@@ -39,6 +40,12 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// Used for logging only
     /// </summary>
     private readonly string InternalDeviceType = "Nordic_Thingy"; // Change: change the BTStandard_Demo string to match your device. The exact name does not matter.
+
+    /// <summary>
+    /// Tags for the device. This is used to categorize the different devices.
+    /// Common tags: environment exersise health cooking agriculture light
+    /// </summary>
+    public string Tags {  get { return "#environment"; } }
     #endregion
 
     #region Change these advanced settings only when needed (most devices won't change these)
@@ -283,6 +290,14 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         return UtilitiesWinUI3.UtilitiesWinUI3.GetGraphColor(OxyPlotModel, axisTitle);
     }
 
+    /// <summary>
+    /// If the device had become disconnected, the control uses this (via BTConnectionControl.GotAnotherAdvertisement)
+    /// to trigger a reconnect attempt. GotAnotherAdvertisement is smart and will only reconnect as appropriate.
+    /// </summary>
+    public async Task HandleMyAdvertisementAsync(WatcherData data)
+    {
+        await uiBTConnectionControl.GotAnotherAdvertisementAsync();
+    }
 
     /// <summary>
     /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
@@ -304,6 +319,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         }
         await ReconnectAsync();
     }
+
     /// <summary>
     /// Called by e.g., the ConnectionControl when the user wants to reconnect to the device (sensor).
     /// The initial connect is handled by the controls in Control_DataContextChanged() when the
@@ -379,13 +395,20 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     }
 
     /// <summary>
-    /// Called when the BLE device connection status changes.
+    /// Called when the BLE device connection status changes. Being told we're connected isn't useful (because it might
+    /// be a reconnect but we haven't done the SetNotify for changes), but if we're disconnected that's a good thing
+    /// to tell the user.
+    /// 
+    /// The uiBTConnectionControl will do a timed retry as needed.
     /// </summary>
     private void Ble_ConnectionStatusChanged(BluetoothLEDevice sender, object args)
     {
         // TODO: do something smarter here this will drive a bunch of the control flow.
         // Choices for ConnectionStatus is just Disconnected and Connected 
-        uiBTConnectionControl.SetState(sender.ConnectionStatus);
+        if (sender.ConnectionStatus != BluetoothConnectionStatus.Connected)
+        {
+            uiBTConnectionControl.SetState(sender.ConnectionStatus);
+        }
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
         ;
     }

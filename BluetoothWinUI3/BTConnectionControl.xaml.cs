@@ -2,17 +2,8 @@ using BluetoothProtocols;
 using BluetoothWatcher.AdvertismentWatcher;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Utilities;
@@ -45,15 +36,16 @@ namespace BluetoothWinUI3
         }
     }
 
-    public interface IReconnectDevice
-    {
-        Task DoReconnect();
-    }
 
     public sealed partial class BTConnectionControl : UserControl
     {
         public enum ConnectionState
         {
+            /// <summary>
+            /// Only used by the BTServicesCharacteristics control. Normal devices are either
+            /// purely advertisement and just stay as Disconnected or are normal devices
+            /// and are drive by the control
+            /// </summary>
             FoundViaAdvertisement,
             Connecting,
             ConnectionFailed,
@@ -61,9 +53,17 @@ namespace BluetoothWinUI3
             Disconnecting,
             Disconnected,
         }
+        public enum AutoReconnectType {  None, Advertisement, EveryMinuteFor5TimesAfterConnect, }
+        public AutoReconnectType CurrAutoReconnectType { get; set; } = AutoReconnectType.Advertisement;
+        public int NConnect { get; internal set; } = 0;
+        public int NAutoRetryCount { get; internal set; } = 0;
+        private Task RetryTask = null;
 
-        public IReconnectDevice ReconnectDevice { get; set; } = null;
 
+        /// <summary>
+        /// Set by the different Controls to distribute the ConnectionChanged value.
+        /// 2026-08-09: Actually is just used by the BTServicesCharacteristics display
+        /// </summary>
         public event EventHandler<ConnectionChangedEventArgs> ConnectionChanged;
         public void OnConnectionChanged()
         {
@@ -73,10 +73,26 @@ namespace BluetoothWinUI3
         ConnectionState _CurrState = ConnectionState.Disconnected;
         /// <summary>
         /// The current connection state. Is often "Disconnected" or "FoundViaAdvertisement"
+        /// For many controls, the control will set this value
         /// </summary>
         public ConnectionState CurrState { 
             get { return _CurrState; } 
-            internal set { if (value == _CurrState) return; _CurrState = value; UpdateIcon();  OnConnectionChanged(); } 
+            internal set 
+            { 
+                if (value == _CurrState) return; 
+                _CurrState = value;
+                if (value == ConnectionState.Connected)
+                {
+                    NAutoRetryCount = 0;
+                    NConnect++;
+                }
+                else if (value == ConnectionState.Disconnected)
+                {
+                    PotentiallyRetryConnect();
+                }
+                UpdateIcon();  
+                OnConnectionChanged(); 
+            } 
         }
 
         public void SetState(BluetoothConnectionStatus value)
@@ -102,7 +118,6 @@ namespace BluetoothWinUI3
                 default: // everything else is bad: Unreachable ProtocolError AccessDenied
                     CurrState = ConnectionState.Disconnected;
                     break;
-
             }
         }
 
@@ -170,10 +185,13 @@ namespace BluetoothWinUI3
             CurrLEDevice = null;
             switch (CurrState)
             {
+                // FoundViaAdvertisement is only used by the BTServicesCharacteristics control
                 case ConnectionState.FoundViaAdvertisement:
                     if (CurrWatcherData == null)
                     {
                         uiStatus.Text = $"Unable to connect; there isn't a Bluetooth advertisement";
+                        CurrState = ConnectionState.ConnectionFailed;
+                        CurrState = ConnectionState.FoundViaAdvertisement;
                         return;
                     }
 
@@ -187,7 +205,7 @@ namespace BluetoothWinUI3
                         Log($"Unable to connect to {CurrWatcherData.AddressAsString}");
                         return;
                     }
-                    CurrState = ConnectionState.Connected;
+                    CurrState = ConnectionState.Connected; // It's not really connected at this point ... 
 
                     break;
 
@@ -223,22 +241,66 @@ namespace BluetoothWinUI3
                 switch (CurrState)
                 {
                     case ConnectionState.FoundViaAdvertisement:
-                        uiIcon.Text = "Adv";
+                        uiIcon.Text = "🔷"; // Adv
+                        uiConnectRing.IsActive = false;
                         break;
                     case ConnectionState.Connecting:
-                        uiIcon.Text = "..c";
+                        uiIcon.Text = "⟳"; //  ..c";
+                        uiConnectRing.IsActive = true;
                         break;
                     case ConnectionState.Connected:
-                        uiIcon.Text = "Con";
+                        uiIcon.Text = "✔"; //  Con";
+                        uiConnectRing.IsActive = false;
                         break;
                     case ConnectionState.Disconnecting:
-                        uiIcon.Text = "..d";
+                        uiIcon.Text = "𝗑🗲";
                         break;
                     case ConnectionState.Disconnected:
-                        uiIcon.Text = "Dis";
+                        uiIcon.Text = "🗙"; // Dis";
+                        uiConnectRing.IsActive = false;
                         break;
                 }
             });
+        }
+
+        public async Task GotAnotherAdvertisementAsync()
+        {
+            if (DeviceControlBasic == null) return;
+            if (NConnect == 0) return;
+            if (CurrAutoReconnectType != AutoReconnectType.Advertisement) return;
+            if (CurrState != ConnectionState.Disconnected) return;
+            await DeviceControlBasic.ReconnectAsync();
+        }
+
+        private void PotentiallyRetryConnect()
+        {
+            if (DeviceControlBasic == null) return; // Can't reconnect automatically if there's nobody to do it
+            if (NConnect == 0) return; // we've never connected; let's not retry now
+            switch (CurrAutoReconnectType)
+            {
+                case AutoReconnectType.None:
+                    return; // our parent control thinks we should not retry
+                case AutoReconnectType.Advertisement:
+                    return; // wait for an advertisement to reconnect
+                case AutoReconnectType.EveryMinuteFor5TimesAfterConnect:
+                    RetryTask = new Task(async () =>
+                    {
+                        await Task.Delay(60_000); // wait one minute
+                        //await Task.Delay(5_000); // wait one minute
+
+                        // Maybe we have already reconnected -- e.g., the user clicked connect or the
+                        // device sent an advert which triggers reconnect.
+                        if (CurrState != ConnectionState.Disconnected) return; // user click connect?
+                        NAutoRetryCount++;
+                        if (NAutoRetryCount > 5) return; // no reason to retry
+                        UIThreadHelper.CallOnUIThread(async () =>
+                        {
+                            await DeviceControlBasic.ReconnectAsync();
+                        });
+                    });
+                    RetryTask.Start();
+                    break;
+            }
         }
     }
 }

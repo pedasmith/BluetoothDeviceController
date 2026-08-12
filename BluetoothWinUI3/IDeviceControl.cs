@@ -43,6 +43,14 @@ namespace BluetoothWinUI3
         Task ReconnectAsync();
 
         /// <summary>
+        /// Called by MainWindow when a physical device sends out another advertisement. This is used both
+        /// by e.g., the environmental control for all the advertisement-only sensors and also by 
+        /// regular devices to trigger reconnects
+        /// </summary>
+        Task HandleMyAdvertisementAsync(WatcherData data);
+
+
+        /// <summary>
         /// updates the device control user interface base on the user preferences in SaveData.
         /// </summary>
         void UpdateUX(SaveData saveData);
@@ -99,6 +107,8 @@ namespace BluetoothWinUI3
         string GetDetails(DetailsType detailsType);
 
         void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow);
+
+        string Tags { get; }
     }
 
 
