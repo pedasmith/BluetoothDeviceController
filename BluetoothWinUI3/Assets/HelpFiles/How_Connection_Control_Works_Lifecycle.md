@@ -1,13 +1,5 @@
 ﻿# Connection control and device lifetime
 
-## TODO list for the connection control
-
-- DONE The connection control is ugly
-- DONE Add a connect ring
-- DONE On status failures, disconnect
-- DONE On device disconnect, set to disconnected
-- DONE On timer, reconnect (really? if there's reconnect-on-advert, why bother?)
-- DONE If I get an advert for a disconnected device, reconnect!
 
 ## Code that sets status
 
