@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothWatcher.AdvertismentWatcher;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,6 +77,16 @@ The last byte is a checksum.
 AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse. 
 
 #endif
+    public static class Viatom
+    {
+        public enum SensorType { Other, PC60FW, NotThisSensorFamily };
+
+        public static SensorType AdvertIsSensorFamily(WatcherData advertisement)
+        {
+            return SensorType.NotThisSensorFamily;
+        }
+
+    }
 
     /// <summary>
     /// Factory to create pulse oximeter data items. You keep giving it bt notifications, and then you can pull out data from GetNext
@@ -97,6 +108,17 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                 InputBuffers.Add(args.CharacteristicValue);
             }
         }
+
+        /// <summary>
+        /// Adds the next notification onto the current buffer. End result is a longer buffer. You should call GetNext afterwards.
+        /// </summary>
+        public void AddNotification(byte[] value)
+        {
+            lock (this)
+            {
+                InputBuffers.Add(value);
+            }
+        }
         string CurrWaveform = "!";
         bool WaveformPeak = false;
         List<byte> CurrWaveformData = new List<byte>();
@@ -104,8 +126,7 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
         /// <summary>
         /// Gets whatever data is ready. Is often null when there's not enough data or it's the wrong type.
         /// </summary>
-        /// <returns></returns>
-        public HealthDataRecord GetNext()
+        public HealthDataRecord GetNext(HealthDataRecord source = null)
         {
             //  AA 55 0F 08 01 61 40 00 51 00 C0 5B 	# New data sat=61=97 pr/hr=40=64 PI=51=81=8.1 PI is the Perfusion Index
             if (!InputBuffers.HasData) return null;
@@ -135,11 +156,11 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                             }
                             else
                             {
-                                var retval = new HealthDataRecord()
+                                var retval = source ?? new HealthDataRecord()
                                 {
                                     IsSensorPresent = HealthDataRecord.SensorPresent.PulseRate | HealthDataRecord.SensorPresent.OxygenSaturationInPercent | HealthDataRecord.SensorPresent.PerfusionIndexInPercent,
                                 };
-
+                                retval.TimestampMostRecent = DateTimeOffset.Now;
                                 retval.OxygenSaturationInPercent = InputBuffers.ReadByte();
                                 retval.PulseRate = InputBuffers.ReadByte();
                                 byte junk = InputBuffers.ReadByte();

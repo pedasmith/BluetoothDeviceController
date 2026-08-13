@@ -132,6 +132,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("TP357*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("TP359*", typeof(BTCommon_EnvironmentalControl)),
 
+            // Viatom
+            new SupportedDevice("PC-60F_*", typeof(BTCommon_HealthControl)),
+
             // Bike Cycle Cadence and Speed
             //new SupportedDevice("BK6*", typeof(BTTAOPE_CyclingSpeedCadenceControl)),
             SupportedDevice.MakeFromGuid("00001816-0000-1000-8000-00805F9B34FB", typeof(BTStandard_CyclingSpeedCadenceControl)),

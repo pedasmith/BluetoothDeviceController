@@ -151,7 +151,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // InitializeUX(); // For advertisement-based data, initialize the UX when we get the first data
     }
 
-    private void UpdateForSensor(SensorDataRecord.SensorPresent sensor, int step, int range, string title, string propertyName, StackPanel panel, AxisPosition axisPosition = AxisPosition.Left, string axisKey = null, string axisTitle = null)
+    private void UpdateForSensor(DeviceSpecificSensorData.SensorPresent sensor, int step, int range, string title, string propertyName, StackPanel panel, AxisPosition axisPosition = AxisPosition.Left, string axisKey = null, string axisTitle = null)
     {
         if (CurrSensor_Data.IsSensorPresent.HasFlag(sensor))
         {
@@ -184,7 +184,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            ( SensorDataRecord.TemperaturePropertyChangedName, uiTemperatureChange),
+            ( DeviceSpecificSensorData.TemperaturePropertyChangedName, uiTemperatureChange),
         };
 
         // Change: set up the graph by making an OxyPlotModel
@@ -192,7 +192,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         // Set up the Connect button and Battery visibility
         uiBTConnectionControl.SetConnectVisibility(Visibility.Collapsed);
-        if (!CurrSensor_Data.IsSensorPresent.HasFlag(SensorDataRecord.SensorPresent.Battery))
+        if (!CurrSensor_Data.IsSensorPresent.HasFlag(DeviceSpecificSensorData.SensorPresent.Battery))
         {
             uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
         }
@@ -201,17 +201,17 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         // set it to invisible because the items will still show up
         CurrTableCustomization.TableColumns.Add("Name"); // always show the name
 
-        UpdateForSensor(SensorDataRecord.SensorPresent.Temperature, 5, 30, "Temperature", "Temperature", uiDeviceDataTemperature);
-        UpdateForSensor(SensorDataRecord.SensorPresent.Humidity, 5, 20, "Humidity", "Humidity", uiDeviceDataHumidity);
-        UpdateForSensor(SensorDataRecord.SensorPresent.Pressure, 5, 10, "Pressure", "Pressure", uiDeviceDataPressure);
-        UpdateForSensor(SensorDataRecord.SensorPresent.PM10, 5, 5, "PM10", "PM10", uiDeviceDataPM10, axisKey:"PMaxis", axisTitle:"PM", axisPosition:AxisPosition.Right);
-        UpdateForSensor(SensorDataRecord.SensorPresent.PM25, 5, 5, "PM25", "PM25", uiDeviceDataPM25, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
-        UpdateForSensor(SensorDataRecord.SensorPresent.PM40, 5, 5, "PM40", "PM40", uiDeviceDataPM40, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
-        UpdateForSensor(SensorDataRecord.SensorPresent.PM100, 5, 5, "PM100", "PM100", uiDeviceDataPM100, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
-        UpdateForSensor(SensorDataRecord.SensorPresent.CO2, 10, 40, "CO2", "CO2", uiDeviceDataCO2, axisPosition: AxisPosition.Right);
-        UpdateForSensor(SensorDataRecord.SensorPresent.NOXIndex, 10, 40, "NOX", "NOXIndex", uiDeviceDataNOXIndex, axisPosition: AxisPosition.Right);
-        UpdateForSensor(SensorDataRecord.SensorPresent.VOC, 10, 40, "VOC", "VOC", uiDeviceDataVOC, axisPosition: AxisPosition.Right);
-        UpdateForSensor(SensorDataRecord.SensorPresent.Luminosity, 1000, 10000, "LUX", "Luminosity", uiDeviceDataLuminosity, axisPosition: AxisPosition.Right);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.Temperature, 5, 30, "Temperature", "Temperature", uiDeviceDataTemperature);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.Humidity, 5, 20, "Humidity", "Humidity", uiDeviceDataHumidity);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.Pressure, 5, 10, "Pressure", "Pressure", uiDeviceDataPressure);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.PM10, 5, 5, "PM10", "PM10", uiDeviceDataPM10, axisKey:"PMaxis", axisTitle:"PM", axisPosition:AxisPosition.Right);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.PM25, 5, 5, "PM25", "PM25", uiDeviceDataPM25, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.PM40, 5, 5, "PM40", "PM40", uiDeviceDataPM40, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.PM100, 5, 5, "PM100", "PM100", uiDeviceDataPM100, axisKey: "PMaxis", axisTitle: "PM", axisPosition: AxisPosition.Right);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.CO2, 10, 40, "CO2", "CO2", uiDeviceDataCO2, axisPosition: AxisPosition.Right);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.NOXIndex, 10, 40, "NOX", "NOXIndex", uiDeviceDataNOXIndex, axisPosition: AxisPosition.Right);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.VOC, 10, 40, "VOC", "VOC", uiDeviceDataVOC, axisPosition: AxisPosition.Right);
+        UpdateForSensor(DeviceSpecificSensorData.SensorPresent.Luminosity, 1000, 10000, "LUX", "Luminosity", uiDeviceDataLuminosity, axisPosition: AxisPosition.Right);
 
         // Handle the PM data. If there's just one sensor, keep it.
         // But if there are 4, use the combo
@@ -559,67 +559,67 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         switch (name)
         {
             case "*": // All the data changed. This is what always happens with the sensor.
-            case SensorDataRecord.TemperaturePropertyChangedName:
-            case SensorDataRecord.PM25PropertyChangedName:
-            case SensorDataRecord.HumidityPropertyChangedName:
+            case DeviceSpecificSensorData.TemperaturePropertyChangedName:
+            case DeviceSpecificSensorData.PM25PropertyChangedName:
+            case DeviceSpecificSensorData.HumidityPropertyChangedName:
                 UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
                 break;
         }
 
 
 
-        if (name == SensorDataRecord.TemperaturePropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.TemperaturePropertyChangedName || name == "" || name == "*")
         {
             uiTemperature.Text = BluetoothWatcher.Units.Temperature.AsString(CurrSensor_DataUnits.Temperature, CurrUserPrefs.Temperature);
         }
-        if (name == SensorDataRecord.HumidityPropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.HumidityPropertyChangedName || name == "" || name == "*")
         {
             uiHumidity.Text = CurrSensor_DataUnits.Humidity.ToString("0.0") + "%";
         }
-        if (name == SensorDataRecord.PressurePropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.PressurePropertyChangedName || name == "" || name == "*")
         {
             uiPressure.Text = BluetoothWatcher.Units.Pressure.AsString(CurrSensor_DataUnits.Pressure, CurrUserPrefs.Pressure);
         }
-        if (name == SensorDataRecord.PM10PropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.PM10PropertyChangedName || name == "" || name == "*")
         {
             uiPM10.Text = CurrSensor_DataUnits.PM10.ToString("0.0");
             uiPM10Combo.Text = CurrSensor_DataUnits.PM10.ToString("0.0");
         }
-        if (name == SensorDataRecord.PM25PropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.PM25PropertyChangedName || name == "" || name == "*")
         {
             uiPM25.Text = CurrSensor_DataUnits.PM25.ToString("0.0");
             uiPM25Combo.Text = CurrSensor_DataUnits.PM25.ToString("0.0");
         }
-        if (name == SensorDataRecord.PM40PropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.PM40PropertyChangedName || name == "" || name == "*")
         {
             uiPM40.Text = CurrSensor_DataUnits.PM40.ToString("0.0");
             uiPM40Combo.Text = CurrSensor_DataUnits.PM40.ToString("0.0");
         }
-        if (name == SensorDataRecord.PM100PropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.PM100PropertyChangedName || name == "" || name == "*")
         {
             uiPM100.Text = CurrSensor_DataUnits.PM100.ToString("0.0");
             uiPM100Combo.Text = CurrSensor_DataUnits.PM100.ToString("0.0");
         }
-        if (name == SensorDataRecord.CO2PropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.CO2PropertyChangedName || name == "" || name == "*")
         {
             uiCO2.Text = CurrSensor_DataUnits.CO2.ToString("0.0");
             uiCO2Combo.Text = CurrSensor_DataUnits.CO2.ToString("0.0");
         }
-        if (name == SensorDataRecord.VOCPropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.VOCPropertyChangedName || name == "" || name == "*")
         {
             uiVOC.Text = CurrSensor_DataUnits.VOC.ToString("0.0");
             uiVOCCombo.Text = CurrSensor_DataUnits.VOC.ToString("0.0");
         }
-        if (name == SensorDataRecord.NOXIndexPropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.NOXIndexPropertyChangedName || name == "" || name == "*")
         {
             uiNOXIndex.Text = CurrSensor_DataUnits.NOXIndex.ToString("0.0");
             uiNOXIndexCombo.Text = CurrSensor_DataUnits.NOXIndex.ToString("0.0");
         }
-        if (name == SensorDataRecord.LuminosityPropertyChangedName || name == "" || name == "*")
+        if (name == DeviceSpecificSensorData.LuminosityPropertyChangedName || name == "" || name == "*")
         {
             uiLuminosity.Text = CurrSensor_DataUnits.Luminosity.ToString("0.0");
         }
-        if (name == SensorDataRecord.BatteryPropertyChangedName || name == "" || name == "*") 
+        if (name == DeviceSpecificSensorData.BatteryPropertyChangedName || name == "" || name == "*") 
         {
             uiBTConnectionControl.SetBatteryLevel(CurrSensor_DataUnits.BatteryInPercent);
         }

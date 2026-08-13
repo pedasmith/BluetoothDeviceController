@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Eddystone.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Govee.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HealthDataRecord.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HealthDataRecordCopyable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Ruuvi_Tag.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Ruuvi_TagCSDR.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Ruuvi_Tag_v1_Helper.cs" />

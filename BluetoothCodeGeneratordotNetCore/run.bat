@@ -27,12 +27,14 @@ goto :EOF
 
 REM Or generate just the one, which is a little easier to handle when debugging.
 :Debug
+%BIN% -inputJsonFile "%JSONDIR%"\Viatom_PC60FW_PulseOximeter.json -inputTemplates Templates -output output
+goto :EOF
 REM %BIN% -inputJsonFile "%JSONDIR%"\Govee_H6005.json -inputTemplates Templates -output output
 REM %BIN% -inputJsonFile "%JSONDIR%"\Bluetooth_CurrentTimeService.json -inputTemplates Templates -output output
 REM %BIN% -inputJsonFile "%JSONDIR%"\BtUnicodeKeyboard.json -inputTemplates Templates -output output
-REM %BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Templates -output output
 REM %BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
 REM %BIN% -inputJsonFile "%JSONDIR%"\SensyOne-S1ProMultiSense.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\Viatom_PC60FW_PulseOximeter.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Cycling_Speed_Cadence.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Demo.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Heart_Rate.json -inputTemplates Templates -output output
