@@ -72,7 +72,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     }
 
     #region Instance value for a device (not changed)
-    Viatom_PC_60F Device = null;
+    Viatom_PC_60F Device_Viatom = null;
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
     ulong OriginalBTAddr = 0xFFFFFFFF_FFFFFFFF;
@@ -364,11 +364,11 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
                 Log($"Health: Error: unknown sensor");
                 return;
             case SensorFamily.Viatom:
-                Device = new Viatom_PC_60F()
+                Device_Viatom = new Viatom_PC_60F()
                 {
                     ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
                 };
-                if (Device.ble == null)
+                if (Device_Viatom.ble == null)
                 {
                     // ConnectError:NoBLE
                     Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
@@ -382,7 +382,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         // It's critical to set these!
         DataContextAsKnownDevice.Id = DataContextAsKnownDevice.Advertisement.AddressAsString; //  Device.ble.DeviceId ?? ""; // never null :-)
-        DataContextAsKnownDevice.BTLEDevice = Device.ble;
+        DataContextAsKnownDevice.BTLEDevice = Device_Viatom.ble;
         CurrSaveData = AllSaveData.SwitchToDeviceIdCurrSaveData(CurrSaveData, DataContextAsKnownDevice);
 
         UtilitiesWinUI3.UtilitiesWinUI3.InitializeKeyLineColorsFromDefaultOxyPlot(OxyPlotModel, rootPanel);
@@ -390,27 +390,27 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         KnownDeviceName = DataContextAsKnownDevice.Advertisement.BestName;
         uiKnownDeviceName.Text = KnownDeviceName;
 
-        Device.PropertyChanged += Device_PropertyChanged;
-        Device.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
-        Device.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+        Device_Viatom.PropertyChanged += Device_PropertyChanged;
+        Device_Viatom.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
+        Device_Viatom.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
         bool connectAllOk = true;
         uiBTConnectionControl.CurrState = BTConnectionControl.ConnectionState.Connecting;
         #region Change so the device starts sending notifications for changed properties (data)
 
-        connectAllOk = connectAllOk && await Device.NotifyReceiveAsync();
+        connectAllOk = connectAllOk && await Device_Viatom.NotifyReceiveAsync();
         #endregion
 
         // The system tracks device changes
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
-        var statusMatch = (connectAllOk && Device.ble.ConnectionStatus == BluetoothConnectionStatus.Connected)
-            || (!connectAllOk && Device.ble.ConnectionStatus == BluetoothConnectionStatus.Disconnected);
+        var statusMatch = (connectAllOk && Device_Viatom.ble.ConnectionStatus == BluetoothConnectionStatus.Connected)
+            || (!connectAllOk && Device_Viatom.ble.ConnectionStatus == BluetoothConnectionStatus.Disconnected);
         if (!statusMatch)
         {
-            Log($"{KnownDeviceName}: connect is inconsistent: connectAllOk={connectAllOk} but ble={Device.ble.ConnectionStatus}");
+            Log($"{KnownDeviceName}: connect is inconsistent: connectAllOk={connectAllOk} but ble={Device_Viatom.ble.ConnectionStatus}");
         }
-        uiBTConnectionControl.SetState(Device.ble.ConnectionStatus);
-        CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
+        uiBTConnectionControl.SetState(Device_Viatom.ble.ConnectionStatus);
+        CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device_Viatom.ble.ConnectionStatus);
 
         HandleMyAdvertisement(DataContextAsKnownDevice.Advertisement);
     }
@@ -588,7 +588,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     {
         if (name == Viatom_PC_60F.ReceivePropertyChangedName)
         {
-            ViatomFactory.AddNotification(Device.CurrTransmit_Data.Receive);
+            ViatomFactory.AddNotification(Device_Viatom.CurrTransmit_Data.Receive);
             var next = ViatomFactory.GetNext(CurrSensor_Data);
             if (next == null) return;
             CurrSensor_Data = next;
