@@ -70,7 +70,7 @@ namespace BluetoothProtocols
                 dest = source.Clone(name);
             }
             dest.TimestampMostRecent = source.TimestampMostRecent;
-            dest.Name = source.Name;
+            if (string.IsNullOrEmpty(dest.Name)) dest.Name = source.Name;
             dest.PulseRate = convert(source.PulseRate, "");
             dest.OxygenSaturationInPercent = convert(source.OxygenSaturationInPercent, "");
             dest.PerfusionIndexInPercent = convert(source.PerfusionIndexInPercent, "");

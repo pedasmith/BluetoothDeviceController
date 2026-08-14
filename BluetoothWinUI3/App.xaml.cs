@@ -40,6 +40,7 @@ namespace BluetoothWinUI3
         static int TestAll()
         {
             int nerror = 0;
+            nerror += Viatom_PulseOximeter_PC60FW_Factory.Test();
             nerror += AirQualityIndex.Test();
             nerror += BatteryVoltageToPercent.Test();
             nerror += SparklesHelper.Test();

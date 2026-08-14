@@ -134,7 +134,9 @@ internal static class OxyPlotUtilities
 
         { "RpsSensor", new LineColorStyle(OxyColors.White)},
         { "HeartRate", new LineColorStyle(OxyColors.DarkRed)}, // Blood color :-)
-
+        { "PulseRate", new LineColorStyle(OxyColors.DarkRed)}, // Blood color :-)
+        { "OxygenSaturationInPercent", new LineColorStyle(OxyColors.DarkBlue)}, 
+        { "PerfusionIndexInPercent", new LineColorStyle(OxyColors.Violet, LineStyle.Dash, WIDTH_SECONDARY)}, 
     };
 
     private static List<LineColorStyle> BackupColorStyle = new ()

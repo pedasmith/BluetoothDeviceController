@@ -148,7 +148,7 @@ namespace BluetoothProtocols
                 dest = source.Clone(name);
             }
             dest.TimestampMostRecent = source.TimestampMostRecent;
-            dest.Name = source.Name;
+            if (string.IsNullOrEmpty(dest.Name)) dest.Name = source.Name;
             dest.Temperature = convert(source.Temperature, "C");
             dest.Pressure = convert(source.Pressure, "hPA");
             dest.Humidity = convert(source.Humidity, "%");

@@ -9,10 +9,12 @@
     <Import_RootNamespace>Utilities</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Checksum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataReaderReadStringRobust.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataWriterExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EWMA.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HexUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IBufferExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SimpleStatistics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UIThreadHelper.cs" />

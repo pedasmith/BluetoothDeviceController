@@ -156,7 +156,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         if (CurrSensor_Data.IsSensorPresent.HasFlag(sensor))
         {
             OxyPlotUtilities.AddLine(OxyPlotModel, step, range, title, propertyName, axisPosition:axisPosition, axisKey:axisKey, axisTitle:axisTitle);
-            CurrTableCustomization.TableColumns.Add(title);
+            CurrTableCustomization.TableColumns.Add(propertyName);
         }
         else
         {

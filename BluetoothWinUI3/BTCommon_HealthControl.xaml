@@ -19,7 +19,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="uiKnownDeviceName" Grid.Row="0" Text="Environment Sensor" Style="{StaticResource sDeviceTitle}"/>
+            <TextBlock x:Name="uiKnownDeviceName" Grid.Row="0" Text="Health Sensor" Style="{StaticResource sDeviceTitle}"/>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
@@ -39,7 +39,7 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataOxygenSaturationInPercent">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Oxygen Saturation</Run>
+                        <Run>Oxygen %</Run>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiOxygenSaturationInPercent"/></TextBlock>
                         <Line Height="5" Tag="OxygenSaturationInPercentColor" Style="{StaticResource sGraphLineKey}"/>
@@ -47,7 +47,7 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataPerfusionIndexInPercent">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Perfusion Index</Run>
+                        <Run>Perfusion %</Run>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPerfusionIndexInPercent"/></TextBlock>
                         <Line Height="5" Tag="PerfusionIndexInPercentColor" Style="{StaticResource sGraphLineKey}" />

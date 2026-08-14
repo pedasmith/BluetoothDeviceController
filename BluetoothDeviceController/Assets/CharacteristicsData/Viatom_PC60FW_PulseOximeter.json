@@ -5,6 +5,11 @@
       "ClassName": "Viatom_PC_60F",
       "CompletionStatus": "Usable",
       "CompletionStatusExplanation": "2022-12-10: protocol is understood; device sends packets which can be decoded",
+      "Description": "LED strip lights with Bluetooth control. Can also be controlled with a small IR remote. Uses a ModBus-based custom protocol.",
+      "Links": [
+        "https://github.com/sza2/viatom_pc60fw",
+        "https://github.com/rileyg98/ViatomDataReader"
+      ],
       "Services": [
         {
           "UUID": "00001800-0000-1000-8000-00805f9b34fb",
@@ -69,7 +74,15 @@
               "UUID": "6e400003-b5a3-f393-e0a9-e50e24dcca9e",
               "Name": "Receive",
               "Type": "BYTES|HEX|Receive",
-              "IsNotify": true
+              "IsNotify": true,
+              "ExampleData": [
+                "Index: 00 01 02 03 04 05 06 07 08 09 10 11",
+                "Index: -- -- -- -- 00 01 02 03 04 05 06 07  Index as used in the factory after reading len",
+                "Value: AA 55 0F 08 01 61 40 00 51 00 C0 5B # New data sat[5]=61=97 pr/hr[6]=40=64 PI[8]=51=81=8.1 PI is the Perfusion Index",
+                "Deci: 170 85 15 08 01 97 64 00 81 00192 91",
+                "Deco:  -- -- -- LN OP Ox PR -- PI -- XX XX # LN=length, OP=opcode Ox=SpO2, PR=Pulse Rate, PI=Perfusion Index, XX=checksum?",
+                "    # Standard CRC-8-CCITT checksum with 0x07 polynomial and 0x00 seed #  below function uses a hybrid method instead of a lookup table or bit shifting"
+              ]
             }
           ]
         }

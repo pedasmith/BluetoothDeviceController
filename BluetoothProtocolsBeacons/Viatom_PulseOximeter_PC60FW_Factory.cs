@@ -1,5 +1,6 @@
 ﻿using BluetoothWatcher.AdvertismentWatcher;
 using System;
+using Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using System.ComponentModel.DataAnnotations;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -144,7 +146,11 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                     if (InputBuffers.ReadByte() != 0x0F) continue; // other command
                     var len = InputBuffers.ReadByte();
                     if (len > 20) continue; // length is very much out of range; bail and resync.
-                    var cmd = InputBuffers.ReadByte();
+
+                    // Read buffer full of data
+                    var cmdBuffer = InputBuffers.ToArray(len);
+
+                    var cmd = cmdBuffer[0]; //  InputBuffers.ReadByte();
                     bool commandIsKnown = true;
                     bool commandIsValid = true;
                     switch (cmd)
@@ -161,13 +167,21 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                                     IsSensorPresent = HealthDataRecord.SensorPresent.PulseRate | HealthDataRecord.SensorPresent.OxygenSaturationInPercent | HealthDataRecord.SensorPresent.PerfusionIndexInPercent,
                                 };
                                 retval.TimestampMostRecent = DateTimeOffset.Now;
-                                retval.OxygenSaturationInPercent = InputBuffers.ReadByte();
-                                retval.PulseRate = InputBuffers.ReadByte();
-                                byte junk = InputBuffers.ReadByte();
-                                retval.PerfusionIndexInPercent = (double)InputBuffers.ReadByte() / 10.0;
-                                junk = InputBuffers.ReadByte();
-                                junk = InputBuffers.ReadByte();
-                                junk = InputBuffers.ReadByte();
+                                retval.OxygenSaturationInPercent = cmdBuffer[1]; //  InputBuffers.ReadByte();
+                                retval.PulseRate = cmdBuffer[2]; //  InputBuffers.ReadByte();
+                                //byte junk = InputBuffers.ReadByte();
+                                retval.PerfusionIndexInPercent = (double)cmdBuffer[4] / 10.0; //  (double)InputBuffers.ReadByte() / 10.0;
+                                //junk = InputBuffers.ReadByte();
+                                //junk = InputBuffers.ReadByte();
+                                //junk = InputBuffers.ReadByte();
+                                // NOTE: this CRC is definitely wrong. AFAICT, the CRC should
+                                // include the 0xAA 0x55 ... stuff. But the cmdBuffer doesn't have
+                                // those values.
+                                //var crc = Utilities.Checksum.Crc8(cmdBuffer, 0, -2);
+                                //if (crc != cmdBuffer[cmdBuffer.Length-1])
+                                //{
+                                //    ;
+                                //}
                                 return retval;
                             }
                             break;
@@ -183,7 +197,7 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                                 bool gotPeak = false;
                                 for (int i=0; i<5; i++)
                                 {
-                                    var wavedata = InputBuffers.ReadByte();
+                                    var wavedata = cmdBuffer[i]; // InputBuffers.ReadByte();
                                     if ((wavedata & 0x80) != 0) WaveformPeak = true;
                                     if ((wavedata & 0x80) != 0) gotPeak = true;
                                     if (WaveformPeak)
@@ -225,7 +239,7 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                                     ;
                                     CurrWaveformData.Clear();
                                 }
-                                var checksum = InputBuffers.ReadByte();
+                                //var checksum = InputBuffers.ReadByte();
                             }
                             break;
                         default:
@@ -237,23 +251,23 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                     {
                         // Read in the bytes
                         var bytes = "";
-                        for (int i = 0; i < len - 2; i++)
+                        for (int i = 1; i < len - 1; i++)
                         {
-                            var value = InputBuffers.ReadByte();
+                            var value = cmdBuffer[i]; // InputBuffers.ReadByte();
                             bytes += $"{value:X2} ";
                         }
-                        var checksum = InputBuffers.ReadByte();
+                        //var checksum = InputBuffers.ReadByte();
 
                         if (!commandIsValid)
                         {
-                            System.Diagnostics.Debug.WriteLine($"Oximeter: invalid command {cmd:X2}");
+                            Log($"Oximeter: invalid command {cmd:X2}");
                         }
                         else
                         {
                             bool supress = (cmd == 0x21 && bytes == "02 00 00 00 ");
                             if (!supress)
                             {
-                                System.Diagnostics.Debug.WriteLine($"Oximeter: unknown command {cmd:X2} data {bytes}");
+                                Log($"Oximeter: unknown command {cmd:X2} data {bytes}");
                             }
                         }
                     }
@@ -278,6 +292,52 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                 var notAA = InputBuffers.ReadByte();
             }
             return false;
+        }
+
+        private static void Log(string str)
+        {
+            System.Diagnostics.Debug.WriteLine(str);
+            Console.WriteLine(str);
+        }
+
+        private static int TestOne(string hex, int expectedSaturation, int expectedPulse, double expectedPerfusion)
+        {
+            int nerror = 0;
+            var factory = new Viatom_PulseOximeter_PC60FW_Factory();
+            byte[] data = Utilities.HexUtilities.HexStringToByteArray(hex);
+            factory.AddNotification(data);
+            var actual = factory.GetNext();
+            if (actual == null)
+            {
+                nerror++;
+                Log($"Viatom: Error: ({hex}) returned no data");
+                return nerror;
+            }
+            if (actual.OxygenSaturationInPercent != expectedSaturation)
+            {
+                nerror++;
+                Log($"Viatom: Error: ({hex}) saturation expected {expectedSaturation} actual {actual.OxygenSaturationInPercent}");
+
+            }
+            if (actual.PulseRate != expectedPulse)
+            {
+                nerror++;
+                Log($"Viatom: Error: ({hex}) pulse expected {expectedPulse} actual {actual.PulseRate}");
+
+            }
+            if (actual.PerfusionIndexInPercent != expectedPerfusion)
+            {
+                nerror++;
+                Log($"Viatom: Error: ({hex}) perfusion expected {expectedPerfusion} actual {actual.PerfusionIndexInPercent}");
+            }
+            return nerror;
+        }
+
+        public static int Test()
+        {
+            int nerror = 0;
+            nerror += TestOne("AA 55 0F 08 01 61 40 00 51 00 C0 5B", 0x61, 0x40, 8.1);
+            return nerror;
         }
     }
 }

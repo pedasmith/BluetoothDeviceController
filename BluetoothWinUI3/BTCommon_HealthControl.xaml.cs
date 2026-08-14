@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
-using Windows.Devices.Enumeration;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -157,7 +156,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         if (CurrSensor_Data.IsSensorPresent.HasFlag(sensor))
         {
             OxyPlotUtilities.AddLine(OxyPlotModel, step, range, title, propertyName, axisPosition: axisPosition, axisKey: axisKey, axisTitle: axisTitle);
-            CurrTableCustomization.TableColumns.Add(title);
+            CurrTableCustomization.TableColumns.Add(propertyName);
         }
         else
         {
@@ -192,7 +191,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Sensor Data");
 
         // Set up the Connect button and Battery visibility
-        uiBTConnectionControl.SetConnectVisibility(Visibility.Collapsed);
+        uiBTConnectionControl.SetConnectVisibility(Visibility.Visible); // Viatom is connected, not advert.
         if (!CurrSensor_Data.IsSensorPresent.HasFlag(HealthDataRecord.SensorPresent.Battery))
         {
             uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
@@ -202,8 +201,8 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         CurrTableCustomization.TableColumns.Add("Name"); // always show the name
 
         UpdateForSensor(HealthDataRecord.SensorPresent.PulseRate, 5, 30, "Pulse", "PulseRate", uiDeviceDataPulseRate);
-        UpdateForSensor(HealthDataRecord.SensorPresent.OxygenSaturationInPercent, 5, 20, "Oxygen", "OxygenSaturationInPercent", uiDeviceDataOxygenSaturationInPercent);
-        UpdateForSensor(HealthDataRecord.SensorPresent.PerfusionIndexInPercent, 5, 10, "Perfusion", "PerfustionIndexInPercent", uiDeviceDataPerfusionIndexInPercent);
+        UpdateForSensor(HealthDataRecord.SensorPresent.OxygenSaturationInPercent, 2, 10, "Oxygen", "OxygenSaturationInPercent", uiDeviceDataOxygenSaturationInPercent);
+        UpdateForSensor(HealthDataRecord.SensorPresent.PerfusionIndexInPercent, 2, 10, "Perfusion", "PerfusionIndexInPercent", uiDeviceDataPerfusionIndexInPercent);
 
         //
         uiOxyPlot.Model = OxyPlotModel;
@@ -318,7 +317,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         if (args.NewValue == null) return; // just bogus; ignore.
 
-        // Note: weird setup here! TODO: fix?
+        // What's the correct sensor?
         CurrSensor_Data = new HealthDataRecord()
         {
             IsSensorPresent = HealthDataRecord.SensorPresent.PulseRate | HealthDataRecord.SensorPresent.OxygenSaturationInPercent | HealthDataRecord.SensorPresent.PerfusionIndexInPercent,
@@ -355,23 +354,31 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // Has already been saved, so will exist.
 
-        // TODO: pick the right device based on advertisement?
         // Initialize data values. Somewhat ugly code :-(
         ViatomSensorType = Viatom.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
         if (ViatomSensorType != Viatom.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.Viatom;
 
-        Device = new Viatom_PC_60F()
+        switch (CurrSensorFamily)
         {
-            ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
-        };
-        if (Device.ble == null)
-        {
-            // ConnectError:NoBLE
-            Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
-            CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
-            return;
+            case SensorFamily.Unknown:
+                Log($"Health: Error: unknown sensor");
+                return;
+            case SensorFamily.Viatom:
+                Device = new Viatom_PC_60F()
+                {
+                    ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
+                };
+                if (Device.ble == null)
+                {
+                    // ConnectError:NoBLE
+                    Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
+                    CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
+                    return;
+                }
+                ViatomFactory = new Viatom_PulseOximeter_PC60FW_Factory();
+                break;
         }
-        ViatomFactory = new Viatom_PulseOximeter_PC60FW_Factory();
+
 
         // It's critical to set these!
         DataContextAsKnownDevice.Id = DataContextAsKnownDevice.Advertisement.AddressAsString; //  Device.ble.DeviceId ?? ""; // never null :-)
@@ -413,7 +420,6 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// </summary>
     private void Ble_ConnectionStatusChanged(BluetoothLEDevice sender, object args)
     {
-        // TODO: do something smarter here this will drive a bunch of the control flow.
         // Choices for ConnectionStatus is just Disconnected and Connected 
         uiBTConnectionControl.SetState(sender.ConnectionStatus);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
@@ -580,10 +586,6 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// </summary>
     private void UpdateDeviceDataUX(string name)
     {
-        //if (CurrSensor_Data == null) return;
-        SparklesHelper.UpdateSparkles(ControlsWithSparkles, name);
-
-        // TODO: special code for Viatom
         if (name == Viatom_PC_60F.ReceivePropertyChangedName)
         {
             ViatomFactory.AddNotification(Device.CurrTransmit_Data.Receive);
@@ -597,9 +599,16 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             return; // no other data???
         }
 
+        //if (CurrSensor_Data == null) return;
+        SparklesHelper.UpdateSparkles(ControlsWithSparkles, name);
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
         CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+
+        if (CurrSensor_DataUnits.PulseRate == 0 && CurrSensor_DataUnits.OxygenSaturationInPercent == 0)
+        {
+            return; // ignore bogus data; it's not helpful
+        }
 
         // Track the historical data
         switch (name)
@@ -664,7 +673,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         var updateAgeInMinutes = DateTimeOffset.Now.Subtract(currSensor_DataUnits.TimestampMostRecent).TotalMinutes;
         if (updateAgeInMinutes < 10)
         {
-            uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines // TODO: don't do this in catch-up mode!
+            uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines 
         }
     }
 
@@ -764,7 +773,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         UIThreadHelper.CallOnUIThread(() => HandleMyAdvertisementOnUIThread(data));
     }
 
-    bool CalledOnGetUXCapabilities = false;
+    // bool CalledOnGetUXCapabilities = false;
 
 
 
