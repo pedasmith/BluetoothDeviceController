@@ -14,6 +14,10 @@ namespace BluetoothProtocolsDevicesCoreExtensions
             {
                 return SensorType.PulseOximeter;
             }
+            if (advertisement.BestName.StartsWith("iP900BPB"))
+            {
+                return SensorType.PulseOximeter;
+            }
             return SensorType.NotThisSensorFamily;
         }
     }

@@ -132,9 +132,10 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("TP357*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("TP359*", typeof(BTCommon_EnvironmentalControl)),
 
-            // Viatom
-            new SupportedDevice("PC-60F_*", typeof(BTCommon_HealthControl)),
-            new SupportedDevice("500E-B", typeof(BTCommon_HealthControl)), // ZacVRate
+            // ChoiceMD and Viatom pulse oximeters
+            new SupportedDevice("PC-60F_*", typeof(BTCommon_HealthControl)), // Viatom PC60FW
+            new SupportedDevice("iP900BP", typeof(BTCommon_HealthControl)), // Innovo iP900BP-P pulse oximeter (ChoiceMD)
+            new SupportedDevice("500E-B", typeof(BTCommon_HealthControl)), // ZacVRate pulse oximeter (ChoiceMD)
 
             // Bike Cycle Cadence and Speed
             //new SupportedDevice("BK6*", typeof(BTTAOPE_CyclingSpeedCadenceControl)),

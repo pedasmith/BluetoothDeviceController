@@ -1,5 +1,9 @@
 ﻿# Missing large pieces 2026-06-19
 
+## Pulse Oximeter
+
+
+
 
 ## Smart Export is started but missing all UX pieces
 
