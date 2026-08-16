@@ -1,0 +1,277 @@
+{
+  "AllDevices": [
+    {
+      "Name": "500E-B",
+      "ClassName":  "ChoiceMMed_PulseOximeter",
+      "CompletionStatus": 0,
+      "Links": [
+        "https://github.com/crcctcpr/choicemmed-md300cn358r"
+      ],
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "GAP",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "500E-B"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "00"
+              ]
+            },
+            {
+              "UUID": "00002a02-0000-1000-8000-00805f9b34fb",
+              "Name": "Peripheral Privacy Flag",
+              "Type": "U8|DEC|Flag",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "00"
+              ]
+            },
+            {
+              "UUID": "00002a03-0000-1000-8000-00805f9b34fb",
+              "Name": "Reconnection Address",
+              "Type": "BYTES|HEX|ReconnectAddress",
+              "DataGroupName": "GAP_Data",
+              "IsWrite": true,
+              "Verbs": ":Write:WrWw:"
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Peripheral Preferred Connection Parameters",
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms U16^1.15_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "18 00 24 00 00 00 C8 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Device Information",
+          "Characteristics": [
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number String",
+              "Type": "STRING|ASCII|ModelNumber",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "C228_D4"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number String",
+              "Type": "STRING|ASCII|SerialNumber",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "433232385F4434"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision String",
+              "Type": "STRING|ASCII|SoftwareRevision",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "1.0.0"
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manufacturer Name String",
+              "Type": "STRING|ASCII|ManufacturerName",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "ChoiceMMed"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180f-0000-1000-8000-00805f9b34fb",
+          "RegistrationOwner": "Bluetooth Standard",
+          "Name": "Battery",
+          "Characteristics": [
+            {
+              "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
+              "Name": "Battery Level",
+              "Type": "I8|DEC|BatteryLevel|%",
+              "DataGroupName": "Battery_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "4D"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+          "Name": "TransmitNordic",
+          "Priority":  10,
+          "Characteristics": [
+            {
+              "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+              "Name": "EnablePulseOximeterStream",
+              "Type": "BYTES|HEX|TransmitData",
+              "DataGroupName": "TransmitNordic",
+              "IsIndicate": true,
+              "Verbs": ":Indicate:RdInNo:InNo:"
+            },
+            {
+              "UUID": "0000fff1-0000-1000-8000-00805f9b34fb",
+              "Name": "OximeterDataStream",
+              "Type": "U8|HEX|Opcode OSKIP^9^$Opcode_GN_62_EQ_NT U16|DEC|OxygenSaturationInPercent U16|DEC|PulseRate|bpm U8|DEC|RespirationRate U8|DEC|Unknown10 U8|DEC|Unknown11 U8|DEC|Unknown12 U8|DEC|Unknown13 U8|DEC|Unknown14 U8^10_/|FIXED|PerfusionIndexInPercent OSKIP^1^$Opcode_GN_01_EQ_NT U8|DEC|PulseData OOPT BYTES|HEX|RestOfData",
+              "DataGroupName": "TransmitNordic",
+              "IsNotify": true,
+              "Verbs": ":Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "NOTE: only works when the FFF0 is set to indicate (yes, this is weird)",
+                "01 4F : 01 is a 'pleth' pulse data. There's a lot of it!'",
+                "00 01 02 03 04 05 06 07 08 09 10 11 12",
+                "3E 5F 00 36 00 10 20 00 00 00 00 34 F0",
+                "op o2+++ pulse br rr .. .. .. .. pf o2=oxy pulse=pulse rate br=signal bars? pf=perfusion ",
+                "https://github.com/crcctcpr/choicemmed-md300cn358r",
+                "op o2 .. pu .. .. .. .. .. .. .. pf",
+                "https://github.com/ShawTechLab/ble-spo2-validator/blob/main/public/index.html#L575  function decodePacket line 584"
+              ]
+            },
+            {
+              "UUID": "0000fff2-0000-1000-8000-00805f9b34fb",
+              "Name": "Uknown_FFF2",
+              "Type": "BYTES|HEX|ReceiveDataRead",
+              "DataGroupName": "TransmitNordic",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "43 00 20 00 24 08 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00000001-0000-6465-6d6d-65636c6f6843",
+          "Name": "ServiceControl0001",
+          "Characteristics": [
+            {
+              "UUID": "00000002-0000-6465-6d6d-65636c6f6843",
+              "Name": "ReadC0002",
+              "Type": "BYTES|HEX|ReadC0002",
+              "DataGroupName": "ServiceControl0001",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "C2 25 F8 1D 1F 56"
+              ]
+            },
+            {
+              "UUID": "00000003-0000-6465-6d6d-65636c6f6843",
+              "Name": "NotifyC0003",
+              "Type": "BYTES|HEX|NotifyC0003",
+              "DataGroupName": "ServiceControl0001",
+              "IsNotify": true,
+              "Verbs": ":Notify:RdInNo:InNo:"
+            },
+            {
+              "UUID": "00000004-0000-6465-6d6d-65636c6f6843",
+              "Name": "WriteC0004",
+              "Type": "BYTES|HEX|WriteC0004",
+              "DataGroupName": "ServiceControl0001",
+              "IsWrite": true,
+              "Verbs": ":Write:WrWw:"
+            },
+            {
+              "UUID": "00000005-0000-6465-6d6d-65636c6f6843",
+              "Name": "ReadC0005",
+              "Type": "BYTES|HEX|ReadC0005",
+              "DataGroupName": "ServiceControl0001",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000ff00-0000-1000-8000-00805f9b34fb",
+          "Name": "ServiceControlFF00",
+          "Characteristics": [
+            {
+              "UUID": "0000ff01-0000-1000-8000-00805f9b34fb",
+              "Name": "FF01",
+              "Type": "BYTES|HEX|FF01",
+              "DataGroupName": "ServiceControlFF00",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Write:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:",
+              "ExampleData": [
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "0000ff02-0000-1000-8000-00805f9b34fb",
+              "Name": "FF02",
+              "Type": "BYTES|HEX|FF02",
+              "DataGroupName": "ServiceControlFF00",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":Read:Write:WriteWithoutResponse:RdInNo:WrWw:",
+              "ExampleData": [
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "0000ff03-0000-1000-8000-00805f9b34fb",
+              "Name": "FF03",
+              "Type": "BYTES|HEX|FF03",
+              "DataGroupName": "ServiceControlFF00",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":Read:Write:WriteWithoutResponse:RdInNo:WrWw:",
+              "ExampleData": [
+                "00"
+              ]
+            }
+          ]
+        }
+      ],
+      "Details": "TODO: line 190"
+    }
+  ]
+}

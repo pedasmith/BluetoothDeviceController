@@ -7,11 +7,13 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Utilities;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -26,6 +28,9 @@ using Windows.Storage.Streams;
 
 namespace BluetoothWinUI3
 {
+    /// <summary>
+    /// Despite the name, this displays both advertisements and also can connect to a device and dump out all the services + characteristics.
+    /// </summary>
     public sealed partial class BTServicesCharacteristicsDisplay : UserControl, IHandleBTAdvertisements, IDeviceControlBasic
     {
         /// <summary>
@@ -350,8 +355,17 @@ namespace BluetoothWinUI3
             }
         }
 
+        /// <summary>
+        /// Handle all the stuff that happens on connect.
+        /// - Create summary of the device in JSON
+        /// - add to uimNotify for everything that can notify
+        /// </summary>
         private async Task DoConnected(BluetoothLEDevice le)
         {
+            uimIndicate.Items.Clear();
+            uimNotify.Items.Clear();
+            uimRead.Items.Clear();
+
             BluetoothCacheMode cacheMode = BluetoothCacheMode.Cached;
             var addr = SelectedWatcherData.Addr;
             var services = await le.GetGattServicesAsync(cacheMode);
@@ -370,9 +384,13 @@ namespace BluetoothWinUI3
             // TODO: skipping copying classModifiers ClassName Description from knownDevice
             int serviceCount = 0;
 
+            var defaultDevice = BleNames.GetDevice(nameDevice.Name);
+
             foreach (var service in services.Services)
             {
-                var nameService = new NameService(service, null, serviceCount++);
+                // Find the right default service
+                var defaultService = defaultDevice.GetService(service.Uuid);
+                var nameService = new NameService(service, defaultService, serviceCount++);
                 nameDevice.Services.Add(nameService);
 
                 var shortuuid = BluetoothUuidHelper.TryGetShortId(service.Uuid);
@@ -408,8 +426,8 @@ namespace BluetoothWinUI3
                         var chUuidStr = (chshortuuid != null) ? $"{chshortuuid:X4}" : characteristic.Uuid.ToString();
                         var chname = (chshortuuid != null) ? $"name={BluetoothCharacteristic.Decode((ushort)chshortuuid)} " : "";
 
-
-                        var nameCharacteristic = new NameCharacteristic(characteristic, null, null, characteristicCount++);
+                        var defaultCharacteristic = defaultService?.GetCharacteristic(characteristic.Uuid);
+                        var nameCharacteristic = new NameCharacteristic(characteristic, nameService, defaultCharacteristic, characteristicCount++);
                         if (chshortuuid != null)
                         {
                             nameCharacteristic.Name = BluetoothCharacteristic.Decode((ushort)chshortuuid);
@@ -451,6 +469,46 @@ namespace BluetoothWinUI3
                                 chsb.AppendLine($"        Read: {str}");
                             }
                         }
+                        bool addToMap = false;
+                        if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate))
+                        {
+                            ToggleMenuFlyoutItem tmfi = new()
+                            {
+                                Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
+                                IsChecked = false,
+                                Tag = characteristic,
+                            };
+                            tmfi.Click += OnIndicateToggleClicked;
+                            uimIndicate.Items.Add(tmfi);
+                            addToMap = true;
+                        }
+                        if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify))
+                        {
+                            ToggleMenuFlyoutItem tmfi = new()
+                            {
+                                Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
+                                IsChecked = false,
+                                Tag = characteristic,
+                            };
+                            tmfi.Click += OnNotifyToggleClicked;
+                            uimNotify.Items.Add(tmfi);
+                            addToMap = true;
+                        }
+                        if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
+                        {
+                            MenuFlyoutItem tmfi = new()
+                            {
+                                Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
+                                Tag = characteristic,
+                            };
+                            tmfi.Click += OnReadClicked;
+                            uimRead.Items.Add(tmfi);
+                            addToMap = true;
+                        }
+                        if (addToMap)
+                        {
+                            CharacteristicNameMap[characteristic] = nameCharacteristic;
+                        }
                         uiDeviceDetailsTextBlock.Text += chsb.ToString();
                     }
                 }
@@ -463,16 +521,144 @@ namespace BluetoothWinUI3
             var jsonOptions = new JsonSerializerOptions()
             {
                 WriteIndented = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWriting,
                 TypeInfoResolver = resolver,
             };
             //var JsonAsList = System.Text.Json.JsonSerializer.Serialize(nameDeviceList, jsonOptions); // , jsonFormat, jsonSettings);
             var node = BluetoothWinUI3.SystemTextJsonCleaner.ToJsonNode(nameDeviceList);
             var JsonAsList = node?.ToJsonString(jsonOptions) ?? "";
+            JsonAsList = StripPointlessJson(JsonAsList);
 
             uiDeviceDetailsTextBlock.Text += $"\n\n\n" + JsonAsList;
         }
 
+        Dictionary<GattCharacteristic, NameCharacteristic> CharacteristicNameMap = new();
+        HashSet<GattCharacteristic> CharacteristicsWithValueChangedCallback = new();
+        private async void OnIndicateToggleClicked(object sender, RoutedEventArgs e)
+        {
+            var toggle = sender as ToggleMenuFlyoutItem;
+            if (toggle == null) return;
+            var ch = toggle.Tag as GattCharacteristic;
+            if (ch == null)
+            {
+                Log($"BTServices: indicate isn't a GattCharacteristic");
+                return;
+            }
+            var notifyType = toggle.IsChecked ? GattClientCharacteristicConfigurationDescriptorValue.Indicate : GattClientCharacteristicConfigurationDescriptorValue.None;
+            var result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+            if (!CharacteristicsWithValueChangedCallback.Contains(ch))
+            {
+                ch.ValueChanged += Characteristic_ValueChanged;
+                CharacteristicsWithValueChangedCallback.Add(ch);
+            }
+        }
+        private async void OnNotifyToggleClicked(object sender, RoutedEventArgs e)
+        {
+            var toggle = sender as ToggleMenuFlyoutItem;
+            if (toggle == null) return;
+            var ch = toggle.Tag as GattCharacteristic;
+            if (ch == null)
+            {
+                Log($"BTServices: notify isn't a GattCharacteristic");
+                return;
+            }
+            var notifyType = toggle.IsChecked ? GattClientCharacteristicConfigurationDescriptorValue.Notify : GattClientCharacteristicConfigurationDescriptorValue.None;
+            var result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+            if (!CharacteristicsWithValueChangedCallback.Contains(ch))
+            {
+                ch.ValueChanged += Characteristic_ValueChanged;
+                CharacteristicsWithValueChangedCallback.Add(ch);
+            }
+        }
+        private async void OnReadClicked(object sender, RoutedEventArgs e)
+        {
+            var toggle = sender as MenuFlyoutItem;
+            if (toggle == null) return;
+            var ch = toggle.Tag as GattCharacteristic;
+            if (ch == null)
+            {
+                Log($"BTServices: read isn't a GattCharacteristic");
+                return;
+            }
+            var readResult = await ch.ReadValueAsync(BluetoothCacheMode.Cached);
+            if (readResult.Status != GattCommunicationStatus.Success)
+            {
+                Log($"Read: error: status={readResult.Status}");
+            }
+            else
+            {
+                NameCharacteristic name = null;
+                CharacteristicNameMap.TryGetValue(ch, out name);
+                string decodestr = name?.Type ?? "BYTES|HEX|data|";
+                var parseResult = IotNumberFormats.ValueParser.Parse(readResult.Value.ToArray(), decodestr);
+                var str = parseResult.AsString;
+                Log($"Read: {name} {str}");
+            }
+        }
+
+
+        private void Characteristic_ValueChanged(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            NameCharacteristic name = null;
+            CharacteristicNameMap.TryGetValue(sender, out name);
+            string decodestr = name?.Type ?? "BYTES|HEX|data|";
+            //var vr = new IotNumberFormats.ValueParser(decodestr); // was just plain "BYTES|HEX|data|"
+            //vr.Initialize(args.CharacteristicValue.ToArray());
+            //var str = vr.GetNextString();
+            var parseResult = IotNumberFormats.ValueParser.Parse(args.CharacteristicValue.ToArray(), decodestr);
+            var str = parseResult.AsString;
+            Log($"Characteristic Changed: {name.Name} {str}");
+        }
+
+
+        private static string StripPointlessJson(string json)
+        {
+            json = RemovePointlessJson(json, "Suppress", "false");
+            json = RemovePointlessJson(json, "IsRead", "false");
+            json = RemovePointlessJson(json, "IsWrite", "false");
+            json = RemovePointlessJson(json, "SuppressRead", "false");
+            json = RemovePointlessJson(json, "SuppressWrite", "false");
+            json = RemovePointlessJson(json, "IsWriteWithoutResponse", "false");
+            json = RemovePointlessJson(json, "IsNotify", "false");
+            json = RemovePointlessJson(json, "IsIndicate", "false");
+            json = RemovePointlessJson(json, "RegistrationOwner", "Bluetooth Standard");
+            return json;
+        }
+        private static string RemovePointlessJson(string json, string fieldName, string removeValue)
+        {
+            fieldName = "\"" + fieldName + "\"";
+            bool keepGoing = true;
+            int idx = 0;
+            while (keepGoing)
+            {
+                idx = json.IndexOf(fieldName, idx+1);
+                if (idx < 0)
+                {
+                    keepGoing = false;
+                }
+                else
+                {
+                    var idxCR = json.IndexOf("\n", idx);
+                    var idxValue = json.IndexOf(removeValue, idx);
+                    if (idxCR >= 0 && idxValue >= 0 && idxValue < idxCR)
+                    {
+                        // Nuke it!
+                        var idxStart = IndexOfPreviousCR(json, idx);
+                        json = json.Substring(0, idxStart) + json.Substring(idxCR);
+                    }
+                }
+            }
+            return json;
+        }
+
+        private static int IndexOfPreviousCR(string json, int idx)
+        {
+            for (int i=idx-1; i>=0; i--)
+            {
+                if (json[i] == '\n') return i;
+            }
+            return -1;
+        }
         public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
         {
             string retval = "No details";
@@ -498,6 +684,7 @@ namespace BluetoothWinUI3
         {
             NotifyDeviceControlChangesWindows = mainWindow;
         }
+
 
     }
 }

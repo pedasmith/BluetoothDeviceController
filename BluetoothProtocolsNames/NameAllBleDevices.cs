@@ -4,7 +4,7 @@ namespace BluetoothProtocolsNames
 {
     public class NameAllBleDevices
     {
-        public IList<NameDevice> AllDevices { get; } = new List<NameDevice>();
+        public IList<NameDevice> AllDevices { get; set; } = new List<NameDevice>();
 
         public int GetBleIndex(string name)
         {

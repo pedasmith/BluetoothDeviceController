@@ -211,7 +211,10 @@ namespace BluetoothWinUI3
 
                 case ConnectionState.Connected:
                 case ConnectionState.Disconnected:
-                    await DeviceControlBasic?.ReconnectAsync();
+                    if (DeviceControlBasic != null)
+                    {
+                        await DeviceControlBasic?.ReconnectAsync();
+                    }
                     break;
             }
         }

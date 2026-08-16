@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothWinUI3;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -20,7 +21,7 @@ namespace BluetoothProtocols
         public enum SensorPresent
         {
             None = 0x00,
-            PulseRate = 0x01, OxygenSaturationInPercent = 0x02, PerfusionIndexInPercent = 0x04,
+            PulseRate = 0x01, OxygenSaturationInPercent = 0x02, PerfusionIndexInPercent = 0x04, RespirationRate = 0x08,
 
             Battery = 0x80, // TODO: handle like SensorDataRecord??
             All = 0x07,
@@ -32,6 +33,7 @@ namespace BluetoothProtocols
             PulseRate = double.NaN;
             OxygenSaturationInPercent = double.NaN;
             PerfusionIndexInPercent = double.NaN;
+            RespirationRate = double.NaN;
             TimestampMostRecent = DateTimeOffset.Now;
         }
         public HealthDataRecord(double pulseRate, double oxygenSaturationInPercent, double perfusionIndexInPercent, DateTimeOffset? eventTime)
@@ -60,6 +62,7 @@ namespace BluetoothProtocols
             this.PulseRate = value.PulseRate;
             this.OxygenSaturationInPercent = value.OxygenSaturationInPercent;
             this.PerfusionIndexInPercent = value.PerfusionIndexInPercent;
+            this.RespirationRate = value.RespirationRate;
         }
 
         // CopyFrom, but convert the doubles as appropriate
@@ -74,6 +77,7 @@ namespace BluetoothProtocols
             dest.PulseRate = convert(source.PulseRate, "");
             dest.OxygenSaturationInPercent = convert(source.OxygenSaturationInPercent, "");
             dest.PerfusionIndexInPercent = convert(source.PerfusionIndexInPercent, "");
+            dest.RespirationRate = convert(source.RespirationRate, "");
             return dest;
         }
 
@@ -83,6 +87,7 @@ namespace BluetoothProtocols
             if (IsSensorPresent.HasFlag(SensorPresent.PulseRate)) headers.Add("PulseRate");
             if (IsSensorPresent.HasFlag(SensorPresent.OxygenSaturationInPercent)) headers.Add("OxygenSaturationInPercent");
             if (IsSensorPresent.HasFlag(SensorPresent.PerfusionIndexInPercent)) headers.Add("PerfusionIndexInPercent");
+            if (IsSensorPresent.HasFlag(SensorPresent.RespirationRate)) headers.Add("RespirationRate");
 
             if (IsSensorPresent.HasFlag(SensorPresent.Battery)) headers.Add("Battery");
 
@@ -94,6 +99,7 @@ namespace BluetoothProtocols
             if (IsSensorPresent.HasFlag(SensorPresent.PulseRate)) exporter.CellSet(PulseRate);
             if (IsSensorPresent.HasFlag(SensorPresent.OxygenSaturationInPercent)) exporter.CellSet(OxygenSaturationInPercent);
             if (IsSensorPresent.HasFlag(SensorPresent.PerfusionIndexInPercent)) exporter.CellSet(PerfusionIndexInPercent);
+            if (IsSensorPresent.HasFlag(SensorPresent.RespirationRate)) exporter.CellSet(RespirationRate);
             if (IsSensorPresent.HasFlag(SensorPresent.Battery)) exporter.CellSet(BatteryInPercent);
         }
 
@@ -102,8 +108,8 @@ namespace BluetoothProtocols
         public const string PulseRatePropertyChangedName = "PulseRate";
         public const string OxygenSaturationInPercentPropertyChangedName = "OxygenSaturationInPercent";
         public const string PerfusionIndexInPercentPropertyChangedName = "PerfusionIndexInPercent";
+        public const string RespirationRatePropertyChangedName = "RespirationRate";
         public const string BatteryPropertyChangedName = "BatteryInPercent";
-
 
         private double _PulseRate;
         /// <summary>
@@ -123,6 +129,11 @@ namespace BluetoothProtocols
         /// </summary>
         public double PerfusionIndexInPercent { get { return _PerfusionIndexInPercent; } set { if (value == _PerfusionIndexInPercent) return; _PerfusionIndexInPercent = value; OnPropertyChanged(); } }
 
+        private double _RespirationRate;
+        /// <summary>
+        /// Temperature in degrees C
+        /// </summary>
+        public double RespirationRate { get { return _RespirationRate; } set { if (value == _RespirationRate) return; _RespirationRate = value; OnPropertyChanged(); } }
 
 
         private double _BatteryInPercent;
@@ -138,9 +149,10 @@ namespace BluetoothProtocols
         public override string ToString()
         {
             var retval = $"Sensor";
-            if (IsSensorPresent.HasFlag(SensorPresent.PulseRate)) retval += " {PulseRate} bpm";
-            if (IsSensorPresent.HasFlag(SensorPresent.OxygenSaturationInPercent)) retval += " {OxygenSaturationInPercent}%";
-            if (IsSensorPresent.HasFlag(SensorPresent.PerfusionIndexInPercent)) retval += " {PerfusionIndexInPercent}";
+            if (IsSensorPresent.HasFlag(SensorPresent.PulseRate)) retval += $" {PulseRate} bpm";
+            if (IsSensorPresent.HasFlag(SensorPresent.OxygenSaturationInPercent)) retval += $" {OxygenSaturationInPercent}%";
+            if (IsSensorPresent.HasFlag(SensorPresent.PerfusionIndexInPercent)) retval += $" {PerfusionIndexInPercent}";
+            if (IsSensorPresent.HasFlag(SensorPresent.RespirationRate)) retval += $" {RespirationRate} bpm";
             return retval;
         }
     }

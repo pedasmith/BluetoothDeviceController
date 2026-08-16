@@ -184,12 +184,16 @@ namespace IotNumberFormats
                                 stack.Push(d1);
                                 stack.Push(d1);
                                 break;
+                            case "EQ": // equal (result value is 0 or 1)
+                                d1 = stack.Pop();
+                                d2 = stack.Pop();
+                                value = (d1 == d2) ? 1 : 0;
+                                stack.Push(value);
+                                break;
                             case "GO": // go to a location
                                 d1 = stack.Pop();
                                 nextindex = (int)d1;
                                 break;
-
-
                             case "GN": // Get a name, look up in current (new)
                                 {
                                     string name = stringstack.Pop();
@@ -255,6 +259,12 @@ namespace IotNumberFormats
                                 d1 = stack.Pop();
                                 d2 = stack.Pop();
                                 value = ((int)d2) << ((int)d1);
+                                stack.Push(value);
+                                break;
+                            case "NE": //not equal (result value is 0 or 1)
+                                d1 = stack.Pop();
+                                d2 = stack.Pop();
+                                value = (d1 != d2) ? 1 : 0;
                                 stack.Push(value);
                                 break;
                             case "NO": // no-op

@@ -134,6 +134,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
 
             // Viatom
             new SupportedDevice("PC-60F_*", typeof(BTCommon_HealthControl)),
+            new SupportedDevice("500E-B", typeof(BTCommon_HealthControl)), // ZacVRate
 
             // Bike Cycle Cadence and Speed
             //new SupportedDevice("BK6*", typeof(BTTAOPE_CyclingSpeedCadenceControl)),

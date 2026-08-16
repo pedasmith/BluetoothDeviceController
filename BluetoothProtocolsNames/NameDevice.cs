@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BluetoothConversions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -107,8 +108,17 @@ namespace BluetoothProtocolsNames
         /// </summary>
         public List<string> Aliases { get; set; } = new List<string>(); // Must not be null
         public IList<String> Links { get; } = new List<String>();
-        public IList<NameService> Services { get; } = new List<NameService>();
+        public IList<NameService> Services { get; set;  } = new List<NameService>();
 
+        public NameService GetService(Guid uuid)
+        {
+            return GetService(uuid.ToString("D"));
+        }
+
+        /// <summary>
+        /// Gets the service with the right Uuid. Use uuid.ToString("D") for the right format
+        /// or use the GetService that takes in a Uuid.
+        /// </summary>
         public NameService GetService (string uuid)
         {
             foreach (NameService service in Services)

@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_CyclingSpeedCadence_Facade.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_HeartRate_Facade.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ChoiceMMed_PulseOximeter_Extension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy_Extension.cs" />
   </ItemGroup>
 </Project>

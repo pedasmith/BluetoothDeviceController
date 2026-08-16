@@ -50,9 +50,33 @@
                     </ScrollViewer>
                 </Grid>
                 <Grid x:Name="uiDeviceDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
-                    <ScrollViewer x:Name="uiDeviceDetailScrollViewer">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Row="0" x:Name="uiDeviceDetailScrollViewer">
                         <TextBlock x:Name="uiDeviceDetailsTextBlock" Style="{StaticResource sAdvertisementData}" >Device Details</TextBlock>
                     </ScrollViewer>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <Button Content="Notify">
+                            <Button.Flyout>
+                                <MenuFlyout x:Name="uimNotify">
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                        <Button Content="Indicate">
+                            <Button.Flyout>
+                                <MenuFlyout x:Name="uimIndicate">
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                        <Button Content="Read">
+                            <Button.Flyout>
+                                <MenuFlyout x:Name="uimRead">
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Grid>
 
@@ -69,7 +93,6 @@
                 <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
                     <Button x:Name="uiBack" Style="{StaticResource NavigationBackButtonSmallStyle}" Click="OnBackClicked" />
                 </StackPanel>
-                
                 <local:BTConnectionControl x:Name="uiConnectionControl" Grid.Row="1" Grid.ColumnSpan="2" />
             </Grid>
         </Grid>

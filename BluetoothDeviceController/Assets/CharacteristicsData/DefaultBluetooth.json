@@ -179,32 +179,32 @@
             {
               "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
               "Name": "Model Number",
-              "Type": "STRING|ASCII"
+              "Type": "STRING|ASCII|ModelNumber"
             },
             {
               "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
               "Name": "Serial Number",
-              "Type": "STRING|ASCII"
+              "Type": "STRING|ASCII|SerialNumber"
             },
             {
               "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
               "Name": "Firmware Revision",
-              "Type": "STRING|ASCII"
+              "Type": "STRING|ASCII|FirmwareRevision"
             },
             {
               "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
               "Name": "Hardware Revision",
-              "Type": "STRING|ASCII"
+              "Type": "STRING|ASCII|HardwareRevision"
             },
             {
               "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
               "Name": "Software Revision",
-              "Type": "STRING|ASCII"
+              "Type": "STRING|ASCII|SoftwareRevision"
             },
             {
               "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
               "Name": "Manufacturer Name",
-              "Type": "STRING|ASCII"
+              "Type": "STRING|ASCII|ManufacturerName"
             },
             {
               "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
@@ -214,7 +214,7 @@
             {
               "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
               "Name": "PnP ID",
-              "Type": "STRING|ASCII"
+              "Type": "STRING|ASCII|PnPID"
             },
             {
               "UUID": "00002a05-0000-1000-8000-00805f9b34fb",

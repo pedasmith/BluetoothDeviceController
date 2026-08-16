@@ -87,7 +87,17 @@ namespace BluetoothProtocolsNames
         /// </summary>
         [DefaultValue(0)]
         public int Priority { get; set; } = 0;
-        public NameCharacteristic GetChacteristic (string uuid)
+
+        public NameCharacteristic GetCharacteristic(Guid uuid)
+        {
+            return GetCharacteristic(uuid.ToString("D"));
+        }
+        [Obsolete("GetChacteristic is mis-spelled. Use the method with the correct spelling GetCharacteristic")]
+        public NameCharacteristic GetChacteristic(string uuid)
+        {
+            return GetCharacteristic(uuid);
+        }
+        public NameCharacteristic GetCharacteristic (string uuid)
         {
             foreach (var characteristic in Characteristics)
             {
@@ -99,7 +109,7 @@ namespace BluetoothProtocolsNames
             return null;
         }
 
-        public IList<NameCharacteristic> Characteristics { get; } = new List<NameCharacteristic>();
+        public IList<NameCharacteristic> Characteristics { get; set;  } = new List<NameCharacteristic>();
 
         [JsonIgnore]
         public IList<string> DataGroupNames

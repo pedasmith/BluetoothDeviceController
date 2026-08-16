@@ -1,5 +1,6 @@
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
+using BluetoothProtocolsDevicesCoreExtensions;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
@@ -73,6 +74,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
     #region Instance value for a device (not changed)
     Viatom_PC_60F Device_Viatom = null;
+    ChoiceMMed_PulseOximeter Device_MMedPulseOximeter = null;
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
     ulong OriginalBTAddr = 0xFFFFFFFF_FFFFFFFF;
@@ -107,7 +109,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// Current sensor data from the Device. For the demo, it's battery level.
     /// </summary>
     DeviceSpecificSensorData CurrSensor_Data = null;
-    enum SensorFamily { Unknown, Viatom };
+    enum SensorFamily { Unknown, ChoiceMMed_PulseOximeter, Viatom };
     SensorFamily CurrSensorFamily = SensorFamily.Unknown;
 
     /// <summary>
@@ -123,6 +125,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// </summary>
    
     Viatom.SensorType ViatomSensorType = Viatom.SensorType.NotThisSensorFamily;
+    ChoiceMMed_PulseOximeter_Extension.SensorType ChoiceMMedPulseOximeterSensorType = ChoiceMMed_PulseOximeter_Extension.SensorType.NotThisSensorFamily;
     #endregion
 
     #region Instance values for the UX (not changed)
@@ -191,7 +194,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Sensor Data");
 
         // Set up the Connect button and Battery visibility
-        uiBTConnectionControl.SetConnectVisibility(Visibility.Visible); // Viatom is connected, not advert.
+        uiBTConnectionControl.SetConnectVisibility(Visibility.Visible); // ChoiceMMed and Viatom are connected, not advert.
         if (!CurrSensor_Data.IsSensorPresent.HasFlag(HealthDataRecord.SensorPresent.Battery))
         {
             uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
@@ -203,6 +206,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         UpdateForSensor(HealthDataRecord.SensorPresent.PulseRate, 5, 30, "Pulse", "PulseRate", uiDeviceDataPulseRate);
         UpdateForSensor(HealthDataRecord.SensorPresent.OxygenSaturationInPercent, 2, 10, "Oxygen", "OxygenSaturationInPercent", uiDeviceDataOxygenSaturationInPercent);
         UpdateForSensor(HealthDataRecord.SensorPresent.PerfusionIndexInPercent, 2, 10, "Perfusion", "PerfusionIndexInPercent", uiDeviceDataPerfusionIndexInPercent);
+        UpdateForSensor(HealthDataRecord.SensorPresent.RespirationRate, 5, 30, "Respiration", "RespirationRate", uiDeviceDataRespirationRate);
 
         //
         uiOxyPlot.Model = OxyPlotModel;
@@ -357,17 +361,29 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         // Initialize data values. Somewhat ugly code :-(
         ViatomSensorType = Viatom.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
         if (ViatomSensorType != Viatom.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.Viatom;
+        ChoiceMMedPulseOximeterSensorType = ChoiceMMed_PulseOximeter_Extension.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
+        if (ChoiceMMedPulseOximeterSensorType != ChoiceMMed_PulseOximeter_Extension.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.ChoiceMMed_PulseOximeter;
 
+        BluetoothLEDevice ble = null;
         switch (CurrSensorFamily)
         {
             case SensorFamily.Unknown:
                 Log($"Health: Error: unknown sensor");
                 return;
-            case SensorFamily.Viatom:
-                Device_Viatom = new Viatom_PC_60F()
+            case SensorFamily.ChoiceMMed_PulseOximeter:
+                ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr);
+                Device_MMedPulseOximeter = new ChoiceMMed_PulseOximeter() { ble = ble };
+                if (Device_MMedPulseOximeter.ble == null)
                 {
-                    ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
-                };
+                    // ConnectError:NoBLE
+                    Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
+                    CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
+                    return;
+                }
+                break;
+            case SensorFamily.Viatom:
+                ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr);
+                Device_Viatom = new Viatom_PC_60F() { ble = ble };
                 if (Device_Viatom.ble == null)
                 {
                     // ConnectError:NoBLE
@@ -382,7 +398,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         // It's critical to set these!
         DataContextAsKnownDevice.Id = DataContextAsKnownDevice.Advertisement.AddressAsString; //  Device.ble.DeviceId ?? ""; // never null :-)
-        DataContextAsKnownDevice.BTLEDevice = Device_Viatom.ble;
+        DataContextAsKnownDevice.BTLEDevice = ble;
         CurrSaveData = AllSaveData.SwitchToDeviceIdCurrSaveData(CurrSaveData, DataContextAsKnownDevice);
 
         UtilitiesWinUI3.UtilitiesWinUI3.InitializeKeyLineColorsFromDefaultOxyPlot(OxyPlotModel, rootPanel);
@@ -390,30 +406,50 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         KnownDeviceName = DataContextAsKnownDevice.Advertisement.BestName;
         uiKnownDeviceName.Text = KnownDeviceName;
 
-        Device_Viatom.PropertyChanged += Device_PropertyChanged;
-        Device_Viatom.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
-        Device_Viatom.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+        if (Device_MMedPulseOximeter != null)
+        {
+            Device_MMedPulseOximeter.PropertyChanged += Device_PropertyChanged;
+            Device_MMedPulseOximeter.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
+            Device_MMedPulseOximeter.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+        }
+        if (Device_Viatom != null)
+        {
+            Device_Viatom.PropertyChanged += Device_PropertyChanged;
+            Device_Viatom.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
+            Device_Viatom.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+        }
         bool connectAllOk = true;
         uiBTConnectionControl.CurrState = BTConnectionControl.ConnectionState.Connecting;
         #region Change so the device starts sending notifications for changed properties (data)
 
-        connectAllOk = connectAllOk && await Device_Viatom.NotifyReceiveAsync();
+        if (Device_MMedPulseOximeter != null)
+        {
+            connectAllOk = connectAllOk && await Device_MMedPulseOximeter.NotifyOximeterDataStreamAsync();
+            var INDICATE = Windows.Devices.Bluetooth.GenericAttributeProfile.GattClientCharacteristicConfigurationDescriptorValue.Indicate;
+            connectAllOk = connectAllOk && await Device_MMedPulseOximeter.NotifyEnablePulseOximeterStreamAsync(INDICATE);
+        }
+        if (Device_Viatom != null)
+        {
+            connectAllOk = connectAllOk && await Device_Viatom.NotifyReceiveAsync();
+        }
         #endregion
 
         // The system tracks device changes
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
-        var statusMatch = (connectAllOk && Device_Viatom.ble.ConnectionStatus == BluetoothConnectionStatus.Connected)
-            || (!connectAllOk && Device_Viatom.ble.ConnectionStatus == BluetoothConnectionStatus.Disconnected);
+
+        var statusMatch = (connectAllOk && ble.ConnectionStatus == BluetoothConnectionStatus.Connected)
+            || (!connectAllOk && ble.ConnectionStatus == BluetoothConnectionStatus.Disconnected);
         if (!statusMatch)
         {
-            Log($"{KnownDeviceName}: connect is inconsistent: connectAllOk={connectAllOk} but ble={Device_Viatom.ble.ConnectionStatus}");
+            Log($"{KnownDeviceName}: connect is inconsistent: connectAllOk={connectAllOk} but ble={ble.ConnectionStatus}");
         }
-        uiBTConnectionControl.SetState(Device_Viatom.ble.ConnectionStatus);
-        CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device_Viatom.ble.ConnectionStatus);
+        uiBTConnectionControl.SetState(ble.ConnectionStatus);
+        CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, ble.ConnectionStatus);
 
         HandleMyAdvertisement(DataContextAsKnownDevice.Advertisement);
     }
+
 
     /// <summary>
     /// Called when the BLE device connection status changes.
@@ -594,6 +630,26 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             CurrSensor_Data = next;
             name = "*"; // all data is updated
         }
+        else if (name == ChoiceMMed_PulseOximeter.OximeterDataStreamPropertyChangedName)
+        {
+            if (CurrSensor_Data == null)
+            {
+                CurrSensor_Data = new DeviceSpecificSensorData()
+                {
+                    IsSensorPresent = DeviceSpecificSensorData.SensorPresent.OxygenSaturationInPercent
+                    | DeviceSpecificSensorData.SensorPresent.PerfusionIndexInPercent
+                    | DeviceSpecificSensorData.SensorPresent.PulseRate
+                    | DeviceSpecificSensorData.SensorPresent.RespirationRate,
+                };
+            }
+            var data = Device_MMedPulseOximeter.CurrTransmitNordic;
+            CurrSensor_Data.OxygenSaturationInPercent = data.OxygenSaturationInPercent;
+            CurrSensor_Data.PerfusionIndexInPercent = data.PerfusionIndexInPercent;
+            CurrSensor_Data.PulseRate = data.PulseRate;
+            CurrSensor_Data.RespirationRate = data.RespirationRate;
+            CurrSensor_Data.TimestampMostRecent = data.TimestampMostRecent;
+            name = "*"; // all data is updated
+        }
         else
         {
             return; // no other data???
@@ -614,9 +670,6 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         switch (name)
         {
             case "*": // All the data changed. This is what always happens with the sensor.
-            case HealthDataRecord.PulseRatePropertyChangedName:
-            case HealthDataRecord.OxygenSaturationInPercentPropertyChangedName:
-            case HealthDataRecord.PerfusionIndexInPercentPropertyChangedName:
                 UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
                 break;
         }
@@ -634,6 +687,10 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         if (name == HealthDataRecord.PerfusionIndexInPercentPropertyChangedName || name == "" || name == "*")
         {
             uiPerfusionIndexInPercent.Text = CurrSensor_DataUnits.PerfusionIndexInPercent.ToString("F0") + "%";
+        }
+        if (name == HealthDataRecord.RespirationRatePropertyChangedName || name == "" || name == "*")
+        {
+            uiRespirationRate.Text = CurrSensor_DataUnits.RespirationRate.ToString("F0");
         }
 
         if (name == HealthDataRecord.BatteryPropertyChangedName || name == "" || name == "*")
@@ -713,8 +770,9 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         switch (CurrSensorFamily)
         {
+            case SensorFamily.ChoiceMMed_PulseOximeter:
             case SensorFamily.Viatom:
-                return; // viatom PC60FW doesn't use adverts for data.
+                return; // ChoiceMMed and viatom PC60FW doesn't use adverts for data.
         }
         ;
 

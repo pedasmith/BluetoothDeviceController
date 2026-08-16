@@ -52,6 +52,14 @@
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPerfusionIndexInPercent"/></TextBlock>
                         <Line Height="5" Tag="PerfusionIndexInPercentColor" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataRespirationRate">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Respiration</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRespirationRate"/></TextBlock>
+                        <Line Height="5" Tag="RespirationRateColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
                 </GridView>
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >

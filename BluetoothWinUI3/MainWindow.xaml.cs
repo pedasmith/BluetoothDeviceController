@@ -1,3 +1,4 @@
+using BluetoothProtocolsNames;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWatcher.Units;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
@@ -73,7 +74,7 @@ namespace BluetoothWinUI3
             CurrUserPrefs.Save();
         }
 
-
+        BleNames SingletonBleNames = new BleNames();
         private async void MainWindow_Loaded(object sender, RoutedEventArgs args)
         {
             if (rootPanel.ActualHeight < 800)
@@ -91,6 +92,9 @@ namespace BluetoothWinUI3
             }
 
             SaveDataRunner.Start();
+
+            // Arguably I don't need to do this here -- the data is only used by the BTServicesCharacteristicsDisplay
+            await SingletonBleNames.InitAsync();
         }
 
         // Code is From https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.windowing.appwindow.seticon?view=windows-app-sdk-1.8#Microsoft_UI_Windowing_AppWindow_SetIcon_System_String_

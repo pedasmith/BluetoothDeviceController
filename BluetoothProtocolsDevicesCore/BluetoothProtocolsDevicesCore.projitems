@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_Demo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTCommonMetaData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_HeartRate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ChoiceMMed_PulseOximeter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IExportData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy.cs" />
