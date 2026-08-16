@@ -99,7 +99,7 @@ namespace BluetoothConversions
 				case 0x2768: return "mass (tonne)"; // org.bluetooth.unit.mass.tonne
 				case 0x2780: return "pressure (bar)"; // org.bluetooth.unit.pressure.bar
 				case 0x2781: return "pressure (millimetre of mercury)"; // org.bluetooth.unit.pressure.millimetre_of_mercury
-				case 0x2782: return "length (Üngstrîm)"; // org.bluetooth.unit.length.Üngstrîm
+				case 0x2782: return "length (√•ngstr√∂m)"; // org.bluetooth.unit.length.√•ngstr√∂m
 				case 0x2783: return "length (nautical mile)"; // org.bluetooth.unit.length.nautical_mile
 				case 0x2784: return "area (barn)"; // org.bluetooth.unit.area.barn
 				case 0x2785: return "velocity (knot)"; // org.bluetooth.unit.velocity.knot
