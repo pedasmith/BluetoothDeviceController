@@ -19,11 +19,16 @@ namespace BluetoothProtocolsNames
             {
                 return StandardRegistration;
             }
-            foreach (var item in Registrations)
-            {
-                if (item.Id == id) return item;
-            }
-            return null;
+            var name = GetMember_Uuid(id);
+            if (name == null) return null;
+            return new Registration(id, name, "3/3/2023");
+
+            // Old code. New code is automatically generated from YAML files
+            //foreach (var item in Registrations)
+            //{
+            //    if (item.Id == id) return item;
+            //}
+            //return null;
         }
         public static Registration FindRegistration(Guid g)
         {
@@ -61,14 +66,39 @@ namespace BluetoothProtocolsNames
             }
             public ushort Id { get; set; }
             public string RegistrationOwner { get; set; }
-            public string RegistrationDate { get; set; }
+            /// <summary>
+            /// The registration date is no longer supplied with the YAML file
+            /// </summary>
+            private string RegistrationDate { get; set; }
         }
 
         private static Registration StandardRegistration = new Registration(0x180F, "Bluetooth Standard", "1/1/1970");
+
+        // 2026: or look in the YAML file: https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/uuids/member_uuids.yaml
+
+        private static string GetMember_Uuid(uint uuid)
+        {
+            switch (uuid)
+            {
+                // updatefile:
+                // url:https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/uuids/member_uuids.yaml
+                // file:member_uuids.yaml
+                // startupdatefile:
+                // endupdatefile:
+
+            }
+            return null; // $"?{uuid:X2}";
+        }
+
         private static Registration[] Registrations = new Registration[]
         {
+            // updatefile:
+            // url:https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/uuids/member_uuids.yaml
+            // file:member_uuids.yaml
+            // template:new Registration(HEX, "NAME", "DATEMMDDYYYY"),
+            // startupdatefile:
             new Registration(0xFD75, "Insulet Corporation", "25/02/2020"),
-            new Registration(0xFD75, "Insulet Corporation", "25/02/2020"),
+            // endupdatefile
             new Registration(0xFD76, "Insulet Corporation", "25/02/2020"),
             new Registration(0xFD77, "Withings", "11/02/2020"),
             new Registration(0xFD78, "Withings", "11/02/2020"),

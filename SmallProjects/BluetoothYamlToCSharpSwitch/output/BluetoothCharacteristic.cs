@@ -518,6 +518,13 @@ namespace BluetoothConversions
 				case 0x2C38: return "Voice Assistant Supported Features"; // org.bluetooth.characteristic.voice_assistant_supported_features
 				case 0x2C39: return "HID SCI Mode"; // org.bluetooth.characteristic.hid_sci_mode
 				case 0x2C3A: return "HID SCI Information"; // org.bluetooth.characteristic.hid_sci_information
+				case 0x2C3B: return "Tire Pressure"; // org.bluetooth.characteristic.tire_pressure
+				case 0x2C3C: return "Tire Temperature"; // org.bluetooth.characteristic.tire_temperature
+				case 0x2C3D: return "Tire Acceleration"; // org.bluetooth.characteristic.tire_acceleration
+				case 0x2C3E: return "TPMS Properties"; // org.bluetooth.characteristic.tpms_properties
+				case 0x2C3F: return "TPMS Duty Cycle"; // org.bluetooth.characteristic.tpms_duty_cycle
+				case 0x2C40: return "TPMS Position"; // org.bluetooth.characteristic.tpms_position
+				case 0x2C41: return "TPMS Signing Key"; // org.bluetooth.characteristic.tpms_signing_key
                 // endupdatefile:
             }
             return $"{value:X2}";

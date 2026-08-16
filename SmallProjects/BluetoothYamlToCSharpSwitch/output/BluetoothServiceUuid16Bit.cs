@@ -131,6 +131,7 @@ namespace BluetoothConversions
 				case 0x185D: return "Cookware"; // org.bluetooth.service.cookware
 				case 0x185E: return "Voice Assistant"; // org.bluetooth.service.voice_assistant
 				case 0x185F: return "Generic Voice Assistant"; // org.bluetooth.service.generic_voice_assistant
+				case 0x1860: return "Tire Pressure Monitoring System"; // org.bluetooth.service.tire_pressure_monitoring_system
                     // endupdatefile:
             }
             return $"";

@@ -257,3 +257,6 @@ uuids:
  - uuid: 0x185F
    name: Generic Voice Assistant
    id: org.bluetooth.service.generic_voice_assistant
+ - uuid: 0x1860
+   name: Tire Pressure Monitoring System
+   id: org.bluetooth.service.tire_pressure_monitoring_system

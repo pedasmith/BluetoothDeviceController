@@ -1544,3 +1544,24 @@ uuids:
  - uuid: 0x2C3A
    name: HID SCI Information
    id: org.bluetooth.characteristic.hid_sci_information
+ - uuid: 0x2C3B
+   name: Tire Pressure
+   id: org.bluetooth.characteristic.tire_pressure
+ - uuid: 0x2C3C
+   name: Tire Temperature
+   id: org.bluetooth.characteristic.tire_temperature
+ - uuid: 0x2C3D
+   name: Tire Acceleration
+   id: org.bluetooth.characteristic.tire_acceleration
+ - uuid: 0x2C3E
+   name: TPMS Properties
+   id: org.bluetooth.characteristic.tpms_properties
+ - uuid: 0x2C3F
+   name: TPMS Duty Cycle
+   id: org.bluetooth.characteristic.tpms_duty_cycle
+ - uuid: 0x2C40
+   name: TPMS Position
+   id: org.bluetooth.characteristic.tpms_position
+ - uuid: 0x2C41
+   name: TPMS Signing Key
+   id: org.bluetooth.characteristic.tpms_signing_key

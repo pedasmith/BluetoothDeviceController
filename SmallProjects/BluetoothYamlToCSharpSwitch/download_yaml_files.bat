@@ -11,9 +11,10 @@ REM                 into https://bitbucket.org/bluetooth-SIG/public/raw/main/gss
 
 curl --remote-name --get https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/core/ad_types.yaml
 curl --remote-name --get https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/uuids/characteristic_uuids.yaml
+curl --remote-name --get https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/uuids/member_uuids.yaml
+curl --remote-name --get https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/uuids/service_uuids.yaml
 curl --remote-name --get https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/uuids/units.yaml
 curl --remote-name --get https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
-curl --remote-name --get https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/uuids/service_uuids.yaml
 curl --remote-name --get https://bitbucket.org/bluetooth-SIG/public/raw/main/gss/org.bluetooth.characteristic.body_sensor_location.yaml
 
 

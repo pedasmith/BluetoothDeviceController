@@ -46,6 +46,18 @@ namespace BluetoothYamlToCSharpSwitch
         {
             public string value { get; set; }
             public string name { get; set; }
+            public uint valueAsUInt
+            {
+                get
+                {
+                    uint asdecimal = 0xFFF0;
+                    string noleading = value;
+                    if (noleading.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) noleading = noleading.Substring(2);
+                    var ishex = uint.TryParse(noleading, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out asdecimal);
+                    return asdecimal;
+                }
+            }
+
             public override string ToString()
             {
                 uint asdecimal = 0xFFF0;
@@ -65,6 +77,14 @@ namespace BluetoothYamlToCSharpSwitch
 
                 }
                 return $"case {value}: /* {asdecimal} */ return \"{name.RemoveQuotes()}\";";
+            }
+
+            public static string TemplateReplace(uint valueAsUInt, string name, string template= "case HEX: /* DECIMAL */ return \"NAME\";")
+            {
+                var retval = template.Replace("HEX", valueAsUInt.ToString("X2"));
+                retval = retval.Replace("DECIMAL", valueAsUInt.ToString());
+                retval = retval.Replace("NAME", name.RemoveQuotes());
+                return retval;
             }
         }
 
