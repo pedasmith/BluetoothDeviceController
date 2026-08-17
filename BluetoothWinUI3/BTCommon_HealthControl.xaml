@@ -19,7 +19,14 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="uiKnownDeviceName" Grid.Row="0" Text="Health Sensor" Style="{StaticResource sDeviceTitle}"/>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" x:Name="uiKnownDeviceName" Text="Health Sensor" Style="{StaticResource sDeviceTitle}"/>
+                <local:HeartRate_Pleth_Control Visibility="Collapsed" Grid.Column="1" x:Name="uiPleth" Width="200" Height="15" />
+            </Grid>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />

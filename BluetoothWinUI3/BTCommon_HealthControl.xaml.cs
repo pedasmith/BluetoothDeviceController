@@ -339,6 +339,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             default: break;
             case SensorFamily.Unknown: break;
             case SensorFamily.ChoiceMMed_PulseOximeter:
+                // Sets the IsSensorPresent value
                 ChoiceMMed_PulseOximeter_Extension.SetHealthDataRecordIsSensor(CurrSensor_Data, ChoiceMMedPulseOximeterSensorType);
                 break;
         }
@@ -648,11 +649,24 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
                 ;
             }
             var data = Device_MMedPulseOximeter.CurrTransmitNordic;
-            CurrSensor_Data.OxygenSaturationInPercent = data.OxygenSaturationInPercent;
-            CurrSensor_Data.PerfusionIndexInPercent = data.PerfusionIndexInPercent;
-            CurrSensor_Data.PulseRate = data.PulseRate;
-            CurrSensor_Data.RespirationRate = data.RespirationRate;
-            CurrSensor_Data.TimestampMostRecent = data.TimestampMostRecent;
+            switch (data.Opcode)
+            {
+                case 0x01: // pulse data
+                    uiPleth.Visibility = Visibility.Visible;
+                    uiPleth.AddNextPulse(data.PulseData);
+                    // Other than updating the uiPleth display, do nothing.
+                    // Especially don't update the sparkles; if you do, they just jump around
+                    // like a puppy wanting a treat.
+                    return;
+                case 0x3E: // normal data
+                    CurrSensor_Data.OxygenSaturationInPercent = data.OxygenSaturationInPercent;
+                    CurrSensor_Data.PerfusionIndexInPercent = data.PerfusionIndexInPercent;
+                    CurrSensor_Data.PulseRate = data.PulseRate;
+                    CurrSensor_Data.RespirationRate = data.RespirationRate;
+                    CurrSensor_Data.TimestampMostRecent = data.TimestampMostRecent;
+                    break;
+            }
+
             name = "*"; // all data is updated
         }
         else
