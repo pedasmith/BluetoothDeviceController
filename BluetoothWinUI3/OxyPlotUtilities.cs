@@ -132,11 +132,15 @@ internal static class OxyPlotUtilities
         { "eCOS" , new LineColorStyle(OxyColors.DarkGreen, LineStyle.Dash, WIDTH_SECONDARY)},
         { "TVOC" , new LineColorStyle(OxyColors.DarkMagenta, LineStyle.Dash, WIDTH_SECONDARY)},
 
+        // Biking
         { "RpsSensor", new LineColorStyle(OxyColors.White)},
+
+        // Health
         { "HeartRate", new LineColorStyle(OxyColors.DarkRed)}, // Blood color :-)
         { "PulseRate", new LineColorStyle(OxyColors.DarkRed)}, // Blood color :-)
-        { "OxygenSaturationInPercent", new LineColorStyle(OxyColors.DarkBlue)}, 
-        { "PerfusionIndexInPercent", new LineColorStyle(OxyColors.Violet, LineStyle.Dash, WIDTH_SECONDARY)}, 
+        { "OxygenSaturationInPercent", new LineColorStyle(OxyColors.DarkBlue)},
+        { "PerfusionIndexInPercent", new LineColorStyle(OxyColors.Violet, LineStyle.Dash, WIDTH_SECONDARY)},
+        { "RespirationRate", new LineColorStyle(OxyColors.Green, LineStyle.Dash, WIDTH_SECONDARY)},
     };
 
     private static List<LineColorStyle> BackupColorStyle = new ()

@@ -191,12 +191,13 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         };
 
         // Change: set up the graph by making an OxyPlotModel
-        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Sensor Data");
+        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Health Data");
 
         // Set up the Connect button and Battery visibility
         uiBTConnectionControl.SetConnectVisibility(Visibility.Visible); // ChoiceMMed and Viatom are connected, not advert.
         if (!CurrSensor_Data.IsSensorPresent.HasFlag(HealthDataRecord.SensorPresent.Battery))
         {
+            // TODO: or the device might have a battery service
             uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
         }
         // Note: you have to remove the sensor from the uiDeviceDataList entirely. You can't just
@@ -205,8 +206,8 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         UpdateForSensor(HealthDataRecord.SensorPresent.PulseRate, 5, 30, "Pulse", "PulseRate", uiDeviceDataPulseRate);
         UpdateForSensor(HealthDataRecord.SensorPresent.OxygenSaturationInPercent, 2, 10, "Oxygen", "OxygenSaturationInPercent", uiDeviceDataOxygenSaturationInPercent);
-        UpdateForSensor(HealthDataRecord.SensorPresent.PerfusionIndexInPercent, 2, 10, "Perfusion", "PerfusionIndexInPercent", uiDeviceDataPerfusionIndexInPercent);
-        UpdateForSensor(HealthDataRecord.SensorPresent.RespirationRate, 5, 30, "Respiration", "RespirationRate", uiDeviceDataRespirationRate);
+        UpdateForSensor(HealthDataRecord.SensorPresent.PerfusionIndexInPercent, 2, 10, "Perfusion", "PerfusionIndexInPercent", uiDeviceDataPerfusionIndexInPercent, axisPosition:AxisPosition.Right);
+        UpdateForSensor(HealthDataRecord.SensorPresent.RespirationRate, 5, 30, "Respiration (RR)", "RespirationRate", uiDeviceDataRespirationRate, axisPosition: AxisPosition.Right);
 
         //
         uiOxyPlot.Model = OxyPlotModel;
@@ -327,6 +328,21 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             IsSensorPresent = HealthDataRecord.SensorPresent.PulseRate | HealthDataRecord.SensorPresent.OxygenSaturationInPercent | HealthDataRecord.SensorPresent.PerfusionIndexInPercent,
         };
 
+        // Initialize sensor types Must happen before we InitializeUX() because that code
+        // uses the sensor type to decide what to display
+        ViatomSensorType = Viatom.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
+        if (ViatomSensorType != Viatom.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.Viatom;
+        ChoiceMMedPulseOximeterSensorType = ChoiceMMed_PulseOximeter_Extension.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
+        if (ChoiceMMedPulseOximeterSensorType != ChoiceMMed_PulseOximeter_Extension.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.ChoiceMMed_PulseOximeter;
+        switch (CurrSensorFamily)
+        {
+            default: break;
+            case SensorFamily.Unknown: break;
+            case SensorFamily.ChoiceMMed_PulseOximeter:
+                ChoiceMMed_PulseOximeter_Extension.SetHealthDataRecordIsSensor(CurrSensor_Data, ChoiceMMedPulseOximeterSensorType);
+                break;
+        }
+
         InitializeUX(); // ensure we're initialized.
         uiBTConnectionControl.SetDeviceControl(this);
         if (OriginalBTAddr != 0xFFFFFFFF_FFFFFFFF)
@@ -358,12 +374,6 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // Has already been saved, so will exist.
 
-        // Initialize data values. Somewhat ugly code :-(
-        ViatomSensorType = Viatom.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
-        if (ViatomSensorType != Viatom.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.Viatom;
-        ChoiceMMedPulseOximeterSensorType = ChoiceMMed_PulseOximeter_Extension.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
-        if (ChoiceMMedPulseOximeterSensorType != ChoiceMMed_PulseOximeter_Extension.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.ChoiceMMed_PulseOximeter;
-
         BluetoothLEDevice ble = null;
         switch (CurrSensorFamily)
         {
@@ -371,6 +381,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
                 Log($"Health: Error: unknown sensor");
                 return;
             case SensorFamily.ChoiceMMed_PulseOximeter:
+                ChoiceMMed_PulseOximeter_Extension.SetHealthDataRecordIsSensor(CurrSensor_Data, ChoiceMMedPulseOximeterSensorType);
                 ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr);
                 Device_MMedPulseOximeter = new ChoiceMMed_PulseOximeter() { ble = ble };
                 if (Device_MMedPulseOximeter.ble == null)
@@ -634,13 +645,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         {
             if (CurrSensor_Data == null)
             {
-                CurrSensor_Data = new DeviceSpecificSensorData()
-                {
-                    IsSensorPresent = DeviceSpecificSensorData.SensorPresent.OxygenSaturationInPercent
-                    | DeviceSpecificSensorData.SensorPresent.PerfusionIndexInPercent
-                    | DeviceSpecificSensorData.SensorPresent.PulseRate
-                    | DeviceSpecificSensorData.SensorPresent.RespirationRate,
-                };
+                ;
             }
             var data = Device_MMedPulseOximeter.CurrTransmitNordic;
             CurrSensor_Data.OxygenSaturationInPercent = data.OxygenSaturationInPercent;

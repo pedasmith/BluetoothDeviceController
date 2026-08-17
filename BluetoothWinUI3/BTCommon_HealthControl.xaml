@@ -55,7 +55,7 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiDeviceDataRespirationRate">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Respiration</Run>
+                        <Run>Respiration</Run><Run FontSize="15">&#160;(RR)</Run>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiRespirationRate"/></TextBlock>
                         <Line Height="5" Tag="RespirationRateColor" Style="{StaticResource sGraphLineKey}" />
