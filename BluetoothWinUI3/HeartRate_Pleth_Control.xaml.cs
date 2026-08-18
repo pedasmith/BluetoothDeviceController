@@ -26,7 +26,7 @@ namespace BluetoothWinUI3
     public sealed partial class HeartRate_Pleth_Control : UserControl
     {
         const int NLINE = 140; // Makes a decent display
-        const double THICKNESS = 1.0;
+        const double THICKNESS = 1.8;
         double HEIGHT { get { return ActualHeight < 10 ? 10 : ActualHeight; } }
         double WIDTH { get { return ActualWidth < 10 ? 10 : ActualWidth; } }
         int NextLineIndex = 0;

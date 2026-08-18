@@ -229,11 +229,6 @@
           "Name": "Battery",
           "Characteristics": [
             {
-              "UUID": "00002a07-0000-1000-8000-00805f9b34fb",
-              "Name": "Transmit Power",
-              "Type": "I8|DEC|TransmitPower|db"
-            },
-            {
               "UUID": "00002a19-0000-1000-8000-00805f9b34fb",
               "Name": "BatteryLevel",
               "Type": "I8|DEC|BatteryLevel|%",

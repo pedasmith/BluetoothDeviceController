@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 #if NET8_0_OR_GREATER
@@ -49,6 +50,8 @@ namespace BluetoothProtocolsNames
         public string GetUserName() { return String.IsNullOrEmpty(UserName) ? Name : UserName; }
 
         public enum CompletionStatusEnum {  Usable, Unusable};
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public CompletionStatusEnum CompletionStatus { get; set; } = CompletionStatusEnum.Usable;
 
         [DefaultValue("")]

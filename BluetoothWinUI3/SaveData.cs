@@ -27,7 +27,7 @@ namespace BluetoothWinUI3
         /// folder in a file called AllDeviceData.devices. It's restored with a call to Restore() which is done automatically
         /// in App.xaml.cs
         /// </summary>
-        public static void Save()
+        public static void Save(string suffix = "")
         {
             string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
             Directory.CreateDirectory(folderPath);
@@ -36,7 +36,7 @@ namespace BluetoothWinUI3
             var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
             File.WriteAllText(filePath, json);
 
-            Log($"Saved configuration to {filePath}");
+            Log($"Saved configuration to {filePath}{suffix}");
         }
 
         private static void Log(string str)
@@ -153,7 +153,7 @@ namespace BluetoothWinUI3
                 // Must create a new SaveData.
                 saveData = new SaveData(knownDevice);
                 AllSaveData.Insert(saveData);
-                AllSaveData.Save(); // quick update
+                AllSaveData.Save(" create"); // quick update
             }
             return saveData;
         }

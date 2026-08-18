@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 #if NET8_0_OR_GREATER
@@ -69,7 +70,7 @@ namespace BluetoothWinUI3
             NElapsedCalls++;
             try
             {
-                AllSaveData.Save();
+                AllSaveData.Save($" after {tl.TimeInMinutes} minutes");
             }
             catch (Exception)
             {

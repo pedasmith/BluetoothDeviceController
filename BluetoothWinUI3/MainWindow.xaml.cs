@@ -365,7 +365,7 @@ namespace BluetoothWinUI3
 
         private void OnDebugSaveDevices(object sender, RoutedEventArgs e)
         {
-            AllSaveData.Save();
+            AllSaveData.Save(" debug save");
         }
 
         private async Task<ZoomableDeviceControl> GetZoomableSelectedAsync(string verb)
@@ -464,7 +464,7 @@ namespace BluetoothWinUI3
 
             // Save it and update colors!
             colorsSave.Set(colorType, newcolor);
-            AllSaveData.Save();
+            AllSaveData.Save(" update color");
             selected.UpdateUX(saveData);
         }
 
@@ -485,7 +485,7 @@ namespace BluetoothWinUI3
 
             string newname = uiDialogRenameDeviceName.Text;
             saveData.SetUserName(newname);
-            AllSaveData.Save();
+            AllSaveData.Save(" rename {newname}");
             ;
             selected.UpdateUX(saveData);
         }
@@ -911,7 +911,7 @@ namespace BluetoothWinUI3
 
             // Save it and update colors!
             colorsSave.Set("Graph:" + lineTitle, newcolor);
-            AllSaveData.Save();
+            AllSaveData.Save(" color");
             selected.UpdateGraphColor(lineTitle, newcolor);
         }
 

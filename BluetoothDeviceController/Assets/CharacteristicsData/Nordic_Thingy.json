@@ -152,9 +152,10 @@
             {
               "UUID": "EF680109-9B35-4933-9B10-52FFA9740042",
               "Name": "NFC Tag",
-              "Type": "STRING|ASCII|NFCTag"
+              "Type": "STRING|ASCII|NFCTag",
+              "IsRead": true,
+              "REM":  "The NFC Tag characteristic was original noted without an IsRead, etc. Adding because why not?"
             }
-
           ]
         },
 
@@ -444,7 +445,9 @@
             {
               "UUID": "8EC90001-F315-4F60-9FB8-838830DAEA50",
               "Name": "Device Firmware Update (DFU) Characteristics",
-              "Type": "U8|HEX|EnableButtonlessDfuMode"
+              "Type": "U8|HEX|EnableButtonlessDfuMode",
+              "IsRead": true,
+              "REM": "The device firmaware update characteristic was original noted without an IsRead, etc. Adding because why not?"
             },
             {
               "UUID": "8ec90003-f315-4f60-9fb8-838830daea50",
