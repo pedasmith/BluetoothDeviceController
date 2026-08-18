@@ -24,6 +24,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)SensorDataRecordCopyable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SensorPro.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ThermPro.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Viatom_PulseOximeter_PC60FW_Factory.cs" />
   </ItemGroup>
 </Project>

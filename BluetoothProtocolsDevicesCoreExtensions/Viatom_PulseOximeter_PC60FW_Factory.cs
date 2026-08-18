@@ -122,9 +122,9 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                 InputBuffers.Add(value);
             }
         }
-        string CurrWaveform = "!";
-        bool WaveformPeak = false;
-        List<byte> CurrWaveformData = new List<byte>();
+        //string CurrWaveform = "!";
+        //bool WaveformPeak = false;
+        public List<byte> CurrWaveformData { get; } = new List<byte>();
 
         /// <summary>
         /// Gets whatever data is ready. Is often null when there's not enough data or it's the wrong type.
@@ -193,53 +193,48 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
                             }
                             else
                             {
-                                int nZero = 0;
-                                bool gotZeroStretch = false;
-                                bool gotPeak = false;
+                                //int nZero = 0;
+                                //bool gotZeroStretch = false;
+                                //bool gotPeak = false;
                                 for (int i=0; i<5; i++)
                                 {
                                     var wavedata = cmdBuffer[i]; // InputBuffers.ReadByte();
-                                    if ((wavedata & 0x80) != 0) WaveformPeak = true;
-                                    if ((wavedata & 0x80) != 0) gotPeak = true;
-                                    if (WaveformPeak)
-                                    {
-                                        if (wavedata < 0x20)
-                                        {
-                                            nZero++;
-                                            if (nZero > 2) gotZeroStretch = true;
-                                        }
-                                        else
-                                        {
-                                            nZero = 0;
-                                        }
-                                    }
+                                    //if ((wavedata & 0x80) != 0) WaveformPeak = true;
+                                    //if ((wavedata & 0x80) != 0) gotPeak = true;
+                                    //if (WaveformPeak)
+                                    //{
+                                    //    if (wavedata < 0x20)
+                                    //    {
+                                    //        nZero++;
+                                    //        if (nZero > 2) gotZeroStretch = true;
+                                    //    }
+                                    //    else
+                                    //    {
+                                    //        nZero = 0;
+                                    //    }
+                                    //}
                                     CurrWaveformData.Add((byte)(wavedata & 0x7F));
 
-                                    var value = (wavedata & 0x7F) / 21; // use Musical Symbol one-line staff .. size-line staff
-                                    if (value < 0) value = 0;
-                                    if (value > 4) value = 4;
-                                    char c1 = '\ud834';
-                                    char c2 = (char)('\udd16' + value);
-                                    CurrWaveform = CurrWaveform + c1 + c2;
+                                    // Cute waveform data. Original code sent this to the output
+                                    // where it's handy for debugging.
+                                    //var value = (wavedata & 0x7F) / 21; // use Musical Symbol one-line staff .. size-line staff
+                                    //if (value < 0) value = 0;
+                                    //if (value > 4) value = 4;
+                                    //char c1 = '\ud834';
+                                    //char c2 = (char)('\udd16' + value);
+                                    //CurrWaveform = CurrWaveform + c1 + c2;
                                 }
 
-                                if (gotZeroStretch)
-                                {
-                                    System.Diagnostics.Debug.WriteLine($"Oximeter: pulse waveform <<{CurrWaveform}>>");
-                                    WaveformPeak = false;
-                                    CurrWaveform = "*";
-                                }
-                                if (gotPeak)
-                                {
-                                    var str = "";
-                                    foreach (var b in CurrWaveformData)
-                                    {
-                                        str += $"{b:X2} ";
-                                    }
-                                    //System.Diagnostics.Debug.WriteLine($"Oximeter: peak data <<{str}>>");
-                                    ;
-                                    CurrWaveformData.Clear();
-                                }
+                                //if (gotZeroStretch)
+                                //{
+                                //    System.Diagnostics.Debug.WriteLine($"Oximeter: pulse waveform <<{CurrWaveform}>>");
+                                //    WaveformPeak = false;
+                                //    CurrWaveform = "*";
+                                //}
+                                //if (gotPeak)
+                                //{
+                                //    CurrWaveformData.Clear();
+                                //}
                                 //var checksum = InputBuffers.ReadByte();
                             }
                             break;

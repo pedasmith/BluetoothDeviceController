@@ -15,6 +15,7 @@ using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
+using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
@@ -681,6 +682,20 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             var next = ViatomFactory.GetNext(CurrSensor_Data);
             if (next == null) return;
             CurrSensor_Data = next;
+            var wavedata = ViatomFactory.CurrWaveformData;
+            if (wavedata.Count > 250)
+            {
+                wavedata.Clear(); // hasn't been dealth with in a while! Just ignore the data
+            }
+            if (wavedata.Count > 0)
+            {
+                uiPleth.Visibility = Visibility.Visible;
+                for (int i=0; i<wavedata.Count; i++)
+                {
+                    uiPleth.AddNextPulse(wavedata[i] * 2); // Viatom produces data 0..127
+                }
+                wavedata.Clear();
+            }
             name = "*"; // all data is updated
         }
         else if (name == ChoiceMMed_PulseOximeter.OximeterDataStreamPropertyChangedName)
