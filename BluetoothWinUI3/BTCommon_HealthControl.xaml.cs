@@ -1,3 +1,4 @@
+using BluetoothConversions;
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
 using BluetoothProtocolsDevicesCoreExtensions;
@@ -28,7 +29,9 @@ namespace BluetoothWinUI3;
 
 
 #region Change these to match your device
+using DeviceSpecificBatteryData_Choice_MMed = ChoiceMMed_PulseOximeter.Battery_Data; // Change: many device support battery
 using DeviceSpecificSensorData = HealthDataRecord; // Change: 
+
 #endregion
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -56,6 +59,12 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// there's a way to tell the MainWindow that the device doesn't have a sensor.
     /// </summary>
     bool HasSensorData = true;
+
+    /// <summary>
+    /// Normally we can just read cached data and that's good enough. Some advanced cases
+    /// might require reading non-cached data.
+    /// </summary>
+    BluetoothCacheMode DefaultCacheMode = BluetoothCacheMode.Cached;
 
     /// <summary>
     /// Every use case might have a different point of view about how frequently to update
@@ -117,6 +126,16 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
     DeviceSpecificSensorData CurrSensor_DataUnits = null;
+    /// <summary>
+    /// Making a battery value that's seperate from the Sensor. This lets the programmer
+    /// copy-paste data, pick a new sensor, and the battery stuff will still work.
+    /// </summary>
+    DeviceSpecificBatteryData_Choice_MMed CurrBattery_Data_Choice_MMed = null;
+    /// <summary>
+    /// Just like CurrBattery_Data but in user-preferred units. For battery, it
+    /// doesn't actually change anything :-)
+    /// </summary>
+    DeviceSpecificBatteryData_Choice_MMed CurrBattery_DataUnits_Choice_MMed = null;
 
     enum Vitam_SensorType {  }
 
@@ -195,10 +214,21 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         // Set up the Connect button and Battery visibility
         uiBTConnectionControl.SetConnectVisibility(Visibility.Visible); // ChoiceMMed and Viatom are connected, not advert.
-        if (!CurrSensor_Data.IsSensorPresent.HasFlag(HealthDataRecord.SensorPresent.Battery))
+
+        switch (CurrSensorFamily)
         {
-            // TODO: or the device might have a battery service
-            uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
+            default: 
+            case SensorFamily.Unknown:
+            case SensorFamily.Viatom:
+                if (!CurrSensor_Data.IsSensorPresent.HasFlag(HealthDataRecord.SensorPresent.Battery))
+                {
+                    // TODO: or the device might have a battery service
+                    uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
+                }
+                break;
+            case SensorFamily.ChoiceMMed_PulseOximeter:
+                // Battery is based on detecting the Battery service
+                break;
         }
         // Note: you have to remove the sensor from the uiDeviceDataList entirely. You can't just
         // set it to invisible because the items will still show up
@@ -439,7 +469,18 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             connectAllOk = connectAllOk && await Device_MMedPulseOximeter.NotifyOximeterDataStreamAsync();
             var INDICATE = Windows.Devices.Bluetooth.GenericAttributeProfile.GattClientCharacteristicConfigurationDescriptorValue.Indicate;
             connectAllOk = connectAllOk && await Device_MMedPulseOximeter.NotifyEnablePulseOximeterStreamAsync(INDICATE);
+
+            // Verify that your device has a battery characteristic. If your device does not,
+            // just SetBatteryVisibility(Visibility.Collapsed); without further notice.
+            var batterydata = connectAllOk ? await Device_MMedPulseOximeter.ReadBattery_Level(DefaultCacheMode) : null;
+            if (batterydata == null)
+            {
+                uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
+            }
+            connectAllOk = connectAllOk && await Device_MMedPulseOximeter.NotifyBattery_LevelAsync(); 
+
         }
+
         if (Device_Viatom != null)
         {
             connectAllOk = connectAllOk && await Device_Viatom.NotifyReceiveAsync();
@@ -669,6 +710,10 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
             name = "*"; // all data is updated
         }
+        else if (name == ChoiceMMed_PulseOximeter.Battery_LevelPropertyChangedName)
+        {
+            CurrBattery_Data_Choice_MMed = Device_MMedPulseOximeter.CurrBattery_Data;
+        }
         else
         {
             return; // no other data???
@@ -679,6 +724,10 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
         CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        if (CurrBattery_Data_Choice_MMed != null)
+        {
+            CurrBattery_DataUnits_Choice_MMed = DeviceSpecificBatteryData_Choice_MMed.CopyToWithConvertAndCreate(CurrBattery_Data_Choice_MMed, CurrBattery_DataUnits_Choice_MMed, KnownDeviceName, CurrUserPrefs.Convert);
+        }
 
         if (CurrSensor_DataUnits.PulseRate == 0 && CurrSensor_DataUnits.OxygenSaturationInPercent == 0)
         {
@@ -714,7 +763,22 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         if (name == HealthDataRecord.BatteryPropertyChangedName || name == "" || name == "*")
         {
-            uiBTConnectionControl.SetBatteryLevel(CurrSensor_DataUnits.BatteryInPercent);
+            if (CurrSensor_DataUnits.BatteryInPercent != 0)
+            {
+                uiBTConnectionControl.SetBatteryLevel(CurrSensor_DataUnits.BatteryInPercent);
+            }
+        }
+
+        //
+        // Many devices include a battery level. If so, chances are it's called "BatteryLevel"
+        // 
+        //
+        if (CurrBattery_DataUnits_Choice_MMed != null)
+        {
+            if (name == ChoiceMMed_PulseOximeter.Battery_LevelPropertyChangedName || name == "")
+            {
+                uiBTConnectionControl.SetBatteryLevel(CurrBattery_DataUnits_Choice_MMed.BatteryLevel);
+            }
         }
     }
     #endregion
