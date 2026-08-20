@@ -2,6 +2,7 @@ using BluetoothConversions;
 using BluetoothProtocols;
 using BluetoothProtocolsNames;
 using BluetoothWatcher.AdvertismentWatcher;
+using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -323,7 +324,7 @@ namespace BluetoothWinUI3
         WatcherData SelectedWatcherData = null;
         WatcherData MostRecentWatcherData = null;
 
-        private void OnAdvertisementSelected(ItemsView sender, ItemsViewSelectionChangedEventArgs args)
+        private async void OnAdvertisementSelected(ItemsView sender, ItemsViewSelectionChangedEventArgs args)
         {
             var data = sender.SelectedItem as WatcherData;
             if (data == null) return;
@@ -337,6 +338,13 @@ namespace BluetoothWinUI3
             uiAdvertisementDetailsTextBlock.Text = details;
             uiConnectionControl.SetAdvertisementData(data);
             ShowDetail(DetailPane.AdvertisementDetails);
+
+            // Let's run in through the smart analyzer, too!
+            var analysis = await DeviceInformationSmartCache.AnalyzeAsync(SelectedWatcherData);
+            if (analysis != null)
+            {
+                uiAdvertisementDetailsTextBlock.Text += $"\n\nSmart Analysis: {analysis.AnalysisResult} {analysis.Analysis}";
+            }
         }
 
         private void OnBackClicked(object sender, RoutedEventArgs e)

@@ -15,7 +15,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Content Remove="Assets\AboutDevices\About_ChoiceMD_Pulse_Oximeter.md" />
+    <Content Remove="Assets\AboutDevices\About_ChoiceMMed_Pulse_Oximeter.md" />
     <Content Remove="Assets\About_BluetoothWinUI3_dev.md" />
     <Content Remove="Assets\HelpFiles\Help_AirQualityValues.md" />
     <Content Remove="Assets\HelpFiles\How_Connection_Control_Works_Lifecycle.md" />

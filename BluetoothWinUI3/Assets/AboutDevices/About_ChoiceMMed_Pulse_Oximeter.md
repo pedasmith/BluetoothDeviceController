@@ -3,12 +3,12 @@
 The app supports several pulse oximeters.
 
 * 2024 **Viatom** PC60FW
-* 2026 **Innovo** iP900P-B (ChoiceMD)
-* 2026 **Zac VRate** 500E-B (ChoiceMD)
+* 2026 **Innovo** iP900P-B (ChoiceMMed)
+* 2026 **Zac VRate** 500E-B (ChoiceMMed)
 
 # Program updates
 
-The IOT Number formats now includes EQ and NE specifically to handle these ChoiceMD devices. These device send out either a type 3E or 01 data. The Type 3E is the pulse data; the 01 is single byte pulse ('pleth') data.
+The IOT Number formats now includes EQ and NE specifically to handle these ChoiceMMed devices. These device send out either a type 3E or 01 data. The Type 3E is the pulse data; the 01 is single byte pulse ('pleth') data.
 
 The devices have the unique and bad property that merely connecting to the Nordic service 6e400001-b5a3-f393-e0a9-e50e24dcca9e and putting a Notify on the Transmit characteristic FFF1 isn't enough to start data flowing. Instead you also have to do an "indicate" on FFF0
 
