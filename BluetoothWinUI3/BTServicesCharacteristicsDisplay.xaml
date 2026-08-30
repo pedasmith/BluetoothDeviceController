@@ -76,6 +76,12 @@
                                 </MenuFlyout>
                             </Button.Flyout>
                         </Button>
+                        <Button Content="Write">
+                            <Button.Flyout>
+                                <MenuFlyout x:Name="uimWrite">
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Grid>

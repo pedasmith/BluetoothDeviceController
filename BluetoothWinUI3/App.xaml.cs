@@ -5,6 +5,7 @@ using IotNumberFormats;
 using Microsoft.UI.Xaml;
 using System;
 using System.Runtime.InteropServices;
+using Utilities;
 using UtilitiesWinUI3;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -40,6 +41,8 @@ namespace BluetoothWinUI3
         static int TestAll()
         {
             int nerror = 0;
+            nerror += iHealthChecksum.Test();
+            nerror += ReverseCalculations.Test();
             nerror += Viatom_PulseOximeter_PC60FW_Factory.Test();
             nerror += AirQualityIndex.Test();
             nerror += BatteryVoltageToPercent.Test();

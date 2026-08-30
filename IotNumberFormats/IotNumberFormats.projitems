@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ParserField.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ParserFieldList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReverseCalculations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ValueCalculate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ValueToString.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ValueToStringTests.cs" />

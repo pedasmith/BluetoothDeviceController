@@ -82,6 +82,11 @@ namespace IotNumberFormats
             }
             return retval;
         }
+
+        /// <summary>
+        /// Chances are you want to use the new ValueParser(value) and not this. Note that ValueParser(value) will call this method
+        /// Primary call for this class -- given a string like "U8|HEX|Opcode U16|DEC|Value U16|HEX|Options||0" parse it into a ParserFieldList
+        /// </summary>
         public static ParserFieldList ParseLine(string value, ParserFieldList globalFields=null)
         {
             var Retval = new ParserFieldList();

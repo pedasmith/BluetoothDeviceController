@@ -16,9 +16,9 @@ namespace IotNumberFormats
     /// Simple example: "U8 U8" "U8|DEC|Temp|C U8|HEX|Mode" (these are example of ParserFieldList, BTW)
     /// Complex example: "Q12Q4^_125_/|FIXED|Pressure|mbar"
     /// ODE example: ODE^Temp|U8|DEC|Temp|C
-    /// Default example: "U8|HEX|Mode||FF"
+    /// Default example: "U8|DEC|Temp|C|FF"
     /// Three levels of splitting using space, vertical-bar (|) and caret (^) and sometimes underscore (_)
-    /// Fields are ByteFormat (U8) DisplayFormat (DEC) Name (Temp) Units (c) DefaultValue (0)
+    /// Fields are ByteFormat (U8) DisplayFormat (DEC) Name (Temp) Units (c) DefaultValue (FF)
     /// </summary>
     public class ParserField
     {

@@ -17,6 +17,8 @@ namespace Utilities
         static Decoder Utf8NonThrowingDecoder = null;
         static string EncoderFallbackDetectionString = "#E?^%${ERR561:";
 
+        public enum OptionsForReadString { None, ReplaceNull };
+
         public enum ReadStatus {  OK, Hex };
         /// <summary>
         /// Do the equivilent of dr.ReadString(len) but without throwing and will always return a string. If the bytes
@@ -25,7 +27,7 @@ namespace Utilities
         /// <param name="dr"></param>
         /// <param name="len"></param>
         /// <returns></returns>
-        public static (string, ReadStatus) ReadString(DataReader dr, uint len)
+        public static (string, ReadStatus) ReadString(DataReader dr, uint len, OptionsForReadString options = OptionsForReadString.None)
         {
             if (Utf8NonThrowingDecoder == null)
             {
@@ -82,17 +84,24 @@ namespace Utilities
                 }
 
             }
+            else
+            {
+                if (options == OptionsForReadString.ReplaceNull)
+                {
+                    retval = retval.Replace("\0", "\\0");
+                }
+            }
             return (retval, readStatus);
         }
-        public static (string, ReadStatus) ReadStringEntire(DataReader dr)
+        public static (string, ReadStatus) ReadStringEntire(DataReader dr, OptionsForReadString options = OptionsForReadString.None)
         {
-            return ReadString(dr, dr.UnconsumedBufferLength);
+            return ReadString(dr, dr.UnconsumedBufferLength, options);
         }
 
-        public static (string, ReadStatus) ReadStringEntire(byte[] value)
+        public static (string, ReadStatus) ReadStringEntire(byte[] value, OptionsForReadString options = OptionsForReadString.None)
         {
             var dr = DataReader.FromBuffer(value.AsBuffer());
-            return ReadString(dr, dr.UnconsumedBufferLength);
+            return ReadString(dr, dr.UnconsumedBufferLength, options);
         }
 
 

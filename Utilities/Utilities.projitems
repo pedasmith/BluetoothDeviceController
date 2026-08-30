@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataWriterExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EWMA.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GuidAdditionalUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HexUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IBufferExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SimpleStatistics.cs" />

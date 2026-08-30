@@ -79,6 +79,9 @@
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Govee_H6005.json" Link="Assets\CharacteristicsData\Govee_H6005.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\iHealth_PulseOximeter.json" Link="Assets\CharacteristicsData\iHealth_PulseOximeter.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Nordic_Thingy.json" Link="Assets\CharacteristicsData\Nordic_Thingy.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -242,6 +245,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\GraphicalHelps\" />
+    <Folder Include="Assets\CharacteristicsData\" />
     <Folder Include="Assets\SerialData\" />
   </ItemGroup>
   <ItemGroup>
@@ -320,4 +324,5 @@
   <Import Project="..\UtilitiesWinUI3\UtilitiesWinUI3.projitems" Label="Shared" />
   <Import Project="..\BluetoothProtocolsNames\BluetoothProtocolsNames.projitems" Label="Shared" />
   <Import Project="..\BluetoothProtocolsDevicesCoreExtensions\BluetoothProtocolsDevicesCoreExtensions.projitems" Label="Shared" />
+  <Import Project="..\UtilitiesCore\UtilitiesCore.projitems" Label="Shared" />
 </Project>

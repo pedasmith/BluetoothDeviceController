@@ -525,7 +525,9 @@ namespace BluetoothConversions
 				case 0x2C3F: return "TPMS Duty Cycle"; // org.bluetooth.characteristic.tpms_duty_cycle
 				case 0x2C40: return "TPMS Position"; // org.bluetooth.characteristic.tpms_position
 				case 0x2C41: return "TPMS Signing Key"; // org.bluetooth.characteristic.tpms_signing_key
-                // endupdatefile:
+														// endupdatefile:
+
+				case 0x2A30: return "Battery Level"; // deprecated, (use 0x2A19 instead?)
             }
             return $"{value:X2}";
         }

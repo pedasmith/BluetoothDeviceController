@@ -588,10 +588,17 @@ namespace BluetoothCodeGenerator
                     var needsQuote = defaultValueCSharp.StartsWith("\""); // the default value might be 0, 0.0, or "";
                     defaultValueCSharp = needsQuote ? "\"" + item.DefaultValuePrimary + "\"" : item.DefaultValuePrimary;
                 }
+
+                // Handle the automatic checksums
                 if (defaultValue == "UpdateXorAtEnd")
                 {
                     crc_xor_fixup = "CrcCalculations.UpdateXorAtEnd(command);";
                     defaultValue = "0"; // Makes for a nicer UX and doesn't trigger the later parses.
+                }
+                else if (defaultValue == "UpdateiHealthChecksumAtEnd")
+                {
+                    crc_xor_fixup = "CrcCalculations.UpdateiHealthChecksumAtEnd(command);";
+                    defaultValue = "0";
                 }
                 else if (defaultValue == "UpdateModbusCrc16AtEnd")
                 {

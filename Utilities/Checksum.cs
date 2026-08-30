@@ -2,10 +2,14 @@ using System;
 
 namespace Utilities
 {
+    /// <summary>
+    /// See also the CrcCalculations.cs file for checksums!
+    /// </summary>
     public static class Checksum
     {
         /// <summary>
         /// Compute CRC-8 (poly 0x07) over the supplied data. Default init 0x00.
+        /// Not used and not tested???
         /// </summary>
         public static byte Crc8(byte[] data, int startIndex = 0, int endIndex = -1, byte poly = 0x07, byte init = 0x00)
         {
@@ -30,6 +34,7 @@ namespace Utilities
 
         /// <summary>
         /// Simple 8-bit sum checksum (mod 256)
+        /// Not used and not tested???
         /// </summary>
         public static byte Sum8(byte[] data)
         {

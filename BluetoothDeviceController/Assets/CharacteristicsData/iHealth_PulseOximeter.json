@@ -1,0 +1,199 @@
+{
+  "AllDevices": [
+    {
+      "Name": "Pulse Oximeter",
+      "ClassName": "iHealth_PulseOximeter",
+      "CompletionStatus": 0,
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "GAP",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Pulse Oximeter"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "00 00"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Peripheral Preferred Connection Parameters",
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms U16^1.15_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "50 00 A0 00 00 00 E8 03"
+              ]
+            },
+            {
+              "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+              "Name": "Central Address Resolution",
+              "Type": "U8|DEC|AddressResolutionSupported",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "GATT",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changed",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "DataGroupName": "GATT_Data",
+              "IsIndicate": true,
+              "Verbs": ":Indicate:RdInNo:InNo:"
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Information",
+          "Characteristics": [
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number String",
+              "Type": "STRING|ASCII|ModelNumber",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "PO3 11070\\0\\0\\0\\0\\0\\0\\0"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number String",
+              "Type": "STRING|ASCII|SerialNumber",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "E0 4E 7A 8E C4 05"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision String",
+              "Type": "STRING|ASCII|FirmwareRevision",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "324"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision String",
+              "Type": "STRING|ASCII|HardwareRevision",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "800"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision String",
+              "Type": "STRING|ASCII|SoftwareRevision",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "180"
+              ]
+            },
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manufacturer Name String",
+              "Type": "STRING|ASCII|ManufacturerName",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "iHealth\\0\\0\\0\\0\\0\\0\\0\\0\\0"
+              ]
+            },
+            {
+              "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+              "Name": "IEEE 11073-20601 Regulatory Certification Data List",
+              "Type": "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "FE 00 65 78 70 65 72 69 6D 65 6E 74 61 6C"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "STRING|ASCII|PnPID",
+              "DataGroupName": "Device Information_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "01 D7 07 00 00 10 01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "636f6d2e-6a69-7561-6e2e-504f56313100",
+          "Name": "Communication",
+          "Characteristics": [
+            {
+              "UUID": "7274782e-6a69-7561-6e2e-504f56313100",
+              "Name": "Transmit",
+              "TypeREAL": "U8|HEX|TransmitHead||B0 U8|HEX|Length U8|HEX|Zero||0 U8|HEX|Sequence BYTES|HEX|Command U8|HEX|Checksum||UpdateiHealthChecksumAtEnd",
+              "TypeREALv2": "U8|HEX|TransmitHead||B0 U8|HEX|Length BYTES|HEX|Command U8|HEX|Checksum||UpdateiHealthChecksumAtEnd",
+              "Type": "BYTES|HEX|Command",
+              "DataGroupName": "CommunicationData",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Write:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:"
+            }
+          ]
+        }
+      ],
+      "Details": "TODO: line 190"
+    }
+  ]
+}
