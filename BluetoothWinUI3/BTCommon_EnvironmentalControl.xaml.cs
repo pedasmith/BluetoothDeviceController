@@ -347,6 +347,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     public async Task HandleMyAdvertisementAsync(WatcherData data)
     {
         await uiBTConnectionControl.GotAnotherAdvertisementAsync();
+        HandleMyAdvertisement(data);
     }
 
     /// <summary>

@@ -23,6 +23,10 @@ namespace BluetoothWatcher.AdvertismentWatcher
         public delegate void WatcherEventHandler(BluetoothLEAdvertisementWatcher sender, WatcherData e);
         public event WatcherEventHandler WatcherEvent;
         public double FilterRssiDb = -75; // filter out far away things because they are irritating.
+        /// <summary>
+        /// Almost always false, to allow extended advertisements. Will sometimes be set to true to make it easier
+        /// to emulate a system with a Bluetooth chip that can't do extended advertisements.
+        /// </summary>
         public bool FilterExtendedAdvertisements = false; // Normally false. Setting to true will act like older BT chips for testing.
         public int NExtendedAdvertisementsFiltered = 0;
 
@@ -53,14 +57,13 @@ namespace BluetoothWatcher.AdvertismentWatcher
             bool havePreviousAdvert = false;
             WatcherData previousAdvert = null;
             havePreviousAdvert = OriginalAdvertisements.TryGetValue(args.BluetoothAddress, out previousAdvert);
-            if (args.AdvertisementType == BluetoothLEAdvertisementType.Extended)
+            if (args.AdvertisementType == BluetoothLEAdvertisementType.Extended
+                && FilterExtendedAdvertisements)
             {
-                if (FilterExtendedAdvertisements)
-                {
-                    NExtendedAdvertisementsFiltered++;
-                    return;
-                }
+                NExtendedAdvertisementsFiltered++;
+                return;
             }
+
             if (args.IsScanResponse)
             {
                 watcherData = previousAdvert;
