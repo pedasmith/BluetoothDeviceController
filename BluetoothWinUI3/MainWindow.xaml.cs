@@ -224,7 +224,7 @@ namespace BluetoothWinUI3
 
             foreach (var handler in BTAdvertisementHandlers)
             {
-                handler.HandleAdvertisement(e);
+                await handler.HandleAdvertisementAsync(e);
             }
         }
         private void AdvertisementWatcher_WatcherEvent(BluetoothLEAdvertisementWatcher sender, BluetoothWatcher.AdvertismentWatcher.WatcherData e)

@@ -44,11 +44,7 @@
                 </ItemsView>
             </Grid>
             <Grid x:Name="uiDetailsPane" Grid.Column="0" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
-                <Grid x:Name="uiAdvertisementDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
-                    <ScrollViewer x:Name="uiAdvertisementDetailScrollViewer">
-                        <TextBlock x:Name="uiAdvertisementDetailsTextBlock" Style="{StaticResource sAdvertisementData}" TextAlignment="Left" >Advertisement Details</TextBlock>
-                    </ScrollViewer>
-                </Grid>
+                <local:TextBlockWithHistory x:Name="uiAdvertisementDetailsControl" />
                 <Grid x:Name="uiDeviceDetails" Grid.Row="1" Visibility="Collapsed" Style="{StaticResource sPanelDisplay}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />

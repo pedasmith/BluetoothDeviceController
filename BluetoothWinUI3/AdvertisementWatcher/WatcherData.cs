@@ -86,9 +86,16 @@ namespace BluetoothWatcher.AdvertismentWatcher
         /// </summary>
         public BluetoothLEAdvertisementReceivedEventArgs OriginalAdvertisement { get; set; }
         public BluetoothLEAdvertisementReceivedEventArgs ResponseAdvertisement { get; set; }
+        public BluetoothLEAdvertisementReceivedEventArgs ExtendedAdvertisement { get; set; }
         public int NResponseAdvertisement { get; set; } = 0;
         public BluetoothLEAdvertisementReceivedEventArgs MostRecentAdvertisement
-            { get {  var retval = ResponseAdvertisement ?? OriginalAdvertisement; return retval;  } } 
+            { 
+            get 
+            {
+                var originalOrExtended = ExtendedAdvertisement ?? OriginalAdvertisement;
+                var retval = ResponseAdvertisement ?? originalOrExtended; return retval;  
+            } 
+        } 
         public List<BluetoothLEAdvertisementReceivedEventArgs> Advertisements
         {
             get
@@ -96,6 +103,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 var retval = new List<BluetoothLEAdvertisementReceivedEventArgs>();
                 if (OriginalAdvertisement != null) retval.Add(OriginalAdvertisement);
                 if (ResponseAdvertisement != null) retval.Add(ResponseAdvertisement);
+                if (ExtendedAdvertisement != null) retval.Add(ExtendedAdvertisement);
                 return retval;
             }
         }
@@ -198,53 +206,25 @@ namespace BluetoothWatcher.AdvertismentWatcher
         /// <summary>
         /// Very full details of the WatcherData. Is used by the Advertisements display
         /// Goal is to display all the data known about the advertisement
+        /// Used by the BTServicesAndCharacteristicsControl display
         /// </summary>
         public string ToStringDetails()
         {
-            var args = MostRecentAdvertisement;
-            string retval = "";
-            retval += $"Event time: {MostRecentAdvertisement.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}\n";
-            retval += $"Address: {BluetoothAddress.AsString(Addr)}\n";
-            retval += $"Address type: {args.BluetoothAddressType}\n";
-            retval += $"Advertisement type: {args.AdvertisementType}\n";
+            BluetoothLEAdvertisementReceivedEventArgs args = MostRecentAdvertisement;
 
-            var isstr = "";
-            if (args.IsAnonymous) isstr += ",Anonymous";
-            if (args.IsConnectable) isstr += ",Connectable";
-            if (args.IsScanResponse) isstr += ",ScanResponse";
-            if (args.IsDirected) isstr += ",Directed";
-            if (isstr.Length > 0) isstr = isstr.Substring(1); // remove leading +
-            retval += $"Flags: {isstr}\n";
-
-            retval += $"Signal strength (dBm): {args.RawSignalStrengthInDBm}\n";
-            retval += $"Transmit power (dBm): {args.TransmitPowerLevelInDBm}\n";
-            retval += $"Timestamp: {args.Timestamp:yyyy-MM-dd HH:mm:ss.fff}\n";
-
-            // Primary/Secondary PHY may not exist on all SDK versions; use reflection if present.
-            var primaryPhyProp = args.GetType().GetProperty("PrimaryPhy");
-            if (primaryPhyProp != null)
+            string retval = ToStringDetailsOne(OriginalAdvertisement, "");
+            retval += DataSectionDetailsOne(OriginalAdvertisement, "");
+            if (ExtendedAdvertisement != null)
             {
-                var primaryPhyVal = primaryPhyProp.GetValue(args);
-                retval += $"Primary PHY: {primaryPhyVal}\n";
+                retval += "**Extended advertisement:**\n";
+                retval += ToStringDetailsOne(ExtendedAdvertisement, "&nbsp;&nbsp;&nbsp;&nbsp;");
+                retval += DataSectionDetailsOne(ExtendedAdvertisement, "&nbsp;&nbsp;&nbsp;&nbsp;");
             }
-
-            var secondaryPhyProp = args.GetType().GetProperty("SecondaryPhy");
-            if (secondaryPhyProp != null)
+            if (ResponseAdvertisement != null)
             {
-                var secondaryPhyVal = secondaryPhyProp.GetValue(args);
-                retval += $"Secondary PHY: {secondaryPhyVal}\n";
-            }
-
-            // And now, data directly from the advertisement!
-            foreach (var advertisement in Advertisements)
-            {
-                sbyte txPower = (sbyte)(advertisement.TransmitPowerLevelInDBm ?? 0);
-                foreach (var section in advertisement.Advertisement.DataSections)
-                {
-                    var mtype = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
-                    var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, advertisement.RawSignalStrengthInDBm, txPower, mtype, "");
-                    retval += "Section: " + str;
-                }
+                retval += "**Response advertisement:**\n";
+                retval += ToStringDetailsOne(ResponseAdvertisement, "&nbsp;&nbsp;&nbsp;&nbsp;");
+                retval += DataSectionDetailsOne(ResponseAdvertisement, "&nbsp;&nbsp;&nbsp;&nbsp;");
             }
 
             foreach (var advertisement in Advertisements)
@@ -277,10 +257,66 @@ namespace BluetoothWatcher.AdvertismentWatcher
                     retval += $"Govee data: Type={goveeData.TagType}, Temp={goveeData.TemperatureInDegreesF:F1}F, Humidity={goveeData.Humidity}%, Battery={goveeData.BatteryInPercent}%\n";
                 }
             }
-
+            retval += "\n\nMore info at [Novelbits.io](https://novelbits.io/bluetooth-address-privacy-ble/)\n";
             return retval;
         }
 
+        private string ToStringDetailsOne(BluetoothLEAdvertisementReceivedEventArgs args, string indent)
+        {
+            string retval = "";
+            retval += $"{indent}Event time: {MostRecentAdvertisement.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}\n";
+            retval += $"{indent}Address: {BluetoothAddress.AsString(Addr)}\n";
+            retval += $"{indent}Address type: {args.BluetoothAddressType}\n";
+            retval += $"{indent}Advertisement type: {args.AdvertisementType}\n";
+
+            var isstr = "";
+            if (args.IsConnectable) isstr += ",Connectable";
+            if (args.IsDirected) isstr += ",Directed";
+            if (args.IsScannable) isstr += ",Scannable";
+            if (args.IsAnonymous) isstr += ",Anonymous";
+            if (args.IsScanResponse) isstr += ",ScanResponse";
+            if (isstr.Length > 0)
+            {
+                isstr = isstr.Substring(1); // remove leading (,) comma
+                retval += $"{indent}Flags: {isstr}\n";
+            }
+
+            retval += $"{indent}Signal strength (dBm): {args.RawSignalStrengthInDBm}\n";
+            if (args.TransmitPowerLevelInDBm != null)
+            {
+                retval += $"{indent}Transmit power (dBm): {args.TransmitPowerLevelInDBm}\n";
+            }
+            retval += $"{indent}Timestamp: {args.Timestamp:yyyy-MM-dd HH:mm:ss.fff}\n";
+
+            // Primary/Secondary PHY may not exist on all SDK versions; use reflection if present.
+            var primaryPhyProp = args.GetType().GetProperty("PrimaryPhy");
+            if (primaryPhyProp != null)
+            {
+                var primaryPhyVal = primaryPhyProp.GetValue(args);
+                retval += $"{indent}Primary PHY: {primaryPhyVal}\n";
+            }
+
+            var secondaryPhyProp = args.GetType().GetProperty("SecondaryPhy");
+            if (secondaryPhyProp != null)
+            {
+                var secondaryPhyVal = secondaryPhyProp.GetValue(args);
+                retval += $"{indent}Secondary PHY: {secondaryPhyVal}\n";
+            }
+            return retval;
+        }
+
+        private string DataSectionDetailsOne(BluetoothLEAdvertisementReceivedEventArgs advertisement, string indent)
+        {
+            string retval = "";
+            sbyte txPower = (sbyte)(advertisement.TransmitPowerLevelInDBm ?? 0);
+            foreach (var section in advertisement.Advertisement.DataSections)
+            {
+                var mtype = BluetoothCompanyIdentifier.CommonManufacturerType.Other;
+                var (str, manufacturerType, companyId) = AdvertisementDataSectionParser.Parse(section, advertisement.RawSignalStrengthInDBm, txPower, mtype, "");
+                retval += indent + "Section: " + str;
+            }
+            return retval;
+        }
         /// <summary>
         /// Returns a string with \n for CR (or the defaultValue). The strings are in 
         /// almost JSON format tabs at the start and with double-quotes

@@ -83,6 +83,49 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 // If I can't match this scan response with an original, then just ignore everything
                 // (will return early based on watcherData==null below)
             }
+            else if (args.AdvertisementType == BluetoothLEAdvertisementType.Extended)
+            {
+                // Extended advertisements are a pain. 
+                // Some devices will only send an extended advertisement and never send a non-extended one
+                // Other devices will send the extended first and others will send it second
+                // Set this up so that we either add as the extended on the previousAdvert OR 
+                // is a new advert. 
+                bool makeNew = false;
+                if (previousAdvert == null)
+                {
+                    makeNew = true;
+                }
+                else if (previousAdvert.OriginalAdvertisement.AdvertisementType == BluetoothLEAdvertisementType.Extended)
+                {
+                    makeNew = true;
+                }
+                else if (previousAdvert.ExtendedAdvertisement == null)
+                {
+                    watcherData = previousAdvert;
+                    watcherData.ExtendedAdvertisement = args;
+                }
+                else
+                {
+                    // There was an old advert that wasn't extended AND it's already got an extended.
+                    // Let's just make this a new thing.
+                    Log($"NOTE: got a second extended advertisement for the one original! Name={previousAdvert.BestName} NResponse={previousAdvert.NResponseAdvertisement}");
+                    makeNew = true;
+                }
+
+                if (makeNew) 
+                {
+                    // even though we got an extended advert, it becomes the main parent advert
+                    // and the ExtendedAdvertisement is left null.
+                    watcherData = new WatcherData()
+                    {
+                        OriginalAdvertisement = args,
+                        ResponseAdvertisement = null,
+                        ExtendedAdvertisement = null,
+                        NResponseAdvertisement = 0,
+                    };
+                    OriginalAdvertisements[args.BluetoothAddress] = watcherData;
+                }
+            }
             else
             {
                 // Always make a new one!
@@ -90,6 +133,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 {
                     OriginalAdvertisement = args,
                     ResponseAdvertisement = null,
+                    ExtendedAdvertisement = null,
                     NResponseAdvertisement = 0,
                 };
                 OriginalAdvertisements[args.BluetoothAddress] = watcherData;

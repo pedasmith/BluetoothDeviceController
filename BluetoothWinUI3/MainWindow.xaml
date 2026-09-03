@@ -73,13 +73,15 @@
                 </MenuBarItem>
                 
                 <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">
-                    <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="T" />
-                    <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
-                    <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
-                    <MenuFlyoutItem Text="Delete active" Click="OnDebugDeleteDevice" AccessKey="S" />
-                    <MenuFlyoutItem Text="Show directories" Click="OnDebugShowDirectories" AccessKey="D" />
                     <MenuFlyoutItem Text="Show advertisements" Click="OnDebugShowAdvertisements" AccessKey="A" />
+                    <ToggleMenuFlyoutItem Text="Use Dark theme" Click="OnDebugDarkTheme" AccessKey="T" />
+                    <MenuFlyoutItem Text="Delete active" Click="OnDebugDeleteDevice" AccessKey="S" />
                     <MenuFlyoutItem Text="Smart Export" Click="OnDebugSmartExport" />
+                    <MenuFlyoutSubItem Text="Files and Directories">
+                        <MenuFlyoutItem Text="Show directories" Click="OnDebugShowDirectories" AccessKey="D" />
+                        <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
+                        <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
+                    </MenuFlyoutSubItem>
                     <MenuFlyoutSubItem Text="Filters">
                         <ToggleMenuFlyoutItem Text="Filter far-away advertisements" Click="OnDebugSetFilterRssiDb"  />
                         <ToggleMenuFlyoutItem Text="Filter Extended advertisements" Click="OnDebugSetFilterExtendedAdvertisements" />

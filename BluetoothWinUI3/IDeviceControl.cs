@@ -145,7 +145,7 @@ namespace BluetoothWinUI3
     /// </summary>
     public interface IHandleBTAdvertisements
     {
-        void HandleAdvertisement(WatcherData data);
+        Task HandleAdvertisementAsync(WatcherData data);
     }
 
 

@@ -72,6 +72,8 @@ namespace BluetoothWinUI3
 
         public IBTCommonMetaData GetDataMostRecent() { return null; }
 
+
+
         private async void UiConnectionControl_ConnectionChanged(object sender, ConnectionChangedEventArgs e)
         {
             switch (e.NewConnectionState)
@@ -96,6 +98,7 @@ namespace BluetoothWinUI3
         /// </summary>
         public async Task HandleMyAdvertisementAsync(WatcherData data)
         {
+            // This control doesn't ever want to reconnect automatically
             await Task.Delay(0); // uiBTConnectionControl.GotAnotherAdvertisementAsync();
         }
 
@@ -186,7 +189,7 @@ namespace BluetoothWinUI3
             return -1;
         }
 
-        public void HandleAdvertisement(WatcherData data)
+        public async Task HandleAdvertisementAsync(WatcherData data)
         {
             var index = FindWatcherDataIndex(data);
             if (index == -1)
@@ -205,7 +208,7 @@ namespace BluetoothWinUI3
                 // The device the user selected has sent a new (or scan-response) advertisement! Update!
                 SelectedWatcherData = data;
                 var details = data.ToStringDetails();
-                uiAdvertisementDetailsTextBlock.Text = details;
+                uiAdvertisementDetailsControl.StartMostRecent(details);
                 uiConnectionControl.SetAdvertisementData(data);
             }
         }
@@ -295,7 +298,7 @@ namespace BluetoothWinUI3
                 case DetailPane.None:
                     uiAdvertisementList.Visibility = Visibility.Visible;
                     uiDetailsPane.Visibility = DetailsAlwaysShown ? Visibility.Visible : Visibility.Collapsed;
-                    uiAdvertisementDetails.Visibility = Visibility.Collapsed;
+                    uiAdvertisementDetailsControl.Visibility = Visibility.Collapsed;
                     uiDeviceDetails.Visibility = Visibility.Collapsed;
                     uiConnectionControl.Visibility = Visibility.Collapsed;
                     uiBack.IsEnabled = false;
@@ -303,7 +306,7 @@ namespace BluetoothWinUI3
                 case DetailPane.AdvertisementDetails:
                     uiAdvertisementList.Visibility = DetailsAlwaysShown ? Visibility.Visible : Visibility.Collapsed; ;
                     uiDetailsPane.Visibility = Visibility.Visible;
-                    uiAdvertisementDetails.Visibility = Visibility.Visible;
+                    uiAdvertisementDetailsControl.Visibility = Visibility.Visible;
                     uiDeviceDetails.Visibility = Visibility.Collapsed;
                     uiConnectionControl.Visibility = Visibility.Visible;
                     uiBack.IsEnabled = DetailsAlwaysShown ? false : true;
@@ -311,7 +314,7 @@ namespace BluetoothWinUI3
                 case DetailPane.DeviceDetails:
                     uiAdvertisementList.Visibility = DetailsAlwaysShown ? Visibility.Visible : Visibility.Collapsed; ;
                     uiDetailsPane.Visibility = Visibility.Visible;
-                    uiAdvertisementDetails.Visibility = Visibility.Collapsed;
+                    uiAdvertisementDetailsControl.Visibility = Visibility.Collapsed;
                     uiDeviceDetails.Visibility = Visibility.Visible;
                     uiConnectionControl.Visibility = Visibility.Visible;
                     uiBack.IsEnabled = true;
@@ -335,7 +338,7 @@ namespace BluetoothWinUI3
             }
             SelectedWatcherData = data;
             var details = data.ToStringDetails();
-            uiAdvertisementDetailsTextBlock.Text = details;
+            uiAdvertisementDetailsControl.StartMostRecent(details);
             uiConnectionControl.SetAdvertisementData(data);
             ShowDetail(DetailPane.AdvertisementDetails);
 
@@ -343,7 +346,7 @@ namespace BluetoothWinUI3
             var analysis = await DeviceInformationSmartCache.AnalyzeAsync(SelectedWatcherData);
             if (analysis != null)
             {
-                uiAdvertisementDetailsTextBlock.Text += $"\n\nSmart Analysis: {analysis.AnalysisResult} {analysis.Analysis}";
+                uiAdvertisementDetailsControl.AddToMostRecent($"\n\nSmart Analysis: {analysis.AnalysisResult} {analysis.Analysis}");
             }
         }
 

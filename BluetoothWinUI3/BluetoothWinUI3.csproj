@@ -43,6 +43,7 @@
     <None Remove="HeartRate_RRInterval_Control.xaml" />
     <None Remove="MarkdownHelpSystem.xaml" />
     <None Remove="TestUserControl.xaml" />
+    <None Remove="TextBlockWithHistory.xaml" />
     <None Remove="ZoomableDeviceControl.xaml" />
   </ItemGroup>
   <ItemGroup>
@@ -247,6 +248,11 @@
     <Folder Include="Assets\GraphicalHelps\" />
     <Folder Include="Assets\CharacteristicsData\" />
     <Folder Include="Assets\SerialData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="TextBlockWithHistory.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="HeartRate_Pleth_Control.xaml">
