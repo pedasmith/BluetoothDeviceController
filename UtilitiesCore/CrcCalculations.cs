@@ -85,7 +85,7 @@ namespace Utilities
             int nerror = 0;
             nerror += TestOne("A0 03 A0 02 AC 4E", 0x4E);
             nerror += TestOne("b0 04 00 01 f0 d1 C2", 0xC2);
-            nerror += TestOne("B0 03 A0 02 AC 50", 0x50);
+            nerror += TestOne("B0 03 A0 02 AC 4E", 0x4E);
             return nerror;
         }
 

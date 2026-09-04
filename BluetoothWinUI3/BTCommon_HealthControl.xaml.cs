@@ -678,6 +678,8 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     {
         if (name == Viatom_PC_60F.ReceivePropertyChangedName)
         {
+            if (Device_Viatom.CurrTransmit_Data.Receive == null) return; // The Vibeat S5W sends a null packet.
+
             ViatomFactory.AddNotification(Device_Viatom.CurrTransmit_Data.Receive);
             var next = ViatomFactory.GetNext(CurrSensor_Data);
             if (next == null) return;

@@ -378,185 +378,205 @@ namespace BluetoothWinUI3
             uimRead.Items.Clear();
             uimWrite.Items.Clear();
 
-            BluetoothCacheMode cacheMode = BluetoothCacheMode.Cached;
-            var addr = SelectedWatcherData.Addr;
-            var services = await le.GetGattServicesAsync(cacheMode);
-            if (services.Status != Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
+            try
             {
-                DeviceDetailsLog($"Unable to get services for {SelectedWatcherData.AddressAsString}. Reason: {services.Status}");
-                return;
-            }
-            uiDeviceDetailsTextBlock.Text = $"Services for {SelectedWatcherData.AddressAsString} {SelectedWatcherData.BestName}\n\n";
 
-            var nameDeviceList = new NameAllBleDevices();
-            var nameDevice = new NameDevice();
-            nameDevice.Name = le.Name;
-            nameDevice.Details += "TODO: line 190";
-            nameDeviceList.AllDevices.Add(nameDevice);
-            // TODO: skipping copying classModifiers ClassName Description from knownDevice
-            int serviceCount = 0;
+                BluetoothCacheMode cacheMode = BluetoothCacheMode.Cached;
+                // cacheMode = BluetoothCacheMode.Uncached; // TODO: just for now while debugging
+                var addr = SelectedWatcherData.Addr;
 
-            var defaultDevice = BleNames.GetDevice(nameDevice.Name);
-
-            foreach (var service in services.Services)
-            {
-                // Find the right default service
-                var defaultService = defaultDevice.GetService(service.Uuid);
-                var nameService = new NameService(service, defaultService, serviceCount++);
-                nameDevice.Services.Add(nameService);
-
-                var shortuuid = BluetoothUuidHelper.TryGetShortId(service.Uuid);
-                var guidAsAscii = service.Uuid.AsAscii();
-                if (guidAsAscii != "") guidAsAscii = $" ({guidAsAscii})";
-                var serviceUuidStr = (shortuuid != null) ? $"{shortuuid:X4}" : service.Uuid.ToString();
-                var servicename = (shortuuid != null) ? BluetoothServiceUuid16Bit.Decode((ushort)shortuuid) + " " : "";
-                if (shortuuid != null)
+                /* 2026-09-04 all this was a failed attempt to connect to the BT-90EPD multimeter.
+                var aresult = await le.RequestAccessAsync();
+                var pto = BluetoothLEPreferredConnectionParameters.ThroughputOptimized; // timeout=0xC8
+                var ppo = BluetoothLEPreferredConnectionParameters.PowerOptimized; // timeout=0x258
+                var pb = BluetoothLEPreferredConnectionParameters.Balanced; // timeout=0x190
+                var cpresult = le.RequestPreferredConnectionParameters(pto);
+                var cparam = le.GetConnectionParameters(); // Returns 3C0=nine seconds???
+                var dresult = await le.GetGattServicesForUuidAsync(BluetoothUuidHelper.FromShortId(0xFFB0), cacheMode); // prefetch the base services
+                */
+                var services = await le.GetGattServicesAsync(cacheMode);
+                if (services.Status != Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
                 {
-                    nameService.Name = BluetoothServiceUuid16Bit.Decode((ushort)shortuuid);
+                    DeviceDetailsLog($"Unable to get services for {SelectedWatcherData.AddressAsString}. Reason: {services.Status}");
+                    return;
                 }
+                uiDeviceDetailsTextBlock.Text = $"Services for {SelectedWatcherData.AddressAsString} {SelectedWatcherData.BestName}\n\n";
 
-                var servicesb = new StringBuilder();
-                servicesb.AppendLine($"Service {servicename}Uuid={serviceUuidStr}{guidAsAscii} handle={service.AttributeHandle}");
-                var dai = service.DeviceAccessInformation;
-                var session = service.Session;
-                servicesb.AppendLine($"    AccessInformation: status={dai.CurrentStatus} prompt={dai.UserPromptRequired}");
-                servicesb.AppendLine($"    DeviceId={service.DeviceId}");
-                servicesb.AppendLine($"    Session: Status={session.SessionStatus} MaxPduSize (MTU)={session.MaxPduSize}");
-                servicesb.AppendLine($"    Session: CanMaintainConnection={session.MaintainConnection} MaintainConnection={session.MaintainConnection}");
-                uiDeviceDetailsTextBlock.Text += servicesb.ToString();
+                var nameDeviceList = new NameAllBleDevices();
+                var nameDevice = new NameDevice();
+                nameDevice.Name = le.Name;
+                nameDevice.Details += "TODO: line 190";
+                nameDeviceList.AllDevices.Add(nameDevice);
+                // TODO: skipping copying classModifiers ClassName Description from knownDevice
+                int serviceCount = 0;
 
-                var chresult = await service.GetCharacteristicsAsync(cacheMode);
-                if (chresult.Status != GattCommunicationStatus.Success)
+                var defaultDevice = BleNames.GetDevice(nameDevice.Name);
+
+                foreach (var service in services.Services)
                 {
-                    DeviceDetailsLog ($"    Unable to get characteristics reason={chresult.Status} {chresult.ProtocolError}");
-                }
-                else
-                {
-                    int characteristicCount = 0;
+                    // Find the right default service
+                    var defaultService = defaultDevice.GetService(service.Uuid);
+                    var nameService = new NameService(service, defaultService, serviceCount++);
+                    nameDevice.Services.Add(nameService);
 
-                    foreach (var characteristic in chresult.Characteristics)
+                    var shortuuid = BluetoothUuidHelper.TryGetShortId(service.Uuid);
+                    var guidAsAscii = service.Uuid.AsAscii();
+                    if (guidAsAscii != "") guidAsAscii = $" ({guidAsAscii})";
+                    var serviceUuidStr = (shortuuid != null) ? $"{shortuuid:X4}" : service.Uuid.ToString();
+                    var servicename = (shortuuid != null) ? BluetoothServiceUuid16Bit.Decode((ushort)shortuuid) + " " : "";
+                    if (shortuuid != null)
                     {
-                        var chshortuuid = BluetoothUuidHelper.TryGetShortId(characteristic.Uuid);
-                        var chUuidStr = (chshortuuid != null) ? $"{chshortuuid:X4}" : characteristic.Uuid.ToString();
-                        var chname = (chshortuuid != null) ? $"name={BluetoothCharacteristic.Decode((ushort)chshortuuid)} " : "";
-                        guidAsAscii = characteristic.Uuid.AsAscii();
-                        if (guidAsAscii != "") guidAsAscii = $" ({guidAsAscii})";
-
-                        var defaultCharacteristic = defaultService?.GetCharacteristic(characteristic.Uuid);
-                        var nameCharacteristic = new NameCharacteristic(characteristic, nameService, defaultCharacteristic, characteristicCount++);
-                        if (chshortuuid != null)
-                        {
-                            nameCharacteristic.Name = BluetoothCharacteristic.Decode((ushort)chshortuuid);
-                        }
-                        nameService.Characteristics.Add(nameCharacteristic);
-
-                        var chsb = new StringBuilder();
-                        chsb.AppendLine($"    Characteristic {chname}Uuid={chUuidStr}{guidAsAscii} handle={characteristic.AttributeHandle}");
-                        if (!String.IsNullOrEmpty(characteristic.UserDescription))
-                        {
-                            chsb.AppendLine($"        Description: {characteristic.UserDescription}");
-                        }
-                        chsb.AppendLine($"        Properties: {characteristic.CharacteristicProperties}");
-                        chsb.AppendLine($"        Protection Level: {characteristic.ProtectionLevel}");
-                        foreach (var format in characteristic.PresentationFormats)
-                        {
-                            chsb.AppendLine($"        Presentation: type={format.FormatType} description={format.Description} unit={format.Unit} exp={format.Exponent} namespace={format.Namespace:X2} sig={GattPresentationFormat.BluetoothSigAssignedNumbers:X2}");
-                        }
-
-                        if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
-                        {
-                            var readresult = await characteristic.ReadValueAsync(cacheMode);
-                            if (readresult.Status != GattCommunicationStatus.Success)
-                            {
-                                chsb.AppendLine($"        Read failed: {readresult.Status} protocol error={readresult.ProtocolError}");
-                            }
-                            else
-                            {
-                                var buff = readresult.Value;
-                                if (buff.Length == 1)
-                                {
-                                    ;
-                                }
-                                var dr = DataReader.FromBuffer(buff);
-                                var (str, readstatus) = DataReaderReadStringRobust.ReadStringEntire(dr, DataReaderReadStringRobust.OptionsForReadString.ReplaceNull);
-
-                                nameCharacteristic.ExampleData.Add(str);
-
-                                chsb.AppendLine($"        Read: {str}");
-                            }
-                        }
-                        bool addToMap = false;
-                        if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate))
-                        {
-                            ToggleMenuFlyoutItem tmfi = new()
-                            {
-                                Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
-                                IsChecked = false,
-                                Tag = characteristic,
-                            };
-                            tmfi.Click += OnIndicateToggleClicked;
-                            uimIndicate.Items.Add(tmfi);
-                            addToMap = true;
-                        }
-                        if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify))
-                        {
-                            ToggleMenuFlyoutItem tmfi = new()
-                            {
-                                Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
-                                IsChecked = false,
-                                Tag = characteristic,
-                            };
-                            tmfi.Click += OnNotifyToggleClicked;
-                            uimNotify.Items.Add(tmfi);
-                            addToMap = true;
-                        }
-                        if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
-                        {
-                            MenuFlyoutItem tmfi = new()
-                            {
-                                Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
-                                Tag = characteristic,
-                            };
-                            tmfi.Click += OnReadClicked;
-                            uimRead.Items.Add(tmfi);
-                            addToMap = true;
-                        }
-                        if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
-                        {
-                            MenuFlyoutItem tmfi = new()
-                            {
-                                Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
-                                Tag = characteristic,
-                            };
-                            tmfi.Click += OnWriteClicked;
-                            uimWrite.Items.Add(tmfi);
-                            addToMap = true;
-                        }
-                        if (addToMap)
-                        {
-                            CharacteristicNameMap[characteristic] = nameCharacteristic;
-                        }
-                        uiDeviceDetailsTextBlock.Text += chsb.ToString();
+                        nameService.Name = BluetoothServiceUuid16Bit.Decode((ushort)shortuuid);
                     }
+
+                    var servicesb = new StringBuilder();
+                    servicesb.AppendLine($"Service {servicename}Uuid={serviceUuidStr}{guidAsAscii} handle={service.AttributeHandle}");
+                    var dai = service.DeviceAccessInformation;
+                    var session = service.Session;
+                    servicesb.AppendLine($"    AccessInformation: status={dai.CurrentStatus} prompt={dai.UserPromptRequired}");
+                    servicesb.AppendLine($"    DeviceId={service.DeviceId}");
+                    servicesb.AppendLine($"    Session: Status={session.SessionStatus} MaxPduSize (MTU)={session.MaxPduSize}");
+                    servicesb.AppendLine($"    Session: CanMaintainConnection={session.MaintainConnection} MaintainConnection={session.MaintainConnection}");
+                    uiDeviceDetailsTextBlock.Text += servicesb.ToString();
+
+                    var chresult = await service.GetCharacteristicsAsync(cacheMode);
+                    if (chresult.Status != GattCommunicationStatus.Success)
+                    {
+                        DeviceDetailsLog($"    Unable to get characteristics reason={chresult.Status} {chresult.ProtocolError}");
+                    }
+                    else
+                    {
+                        int characteristicCount = 0;
+
+                        foreach (var characteristic in chresult.Characteristics)
+                        {
+                            var chshortuuid = BluetoothUuidHelper.TryGetShortId(characteristic.Uuid);
+                            var chUuidStr = (chshortuuid != null) ? $"{chshortuuid:X4}" : characteristic.Uuid.ToString();
+                            var chname = (chshortuuid != null) ? $"name={BluetoothCharacteristic.Decode((ushort)chshortuuid)} " : "";
+                            guidAsAscii = characteristic.Uuid.AsAscii();
+                            if (guidAsAscii != "") guidAsAscii = $" ({guidAsAscii})";
+
+                            var defaultCharacteristic = defaultService?.GetCharacteristic(characteristic.Uuid);
+                            var nameCharacteristic = new NameCharacteristic(characteristic, nameService, defaultCharacteristic, characteristicCount++);
+                            if (chshortuuid != null)
+                            {
+                                nameCharacteristic.Name = BluetoothCharacteristic.Decode((ushort)chshortuuid);
+                            }
+                            nameService.Characteristics.Add(nameCharacteristic);
+
+                            var chsb = new StringBuilder();
+                            chsb.AppendLine($"    Characteristic {chname}Uuid={chUuidStr}{guidAsAscii} handle={characteristic.AttributeHandle}");
+                            if (!String.IsNullOrEmpty(characteristic.UserDescription))
+                            {
+                                chsb.AppendLine($"        Description: {characteristic.UserDescription}");
+                            }
+                            chsb.AppendLine($"        Properties: {characteristic.CharacteristicProperties}");
+                            chsb.AppendLine($"        Protection Level: {characteristic.ProtectionLevel}");
+                            foreach (var format in characteristic.PresentationFormats)
+                            {
+                                chsb.AppendLine($"        Presentation: type={format.FormatType} description={format.Description} unit={format.Unit} exp={format.Exponent} namespace={format.Namespace:X2} sig={GattPresentationFormat.BluetoothSigAssignedNumbers:X2}");
+                            }
+
+                            if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
+                            {
+                                var readresult = await characteristic.ReadValueAsync(cacheMode);
+                                if (readresult.Status != GattCommunicationStatus.Success)
+                                {
+                                    chsb.AppendLine($"        Read failed: {readresult.Status} protocol error={readresult.ProtocolError}");
+                                }
+                                else
+                                {
+                                    var buff = readresult.Value;
+                                    if (buff.Length == 1)
+                                    {
+                                        ;
+                                    }
+                                    var dr = DataReader.FromBuffer(buff);
+                                    var (str, readstatus) = DataReaderReadStringRobust.ReadStringEntire(dr, DataReaderReadStringRobust.OptionsForReadString.ReplaceNull);
+
+                                    nameCharacteristic.ExampleData.Add(str);
+
+                                    chsb.AppendLine($"        Read: {str}");
+                                }
+                            }
+                            bool addToMap = false;
+                            if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate))
+                            {
+                                ToggleMenuFlyoutItem tmfi = new()
+                                {
+                                    Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
+                                    IsChecked = false,
+                                    Tag = characteristic,
+                                };
+                                tmfi.Click += OnIndicateToggleClicked;
+                                uimIndicate.Items.Add(tmfi);
+                                addToMap = true;
+                            }
+                            if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify))
+                            {
+                                ToggleMenuFlyoutItem tmfi = new()
+                                {
+                                    Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
+                                    IsChecked = false,
+                                    Tag = characteristic,
+                                };
+                                tmfi.Click += OnNotifyToggleClicked;
+                                uimNotify.Items.Add(tmfi);
+                                addToMap = true;
+                            }
+                            if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
+                            {
+                                MenuFlyoutItem tmfi = new()
+                                {
+                                    Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
+                                    Tag = characteristic,
+                                };
+                                tmfi.Click += OnReadClicked;
+                                uimRead.Items.Add(tmfi);
+                                addToMap = true;
+                            }
+                            if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
+                            {
+                                MenuFlyoutItem tmfi = new()
+                                {
+                                    Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
+                                    Tag = characteristic,
+                                };
+                                tmfi.Click += OnWriteClicked;
+                                uimWrite.Items.Add(tmfi);
+                                addToMap = true;
+                            }
+                            if (addToMap)
+                            {
+                                CharacteristicNameMap[characteristic] = nameCharacteristic;
+                            }
+                            uiDeviceDetailsTextBlock.Text += chsb.ToString();
+                        }
+                    }
+
+                    uiDeviceDetailsTextBlock.Text += $"\n";
                 }
+                // Build a JsonNode that omits empty strings and empty arrays, then
+                // serialize with System.Text.Json.
+                var resolver = new DefaultJsonTypeInfoResolver();
+                var jsonOptions = new JsonSerializerOptions()
+                {
+                    WriteIndented = true,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWriting,
+                    TypeInfoResolver = resolver,
+                };
+                //var JsonAsList = System.Text.Json.JsonSerializer.Serialize(nameDeviceList, jsonOptions); // , jsonFormat, jsonSettings);
+                var node = BluetoothWinUI3.SystemTextJsonCleaner.ToJsonNode(nameDeviceList);
+                var JsonAsList = node?.ToJsonString(jsonOptions) ?? "";
+                JsonAsList = StripPointlessJson(JsonAsList);
 
-                uiDeviceDetailsTextBlock.Text += $"\n";
+                uiDeviceDetailsTextBlock.Text += $"\n\n\n" + JsonAsList;
             }
-            // Build a JsonNode that omits empty strings and empty arrays, then
-            // serialize with System.Text.Json.
-            var resolver = new DefaultJsonTypeInfoResolver();
-            var jsonOptions = new JsonSerializerOptions()
+            catch (Exception ex)
             {
-                WriteIndented = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWriting,
-                TypeInfoResolver = resolver,
-            };
-            //var JsonAsList = System.Text.Json.JsonSerializer.Serialize(nameDeviceList, jsonOptions); // , jsonFormat, jsonSettings);
-            var node = BluetoothWinUI3.SystemTextJsonCleaner.ToJsonNode(nameDeviceList);
-            var JsonAsList = node?.ToJsonString(jsonOptions) ?? "";
-            JsonAsList = StripPointlessJson(JsonAsList);
+                DeviceDetailsLog($"Exception: {ex.Message}");
+            }
 
-            uiDeviceDetailsTextBlock.Text += $"\n\n\n" + JsonAsList;
         }
 
         Dictionary<GattCharacteristic, NameCharacteristic> CharacteristicNameMap = new();
@@ -590,11 +610,18 @@ namespace BluetoothWinUI3
                 return;
             }
             var notifyType = toggle.IsChecked ? GattClientCharacteristicConfigurationDescriptorValue.Notify : GattClientCharacteristicConfigurationDescriptorValue.None;
-            var result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
-            if (!CharacteristicsWithValueChangedCallback.Contains(ch))
+            try
             {
-                ch.ValueChanged += Characteristic_ValueChanged;
-                CharacteristicsWithValueChangedCallback.Add(ch);
+                var result = await ch.WriteClientCharacteristicConfigurationDescriptorAsync(notifyType);
+                if (!CharacteristicsWithValueChangedCallback.Contains(ch))
+                {
+                    ch.ValueChanged += Characteristic_ValueChanged;
+                    CharacteristicsWithValueChangedCallback.Add(ch);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Notify: exception: {ex.Message}");
             }
         }
         private async void OnReadClicked(object sender, RoutedEventArgs e)
@@ -607,19 +634,26 @@ namespace BluetoothWinUI3
                 Log($"BTServices: read isn't a GattCharacteristic");
                 return;
             }
-            var readResult = await ch.ReadValueAsync(BluetoothCacheMode.Cached);
-            if (readResult.Status != GattCommunicationStatus.Success)
+            try
             {
-                Log($"Read: error: status={readResult.Status}");
+                var readResult = await ch.ReadValueAsync(BluetoothCacheMode.Cached);
+                if (readResult.Status != GattCommunicationStatus.Success)
+                {
+                    Log($"Read: error: status={readResult.Status}");
+                }
+                else
+                {
+                    NameCharacteristic name = null;
+                    CharacteristicNameMap.TryGetValue(ch, out name);
+                    string decodestr = name?.Type ?? "BYTES|HEX|data|";
+                    var parseResult = IotNumberFormats.ValueParser.Parse(readResult.Value.ToArray(), decodestr);
+                    var str = parseResult.AsString;
+                    Log($"Read: {name} {str}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                NameCharacteristic name = null;
-                CharacteristicNameMap.TryGetValue(ch, out name);
-                string decodestr = name?.Type ?? "BYTES|HEX|data|";
-                var parseResult = IotNumberFormats.ValueParser.Parse(readResult.Value.ToArray(), decodestr);
-                var str = parseResult.AsString;
-                Log($"Read: {name} {str}");
+                Log($"Read: exception: {ex.Message}");
             }
         }
         private async void OnWriteClicked(object sender, RoutedEventArgs e)
@@ -657,6 +691,9 @@ namespace BluetoothWinUI3
             var bytes = ReverseCalculations.StringToBytes(compiled, hexstr);
             //var bytesx = HexUtilities.HexStringToByteArray(hexstr);
             // 
+
+            try
+            { 
             var writeResult = await ch.WriteValueAsync(bytes.ToArray().AsBuffer(), GattWriteOption.WriteWithoutResponse);
             if (writeResult != GattCommunicationStatus.Success)
             {
@@ -665,6 +702,11 @@ namespace BluetoothWinUI3
             else
             {
                 Log($"Write: success");
+            }
+            }
+            catch (Exception ex)
+            {
+                Log($"Write: exception: {ex.Message}");
             }
         }
 
@@ -756,7 +798,5 @@ namespace BluetoothWinUI3
         {
             NotifyDeviceControlChangesWindows = mainWindow;
         }
-
-
     }
 }

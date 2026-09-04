@@ -86,6 +86,9 @@ AA 55 0F __ 21 02 00 00 00 __ # Unknown command, but I get it with each pulse.
         public static SensorType AdvertIsSensorFamily(WatcherData advertisement)
         {
             if (advertisement.BestName.StartsWith("PC-60F")) return SensorType.PC60FW;
+            if (advertisement.BestName.StartsWith("S5W-VU")) return SensorType.PC60FW;
+            if (advertisement.BestName.StartsWith("S6W_")) return SensorType.PC60FW;
+            if (advertisement.BestName.StartsWith("KS-60FW")) return SensorType.PC60FW;
             return SensorType.NotThisSensorFamily;
         }
 

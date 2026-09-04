@@ -134,6 +134,11 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
 
             // ChoiceMMed and Viatom pulse oximeters
             new SupportedDevice("PC-60F_*", typeof(BTCommon_HealthControl)), // Viatom PC60FW
+            new SupportedDevice("S5W-VU*", typeof(BTCommon_HealthControl)), // Vibeat
+            new SupportedDevice("S6W_*", typeof(BTCommon_HealthControl)), // Vibeat
+            new SupportedDevice("KS-60FW*", typeof(BTCommon_HealthControl)), // Wellvue
+
+            // None of the ChoiceMMed devices work
             //new SupportedDevice("iP900BP", typeof(BTCommon_HealthControl)), // Innovo iP900BP-P pulse oximeter (ChoiceMMed)
             //new SupportedDevice("500E-B", typeof(BTCommon_HealthControl)), // ZacVRate pulse oximeter (ChoiceMMed)
 

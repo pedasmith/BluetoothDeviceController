@@ -128,6 +128,7 @@ namespace BluetoothWinUI3
             TextIndex = Math.Max(TextIndex - 1, 0);
             if (TextIndex >= TextDisplayed.Count) return; // can never happen
             SetMarkdownText(TextDisplayed[TextIndex]);
+            UpdateHistoryPrevNextButtons();
         }
 
         private void OnCatchupHistory(object sender, RoutedEventArgs e)
@@ -144,6 +145,7 @@ namespace BluetoothWinUI3
             }
             TextIndex = TextDisplayed.Count - 1;
             SetMarkdownText(TextDisplayed[TextIndex]);
+            UpdateHistoryPrevNextButtons();
         }
 
         private void OnNextHistory(object sender, RoutedEventArgs e)
@@ -169,6 +171,7 @@ namespace BluetoothWinUI3
 
             TextIndex += 1;
             SetMarkdownText(TextDisplayed[TextIndex]);
+            UpdateHistoryPrevNextButtons();
        }
 
         private static void Log(string str)
