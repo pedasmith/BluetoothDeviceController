@@ -39,6 +39,7 @@
     <None Remove="BTCommon_HealthControl.xaml" />
     <None Remove="BTNordic_ThingyControl.xaml" />
     <None Remove="BTServicesCharacteristicsDisplay.xaml" />
+    <None Remove="BTTI_SensorTag_1352Control.xaml" />
     <None Remove="HeartRate_Pleth_Control.xaml" />
     <None Remove="HeartRate_RRInterval_Control.xaml" />
     <None Remove="MarkdownHelpSystem.xaml" />
@@ -86,6 +87,7 @@
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Nordic_Thingy.json" Link="Assets\CharacteristicsData\Nordic_Thingy.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TI_SensorTag_1352.json" Link="Assets\CharacteristicsData\TI_SensorTag_1352.json" />
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json" Link="Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -248,6 +250,11 @@
     <Folder Include="Assets\GraphicalHelps\" />
     <Folder Include="Assets\CharacteristicsData\" />
     <Folder Include="Assets\SerialData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="BTTI_SensorTag_1352Control.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="TextBlockWithHistory.xaml">
