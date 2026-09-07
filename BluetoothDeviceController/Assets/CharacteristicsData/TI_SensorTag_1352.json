@@ -221,7 +221,7 @@
               "UUID": "f000aa02-0451-4000-b000-000000000000",
               "Name": "Temperature Conf.",
               "Description": "Temperature Conf.",
-              "Type": "U8|HEX|Enable",
+              "Type": "U8|HEX|TemperatureEnable",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -232,7 +232,7 @@
               "UUID": "f000aa03-0451-4000-b000-000000000000",
               "Name": "Temperature Period",
               "Description": "Temperature Period",
-              "Type": "U8|DEC|Period|10ms",
+              "Type": "U8|DEC|TemperaturePeriod|10ms",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -250,7 +250,7 @@
               "UUID": "f000aa21-0451-4000-b000-000000000000",
               "Name": "Humidity Data",
               "Description": "Humidity Data",
-              "Type": "F32|FIXED|Humidty|Percent",
+              "Type": "F32|FIXED|Humidity|Percent",
               "UI": {
                 "tableType": "standard",
                 "chartType": "ytime",
@@ -268,7 +268,7 @@
               "UUID": "f000aa22-0451-4000-b000-000000000000",
               "Name": "Humidity Conf.",
               "Description": "Humidity Conf.",
-              "Type": "U8|HEX|Enable",
+              "Type": "U8|HEX|HumidityEnable",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -279,7 +279,7 @@
               "UUID": "f000aa23-0451-4000-b000-000000000000",
               "Name": "Humidity Period",
               "Description": "Humidity Period",
-              "Type": "U8|DEC|Period|10ms",
+              "Type": "U8|DEC|HumidityPeriod|10ms",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [

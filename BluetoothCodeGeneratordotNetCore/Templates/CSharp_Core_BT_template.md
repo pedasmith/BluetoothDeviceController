@@ -62,7 +62,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Enumeration of all services
         /// </summary>
-        enum ServiceIndex
+        public enum ServiceIndex
         {
 [[ServiceIndexList]]
         }
@@ -70,7 +70,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Enumeration of all characteristics in all of the services.
         /// </summary>
-        enum CharacteristicIndex
+        public enum CharacteristicIndex
         {
 [[CharacteristicIndexList]]
         }
@@ -97,7 +97,7 @@ namespace BluetoothProtocols
 [[CharacteristicGuidsList]]
         };
 
-        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { [[CharacteristicsNullList]] };
+        public List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { [[CharacteristicsNullList]] };
         private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { [[CharacteristicsFalseList]] };
         private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  [[CharacteristicsNullList]] };
 
@@ -109,7 +109,7 @@ namespace BluetoothProtocols
         /// <param name="data"></param>
         public delegate void BluetoothDataEvent(IotNumberFormats.ValueParserResult data);
 
-        private async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
+        public async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
         {
             if (Characteristics[(int)characteristicIndex] == null)
             {

@@ -1,5 +1,6 @@
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
+using BluetoothProtocolsDevicesCoreExtensions;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
@@ -7,6 +8,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OxyPlot;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 using System.Threading.Tasks;
@@ -23,10 +25,10 @@ namespace BluetoothWinUI3;
 
 
 #region Change these to match your device
-using DeviceSpecificBatteryData = BTStandard_Demo.Battery_Data; // Change: many device support battery
-using DeviceSpecificSensorData = BTStandard_Demo.Battery_Data; // Change: 
-using DeviceSpecificSensorSecondaryData = BTStandard_Demo.Common_Configuration_Data; // Change: pick secondary sensor if needed
-using DeviceSpecificType = BTStandard_Demo; // Change: pick your device, not BTStandard_Demo
+using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Change: many device support battery
+using DeviceSpecificSensorData = TI_SensorTag_1352.Temperature_Data; // Change: 
+using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Change: pick secondary sensor if needed
+using DeviceSpecificType = TI_SensorTag_1352; // Change: pick your device, not BTStandard_Demo
 #endregion
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -36,7 +38,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "BTStandard_Demo"; // Change: change the BTStandard_Demo string to match your device. The exact name does not matter.
+    private readonly string InternalDeviceType = "TI_SensorTag_1352"; // Change: change the BTStandard_Demo string to match your device. The exact name does not matter.
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
@@ -197,12 +199,16 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
         // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            ( DeviceSpecificType.BatteryLevelPropertyChangedName, uiSensorChange),
-            ( DeviceSpecificType.Connection_ParameterPropertyChangedName, uiConnection_ParametersChange),
+            ( DeviceSpecificType.Temperature_DataPropertyChangedName, uiTemperatureChange),
+            ( DeviceSpecificType.Humidity_DataPropertyChangedName, uiHumidityChange),
         };
 
         // Change: set up the graph by making an OxyPlotModel
-        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModelSimple("Sensor Data", 10, 30, "Battery", "BatteryLevel");
+        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("TI Sensor Tag")
+            .AddLine(10, 30, "Temperature", "Temperature")
+            .AddLine(10, 30, "Humidity", "Humidity");
+
+
         // "Sensor Data" is for the main graph title  and is human-readable
         // "Battery" for the axis title and for the color settings in the menus and should be concise and human-readable
         // "BatteryLevel" is the underlying sensor property name and must exactly match the C# name.
@@ -362,22 +368,20 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
 
         #region Change so the device starts sending notifications for changed properties (data)
 
+        // TODO: write the enable code!
+
         // Change: tell the device to start sending sensor data back.
         // The demo code uses the battery level as the sensor.
-        await Device.NotifyBatteryLevelAsync(); // CHANGE: set up the right notifications for your device.
-        var sensordata = await Device.ReadBatteryLevel(DefaultCacheMode);
+        await Device.NotifyTemperature_DataAsync(); // CHANGE: set up the right notifications for your device.
+        await Device.NotifyHumidity_DataAsync();
+        await Device.NotifyBattery_DataAsync(); // CHANGE: set up the right notifications for your device.
 
-        if (sensordata == null)
-        {
-            // Happens in the Demo code when the device doesn't report a battery level (e.g., JBL Pro 4 Speakers,
-            // but lots of others). Usually sensordata is always present.
-            RemoveSensorDataUx();
-        }
-
+        await Device.WriteTemperatureEnable(1); // turn it on!
+        await Device.WriteHumidityEnable(1); // turn it on!
 
         // Verify that your device has a battery characteristic. If your device does not,
         // just SetBatteryVisibility(Visibility.Collapsed); without further notice.
-        var batterydata = connectAllOk ? await Device.ReadBatteryLevel(DefaultCacheMode) : null;
+        var batterydata = connectAllOk ? await Device.ReadBattery_Data(DefaultCacheMode) : null;
         if (batterydata == null)
         {
             uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
@@ -406,7 +410,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
     /// </summary>
     private void RemoveSensorDataUx()
     {
-        uiDeviceDataList.Items.Remove(uiDeviceDataSensor);
+        // uiDeviceDataList.Items.Remove(uiDeviceDataSensor); // TODO: fix this???
         LineNames.Clear();
         uiOxyPlot.Visibility = Visibility.Collapsed;
         uiTableView.Visibility = Visibility.Visible;
@@ -537,7 +541,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
                 // Change: based on your knowledge of the sensor data, change the temperature readings.
-                // data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, CurrUserPrefs.Temperature);
+                data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, CurrUserPrefs.Temperature);
             }
             if (oldPrefs != null && newPrefs.Pressure != oldPrefs.Pressure)
             {
@@ -596,8 +600,8 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
 
 
         // Change: Always update these even though in practice they are only set once.
-        CurrSensor_Data = Device.CurrBattery_Data; // Change: select the right data
-        CurrSensorSecondary_Data = Device.CurrCommon_Configuration_Data; // Change: pick secondary data as appropriate
+        CurrSensor_Data = Device.CurrTemperature_Data; // Change: select the right data
+        CurrSensorSecondary_Data = Device.CurrHumidity_Data; // Change: pick secondary data as appropriate
         CurrBattery_Data = Device.CurrBattery_Data; // Change: if your device doesn't have a battery, remove battery stuff!
 
 
@@ -609,19 +613,15 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
         // Change all this code to match your device and UX.
         switch (name)
         {
-            case DeviceSpecificType.Connection_ParameterPropertyChangedName: // Change: update the UX as appropriate
-                uiInterval_Min.Text = CurrSensorSecondary_DataUnits.Interval_Min.ToString("F2");
-                uiInterval_Max.Text = CurrSensorSecondary_DataUnits.Interval_Max.ToString("F2");
-                uiLatency.Text = CurrSensorSecondary_DataUnits.Latency.ToString("F2");
-                uiTimeout.Text = CurrSensorSecondary_DataUnits.Timeout.ToString("F2");
-                break;
 
 
             // For the Demo, the "sensor" is just the battery level. In your code, hook up the 
             // right sensors to the right XAML
             case "*": // never used, but here so it matches the environment code.
-            case DeviceSpecificType.BatteryLevelPropertyChangedName:
-                uiSensor.Text = CurrSensor_DataUnits.BatteryLevel.ToString("F2"); // Change: update the UX as appropriate
+            case DeviceSpecificType.Temperature_DataPropertyChangedName:
+            case DeviceSpecificType.Humidity_DataPropertyChangedName:
+                uiTemperature.Text = CurrSensor_DataUnits.Temperature.ToString("F2"); // Change: update the UX as appropriate
+                uiHumidity.Text = CurrSensorSecondary_DataUnits.Humidity.ToString("F2"); // Change: update the UX as appropriate
 
                 // Only the sensor data gets plotted as historical data. In the demo,
                 // other values are also read (e.g., the Interval_Min), but they aren't
@@ -637,7 +637,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
         //
         if (CurrBattery_DataUnits != null)
         {
-            if (name == DeviceSpecificType.BatteryLevelPropertyChangedName || name == "")
+            if (name == DeviceSpecificType.Battery_DataPropertyChangedName || name == "")
             {
                 uiBTConnectionControl.SetBatteryLevel(CurrBattery_DataUnits.BatteryLevel);
             }
@@ -710,4 +710,4 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
     }
     #endregion
 
-} // end of class BTStandard_DemoControl // CHANGE: update the comment to match the class name
+} // end of class BTTI_SensorTag_1352Control // CHANGE: update the comment to match the class name

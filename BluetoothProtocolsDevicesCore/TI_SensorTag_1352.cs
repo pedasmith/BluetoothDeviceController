@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The TI 1352 is the 2019 version in the TI range of Sensor Tags. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth.
-    /// This class was automatically generated 2026-09-07::18:14
+    /// This class was automatically generated 2026-09-07::19:56
     /// </summary>
 
     public partial class TI_SensorTag_1352 : INotifyPropertyChanged
@@ -43,15 +43,15 @@ namespace BluetoothProtocols
         Temperature service Guid=f000aa00-0451-4000-b000-000000000000
             Temperature_Data (DataGroup record)
                 Temperature Data characteristic has Temperature (Single-->double)  Guid=f000aa01-0451-4000-b000-000000000000
-                Temperature Conf. characteristic has Enable (Byte-->double)  Guid=f000aa02-0451-4000-b000-000000000000
-                Temperature Period characteristic has Period (Byte-->double)  Guid=f000aa03-0451-4000-b000-000000000000
+                Temperature Conf. characteristic has TemperatureEnable (Byte-->double)  Guid=f000aa02-0451-4000-b000-000000000000
+                Temperature Period characteristic has TemperaturePeriod (Byte-->double)  Guid=f000aa03-0451-4000-b000-000000000000
 
 
         Humidity service Guid=f000aa20-0451-4000-b000-000000000000
             Humidity_Data (DataGroup record)
-                Humidity Data characteristic has Humidty (Single-->double)  Guid=f000aa21-0451-4000-b000-000000000000
-                Humidity Conf. characteristic has Enable (Byte-->double)  Guid=f000aa22-0451-4000-b000-000000000000
-                Humidity Period characteristic has Period (Byte-->double)  Guid=f000aa23-0451-4000-b000-000000000000
+                Humidity Data characteristic has Humidity (Single-->double)  Guid=f000aa21-0451-4000-b000-000000000000
+                Humidity Conf. characteristic has HumidityEnable (Byte-->double)  Guid=f000aa22-0451-4000-b000-000000000000
+                Humidity Period characteristic has HumidityPeriod (Byte-->double)  Guid=f000aa23-0451-4000-b000-000000000000
 
 
         LED service Guid=f0001110-0451-4000-b000-000000000000
@@ -171,24 +171,24 @@ namespace BluetoothProtocols
                 set { if (value == _Temperature) return; _Temperature = value; OnPropertyChanged();}
             }
 
-            private double _Enable = 0;
+            private double _TemperatureEnable = 0;
             /// <summary>
-            /// Enable (U8 ) from Service=Temperature and Characteristic=Temperature Conf.
+            /// TemperatureEnable (U8 ) from Service=Temperature and Characteristic=Temperature Conf.
             ///</summary>
-            public double Enable 
+            public double TemperatureEnable 
             { 
-                get { return _Enable; }
-                set { if (value == _Enable) return; _Enable = value; OnPropertyChanged();}
+                get { return _TemperatureEnable; }
+                set { if (value == _TemperatureEnable) return; _TemperatureEnable = value; OnPropertyChanged();}
             }
 
-            private double _Period = 0;
+            private double _TemperaturePeriod = 0;
             /// <summary>
-            /// Period (U8 10ms) from Service=Temperature and Characteristic=Temperature Period
+            /// TemperaturePeriod (U8 10ms) from Service=Temperature and Characteristic=Temperature Period
             ///</summary>
-            public double Period 
+            public double TemperaturePeriod 
             { 
-                get { return _Period; }
-                set { if (value == _Period) return; _Period = value; OnPropertyChanged();}
+                get { return _TemperaturePeriod; }
+                set { if (value == _TemperaturePeriod) return; _TemperaturePeriod = value; OnPropertyChanged();}
             }
             public override Temperature_Data Clone(string name = null)
             {
@@ -209,8 +209,8 @@ namespace BluetoothProtocols
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = source.Name;
                 dest.Temperature = source.Temperature;
-                dest.Enable = source.Enable;
-                dest.Period = source.Period;
+                dest.TemperatureEnable = source.TemperatureEnable;
+                dest.TemperaturePeriod = source.TemperaturePeriod;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
@@ -228,14 +228,14 @@ namespace BluetoothProtocols
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Temperature = convert(source.Temperature, "C");
-                dest.Enable = convert(source.Enable, "");
-                dest.Period = convert(source.Period, "10ms");
+                dest.TemperatureEnable = convert(source.TemperatureEnable, "");
+                dest.TemperaturePeriod = convert(source.TemperaturePeriod, "10ms");
                 return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
             {
-                return ["Temperature", "Enable", "Period"];
+                return ["Temperature", "TemperatureEnable", "TemperaturePeriod"];
             }
 
             public override void ExportRow(IExportData exporter)
@@ -243,13 +243,13 @@ namespace BluetoothProtocols
                 // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
                 // RowEnd and add in the timestamps
                 exporter.CellSet(Temperature);
-                exporter.CellSet(Enable);
-                exporter.CellSet(Period);                
+                exporter.CellSet(TemperatureEnable);
+                exporter.CellSet(TemperaturePeriod);                
             }
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Temperature} {Enable} {Period}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Temperature} {TemperatureEnable} {TemperaturePeriod}");
             }
         }
 //
@@ -262,34 +262,34 @@ namespace BluetoothProtocols
         /// </summary>
         public class Humidity_Data :BTCommonMetaData<Humidity_Data> //, IExportDataSource
         {
-            private double _Humidty = 0.0;
+            private double _Humidity = 0.0;
             /// <summary>
-            /// Humidty (F32 Percent) from Service=Humidity and Characteristic=Humidity Data
+            /// Humidity (F32 Percent) from Service=Humidity and Characteristic=Humidity Data
             ///</summary>
-            public double Humidty 
+            public double Humidity 
             { 
-                get { return _Humidty; }
-                set { if (value == _Humidty) return; _Humidty = value; OnPropertyChanged();}
+                get { return _Humidity; }
+                set { if (value == _Humidity) return; _Humidity = value; OnPropertyChanged();}
             }
 
-            private double _Enable = 0;
+            private double _HumidityEnable = 0;
             /// <summary>
-            /// Enable (U8 ) from Service=Humidity and Characteristic=Humidity Conf.
+            /// HumidityEnable (U8 ) from Service=Humidity and Characteristic=Humidity Conf.
             ///</summary>
-            public double Enable 
+            public double HumidityEnable 
             { 
-                get { return _Enable; }
-                set { if (value == _Enable) return; _Enable = value; OnPropertyChanged();}
+                get { return _HumidityEnable; }
+                set { if (value == _HumidityEnable) return; _HumidityEnable = value; OnPropertyChanged();}
             }
 
-            private double _Period = 0;
+            private double _HumidityPeriod = 0;
             /// <summary>
-            /// Period (U8 10ms) from Service=Humidity and Characteristic=Humidity Period
+            /// HumidityPeriod (U8 10ms) from Service=Humidity and Characteristic=Humidity Period
             ///</summary>
-            public double Period 
+            public double HumidityPeriod 
             { 
-                get { return _Period; }
-                set { if (value == _Period) return; _Period = value; OnPropertyChanged();}
+                get { return _HumidityPeriod; }
+                set { if (value == _HumidityPeriod) return; _HumidityPeriod = value; OnPropertyChanged();}
             }
             public override Humidity_Data Clone(string name = null)
             {
@@ -309,9 +309,9 @@ namespace BluetoothProtocols
                 var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = source.Name;
-                dest.Humidty = source.Humidty;
-                dest.Enable = source.Enable;
-                dest.Period = source.Period;
+                dest.Humidity = source.Humidity;
+                dest.HumidityEnable = source.HumidityEnable;
+                dest.HumidityPeriod = source.HumidityPeriod;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
@@ -328,29 +328,29 @@ namespace BluetoothProtocols
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
-                dest.Humidty = convert(source.Humidty, "Percent");
-                dest.Enable = convert(source.Enable, "");
-                dest.Period = convert(source.Period, "10ms");
+                dest.Humidity = convert(source.Humidity, "Percent");
+                dest.HumidityEnable = convert(source.HumidityEnable, "");
+                dest.HumidityPeriod = convert(source.HumidityPeriod, "10ms");
                 return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
             {
-                return ["Humidty", "Enable", "Period"];
+                return ["Humidity", "HumidityEnable", "HumidityPeriod"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
                 // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
                 // RowEnd and add in the timestamps
-                exporter.CellSet(Humidty);
-                exporter.CellSet(Enable);
-                exporter.CellSet(Period);                
+                exporter.CellSet(Humidity);
+                exporter.CellSet(HumidityEnable);
+                exporter.CellSet(HumidityPeriod);                
             }
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Humidty} {Enable} {Period}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Humidity} {HumidityEnable} {HumidityPeriod}");
             }
         }
 //
@@ -1184,7 +1184,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Enumeration of all services
         /// </summary>
-        enum ServiceIndex
+        public enum ServiceIndex
         {
             Temperature_index = 0,
             Humidity_index = 1,
@@ -1200,7 +1200,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Enumeration of all characteristics in all of the services.
         /// </summary>
-        enum CharacteristicIndex
+        public enum CharacteristicIndex
         {
             Temperature_Temperature_Data_index = 0,     // GUID f000aa01-0451-4000-b000-000000000000
             Temperature_Temperature_Conf_index = 1,     // GUID f000aa02-0451-4000-b000-000000000000
@@ -1301,7 +1301,7 @@ namespace BluetoothProtocols
             Guid.Parse("00002a50-0000-1000-8000-00805f9b34fb"), // #33 is Device Info PnP ID
         };
 
-        List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
+        public List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
         private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,  };
         private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
 
@@ -1313,7 +1313,7 @@ namespace BluetoothProtocols
         /// <param name="data"></param>
         public delegate void BluetoothDataEvent(IotNumberFormats.ValueParserResult data);
 
-        private async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
+        public async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
         {
             if (Characteristics[(int)characteristicIndex] == null)
             {
@@ -1482,12 +1482,12 @@ namespace BluetoothProtocols
         private void NotifyTemperature_ConfCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Temperature_Temperature_Conf_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Enable");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|TemperatureEnable");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrTemperature_Data.TimestampMostRecent = args.Timestamp;
-            CurrTemperature_Data.Enable = vr.GetNextDouble();
+            CurrTemperature_Data.TemperatureEnable = vr.GetNextDouble();
             OnPropertyChanged(Temperature_ConfPropertyChangedName); // "Temperature_Conf"
         }
         // Per-characteristics methods for Temperature Temperature_Period
@@ -1507,12 +1507,12 @@ namespace BluetoothProtocols
         private void NotifyTemperature_PeriodCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Temperature_Temperature_Period_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|Period|10ms");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|TemperaturePeriod|10ms");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrTemperature_Data.TimestampMostRecent = args.Timestamp;
-            CurrTemperature_Data.Period = vr.GetNextDouble();
+            CurrTemperature_Data.TemperaturePeriod = vr.GetNextDouble();
             OnPropertyChanged(Temperature_PeriodPropertyChangedName); // "Temperature_Period"
         }
         /// <summary>
@@ -1560,11 +1560,11 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Temperature Conf.", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Enable");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|TemperatureEnable");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrTemperature_Data.Enable = vr.GetNextDouble();
+            CurrTemperature_Data.TemperatureEnable = vr.GetNextDouble();
             CurrTemperature_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Temperature_ConfPropertyChangedName); // "Temperature_Conf"
             return CurrTemperature_Data;
@@ -1587,11 +1587,11 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Temperature Period", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|Period|10ms");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|TemperaturePeriod|10ms");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrTemperature_Data.Period = vr.GetNextDouble();
+            CurrTemperature_Data.TemperaturePeriod = vr.GetNextDouble();
             CurrTemperature_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Temperature_PeriodPropertyChangedName); // "Temperature_Period"
             return CurrTemperature_Data;
@@ -1621,12 +1621,12 @@ namespace BluetoothProtocols
         private void NotifyHumidity_DataCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Humidity_Humidity_Data_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("F32|FIXED|Humidty|Percent");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("F32|FIXED|Humidity|Percent");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrHumidity_Data.TimestampMostRecent = args.Timestamp;
-            CurrHumidity_Data.Humidty = vr.GetNextDouble();
+            CurrHumidity_Data.Humidity = vr.GetNextDouble();
             OnPropertyChanged(Humidity_DataPropertyChangedName); // "Humidity_Data"
         }
         // Per-characteristics methods for Humidity Humidity_Conf
@@ -1646,12 +1646,12 @@ namespace BluetoothProtocols
         private void NotifyHumidity_ConfCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Humidity_Humidity_Conf_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Enable");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|HumidityEnable");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrHumidity_Data.TimestampMostRecent = args.Timestamp;
-            CurrHumidity_Data.Enable = vr.GetNextDouble();
+            CurrHumidity_Data.HumidityEnable = vr.GetNextDouble();
             OnPropertyChanged(Humidity_ConfPropertyChangedName); // "Humidity_Conf"
         }
         // Per-characteristics methods for Humidity Humidity_Period
@@ -1671,12 +1671,12 @@ namespace BluetoothProtocols
         private void NotifyHumidity_PeriodCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Humidity_Humidity_Period_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|Period|10ms");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|HumidityPeriod|10ms");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrHumidity_Data.TimestampMostRecent = args.Timestamp;
-            CurrHumidity_Data.Period = vr.GetNextDouble();
+            CurrHumidity_Data.HumidityPeriod = vr.GetNextDouble();
             OnPropertyChanged(Humidity_PeriodPropertyChangedName); // "Humidity_Period"
         }
         /// <summary>
@@ -1697,11 +1697,11 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Humidity Data", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("F32|FIXED|Humidty|Percent");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("F32|FIXED|Humidity|Percent");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrHumidity_Data.Humidty = vr.GetNextDouble();
+            CurrHumidity_Data.Humidity = vr.GetNextDouble();
             CurrHumidity_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Humidity_DataPropertyChangedName); // "Humidity_Data"
             return CurrHumidity_Data;
@@ -1724,11 +1724,11 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Humidity Conf.", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Enable");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|HumidityEnable");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrHumidity_Data.Enable = vr.GetNextDouble();
+            CurrHumidity_Data.HumidityEnable = vr.GetNextDouble();
             CurrHumidity_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Humidity_ConfPropertyChangedName); // "Humidity_Conf"
             return CurrHumidity_Data;
@@ -1751,11 +1751,11 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Humidity Period", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|Period|10ms");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|HumidityPeriod|10ms");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrHumidity_Data.Period = vr.GetNextDouble();
+            CurrHumidity_Data.HumidityPeriod = vr.GetNextDouble();
             CurrHumidity_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Humidity_PeriodPropertyChangedName); // "Humidity_Period"
             return CurrHumidity_Data;

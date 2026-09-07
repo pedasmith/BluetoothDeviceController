@@ -118,8 +118,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("GV5171*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GV5179_*", typeof(BTCommon_EnvironmentalControl)),
 
-            // Nordic
+            // Nordic and TI Sensor Tags and similar
             new SupportedDevice("Thingy*", typeof(BTNordic_ThingyControl)),
+            new SupportedDevice("Multi-Sensor*", typeof(BTTI_SensorTag_1352Control)),
 
             // RuuviTag
             new SupportedDevice("RuuviAir *", typeof(BTCommon_EnvironmentalControl)),
