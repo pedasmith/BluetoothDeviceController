@@ -1,13 +1,30 @@
-﻿# Missing large pieces 2026-06-19
+﻿# Missing large pieces 2026-09-05
+
+## Small Details
+
+- In advertisements, what is a "section 12:
+- Add the ability to not automatically connect??
+- Classify advertisements and allow user to filter (e.g., no Apple adverts!)
 
 ## Pulse Oximeter
 
-
-
+Individual pulse oximeters work.
+The iHealth ones don't work (and I need to try the encryption stuff)
+Need to add the detection capability that the user can direct. One critical feature is to have devices that are detected and and known to not work.
 
 ## Smart Export is started but missing all UX pieces
 
-Finish Smart Export
+Menu File > Easy Export > #health ...
+
+
+Resulting dialog: 
+```
+on/off
+automatically start
+filename
+current list of devices 
+copy as CSV + copy for Excel
+```
 
 ## Automatically make Appearance from YAML data
 
@@ -15,8 +32,11 @@ This is complex because there is a value + sub-value, so it's a new type for me.
 
 ## Create Bluetooth device checker
 
-And add extra checks: maker shouldn't be "20" (heart monitor)
+And add extra checks: manufacturer/maker shouldn't be "20" (heart monitor)
 Firmware and software should generally be different (or only one included)
+Bluetooth MAC should not be "0x32A" like the ...
+Pulse oximeters should have an appearance.
+
 
 ## Multi-hour running issues
 
@@ -26,13 +46,12 @@ Firmware and software should generally be different (or only one included)
 
 # Devices
 
-## Heart Rate improvements
 
-UX updates to look more like other heart monitors? 
 
 ## The cycle speed and cadence should show normal bike data instead of weird data. 
 
-Done: Make seperate Crank and Wheel? Result: there's a new facde class to handle all of this.
+Crank and wheel isn't done -- a crank-only still shows speed.
+Need to let the user enter wheel data
 
 
 

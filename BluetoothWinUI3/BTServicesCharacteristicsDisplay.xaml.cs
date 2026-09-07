@@ -790,6 +790,7 @@ namespace BluetoothWinUI3
                     retval = GetHistory("No advertisements");
                     break;
             }
+            retval = retval.Replace("&nbsp;", " ");
             return retval;
         }
 

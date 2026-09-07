@@ -143,6 +143,37 @@ namespace BluetoothWatcher.AdvertismentWatcher
             }
         }
 
+        public enum DeviceType {  CantTell, LEOnly, BREDROnly, DualMode };
+
+        public DeviceType CalculateDeviceType()
+        {
+            // Per Copilot, dual mode etc is determined only by the Flags section, and that's only
+            // in regular advertisement. It's not supposed to be in a scan response or extended advertisement.
+            if (OriginalAdvertisement == null) return DeviceType.CantTell;
+            if (OriginalAdvertisement.IsScanResponse) return DeviceType.CantTell;
+            if (OriginalAdvertisement.AdvertisementType == BluetoothLEAdvertisementType.Extended) return DeviceType.CantTell;
+
+            var retval = DeviceType.CantTell;
+            var flags = OriginalAdvertisement.Advertisement.Flags;
+            if (flags != null && flags.HasValue)
+            {
+                var f = flags.Value;
+                if (f.HasFlag(BluetoothLEAdvertisementFlags.ClassicNotSupported))
+                {
+                    retval = DeviceType.LEOnly;
+                }
+                else if (f.HasFlag(BluetoothLEAdvertisementFlags.DualModeControllerCapable) || f.HasFlag(BluetoothLEAdvertisementFlags.DualModeHostCapable))
+                {
+                    retval = DeviceType.DualMode;
+                }
+                else
+                {
+                    retval = DeviceType.BREDROnly;
+                }
+            }
+            return retval;
+        }
+
         public string ToStringFull(AdvertisementStringFormat format = AdvertisementStringFormat.Full)
         {
             if (format == AdvertisementStringFormat.AddressOnly)

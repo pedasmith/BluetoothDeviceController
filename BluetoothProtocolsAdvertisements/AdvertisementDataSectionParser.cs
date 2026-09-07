@@ -119,7 +119,7 @@ namespace BluetoothProtocols
                             // Correct output: 6e400001-b5a3-f393-e0a9-e50e24dcca9e
                             // Actual  output: 6E400001-B5A3-F393-E0A9-E50E24DCCA9E
                             str = "";
-                            var pre = dtv == DataTypeValue.CompleteListOf128BitServiceUuids ? "Service UUIDs (complete): " : "Service UUIDs (incomplete)";
+                            var pre = dtv == DataTypeValue.CompleteListOf128BitServiceUuids ? "Service UUIDs (complete): " : "Service UUIDs (incomplete): ";
                             var dr = DataReader.FromBuffer(section.Data);
                             dr.ByteOrder = ByteOrder.LittleEndian;
                             while (dr.UnconsumedBufferLength >= 16)
@@ -203,7 +203,7 @@ namespace BluetoothProtocols
                         break;
                     case DataTypeValue.TxPowerLevel: // 0x0a
                         var db = ParseTxPowerLevel(section);
-                        str = $"{db}";
+                        str = $"Transmit power: {db} db\n";
                         break;
                     case DataTypeValue.ServiceData: // 0x16 = 22 Service Data
 #if SUPPORT_SWITCHBOT_PROTOCOL
@@ -226,7 +226,7 @@ namespace BluetoothProtocols
                         // https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/CSS_v11/out/en/supplement-to-the-bluetooth-core-specification/data-types-specification.html
                         // Section 1.11 Service Data - contains a 16-bit, 32-bit or 128-bit service and the associated data.
                         var servicedatastr = IotNumberFormats.ValueParser.Parse(section.Data.ToArray(), "U16|HEX BYTES|HEX");
-                        str = $"{hexPrefix}section {dtv.ToString()} data={servicedatastr.AsString}\n";
+                        str = $"{hexPrefix} {dtv.ToString()} data={servicedatastr.AsString}\n";
 
                         // Parse as Eddystone
                         var eddystoneResult = Eddystone.ParseEddystoneUrlArgs(section.Data);
@@ -251,9 +251,13 @@ namespace BluetoothProtocols
             if (printAsHex)
             {
                 var hexstr = IotNumberFormats.ValueParser.Parse(section.Data.ToArray(), "BYTES|HEX");
-                str = $"{hexPrefix}section {dtv.ToString()} data={hexstr.AsString}\n";
+                str = $"{hexPrefix}{dtv.ToString()} data={hexstr.AsString}\n";
             }
             if (!string.IsNullOrWhiteSpace(str)) str = indent + str;
+            if (str.Contains("Section: 12"))
+            {
+                ;// handy place for a debugger
+            }
             return (str, manufacturerType, companyId);
         }
 
