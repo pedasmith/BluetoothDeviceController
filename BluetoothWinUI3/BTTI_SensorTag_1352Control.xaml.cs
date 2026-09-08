@@ -1,6 +1,7 @@
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
 using BluetoothProtocolsDevicesCoreExtensions;
+using BluetoothProtocolsDevicesCoreExtensions.TI_SensorTag_1352_Extensions;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
@@ -28,6 +29,7 @@ namespace BluetoothWinUI3;
 using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Change: many device support battery
 using DeviceSpecificSensorData = TI_SensorTag_1352.Temperature_Data; // Change: 
 using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Change: pick secondary sensor if needed
+using DeviceSpecificSensorDataFacade = BluetoothProtocolsDevicesCoreExtensions.TI_SensorTag_1352_Extensions.Environment_Data; // Change: 
 using DeviceSpecificType = TI_SensorTag_1352; // Change: pick your device, not BTStandard_Demo
 #endregion
 
@@ -88,7 +90,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the collection.
     /// </summary>
-    public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
+    public DataCollection<DeviceSpecificSensorDataFacade> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
 
     // CHANGE: some devices (like the heart rate) also have fine grained data.
@@ -126,7 +128,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
-    DeviceSpecificSensorData CurrSensor_DataUnits = null;
+    DeviceSpecificSensorDataFacade CurrSensor_DataUnits = null;
 
     /// <summary>
     /// Making a battery value that's seperate from the Sensor. This lets the programmer
@@ -149,7 +151,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
-    DeviceSpecificSensorSecondaryData CurrSensorSecondary_DataUnits = null;
+    // Not used; is placed into the EnvironmentData class: DeviceSpecificSensorSecondaryData CurrSensorSecondary_DataUnits = null;
     #endregion
 
     #region Instance values for the UX (not changed)
@@ -206,7 +208,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
         // Change: set up the graph by making an OxyPlotModel
         OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("TI Sensor Tag")
             .AddLine(10, 30, "Temperature", "Temperature")
-            .AddLine(10, 30, "Humidity", "Humidity");
+            .AddLine(10, 5, "Humidity", "Humidity");
 
 
         // "Sensor Data" is for the main graph title  and is human-readable
@@ -367,8 +369,6 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
         uiBTConnectionControl.CurrState = BTConnectionControl.ConnectionState.Connecting;
 
         #region Change so the device starts sending notifications for changed properties (data)
-
-        // TODO: write the enable code!
 
         // Change: tell the device to start sending sensor data back.
         // The demo code uses the battery level as the sensor.
@@ -606,8 +606,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
 
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
-        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrSensor_DataUnits = DeviceSpecificSensorDataFacade.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensorSecondary_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Change all this code to match your device and UX.
@@ -621,7 +620,7 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
             case DeviceSpecificType.Temperature_DataPropertyChangedName:
             case DeviceSpecificType.Humidity_DataPropertyChangedName:
                 uiTemperature.Text = CurrSensor_DataUnits.Temperature.ToString("F2"); // Change: update the UX as appropriate
-                uiHumidity.Text = CurrSensorSecondary_DataUnits.Humidity.ToString("F2"); // Change: update the UX as appropriate
+                uiHumidity.Text = CurrSensor_DataUnits.Humidity.ToString("F2"); // Change: update the UX as appropriate
 
                 // Only the sensor data gets plotted as historical data. In the demo,
                 // other values are also read (e.g., the Interval_Min), but they aren't
@@ -651,17 +650,17 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
     /// saves a portion of the data. Technicaly, every time there's new data we either update
     /// the most recent entry OR we add a new entry.
     /// </summary>
-    private void UpdateHistoricalDataAndGraph(DeviceSpecificSensorData currSensor_DataUnits)
+    private void UpdateHistoricalDataAndGraph(DeviceSpecificSensorDataFacade currSensor_DataUnits)
     {
         var deltaInSeconds = currSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
         var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
-            ? DataCollection<DeviceSpecificSensorData>.Verb.Add : DataCollection<DeviceSpecificSensorData>.Verb.ReplaceMostRecent;
+            ? DataCollection<DeviceSpecificSensorDataFacade>.Verb.Add : DataCollection<DeviceSpecificSensorDataFacade>.Verb.ReplaceMostRecent;
         HistoricalDataUnits.Update(currSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
         //
         // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
         //
-        if (verb == DataCollection<DeviceSpecificSensorData>.Verb.Add && HistoricalDataUnits.Count == 2)
+        if (verb == DataCollection<DeviceSpecificSensorDataFacade>.Verb.Add && HistoricalDataUnits.Count == 2)
         {
             // DOC: Can't have the axes start off invisible because then they can't be switched back on
             if (CurrWindowSize == MainWindow.WindowSize.Normal)

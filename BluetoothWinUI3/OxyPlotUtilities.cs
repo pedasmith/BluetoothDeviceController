@@ -190,6 +190,9 @@ internal static class OxyPlotUtilities
             axis.MajorGridlineStyle = LineStyle.Solid;
             axis.MajorGridlineThickness = 1;
             axis.MajorStep = step; // 1 hpa
+        }
+        if (axis != null) // Reminder: The first axis (index 0) is the X axis
+        {
             axis.MinimumRange = range;
         }
         if (axis != null && !double.IsNaN(minimum))
