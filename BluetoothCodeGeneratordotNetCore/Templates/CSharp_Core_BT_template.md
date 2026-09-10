@@ -62,7 +62,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Enumeration of all services
         /// </summary>
-        public enum ServiceIndex
+        enum ServiceIndex
         {
 [[ServiceIndexList]]
         }
@@ -70,7 +70,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Enumeration of all characteristics in all of the services.
         /// </summary>
-        public enum CharacteristicIndex
+        enum CharacteristicIndex
         {
 [[CharacteristicIndexList]]
         }
@@ -97,7 +97,7 @@ namespace BluetoothProtocols
 [[CharacteristicGuidsList]]
         };
 
-        public List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { [[CharacteristicsNullList]] };
+        private List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { [[CharacteristicsNullList]] };
         private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { [[CharacteristicsFalseList]] };
         private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  [[CharacteristicsNullList]] };
 
@@ -109,7 +109,7 @@ namespace BluetoothProtocols
         /// <param name="data"></param>
         public delegate void BluetoothDataEvent(IotNumberFormats.ValueParserResult data);
 
-        public async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
+        async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
         {
             if (Characteristics[(int)characteristicIndex] == null)
             {
@@ -423,7 +423,7 @@ This is the primary section of the code.
 
 [[CharacteristicMethodNotify]]
 [[CharacteristicMethodRead]]
-
+[[CharacteristicMethodWrite]]
 ```
 
 
@@ -620,6 +620,31 @@ the string length> but that won't work when both sides are numeric!
             {
                 Curr[[DataGroupName.dotNet]].[[DataName.dotNet]] = [[DefaultValueCSharp]];
             } 
+```
+
+
+## CharacteristicMethodWrite If="[[Verbs]] contains :WrWw:" Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics CodeListSubZero=""
+
+The write method for each characteristic.
+
+TODO: set up If= for the rest of the calls :-)
+
+```
+        /// <summary>
+        /// Writes data to [[CharacteristicName]] 
+        /// </summary>
+        public async Task Write[[CharacteristicName.dotNet]](byte[] data)
+        {
+            var index = CharacteristicIndex.[[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index;
+            await Ensure_Characteristic_Async(ServiceIndex.[[ServiceName.dotNet]]_index, "[[ServiceName]]", index, "[[CharacteristicName]]");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("Write[[CharacteristicName.dotNet]]", result);
+        }
 ```
 
 //

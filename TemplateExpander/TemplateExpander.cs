@@ -293,6 +293,16 @@ namespace TemplateExpander
             int nmove = 0;
             var orderedList = templateParent.Children.ToList();
             bool keepGoing = true;
+
+            for (int i=0; i< orderedList.Count && keepGoing; i++)
+            {
+                var item = orderedList[i].Value;
+                if (item.Code == null)
+                {
+                    keepGoing = false;
+                    return $"ERROR: ExpandChildTemplatesIntoMacros: the code block for {item.Name} is empty. This is likely caused by not having a blank line before the ``` code section ``` ";
+                }
+            }
             for (int i=1; i<orderedList.Count && keepGoing; i++)
             {
                 int moveTo = i;
@@ -301,7 +311,12 @@ namespace TemplateExpander
                 for (int j=0; j<i && moveTo==i; j++)
                 {
                     var earlierCode = orderedList[j].Value.Code;
-                    if (earlierCode.Contains(searchFor))
+                    if (earlierCode == null)
+                    {
+                        keepGoing = false;
+                        return $"ERROR: ExpandChildTemplatesIntoMacros: a code block is empty. This is likely caused by not having a blank line before the ``` code section ``` ";
+                    }
+                    else if (earlierCode.Contains(searchFor))
                     {
                         moveTo = j;
                     }

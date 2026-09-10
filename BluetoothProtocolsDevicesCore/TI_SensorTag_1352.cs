@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// The TI 1352 is the 2019 version in the TI range of Sensor Tags. Each battery-driven sensor tag includes a variety of sensors (light, humidity, accelerometer, and more) which are accessible from Bluetooth.
-    /// This class was automatically generated 2026-09-07::19:56
+    /// This class was automatically generated 2026-09-09::20:11
     /// </summary>
 
     public partial class TI_SensorTag_1352 : INotifyPropertyChanged
@@ -1184,7 +1184,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Enumeration of all services
         /// </summary>
-        public enum ServiceIndex
+        enum ServiceIndex
         {
             Temperature_index = 0,
             Humidity_index = 1,
@@ -1200,7 +1200,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Enumeration of all characteristics in all of the services.
         /// </summary>
-        public enum CharacteristicIndex
+        enum CharacteristicIndex
         {
             Temperature_Temperature_Data_index = 0,     // GUID f000aa01-0451-4000-b000-000000000000
             Temperature_Temperature_Conf_index = 1,     // GUID f000aa02-0451-4000-b000-000000000000
@@ -1301,7 +1301,7 @@ namespace BluetoothProtocols
             Guid.Parse("00002a50-0000-1000-8000-00805f9b34fb"), // #33 is Device Info PnP ID
         };
 
-        public List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
+        private List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
         private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,  };
         private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
 
@@ -1313,7 +1313,7 @@ namespace BluetoothProtocols
         /// <param name="data"></param>
         public delegate void BluetoothDataEvent(IotNumberFormats.ValueParserResult data);
 
-        public async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
+        async Task<bool> Ensure_Characteristic_Async(ServiceIndex serviceIndex, string serviceName, CharacteristicIndex characteristicIndex, string characteristicName)
         {
             if (Characteristics[(int)characteristicIndex] == null)
             {
@@ -1596,6 +1596,36 @@ namespace BluetoothProtocols
             OnPropertyChanged(Temperature_PeriodPropertyChangedName); // "Temperature_Period"
             return CurrTemperature_Data;
         }
+        /// <summary>
+        /// Writes data to Temperature Conf. 
+        /// </summary>
+        public async Task WriteTemperature_Conf(byte[] data)
+        {
+            var index = CharacteristicIndex.Temperature_Temperature_Conf_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Temperature_index, "Temperature", index, "Temperature Conf.");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteTemperature_Conf", result);
+        }
+        /// <summary>
+        /// Writes data to Temperature Period 
+        /// </summary>
+        public async Task WriteTemperature_Period(byte[] data)
+        {
+            var index = CharacteristicIndex.Temperature_Temperature_Period_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Temperature_index, "Temperature", index, "Temperature Period");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteTemperature_Period", result);
+        }
 
         #endregion
 //
@@ -1760,6 +1790,36 @@ namespace BluetoothProtocols
             OnPropertyChanged(Humidity_PeriodPropertyChangedName); // "Humidity_Period"
             return CurrHumidity_Data;
         }
+        /// <summary>
+        /// Writes data to Humidity Conf. 
+        /// </summary>
+        public async Task WriteHumidity_Conf(byte[] data)
+        {
+            var index = CharacteristicIndex.Humidity_Humidity_Conf_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Humidity_index, "Humidity", index, "Humidity Conf.");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteHumidity_Conf", result);
+        }
+        /// <summary>
+        /// Writes data to Humidity Period 
+        /// </summary>
+        public async Task WriteHumidity_Period(byte[] data)
+        {
+            var index = CharacteristicIndex.Humidity_Humidity_Period_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Humidity_index, "Humidity", index, "Humidity Period");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteHumidity_Period", result);
+        }
 
         #endregion
 //
@@ -1923,6 +1983,51 @@ namespace BluetoothProtocols
             CurrLED_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(BluePropertyChangedName); // "Blue"
             return CurrLED_Data;
+        }
+        /// <summary>
+        /// Writes data to Red 
+        /// </summary>
+        public async Task WriteRed(byte[] data)
+        {
+            var index = CharacteristicIndex.LED_Red_index;
+            await Ensure_Characteristic_Async(ServiceIndex.LED_index, "LED", index, "Red");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteRed", result);
+        }
+        /// <summary>
+        /// Writes data to Green 
+        /// </summary>
+        public async Task WriteGreen(byte[] data)
+        {
+            var index = CharacteristicIndex.LED_Green_index;
+            await Ensure_Characteristic_Async(ServiceIndex.LED_index, "LED", index, "Green");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteGreen", result);
+        }
+        /// <summary>
+        /// Writes data to Blue 
+        /// </summary>
+        public async Task WriteBlue(byte[] data)
+        {
+            var index = CharacteristicIndex.LED_Blue_index;
+            await Ensure_Characteristic_Async(ServiceIndex.LED_index, "LED", index, "Blue");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteBlue", result);
         }
 
         #endregion
@@ -2304,6 +2409,21 @@ namespace BluetoothProtocols
             OnPropertyChanged(ZPropertyChangedName); // "Z"
             return CurrAccelerometer_Data;
         }
+        /// <summary>
+        /// Writes data to Accel Enable 
+        /// </summary>
+        public async Task WriteAccel_Enable(byte[] data)
+        {
+            var index = CharacteristicIndex.Accelerometer_Accel_Enable_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Accelerometer_index, "Accelerometer", index, "Accel Enable");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteAccel_Enable", result);
+        }
 
         #endregion
 //
@@ -2467,6 +2587,36 @@ namespace BluetoothProtocols
             CurrOptical_Service_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Light_PeriodPropertyChangedName); // "Light_Period"
             return CurrOptical_Service_Data;
+        }
+        /// <summary>
+        /// Writes data to Light Conf. 
+        /// </summary>
+        public async Task WriteLight_Conf(byte[] data)
+        {
+            var index = CharacteristicIndex.Optical_Service_Light_Conf_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Optical_Service_index, "Optical Service", index, "Light Conf.");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteLight_Conf", result);
+        }
+        /// <summary>
+        /// Writes data to Light Period 
+        /// </summary>
+        public async Task WriteLight_Period(byte[] data)
+        {
+            var index = CharacteristicIndex.Optical_Service_Light_Period_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Optical_Service_index, "Optical Service", index, "Light Period");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteLight_Period", result);
         }
 
         #endregion

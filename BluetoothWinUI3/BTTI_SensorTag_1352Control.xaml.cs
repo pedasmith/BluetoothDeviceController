@@ -376,8 +376,8 @@ public sealed partial class BTTI_SensorTag_1352Control : UserControl, IDeviceCon
         await Device.NotifyHumidity_DataAsync();
         await Device.NotifyBattery_DataAsync(); // CHANGE: set up the right notifications for your device.
 
-        await Device.WriteTemperatureEnable(1); // turn it on!
-        await Device.WriteHumidityEnable(1); // turn it on!
+        await Device.WriteTemperature_Conf([1]); // turn it on!
+        await Device.WriteHumidity_Conf([1]); // turn it on!
 
         // Verify that your device has a battery characteristic. If your device does not,
         // just SetBatteryVisibility(Visibility.Collapsed); without further notice.
