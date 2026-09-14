@@ -456,7 +456,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
 
     /// <summary>
-    /// Updates the OxyPlit and highlights a given line OR clears the highlight if the
+    /// Updates the OxyPlot and highlights a given line OR clears the highlight if the
     /// lineTag is !CLEAR
     /// </summary>
     public void HighlightGraphLine(string lineTag)

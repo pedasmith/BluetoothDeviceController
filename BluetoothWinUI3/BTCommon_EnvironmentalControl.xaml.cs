@@ -443,7 +443,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
 
     /// <summary>
-    /// Updates the OxyPlit and highlights a given line OR clears the highlight if the
+    /// Updates the OxyPlot and highlights a given line OR clears the highlight if the
     /// lineTag is !CLEAR
     /// </summary>
     public void HighlightGraphLine(string lineTag)

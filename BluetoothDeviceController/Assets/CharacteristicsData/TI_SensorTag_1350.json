@@ -54,7 +54,7 @@
             {
               "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
               "Name": "System ID",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|SystemID",
               "IsRead": true,
               "ExampleData": [
                 "Value:  92 7A F3 00 00 F1 34 A4",
@@ -64,7 +64,7 @@
             {
               "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
               "Name": "Model Number",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|ModelNumber",
               "IsRead": true,
               "ExampleData": [
                 "Value:  43 43 31 33 35 30 20 53 65 6E 73 6F 72 54 61 67",
@@ -74,7 +74,7 @@
             {
               "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
               "Name": "Serial Number",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|SerialNumber",
               "IsRead": true,
               "ExampleData": [
                 "Value:  4E 2E 41 2E",
@@ -84,7 +84,7 @@
             {
               "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
               "Name": "Firmware Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|FirmwareRevision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  31 2E 34 33 20 28 53 65 70 20 20 38 20 32 30 31 37 29",
@@ -94,7 +94,7 @@
             {
               "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
               "Name": "Hardware Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|HardwareRevision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  4E 2E 41 2E",
@@ -104,7 +104,7 @@
             {
               "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
               "Name": "Software Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|SoftwareRevision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  4E 2E 41 2E",
@@ -114,7 +114,7 @@
             {
               "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
               "Name": "Manufacturer Name",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|ManufacturerName",
               "IsRead": true,
               "ExampleData": [
                 "Value:  54 65 78 61 73 20 49 6E 73 74 72 75 6D 65 6E 74 73",
@@ -134,7 +134,7 @@
             {
               "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
               "Name": "PnP ID",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|PnPID",
               "IsRead": true,
               "ExampleData": [
                 "Value:  01 0D 00 00 00 10 01",
@@ -419,7 +419,7 @@
             {
               "UUID": "f000aa65-0451-4000-b000-000000000000",
               "Name": "IO Service Data",
-              "Type": "BYTES|HEX",
+              "Type": "BYTES|HEX|IOData",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -429,7 +429,7 @@
             {
               "UUID": "f000aa66-0451-4000-b000-000000000000",
               "Name": "IO Service Config",
-              "Type": "U8|HEX",
+              "Type": "U8|HEX|IOConfig",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -447,7 +447,7 @@
             {
               "UUID": "f000ac01-0451-4000-b000-000000000000",
               "Name": "Register Data",
-              "Type": "BYTES|HEX",
+              "Type": "BYTES|HEX|RegisterData",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -457,7 +457,7 @@
             {
               "UUID": "f000ac02-0451-4000-b000-000000000000",
               "Name": "Register Address",
-              "Type": "BYTES|HEX",
+              "Type": "BYTES|HEX|RegisterAddress",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -467,7 +467,7 @@
             {
               "UUID": "f000ac03-0451-4000-b000-000000000000",
               "Name": "Register Device ID",
-              "Type": "BYTES|HEX",
+              "Type": "BYTES|HEX|RegisterDeviceID",
               "IsRead": true,
               "IsWrite": true,
               "ExampleData": [
@@ -502,7 +502,7 @@
             {
               "UUID": "f000ccc3-0451-4000-b000-000000000000",
               "Name": "Disconnect Request",
-              "Type": "BYTES|HEX",
+              "Type": "BYTES|HEX|DisconnectRequest",
               "IsWrite": true,
               "ExampleData": []
             }
@@ -516,7 +516,7 @@
             {
               "UUID": "f000ffc1-0451-4000-b000-000000000000",
               "Name": "Img Identify",
-              "Type": "BYTES|HEX",
+              "Type": "BYTES|HEX|ImageIdentify",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "IsNotify": true,
@@ -525,7 +525,7 @@
             {
               "UUID": "f000ffc2-0451-4000-b000-000000000000",
               "Name": "Img Block",
-              "Type": "BYTES|HEX",
+              "Type": "BYTES|HEX|ImageBlock",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "IsNotify": true,
@@ -534,7 +534,7 @@
             {
               "UUID": "f000ffc3-0451-4000-b000-000000000000",
               "Name": "Img Count",
-              "Type": "BYTES|HEX",
+              "Type": "BYTES|HEX|ImageCount",
               "IsWrite": true,
               "IsWriteWithoutResponse": true,
               "ExampleData": []
@@ -542,7 +542,7 @@
             {
               "UUID": "f000ffc4-0451-4000-b000-000000000000",
               "Name": "Img Status",
-              "Type": "BYTES|HEX",
+              "Type": "BYTES|HEX|ImageStatus",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [

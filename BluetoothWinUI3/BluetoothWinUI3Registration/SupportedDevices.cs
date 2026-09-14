@@ -120,7 +120,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
 
             // Nordic and TI Sensor Tags and similar
             new SupportedDevice("Thingy*", typeof(BTNordic_ThingyControl)),
-            new SupportedDevice("Multi-Sensor*", typeof(BTTI_SensorTag_1352Control)),
+            new SupportedDevice("SensorTag*", typeof(BTTI_SensorTagControl)), // TI SensorTag 2541
+            new SupportedDevice("CC1350 SensorTag*", typeof(BTTI_SensorTagControl)), // TI SensorTag 1350
+            new SupportedDevice("Multi-Sensor*", typeof(BTTI_SensorTagControl)), // TI SensorTag 1352
 
             // RuuviTag
             new SupportedDevice("RuuviAir *", typeof(BTCommon_EnvironmentalControl)),

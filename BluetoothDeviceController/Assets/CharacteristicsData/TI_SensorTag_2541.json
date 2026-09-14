@@ -83,7 +83,7 @@
             {
               "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
               "Name": "System ID",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|SystemId",
               "IsRead": true,
               "ExampleData": [
                 "Value:  AE 3D D1 00 00 F7 B1 34",
@@ -93,7 +93,7 @@
             {
               "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
               "Name": "Model Number",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|ModelNumber",
               "IsRead": true,
               "ExampleData": [
                 "Value:  4E 2E 41 2E 00",
@@ -103,7 +103,7 @@
             {
               "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
               "Name": "Serial Number",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|SerialNumber",
               "IsRead": true,
               "ExampleData": [
                 "Value:  4E 2E 41 2E 00",
@@ -113,7 +113,7 @@
             {
               "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
               "Name": "Firmware Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|FormwareRevision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  31 2E 30 31 20 28 46 65 62 20 20 37 20 32 30 31 33 29 00",
@@ -123,7 +123,7 @@
             {
               "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
               "Name": "Hardware Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|HardwareRevision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  4E 2E 41 2E 00",
@@ -133,7 +133,7 @@
             {
               "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
               "Name": "Software Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|SoftwareRevision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  4E 2E 41 2E 00",
@@ -143,7 +143,7 @@
             {
               "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
               "Name": "Manufacturer Name",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|ManufacturerName",
               "IsRead": true,
               "ExampleData": [
                 "Value:  54 65 78 61 73 20 49 6E 73 74 72 75 6D 65 6E 74 73 00",
@@ -163,7 +163,7 @@
             {
               "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
               "Name": "PnP ID",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|PnpID",
               "IsRead": true,
               "ExampleData": [
                 "Value:  01 0D 00 00 00 10 01",

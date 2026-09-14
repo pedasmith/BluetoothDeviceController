@@ -19,6 +19,7 @@ namespace BluetoothWinUI3.BTDeviceUnitConverters
                 case "celcius":
                     retval = BluetoothWatcher.Units.Temperature.Convert(value, BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius, prefs.Temperature);
                     break;
+                case "hPa":
                 case "hPA":
                     retval = BluetoothWatcher.Units.Pressure.Convert(value, BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar, prefs.Pressure);
                     break;

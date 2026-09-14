@@ -70,11 +70,9 @@ namespace BluetoothProtocols
 
 
         /// <summary>
-        /// Returns true if the local name OR the original name matches Govee_H5074_ or GVH5075_
+        /// Returns true if the local name OR the original name matches ThermPro
         /// All of these parsers happen to have an AdvertIsSensorFamily :-)
         /// </summary>
-        /// <param name="wrapper"></param>
-        /// <returns></returns>
         public static SensorType AdvertIsSensorFamily(WatcherData wrapper)
         {
             var retval = NameToSensorType(wrapper.BestName);
@@ -98,7 +96,7 @@ namespace BluetoothProtocols
         }
 
         /// <summary>
-        /// Parses a BleAdvertisementWrapper and returns a Govee data record. Return might be null or might be Invalid.
+        /// Parses a BleAdvertisementWrapper and returns a ThermPro data record. Return might be null or might be Invalid.
         /// The source will be overwritten! Null is never returned!
         /// </summary>
         public static ThermPro Parse(SensorType sensorType, WatcherData wrapper, ThermPro source)

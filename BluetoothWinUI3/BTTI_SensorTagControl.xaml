@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UserControl
-    x:Class="BluetoothWinUI3.BTTI_SensorTag_1352Control"
+    x:Class="BluetoothWinUI3.BTTI_SensorTagControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BluetoothWinUI3"
@@ -52,8 +52,13 @@
                         <Line Tag="HumidityColor" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
 
-
-
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}" x:Name="uiPressurePanel">
+                        <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
+                        <Run>Pressure</Run><Run Text=" "/><Run x:Name="uiPressureChange" Text=" "/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiPressure"/></TextBlock>
+                        <Line Tag="PressureColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
                 </GridView>
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
