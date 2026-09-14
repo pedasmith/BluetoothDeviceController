@@ -8,12 +8,19 @@ The Simple Bluetooth Device Controller app automatically connects to and display
 
 Supported devices include
 
-|Type|Supported|
-|----|----|
-|Bike sensors|Bluetooth standard bike cadence and speed sensors
-|Environment Sensors|[Nordic Thingy:52](./Device_Nordic_Thingy.md)<br>Govee H5074 H5075 H5103 H5106 H5171 H5179 <br>Ruuvi Air and other sensors<br>SensorPro T201<br>ThermPro TP351 TP357 PT359<br>TI SensorTag 2541 1350 1352 |
-|Heart Rate bands|Bluetooth standard heart rate bands
-|Pulse Oximeters|Viatom compatible PC-60F<br>Vibeat S5W S6W<br>Wellvue KS-60FW
+* Bike sensors: Bluetooth standard bike cadence and speed sensors
+* Environment Sensors
+  o [Nordic Thingy:52](./Device_Nordic_Thingy.md)  
+  o Govee H5074 H5075 H5103 H5106 H5171 H5179  
+  o Ruuvi Air and other sensors  
+  o SensorPro T201  
+  o ThermPro TP351 TP357 PT359  
+  o TI SensorTag 2541 1350 1352
+* Heart Rate bands: Bluetooth standard heart rate bands
+* Pulse Oximeters
+  o Viatom compatible PC-60F  
+  o Vibeat S5W S6W  
+  o Wellvue KS-60FW
 
 
 
