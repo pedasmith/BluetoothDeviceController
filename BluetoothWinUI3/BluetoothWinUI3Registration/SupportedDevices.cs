@@ -102,14 +102,13 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
     /// </summary>
     public static class SupportedDevices
     {
+        private static List<SupportedDevice> DemoDevices { get; set; } = new List<SupportedDevice>()
+        {
+            new SupportedDevice("Multi-Sensor*", typeof(BTSimple_DemoControl)),
+        };
+
         private static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()
         {
-            //new SupportedDevice("BK6*", typeof(BTStandard_DemoControl)),
-            // new SupportedDevice("JBL*", typeof(BTStandard_DemoControl)),
-            //new SupportedDevice("Thingy*", typeof(BTStandard_DemoControl)),
-
-
-
             // Govee Environmental Thermometer devices
             new SupportedDevice("Govee_H5074_*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GVH5075_*", typeof(BTCommon_EnvironmentalControl)),
@@ -156,6 +155,18 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {
             var name = advertisement.BestName;
+
+            if (App.CurrAppSwitches.EnableDemo)
+            {
+                foreach (var device in DemoDevices)
+                {
+                    if (device.Matches(advertisement))
+                    {
+                        return device;
+                    }
+                }
+            }
+
             foreach (var device in Devices)
             {
                 if (device.Matches(advertisement))

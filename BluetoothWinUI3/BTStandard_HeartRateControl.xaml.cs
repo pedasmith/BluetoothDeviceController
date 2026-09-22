@@ -1,3 +1,4 @@
+#region Usings stay the same
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
 using BluetoothWatcher.AdvertismentWatcher;
@@ -22,37 +23,35 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
-
-#region Change these to match your device
-using DeviceSpecificBatteryData = BTStandard_HeartRate.Battery_Data; // Change: many device support battery
-using DeviceSpecificSensorData = BTStandard_HeartRate.Heart_Rate_Data; // Change: 
-using DeviceSpecificSensorDataFacade = Heart_Rate_Data_Facade; // Change: 
-using DeviceSpecificType = BTStandard_HeartRate; // Change: pick your device, not BTStandard_Demo
 #endregion
+// Modify these to match your device
+using DeviceSpecificType = BTStandard_HeartRate; // Modify: pick your device, not BTSimple_Demo
+using DeviceSpecificSensorData = BTStandard_HeartRate.Heart_Rate_Data; // Modify: 
+using DeviceSpecificSensorDataFacade = Heart_Rate_Data_Facade; // Modify: 
+using DeviceSpecificBatteryData = BTStandard_HeartRate.Battery_Data; // Modify: many device support battery
+
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Change: change the name from BTStandard_DemoControl
+public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Modify: rename to match your device
 {
-    #region Change these settings that must be updated for a new device
+    // Modify these settings to match your device
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "BTStandard_HeartRate";  // Change: change the BTStandard_Demo string to match your device. The exact name does not matter.
+    private readonly string InternalDeviceType = "BTStandard_HeartRate"; // Modify: edit the string to match your device. The exact name does not matter.
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
-    /// Common tags: environment exersize health cooking agriculture light
+    /// Common tags: environment exersise health cooking agriculture light
     /// </summary>
     public string Tags { get { return "#exercise #health"; } }
-    #endregion
 
-    #region Change these advanced settings only when needed (most devices won't change these)
+    // Modify these advanced settings only when needed (most devices won't update these)
     /// <summary>
-    /// Most developer never need to change this from 'true'!
+    /// Most developer never need to switch this from 'true'!
     /// Ususually a device always has their sensor data. But some devices are might not. 
-    /// For the BTStandard_DemoControl, the "sensor" is just the battery level. That was
-    /// picked because so many devices include a battery level. But in case it doesn't,
-    /// there's a way to tell the MainWindow that the device doesn't have a sensor.
+    /// The HasSensorData shows how to handle the case of your device not always having
+    /// the sensor.
     /// </summary>
     bool HasSensorData = true;
 
@@ -68,16 +67,20 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// + exported). A good default is 5 seconds.
     /// </summary>
     const double HistoricalDataUpdateRateInSeconds = 5.0;
-    #endregion
 
-    public BTStandard_HeartRateControl() // CHANGE: change the name to match the changed class name
+    public BTStandard_HeartRateControl() // Modify: edit the name to match the class name
+    {
+        Initialize(); // Initialization that will stay the same
+    }
+
+    #region Instance value for a device stay the same
+    private void Initialize()
     {
         InitializeComponent();
         this.Loaded += Control_Loaded;
         this.DataContextChanged += Control_DataContextChanged;
     }
 
-    #region Instance value for a device (not changed)
     DeviceSpecificType Device;
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
@@ -89,14 +92,17 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// </summary>
     public DataCollection<DeviceSpecificSensorDataFacade> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
+    #endregion
 
-    // CHANGE: some devices (like the heart rate) also have fine grained data.
+    // Modify: some devices (like the heart rate) also have fine grained data.
+    // Most devices do not; it's OK to just return data every 5 second or so
     public void ClearAccumulatedFineGrainedData()
     {
         // Only the RRInterval data is fine grained.
         CurrSensor_DataUnits?.CurrRRRecent?.DoClearAccumulatedFineGrainedData();
     }
 
+    #region Historical data methods and fields stay the same
     /// <summary>
     /// Called from MainWindow when the user wants to clear their graph
     /// </summary>
@@ -109,14 +115,6 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     {
         return HistoricalDataUnits.GetDataMostRecent();
     }
-
-
-    // This control show two kinds of data. 
-    // 1. Battery data is the "sensor data" which is the data to be graphed
-    // and displayed in a table. 
-    //
-    // 2. Configuration data which is just displayed to the user
-    //
 
     /// <summary>
     /// Current sensor data from the Device. For the demo, it's battery level.
@@ -134,14 +132,14 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// </summary>
     DeviceSpecificType.Battery_Data CurrBattery_Data = null;
     /// <summary>
-    /// Just like CurrBattery_Data but in user-preferred units. For battery, it
-    /// doesn't actually change anything :-)
+    /// Just like CurrBattery_Data but in user-preferred units. For battery, the units
+    /// are actually OK as is
     /// </summary>
     DeviceSpecificType.Battery_Data CurrBattery_DataUnits = null;
 
     #endregion
 
-    #region Instance values for the UX (not changed)
+    #region Instance values for the UX stay the same
     /// <summary>
     /// Standard: Panel size. Set in UpdateUX from MainWindow.
     /// </summary>
@@ -168,39 +166,54 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         InitializeUX();
     }
 
-
     bool InitializeUXCalled = false;
+
     /// <summary>
     /// Code to initialize the UX. Will be called both from Control_Loaded and from
     /// DataContextChanged
     /// </summary>
     private void InitializeUX()
     {
-        // Loaded gets called both when it's first loaded and also each time it's 
+        // InitializeUX gets called both when it's first loaded and also each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         // We only want to do work the first time.
 
         if (InitializeUXCalled) return;
         InitializeUXCalled = true;
 
-        #region Change to set up the sparkles and graph
+        // Modify to set up the sparkles and graph
 
-        // Change: set the right sparkles.
+        // Modify: set the right sparkles.
         // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
             ( DeviceSpecificType.Heart_Rate_MeasurementPropertyChangedName, uiBpmChange),
         };
 
-        // Change: set up the graph by making an OxyPlotModel
-        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModelSimple("Heart Rate", 10, 50, "Heart Rate", "HeartRate");
+        // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
+        // The line data must exist in the HistoricalData
+        OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Heart Rate")
+            .AddLine(10, 50, "Heart Rate", "HeartRate")
+            ;
+
         // "Sensor Data" is for the main graph title  and is human-readable
-        // "Battery" for the axis title and for the color settings in the menus and should be concise and human-readable
-        // "BatteryLevel" is the underlying sensor property name and must exactly match the C# name.
-        #endregion
+        // "Ambient Temperature" for the axis title and for the color settings in the menus and should be concise and human-readable
+        // "Temperature" is the underlying sensor property name and must exactly match the C# name.
 
+        // Your sensor might include properties that aren't interesting to see in the table view.
+        // Note that this table is the visible table; the exported data is set differently.
+        CurrTableCustomization.TableColumnsToExclude.Add("TemperatureEnable");
+        CurrTableCustomization.TableColumnsToExclude.Add("TemperaturePeriod");
 
-        // This sarkles, oxyplot, and table code is always the same and doesn't need to be changed.
+        // end modifications
+
+        InitializeSparklesOxyplotTables();
+    }
+
+    #region Code to initialize some of the UX components after the customization is setup up. Will stay the same
+    private void InitializeSparklesOxyplotTables()
+    {
+        // This sparkles, oxyplot, and table code is always the same and doesn't need to be edited.
         SparklesHelper.InitializeSparkles(ControlsWithSparkles);
 
         OxyPlotUtilities.InitializeOxyPlotData(uiOxyPlot, OxyPlotModel, HistoricalDataUnits.Data);
@@ -221,8 +234,8 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
 
     /// <summary>
-    /// Called by MainWindow so this control knows who to contact based on device changes.
-    /// Often there are no changes
+    /// Called by MainWindow so this control knows who to contact based on device schema updates.
+    /// Often there are no updates
     /// </summary>
     public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
     {
@@ -237,7 +250,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     List<string> _LineNames = new() { };
     /// <summary>
     /// List of line names in the plot. This is set up directly from the OxyPlotModel. The line names
-    /// are needed so the MainWindow can set up the list of changeable line colors in the plot.
+    /// are needed so the MainWindow can set up the list of editable line colors in the plot.
     /// </summary>
     public List<string> LineNames { get { return _LineNames; } }
 
@@ -254,9 +267,6 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// <summary>
     /// The OxyPlotModel is the graph for the sensor data that we want to plot. It's of
     /// type "H.Oxyplot" which is a WinUI3 port of the original OxyPlot code.
-    /// CHANGE: you will want to set the Title and the list of Axes and LineSeries. In
-    /// general, each sensor type (e.g, on the Nordic Thingy there's a sensor for temperature,
-    /// dumidity, pressure, etc.) has its own Axis and its own LineSeries.
     /// </summary>
     // H.OxyPlot
     private PlotModel OxyPlotModel { get; set; } = null;
@@ -283,7 +293,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
     /// <summary>
     /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
-    /// trigger looking up the SaveData and change more things. And it will actually connect to the device.
+    /// trigger looking up the SaveData and update more things. And it will actually connect to the device.
     /// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
     /// used by other bits of the system.
     /// </summary>
@@ -302,6 +312,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         }
         await ReconnectAsync();
     }
+    #endregion
 
     /// <summary>
     /// Called by e.g., the ConnectionControl when the user wants to reconnect to the device (sensor).
@@ -312,7 +323,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// </summary>
     public async Task ReconnectAsync()
     {
-
+        #region Normal device setup stays the same
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
         // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
         if (DataContextAsKnownDevice == null)
@@ -345,7 +356,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         // Initialize the line colors from the default colors in the OxyPlotModel.
         // This will get over-ridden with the data from the saveData
         UtilitiesWinUI3.UtilitiesWinUI3.InitializeKeyLineColorsFromDefaultOxyPlot(OxyPlotModel, rootPanel);
-        UpdateUX(CurrSaveData);
+        UpdateUX(CurrSaveData); // Can be null when the user hasn't made any changes
         KnownDeviceName = DataContextAsKnownDevice.Advertisement?.BestName ?? KnownDeviceName;
         uiKnownDeviceName.Text = KnownDeviceName;
 
@@ -354,23 +365,17 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         Device.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
         bool connectAllOk = true;
         uiBTConnectionControl.CurrState = BTConnectionControl.ConnectionState.Connecting;
+        #endregion
 
-        #region Change so the device starts sending notifications for changed properties (data)
+        // Modify so the device starts sending notifications for changed properties (data)
 
-        // Change: tell the device to start sending sensor data back.
-        // The demo code uses the battery level as the sensor.
-        connectAllOk = connectAllOk && await Device.NotifyBatteryLevelAsync(); // CHANGE: set up the right notifications for your device.
-        connectAllOk = connectAllOk && await Device.ReadBody_Sensor_Location(DefaultCacheMode) != null;
-
-        // TODO: Remove: Tons of GAP stuff to test out more reads
-        connectAllOk = connectAllOk && await Device.ReadManufacturer_Name_String(DefaultCacheMode) != null;
-        connectAllOk = connectAllOk && await Device.ReadModel_Number_String(DefaultCacheMode) != null;
-        connectAllOk = connectAllOk && await Device.ReadHardware_Revision_String(DefaultCacheMode) != null;
-        connectAllOk = connectAllOk && await Device.ReadFirmware_Revision_String(DefaultCacheMode) != null;
-        connectAllOk = connectAllOk && await Device.ReadSoftware_Revision_String(DefaultCacheMode) != null;
-        connectAllOk = connectAllOk && await Device.ReadSystem_ID(DefaultCacheMode) != null;
-        connectAllOk = connectAllOk && await Device.ReadDevice_Name(DefaultCacheMode) != null;
-
+        // Modify: tell the device to start sending sensor and battery data back.
+        if (connectAllOk)
+        {
+            // optional read
+            await Device.NotifyBatteryLevelAsync(); // Modify: set up the right notifications for your device.
+            await Device.ReadBody_Sensor_Location(DefaultCacheMode);
+        }
         connectAllOk = connectAllOk && await Device.NotifyHeart_Rate_MeasurementAsync();
 
         // Verify that your device has a battery characteristic. If your device does not,
@@ -383,7 +388,10 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
 
         // Some UX needs additional information
         connectAllOk = connectAllOk && await Device.ReadDevice_Name(DefaultCacheMode) != null;
-        #endregion
+        // How this works: when you call the Read call, in addition to returning data it will
+        // also call the Device.PropertyChanged (INPC) callback. In my code, it's handy to just
+        // have all the UX update code for handling changes in the same place, so I just
+        // ignore the return value here.
 
         // The system tracks device changes
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
@@ -392,6 +400,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     }
 
 
+#if YOUR_CODE_MIGHT_NEED_THIS
     /// <summary>
     /// Called from DataContextChanged when a device does not, in fact, have a sensor. This 
     /// removes the grpah and table from the display (no sensor means no data) and tells
@@ -399,7 +408,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// </summary>
     private void RemoveSensorDataUx()
     {
-        uiDeviceDataList.Items.Remove(uiBpm);
+        uiDeviceDataList.Items.Remove(ui__Item_To_Remove__);
         LineNames.Clear();
         uiOxyPlot.Visibility = Visibility.Collapsed;
         uiTableView.Visibility = Visibility.Visible;
@@ -410,17 +419,17 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         // technically isn't quite in accordance with the name.
         NotifyDeviceControlChangesWindows?.OnGetUXCapabilitiesChanged(this, GetUXCapabilities());
     }
+#endif
 
+    #region Update glue code stays the same
     /// <summary>
     /// Called when the BLE device connection status changes.
     /// </summary>
     private void Ble_ConnectionStatusChanged(BluetoothLEDevice sender, object args)
     {
-        // TODO: do something smarter here this will drive a bunch of the control flow.
         // Choices for ConnectionStatus is just Disconnected and Connected 
         uiBTConnectionControl.SetState(sender.ConnectionStatus);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
-        ;
     }
 
     /// <summary>
@@ -512,11 +521,12 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         OxyPlotModel.TextColor = oxyColorText;
 
         // Also set the graph line colors.
-        foreach (var (lineName, color) in colors.GraphColors)
+        foreach (var (axisTitle, color) in colors.GraphColors)
         {
-            UpdateGraphColor(lineName, color);
+            UpdateGraphColor(axisTitle, color);
         }
     }
+    #endregion
 
     /// <summary>
     /// UserPreferences are for the app as a whole, not for this particular device. For example: the preferred temperature unit.
@@ -528,29 +538,29 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         // Update the saved data in the HistoricalDataUnits to match the new user preferences.
         foreach (var data in HistoricalDataUnits.Data)
         {
-            #region Change to update the data based on user preferred units (e.g, C versus F)
-            // For the BTStandard_Demo, there are no units to change
+            // Modify to update the data based on user preferred units (e.g, C versus F)
+            // For the BTSimple_Demo, there is just the temperature
             if (oldPrefs != null && newPrefs.Distance != oldPrefs.Distance)
             {
-                // Change: based on your knowledge of the sensor data, change the distance readings.
+                // Modify: based on your knowledge of the sensor data, edit the distance readings.
                 // data.Distance = BluetoothWatcher.Units.Distance.Convert(data.Distance, oldPrefs.Distance, CurrUserPrefs.Distance);
             }
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
-                // Change: based on your knowledge of the sensor data, change the temperature readings.
+                // Modify: based on your knowledge of the sensor data, edit the temperature readings.
                 // data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, CurrUserPrefs.Temperature);
             }
             if (oldPrefs != null && newPrefs.Pressure != oldPrefs.Pressure)
             {
-                // Change: based on your knowledge of the sensor data, change the pressure readings.
+                // Modify: based on your knowledge of the sensor data, edit the pressure readings.
                 // data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, CurrUserPrefs.Pressure);
             }
-            #endregion
         }
 
         UpdateDeviceDataUX(""); // all of them.
     }
 
+    #region Glue code stays the same
     /// <summary>
     /// Standard: the normal way to resize the control. 
     /// </summary>
@@ -584,8 +594,9 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
             UpdateDeviceDataUX(e.PropertyName);
         });
     }
+    #endregion
 
-    #region Change to update the UX when the device says there's new data
+    // Modify to update the UX when the device says there's new data
 
     static string RRIntervalToString(List<double> values)
     {
@@ -612,20 +623,18 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         SparklesHelper.UpdateSparkles(ControlsWithSparkles, name); // name is from e.PropertyName when the Device does a PropertyChanged.
 
 
-        // Change: Always update these even though in practice they are only set once.
-        CurrSensor_Data = Device.CurrHeart_Rate_Data; // Change: select the right data
-        CurrBattery_Data = Device.CurrBattery_Data; // Change: if your device doesn't have a battery, remove battery stuff!
+        // Modify: Always update these even though in practice they are only set once.
+        CurrSensor_Data = Device.CurrHeart_Rate_Data; // Modify: select the right data
+        CurrBattery_Data = Device.CurrBattery_Data; // Modify: if your device doesn't have a battery, remove battery stuff!
 
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
         CurrSensor_DataUnits = DeviceSpecificSensorDataFacade.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
-        // Change all this code to match your device and UX.
+        // Modify: Edit all this code to match your device and UX.
         switch (name)
         {
-
-            case "*": // never used, but here so it matches the Govee code.
             case DeviceSpecificType.Heart_Rate_MeasurementPropertyChangedName:
                 uiBpm.Text = CurrSensor_DataUnits.HeartRate.ToString();
                 uiFlags.Text = CurrSensor_DataUnits.CurrFlagsDecoded.ToString();
@@ -682,7 +691,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         }
 
         //
-        // Many devices include a battery level. If so, chances are it's called "BatteryLevel"
+        // Many devices include a battery level. If so, chances are it's called "BatteryLevel" or "Battery_Data"
         // 
         //
         if (CurrBattery_DataUnits != null)
@@ -693,8 +702,9 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
             }
         }
     }
-    #endregion
+    // End of UX changes
 
+    #region Historical Data and export code stays the same
 
     /// <summary>
     /// Helper code to update historical data. The sensor might send a lot of data; the history only
@@ -724,7 +734,6 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
     }
 
-    #region Exporters don't need to be changed
 
     /// <summary>
     /// Called from MainWindow when the user asks for, e.g., exported data or graphs. Most sensors will 
@@ -735,8 +744,8 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         var retval = IDeviceControlBasic.UXCapabilities.CanRename;
         if (HasSensorData)
         {
-            retval |=
-            IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
+            retval = retval
+            | IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
             | IDeviceControlBasic.UXCapabilities.CanGetData
             | IDeviceControlBasic.UXCapabilities.CanShowTable
             ;
@@ -760,4 +769,4 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     }
     #endregion
 
-} // end of class BTStandard_HeartRateControl // CHANGE: update the comment to match the class name
+} // end of class BTStandard_HeartRateControl // Modify: update the comment to match the class name

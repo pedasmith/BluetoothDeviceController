@@ -202,7 +202,7 @@
     <Page Update="BTStandard_HeartRateControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="BTStandard_DemoControl.xaml">
+    <Page Update="BTSimple_DemoControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="BTServicesCharacteristicsDisplay.xaml">

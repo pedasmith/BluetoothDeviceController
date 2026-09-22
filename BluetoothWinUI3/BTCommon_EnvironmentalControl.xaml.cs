@@ -270,7 +270,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
         #endregion
 
 
-        // This sarkles, oxyplot, and table code is always the same and doesn't need to be changed.
+        // This sparkles, oxyplot, and table code is always the same and doesn't need to be changed.
         SparklesHelper.InitializeSparkles(ControlsWithSparkles);
 
         OxyPlotUtilities.InitializeOxyPlotData(uiOxyPlot, OxyPlotModel, HistoricalDataUnits.Data);

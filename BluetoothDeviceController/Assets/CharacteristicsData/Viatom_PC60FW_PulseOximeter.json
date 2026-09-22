@@ -5,7 +5,7 @@
       "ClassName": "Viatom_PC_60F",
       "CompletionStatus": "Usable",
       "CompletionStatusExplanation": "2022-12-10: protocol is understood; device sends packets which can be decoded",
-      "Description": "LED strip lights with Bluetooth control. Can also be controlled with a small IR remote. Uses a ModBus-based custom protocol.",
+      "Description": "Pulse Oximeter from Viatom",
       "Links": [
         "https://github.com/sza2/viatom_pc60fw",
         "https://github.com/rileyg98/ViatomDataReader"

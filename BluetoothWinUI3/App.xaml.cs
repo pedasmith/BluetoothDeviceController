@@ -18,6 +18,16 @@ namespace BluetoothWinUI3
     /// </summary>
     public partial class App : Application
     {
+        /// <summary>
+        /// Values the user can set from the command line
+        /// </summary>
+        public class AppSwitches
+        {
+            public bool EnableDemo { get; set; } = false; 
+        }
+
+        public static AppSwitches CurrAppSwitches = new AppSwitches();
+
         private Window? _window;
 
         /// <summary>

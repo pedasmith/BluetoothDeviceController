@@ -1,21 +1,17 @@
-using BluetoothConversions;
+#region Usings stay the same
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
 using BluetoothProtocolsDevicesCoreExtensions;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
-using BluetoothWinUI3.Units;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Shapes;
 using OxyPlot;
 using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
@@ -28,36 +24,33 @@ namespace BluetoothWinUI3;
 #nullable disable
 #endif
 
-
-#region Change these to match your device
-using DeviceSpecificBatteryData_Choice_MMed = ChoiceMMed_PulseOximeter.Battery_Data; // Change: many device support battery
-using DeviceSpecificSensorData = HealthDataRecord; // Change: 
-
 #endregion
+// Modify these to match your device
+using DeviceSpecificBatteryData_Choice_MMed = ChoiceMMed_PulseOximeter.Battery_Data; // Modify: many device support battery
+using DeviceSpecificSensorData = HealthDataRecord; // Modify: 
+
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControlBasic, IDeviceControlDevice, IHandleMyBTAdvertisements // Change: change the name from BTStandard_DemoControl
+public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Change: change the name from BTSimple_DemoControl
 {
-    #region Change these settings that must be updated for a new device
+    // Modify these settings to match your device
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "HealthSensor"; // Change: change the BTStandard_Demo string to match your device. The exact name does not matter.
+    private readonly string InternalDeviceType = "HealthSensor"; // Modify: edit the string to match your device. The exact name does not matter..
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
     /// Common tags: environment exersise health cooking agriculture light
     /// </summary>
     public string Tags { get { return "#health"; } }
-    #endregion
 
-    #region Change these advanced settings only when needed (most devices won't change these)
+    // Modify these advanced settings only when needed (most devices won't update these)
     /// <summary>
-    /// Most developer never need to change this from 'true'!
+    /// Most developer never need to switch this from 'true'!
     /// Ususually a device always has their sensor data. But some devices are might not. 
-    /// For the BTStandard_DemoControl, the "sensor" is just the battery level. That was
-    /// picked because so many devices include a battery level. But in case it doesn't,
-    /// there's a way to tell the MainWindow that the device doesn't have a sensor.
+    /// The HasSensorData shows how to handle the case of your device not always having
+    /// the sensor.
     /// </summary>
     bool HasSensorData = true;
 
@@ -73,16 +66,20 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// + exported). A good default is 5 seconds.
     /// </summary>
     const double HistoricalDataUpdateRateInSeconds = 5.0;
-    #endregion
 
-    public BTCommon_HealthControl() // CHANGE: change the name to match the changed class name
+    public BTCommon_HealthControl() // Modify: edit the name to match the class name
+    {
+        Initialize(); // Initialization that will stay the same
+    }
+
+    #region Instance value for a device stay the same
+    private void Initialize()
     {
         InitializeComponent();
         this.Loaded += Control_Loaded;
         this.DataContextChanged += Control_DataContextChanged;
     }
 
-    #region Instance value for a device (not changed)
     Viatom_PC_60F Device_Viatom = null;
     ChoiceMMed_PulseOximeter Device_MMedPulseOximeter = null;
     string KnownDeviceName = "device";
@@ -95,13 +92,16 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// </summary>
     public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
+    #endregion
 
-    // CHANGE: some devices (like the heart rate) also have fine grained data.
+    // Modify: some devices (like the heart rate) also have fine grained data.
+    // Most devices do not; it's OK to just return data every 5 second or so
     public void ClearAccumulatedFineGrainedData()
     {
         ;  // do nothing
     }
 
+    #region Historical data methods and fields stay the same
     /// <summary>
     /// Called from MainWindow when the user wants to clear their graph
     /// </summary>
@@ -127,6 +127,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
     DeviceSpecificSensorData CurrSensor_DataUnits = null;
+
     /// <summary>
     /// Making a battery value that's seperate from the Sensor. This lets the programmer
     /// copy-paste data, pick a new sensor, and the battery stuff will still work.
@@ -148,7 +149,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     ChoiceMMed_PulseOximeter_Extension.SensorType ChoiceMMedPulseOximeterSensorType = ChoiceMMed_PulseOximeter_Extension.SensorType.NotThisSensorFamily;
     #endregion
 
-    #region Instance values for the UX (not changed)
+    #region Instance values for the UX stay the same
     /// <summary>
     /// Standard: Panel size. Set in UpdateUX from MainWindow.
     /// </summary>
@@ -194,23 +195,24 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// </summary>
     private void InitializeUX()
     {
-        // Loaded gets called both when it's first loaded and also each time it's 
+        // InitializeUX gets called both when it's first loaded and also each time it's 
         // attached to somewhere else (e.g., when the control is made large and then small)
         // We only want to do work the first time.
 
         if (InitializeUXCalled) return;
         InitializeUXCalled = true;
 
-        #region Change to set up the sparkles and graph
+        // Modify to set up the sparkles and graph
 
-        // Change: set the right sparkles.
+        // Modify: set the right sparkles.
         // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
             ( DeviceSpecificSensorData.PulseRatePropertyChangedName, uiPulseRateChange),
         };
 
-        // Change: set up the graph by making an OxyPlotModel
+        // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
+        // The line data must exist in the HistoricalData
         OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Health Data");
 
         // Set up the Connect button and Battery visibility
@@ -218,7 +220,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         switch (CurrSensorFamily)
         {
-            default: 
+            default:
             case SensorFamily.Unknown:
             case SensorFamily.Viatom:
                 if (!CurrSensor_Data.IsSensorPresent.HasFlag(HealthDataRecord.SensorPresent.Battery))
@@ -237,10 +239,21 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
         UpdateForSensor(HealthDataRecord.SensorPresent.PulseRate, 5, 30, "Pulse", "PulseRate", uiDeviceDataPulseRate);
         UpdateForSensor(HealthDataRecord.SensorPresent.OxygenSaturationInPercent, 2, 10, "Oxygen", "OxygenSaturationInPercent", uiDeviceDataOxygenSaturationInPercent);
-        UpdateForSensor(HealthDataRecord.SensorPresent.PerfusionIndexInPercent, 2, 10, "Perfusion", "PerfusionIndexInPercent", uiDeviceDataPerfusionIndexInPercent, axisPosition:AxisPosition.Right);
+        UpdateForSensor(HealthDataRecord.SensorPresent.PerfusionIndexInPercent, 2, 10, "Perfusion", "PerfusionIndexInPercent", uiDeviceDataPerfusionIndexInPercent, axisPosition: AxisPosition.Right);
         UpdateForSensor(HealthDataRecord.SensorPresent.RespirationRate, 5, 30, "Respiration (RR)", "RespirationRate", uiDeviceDataRespirationRate, axisPosition: AxisPosition.Right);
 
-        //
+        // Your sensor might include properties that aren't interesting to see in the table view.
+        // Note that this table is the visible table; the exported data is set differently.
+
+        // end modifications
+
+        InitializeSparklesOxyplotTables();
+    }
+
+    #region Code to initialize some of the UX components after the customization is setup up. Will stay the same
+    private void InitializeSparklesOxyplotTables()
+    {
+        // This sparkles, oxyplot, and table code is always the same and doesn't need to be edited.
         uiOxyPlot.Model = OxyPlotModel;
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
@@ -259,10 +272,9 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         // "Sensor Data" is for the main graph title  and is human-readable
         // "Battery" for the axis title and for the color settings in the menus and should be concise and human-readable
         // "BatteryLevel" is the underlying sensor property name and must exactly match the C# name.
-#endregion
 
 
-        // This sarkles, oxyplot, and table code is always the same and doesn't need to be changed.
+        // This sparkles, oxyplot, and table code is always the same and doesn't need to be changed.
         SparklesHelper.InitializeSparkles(ControlsWithSparkles);
 
         OxyPlotUtilities.InitializeOxyPlotData(uiOxyPlot, OxyPlotModel, HistoricalDataUnits.Data);
@@ -283,8 +295,8 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     IHandleNotifyDeviceControlChanges NotifyDeviceControlChangesWindows = null;
 
     /// <summary>
-    /// Called by MainWindow so this control knows who to contact based on device changes.
-    /// Often there are no changes
+    /// Called by MainWindow so this control knows who to contact based on device schema updates.
+    /// Often there are no updates
     /// </summary>
     public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
     {
@@ -299,7 +311,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     List<string> _LineNames = new() { };
     /// <summary>
     /// List of line names in the plot. This is set up directly from the OxyPlotModel. The line names
-    /// are needed so the MainWindow can set up the list of changeable line colors in the plot.
+    /// are needed so the MainWindow can set up the list of editable line colors in the plot.
     /// </summary>
     public List<string> LineNames { get { return _LineNames; } }
 
@@ -312,7 +324,6 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// DataContextAsKnownDevice is either a real KnownDevice or it's null.
     /// </summary>
     public KnownDevice DataContextAsKnownDevice { get { return DataContext as KnownDevice; } }
-
 
     /// <summary>
     /// The OxyPlotModel is the graph for the sensor data that we want to plot. It's of
@@ -343,7 +354,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
 
     /// <summary>
     /// This is a two-way street. Setting the DataContest to the KnownDevice will update some UX and will
-    /// trigger looking up the SaveData and change more things. And it will actually connect to the device.
+    /// trigger looking up the SaveData and update more things. And it will actually connect to the device.
     /// AND this will update the KnownDevice with, e.g., the DeviceId and the BluetoothLEDevice which will be
     /// used by other bits of the system.
     /// </summary>
@@ -384,6 +395,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         }
         await ReconnectAsync();
     }
+    #endregion
 
     /// <summary>
     /// Called by e.g., the ConnectionControl when the user wants to reconnect to the device (sensor).
@@ -394,6 +406,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
     /// </summary>
     public async Task ReconnectAsync()
     {
+        #region Normal device setup stays the same
         // Must have been set as a KnownDevice; otherwise we're in a very weird state.
         // DataContxtAsKnownDevice is just the DataContext cast (with an "as") to KnownDevice.
         if (DataContextAsKnownDevice == null)
@@ -463,7 +476,8 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         }
         bool connectAllOk = true;
         uiBTConnectionControl.CurrState = BTConnectionControl.ConnectionState.Connecting;
-        #region Change so the device starts sending notifications for changed properties (data)
+        #endregion
+        // Modify so the device starts sending notifications for changed properties (data)
 
         if (Device_MMedPulseOximeter != null)
         {
@@ -486,7 +500,16 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         {
             connectAllOk = connectAllOk && await Device_Viatom.NotifyReceiveAsync();
         }
-        #endregion
+
+#if YOUR_CODE_MIGHT_NEED_TO_QUERY_DEVICE
+        var sensordata = await Device.Read__SENSOR_DATA__(DefaultCacheMode);
+        if (sensordata == null)
+        {
+            // Happens in the Demo code when the device doesn't report a battery level (e.g., JBL Pro 4 Speakers,
+            // but lots of others). Usually sensordata is always present.
+            RemoveSensorDataUx();
+        }
+#endif
 
         // The system tracks device changes
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
@@ -504,7 +527,28 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         HandleMyAdvertisement(DataContextAsKnownDevice.Advertisement);
     }
 
+#if YOUR_CODE_MIGHT_NEED_THIS
+    /// <summary>
+    /// Called from DataContextChanged when a device does not, in fact, have a sensor. This 
+    /// removes the grpah and table from the display (no sensor means no data) and tells
+    /// the MainWindow to update its UX accordingly.
+    /// </summary>
+    private void RemoveSensorDataUx()
+    {
+        uiDeviceDataList.Items.Remove(ui__Item_To_Remove__);
+        LineNames.Clear();
+        uiOxyPlot.Visibility = Visibility.Collapsed;
+        uiTableView.Visibility = Visibility.Visible;
 
+        // Notify MainWindow that the UX capabilities have changed. This might change
+        // the UX (e.g., device> show graph/table might be removed)
+        // Will also trigger redoing the graph line names via LineNames, which
+        // technically isn't quite in accordance with the name.
+        NotifyDeviceControlChangesWindows?.OnGetUXCapabilitiesChanged(this, GetUXCapabilities());
+    }
+#endif
+
+    #region Update glue code stays the same
     /// <summary>
     /// Called when the BLE device connection status changes.
     /// </summary>
@@ -513,7 +557,6 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         // Choices for ConnectionStatus is just Disconnected and Connected 
         uiBTConnectionControl.SetState(sender.ConnectionStatus);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
-        ;
     }
 
     /// <summary>
@@ -602,6 +645,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             UpdateGraphColor(axisTitle, color);
         }
     }
+    #endregion
 
     /// <summary>
     /// UserPreferences are for the app as a whole, not for this particular device. For example: the preferred temperature unit.
@@ -613,28 +657,29 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         // Update the saved data in the HistoricalDataUnits to match the new user preferences.
         foreach (var data in HistoricalDataUnits.Data)
         {
-            #region Change to update the data based on user preferred units (e.g, C versus F)
+            // Modify to update the data based on user preferred units (e.g, C versus F)
+            // For the BTSimple_Demo, there is just the temperature
             if (oldPrefs != null && newPrefs.Distance != oldPrefs.Distance)
             {
-                // Change: based on your knowledge of the sensor data, change the distance readings.
+                // Modify: based on your knowledge of the sensor data, edit the distance readings.
                 // data.Distance = BluetoothWatcher.Units.Distance.Convert(data.Distance, oldPrefs.Distance, CurrUserPrefs.Distance);
             }
             if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
             {
-                // Change: based on your knowledge of the sensor data, change the temperature readings.
+                // Modify: based on your knowledge of the sensor data, edit the temperature readings.
                 // data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, CurrUserPrefs.Temperature);
             }
             if (oldPrefs != null && newPrefs.Pressure != oldPrefs.Pressure)
             {
-                // Change: based on your knowledge of the sensor data, change the pressure readings.
+                // Modify: based on your knowledge of the sensor data, edit the pressure readings.
                 // data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, CurrUserPrefs.Pressure);
             }
-            #endregion
         }
 
         UpdateDeviceDataUX(""); // all of them.
     }
 
+    #region Glue code stays the same
     /// <summary>
     /// Standard: the normal way to resize the control. 
     /// </summary>
@@ -668,8 +713,9 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             UpdateDeviceDataUX(e.PropertyName);
         });
     }
+    #endregion
 
-    #region Change to update the UX when the device says there's new data
+    // Modify to update the UX when the device says there's new data
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. Most often called from Device_PropertyChanged
@@ -787,7 +833,7 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         }
 
         //
-        // Many devices include a battery level. If so, chances are it's called "BatteryLevel"
+        // Many devices include a battery level. If so, chances are it's called "BatteryLevel" or "Battery_Data"
         // 
         //
         if (CurrBattery_DataUnits_Choice_MMed != null)
@@ -798,8 +844,9 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             }
         }
     }
-    #endregion
+    // End of UX changes
 
+    #region Historical Data and export code stays the same
 
     /// <summary>
     /// Helper code to update historical data. The sensor might send a lot of data; the history only
@@ -834,7 +881,6 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         }
     }
 
-    #region Exporters don't need to be changed
 
     /// <summary>
     /// Called from MainWindow when the user asks for, e.g., exported data or graphs. Most sensors will 
@@ -845,8 +891,8 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         var retval = IDeviceControlBasic.UXCapabilities.CanRename;
         if (HasSensorData)
         {
-            retval |=
-            IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
+            retval = retval
+            | IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
             | IDeviceControlBasic.UXCapabilities.CanGetData
             | IDeviceControlBasic.UXCapabilities.CanShowTable
             ;
@@ -874,50 +920,6 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
             case SensorFamily.Viatom:
                 return; // ChoiceMMed and viatom PC60FW doesn't use adverts for data.
         }
-        ;
-
-#if NEVER_EVER_DEFINED
-        if (CurrSensor_Data == null)
-        {
-            // Lots of reasons it might be invalid. For example, we get an advert that includes a 
-            // name (and creates this control), but the advert doesn't include the data because
-            // we haven't gotten the BT advertisement response yet.
-            Log($"ERROR: unable to parse sensor data for sensor type {CurrSensorFamily}");
-            return;
-        }
-        var copyable = CurrSensor_Data as HealthDataRecordCopyable;
-        if (copyable != null && !copyable.IsValid)
-        {
-            // Lots of reasons it might be invalid. For example, we get an advert that includes a 
-            // name (and creates this control), but the advert doesn't include the data because
-            // we haven't gotten the BT advertisement response yet.
-            if (!copyable.IsIgnored)
-            {
-                // The Ruuvi Air sends an enormous number of unusable advertisements to
-                // support backwards compatibility.
-                Log($"ERROR: unable to parse IsValid sensor data for sensor type {CurrSensorFamily}");
-            }
-            return;
-        }
-
-        InitializeUX(); // Will initialize the UX as appropriate
-        CurrSaveData.History.UpdateAdvertisementHistory(data.MostRecentAdvertisement.Timestamp);
-        CurrSaveData.History.UpdateDataHistory(data.MostRecentAdvertisement.Timestamp);
-        if (!string.IsNullOrEmpty(data.BestName))
-        {
-            // RuuviTag Eddystone don't include a Name in their advertisement.
-            CurrSensor_Data.Name = data.BestName;
-        }
-        CurrSensor_Data.TimestampMostRecent = data.MostRecentAdvertisement.Timestamp;
-        //UpdateDeviceDataUX("*"); // Update all the data!
-
-        // here!here: tell the window about line names
-        if (!CalledOnGetUXCapabilities)
-        {
-            CalledOnGetUXCapabilities = true;
-            NotifyDeviceControlChangesWindows.OnGetUXCapabilitiesChanged(this, this.GetUXCapabilities());
-        }
-#endif
     }
 
 
@@ -931,14 +933,14 @@ public sealed partial class BTCommon_HealthControl : UserControl, IDeviceControl
         UIThreadHelper.CallOnUIThread(() => HandleMyAdvertisementOnUIThread(data));
     }
 
-    // bool CalledOnGetUXCapabilities = false;
-
-
-
-
+    /// <summary>
+    /// A small number of controls have this as a specialty value. For example, the 
+    /// BTServicesAndCharacteristics control uses it to "dump" all of the seen 
+    /// advertisements or the discovered services + characteristics to the clipboard.
+    /// </summary>
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {
         return "Internal error: no details are available";
     }
-#endregion
-} // end of class BTCommon_HealthControl // CHANGE: update the comment to match the class name
+    #endregion
+} // end of class BTCommon_HealthControl // Modify: update the comment to match the class name
