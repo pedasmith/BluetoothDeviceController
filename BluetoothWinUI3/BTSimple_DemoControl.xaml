@@ -43,6 +43,7 @@
                         <Run>Humidity</Run><Run Text="&#160;"/><Run x:Name="uiHumidityChange" Text="┄"/>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
+                        <Line Tag="HumidityColor" Style="{StaticResource sGraphLineKey}" />
                     </StackPanel>
                 </GridView>
 

@@ -23,11 +23,19 @@ namespace BluetoothWinUI3;
 #endif
 
 #endregion
-// Modify these to match your device
+using static BluetoothProtocols.TI_SensorTag_1352;
 using DeviceSpecificType = TI_SensorTag_1352; // Modify: pick your device, not BTSimple_Demo
 using DeviceSpecificSensorData = TI_SensorTag_1352.Temperature_Data; // Modify: 
+// The DeviceSpecificDataUnits should be set either to the DeviceSpecificSensorData or to a data facade.
+// Use the DeviceSpecificSensorData if it has the data you want to the user to see
+// Use the facade when you need to merge multiple sensor data values together
+// or when the original data is "messy"
+// About half of all devices require a facade
+// Not using a facade? Then the line below is what you want (but modify it!)
+//using DeviceSpecificSensorDataUnits = TI_SensorTag_1352.Temperature_Data; // Modify: Often the same as the DeviceSpecificSensorData
+using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.TI_SensorTag_Extensions.Environment_Data; // Modify: Often the same as the DeviceSpecificSensorData
 using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Modify: pick secondary sensor if needed
-using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery
+using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery                                                                // Modify these to match your device
 
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -89,7 +97,7 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
     /// Collection of data from the sensor. This is all a copy and will be in the user's preferred units.
     /// The units are set right before the data is added to the collection.
     /// </summary>
-    public DataCollection<DeviceSpecificSensorData> HistoricalDataUnits { get; } = new();
+    public DataCollection<DeviceSpecificSensorDataUnits> HistoricalDataUnits { get; } = new();
     public IReadOnlyList<IBTCommonMetaData> GetDataAll() { return HistoricalDataUnits.Data; }
     #endregion
 
@@ -122,7 +130,7 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
-    DeviceSpecificSensorData CurrSensor_DataUnits = null;
+    DeviceSpecificSensorDataUnits CurrSensor_DataUnits = null;
 
     /// <summary>
     /// Making a battery value that's seperate from the Sensor. This lets the programmer
@@ -203,6 +211,7 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
         // The line data must exist in the HistoricalData
         OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Sensor Data")
             .AddLine(10, 30, "Ambient Temperature", "Temperature")
+            .AddLine(10, 5, "Humidity", "Humidity")
             ;
 
         // "Sensor Data" is for the main graph title  and is human-readable
@@ -211,8 +220,10 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
 
         // Your sensor might include properties that aren't interesting to see in the table view.
         // Note that this table is the visible table; the exported data is set differently.
-        CurrTableCustomization.TableColumnsToExclude.Add("TemperatureEnable");
-        CurrTableCustomization.TableColumnsToExclude.Add("TemperaturePeriod");
+        // Examples:
+        // In this demo, the Facade only includes columns to show
+        CurrTableCustomization.TableColumnsToExclude.Add("HasPressure");
+        CurrTableCustomization.TableColumnsToExclude.Add("Pressure");
 
         // end modifications
 
@@ -609,6 +620,8 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
     #endregion
 
     // Modify to update the UX when the device says there's new data
+    bool gotTemperature = false;
+    bool gotHumidity = false;
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. Most often called from Device_PropertyChanged
@@ -626,7 +639,10 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
 
 
         // Update data from the device to match the current preferred units. Will create the values as needed.
-        CurrSensor_DataUnits = DeviceSpecificSensorData.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        // Modify: the CopyToWithConvertAndCreate as made by the autogen system will handle only a
+        // single data type. If you make a Facade class to combine multiple sensors into one, you will
+        // need to create a version of CopyToWithConvertAndCreate that takes in both types.
+        CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensorSecondary_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
@@ -640,11 +656,18 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
                 // other values are also read (e.g., the Interval_Min), but they aren't
                 // part of the sensor data that's plotted.
                 // The historical data is updated from the CurrSensor_DataUnits
-                UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
+                gotTemperature = true;
+                // Only update when I have a full set of data. Otherwise the graph gets
+                // all weird.
+                if (gotTemperature && gotHumidity)
+                {
+                    UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
+                }
                 break;
 
             // Secondary sensor is shown in the UX but isn't in the history data.
             case DeviceSpecificType.Humidity_DataPropertyChangedName:
+                gotHumidity = true;
                 uiHumidity.Text = CurrSensorSecondary_DataUnits.Humidity.ToString("F2"); // Modify: update the UX as appropriate
                 break;
         }
@@ -670,17 +693,17 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
     /// saves a portion of the data. Technicaly, every time there's new data we either update
     /// the most recent entry OR we add a new entry.
     /// </summary>
-    private void UpdateHistoricalDataAndGraph(DeviceSpecificSensorData currSensor_DataUnits)
+    private void UpdateHistoricalDataAndGraph(DeviceSpecificSensorDataUnits currSensor_DataUnits)
     {
         var deltaInSeconds = currSensor_DataUnits.TimestampMostRecent.Subtract(HistoricalDataUnits.TimestampMostRecentAdd).TotalSeconds;
         var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
-            ? DataCollection<DeviceSpecificSensorData>.Verb.Add : DataCollection<DeviceSpecificSensorData>.Verb.ReplaceMostRecent;
+            ? DataCollection<DeviceSpecificSensorDataUnits>.Verb.Add : DataCollection<DeviceSpecificSensorDataUnits>.Verb.ReplaceMostRecent;
         HistoricalDataUnits.Update(currSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
 
         //
         // Update the OxyPlot because it doesn't track the INotifyCollectionChanged
         //
-        if (verb == DataCollection<DeviceSpecificSensorData>.Verb.Add && HistoricalDataUnits.Count == 2)
+        if (verb == DataCollection<DeviceSpecificSensorDataUnits>.Verb.Add && HistoricalDataUnits.Count == 2)
         {
             // DOC: Can't have the axes start off invisible because then they can't be switched back on
             if (CurrWindowSize == MainWindow.WindowSize.Normal)
