@@ -44,7 +44,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
     /// Tags for the device. This is used to categorize the different devices.
     /// Common tags: environment exersise health cooking agriculture light
     /// </summary>
-    public string Tags { get { return "#exercise #health"; } }
+    public string Tags { get { return "#exercise #health #heartrate"; } }
 
     // Modify these advanced settings only when needed (most devices won't update these)
     /// <summary>
@@ -513,7 +513,7 @@ public sealed partial class BTStandard_HeartRateControl : UserControl, IDeviceCo
         }
 
         var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
-        var brushes = new DeviceColorBrushes(colors);
+        var brushes = new DeviceColorBrushes(colors, saveData.Preferences);
         DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
 
         // Set the graph text colors

@@ -536,7 +536,7 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
         }
 
         var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
-        var brushes = new DeviceColorBrushes(colors);
+        var brushes = new DeviceColorBrushes(colors, saveData.Preferences);
         DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
 
         // Set the graph text colors

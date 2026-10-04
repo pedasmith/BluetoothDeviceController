@@ -35,15 +35,6 @@ namespace BluetoothProtocols
             // In reality, IsValid is always true here and IsIgnored false.
             IsValid = value.IsValid;
             IsIgnored = value.IsIgnored;
-#if NEVER_EVER_DEFINED
-            TimestampMostRecent = value.TimestampMostRecent;
-            Temperature = value.Temperature;
-            Pressure = value.Pressure;
-            Humidity = value.Humidity;
-            PM25 = value.PM25; // TODO: add in all other for Ruuvi Air!
-            BatteryInPercent = value.BatteryInPercent;
-            Name = value.Name;
-#endif
         }
 
         public virtual SensorDataRecordCopyable CopyToAndUpdateUnits(SensorDataRecordCopyable dest, UserPreferences CurrUserPrefs, string knownDeviceName)

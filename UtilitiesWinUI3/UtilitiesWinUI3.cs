@@ -242,13 +242,11 @@ internal static class UtilitiesWinUI3
     }
 
     /// <summary>
-    /// Given a SaveData type color
+    /// Given a SaveData type color returns a brush. Will often return null if the color is default.
     /// </summary>
-    /// <param name="color"></param>
-    /// <returns></returns>
     public static SolidColorBrush GetBrush(uint color)
     {
-        if (color == DeviceColors.ColorIsDefault) return default;
+        if (color == DeviceColors.ColorIsDefault) return default; // default is null
         return new SolidColorBrush(ConvertIgnoreA(color));
     }
 

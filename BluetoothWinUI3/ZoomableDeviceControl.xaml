@@ -11,6 +11,5 @@
     <Grid x:Name="uiMainPanel">
         <Border Style="{StaticResource sZoomableDeviceBorder}" x:Name="rootPanel">
         </Border>
-
     </Grid>
 </UserControl>

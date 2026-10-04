@@ -500,7 +500,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         }
 
         var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
-        var brushes = new DeviceColorBrushes(colors);
+        var brushes = new DeviceColorBrushes(colors, saveData.Preferences);
         DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
 
         // Set the graph text colors

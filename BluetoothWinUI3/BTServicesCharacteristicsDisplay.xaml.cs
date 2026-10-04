@@ -48,7 +48,7 @@ namespace BluetoothWinUI3
         /// Tags for the device. This is used to categorize the different devices.
         /// Common tags: environment exersise health cooking agriculture light
         /// </summary>
-        public string Tags { get { return "#other"; } }
+        public string Tags { get { return "#other #report"; } }
 
         public BTServicesCharacteristicsDisplay()
         {
@@ -223,7 +223,7 @@ namespace BluetoothWinUI3
             if (saveData == null) return;
 
             var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
-            var brushes = new DeviceColorBrushes(colors);
+            var brushes = new DeviceColorBrushes(colors, saveData.Preferences);
             DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
         }
 

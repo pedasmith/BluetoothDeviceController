@@ -656,8 +656,8 @@ public sealed partial class BTTI_SensorTagControl : UserControl, IDeviceControlB
         }
 
         var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
-        var brushes = new DeviceColorBrushes(colors);
-        DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
+        var brushes = new DeviceColorBrushes(colors, saveData.Preferences);
+        DeviceColorBrushes.SetUxColors(this.rootPanel, brushes, Tags);
 
         // Set the graph text colors
         var oxyColorText = UtilitiesOxyColor.WinUI3ColorToOxyColor(colors.TextColor);

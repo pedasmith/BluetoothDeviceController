@@ -1,4 +1,6 @@
-﻿using BluetoothWinUI3.BluetoothWinUI3Registration;
+﻿using BluetoothProtocols;
+using BluetoothWinUI3.BluetoothWinUI3Registration;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -9,6 +11,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Sensors;
 using Windows.UI;
 
 
@@ -60,7 +63,24 @@ namespace BluetoothWinUI3
                 try
                 {
                     var list = (List<SaveData>)System.Text.Json.JsonSerializer.Deserialize(json, typeof(List<SaveData>), SaveDataContext.Default);
-                    AllDevices = list ?? new List<SaveData>();
+                    if (list != null)
+                    {
+                        int nremoved = 0;
+                        for (int i=list.Count -1; i>=0; i--)
+                        {
+                            var item = list[i];
+                            if (item == null || item.Id.GetIsBlank())
+                            {
+                                list.RemoveAt(i);
+                                nremoved++;
+                            }
+                        }
+                        AllDevices = list;
+                    }
+                    else
+                    {
+                        AllDevices = new List<SaveData>();
+                    };
                 }
                 catch (Exception ex)
                 {
@@ -155,6 +175,7 @@ namespace BluetoothWinUI3
                 AllSaveData.Insert(saveData);
                 AllSaveData.Save(" create"); // quick update
             }
+            saveData.UpdateForPreferences(knownDevice);
             return saveData;
         }
 
@@ -213,7 +234,12 @@ namespace BluetoothWinUI3
 
 
 
-
+    /// <summary>
+    /// SaveData is a per-known-device data that stores user preferences for a particular device (e.g., 
+    /// 'this sensor background should be puce' and 'that otherwise dientical sensor should be green'.)
+    /// It's saved and restored from a JSON files in the Documents/BluetoothDevices.
+    /// SaveData includes three main sections: ID, History, and Preferences (user name + colors)
+    /// </summary>
     public class SaveData
     {
         public SaveData(KnownDevice knownDevice)
@@ -223,7 +249,28 @@ namespace BluetoothWinUI3
             Id.ConnectAddress = knownDevice.BTLEDevice?.BluetoothAddress ?? 0;
             Id.ConnectName = knownDevice.BTLEDevice?.Name ?? "";
             Id.DeviceId = knownDevice.BTLEDevice?.DeviceId ?? knownDevice.Id;
+
+            UpdateForPreferences(knownDevice);
         }
+
+        public void UpdateForPreferences(KnownDevice knownDevice)
+        {
+            Preferences.Tags = (knownDevice.Control as IDeviceControlBasic)?.Tags ?? "";
+        }
+
+        /// <summary>
+        /// Id information is all from Bluetooth and isn't under user control
+        /// </summary>
+        public DeviceIdentification Id { get; set; } = new DeviceIdentification();
+        /// <summary>
+        /// History is all about when we see addresses and times. It's not under user control.
+        /// </summary>
+        public DeviceHistory History { get; set; } = new DeviceHistory();
+        /// <summary>
+        /// User preferences include the user's preferred name and colors for texts, background, and
+        /// the graph.
+        /// </summary>
+        public KnownDeviceUserPreferences Preferences { get; set; } = new KnownDeviceUserPreferences();
 
 
         /// <summary>
@@ -278,12 +325,8 @@ namespace BluetoothWinUI3
         /// <returns></returns>
         public DeviceColors GetDeviceColors(ApplicationTheme theme)
         {
-            switch (theme)
-            {
-                case ApplicationTheme.Dark:
-                    return Preferences.DarkColors;
-            }
-            return Preferences.LightColors;
+            var retval = (theme == ApplicationTheme.Dark) ? Preferences.DarkColors : Preferences.LightColors;
+            return retval;
         }
 
         /// <summary>
@@ -302,13 +345,22 @@ namespace BluetoothWinUI3
         {
             Preferences.UserName = name;
         }
-        public DeviceIdentification Id { get; set; } = new DeviceIdentification();
-        public DeviceHistory History { get; set; } = new DeviceHistory();
-        public KnownDeviceUserPreferences Preferences { get; set; } = new KnownDeviceUserPreferences();
+
+        public override string ToString()
+        {
+            if (Id == null) return "SaveData: Id is null";
+            return Id.ToString();
+        }
     }
 
     public class DeviceIdentification
     {
+        public bool GetIsBlank()
+        {
+            var retval = AdvertisementAddress == 0 && ConnectAddress == 0
+                && AdvertisementName == "" && ConnectName == "" && DeviceId == "";
+            return retval;
+        }
         public ulong AdvertisementAddress { get; set; }
         public ulong ConnectAddress { get; set; }
         /// <summary>
@@ -326,9 +378,24 @@ namespace BluetoothWinUI3
         /// This is a long-ass string that is only barely human readable (unless you are a real expert)
         /// </summary>
         public string DeviceId { get; set; }
+
+        public override string ToString()
+        {
+            var retval = $"AdvertisementAddress: {BluetoothAddress.AsString(AdvertisementAddress)}, AdvertisementName: {AdvertisementName}, ConnectAddress: {BluetoothAddress.AsString(ConnectAddress)}";
+            return retval;
+        }
     }
+
+    /// <summary>
+    /// DeviceColors is the ARGB (as uint) color for text, background, and graph colors.
+    /// For the background we need a brush which also depends on the device Tags and the PreferredIndex
+    /// </summary>
     public class DeviceColors
     {
+        public DeviceColors()
+        {
+            ;
+        }
         public static uint ColorIsDefault = 0xAA000000; // Valid but uncommon ARGB color.
         /// <summary>
         /// Color is a uint of ARGB (msb to lsb, of course)
@@ -363,18 +430,35 @@ namespace BluetoothWinUI3
     /// </summary>
     public class DeviceColorBrushes
     {
-        public DeviceColorBrushes(DeviceColors colors)
+        public DeviceColorBrushes(DeviceColors colors, KnownDeviceUserPreferences preferences)
         {
             TextColorBrush = UtilitiesWinUI3.UtilitiesWinUI3.GetBrush(colors.TextColor);
             BackgroundColorBrush = UtilitiesWinUI3.UtilitiesWinUI3.GetBrush(colors.BackgroundColor);
+            if (BackgroundColorBrush == null)
+            {
+                // Get the right default color brush based on the tags and preferred index. 
+                // Uses the colors defined in AppDictionary.xaml (created from MakeRainbow) using code
+                // from AppDictionaryFromTags.cs
+                var (brush, selectedIndex) = AppDictionaryFromTags.GetBackgroundBrushFromTags(preferences.Tags, preferences.ColorIndex);
+                preferences.ColorIndex = selectedIndex;
+                BackgroundColorBrush = brush as SolidColorBrush;
+            }
         }
+        /// <summary>
+        /// Brush for the text; might be null if the user doesn't have a preference.
+        /// </summary>
         public SolidColorBrush TextColorBrush;
+        /// <summary>
+        /// Brush for the background; might be null if the user doesn't have a preference
+        /// BUT if there are tags + preferredIndex then it will use the brush from
+        /// the AppDictionaryFromTags.GetBackgroundBrushFromTags(tags, preferredIndex) function.
+        /// </summary>
         public SolidColorBrush BackgroundColorBrush;
 
 
-        public SolidColorBrush Get(string tagName)
+        public SolidColorBrush Get(string colorName)
         {
-            switch (tagName)
+            switch (colorName)
             {
                 case "BackgroundColor": return BackgroundColorBrush;
                 case "TextColor": return TextColorBrush;
@@ -389,9 +473,8 @@ namespace BluetoothWinUI3
         /// This is a bridge between what all of the device controls need, XAML-wise, and the 
         /// SaveData which is kept XAML-free.
         /// </summary>
-        /// 
 
-        public static void SetUxColors(UIElement root, DeviceColorBrushes brushes)
+        public static void SetUxColors(UIElement root, DeviceColorBrushes brushes, string tags="", int preferredIndex = -1)
         {
             if (root is TextBlock tb)
             {
@@ -400,32 +483,52 @@ namespace BluetoothWinUI3
             else if (root is Border border)
             {
                 if (brushes.BackgroundColorBrush != null) border.Background = brushes.BackgroundColorBrush;
-                SetUxColors(border.Child, brushes);
+                else //if (tags.Contains("#environment"))
+                {
+                    var (brush, selectedIndex) = AppDictionaryFromTags.GetBackgroundBrushFromTags(tags, preferredIndex);
+                    if (brush != null)
+                    {
+                        border.Background = brush;
+                    }
+                }
+                SetUxColors(border.Child, brushes, tags, preferredIndex);
             }
             else if (root is Panel parent)
             {
                 foreach (var child in parent.Children) 
                 {
-                    SetUxColors(child, brushes);
+                    SetUxColors(child, brushes, tags, preferredIndex);
                 }
             }
             else if (root is ContentControl cc && cc.Content is UIElement ccContent)
             {
-                SetUxColors(ccContent, brushes);
+                SetUxColors(ccContent, brushes, tags, preferredIndex);
             }
             else if (root is UserControl uc && uc.Content is UIElement ucContent)
             {
-                SetUxColors(ucContent, brushes);
+                SetUxColors(ucContent, brushes, tags, preferredIndex);
             }
+            return;
         }
     }
 
     public class KnownDeviceUserPreferences
     {
+        /// <summary>
+        /// User's preferred name. Is often blank.
+        /// </summary>
         public string UserName { get; set; } = ""; // will depend on the DeviceIdentification, but could be set by the user to something more memorable
         public DeviceColors DarkColors { get; set; } = new DeviceColors();
         public DeviceColors LightColors { get; set; } = new DeviceColors();
 
+        /// <summary>
+        /// Index for the color. This is used to keep the indexes stable over time. It's not technically a user preference.
+        /// </summary>
+        public int ColorIndex { get; set; } = -1;
+        /// <summary>
+        /// Copy of the tags (like #environment) from the control. It's not saved in the JSON and isn't a user preference.
+        /// </summary>
+        public string Tags = "";
     }
 
     /// <summary>

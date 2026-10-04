@@ -51,13 +51,15 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         /// failures, it will be a blank string (not null).
         /// Alternative: it might be the bluetooth address and not the DeviceId for devices that are only
         /// known from their advertisements.
-
         /// </summary>
         public string Id { get; set; } = "";
     }
 
     public static class KnownDevices
     {
+        /// <summary>
+        /// Creates a new KnownDevice from the advertisement, the appropriate control and zoomable container and supported device.
+        /// </summary>
         public static KnownDevice Add(WatcherData advertisement, UserControl control, ZoomableDeviceControl container, SupportedDevice supported)
         {
             var known = new KnownDevice(advertisement, control, container, supported);

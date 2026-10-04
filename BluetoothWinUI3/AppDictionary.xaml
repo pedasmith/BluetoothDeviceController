@@ -10,13 +10,161 @@
             <SolidColorBrush x:Key="sDeviceBorder_BorderBrush" Color="DarkGray" />
             <SolidColorBrush x:Key="sDeviceBorder_Background" Color="#FF221155" />
             <SolidColorBrush x:Key="sZoomableDeviceBorder_Background" Color="Gray" />
+
+
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_0" Color="#FF221155" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_1" Color="#FF2A1462" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_2" Color="#FF32166E" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_3" Color="#FF3B197B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_4" Color="#FF451B88" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_0" Color="#FF331155" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_1" Color="#FF3D1462" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_2" Color="#FF48166E" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_3" Color="#FF54197B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_4" Color="#FF601B88" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_0" Color="#FF441155" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_1" Color="#FF511462" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_2" Color="#FF5E166E" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_3" Color="#FF6C197B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_4" Color="#FF7B1B88" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_0" Color="#FF551155" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_1" Color="#FF62145F" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_2" Color="#FF6E1669" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_3" Color="#FF7B1971" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_4" Color="#FF881B79" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_0" Color="#FF551133" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_1" Color="#FF621438" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_2" Color="#FF6E163C" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_3" Color="#FF7B1940" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_4" Color="#FF881B43" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_0" Color="#FF551122" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_1" Color="#FF621424" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_2" Color="#FF6E1626" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_3" Color="#FF7B1927" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_4" Color="#FF881B28" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_0" Color="#FF553311" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_1" Color="#FF623D14" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_2" Color="#FF6E4816" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_3" Color="#FF7B5419" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_4" Color="#FF88601B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_0" Color="#FF555511" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_1" Color="#FF5F6214" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_2" Color="#FF696E16" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_3" Color="#FF717B19" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_4" Color="#FF79881B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_0" Color="#FF445511" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_1" Color="#FF4C6214" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_2" Color="#FF536E16" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_3" Color="#FF597B19" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_4" Color="#FF5E881B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_0" Color="#FF225511" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_1" Color="#FF246214" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_2" Color="#FF266E16" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_3" Color="#FF277B19" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_4" Color="#FF28881B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_0" Color="#FF115511" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_1" Color="#FF146216" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_2" Color="#FF166E1C" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_3" Color="#FF197B23" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_4" Color="#FF1B882A" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_0" Color="#FF115555" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_1" Color="#FF145F62" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_2" Color="#FF16696E" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_3" Color="#FF19717B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_4" Color="#FF1B7988" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_0" Color="#FF113355" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_1" Color="#FF143862" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_2" Color="#FF163C6E" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_3" Color="#FF19407B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_4" Color="#FF1B4388" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_0" Color="#FF111155" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_1" Color="#FF161462" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_2" Color="#FF1C166E" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_3" Color="#FF23197B" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_4" Color="#FF2A1B88" />
+
+
         </ResourceDictionary>
         
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="sAllFonts_Foreground" Color="DarkCyan" />
             <SolidColorBrush x:Key="sDeviceBorder_BorderBrush" Color="Gray" />
+            <SolidColorBrush x:Key="ZZsDeviceBorder_Background" Color="LightBlue" />
             <SolidColorBrush x:Key="sDeviceBorder_Background" Color="LightBlue" />
             <SolidColorBrush x:Key="sZoomableDeviceBorder_Background" Color="Gray" />
+
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_0" Color="#FFADD8E6" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_1" Color="#FFB9DCEA" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_2" Color="#FFC4E0ED" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_3" Color="#FFD0E5F1" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Environment_4" Color="#FFDCEBF4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_0" Color="#FFADCAE6" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_1" Color="#FFB9D0EA" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_2" Color="#FFC4D6ED" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_3" Color="#FFD0DDF1" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_PulseOximeter_4" Color="#FFDCE5F4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_0" Color="#FFADBCE6" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_1" Color="#FFB9C4EA" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_2" Color="#FFC4CCED" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_3" Color="#FFD0D5F1" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Cycling_4" Color="#FFDCDFF4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_0" Color="#FFADADE6" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_1" Color="#FFBAB9EA" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_2" Color="#FFC7C4ED" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_3" Color="#FFD3D0F1" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Calipers_4" Color="#FFDFDCF4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_0" Color="#FFC9ADE6" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_1" Color="#FFD3B9EA" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_2" Color="#FFDBC4ED" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_3" Color="#FFE4D0F1" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Security_4" Color="#FFEBDCF4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_0" Color="#FFD7ADE6" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_1" Color="#FFDFB9EA" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_2" Color="#FFE6C4ED" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_3" Color="#FFECD0F1" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Health_4" Color="#FFF1DCF4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_0" Color="#FFE6ADCA" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_1" Color="#FFEAB9D0" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_2" Color="#FFEDC4D6" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_3" Color="#FFF1D0DD" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_BloodPressure_4" Color="#FFF4DCE5" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_0" Color="#FFE6ADAD" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_1" Color="#FFEABAB9" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_2" Color="#FFEDC7C4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_3" Color="#FFF1D3D0" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_HeartRate_4" Color="#FFF4DFDC" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_0" Color="#FFE6BBAD" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_1" Color="#FFEAC6B9" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_2" Color="#FFEDD1C4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_3" Color="#FFF1DBD0" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Exercise_4" Color="#FFF4E5DC" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_0" Color="#FFE6D7AD" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_1" Color="#FFEADFB9" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_2" Color="#FFEDE6C4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_3" Color="#FFF1ECD0" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Reports_4" Color="#FFF4F1DC" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_0" Color="#FFE6E6AD" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_1" Color="#FFE8EAB9" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_2" Color="#FFEBEDC4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_3" Color="#FFEEF1D0" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_LED_4" Color="#FFF1F4DC" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_0" Color="#FFADE6AD" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_1" Color="#FFB9EABA" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_2" Color="#FFC4EDC7" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_3" Color="#FFD0F1D3" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Location_4" Color="#FFDCF4DF" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_0" Color="#FFADE6C9" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_1" Color="#FFB9EAD3" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_2" Color="#FFC4EDDB" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_3" Color="#FFD0F1E4" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Other_4" Color="#FFDCF4EB" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_0" Color="#FFADE6E6" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_1" Color="#FFB9E8EA" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_2" Color="#FFC4EBED" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_3" Color="#FFD0EEF1" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_4" Color="#FFDCF1F4" />
+
+
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 
