@@ -1,0 +1,128 @@
+﻿{
+  "AllDevices": [
+    {
+      "Name": "Nordic_LBS",
+      "CompletionStatus": 0,
+      "Services": [
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "GATT",
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changed",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "DataGroupName": "GATT_Data",
+              "IsIndicate": true,
+              "Verbs": ":Indicate:RdInNo:InNo:"
+            },
+            {
+              "UUID": "00002b29-0000-1000-8000-00805f9b34fb",
+              "Name": "Client Supported Features",
+              "Type": "U8|HEX|FeatureBitmap0",
+              "DataGroupName": "GATT_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "01"
+              ]
+            },
+            {
+              "UUID": "00002b2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Database Hash",
+              "Type": "U32|HEX|Hash0 U32|HEX|Hash1 U32|HEX|Hash2 U32|HEX|Hash3",
+              "DataGroupName": "GATT_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "EC 88 39 CE 41 6A CA 7F 03 2C 97 C7 B6 43 75 02"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "GAP",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Nordic_LBS"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "00 00"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Peripheral Preferred Connection Parameters",
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms U16^1.25_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "DataGroupName": "GAP_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "18 00 28 00 00 00 2A 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001523-1212-efde-1523-785feabcd123",
+          "Name": "LEDAndButtonService",
+          "Characteristics": [
+            {
+              "UUID": "00001524-1212-efde-1523-785feabcd123",
+              "Name": "Buttons",
+              "Type": "U8|HEX|ButtonData",
+              "DataGroupName": "Buttons_Data",
+              "IsRead": true,
+              "IsNotify": true,
+              "Verbs": ":Read:Notify:RdInNo:InNo:",
+              "ExampleData": [
+                "00"
+              ]
+            },
+            {
+              "UUID": "00001525-1212-efde-1523-785feabcd123",
+              "Name": "Led",
+              "Type": "BYTES|HEX|Led",
+              "DataGroupName": "Led_Data",
+              "IsWrite": true,
+              "Verbs": ":Write:WrWw:"
+            }
+          ]
+        },
+        {
+          "UUID": "8d53dc1d-1db7-4cd3-868b-8a527460aa84",
+          "Name": "FirmwareUpdate",
+          "Characteristics": [
+            {
+              "UUID": "da2e7828-fbce-4e01-ae9e-261174997c48",
+              "Name": "Firmware",
+              "Type": "BYTES|HEX|FirmwareStream",
+              "DataGroupName": "FirmwareStream_Data",
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:"
+            }
+          ]
+        }
+      ],
+      "Details": "TODO: line 190"
+    }
+  ]
+}

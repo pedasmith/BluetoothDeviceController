@@ -57,7 +57,7 @@
             {
               "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
               "Name": "Peripheral Preferred Connection Parameters",
-              "Type": "U16^1.25_*|DEC|Interval_Min|ms U16^1.15_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms U16^1.25_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
               "DataGroupName": "GAP_Data",
               "IsRead": true,
               "Verbs": ":Read:RdInNo:",

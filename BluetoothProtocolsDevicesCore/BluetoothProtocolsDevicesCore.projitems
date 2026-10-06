@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothCommunicationStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothStatusHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BTCommon_Info.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_Demo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTCommonMetaData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_HeartRate.cs" />

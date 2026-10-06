@@ -491,11 +491,19 @@ namespace BluetoothWinUI3
                                     {
                                         ;
                                     }
+                                    var interpretTypeCommands = nameCharacteristic?.Type;
                                     var dr = DataReader.FromBuffer(buff);
                                     var (str, readstatus) = DataReaderReadStringRobust.ReadStringEntire(dr, DataReaderReadStringRobust.OptionsForReadString.ReplaceNull);
-
+                                    if (!string.IsNullOrEmpty(interpretTypeCommands))
+                                    {
+                                        var vp = new ValueParser(interpretTypeCommands);
+                                        var result = vp.Parse(buff.ToByteArray());
+                                        if (result.Result == ValueParserResult.ResultValues.Ok)
+                                        {
+                                            str = result.UserString + " Hex:" + str;
+                                        }
+                                    }
                                     nameCharacteristic.ExampleData.Add(str);
-
                                     chsb.AppendLine($"        Read: {str}");
                                 }
                             }
@@ -536,6 +544,17 @@ namespace BluetoothWinUI3
                                 addToMap = true;
                             }
                             if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
+                            {
+                                MenuFlyoutItem tmfi = new()
+                                {
+                                    Text = $"{nameService.Name} -- {nameCharacteristic.Name}",
+                                    Tag = characteristic,
+                                };
+                                tmfi.Click += OnWriteClicked;
+                                uimWrite.Items.Add(tmfi);
+                                addToMap = true;
+                            }
+                            if (characteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Write))
                             {
                                 MenuFlyoutItem tmfi = new()
                                 {
@@ -694,7 +713,9 @@ namespace BluetoothWinUI3
 
             try
             { 
-            var writeResult = await ch.WriteValueAsync(bytes.ToArray().AsBuffer(), GattWriteOption.WriteWithoutResponse);
+                var isWriteWithoutResponse = ch.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse);
+                var writeType = isWriteWithoutResponse ? GattWriteOption.WriteWithoutResponse : GattWriteOption.WriteWithResponse;
+                var writeResult = await ch.WriteValueAsync(bytes.ToArray().AsBuffer(), writeType);
             if (writeResult != GattCommunicationStatus.Success)
             {
                 Log($"Write: error: status={writeResult}");

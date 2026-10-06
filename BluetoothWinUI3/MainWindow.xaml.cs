@@ -605,11 +605,17 @@ namespace BluetoothWinUI3
             selected.ClearData();
         }
 
+        /// <summary>
+        /// Triggered by uimFileCopyDetailsNormal and enabled by CanGetDetails.
+        /// </summary>
         private async void OnFileCopyDetailsAll(object sender, RoutedEventArgs e)
         {
             await DoFileCopyDetails(IDeviceControlBasic.DetailsType.All);
         }
 
+        /// <summary>
+        /// Triggered by uimFileCopyDetailsNormal and enabled by CanGetDetails.
+        /// </summary>
         private async void OnFileCopyDetailsNormal(object sender, RoutedEventArgs e)
         {
             await DoFileCopyDetails(IDeviceControlBasic.DetailsType.Normal);

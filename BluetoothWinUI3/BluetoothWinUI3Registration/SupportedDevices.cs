@@ -106,6 +106,11 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         {
             new SupportedDevice("Multi-Sensor*", typeof(BTSimple_DemoControl)),
         };
+        private static List<SupportedDevice> UnsupportedDevices { get; set; } = new List<SupportedDevice>()
+        {
+            new SupportedDevice("Nordic_LBS", typeof(BTCommon_UnsupportedControl)),
+            new SupportedDevice("EdgeImpulse", typeof(BTCommon_UnsupportedControl)), // Nordic Thingy:53
+        };
 
         private static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()
         {
@@ -168,6 +173,14 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             }
 
             foreach (var device in Devices)
+            {
+                if (device.Matches(advertisement))
+                {
+                    return device;
+                }
+            }
+
+            foreach (var device in UnsupportedDevices)
             {
                 if (device.Matches(advertisement))
                 {

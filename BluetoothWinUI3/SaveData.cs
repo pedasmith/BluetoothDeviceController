@@ -32,14 +32,22 @@ namespace BluetoothWinUI3
         /// </summary>
         public static void Save(string suffix = "")
         {
-            string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
-            Directory.CreateDirectory(folderPath);
-            string filePath = Path.Combine(folderPath, "AllDeviceData.devices");
+            try
+            {
+                string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BluetoothDevices");
+                Directory.CreateDirectory(folderPath);
+                string filePath = Path.Combine(folderPath, "AllDeviceData.devices");
 
-            var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
-            File.WriteAllText(filePath, json);
+                var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
+                File.WriteAllText(filePath, json);
 
-            Log($"Saved configuration to {filePath}{suffix}");
+                Log($"Saved configuration to {filePath}{suffix}");
+            }
+            catch (Exception e)
+            {
+                Log($"Error: unable to save configuration error={e.Message} when writing Documents\\BluetoothDevices\\AllDeviceData.devices");
+                ; // Might fail if the user has the AllDeviceData.devices file open
+            }
         }
 
         private static void Log(string str)
