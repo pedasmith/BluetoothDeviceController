@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Input.Preview;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -69,6 +72,37 @@ namespace BluetoothWinUI3.Reports
 
     class BTAccessoryGuidelinesReport
     {
+        public static async Task<string> CreateFromAdvertisement(WatcherData advertisement)
+        {
+            var Report = new BTAccessoryGuidelinesReport();
+            BTCommon_Info Device = new()
+            {
+                ble = await BluetoothLEDevice.FromBluetoothAddressAsync(advertisement.Addr),
+            };
+            BluetoothCacheMode DefaultCacheMode = BluetoothCacheMode.Cached;
+            if (Device.ble == null)
+            {
+                return $"Error: unable to make report for {BluetoothAddress.AsString(advertisement.Addr)}";
+            }
+
+            await Device.ReadDevice_Name(DefaultCacheMode);
+            await Device.ReadAppearance(DefaultCacheMode);
+            await Device.ReadConnection_Parameter(DefaultCacheMode);
+            await Device.ReadBatteryLevel(DefaultCacheMode);
+            await Device.ReadManufacturer_Name(DefaultCacheMode);
+            await Device.ReadModel_Number(DefaultCacheMode);
+            await Device.ReadFirmware_Revision(DefaultCacheMode);
+            await Device.ReadSoftware_Revision(DefaultCacheMode);
+            await Device.ReadPnP_ID(DefaultCacheMode);
+
+            Report.SetCommon_Info(Device.CurrCommon_Configuration_Data);
+            Report.SetAdvertisement_Info(advertisement);
+            Report.SetBattery_Info(Device.CurrBattery_Data);
+            Report.SetDevice_Info(Device.CurrDevice_Info_Data);
+
+            var retval = Report.MakeReportMarkdown();
+            return retval;
+        }
         public void SetCommon_Info(BTCommon_Info.Common_Configuration_Data info)
         {
             Common_Configuration_Data = info;
@@ -280,7 +314,7 @@ namespace BluetoothWinUI3.Reports
                 return new SingleTestResult(section, testname, deviceInfo, SingleTestResult.TestResult.FailShould, "Devices with batteries should support battery level reporting.");
             }
 
-            return new SingleTestResult(section, testname, deviceInfo, SingleTestResult.TestResult.Pass, $"Connection min, max contains one of the recommended values");
+            return new SingleTestResult(section, testname, deviceInfo, SingleTestResult.TestResult.Pass, $"Device has a valid battery level");
         }
 
         private SingleTestResult Test72x(BTCommon_Info.Device_Info_Data info, WatcherData Advertisement, UserSuppliedDeviceInformation userInfo)

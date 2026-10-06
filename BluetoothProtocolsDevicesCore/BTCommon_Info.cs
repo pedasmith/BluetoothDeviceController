@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-10-06::10:58
+    /// This class was automatically generated 2026-10-06::12:11
     /// </summary>
 
     public  class BTCommon_Info : INotifyPropertyChanged
@@ -948,7 +948,7 @@ namespace BluetoothProtocols
         /// </summary>
         public class Battery_Data :BTCommonMetaData<Battery_Data> //, IExportDataSource
         {
-            private double _BatteryLevel = 0;
+            private double _BatteryLevel = -1;
             /// <summary>
             /// BatteryLevel (I8 %) from Service=Battery and Characteristic=BatteryLevel
             ///</summary>
@@ -2599,7 +2599,7 @@ namespace BluetoothProtocols
         private void NotifyBatteryLevelCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Battery_BatteryLevel_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%|-1");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
@@ -2625,7 +2625,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "BatteryLevel", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("I8|DEC|BatteryLevel|%|-1");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());

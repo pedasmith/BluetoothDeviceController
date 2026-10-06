@@ -108,8 +108,8 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
         };
         private static List<SupportedDevice> UnsupportedDevices { get; set; } = new List<SupportedDevice>()
         {
-            new SupportedDevice("Nordic_LBS", typeof(BTCommon_UnsupportedControl)),
-            new SupportedDevice("EdgeImpulse", typeof(BTCommon_UnsupportedControl)), // Nordic Thingy:53
+            // new SupportedDevice("Nordic_LBS", typeof(BTCommon_UnsupportedControl)),
+            // new SupportedDevice("EdgeImpulse", typeof(BTCommon_UnsupportedControl)), // Nordic Thingy:53
         };
 
         private static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()

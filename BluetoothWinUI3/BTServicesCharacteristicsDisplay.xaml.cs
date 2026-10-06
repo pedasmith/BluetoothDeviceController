@@ -3,6 +3,7 @@ using BluetoothProtocols;
 using BluetoothProtocolsNames;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
+using BluetoothWinUI3.Reports;
 using IotNumberFormats;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -384,6 +385,8 @@ namespace BluetoothWinUI3
                 BluetoothCacheMode cacheMode = BluetoothCacheMode.Cached;
                 // cacheMode = BluetoothCacheMode.Uncached; // TODO: just for now while debugging
                 var addr = SelectedWatcherData.Addr;
+
+                var report = await BTAccessoryGuidelinesReport.CreateFromAdvertisement(SelectedWatcherData);
 
                 /* 2026-09-04 all this was a failed attempt to connect to the BT-90EPD multimeter.
                 var aresult = await le.RequestAccessAsync();
