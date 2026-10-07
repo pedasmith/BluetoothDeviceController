@@ -332,7 +332,6 @@ public sealed partial class BTCommon_UnsupportedControl : UserControl, IDeviceCo
     }
     #endregion
 
-    BTAccessoryGuidelinesReport Report = new();
     /// <summary>
     /// Called by e.g., the ConnectionControl when the user wants to reconnect to the device (sensor).
     /// The initial connect is handled by the controls in Control_DataContextChanged() when the
@@ -398,8 +397,6 @@ public sealed partial class BTCommon_UnsupportedControl : UserControl, IDeviceCo
         await Device.ReadFirmware_Revision(DefaultCacheMode);
         await Device.ReadSoftware_Revision(DefaultCacheMode);
         await Device.ReadPnP_ID(DefaultCacheMode);
-
-        MakeReport();
 
         await Device.NotifyBatteryLevelAsync(); // Modify: set up the right notifications for your device.
 
@@ -627,15 +624,6 @@ public sealed partial class BTCommon_UnsupportedControl : UserControl, IDeviceCo
     }
     #endregion
 
-    private void MakeReport()
-    {
-        Report.SetCommon_Info(Device.CurrCommon_Configuration_Data);
-        Report.SetAdvertisement_Info(DataContextAsKnownDevice.Advertisement);
-        Report.SetBattery_Info(Device.CurrBattery_Data);
-        Report.SetDevice_Info(Device.CurrDevice_Info_Data);
-        var report = Report.MakeReportMarkdown();
-        uiReport.Text = report;
-    }
 
     // Modify to update the UX when the device says there's new data
     /// <summary>
@@ -671,8 +659,6 @@ public sealed partial class BTCommon_UnsupportedControl : UserControl, IDeviceCo
                  UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
                 break;
         }
-
-        MakeReport();
 
 
         //
@@ -732,7 +718,6 @@ public sealed partial class BTCommon_UnsupportedControl : UserControl, IDeviceCo
             retval = retval
             // | IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
             | IDeviceControlBasic.UXCapabilities.CanGetData
-            | IDeviceControlBasic.UXCapabilities.CanGetDetails
             | IDeviceControlBasic.UXCapabilities.CanShowTable
             ;
         }
@@ -752,7 +737,7 @@ public sealed partial class BTCommon_UnsupportedControl : UserControl, IDeviceCo
     public string GetDetails(IDeviceControlBasic.DetailsType detailsType)
     {
         // Get report details
-        var retval = Report.MakeReportMarkdown();
+        var retval = "This device has no details";
         return retval;
     }
     #endregion

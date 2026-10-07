@@ -75,6 +75,9 @@ namespace BluetoothProtocols
 [[CharacteristicIndexList]]
         }
 
+        // All of the services that this device supports
+[[ServiceGuidsPublics]]        
+
         /// <summary>
         /// List of the guids supported by the device. 
         /// </summary>
@@ -264,6 +267,18 @@ Original: OnPropertyChanged("[[CharacteristicName.dotNet]]");
 ```
             Guid.Parse("[[UUID]]"), // #[[Count.Child]] is [[Name]]
 ```
+
+## ServiceGuidsPublics Type=list Source=Services Trim=endCR  
+
+```
+        /// <summary>
+        /// Convenience GUID for [[Name]] service. [[ServiceDescription]]
+        /// </summary>
+        public static readonly Guid ServiceGuid_[[Name.dotNet]] = Guid.Parse("[[UUID]]"); // #[[Count.Child]] is [[Name]]
+```
+
+
+
 ## ServicesNullList Type=list Source=Services Trim=true Code="null, " 
 
 ## CharacteristicIndexList Type=list Source=Services/Characteristics Trim=endCR

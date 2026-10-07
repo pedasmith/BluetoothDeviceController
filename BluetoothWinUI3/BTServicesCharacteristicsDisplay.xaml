@@ -54,6 +54,15 @@
                         <TextBlock x:Name="uiDeviceDetailsTextBlock" Style="{StaticResource sAdvertisementData}" >Device Details</TextBlock>
                     </ScrollViewer>
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <Button Content="Copy">
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Copy All" Click="OnMenuCopyAll" />
+                                    <MenuFlyoutItem Text="Copy Json" Click="OnMenuCopyJson" />
+                                    <MenuFlyoutItem Text="Copy Report" Click="OnMenuCopyReport" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
                         <Button Content="Notify">
                             <Button.Flyout>
                                 <MenuFlyout x:Name="uimNotify">

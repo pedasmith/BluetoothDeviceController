@@ -17,6 +17,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 using Utilities;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
@@ -367,6 +368,9 @@ namespace BluetoothWinUI3
             }
         }
 
+        string AccessoryGuidelinesReport = "# No report generated";
+        string JsonReport = "No JSON report generated";
+
         /// <summary>
         /// Handle all the stuff that happens on connect.
         /// - Create summary of the device in JSON
@@ -386,7 +390,7 @@ namespace BluetoothWinUI3
                 // cacheMode = BluetoothCacheMode.Uncached; // TODO: just for now while debugging
                 var addr = SelectedWatcherData.Addr;
 
-                var report = await BTAccessoryGuidelinesReport.CreateFromAdvertisement(SelectedWatcherData);
+                AccessoryGuidelinesReport = await BTAccessoryGuidelinesReport.CreateFromAdvertisement(SelectedWatcherData);
 
                 /* 2026-09-04 all this was a failed attempt to connect to the BT-90EPD multimeter.
                 var aresult = await le.RequestAccessAsync();
@@ -575,9 +579,10 @@ namespace BluetoothWinUI3
                             uiDeviceDetailsTextBlock.Text += chsb.ToString();
                         }
                     }
-
-                    uiDeviceDetailsTextBlock.Text += $"\n";
                 }
+
+                uiDeviceDetailsTextBlock.Text += "\n\n\n" + AccessoryGuidelinesReport + "\n\n";
+
                 // Build a JsonNode that omits empty strings and empty arrays, then
                 // serialize with System.Text.Json.
                 var resolver = new DefaultJsonTypeInfoResolver();
@@ -591,6 +596,7 @@ namespace BluetoothWinUI3
                 var node = BluetoothWinUI3.SystemTextJsonCleaner.ToJsonNode(nameDeviceList);
                 var JsonAsList = node?.ToJsonString(jsonOptions) ?? "";
                 JsonAsList = StripPointlessJson(JsonAsList);
+                JsonReport = JsonAsList;
 
                 uiDeviceDetailsTextBlock.Text += $"\n\n\n" + JsonAsList;
             }
@@ -822,6 +828,37 @@ namespace BluetoothWinUI3
         public void SetNotifyDeviceControlChanges(IHandleNotifyDeviceControlChanges mainWindow)
         {
             NotifyDeviceControlChangesWindows = mainWindow;
+        }
+
+        private void OnMenuCopyAll(object sender, RoutedEventArgs e)
+        {
+            var txt = uiDeviceDetailsTextBlock.Text;
+
+            DataPackage dataPackage = new DataPackage();
+            var header = "N," + BluetoothWatcher.AdvertismentWatcher.WatcherData.ToHeaderString() + "\n";
+            dataPackage.SetText(txt);
+            dataPackage.Properties.Title = "All connection data";
+            Clipboard.SetContent(dataPackage);
+        }
+        private void OnMenuCopyJson(object sender, RoutedEventArgs e)
+        {
+            var txt = JsonReport;
+
+            DataPackage dataPackage = new DataPackage();
+            var header = "N," + BluetoothWatcher.AdvertismentWatcher.WatcherData.ToHeaderString() + "\n";
+            dataPackage.SetText(txt);
+            dataPackage.Properties.Title = "JSON services and characteristics";
+            Clipboard.SetContent(dataPackage);
+        }
+        private void OnMenuCopyReport(object sender, RoutedEventArgs e)
+        {
+            var txt = AccessoryGuidelinesReport;
+
+            DataPackage dataPackage = new DataPackage();
+            var header = "N," + BluetoothWatcher.AdvertismentWatcher.WatcherData.ToHeaderString() + "\n";
+            dataPackage.SetText(txt);
+            dataPackage.Properties.Title = "Bluetooth Accessory Guidelines Report";
+            Clipboard.SetContent(dataPackage);
         }
     }
 }

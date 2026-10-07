@@ -288,7 +288,8 @@ namespace BluetoothWatcher.AdvertismentWatcher
                     retval += $"Govee data: Type={goveeData.TagType}, Temp={goveeData.TemperatureInDegreesF:F1}F, Humidity={goveeData.Humidity}%, Battery={goveeData.BatteryInPercent}%\n";
                 }
             }
-            retval += "\n\nMore info at [Novelbits.io](https://novelbits.io/bluetooth-address-privacy-ble/)\n";
+            //Example of adding a link
+            //retval += "\n\nMore info at [Novelbits.io](https://novelbits.io/bluetooth-address-privacy-ble/)\n";
             return retval;
         }
 

@@ -43,7 +43,7 @@
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
                         <Run>Info</Run>
                         </TextBlock>
-                        <TextBlock Style="{StaticResource sDeviceListDataCompressed}"><Run x:Name="uiReport"/></TextBlock>
+                        <TextBlock Style="{StaticResource sDeviceListDataCompressed}"><Run x:Name="uiDeviceInfo"/></TextBlock>
                     </StackPanel>
                 </GridView>
 

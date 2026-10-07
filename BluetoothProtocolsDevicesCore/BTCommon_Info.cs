@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-10-06::12:11
+    /// This class was automatically generated 2026-10-07::08:43
     /// </summary>
 
     public  class BTCommon_Info : INotifyPropertyChanged
@@ -807,7 +807,7 @@ namespace BluetoothProtocols
                 set { if (value == _Data) return; _Data = value; OnPropertyChanged();}
             }
 
-            private double _VendorIDSource = 0;
+            private double _VendorIDSource = 255;
             /// <summary>
             /// VendorIDSource (U8 ) from Service=Device Info and Characteristic=PnP ID
             ///</summary>
@@ -816,7 +816,7 @@ namespace BluetoothProtocols
                 get { return _VendorIDSource; }
                 set { if (value == _VendorIDSource) return; _VendorIDSource = value; OnPropertyChanged();}
             }
-            private double _VendorID = 0;
+            private double _VendorID = 65535;
             /// <summary>
             /// VendorID (U16 ) from Service=Device Info and Characteristic=PnP ID
             ///</summary>
@@ -1063,6 +1063,36 @@ namespace BluetoothProtocols
             Device_Info_PnP_ID_index = 22,     // GUID 00002a50-0000-1000-8000-00805f9b34fb
             Battery_BatteryLevel_index = 23,     // GUID 00002a19-0000-1000-8000-00805f9b34fb
         }
+
+        // All of the services that this device supports
+        /// <summary>
+        /// Convenience GUID for Common Configuration service. 
+        /// </summary>
+        public static readonly Guid ServiceGuid_Common_Configuration = Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"); // #0 is Common Configuration
+        /// <summary>
+        /// Convenience GUID for Generic Service service. 
+        /// </summary>
+        public static readonly Guid ServiceGuid_Generic_Service = Guid.Parse("00001801-0000-1000-8000-00805f9b34fb"); // #1 is Generic Service
+        /// <summary>
+        /// Convenience GUID for Immediate Alert service. 
+        /// </summary>
+        public static readonly Guid ServiceGuid_Immediate_Alert = Guid.Parse("00001802-0000-1000-8000-00805f9b34fb"); // #2 is Immediate Alert
+        /// <summary>
+        /// Convenience GUID for Link Loss Alert service. 
+        /// </summary>
+        public static readonly Guid ServiceGuid_Link_Loss_Alert = Guid.Parse("00001803-0000-1000-8000-00805f9b34fb"); // #3 is Link Loss Alert
+        /// <summary>
+        /// Convenience GUID for Transmit Power service. 
+        /// </summary>
+        public static readonly Guid ServiceGuid_Transmit_Power = Guid.Parse("00001804-0000-1000-8000-00805f9b34fb"); // #4 is Transmit Power
+        /// <summary>
+        /// Convenience GUID for Device Info service. Includes details on the manufacturer, model, firmware versions, and PNP ID
+        /// </summary>
+        public static readonly Guid ServiceGuid_Device_Info = Guid.Parse("0000180a-0000-1000-8000-00805f9b34fb"); // #5 is Device Info
+        /// <summary>
+        /// Convenience GUID for Battery service. 
+        /// </summary>
+        public static readonly Guid ServiceGuid_Battery = Guid.Parse("0000180f-0000-1000-8000-00805f9b34fb"); // #6 is Battery        
 
         /// <summary>
         /// List of the guids supported by the device. 
@@ -2315,7 +2345,7 @@ namespace BluetoothProtocols
         private void NotifyPnP_IDCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Device_Info_PnP_ID_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|VendorIDSource U16|DEC|VendorID U16|DEC|ProductID U16|DEC|ProductVersion");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|VendorIDSource||255 U16|DEC|VendorID||65535 U16|DEC|ProductID U16|DEC|ProductVersion");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
@@ -2562,7 +2592,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "PnP ID", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|VendorIDSource U16|DEC|VendorID U16|DEC|ProductID U16|DEC|ProductVersion");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|VendorIDSource||255 U16|DEC|VendorID||65535 U16|DEC|ProductID U16|DEC|ProductVersion");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
