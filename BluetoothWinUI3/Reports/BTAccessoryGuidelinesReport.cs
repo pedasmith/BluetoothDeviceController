@@ -187,10 +187,19 @@ namespace BluetoothWinUI3.Reports
             return retval;
         }
 
+        private bool RangeContains(double value, double min, double max)
+        {
+            var retval = value >= min && value <= max;
+            if (retval == true)
+            {
+                ; // handy place for a debugger
+            }
+            return retval;
+        }
         private bool RangeDivisibleBy30(double minvalue, double maxvalue)
         {
             var value = (maxvalue - minvalue);
-            var retval = (value % 30.0) == 0;
+            var retval = (value > 0) && (value % 30.0) == 0;
             return retval;
         }
 
@@ -221,11 +230,6 @@ namespace BluetoothWinUI3.Reports
         }
 
 
-        private bool RangeContains(double value, double min, double max)
-        {
-            var retval = value >= min && value <= max;
-            return retval;
-        }
         private SingleTestResult Test612(BTCommon_Info.Battery_Data info, UserSuppliedAccessoryInformation userInfo)
         {
             var section = "6.1.2";

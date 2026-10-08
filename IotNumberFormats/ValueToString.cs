@@ -908,7 +908,7 @@ namespace IotNumberFormats
                 doubleValues = null;
                 return command;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

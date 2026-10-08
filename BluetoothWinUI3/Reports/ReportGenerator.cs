@@ -60,7 +60,7 @@ static class ReportGenerator
         }
         var retval = "\n\n|Result|Count|Tests\n|----|----|----|\n";
         retval += $"|Pass|{counts[SingleTestResult.TestResult.Pass]}|{list[SingleTestResult.TestResult.Pass]}\n";
-        retval += $"|Fail (shall)|{counts[SingleTestResult.TestResult.FailShall]}|{list[SingleTestResult.TestResult.FailShould]}\n";
+        retval += $"|Fail (shall)|{counts[SingleTestResult.TestResult.FailShall]}|{list[SingleTestResult.TestResult.FailShall]}\n";
         retval += $"|Fail (should)|{counts[SingleTestResult.TestResult.FailShould]}|{list[SingleTestResult.TestResult.FailShould]}\n";
         retval += $"|Fail (unofficial)|{counts[SingleTestResult.TestResult.FailUnofficial]}|{list[SingleTestResult.TestResult.FailUnofficial]}\n";
 
