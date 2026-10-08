@@ -2,12 +2,10 @@
 using BluetoothWatcher.AdvertismentWatcher;
 using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Devices.Input.Preview;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -21,61 +19,6 @@ namespace BluetoothWinUI3.Reports
         public AccessoryType CurrAccessoryType { get; set; } = UserSuppliedAccessoryInformation.AccessoryType.AudioAccessory;
         public bool HasBattery { get; set; } = true;
         public bool IsAccessoryNotJustLEBroadcaster { get; set; } = true; // Section 7.2, DIS "... does not apply to accessories that are just LE Broadcasters"
-    }
-
-    class SingleTestResult
-    {
-        public SingleTestResult(string section, string testName, string deviceInfo)
-        {
-            Section = section;
-            TestName = testName;
-            DeviceInfo = deviceInfo;
-        }
-        public SingleTestResult(string section, string testName, string deviceInfo, SingleTestResult.TestResult result, string comments)
-        {
-            Section = section;
-            TestName = testName;
-            DeviceInfo = deviceInfo;
-            Result = result;
-            Comments = comments;
-        }
-
-        public SingleTestResult Update(SingleTestResult.TestResult result, string comments)
-        {
-            Result = result;
-            Comments = comments;
-            return this;
-        }
-        public string Section = "";
-        public string TestName = "";
-        public enum TestResult { NotTested, CannotTest, Pass, FailShould, FailShall, FailUnofficial };
-
-        public TestResult Result = TestResult.NotTested;
-        public string ResultAsString
-        {
-            get
-            {
-                switch (Result)
-                {
-                    case TestResult.NotTested:
-                        return "Not Tested";
-                    case TestResult.CannotTest:
-                        return "Cannot Test this guideline";
-                    case TestResult.Pass:
-                        return "Pass";
-                    case TestResult.FailShould:
-                        return "A SHOULD guideline is not satisfied";
-                    case TestResult.FailShall:
-                        return "A MUST guideline is not satisfied";
-                    case TestResult.FailUnofficial:
-                        return "The accessory has an issue that's not part of the official guidelines";
-                    default:
-                        return "Unknown Result";
-                }
-            }
-        }
-        public string DeviceInfo = "";
-        public string Comments = "";
     }
 
     class BTAccessoryGuidelinesReport
@@ -97,7 +40,7 @@ namespace BluetoothWinUI3.Reports
 
             await Device.ReadDevice_Name(DefaultCacheMode);
             await Device.ReadAppearance(DefaultCacheMode);
-            await Device.ReadConnection_Parameter(DefaultCacheMode);
+            Report.ReadConnection_ParametersOK = (await Device.ReadConnection_Parameter(DefaultCacheMode)) != null;
             await Device.ReadBatteryLevel(DefaultCacheMode);
             await Device.ReadManufacturer_Name(DefaultCacheMode);
             await Device.ReadModel_Number(DefaultCacheMode);
@@ -110,75 +53,52 @@ namespace BluetoothWinUI3.Reports
             Report.Battery_Data = Device.CurrBattery_Data;
             Report.Device_Info_Data = Device.CurrDevice_Info_Data;
 
-            var retval = Report.MakeReportMarkdown();
+            List<SingleTestResult> tests = Report.RunTests();
+            var retval = ReportGenerator.MakeMarkdown(tests, Report.Common_Configuration_Data, Report.Advertisement);
             return retval;
         }
 
 
         private BTCommon_Info.Common_Configuration_Data Common_Configuration_Data;
+        bool ReadConnection_ParametersOK = false;
         private BTCommon_Info.Battery_Data Battery_Data;
         private BTCommon_Info.Device_Info_Data Device_Info_Data;
         GattDeviceServicesResult StatusDIS;
         private UserSuppliedAccessoryInformation UserSuppliedAccessoryInformation = new();
         private WatcherData Advertisement = null;
-
-        public string MakeReportMarkdown()
+        private List<SingleTestResult> RunTests()
         {
             List<SingleTestResult> tests = new List<SingleTestResult>();
             tests.Add(Test412(Common_Configuration_Data));
+            tests.Add(Test44Set(Common_Configuration_Data)); // put the 'c' test first. If the 44c fails it's because the accessory didn't set the connection parameters and the user should see that failure first.
             tests.Add(Test44A(Common_Configuration_Data));
             tests.Add(Test44A2(Common_Configuration_Data, UserSuppliedAccessoryInformation));
             tests.Add(Test44B(Common_Configuration_Data, UserSuppliedAccessoryInformation));
-            tests.Add(Test44C(Common_Configuration_Data));
             tests.Add(Test612(Battery_Data, UserSuppliedAccessoryInformation));
-            tests.Add(Test72DIS(Device_Info_Data, StatusDIS, Advertisement, UserSuppliedAccessoryInformation));
-            tests.Add(Test72x(Device_Info_Data, Advertisement, UserSuppliedAccessoryInformation));
-
-            var sb = new StringBuilder();
-            sb.Append("# Accessory Guidelines Report\n\n");
-            foreach (var test in tests)
+            tests.Add(Test72Supported(Device_Info_Data, StatusDIS, Advertisement, UserSuppliedAccessoryInformation));
+            if (StatusDIS.Services.Count == 1)
             {
-                var icon = "";
-                switch (test.Result)
-                {
-                    case SingleTestResult.TestResult.NotTested: icon = "┅"; break;
-                    case SingleTestResult.TestResult.CannotTest: icon = "┅"; break;
-                    case SingleTestResult.TestResult.Pass: icon = "👌"; break;
-                    case SingleTestResult.TestResult.FailUnofficial: icon = "☹"; break;
-                    case SingleTestResult.TestResult.FailShould: icon = "☹"; break;
-                    case SingleTestResult.TestResult.FailShall: icon = "☹"; break;
-                }
-
-                sb.Append($"## {icon} Test {test.Section} {test.TestName}\n");
-                if (!test.DeviceInfo.Contains("\n"))
-                {
-                    sb.Append($"- Device Info: {test.DeviceInfo} \n");
-                }
-                else
-                {
-                    sb.Append($"- Device Info: \n");
-                    var lines = test.DeviceInfo.Split("\n");
-                    foreach (var line in lines)
-                    {
-                        sb.Append("  * " + line + " \n");
-                    }
-                }
-                sb.Append($"- Result: {test.ResultAsString} \n");
-                if (!string.IsNullOrEmpty(test.Comments))
-                {
-                    sb.Append($"- Comments: {test.Comments} \n");
-                }
-                sb.Append("\n\n");
+                // Only check guidelines when the device info data is available.
+                tests.AddRange(Test72(Device_Info_Data, Advertisement, UserSuppliedAccessoryInformation).Results);
             }
-            ;
 
-            return sb.ToString();
+            // Add in all the sections with guidelines but for which I have no tests
+            tests.Add(SingleTestResult.MakeCannotTest("4.1", "Pairing and Discoverability"));
+            tests.Add(SingleTestResult.MakeCannotTest("4.2", "Swiftpair and factory bonding"));
+            tests.Add(SingleTestResult.MakeCannotTest("4.3", "Dual mode pairing"));
+            tests.Add(SingleTestResult.MakeCannotTest("4.5", "Accessory initiated pairing"));
+            tests.Add(SingleTestResult.MakeCannotTest("4.6", "Link loss recovery"));
+            tests.Add(SingleTestResult.MakeCannotTest("4.7", "Classic (BR/EDR) piconets and scatternets"));
+            tests.Add(SingleTestResult.MakeCannotTest("4.8", "Sniff mode"));
+            tests.Add(SingleTestResult.MakeCannotTest("5", "Classic audio", "Follow the manual procedures in section 10"));
+            return tests;
         }
+
 
         private SingleTestResult Test412(BTCommon_Info.Common_Configuration_Data info)
         {
             var section = "4.1.2";
-            var testname = "Appearance SHOULD be set";
+            var testname = "Appearance should be set";
             var deviceInfo = $"Appearance: {info.Appearance}";
             var retval = new SingleTestResult(section, testname, deviceInfo);
             switch (info.Appearance)
@@ -186,22 +106,39 @@ namespace BluetoothWinUI3.Reports
                 case 0:
                     return retval.Update (SingleTestResult.TestResult.FailUnofficial, "Appearance value is 0, which is not a useful value to set.");
                 case 65535:
-                    return retval.Update(SingleTestResult.TestResult.FailShould, "Appearance value was not set. The appearance SHOULD be set.");
+                    return retval.Update(SingleTestResult.TestResult.FailShould, "Appearance value was not set.");
                 default:
                     return retval.Update(SingleTestResult.TestResult.Pass, $"Appearance value is valid.");
             }
         }
 
-        private SingleTestResult Test44A(BTCommon_Info.Common_Configuration_Data info)
+        private SingleTestResult Test44Set(BTCommon_Info.Common_Configuration_Data info)
         {
-            var section = "4.4A";
-            var testname = "Connection interval SHOULD be a multiple of 7.5 ms";
+            var section = "4.4 Set";
+            var testname = "Connection min, max values should be set";
             var deviceInfo = $"Connection min interval: {info.Interval_Min}\nConnection max interval: {info.Interval_Max}";
             var retval = new SingleTestResult(section, testname, deviceInfo);
             if (info.Interval_Min < 0)
             {
-                // TODO: Required by the spec?
-                return retval.Update(SingleTestResult.TestResult.FailShall, "Device connection intervals are not set.");
+                return retval.Update(SingleTestResult.TestResult.FailShould, "Device connection intervals are not set.");
+            }
+
+            return retval.Update(SingleTestResult.TestResult.Pass, $"Connection min, max are set");
+        }
+
+        private SingleTestResult Test44A(BTCommon_Info.Common_Configuration_Data info)
+        {
+            var section = "4.4 A";
+            var testname = "Connection interval should be a multiple of 7.5 ms";
+            var deviceInfo = $"Connection min interval: {info.Interval_Min}\nConnection max interval: {info.Interval_Max}";
+            var retval = new SingleTestResult(section, testname, deviceInfo);
+            if (info.Interval_Min == 65535 || info.Interval_Max == 65353)
+            {
+                return retval.Update(SingleTestResult.TestResult.CannotTest, "Device connection intervals are set to the do not care value (65535=0xFFFF) which cannot be tested");
+            }
+            if (info.Interval_Min < 0)
+            {
+                return retval.Update(SingleTestResult.TestResult.FailUnofficial, "Device connection intervals are not set.");
             }
             if (!DivisibleBy75(info.Interval_Min))
             {
@@ -224,20 +161,22 @@ namespace BluetoothWinUI3.Reports
                 default: allowedMin = 30; break;
             }
 
-            var section = "4.4A2";
-            var testname = $"Connection min interval SHOULD be {allowedMin} ms or higher";
+            var section = "4.4 B";
+            var testname = $"Connection min interval should be {allowedMin} ms or higher";
             var deviceInfo = $"Connection min interval: {info.Interval_Min}\nConnection max interval: {info.Interval_Max}";
             var retval = new SingleTestResult(section, testname, deviceInfo);
             if (info.Interval_Min < 0)
             {
-                // TODO: Required by the spec?
-                return retval.Update(SingleTestResult.TestResult.FailShall, "Device connection intervals are not set.");
+                return retval.Update(SingleTestResult.TestResult.FailUnofficial, "Device connection intervals are not set.");
             }
-
 
             if (info.Interval_Min < allowedMin)
             {
-                return retval.Update(SingleTestResult.TestResult.FailShould, $"Connection min interval must be at least {allowedMin} ms.");
+                return retval.Update(SingleTestResult.TestResult.FailShould, $"Connection min interval should be at least {allowedMin} ms.");
+            }
+            if (info.Interval_Max < info.Interval_Min)
+            {
+                return retval.Update(SingleTestResult.TestResult.FailUnofficial, $"Connection min interval {info.Interval_Min} should <= max interval {info.Interval_Max} ms");
             }
             return retval.Update(SingleTestResult.TestResult.Pass, $"Connection min >= {allowedMin} ms");
         }
@@ -257,14 +196,15 @@ namespace BluetoothWinUI3.Reports
 
         private SingleTestResult Test44B(BTCommon_Info.Common_Configuration_Data info, UserSuppliedAccessoryInformation userInfo)
         {
-            var section = "4.4B";
-            var testname = "Connection min, max range SHOULD contain at least one of 7.5, 15, 30 etc. ms";
+            var section = "4.4 C";
+            var testname = "Connection min, max range should contain at least one of 7.5, 15, 30 etc. ms";
             var deviceInfo = $"Connection min interval: {info.Interval_Min}\nConnection max interval: {info.Interval_Max}";
             var retval = new SingleTestResult(section, testname, deviceInfo);
             if (info.Interval_Min < 0)
             {
                 // TODO: Required by the spec?
-                return new SingleTestResult(section, testname, deviceInfo, SingleTestResult.TestResult.FailShall, "Device connection intervals are not set.");
+                retval.Update(SingleTestResult.TestResult.FailShall, "Device connection intervals are not set.");
+                return retval;
             }
             if (!RangeContains(7.5, info.Interval_Min, info.Interval_Max) &&
                 !RangeContains(15, info.Interval_Min, info.Interval_Max) &&
@@ -280,20 +220,6 @@ namespace BluetoothWinUI3.Reports
             return retval.Update(SingleTestResult.TestResult.Pass, $"Connection min, max contains one of the recommended values");
         }
 
-        private SingleTestResult Test44C(BTCommon_Info.Common_Configuration_Data info)
-        {
-            var section = "4.4C";
-            var testname = "Connection min, max values SHOULD be set";
-            var deviceInfo = $"Connection min interval: {info.Interval_Min}\nConnection max interval: {info.Interval_Max}";
-            var retval = new SingleTestResult(section, testname, deviceInfo);
-            if (info.Interval_Min < 0)
-            {
-                // TODO: Required by the spec?
-                return retval.Update(SingleTestResult.TestResult.FailShould, "Device connection intervals are not set.");
-            }
-
-            return retval.Update(SingleTestResult.TestResult.Pass, $"Connection min, max are set");
-        }
 
         private bool RangeContains(double value, double min, double max)
         {
@@ -303,7 +229,7 @@ namespace BluetoothWinUI3.Reports
         private SingleTestResult Test612(BTCommon_Info.Battery_Data info, UserSuppliedAccessoryInformation userInfo)
         {
             var section = "6.1.2";
-            var testname = "Accessories with a battery SHOULD support battery level reporting";
+            var testname = "Accessories with a battery should support battery level reporting";
             var battery = info?.BatteryLevel.ToString() ?? "no battery data";
             var deviceInfo = $"Accessory has battery: {userInfo.HasBattery} \nBattery level: {battery}";
             var retval = new SingleTestResult(section, testname, deviceInfo);
@@ -313,7 +239,7 @@ namespace BluetoothWinUI3.Reports
             }
             if (info == null || info.BatteryLevel < 0)
             {
-                return retval.Update(SingleTestResult.TestResult.FailShould, "Accessoryies with batteries should support battery level reporting.");
+                return retval.Update(SingleTestResult.TestResult.FailShould, "Accessories with batteries should support battery level reporting.");
             }
 
             return retval.Update(SingleTestResult.TestResult.Pass, $"Accessory has a valid battery level");
@@ -324,7 +250,7 @@ namespace BluetoothWinUI3.Reports
             var pnpManufacturer = BluetoothConversions.BluetoothCompanyIdentifier.GetBluetoothCompanyIdentifier(vendorID);
             switch (info.VendorIDSource)
             {
-                case 0: pnpManufacturer = $"{vendorID:X4} source={info.VendorIDSource}"; break;
+                case 0: pnpManufacturer = $"{vendorID:X4} source=Invalid ({info.VendorIDSource})"; break;
                 case 1:
                     if (pnpManufacturer.StartsWith("CompanyId="))
                     {
@@ -332,62 +258,13 @@ namespace BluetoothWinUI3.Reports
                     }
                     break;
                 case 2: pnpManufacturer = $"{vendorID:X4} source= USB Forum {info.VendorIDSource}"; break;
-                default: pnpManufacturer = $"{vendorID:X4} source={info.VendorIDSource} Reserved"; break;
+                default: pnpManufacturer = $"{vendorID:X4} source=Reserved ({info.VendorIDSource})"; break;
             }
             return pnpManufacturer;
         }
-
-        private bool ValidateManufacturerString(SingleTestResult retval, string str, string field, string invalidValue = "Manufacturer Name")
+        private SingleTestResult Test72Supported(BTCommon_Info.Device_Info_Data info, GattDeviceServicesResult statusDIS, WatcherData Advertisement, UserSuppliedAccessoryInformation userInfo)
         {
-            if (str == "")
-            {
-                retval.Update(SingleTestResult.TestResult.FailShall, $"{field} shall not be blank");
-                return false;
-            }
-            if (str.EndsWith("\\0"))
-            {
-                retval.Update(SingleTestResult.TestResult.FailShall, $"{field} shall not end with a NUL char");
-                return false;
-            }
-            if (str == invalidValue)
-            {
-                retval.Update(SingleTestResult.TestResult.FailShall, $"{field} shall not be {invalidValue}");
-                return false;
-            }
-            if (str.Contains("\\0"))
-            {
-                retval.Update(SingleTestResult.TestResult.FailUnofficial, $"{field} shall not contain any NUL chars");
-                return false;
-            }
-            return true;
-        }
-        private bool ValidateOtherString(SingleTestResult retval, string str, string field, string invalidValue)
-        {
-            if (str == "")
-            {
-                retval.Update(SingleTestResult.TestResult.FailUnofficial, $"{field} shall not be blank");
-                return false;
-            }
-            if (str.EndsWith("\\0"))
-            {
-                retval.Update(SingleTestResult.TestResult.FailUnofficial, $"{field} shall not end with a NUL char");
-                return false;
-            }
-            if (str == invalidValue)
-            {
-                retval.Update(SingleTestResult.TestResult.FailUnofficial, $"{field} shall not be {invalidValue}");
-                return false;
-            }
-            if (str.Contains("\\0"))
-            {
-                retval.Update(SingleTestResult.TestResult.FailUnofficial, $"{field} shall not contain any NUL chars");
-                return false;
-            }
-            return true;
-        }
-        private SingleTestResult Test72DIS(BTCommon_Info.Device_Info_Data info, GattDeviceServicesResult statusDIS, WatcherData Advertisement, UserSuppliedAccessoryInformation userInfo)
-        {
-            var section = "7.2Supported";
+            var section = "7.2 Supported";
             var testname = "Accessories shall support the Device Information Service";
             var pnpManufacturer = GetPnpManufacturer(info);
             ushort vendorID = (ushort)info.VendorID;
@@ -418,9 +295,58 @@ namespace BluetoothWinUI3.Reports
             return retval.Update(SingleTestResult.TestResult.Pass, $"Accessory includes the Device Information Service");
         }
 
-        private SingleTestResult Test72x(BTCommon_Info.Device_Info_Data info, WatcherData Advertisement, UserSuppliedAccessoryInformation userInfo)
+
+        private bool ValidateManufacturerString(TestResultList retval, string str, string field, string invalidValue = "Manufacturer Name")
         {
-            var section = "7.2x";
+            if (str == "")
+            {
+                retval.Add(SingleTestResult.TestResult.FailShall, $"{field} shall not be blank");
+                return false;
+            }
+            if (str.EndsWith("\\0"))
+            {
+                retval.Add(SingleTestResult.TestResult.FailShall, $"{field} shall not end with a NUL char");
+                return false;
+            }
+            if (str == invalidValue)
+            {
+                retval.Add(SingleTestResult.TestResult.FailShall, $"{field} shall not be {invalidValue}");
+                return false;
+            }
+            if (str.Contains("\\0"))
+            {
+                retval.Add(SingleTestResult.TestResult.FailUnofficial, $"{field} shall not contain any NUL chars");
+                return false;
+            }
+            return true;
+        }
+        private bool ValidateOtherString(TestResultList retval, string str, string field, string invalidValue)
+        {
+            if (str == "")
+            {
+                retval.Add(SingleTestResult.TestResult.FailUnofficial, $"{field} should not be blank");
+                return false;
+            }
+            if (str.EndsWith("\\0"))
+            {
+                retval.Add(SingleTestResult.TestResult.FailUnofficial, $"{field} shall not end with a NUL char");
+                return false;
+            }
+            if (str == invalidValue)
+            {
+                retval.Add(SingleTestResult.TestResult.FailUnofficial, $"{field} shall not be {invalidValue}");
+                return false;
+            }
+            if (str.Contains("\\0"))
+            {
+                retval.Add(SingleTestResult.TestResult.FailUnofficial, $"{field} shall not contain any NUL chars");
+                return false;
+            }
+            return true;
+        }
+        private TestResultList Test72(BTCommon_Info.Device_Info_Data info, WatcherData Advertisement, UserSuppliedAccessoryInformation userInfo)
+        {
+            var section = "7.2";
             var testname = "Device Information Service values are set correctly";
             var pnpManufacturer = GetPnpManufacturer(info);
             ushort vendorID = (ushort)info.VendorID;
@@ -428,11 +354,12 @@ namespace BluetoothWinUI3.Reports
             string pnpstring = pnpRead ? $"PNP ID: {info.VendorIDSource} {vendorID:X4} {info.ProductID} {info.ProductVersion}\nPNP Manufacturer: {pnpManufacturer}" : "PNP ID: not set";
             var deviceInfo = $"Manufacturer: {info.ManufacturerName}\nModel Number: {info.ModelNumber}\nFirmware Revision: {info.FirmwareRevision}\nSoftware Revision: {info.SoftwareRevision}\n{pnpstring}";
 
-            var retval = new SingleTestResult(section, testname, deviceInfo);
-            if (!ValidateManufacturerString(retval, info.ManufacturerName, "Manufacturer Name")) return retval;
-            if (!ValidateOtherString(retval, info.ModelNumber, "Model Number", "Model Number")) return retval;
-            if (!ValidateOtherString(retval, info.FirmwareRevision, "Firmware Revision", "Firmware Revision")) return retval;
-            if (!ValidateOtherString(retval, info.SoftwareRevision, "Software Revision", "Software Revision")) return retval;
+            var retval = new TestResultList(section, testname, deviceInfo);
+
+            ValidateManufacturerString(retval, info.ManufacturerName, "Manufacturer Name");
+            ValidateOtherString(retval, info.ModelNumber, "Model Number", "Model Number");
+            ValidateOtherString(retval, info.FirmwareRevision, "Firmware Revision", "Firmware Revision");
+            ValidateOtherString(retval, info.SoftwareRevision, "Software Revision", "Software Revision");
 
             if (pnpRead)
             {
@@ -442,37 +369,35 @@ namespace BluetoothWinUI3.Reports
                     case 2:
                         break;
                     case 0:
-                        retval.Update(SingleTestResult.TestResult.FailShall, "The PNP Vendor ID Source must set set, not 0");
+                        retval.Add(SingleTestResult.TestResult.FailShall, "The PNP Vendor ID Source must set set, not 0");
                         return retval;
                     case 255:
                         if (userInfo.CurrAccessoryType == UserSuppliedAccessoryInformation.AccessoryType.AudioAccessory)
                         {
-                            retval.Update(SingleTestResult.TestResult.FailShall, "Audio accessories shall implements the PNP ID");
+                            retval.Add(SingleTestResult.TestResult.FailShall, "Audio accessories shall implements the PNP ID");
                         }
                         else
                         {
-                            retval.Update(SingleTestResult.TestResult.FailShall, "Accessories should support [the PNP ID]");
+                            retval.Add(SingleTestResult.TestResult.FailShall, "Accessories should support [the PNP ID]");
                         }
                         return retval;
                     default:
-                        retval.Update(SingleTestResult.TestResult.FailShall, "The PNP Vendor ID Source must be either 1 (Bluetooth) or 2 (USB)");
+                        retval.Add(SingleTestResult.TestResult.FailShall, "The PNP Vendor ID Source must be either 1 (Bluetooth) or 2 (USB)");
                         return retval;
                 }
                 if (info.VendorID == 0)
                 {
-                    retval.Update(SingleTestResult.TestResult.FailShall, "The PNP Vendor ID Source must set set, not 0");
-                    return retval;
+                    retval.Add(SingleTestResult.TestResult.FailShall, "The PNP Vendor ID Source must set set, not 0");
                 }
                 // 2026-10-07 Valid values are 0..4398. The "invalid point" is set to higher than that so the code isn't instantly out of date.
-                if (info.VendorID > 8000)
+                else if (info.VendorID > 8000)
                 {
-                    retval.Update(SingleTestResult.TestResult.FailShall, $"The PNP Vendor ID must be valid. As of 2026-10-07 valid IDs are 0..4398");
+                    retval.Add(SingleTestResult.TestResult.FailShall, $"The PNP Vendor ID must be valid. As of 2026-10-07 valid IDs are 0..4398");
                     return retval;
                 }
             }
-
-            return retval.Update(SingleTestResult.TestResult.NotTested, $"TODO: still making the tests");
-            //return new SingleTestResult(section, testname, deviceInfo, SingleTestResult.TestResult.Pass, $"Connection min, max contains one of the recommended values");
+            retval.AddPass(SingleTestResult.TestResult.Pass, $"Connection min, max contains one of the recommended values");
+            return retval;
         }
     }
 }

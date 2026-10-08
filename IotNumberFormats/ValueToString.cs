@@ -887,34 +887,37 @@ namespace IotNumberFormats
         private ParserField MoveToNext()
         {
             defaultIndex = NextCommandIndex;
-            var command = Commands.Fields[NextCommandIndex++];
+            try
+            {
+                var command = Commands.Fields[NextCommandIndex++];
 
-            stringValue = "";
-            byteArrayValue = null;
+                stringValue = "";
+                byteArrayValue = null;
 
-            readcmd = command.ByteFormatPrimary;
-            readindicator = readcmd[0];
-            displayFormat = command.DisplayFormatPrimary;
-            displayFormatSecondary = command.Get(1, 1);
+                readcmd = command.ByteFormatPrimary;
+                readindicator = readcmd[0];
+                displayFormat = command.DisplayFormatPrimary;
+                displayFormatSecondary = command.Get(1, 1);
 
-            name = command.NamePrimary;
-            if (string.IsNullOrEmpty(name)) name = $"param{defaultIndex}";
-            units = command.UnitsPrimary;
+                name = command.NamePrimary;
+                if (string.IsNullOrEmpty(name)) name = $"param{defaultIndex}";
+                units = command.UnitsPrimary;
 
-            resultState = ResultState.IsDouble; // the most common result
-            doubleValue = double.NaN;
-            doubleValues = null;
-
-            return command;
+                resultState = ResultState.IsDouble; // the most common result
+                doubleValue = double.NaN;
+                doubleValues = null;
+                return command;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
 
 
         /// <summary>
         /// Does a parse like the old 2020 code. You give it data + commands and it does the whole parsing.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="commands"></param>
-        /// <returns></returns>
         public static ValueParserResult Parse(byte[] data, string commands)
         {
             var vr = new ValueParser();
