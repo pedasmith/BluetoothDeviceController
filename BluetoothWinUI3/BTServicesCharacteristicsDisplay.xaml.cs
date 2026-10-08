@@ -431,9 +431,13 @@ namespace BluetoothWinUI3
                     if (guidAsAscii != "") guidAsAscii = $" ({guidAsAscii})";
                     var serviceUuidStr = (shortuuid != null) ? $"{shortuuid:X4}" : service.Uuid.ToString();
                     var servicename = (shortuuid != null) ? BluetoothServiceUuid16Bit.Decode((ushort)shortuuid) + " " : "";
-                    if (shortuuid != null)
+                    if (shortuuid != null && defaultService ==  null)
                     {
                         nameService.Name = BluetoothServiceUuid16Bit.Decode((ushort)shortuuid);
+                    }
+                    if (serviceUuidStr.Contains ("FFF0"))
+                    {
+                        ; // handy place for a debugger
                     }
 
                     var servicesb = new StringBuilder();
@@ -465,7 +469,7 @@ namespace BluetoothWinUI3
 
                             var defaultCharacteristic = defaultService?.GetCharacteristic(characteristic.Uuid);
                             var nameCharacteristic = new NameCharacteristic(characteristic, nameService, defaultCharacteristic, characteristicCount++);
-                            if (chshortuuid != null)
+                            if (chshortuuid != null && defaultCharacteristic == null)
                             {
                                 nameCharacteristic.Name = BluetoothCharacteristic.Decode((ushort)chshortuuid);
                             }

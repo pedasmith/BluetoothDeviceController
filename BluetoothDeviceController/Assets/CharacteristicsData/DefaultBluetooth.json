@@ -348,6 +348,30 @@
               "Commands": {}
             }
           ]
+        },
+        {
+          "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+          "Name": "Multimeter",
+          "REM_Abstract": "Multimeter like MEET MS-BO47Q1767",
+          "Link00": "https://github.com/libreble/multimeter/blob/main/docs/protocols/README.md",
+          "Characteristics": [
+            {
+              "UUID": "0000fff2-0000-1000-8000-00805f9b34fb",
+              "Name": "MultimeterWrite",
+              "Type": "BYTES|HEX|Unknown0",
+              "DataGroupName": "Multimeter_Data",
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":WriteWithoutResponse:WrWw:"
+            },
+            {
+              "UUID": "0000fff1-0000-1000-8000-00805f9b34fb",
+              "Name": "MultimeterReadData",
+              "Type": "BYTES|HEX|Unknown1",
+              "DataGroupName": "Multimeter_Data",
+              "IsNotify": true,
+              "Verbs": ":Notify:RdInNo:InNo:"
+            }
+          ]
         }
       ]
     }
