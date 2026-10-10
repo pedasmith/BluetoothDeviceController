@@ -139,6 +139,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("TP357*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("TP359*", typeof(BTCommon_EnvironmentalControl)),
 
+            // Xiaomi devices
+            new SupportedDevice("MJWSD05MMC", typeof(BTXiaomi_MJWSD05MMC_ThermometerControl)),
+
             // ChoiceMMed and Viatom pulse oximeters
             new SupportedDevice("PC-60F_*", typeof(BTCommon_HealthControl)), // Viatom PC60FW
             new SupportedDevice("S5W-VU*", typeof(BTCommon_HealthControl)), // Vibeat

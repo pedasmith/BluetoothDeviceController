@@ -48,7 +48,9 @@
     <None Remove="ZoomableDeviceControl.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\BTCommon_Info.json" Link="Assets\CharacteristicsData\BTCommon_Info.json" />
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\BTCommon_Info.json" Link="Assets\CharacteristicsData\BTCommon_Info.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\BTStandard_Cycling_Speed_Cadence.json" Link="Assets\CharacteristicsData\BTStandard_Cycling_Speed_Cadence.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -85,14 +87,25 @@
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\iHealth_PulseOximeter.json" Link="Assets\CharacteristicsData\iHealth_PulseOximeter.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Nordic_nRF54L15_Tag.json" Link="Assets\CharacteristicsData\Nordic_nRF54L15_Tag.json" />
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Nordic_nRF54L15_Tag.json" Link="Assets\CharacteristicsData\Nordic_nRF54L15_Tag.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Nordic_Thingy.json" Link="Assets\CharacteristicsData\Nordic_Thingy.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TI_SensorTag_1350.json" Link="Assets\CharacteristicsData\TI_SensorTag_1350.json" />
-    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TI_SensorTag_1352.json" Link="Assets\CharacteristicsData\TI_SensorTag_1352.json" />
-    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TI_SensorTag_2541.json" Link="Assets\CharacteristicsData\TI_SensorTag_2541.json" />
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TI_SensorTag_1350.json" Link="Assets\CharacteristicsData\TI_SensorTag_1350.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TI_SensorTag_1352.json" Link="Assets\CharacteristicsData\TI_SensorTag_1352.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TI_SensorTag_2541.json" Link="Assets\CharacteristicsData\TI_SensorTag_2541.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json" Link="Assets\CharacteristicsData\Viatom_PC60FW_PulseOximeter.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Xiaomi_MJWSD05MMC.json" Link="Assets\CharacteristicsData\Xiaomi_MJWSD05MMC.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\BluetoothDeviceController\Assets\SerialData\Standard_RobotCar.json" Link="Assets\SerialData\Standard_RobotCar.json">
@@ -253,6 +266,16 @@
   <ItemGroup>
     <Folder Include="Assets\GraphicalHelps\" />
     <Folder Include="Assets\SerialData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\BluetoothDeviceController\Assets\CharacteristicsData\_Recognizing_BT_Protocols.md" Link="Assets\CharacteristicsData\_Recognizing_BT_Protocols.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="BTXiaomi_MJWSD05MMC_ThermometerControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="BTCommon_UnsupportedControl.xaml">

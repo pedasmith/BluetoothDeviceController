@@ -96,8 +96,11 @@ namespace BluetoothProtocolsNames
                         ; // hook for debugger.
                     }
                     path = file.Path;
-                    InitSingleBleFile(AllDevices, file, DefaultDevice);
-                    InitSingleBleFile(AllRawDevices, file, null); // read in a device without adding in default services
+                    if (path.EndsWith(".json")) // Ignore everything that isn't json
+                    {
+                        InitSingleBleFile(AllDevices, file, DefaultDevice);
+                        InitSingleBleFile(AllRawDevices, file, null); // read in a device without adding in default services
+                    }
                 }
             }
             catch (Exception e)
@@ -119,14 +122,21 @@ namespace BluetoothProtocolsNames
                 var files = await dir.GetFilesAsync();
                 foreach (var file in files)
                 {
-                    // Serial devices are much simpler than the full bluetooth BLE devices
-                    path = file.Path;
-                    var contents = File.ReadAllText(file.Path);
-                    //OLD: var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllSerialDevices>(contents);
-                    var newlist = System.Text.Json.JsonSerializer.Deserialize<NameAllSerialDevices>(contents);
-                    foreach (var item in newlist.AllSerialDevices)
+                    try
                     {
-                        AllSerialDevices.AllSerialDevices.Add(item);
+                        // Serial devices are much simpler than the full bluetooth BLE devices
+                        path = file.Path;
+                        var contents = File.ReadAllText(file.Path);
+                        //OLD: var newlist = Newtonsoft.Json.JsonConvert.DeserializeObject<NameAllSerialDevices>(contents);
+                        var newlist = System.Text.Json.JsonSerializer.Deserialize<NameAllSerialDevices>(contents);
+                        foreach (var item in newlist.AllSerialDevices)
+                        {
+                            AllSerialDevices.AllSerialDevices.Add(item);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"ERROR: Device JSON: {e.Message} with path {path}");
                     }
                 }
             }

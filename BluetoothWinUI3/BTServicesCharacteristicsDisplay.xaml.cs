@@ -387,7 +387,6 @@ namespace BluetoothWinUI3
             {
 
                 BluetoothCacheMode cacheMode = BluetoothCacheMode.Cached;
-                // cacheMode = BluetoothCacheMode.Uncached; // TODO: just for now while debugging
                 var addr = SelectedWatcherData.Addr;
 
                 AccessoryGuidelinesReport = await BTAccessoryGuidelinesReport.CreateFromAdvertisement(SelectedWatcherData);
@@ -412,9 +411,9 @@ namespace BluetoothWinUI3
                 var nameDeviceList = new NameAllBleDevices();
                 var nameDevice = new NameDevice();
                 nameDevice.Name = le.Name;
-                nameDevice.Details += "TODO: line 190";
+                nameDevice.Details += "Device details:";
                 nameDeviceList.AllDevices.Add(nameDevice);
-                // TODO: skipping copying classModifiers ClassName Description from knownDevice
+                // Note: skipping copying classModifiers ClassName Description from knownDevice
                 int serviceCount = 0;
 
                 var defaultDevice = BleNames.GetDevice(nameDevice.Name);
