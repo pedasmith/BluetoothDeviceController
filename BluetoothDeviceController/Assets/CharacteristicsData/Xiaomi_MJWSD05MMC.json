@@ -8,7 +8,8 @@
         "https://www.mi.com/global/product/xiaomi-smart-temperature-and-humidity-monitor-3/specs/",
         "https://github.com/keks51/lywsd03mmc-client",
         "https://github.com/pvvx/ATC_MiThermometer",
-        "https://community.home-assistant.io/t/how-to-properly-integrate-xiaomi-thermometer-3-mjwsd05mmc/836078"
+        "https://community.home-assistant.io/t/how-to-properly-integrate-xiaomi-thermometer-3-mjwsd05mmc/836078",
+        "https://github.com/esphome/feature-requests/issues/643"
       ],
       "CompletionStatus": 0,
       "Services": [
@@ -259,7 +260,7 @@
             },
             {
               "UUID": "ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6",
-              "Name": "TempHumidity",
+              "Name": "TemperatureHumidityBattery",
               "Type": "U16^100_/|DEC|Temperature|C U16^512_/|DEC|Humidity|% U8|DEC|BatteryLevel",
               "DataGroupName": "Environment_Data",
               "IsRead": true,
@@ -313,7 +314,7 @@
               "IsWrite": true,
               "Verbs": ":Read:Write:RdInNo:WrWw:",
               "ExampleData": [
-                "00 Hex:00  0=24h "
+                "00 Hex:00  0=24h 1=12h"
               ]
             }
           ]

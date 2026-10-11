@@ -251,8 +251,13 @@ namespace BluetoothWatcher.AdvertismentWatcher
             {
                 return;
             }
+            var name = String.IsNullOrEmpty(watcherData.BestName) ? "" : $"name={watcherData.BestName} ";
 
-            var ignoreForPrinting = isOldAdvertisement || watcherData.ManufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10;
+            var ignoreForPrinting = isOldAdvertisement 
+                || watcherData.ManufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10
+                || watcherData.CompanyId == 0x4C // Apple is 76 (dec) = 0x4C
+                || name.StartsWith("LEDBlue") // TODO: it spits out a lot of advertisements!
+                ;
             if (!ignoreForPrinting)
             {
                 // don't bother spiting out apple data; there's much too much of it
@@ -262,7 +267,6 @@ namespace BluetoothWatcher.AdvertismentWatcher
                     company = "(no company data)";
                     if (!string.IsNullOrEmpty(watcherData.ParsedCompanyDataTrim)) company = watcherData.ParsedCompanyDataTrim;
                 }
-                var name = String.IsNullOrEmpty(watcherData.BestName) ? "" : $"name={watcherData.BestName} ";
                 var tx = $"tx={watcherData.TransmitPower}  txarg={args.TransmitPowerLevelInDBm} ";
                 if (!args.TransmitPowerLevelInDBm.HasValue && watcherData.TransmitPower == null) tx = "";
                 System.Diagnostics.Debug.WriteLine($"Bluetooth Event: addr={BluetoothAddress.AsString(args.BluetoothAddress)} rx={args.RawSignalStrengthInDBm} {tx}{name}{company}");

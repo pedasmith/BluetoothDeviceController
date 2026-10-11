@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Thermometer / Hygrometer / Clock with large LCD display..
-    /// This class was automatically generated 2026-10-09::20:00
+    /// This class was automatically generated 2026-10-10::11:13
     /// </summary>
 
     public  class Xiaomi_MJWSD05MMC_Thermometer : INotifyPropertyChanged
@@ -51,7 +51,7 @@ namespace BluetoothProtocols
                 LastHourData characteristic has LastHourData (Bytes-->string)  Guid=ebe0ccbb-7a0a-4b0c-8a1a-6ff2997da3a6
                 FirstHistoryRecordIndex characteristic has FirstHistoryRecordIndex (Bytes-->string)  Guid=ebe0ccbc-7a0a-4b0c-8a1a-6ff2997da3a6
                 TemperatureUnits characteristic has TemperatureUnits (Byte-->double)  Guid=ebe0ccbe-7a0a-4b0c-8a1a-6ff2997da3a6
-                TempHumidity characteristic has Temperature (UInt16-->double) Humidity (UInt16-->double) BatteryLevel (Byte-->double)  Guid=ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6
+                TemperatureHumidityBattery characteristic has Temperature (UInt16-->double) Humidity (UInt16-->double) BatteryLevel (Byte-->double)  Guid=ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6
                 TemperatureCalibration characteristic has CalibrationData (Bytes-->string)  Guid=ebe0ccc2-7a0a-4b0c-8a1a-6ff2997da3a6
                 Battery characteristic has param0 (Byte-->double)  Guid=ebe0ccc4-7a0a-4b0c-8a1a-6ff2997da3a6
                 Disconnect characteristic has DisconnectDAta (Bytes-->string)  Guid=ebe0ccc8-7a0a-4b0c-8a1a-6ff2997da3a6
@@ -104,7 +104,7 @@ namespace BluetoothProtocols
         public const string LastHourDataPropertyChangedName = "LastHourData";
         public const string FirstHistoryRecordIndexPropertyChangedName = "FirstHistoryRecordIndex";
         public const string TemperatureUnitsPropertyChangedName = "TemperatureUnits";
-        public const string TempHumidityPropertyChangedName = "TempHumidity";
+        public const string TemperatureHumidityBatteryPropertyChangedName = "TemperatureHumidityBattery";
         public const string TemperatureCalibrationPropertyChangedName = "TemperatureCalibration";
         public const string BatteryPropertyChangedName = "Battery";
         public const string DisconnectPropertyChangedName = "Disconnect";
@@ -213,7 +213,7 @@ namespace BluetoothProtocols
 
             private double _Temperature = 0;
             /// <summary>
-            /// Temperature (U16 C) from Service=Environment and Characteristic=TempHumidity
+            /// Temperature (U16 C) from Service=Environment and Characteristic=TemperatureHumidityBattery
             ///</summary>
             public double Temperature 
             { 
@@ -222,7 +222,7 @@ namespace BluetoothProtocols
             }
             private double _Humidity = 0;
             /// <summary>
-            /// Humidity (U16 %) from Service=Environment and Characteristic=TempHumidity
+            /// Humidity (U16 %) from Service=Environment and Characteristic=TemperatureHumidityBattery
             ///</summary>
             public double Humidity 
             { 
@@ -231,7 +231,7 @@ namespace BluetoothProtocols
             }
             private double _BatteryLevel = 0;
             /// <summary>
-            /// BatteryLevel (U8 ) from Service=Environment and Characteristic=TempHumidity
+            /// BatteryLevel (U8 ) from Service=Environment and Characteristic=TemperatureHumidityBattery
             ///</summary>
             public double BatteryLevel 
             { 
@@ -1068,7 +1068,7 @@ namespace BluetoothProtocols
             Environment_LastHourData_index = 3,     // GUID ebe0ccbb-7a0a-4b0c-8a1a-6ff2997da3a6
             Environment_FirstHistoryRecordIndex_index = 4,     // GUID ebe0ccbc-7a0a-4b0c-8a1a-6ff2997da3a6
             Environment_TemperatureUnits_index = 5,     // GUID ebe0ccbe-7a0a-4b0c-8a1a-6ff2997da3a6
-            Environment_TempHumidity_index = 6,     // GUID ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6
+            Environment_TemperatureHumidityBattery_index = 6,     // GUID ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6
             Environment_TemperatureCalibration_index = 7,     // GUID ebe0ccc2-7a0a-4b0c-8a1a-6ff2997da3a6
             Environment_Battery_index = 8,     // GUID ebe0ccc4-7a0a-4b0c-8a1a-6ff2997da3a6
             Environment_Disconnect_index = 9,     // GUID ebe0ccc8-7a0a-4b0c-8a1a-6ff2997da3a6
@@ -1152,7 +1152,7 @@ namespace BluetoothProtocols
             Guid.Parse("ebe0ccbb-7a0a-4b0c-8a1a-6ff2997da3a6"), // #3 is Environment LastHourData
             Guid.Parse("ebe0ccbc-7a0a-4b0c-8a1a-6ff2997da3a6"), // #4 is Environment FirstHistoryRecordIndex
             Guid.Parse("ebe0ccbe-7a0a-4b0c-8a1a-6ff2997da3a6"), // #5 is Environment TemperatureUnits
-            Guid.Parse("ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6"), // #6 is Environment TempHumidity
+            Guid.Parse("ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6"), // #6 is Environment TemperatureHumidityBattery
             Guid.Parse("ebe0ccc2-7a0a-4b0c-8a1a-6ff2997da3a6"), // #7 is Environment TemperatureCalibration
             Guid.Parse("ebe0ccc4-7a0a-4b0c-8a1a-6ff2997da3a6"), // #8 is Environment Battery
             Guid.Parse("ebe0ccc8-7a0a-4b0c-8a1a-6ff2997da3a6"), // #9 is Environment Disconnect
@@ -1465,7 +1465,7 @@ namespace BluetoothProtocols
             CurrEnvironment_Data.TemperatureUnits = vr.GetNextDouble();
             OnPropertyChanged(TemperatureUnitsPropertyChangedName); // "TemperatureUnits"
         }
-        // Per-characteristics methods for Environment TempHumidity
+        // Per-characteristics methods for Environment TemperatureHumidityBattery
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -1473,15 +1473,15 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyTempHumidityAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyTemperatureHumidityBatteryAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("TempHumidity", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_TempHumidity_index, NotifyTempHumidityCallback, notifyType);
+            var retval = await SetupNotifyAsync("TemperatureHumidityBattery", ServiceIndex.Environment_index, "Environment", CharacteristicIndex.Environment_TemperatureHumidityBattery_index, NotifyTemperatureHumidityBatteryCallback, notifyType);
             return retval;
         }
 
-        private void NotifyTempHumidityCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyTemperatureHumidityBatteryCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Environment_TempHumidity_index;
+            var index = (int)CharacteristicIndex.Environment_TemperatureHumidityBattery_index;
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U16^100_/|DEC|Temperature|C U16^512_/|DEC|Humidity|% U8|DEC|BatteryLevel");
             var vr = ValueParsers[index];
 
@@ -1490,7 +1490,7 @@ namespace BluetoothProtocols
             CurrEnvironment_Data.Temperature = vr.GetNextDouble();
             CurrEnvironment_Data.Humidity = vr.GetNextDouble();
             CurrEnvironment_Data.BatteryLevel = vr.GetNextDouble();
-            OnPropertyChanged(TempHumidityPropertyChangedName); // "TempHumidity"
+            OnPropertyChanged(TemperatureHumidityBatteryPropertyChangedName); // "TemperatureHumidityBattery"
         }
         // Per-characteristics methods for Environment TemperatureCalibration
         /// <summary>
@@ -1781,21 +1781,21 @@ namespace BluetoothProtocols
             return CurrEnvironment_Data;
         }
         /// <summary>
-        /// Reads data from TempHumidity and triggers an OnPropertyChanged
+        /// Reads data from TemperatureHumidityBattery and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Environment_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Environment_Data> ReadTempHumidity(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<Environment_Data> ReadTemperatureHumidityBattery(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Environment_TempHumidity_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "TempHumidity");
+            var index = CharacteristicIndex.Environment_TemperatureHumidityBattery_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "TemperatureHumidityBattery");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "TempHumidity", cacheMode);
+            IBuffer result = await ReadAsync(ch, "TemperatureHumidityBattery", cacheMode);
             if (result == null) return null;
 
             if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U16^100_/|DEC|Temperature|C U16^512_/|DEC|Humidity|% U8|DEC|BatteryLevel");
@@ -1806,7 +1806,7 @@ namespace BluetoothProtocols
             CurrEnvironment_Data.Humidity = vr.GetNextDouble();
             CurrEnvironment_Data.BatteryLevel = vr.GetNextDouble();
             CurrEnvironment_Data.TimestampMostRecent = DateTimeOffset.Now;
-            OnPropertyChanged(TempHumidityPropertyChangedName); // "TempHumidity"
+            OnPropertyChanged(TemperatureHumidityBatteryPropertyChangedName); // "TemperatureHumidityBattery"
             return CurrEnvironment_Data;
         }
         /// <summary>
@@ -1947,107 +1947,114 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to ClockTime 
         /// </summary>
-        public async Task WriteClockTime(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteClockTime(byte[] data)
         {
             var index = CharacteristicIndex.Environment_ClockTime_index;
             await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "ClockTime");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("WriteClockTime", result);
+            return result;
         }
         /// <summary>
         /// Writes data to SingleRecord 
         /// </summary>
-        public async Task WriteSingleRecord(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteSingleRecord(byte[] data)
         {
             var index = CharacteristicIndex.Environment_SingleRecord_index;
             await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "SingleRecord");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("WriteSingleRecord", result);
+            return result;
         }
         /// <summary>
         /// Writes data to TemperatureUnits 
         /// </summary>
-        public async Task WriteTemperatureUnits(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteTemperatureUnits(byte[] data)
         {
             var index = CharacteristicIndex.Environment_TemperatureUnits_index;
             await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "TemperatureUnits");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("WriteTemperatureUnits", result);
+            return result;
         }
         /// <summary>
         /// Writes data to TemperatureCalibration 
         /// </summary>
-        public async Task WriteTemperatureCalibration(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteTemperatureCalibration(byte[] data)
         {
             var index = CharacteristicIndex.Environment_TemperatureCalibration_index;
             await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "TemperatureCalibration");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("WriteTemperatureCalibration", result);
+            return result;
         }
         /// <summary>
         /// Writes data to Disconnect 
         /// </summary>
-        public async Task WriteDisconnect(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteDisconnect(byte[] data)
         {
             var index = CharacteristicIndex.Environment_Disconnect_index;
             await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "Disconnect");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("WriteDisconnect", result);
+            return result;
         }
         /// <summary>
         /// Writes data to MiHomeCommand 
         /// </summary>
-        public async Task WriteMiHomeCommand(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteMiHomeCommand(byte[] data)
         {
             var index = CharacteristicIndex.Environment_MiHomeCommand_index;
             await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "MiHomeCommand");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("WriteMiHomeCommand", result);
+            return result;
         }
         /// <summary>
         /// Writes data to TimeMode 
         /// </summary>
-        public async Task WriteTimeMode(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteTimeMode(byte[] data)
         {
             var index = CharacteristicIndex.Environment_TimeMode_index;
             await Ensure_Characteristic_Async(ServiceIndex.Environment_index, "Environment", index, "TimeMode");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("WriteTimeMode", result);
+            return result;
         }
 
         #endregion
@@ -2782,17 +2789,18 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to OTABytes 
         /// </summary>
-        public async Task WriteOTABytes(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteOTABytes(byte[] data)
         {
             var index = CharacteristicIndex.TELink_OTA_OTABytes_index;
             await Ensure_Characteristic_Async(ServiceIndex.TELink_OTA_index, "TELink OTA", index, "OTABytes");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("WriteOTABytes", result);
+            return result;
         }
 
         #endregion
@@ -2909,17 +2917,18 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to Unknown0 
         /// </summary>
-        public async Task WriteUnknown0(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteUnknown0(byte[] data)
         {
             var index = CharacteristicIndex.Unknown9_Unknown0_index;
             await Ensure_Characteristic_Async(ServiceIndex.Unknown9_index, "Unknown9", index, "Unknown0");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("WriteUnknown0", result);
+            return result;
         }
 
         #endregion

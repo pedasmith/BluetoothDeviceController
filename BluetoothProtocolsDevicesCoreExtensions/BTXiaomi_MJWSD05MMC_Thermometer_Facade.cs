@@ -1,5 +1,10 @@
 ﻿using BluetoothProtocols;
 using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Storage.Streams;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -7,12 +12,54 @@ using System;
 
 namespace BluetoothProtocolsDevicesCoreExtensions
 {
+    public static class Xiaomi_MJWSD05MMC_Thermometer_Extensions
+    {
+        public enum TimeMode {  H24=0, H12=1 };
+        public enum TemperatureUnits { C = 0, F = 1 };
+        public static async Task<GattCommunicationStatus?> SetTimeModeAsync(this Xiaomi_MJWSD05MMC_Thermometer therm, TimeMode timeMode)
+        {
+            var data = new byte[] { (byte)timeMode };
+            var result = await therm.WriteTimeMode(data);
+            return result;
+        }
+
+        public static async Task<GattCommunicationStatus?> SetTemperatureUnitsAsync(this Xiaomi_MJWSD05MMC_Thermometer therm, TemperatureUnits temperatureUnits)
+        {
+            var data = new byte[] { (byte)temperatureUnits };
+            var result = await therm.WriteTemperatureUnits(data);
+            return result;
+        }
+
+        public static async Task<GattCommunicationStatus?> WriteClockTime(this Xiaomi_MJWSD05MMC_Thermometer therm, UInt32 unixTimestamp, Int16 timeZone)
+        {
+            var dw = new DataWriter();
+            dw.ByteOrder = ByteOrder.LittleEndian; // Bluetooth is little endian by default
+            dw.WriteUInt32(unixTimestamp);
+            if (timeZone < 0) timeZone += 256; // https://github.com/esphome/feature-requests/issues/643
+            dw.WriteInt16(timeZone);
+            //await dw.StoreAsync(); will throw, which is silly
+            var buffer = dw.DetachBuffer();
+            var data = buffer.ToArray();
+            var result = await therm.WriteClockTime(data);
+
+            // Read the value back.
+            var result2 = await therm.ReadClockTime(Windows.Devices.Bluetooth.BluetoothCacheMode.Uncached);
+            var readTimestamp = result2.UnixTimestamp;
+            var delta = unixTimestamp - readTimestamp;
+            return result;
+        }
+
+    }
+    /// <summary>
+    /// Simple (and arguably not needed) facade over the Xiaomi_MJWSD05MMC_Thermometer.Environment_Data
+    /// class. That class is a huge class that covers a ton of features that are mostly not needed.
+    /// </summary>
     public class BTXiaomi_MJWSD05MMC_Thermometer_Facade : BTCommonMetaData<BTXiaomi_MJWSD05MMC_Thermometer_Facade>
     {
         #region From_Xiaomi_Environment_Data
         private double _Temperature = 0;
         /// <summary>
-        /// Temperature (U16 C) from Service=Environment and Characteristic=TempHumidity
+        /// Temperature (U16 C) from Service=Environment and Characteristic=TemperatureHumidityBattery
         ///</summary>
         public double Temperature
         {
@@ -21,7 +68,7 @@ namespace BluetoothProtocolsDevicesCoreExtensions
         }
         private double _Humidity = 0;
         /// <summary>
-        /// Humidity (U16 %) from Service=Environment and Characteristic=TempHumidity
+        /// Humidity (U16 %) from Service=Environment and Characteristic=TemperatureHumidityBattery
         ///</summary>
         public double Humidity
         {
@@ -30,7 +77,7 @@ namespace BluetoothProtocolsDevicesCoreExtensions
         }
         private double _BatteryLevel = 0;
         /// <summary>
-        /// BatteryLevel (U8 ) from Service=Environment and Characteristic=TempHumidity
+        /// BatteryLevel (U8 ) from Service=Environment and Characteristic=TemperatureHumidityBattery
         ///</summary>
         public double BatteryLevel
         {

@@ -1,6 +1,7 @@
 #region Usings stay the same
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
+using BluetoothProtocolsDevicesCoreExtensions;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
@@ -24,7 +25,9 @@ namespace BluetoothWinUI3;
 
 #endregion
 using static BluetoothProtocols.TI_SensorTag_1352;
-using DeviceSpecificType = Xiaomi_MJWSD05MMC_Thermometer; // Modify: pick your device, not BTSimple_Demo
+//using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Modify: pick secondary sensor if needed
+using DeviceSpecificBatteryData = Xiaomi_MJWSD05MMC_Thermometer.Battery_Data; // Modify: many device support battery
+// Modify these to match your device
 using DeviceSpecificSensorData = Xiaomi_MJWSD05MMC_Thermometer.Environment_Data; // Modify: 
 // The DeviceSpecificDataUnits should be set either to the DeviceSpecificSensorData or to a data facade.
 // Use the DeviceSpecificSensorData if it has the data you want to the user to see
@@ -34,8 +37,7 @@ using DeviceSpecificSensorData = Xiaomi_MJWSD05MMC_Thermometer.Environment_Data;
 // Not using a facade? Then the line below is what you want (but modify it!)
 //using DeviceSpecificSensorDataUnits = TI_SensorTag_1352.Temperature_Data; // Modify: Often the same as the DeviceSpecificSensorData
 using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.BTXiaomi_MJWSD05MMC_Thermometer_Facade; // Modify: Often the same as the DeviceSpecificSensorData
-//using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Modify: pick secondary sensor if needed
-using DeviceSpecificBatteryData = Xiaomi_MJWSD05MMC_Thermometer.Battery_Data; // Modify: many device support battery                                                                // Modify these to match your device
+using DeviceSpecificType = Xiaomi_MJWSD05MMC_Thermometer; // Modify: pick your device, not BTSimple_Demo
 
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -193,7 +195,7 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
         // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            ( DeviceSpecificType.TempHumidityPropertyChangedName, uiTemperatureChange),
+            ( DeviceSpecificType.TemperatureHumidityBatteryPropertyChangedName, uiTemperatureChange),
         };
 
         // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
@@ -378,8 +380,10 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
         // Modify so the device starts sending notifications for changed properties (data)
 
         // Modify: tell the device to start sending sensor and battery data back.
-        await Device.NotifyTempHumidityAsync();
-        await Device.ReadTempHumidity();
+        await Device.NotifyTemperatureHumidityBatteryAsync();
+        await Device.NotifyClockTimeAsync();
+        await Device.ReadTemperatureHumidityBattery();
+        await Device.ReadClockTime();
 
 
 #if YOUR_CODE_MIGHT_NEED_TO_QUERY_DEVICE
@@ -630,7 +634,7 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
         switch (name)
         {
             // In your code, hook up the right sensors to the right XAML
-            case DeviceSpecificType.TempHumidityPropertyChangedName: // Modify: update the UX as appropriate
+            case DeviceSpecificType.TemperatureHumidityBatteryPropertyChangedName: // Modify: update the UX as appropriate
                 uiTemperature.Text = CurrSensor_DataUnits.Temperature.ToString("F2");
                 uiHumidity.Text = CurrSensor_DataUnits.Humidity.ToString("F2"); // Modify: update the UX as appropriate
                 // Only the sensor data gets plotted as historical data. In the demo,
@@ -639,6 +643,16 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
                 // The historical data is updated from the CurrSensor_DataUnits
                 UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
 
+                break;
+
+            case DeviceSpecificType.ClockTimePropertyChangedName:
+                {
+                    var unixLocalTime = CurrSensor_Data.UnixTimestamp;
+                    DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var time = epoch.AddSeconds(unixLocalTime).ToLocalTime();
+                    uiClockTime.Text = time.ToString("HH:mm:ss");
+                    //uiClockTime.Text = time.ToShortTimeString();
+                }
                 break;
         }
 
@@ -721,4 +735,85 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
     }
     #endregion
 
+
+
+    private async void OnSetTemperatureUnits(object sender, RoutedEventArgs e)
+    {
+        var tag = (sender as FrameworkElement).Tag as string;
+        if (string.IsNullOrEmpty(tag)) return;
+        var value = tag == "C" ? Xiaomi_MJWSD05MMC_Thermometer_Extensions.TemperatureUnits.C: Xiaomi_MJWSD05MMC_Thermometer_Extensions.TemperatureUnits.F;
+        await Device.SetTemperatureUnitsAsync(value);
+    }
+
+    private async void OnSetTimeMode(object sender, RoutedEventArgs e)
+    {
+        var tag = (sender as FrameworkElement).Tag as string;
+        if (string.IsNullOrEmpty(tag)) return;
+        var value = tag == "H12" ? Xiaomi_MJWSD05MMC_Thermometer_Extensions.TimeMode.H12 : Xiaomi_MJWSD05MMC_Thermometer_Extensions.TimeMode.H24;
+        await Device.SetTimeModeAsync(value);
+    }
+
+    private async void OnSetClock(object sender, RoutedEventArgs e)
+    {
+        var tag = (sender as FrameworkElement).Tag as string;
+        if (string.IsNullOrEmpty(tag)) return;
+        switch (tag)
+        {
+            case "Arbitrary":
+                {
+                    var sp = new StackPanel();
+                    var tbYear = new TextBox { Header = "Year", Width = 90, Text="2026" };
+                    var tbMonth = new TextBox { Header = "Month", Width = 90, Text="10" };
+                    var tbDay = new TextBox { Header = "Day", Width = 90, Text="11" };
+                    var tbHour = new TextBox { Header = "Hour", Width = 90, Text="1" };
+                    var tbMinute = new TextBox { Header = "Minute", Width = 90, Text="2" };
+                    sp.Children.Add(tbYear);
+                    sp.Children.Add(tbMonth);
+                    sp.Children.Add(tbDay);
+                    sp.Children.Add(tbHour);
+                    sp.Children.Add(tbMinute);
+
+                    var dialog = new ContentDialog
+                    {
+                        Title = "Set Clock Time",
+                        Content = sp,
+                        PrimaryButtonText = "Set",
+                        XamlRoot = this.XamlRoot,
+                    };
+                    await dialog.ShowAsync();
+                    var now = DateTimeOffset.Now;
+                    var time = new DateTimeOffset(
+                        int.Parse(tbYear.Text),
+                        int.Parse(tbMonth.Text),
+                        int.Parse(tbDay.Text),
+                        int.Parse(tbHour.Text),
+                        int.Parse(tbMinute.Text),
+                        0, // Seconds
+                        now.Offset
+                        );
+                    var seconds = (UInt32)time.ToUnixTimeSeconds();
+                    var tzhour = (Int16)time.Offset.TotalHours;
+                    await Device.WriteClockTime(seconds, tzhour);
+                }
+                break;
+            case "Zero":
+                await Device.WriteClockTime(0, 0);
+                break;
+            case "Now":
+                {
+                    var now = DateTimeOffset.Now;
+                    var seconds = (UInt32)now.ToUnixTimeSeconds();
+                    var delta = now.Offset.TotalSeconds;
+                    var tzhour = (Int16)now.Offset.TotalHours;
+                    await Device.WriteClockTime(seconds, tzhour);
+                }
+                break;
+        }
+
+    }
+
+    private async void OnReadClock(object sender, RoutedEventArgs e)
+    {
+        await Device.ReadClockTime();
+    }
 } // end of class BTXiaomi_MJWSD05MMC_ThermometerControl // Modify: update the comment to match the class name

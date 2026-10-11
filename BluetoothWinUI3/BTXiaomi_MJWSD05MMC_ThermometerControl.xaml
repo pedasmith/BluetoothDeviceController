@@ -40,10 +40,31 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Humidity</Run><Run Text="&#160;"/><Run x:Name="uiHumidityChange" Text="┄"/>
+                        <Run>Humidity</Run>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiHumidity"/></TextBlock>
                         <Line Tag="HumidityColor" Style="{StaticResource sGraphLineKey}" />
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource sDeviceDataPanel}">
+                        <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiClockTime"/></TextBlock>
+                        <Button Content="⛭">
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Set clock to now" Click="OnSetClock" Tag="Now" />
+                                    <MenuFlyoutItem Text="C" Click="OnSetTemperatureUnits" Tag="C"/>
+                                    <MenuFlyoutItem Text="F" Click="OnSetTemperatureUnits" Tag="F" />
+                                    <MenuFlyoutItem Text="12h" Click="OnSetTimeMode" Tag="H12"/>
+                                    <MenuFlyoutItem Text="24h" Click="OnSetTimeMode" Tag="H24" />
+                                    <!-- These are just for advanced debugging
+                                    <MenuFlyoutItem Text="Read Time" Click="OnReadClock"  />
+                                    <MenuFlyoutItem Text="Set clock arb" Click="OnSetClock" Tag="Arbitrary" />
+                                    -->
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                        <StackPanel Orientation="Horizontal">
+                        </StackPanel>
                     </StackPanel>
                 </GridView>
 

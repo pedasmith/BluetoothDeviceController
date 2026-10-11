@@ -648,17 +648,18 @@ TODO: set up If= for the rest of the calls :-)
         /// <summary>
         /// Writes data to [[CharacteristicName]] 
         /// </summary>
-        public async Task Write[[CharacteristicName.dotNet]](byte[] data)
+        public async Task<GattCommunicationStatus?> Write[[CharacteristicName.dotNet]](byte[] data)
         {
             var index = CharacteristicIndex.[[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index;
             await Ensure_Characteristic_Async(ServiceIndex.[[ServiceName.dotNet]]_index, "[[ServiceName]]", index, "[[CharacteristicName]]");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
-                return;
+                return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
             Status.ReportStatus("Write[[CharacteristicName.dotNet]]", result);
+            return result;
         }
 ```
 

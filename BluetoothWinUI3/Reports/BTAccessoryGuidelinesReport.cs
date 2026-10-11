@@ -401,7 +401,7 @@ class BTAccessoryGuidelinesReport
                 return retval;
             }
         }
-        retval.AddPass(SingleTestResult.TestResult.Pass, $"Connection min, max contains one of the recommended values");
+        retval.AddPass(SingleTestResult.TestResult.Pass, $"Device Information Service DIS was set correctly");
         return retval;
     }
 
