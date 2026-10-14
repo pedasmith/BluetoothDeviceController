@@ -1,0 +1,204 @@
+{
+  "AllDevices": [
+    {
+      "Name": "Bluetooth DMM",
+      "ClassName": "BDM_Aneng_Multimeter",
+      "Links": [
+        "https://github.com/libreble/multimeter/blob/main/docs/protocols/bdm.md",
+        "https://github.com/libreble/multimeter/blob/main/packages/protocol/src/drivers/bdm.ts",
+        "https://github.com/ludwich66/Bluetooth-DMM/wiki/Protocol-all-Variants",
+        "https://github.com/ludwich66/Bluetooth-DMM/wiki/Bluetooth-DMM-11-Byte-Data-Protocol",
+        "https://github.com/ludwich66/Bluetooth-DMM/wiki"
+      ],
+      "CompletionStatus": 0,
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "DataGroupName": "Common Configuration_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                " Hex:"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "DataGroupName": "Common Configuration_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Unknown Hex:00 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Suppress":  true,
+          "Name": "Generic Service"
+        },
+        {
+          "UUID": "0000fff0-0000-1000-8000-00805f9b34fb",
+          "Name": "Multimeter",
+          "Characteristics": [
+            {
+              "UUID": "0000fff4-0000-1000-8000-00805f9b34fb",
+              "Name": "MultimeterData",
+              "Type": "BYTES|HEX|Data",
+              "DataGroupName": "Multimeter_Data",
+              "IsRead": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Read:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:",
+              "ExampleData": [
+                "1B 84 70 51 48 9A DC 7E 66 AC 3A : BDM if [0]=1B [1]=84 len=11"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000180a-0000-1000-8000-00805f9b34fb",
+          "Name": "Device Info",
+          "Description": "Includes details on the manufacturer, model, firmware versions, and PNP ID",
+          "Characteristics": [
+            {
+              "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
+              "Name": "Manufacturer Name",
+              "Type": "STRING|ASCII|ManufacturerName",
+              "DataGroupName": "Device Info_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "BEKEN SAS Hex:BEKEN SAS"
+              ]
+            },
+            {
+              "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
+              "Name": "Model Number",
+              "Type": "STRING|ASCII|ModelNumber",
+              "DataGroupName": "Device Info_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "BK-BLE-1.0 Hex:BK-BLE-1.0"
+              ]
+            },
+            {
+              "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
+              "Name": "Serial Number",
+              "Type": "STRING|ASCII|SerialNumber",
+              "DataGroupName": "Device Info_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "1.0.0.0-LE Hex:1.0.0.0-LE"
+              ]
+            },
+            {
+              "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
+              "Name": "Hardware Revision",
+              "Type": "STRING|ASCII|HardwareRevision",
+              "DataGroupName": "Device Info_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "1.0.0 Hex:1.0.0"
+              ]
+            },
+            {
+              "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
+              "Name": "Firmware Revision",
+              "Type": "STRING|ASCII|FirmwareRevision",
+              "DataGroupName": "Device Info_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "6.1.2 Hex:6.1.2"
+              ]
+            },
+            {
+              "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
+              "Name": "Software Revision",
+              "Type": "STRING|ASCII|SoftwareRevision",
+              "DataGroupName": "Device Info_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "6.3.0 Hex:6.3.0"
+              ]
+            },
+            {
+              "UUID": "00002a23-0000-1000-8000-00805f9b34fb",
+              "Name": "System ID",
+              "Type": "STRING|ASCII|SystemId",
+              "DataGroupName": "Device Info_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "12 34 56 FF FE 9A BC DE Hex:12 34 56 FF FE 9A BC DE"
+              ]
+            },
+            {
+              "UUID": "00002a2a-0000-1000-8000-00805f9b34fb",
+              "Name": "Regulatory List",
+              "Type": "U8|HEX|BodyType U8|HEX|BodyStructure STRING|ASCII|Data",
+              "DataGroupName": "Device Info_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "FF EE DD CC BB AA Hex:FF EE DD CC BB AA"
+              ]
+            },
+            {
+              "UUID": "00002a50-0000-1000-8000-00805f9b34fb",
+              "Name": "PnP ID",
+              "Type": "U8|HEX|VendorIDSource U16|DEC|VendorID U16|DEC|ProductID U16|DEC|ProductVersion",
+              "DataGroupName": "Device Info_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "02 1118 64 768 Hex:02 5E 04 40 00 00 03"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000ffc0-0451-4000-b000-000000000000",
+          "Name": "TI OTA OTD",
+          "Suppress":  true,
+          "Characteristics": [
+            {
+              "UUID": "f000ffc1-0451-4000-b000-000000000000",
+              "Name": "OTD Identify",
+              "Type": "BYTES|HEX|OTD_Image_ID",
+              "DataGroupName": "TI_OTD",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Write:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:"
+            },
+            {
+              "UUID": "f000ffc2-0451-4000-b000-000000000000",
+              "Name": "OTD Image Block",
+              "Type": "BYTES|HEX|OTD_Image_DL",
+              "DataGroupName": "TI_OTD",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Write:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:"
+            }
+          ]
+        }
+      ],
+      "Details": "Device details:"
+    }
+  ]
+}

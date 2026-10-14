@@ -23,6 +23,8 @@ namespace BluetoothProtocolsDevicesCore
 
         public int Count { get { return Data.Count; } }
 
+        public int MaxDataCount { get; set; } = int.MaxValue;
+
         public void Update(SensorData value, Verb verb)
         {
             if (verb == Verb.ReplaceMostRecent && Data.Count == 0)
@@ -40,6 +42,10 @@ namespace BluetoothProtocolsDevicesCore
         {
             TimestampMostRecentAdd = value.TimestampMostRecent;
             Data.Add(value.Clone() as SensorData);
+            while (Data.Count > MaxDataCount)
+            {
+                Data.RemoveAt(0); // In reality, this deletes just one item!
+            }
         }
         public void ReplaceMostRecent(SensorData value)
         {

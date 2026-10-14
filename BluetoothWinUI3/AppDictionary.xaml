@@ -83,7 +83,12 @@
             <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_3" Color="#FF23197B" />
             <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_4" Color="#FF2A1B88" />
 
-
+            <!-- Not part of the pastel colored rainbow selcted by Copilot AI -->
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_0" Color="#FF121212" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_1" Color="#FF222222" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_2" Color="#FF323232" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_3" Color="#FF424342" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_4" Color="#FF525252" />
         </ResourceDictionary>
         
         <ResourceDictionary x:Key="Light">
@@ -165,6 +170,13 @@
             <SolidColorBrush x:Key="sDeviceBorder_Background_TestEquipment_4" Color="#FFDCF1F4" />
 
 
+            <!-- Not part of the pastel colored rainbow. Color selected by Copilot AI -->
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_0" Color="#FFF7F7F7" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_1" Color="#FFE1E1E1" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_2" Color="#FFDDDDDD" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_3" Color="#FFD1D1D1" />
+            <SolidColorBrush x:Key="sDeviceBorder_Background_Multimeter_4" Color="#FFCCCCCC" />
+
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 
@@ -199,9 +211,12 @@
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Margin" Value="0"/>
     </Style>
-    
+
     <Style x:Key="sDeviceDataPanel" TargetType="StackPanel">
         <Setter Property="Width" Value="120" />
+    </Style>
+    <Style x:Key="sDeviceDataPanelWide" TargetType="StackPanel" BasedOn="{StaticResource sDeviceDataPanel}">
+        <Setter Property="Width" Value="240" />
     </Style>
 
     <Style x:Key="sZoomableDeviceBorder" TargetType="Border" BasedOn="{StaticResource sDeviceBorder}">
@@ -239,6 +254,9 @@
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="26" />
         <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="sDevicePrimaryDataXLarge" TargetType="TextBlock" BasedOn="{StaticResource sDevicePrimaryData}">
+        <Setter Property="FontSize" Value="48" />
     </Style>
     <Style x:Key="sAdvertisementData" TargetType="TextBlock" BasedOn="{StaticResource sDeviceListDataCompressed}">
         <Setter Property="FontWeight" Value="Normal" />

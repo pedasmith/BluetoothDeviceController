@@ -404,7 +404,7 @@ namespace BluetoothWinUI3
         {
             ;
         }
-        public static uint ColorIsDefault = 0xAA000000; // Valid but uncommon ARGB color.
+        public const uint ColorIsDefault = 0xAA000000; // Valid but uncommon ARGB color.
         /// <summary>
         /// Color is a uint of ARGB (msb to lsb, of course)
         /// </summary>
@@ -438,9 +438,23 @@ namespace BluetoothWinUI3
     /// </summary>
     public class DeviceColorBrushes
     {
-        public DeviceColorBrushes(DeviceColors colors, KnownDeviceUserPreferences preferences)
+        private static Color ColorFromUInt(uint color)
+        {
+            Color retval = new();
+            retval.A = (byte)((color & 0xFF000000) >> 24);
+            retval.R = (byte)((color & 0x00FF0000) >> 16);
+            retval.G = (byte)((color & 0x0000FF00) >>  8);
+            retval.B = (byte)((color & 0x000000FF) >>  0);
+            return retval;
+        }
+        public DeviceColorBrushes(DeviceColors colors, KnownDeviceUserPreferences preferences, uint devicePreferredTextColorLight = DeviceColors.ColorIsDefault)
         {
             TextColorBrush = UtilitiesWinUI3.UtilitiesWinUI3.GetBrush(colors.TextColor);
+            if (TextColorBrush == null && devicePreferredTextColorLight != DeviceColors.ColorIsDefault)
+            {
+                var color = ColorFromUInt(devicePreferredTextColorLight);
+                TextColorBrush = new SolidColorBrush(color);
+            }
             BackgroundColorBrush = UtilitiesWinUI3.UtilitiesWinUI3.GetBrush(colors.BackgroundColor);
             if (BackgroundColorBrush == null)
             {
@@ -484,6 +498,13 @@ namespace BluetoothWinUI3
 
         public static void SetUxColors(UIElement root, DeviceColorBrushes brushes, string tags="", int preferredIndex = -1)
         {
+            if (root == null) return; // no children or settings. Can get here because e.g., ItemsControl might have random items that aren't UIElements
+
+            var tag = (root as FrameworkElement)?.Tag as string;
+            if (tag != null && tag.Contains ("TODO:"))
+            {
+                ; // Handy place for a debugger
+            }
             if (root is TextBlock tb)
             {
                 if (brushes.TextColorBrush != null) tb.Foreground = brushes.TextColorBrush;
@@ -503,8 +524,16 @@ namespace BluetoothWinUI3
             }
             else if (root is Panel parent)
             {
-                foreach (var child in parent.Children) 
+                foreach (var child in parent.Children)
                 {
+                    SetUxColors(child, brushes, tags, preferredIndex);
+                }
+            }
+            else if (root is ItemsControl items)
+            {
+                foreach (var obj in items.Items)
+                {
+                    var child = obj as UIElement;
                     SetUxColors(child, brushes, tags, preferredIndex);
                 }
             }

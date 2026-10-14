@@ -51,7 +51,9 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
-    /// Common tags: environment exersise health cooking agriculture light
+    /// Common tags: environment exersise health cooking agriculture light testequipment report utility other
+    /// Other tags: cycling heartrate pulseoximeter security entertainment productivity multimeter oscilloscope
+    /// Full list in tagToResourceKeyMap AppDictionaryFromTag.cs
     /// </summary>
     public string Tags { get { return "#environment #clock"; } }
 

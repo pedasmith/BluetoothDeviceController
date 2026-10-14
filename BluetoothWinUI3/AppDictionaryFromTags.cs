@@ -14,12 +14,22 @@ namespace BluetoothWinUI3;
 
 internal static class AppDictionaryFromTags
 {
+    /// <summary>
+    /// Given a tag like #cycling or #testequipment gets the resources 
+    /// Common tags: environment exersise health cooking agriculture light testequipment report utility other
+    /// Other tags: cycling heartrate pulseoximeter security entertainment productivity multimeter oscilloscope
+    /// Full list in tagToResourceKeyMap AppDictionaryFromTag.cs
+    /// </summary>
     static OrderedDictionary<string, string> tagToResourceKeyMap = new OrderedDictionary<string, string>
     {
         { "#cycling", "sDeviceBorder_Background_Cycling" },
         { "#heartrate", "sDeviceBorder_Background_Health" },
         { "#pulseoximeter", "sDeviceBorder_Background_PulseOximeter" },
         { "#health", "sDeviceBorder_Background_Health" },
+
+        { "#testequipment", "sDeviceBorder_Background_Utility"  },
+        { "#multimeter", "sDeviceBorder_Background_Multimeter"  },
+        { "#oscilloscope", "sDeviceBorder_Background_Multimeter"  },
 
         { "#environment", "sDeviceBorder_Background_Environment" },
         { "#security", "sDeviceBorder_Background_Security" },
@@ -28,6 +38,13 @@ internal static class AppDictionaryFromTags
         { "#report", "sDeviceBorder_Background_Report" },
         { "#utility", "sDeviceBorder_Background_Utility" },
         { "#other", "sDeviceBorder_Background_Other" },
+
+
+        // Synonyms
+        { "#exersise", "sDeviceBorder_Background_Health"  },
+        { "#cooking", "sDeviceBorder_Background_Productivity"  },
+        { "#agriculture", "sDeviceBorder_Background_Productivity"  },
+        { "#light", "sDeviceBorder_Background_Utility"  },
     };
     /// <summary>
     /// Given a control's Tags (like "#environment #health"), return the appropriate background brush from the 
@@ -37,6 +54,20 @@ internal static class AppDictionaryFromTags
     /// </summary>
     public static (Brush brush, int selectedIndex) GetBackgroundBrushFromTags(string tags, int preferredIndex = -1)
     {
+        var taglist = tags.Split(" ");
+        foreach (var tag in taglist)
+        {
+            if (string.IsNullOrWhiteSpace(tag)) continue;
+            if (tagToResourceKeyMap.ContainsKey(tag))
+            {
+                var value = tagToResourceKeyMap[tag];
+                // What number?
+                preferredIndex = GetNextAvailableIndex(value, preferredIndex);
+                var brushname = value + "_" + preferredIndex.ToString();
+                return (GetBrush(brushname), preferredIndex);
+            }
+        }
+        ;
         foreach (var item in tagToResourceKeyMap)
         {
             if (tags.Contains(item.Key))

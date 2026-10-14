@@ -9,6 +9,7 @@
     <Import_RootNamespace>BluetoothProtocolsDevicesCore</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BDM_Aneng_Multimeter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothCommunicationStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothStatusHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTCommon_Info.cs" />

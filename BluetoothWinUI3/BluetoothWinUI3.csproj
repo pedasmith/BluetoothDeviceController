@@ -35,6 +35,7 @@
     <None Remove="Assets\Icons\BTIcon.ico" />
     <None Remove="Assets\Icons\Icon.png" />
     <None Remove="Assets\Icons\StoreLogo.png" />
+    <None Remove="BTBdm_Aneng_Multimeter.xaml" />
     <None Remove="BTBlank_BlankControl.xaml" />
     <None Remove="BTCommon_HealthControl.xaml" />
     <None Remove="BTCommon_UnsupportedControl.xaml" />
@@ -48,6 +49,7 @@
     <None Remove="ZoomableDeviceControl.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\BDM_Aneng_Multimeter.json" Link="Assets\CharacteristicsData\BDM_Aneng_Multimeter.json" />
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\BTCommon_Info.json" Link="Assets\CharacteristicsData\BTCommon_Info.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -271,6 +273,11 @@
     <None Include="..\BluetoothDeviceController\Assets\CharacteristicsData\_Recognizing_BT_Protocols.md" Link="Assets\CharacteristicsData\_Recognizing_BT_Protocols.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="BTBdm_Aneng_Multimeter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="BTXiaomi_MJWSD05MMC_ThermometerControl.xaml">

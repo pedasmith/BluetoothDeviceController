@@ -141,6 +141,10 @@ internal static class OxyPlotUtilities
         { "OxygenSaturationInPercent", new LineColorStyle(OxyColors.DarkBlue)},
         { "PerfusionIndexInPercent", new LineColorStyle(OxyColors.Violet, LineStyle.Dash, WIDTH_SECONDARY)},
         { "RespirationRate", new LineColorStyle(OxyColors.Green, LineStyle.Dash, WIDTH_SECONDARY)},
+
+        // Multimeter
+        { "MultimeterValue", new LineColorStyle(OxyColor.FromRgb(0x00, 0x66, 0xCC)) }, // Copilot selected this shade of Engineering Blue
+        { "Value", new LineColorStyle(OxyColors.Gray)},
     };
 
     private static List<LineColorStyle> BackupColorStyle = new ()
@@ -151,11 +155,21 @@ internal static class OxyPlotUtilities
         new LineColorStyle(OxyColors.Black),
         new LineColorStyle(OxyColors.Gray),
     };
-
     /// <summary>
     /// Stackable way to add additional lines to the oxyplot. 
     /// Returns the PlotModel, so you can do a MakeOxyPlotSimple().AddLine().AddLine()
     /// The step and range are only applied to the first line added
+    /// </summary>
+    public static PlotModel AddLineNoDefault(this PlotModel retval, string lineTitle, string propertyName, double minimum = double.NaN, AxisPosition axisPosition = AxisPosition.Left, string axisKey = null, string axisTitle = null)
+    {
+        return retval.AddLine(int.MaxValue, int.MaxValue, lineTitle, propertyName, minimum, axisPosition, axisTitle, axisKey);
+    }
+
+
+    /// <summary>
+    /// Stackable way to add additional lines to the oxyplot. 
+    /// Returns the PlotModel, so you can do a MakeOxyPlotSimple().AddLine().AddLine()
+    /// The step and range are only applied to the first line added (and are ignored when Int.MaxValue)
     /// </summary>
     public static PlotModel AddLine(this PlotModel retval, int step, int range, string lineTitle, string propertyName, double minimum = double.NaN, AxisPosition axisPosition = AxisPosition.Left, string axisKey = null, string axisTitle = null)
     {
@@ -189,9 +203,12 @@ internal static class OxyPlotUtilities
             axis.MajorGridlineColor = OxyColors.Black; // Not set for additional lines. Only the first axis gets a grid!
             axis.MajorGridlineStyle = LineStyle.Solid;
             axis.MajorGridlineThickness = 1;
-            axis.MajorStep = step; // 1 hpa
+            if (step != int.MaxValue)
+            {
+                axis.MajorStep = step; // 1 hpa
+            }
         }
-        if (axis != null) // Reminder: The first axis (index 0) is the X axis
+        if (axis != null && range != int.MaxValue) // Reminder: The first axis (index 0) is the X axis
         {
             axis.MinimumRange = range;
         }
