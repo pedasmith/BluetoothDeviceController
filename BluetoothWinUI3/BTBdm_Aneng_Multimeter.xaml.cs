@@ -1,11 +1,13 @@
 #region Usings stay the same
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
+using BluetoothProtocolsDevicesCoreExtensions;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using OxyPlot;
 using System;
 using System.Collections.Generic;
@@ -24,7 +26,7 @@ namespace BluetoothWinUI3;
 
 #endregion
 using static BluetoothProtocols.BDM_Aneng_Multimeter;
-using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
+using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery
 using DeviceSpecificSensorData = BDM_Aneng_Multimeter.Multimeter_Data; // Modify: 
 // The DeviceSpecificDataUnits should be set either to the DeviceSpecificSensorData or to a data facade.
 // Use the DeviceSpecificSensorData if it has the data you want to the user to see
@@ -34,10 +36,9 @@ using DeviceSpecificSensorData = BDM_Aneng_Multimeter.Multimeter_Data; // Modify
 // Not using a facade? Then the line below is what you want (but modify it!)
 //using DeviceSpecificSensorDataUnits = TI_SensorTag_1352.Temperature_Data; // Modify: Often the same as the DeviceSpecificSensorData
 using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.BdmMultimeterDisplayFacade; // Modify: Often the same as the DeviceSpecificSensorData
-
 // TODO: neither of these
 using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Modify: pick secondary sensor if needed
-using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery
+using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
 // Modify these to match your device
 
 
@@ -613,6 +614,47 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
     #endregion
 
+    bool IsPaused = false;
+    private void OnPause(object sender, RoutedEventArgs e)
+    {
+        IsPaused = (sender as ToggleButton).IsChecked ?? false;
+    }
+
+    /// <summary>
+    /// The user has two ways to pause the display: via the DMM Blue "HOLD" button and via
+    /// the bottom Pause toggle. The Hold button always determines what gets sent, so we 
+    /// should follow it when it changes. When the user click 'pause' on the app, we do the 
+    /// same thing as a 'hold' 
+    /// </summary>
+    private void SetPauseToMatchHold(bool hasHold)
+    {
+        if (HistoricalDataUnits.Count == 0)
+        {
+            // Very first item; let's get it all synced. The DMM will win.
+            uiPauseButton.IsChecked = hasHold; // will set the IsPaused...
+        }
+        else if (hasHold != OldHold)
+        {
+            // DMM changed; sync our pause button to that but only when it had
+            // been checked. I don't want the pause button to always exactly
+            // reflect the Hold button.
+            if (uiPauseButton.IsChecked ?? false)
+            {
+                uiPauseButton.IsChecked = hasHold;
+            }
+            // IsPaused = hasHold; // shouldn't be needed -- set by OnPause()
+        }
+        else if (hasHold)
+        {
+            ; // do nothing?
+        }
+
+        OldHold = hasHold;
+    }
+
+    bool OldHold = false;
+
+
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. Most often called from Device_PropertyChanged
@@ -643,15 +685,37 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         {
             // In your code, hook up the right sensors to the right XAML
             case DeviceSpecificType.MultimeterDataPropertyChangedName: // Modify: update the UX as appropriate
-                uiValue.Text = CurrSensor_DataUnits.DisplayNumber.ToString("F2");
-                uiUnits.Text = CurrSensor_DataUnits.DisplayUnits;
-                uiOther.Text = CurrSensor_DataUnits.DisplayOther;
+                // UX is more complex than just matching the parsed state
+                var other = CurrSensor_DataUnits.DisplayOther;
+                var hasAuto = other.Contains(BdmMultimeterDisplayFacade.AutoStr); // "AUTO "
+                var hasHold = other.Contains(BdmMultimeterDisplayFacade.HoldStr); // "Hold "
+                other = other.Replace(BdmMultimeterDisplayFacade.AutoStr, ""); // "AUTO ", ""); // Auto isn't useful
+                if (IsPaused && !hasHold)
+                {
+                    // Set up the other to show the pause
+                    other = other + "Pause ";
+                }
+
+                if (!IsPaused)
+                {
+                    uiValue.Text = CurrSensor_DataUnits.DisplayText; // which to use? Answer: what the DMM says! .DisplayNumber.ToString("F3");
+                    uiUnits.Text = CurrSensor_DataUnits.DisplayUnits;
+                    uiOther.Text = other;
+                    uiMeasurementType.Text = CurrSensor_DataUnits.ModeStr;
+                    OxyPlotModel.Axes[1].Title = $"{CurrSensor_DataUnits.ModeStr}";
+                }
+                SetPauseToMatchHold(hasHold);
+
 
                 // Only the sensor data gets plotted as historical data. In the demo,
                 // other values are also read (e.g., the Interval_Min), but they aren't
                 // part of the sensor data that's plotted.
                 // The historical data is updated from the CurrSensor_DataUnits
-                UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
+                if (!hasHold && !IsPaused)
+                {
+                    // On hold, freeze the display
+                    UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
+                }
                 break;
 
             // Secondary sensor is shown in the UX but isn't in the history data.
@@ -684,6 +748,11 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         var verb = (deltaInSeconds > HistoricalDataUpdateRateInSeconds)
             ? DataCollection<DeviceSpecificSensorDataUnits>.Verb.Add : DataCollection<DeviceSpecificSensorDataUnits>.Verb.ReplaceMostRecent;
         HistoricalDataUnits.Update(currSensor_DataUnits, verb); // Will add or replace the data and will copy as needed.
+
+        // Remove old data. Max time is 5 seconds.
+
+        const long TIME_CUTOFF_IN_SECONDS = 5;
+        HistoricalDataUnits.RemoveOlderThanSeconds(TIME_CUTOFF_IN_SECONDS);
 
         //
         // Update the OxyPlot because it doesn't track the INotifyCollectionChanged

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Windows.Devices.Bluetooth.Advertisement;
 using static BluetoothProtocols.BDM_Aneng_Multimeter;
 using static BluetoothProtocols.BTStandard_CyclingSpeedCadence;
 
@@ -16,13 +17,38 @@ namespace BluetoothProtocolsDevicesCoreExtensions;
 /// </summary>
 public class BdmMultimeterDisplayFacade : BTCommonMetaData<BdmMultimeterDisplayFacade>
 {
-    public enum Test { Other, Diode, Continuity, DutyCycle, Temperature, Resistance, Frequency, Capacitance, Voltage, Current, }
-    public Test TestType = Test.Other;
     public string DisplayText = "";
     public double DisplayNumber = double.NaN;
     public bool Overload = false;
     public string DisplayUnits = "";
     public string DisplayOther = "";
+    public static string HoldStr = "Hold ";
+    public static string AutoStr = "AUTO ";
+    public enum DmmMode {  Other, Volts, DutyCycle, Hertz, Temperature, Resistance, Diode, Continuity, Capacitance, Amps }
+    // DmmMode {  Other, XXVolts, XXDutyCycle, XXHertz, XXTemperature, XXResistance, XXDiode, Continuity, XXCapacitance, XXAmps }
+    // Missing: continuity? Which is resistance with beeps!
+
+    public DmmMode Mode { get; set; } = DmmMode.Other;
+    public string ModeStr
+    {
+        get
+        {
+            string retval = Mode switch
+            {
+                DmmMode.Volts => "Volts",
+                DmmMode.DutyCycle => "Duty cycle",
+                DmmMode.Hertz => "Frequency",
+                DmmMode.Temperature => "Temperature",
+                DmmMode.Resistance => "Resistance",
+                DmmMode.Diode => "Diode",
+                DmmMode.Continuity => "Continuity",
+                DmmMode.Capacitance => "Capacitance",
+                DmmMode.Amps => "Current",
+                _ => ""
+            };
+            return retval;
+        }
+    }
     public double Multiplier = 1.0;
     public double MultimeterValue { get { return DisplayNumber * Multiplier; } }
 
@@ -42,7 +68,7 @@ public class BdmMultimeterDisplayFacade : BTCommonMetaData<BdmMultimeterDisplayF
         var dest = this;
 
         // All of the facade-specific values.
-        dest.TestType = source.TestType;
+        dest.Mode = source.Mode;
         dest.DisplayText = source.DisplayText;
         dest.DisplayNumber = source.DisplayNumber;
         dest.Overload = source.Overload;
@@ -80,7 +106,7 @@ public class BdmMultimeterDisplayFacade : BTCommonMetaData<BdmMultimeterDisplayF
 
     public override string[] ExportGetHeaders(IExportData _)
     {
-        return ["Value", "DisplayText", "Units", "Overload", "DisplayOther"];
+        return ["Value", "DisplayText", "Units", "Mode", "Overload", "DisplayOther"];
     }
 
     public override void ExportRow(IExportData exporter)
@@ -91,11 +117,12 @@ public class BdmMultimeterDisplayFacade : BTCommonMetaData<BdmMultimeterDisplayF
         exporter.CellSet(DisplayText);
         exporter.CellSet(DisplayUnits);
         exporter.CellSet(Overload.ToString());
+        exporter.CellSet(ModeStr);
         exporter.CellSet(DisplayOther);
     }
     public override string ToString()
     {
-        return $"{DisplayText}{DisplayUnits} measure={TestType} overload={Overload} value={MultimeterValue} other={DisplayOther}";
+        return $"{DisplayText}{DisplayUnits} measure={ModeStr} overload={Overload} value={MultimeterValue} other={DisplayOther}";
     }
 }
 
@@ -158,13 +185,25 @@ public static class BdmMultimeterProtocol
         const double MICRO = 0.000_0001;
         const double NANO = 0.000_000_001;
 
-        if (on(bits, 56)) retval.DisplayOther += "Diode ";
+        if (on(bits, 56))
+        {
+            retval.Mode = BdmMultimeterDisplayFacade.DmmMode.Diode;
+            retval.DisplayOther += "Diode ";
+        }
 
         // Mentioned in the manual (page 3) HOLD MAX MIN MANUAL AUTI TRUE RMS LowBattery AC DC Negative Real Bluetooth
-        if (on(bits, 57)) retval.DisplayUnits += "°C"; // testing temperature
-        if (on(bits, 58)) retval.DisplayUnits += "°F"; // testing temperature
+        if (on(bits, 57))
+        {
+            retval.DisplayUnits += "°C"; // testing temperature
+            retval.Mode = BdmMultimeterDisplayFacade.DmmMode.Temperature;
+        }
+        if (on(bits, 58))
+        {
+            retval.DisplayUnits += "°F"; // testing temperature
+            retval.Mode = BdmMultimeterDisplayFacade.DmmMode.Temperature;
+        }
 
-        if (on(bits, 59)) retval.DisplayOther += "Hold ";
+        if (on(bits, 59)) retval.DisplayOther += BdmMultimeterDisplayFacade.HoldStr; // "Hold ";
         // These are used by the 'si' part of digit n=3 (last digit)
         //if (on(bits, 60)) retval.DisplayOther += "60 ";
         //if (on(bits, 61)) retval.DisplayOther += "61 ";
@@ -189,7 +228,7 @@ public static class BdmMultimeterProtocol
         if (on(bits, 67))
         {
             retval.DisplayUnits += "F"; // Testing capacitance
-            retval.TestType = BdmMultimeterDisplayFacade.Test.Capacitance;
+            retval.Mode = BdmMultimeterDisplayFacade.DmmMode.Capacitance;
         }
 
         if (on(bits, 68)) retval.DisplayOther += "AC ";
@@ -198,11 +237,11 @@ public static class BdmMultimeterProtocol
         if (on(bits, 69))
         {
             retval.DisplayUnits += "%"; // Testing duty cycle
-            retval.TestType = BdmMultimeterDisplayFacade.Test.DutyCycle;
+            retval.Mode = BdmMultimeterDisplayFacade.DmmMode.DutyCycle;
         }
 
-        if (on(bits, 70)) retval.DisplayOther += "70 ";
-        if (on(bits, 71)) retval.DisplayOther += "71 ";
+        if (on(bits, 70)) retval.DisplayOther += "MIN "; // not in original code
+        if (on(bits, 71)) retval.DisplayOther += "MAX "; // not in original code
 
         // Current is bit 72 but is sorted to 85 and up
 
@@ -217,7 +256,7 @@ public static class BdmMultimeterProtocol
         if (on(bits, 75))
         {
             retval.DisplayUnits += "V"; // testing volts
-            retval.TestType = BdmMultimeterDisplayFacade.Test.Voltage;
+            retval.Mode = BdmMultimeterDisplayFacade.DmmMode.Volts;
         }
 
 
@@ -235,20 +274,19 @@ public static class BdmMultimeterProtocol
         if (on(bits, 78))
         {
             retval.DisplayUnits += "Ω"; // testing ohms
-            retval.TestType = BdmMultimeterDisplayFacade.Test.Resistance;
+            retval.Mode = BdmMultimeterDisplayFacade.DmmMode.Resistance;
         }
 
         // Frequency
         if (on(bits, 79))
         {
             retval.DisplayUnits += "Hz"; // testing frequency
-            retval.TestType = BdmMultimeterDisplayFacade.Test.Frequency;
+            retval.Mode = BdmMultimeterDisplayFacade.DmmMode.Hertz;
         }
         if (on(bits, 80)) retval.DisplayOther += "80 ";
         if (on(bits, 81)) retval.DisplayOther += "81 ";
         if (on(bits, 82)) retval.DisplayOther += "82 ";
         if (on(bits, 83)) retval.DisplayOther += "83 ";
-        if (on(bits, 84)) retval.DisplayOther += "84 ";
 
         // Current (see also bit 72!)
         if (on(bits, 84))
@@ -264,11 +302,12 @@ public static class BdmMultimeterProtocol
         if (on(bits, 72))
         {
             retval.DisplayUnits += "A"; // testing current
-            retval.TestType = BdmMultimeterDisplayFacade.Test.Current;
+            retval.Mode = BdmMultimeterDisplayFacade.DmmMode.Amps;
         }
 
+
         if (on(bits, 86)) retval.DisplayOther += "86 ";
-        if (on(bits, 87)) retval.DisplayOther += "AUTO ";
+        if (on(bits, 87)) retval.DisplayOther += BdmMultimeterDisplayFacade.AutoStr; // "AUTO ";
 
         for (int i=88; i<bits.Length; i++) // Length should be 88; this is for extra
         {
@@ -286,7 +325,13 @@ public static class BdmMultimeterProtocol
         if (SEG.ContainsKey(lookup)) return SEG[lookup];
         return defaultValue;
     }
-    static byte[] DATASHIFT = { 65, 33, 115, 85, 162, 193, 50, 113, 102, 170, 59 };
+    //static byte[] DATASHIFT = { 65, 33, 115, 85, 162, 193, 50, 113, 102, 170, 59 };
+    // Every now any then by Aneg produces a 20-byte notification. From the 'all-Variants' doc, 
+    // the original decode was 20 bytes which the DMM for Windows cut to 11 because all the 
+    // messages they see are that length.
+    // See: https://github.com/ludwich66/Bluetooth-DMM/wiki/Protocol-all-Variants
+
+    static byte[] DATASHIFT = { 65, 33, 115, 85, 162, 193, 50, 113, 102, 170, 59, 0xD0, 0xE2, 0xA8, 0x33, 0x14, 0x20, 0x21, 0xAA, 0xBB };
     static Dictionary<string, string> SEG = new() {
         { "0000000", " " },
         { "1111110", "A" },

@@ -17,7 +17,6 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Style="{StaticResource sDeviceTitle}" >
                 <Run x:Name="uiKnownDeviceName" Text="Demonstration Display" /><Run Text="&#160;"/><Run x:Name="uiValueChange" Text="┄"/>
@@ -31,11 +30,21 @@
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
                 <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" ItemContainerStyle="{StaticResource sDeviceDataListItem}" x:Name="uiDeviceDataList">
-                    <StackPanel Style="{StaticResource sDeviceDataPanelWide}">
+                    <StackPanel Style="{StaticResource sDeviceDataPanelWidex3}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Style="{StaticResource sDevicePrimaryDataXLarge}" ><Run x:Name="uiValue"/></TextBlock>
-                            <TextBlock Style="{StaticResource sDeviceData}"  VerticalAlignment="Bottom"><Run x:Name="uiUnits"/></TextBlock>
-                            <TextBlock Style="{StaticResource sDeviceData}"  VerticalAlignment="Bottom" Margin="30,0,0,0"><Run x:Name="uiOther" Text="---"/></TextBlock>
+                            <TextBlock Style="{StaticResource sDevicePrimaryDataXLarge}" MinWidth="120" ><Run x:Name="uiValue" /></TextBlock>
+                            <Border VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30" />
+                                        <ColumnDefinition Width="60" />
+                                        <ColumnDefinition Width="110" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource sDeviceData}"  ><Run x:Name="uiUnits"/></TextBlock>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource sDeviceData}"  ><Run x:Name="uiOther" Text="---"/></TextBlock>
+                                    <TextBlock Grid.Column="2" Style="{StaticResource sDeviceData}"  ><Run x:Name="uiMeasurementType" Text="---"/></TextBlock>
+                                </Grid>
+                            </Border>
                         </StackPanel>
                         <!-- Don't need a line color when there's just the one!
                         <Line Tag="ValueColor" Style="{StaticResource sGraphLineKey}" />
@@ -48,8 +57,23 @@
                     <tv:TableView x:Name="uiTableView" IsReadOnly="True" />
                 </Grid>
             </Grid>
-            <TextBlock Grid.Row="2" Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
-            <local:BTConnectionControl Grid.Row="3" x:Name="uiBTConnectionControl" />
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
+                    <local:BTConnectionControl x:Name="uiBTConnectionControl" />
+                </StackPanel>
+                <Border Grid.Column="2" VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10">
+                    <StackPanel Orientation="Horizontal">
+                        <ToggleButton Content="Pause" x:Name="uiPauseButton" Click="OnPause" />
+                    </StackPanel>
+                </Border>
+
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

@@ -53,6 +53,18 @@ namespace BluetoothProtocolsDevicesCore
             Data[index].CopyFrom(value);  // was value.Clone(); switching to reduce flickering.
         }
 
+        public int RemoveOlderThanSeconds(long seconds)
+        {
+            int nremoved = 0;
+            var cutoff = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(seconds));
+            while (Count > 2 && Data[0].TimestampMostRecent < cutoff)
+            {
+                Data.RemoveAt(0);
+                nremoved++;
+            }
+            return nremoved;
+        }
+
         ///<summary>
         ///Timestamp of the most recent add. This can be different from the value in the Timestamps because that value
         ///is also updated every time a value is replaced. This value is used when, e.g., observations often come in more

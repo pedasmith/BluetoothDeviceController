@@ -156,7 +156,7 @@ internal static class OxyPlotUtilities
         new LineColorStyle(OxyColors.Gray),
     };
     /// <summary>
-    /// Stackable way to add additional lines to the oxyplot. 
+    /// Stackable way to add additional lines + axis to the oxyplot. 
     /// Returns the PlotModel, so you can do a MakeOxyPlotSimple().AddLine().AddLine()
     /// The step and range are only applied to the first line added
     /// </summary>
@@ -167,7 +167,7 @@ internal static class OxyPlotUtilities
 
 
     /// <summary>
-    /// Stackable way to add additional lines to the oxyplot. 
+    /// Stackable way to add additional lines + axis to the oxyplot. 
     /// Returns the PlotModel, so you can do a MakeOxyPlotSimple().AddLine().AddLine()
     /// The step and range are only applied to the first line added (and are ignored when Int.MaxValue)
     /// </summary>
