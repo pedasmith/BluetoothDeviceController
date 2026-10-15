@@ -26,8 +26,9 @@ namespace BluetoothWinUI3;
 
 #endregion
 using static BluetoothProtocols.BDM_Aneng_Multimeter;
-using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery
+using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
 using DeviceSpecificSensorData = BDM_Aneng_Multimeter.Multimeter_Data; // Modify: 
+// using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery
 // The DeviceSpecificDataUnits should be set either to the DeviceSpecificSensorData or to a data facade.
 // Use the DeviceSpecificSensorData if it has the data you want to the user to see
 // Use the facade when you need to merge multiple sensor data values together
@@ -36,9 +37,7 @@ using DeviceSpecificSensorData = BDM_Aneng_Multimeter.Multimeter_Data; // Modify
 // Not using a facade? Then the line below is what you want (but modify it!)
 //using DeviceSpecificSensorDataUnits = TI_SensorTag_1352.Temperature_Data; // Modify: Often the same as the DeviceSpecificSensorData
 using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.BdmMultimeterDisplayFacade; // Modify: Often the same as the DeviceSpecificSensorData
-// TODO: neither of these
-using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Modify: pick secondary sensor if needed
-using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
+//using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Modify: pick secondary sensor if needed
 // Modify these to match your device
 
 
@@ -153,13 +152,13 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// Data directly from the device. It's always in the original units from the device
     /// and isn't converted into the user's preferred units.
     /// </summary>
-    DeviceSpecificSensorSecondaryData CurrSensorSecondary_Data = null;
+    // DeviceSpecificSensorSecondaryData CurrSensorSecondary_Data = null;
 
     /// <summary>
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalDataUnits collection.
     /// </summary>
-    DeviceSpecificSensorSecondaryData CurrSensorSecondary_DataUnits = null;
+    // DeviceSpecificSensorSecondaryData CurrSensorSecondary_DataUnits = null;
     #endregion
 
     #region Instance values for the UX stay the same
@@ -530,8 +529,12 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             }
         }
 
+        // Pick the right Engineering Blue
+        const uint EngineeringBlueLight = 0xFF0066CC;
+        const uint EngineeringBlueDark = 0xFF5599FF;
+        uint engineeringBlue = Application.Current.RequestedTheme == ApplicationTheme.Dark ? EngineeringBlueDark : EngineeringBlueLight;
         var colors = saveData.GetDeviceColors(Application.Current.RequestedTheme);
-        var brushes = new DeviceColorBrushes(colors, saveData.Preferences, 0xFF0066CC); // TODO: Engineering Blue
+        var brushes = new DeviceColorBrushes(colors, saveData.Preferences, engineeringBlue); 
         DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
 
         // Set the graph text colors
@@ -666,8 +669,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
         // Modify: Always update these even though in practice they are only set once.
         CurrSensor_Data = Device.CurrMultimeter_Data; // Modify: select the right data
-        //TODO: CurrSensorSecondary_Data = Device.CurrHumidity_Data; // Modify: pick secondary data as appropriate
-        //TODO:CurrBattery_Data = Device.CurrBattery_Data; // Modify: if your device doesn't have a battery, remove battery stuff!
+        // CurrSensorSecondary_Data = Device.CurrHumidity_Data; // Modify: pick secondary data as appropriate
+        // CurrBattery_Data = Device.CurrBattery_Data; // Modify: if your device doesn't have a battery, remove battery stuff!
         if (CurrSensor_Data.Data == null) return; // not real data
 
         SparklesHelper.UpdateSparkles(ControlsWithSparkles, name); // name is from e.PropertyName when the Device does a PropertyChanged.
@@ -677,8 +680,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // single data type. If you make a Facade class to combine multiple sensors into one, you will
         // need to create a version of CopyToWithConvertAndCreate that takes in both types.
         CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        //TODO: CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        //TODO: CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        // CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        // CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Modify: Edit all this code to match your device and UX.
         switch (name)

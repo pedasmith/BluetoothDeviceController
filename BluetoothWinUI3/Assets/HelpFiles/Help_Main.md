@@ -21,6 +21,8 @@ Supported devices include
   o Viatom compatible PC-60F  
   o Vibeat S5W S6W  
   o Wellvue KS-60FW
+* Test Equipement
+  o Aneng AN9002 Digital Multimeter
 
 
 
