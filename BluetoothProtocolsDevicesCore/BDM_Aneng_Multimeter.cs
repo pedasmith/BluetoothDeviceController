@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-10-11::19:59
+    /// This class was automatically generated 2026-10-16::12:16
     /// </summary>
 
     public  class BDM_Aneng_Multimeter : INotifyPropertyChanged
@@ -25,6 +25,9 @@ namespace BluetoothProtocols
         // Useful links for the device and protocol documentation
         // Link: https://github.com/libreble/multimeter/blob/main/docs/protocols/bdm.md
         // Link: https://github.com/libreble/multimeter/blob/main/packages/protocol/src/drivers/bdm.ts
+        // Link: https://github.com/ludwich66/Bluetooth-DMM/wiki/Protocol-all-Variants
+        // Link: https://github.com/ludwich66/Bluetooth-DMM/wiki/Bluetooth-DMM-11-Byte-Data-Protocol
+        // Link: https://github.com/ludwich66/Bluetooth-DMM/wiki
 
         public BluetoothLEDevice ble { get; set; } = null;
         public BluetoothStatusEvent Status = new BluetoothStatusEvent();
@@ -49,7 +52,8 @@ namespace BluetoothProtocols
 
         Multimeter service Guid=fff0
             Multimeter_Data (DataGroup record)
-                MultimeterData characteristic has Data (Bytes-->string)  Guid=fff4
+                MultimeterDataFFF1 characteristic has DataFFF1 (Bytes-->string)  Guid=fff1
+                MultimeterDataFFF4 characteristic has DataFFF4 (Bytes-->string)  Guid=fff4
 
 
         Device Info service Guid=180a
@@ -67,7 +71,8 @@ namespace BluetoothProtocols
 
         public const string Device_NamePropertyChangedName = "Device_Name";
         public const string AppearancePropertyChangedName = "Appearance";
-        public const string MultimeterDataPropertyChangedName = "MultimeterData";
+        public const string MultimeterDataFFF1PropertyChangedName = "MultimeterDataFFF1";
+        public const string MultimeterDataFFF4PropertyChangedName = "MultimeterDataFFF4";
         public const string Manufacturer_NamePropertyChangedName = "Manufacturer_Name";
         public const string Model_NumberPropertyChangedName = "Model_Number";
         public const string Serial_NumberPropertyChangedName = "Serial_Number";
@@ -182,14 +187,24 @@ namespace BluetoothProtocols
         /// </summary>
         public class Multimeter_Data :BTCommonMetaData<Multimeter_Data> //, IExportDataSource
         {
-            private byte[] _Data = null;
+            private byte[] _DataFFF1 = null;
             /// <summary>
-            /// Data (BYTES ) from Service=Multimeter and Characteristic=MultimeterData
+            /// DataFFF1 (BYTES ) from Service=Multimeter and Characteristic=MultimeterDataFFF1
             ///</summary>
-            public byte[] Data 
+            public byte[] DataFFF1 
             { 
-                get { return _Data; }
-                set { if (value == _Data) return; _Data = value; OnPropertyChanged();}
+                get { return _DataFFF1; }
+                set { if (value == _DataFFF1) return; _DataFFF1 = value; OnPropertyChanged();}
+            }
+
+            private byte[] _DataFFF4 = null;
+            /// <summary>
+            /// DataFFF4 (BYTES ) from Service=Multimeter and Characteristic=MultimeterDataFFF4
+            ///</summary>
+            public byte[] DataFFF4 
+            { 
+                get { return _DataFFF4; }
+                set { if (value == _DataFFF4) return; _DataFFF4 = value; OnPropertyChanged();}
             }
             public override Multimeter_Data Clone(string name = null)
             {
@@ -209,7 +224,8 @@ namespace BluetoothProtocols
                 var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = source.Name;
-                dest.Data = source.Data;
+                dest.DataFFF1 = source.DataFFF1;
+                dest.DataFFF4 = source.DataFFF4;
             }
 
             // Like CopyFrom, but convert the doubles as appropriate + sets name
@@ -226,25 +242,27 @@ namespace BluetoothProtocols
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
-                dest.Data = source.Data;
+                dest.DataFFF1 = source.DataFFF1;
+                dest.DataFFF4 = source.DataFFF4;
                 return dest;
             }
 
             public override string[] ExportGetHeaders(IExportData _)
             {
-                return ["Data"];
+                return ["DataFFF1", "DataFFF4"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
                 // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
                 // RowEnd and add in the timestamps
-                exporter.CellSet(Data);                
+                exporter.CellSet(DataFFF1);
+                exporter.CellSet(DataFFF4);                
             }
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Data}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {DataFFF1} {DataFFF4}");
             }
         }
 //
@@ -509,16 +527,17 @@ namespace BluetoothProtocols
         {
             Common_Configuration_Device_Name_index = 0,     // GUID 00002a00-0000-1000-8000-00805f9b34fb
             Common_Configuration_Appearance_index = 1,     // GUID 00002a01-0000-1000-8000-00805f9b34fb
-            Multimeter_MultimeterData_index = 2,     // GUID 0000fff4-0000-1000-8000-00805f9b34fb
-            Device_Info_Manufacturer_Name_index = 3,     // GUID 00002a29-0000-1000-8000-00805f9b34fb
-            Device_Info_Model_Number_index = 4,     // GUID 00002a24-0000-1000-8000-00805f9b34fb
-            Device_Info_Serial_Number_index = 5,     // GUID 00002a25-0000-1000-8000-00805f9b34fb
-            Device_Info_Hardware_Revision_index = 6,     // GUID 00002a27-0000-1000-8000-00805f9b34fb
-            Device_Info_Firmware_Revision_index = 7,     // GUID 00002a26-0000-1000-8000-00805f9b34fb
-            Device_Info_Software_Revision_index = 8,     // GUID 00002a28-0000-1000-8000-00805f9b34fb
-            Device_Info_System_ID_index = 9,     // GUID 00002a23-0000-1000-8000-00805f9b34fb
-            Device_Info_Regulatory_List_index = 10,     // GUID 00002a2a-0000-1000-8000-00805f9b34fb
-            Device_Info_PnP_ID_index = 11,     // GUID 00002a50-0000-1000-8000-00805f9b34fb
+            Multimeter_MultimeterDataFFF1_index = 2,     // GUID 0000fff1-0000-1000-8000-00805f9b34fb
+            Multimeter_MultimeterDataFFF4_index = 3,     // GUID 0000fff4-0000-1000-8000-00805f9b34fb
+            Device_Info_Manufacturer_Name_index = 4,     // GUID 00002a29-0000-1000-8000-00805f9b34fb
+            Device_Info_Model_Number_index = 5,     // GUID 00002a24-0000-1000-8000-00805f9b34fb
+            Device_Info_Serial_Number_index = 6,     // GUID 00002a25-0000-1000-8000-00805f9b34fb
+            Device_Info_Hardware_Revision_index = 7,     // GUID 00002a27-0000-1000-8000-00805f9b34fb
+            Device_Info_Firmware_Revision_index = 8,     // GUID 00002a26-0000-1000-8000-00805f9b34fb
+            Device_Info_Software_Revision_index = 9,     // GUID 00002a28-0000-1000-8000-00805f9b34fb
+            Device_Info_System_ID_index = 10,     // GUID 00002a23-0000-1000-8000-00805f9b34fb
+            Device_Info_Regulatory_List_index = 11,     // GUID 00002a2a-0000-1000-8000-00805f9b34fb
+            Device_Info_PnP_ID_index = 12,     // GUID 00002a50-0000-1000-8000-00805f9b34fb
         }
 
         // All of the services that this device supports
@@ -558,21 +577,22 @@ namespace BluetoothProtocols
         {
             Guid.Parse("00002a00-0000-1000-8000-00805f9b34fb"), // #0 is Common Configuration Device Name
             Guid.Parse("00002a01-0000-1000-8000-00805f9b34fb"), // #1 is Common Configuration Appearance
-            Guid.Parse("0000fff4-0000-1000-8000-00805f9b34fb"), // #2 is Multimeter MultimeterData
-            Guid.Parse("00002a29-0000-1000-8000-00805f9b34fb"), // #3 is Device Info Manufacturer Name
-            Guid.Parse("00002a24-0000-1000-8000-00805f9b34fb"), // #4 is Device Info Model Number
-            Guid.Parse("00002a25-0000-1000-8000-00805f9b34fb"), // #5 is Device Info Serial Number
-            Guid.Parse("00002a27-0000-1000-8000-00805f9b34fb"), // #6 is Device Info Hardware Revision
-            Guid.Parse("00002a26-0000-1000-8000-00805f9b34fb"), // #7 is Device Info Firmware Revision
-            Guid.Parse("00002a28-0000-1000-8000-00805f9b34fb"), // #8 is Device Info Software Revision
-            Guid.Parse("00002a23-0000-1000-8000-00805f9b34fb"), // #9 is Device Info System ID
-            Guid.Parse("00002a2a-0000-1000-8000-00805f9b34fb"), // #10 is Device Info Regulatory List
-            Guid.Parse("00002a50-0000-1000-8000-00805f9b34fb"), // #11 is Device Info PnP ID
+            Guid.Parse("0000fff1-0000-1000-8000-00805f9b34fb"), // #2 is Multimeter MultimeterDataFFF1
+            Guid.Parse("0000fff4-0000-1000-8000-00805f9b34fb"), // #3 is Multimeter MultimeterDataFFF4
+            Guid.Parse("00002a29-0000-1000-8000-00805f9b34fb"), // #4 is Device Info Manufacturer Name
+            Guid.Parse("00002a24-0000-1000-8000-00805f9b34fb"), // #5 is Device Info Model Number
+            Guid.Parse("00002a25-0000-1000-8000-00805f9b34fb"), // #6 is Device Info Serial Number
+            Guid.Parse("00002a27-0000-1000-8000-00805f9b34fb"), // #7 is Device Info Hardware Revision
+            Guid.Parse("00002a26-0000-1000-8000-00805f9b34fb"), // #8 is Device Info Firmware Revision
+            Guid.Parse("00002a28-0000-1000-8000-00805f9b34fb"), // #9 is Device Info Software Revision
+            Guid.Parse("00002a23-0000-1000-8000-00805f9b34fb"), // #10 is Device Info System ID
+            Guid.Parse("00002a2a-0000-1000-8000-00805f9b34fb"), // #11 is Device Info Regulatory List
+            Guid.Parse("00002a50-0000-1000-8000-00805f9b34fb"), // #12 is Device Info PnP ID
         };
 
-        private List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, null, null, null, null, null,  };
-        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false, false, false, false, false, false,  };
-        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  null, null, null, null, null, null, null, null, null, null, null, null,  };
+        private List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, null, null, null, null, null, null,  };
+        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false, false, false, false, false, false, false,  };
+        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  null, null, null, null, null, null, null, null, null, null, null, null, null,  };
 
 
         /// <summary>
@@ -821,7 +841,7 @@ namespace BluetoothProtocols
 
         public Multimeter_Data CurrMultimeter_Data { get; set; } = new Multimeter_Data();
 
-        // Per-characteristics methods for Multimeter MultimeterData
+        // Per-characteristics methods for Multimeter MultimeterDataFFF1
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -829,64 +849,132 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyMultimeterDataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyMultimeterDataFFF1Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("MultimeterData", ServiceIndex.Multimeter_index, "Multimeter", CharacteristicIndex.Multimeter_MultimeterData_index, NotifyMultimeterDataCallback, notifyType);
+            var retval = await SetupNotifyAsync("MultimeterDataFFF1", ServiceIndex.Multimeter_index, "Multimeter", CharacteristicIndex.Multimeter_MultimeterDataFFF1_index, NotifyMultimeterDataFFF1Callback, notifyType);
             return retval;
         }
 
-        private void NotifyMultimeterDataCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyMultimeterDataFFF1Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Multimeter_MultimeterData_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|Data");
+            var index = (int)CharacteristicIndex.Multimeter_MultimeterDataFFF1_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|DataFFF1");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrMultimeter_Data.TimestampMostRecent = args.Timestamp;
-            CurrMultimeter_Data.Data = vr.GetNextByteArray();
-            OnPropertyChanged(MultimeterDataPropertyChangedName); // "MultimeterData"
+            CurrMultimeter_Data.DataFFF1 = vr.GetNextByteArray();
+            OnPropertyChanged(MultimeterDataFFF1PropertyChangedName); // "MultimeterDataFFF1"
+        }
+        // Per-characteristics methods for Multimeter MultimeterDataFFF4
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyMultimeterDataFFF4Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("MultimeterDataFFF4", ServiceIndex.Multimeter_index, "Multimeter", CharacteristicIndex.Multimeter_MultimeterDataFFF4_index, NotifyMultimeterDataFFF4Callback, notifyType);
+            return retval;
+        }
+
+        private void NotifyMultimeterDataFFF4Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Multimeter_MultimeterDataFFF4_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|DataFFF4");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrMultimeter_Data.TimestampMostRecent = args.Timestamp;
+            CurrMultimeter_Data.DataFFF4 = vr.GetNextByteArray();
+            OnPropertyChanged(MultimeterDataFFF4PropertyChangedName); // "MultimeterDataFFF4"
         }
         /// <summary>
-        /// Reads data from MultimeterData and triggers an OnPropertyChanged
+        /// Reads data from MultimeterDataFFF1 and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
         /// <returns>Multimeter_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Multimeter_Data> ReadMultimeterData(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        public async Task<Multimeter_Data> ReadMultimeterDataFFF1(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Multimeter_MultimeterData_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Multimeter_index, "Multimeter", index, "MultimeterData");
+            var index = CharacteristicIndex.Multimeter_MultimeterDataFFF1_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Multimeter_index, "Multimeter", index, "MultimeterDataFFF1");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "MultimeterData", cacheMode);
+            IBuffer result = await ReadAsync(ch, "MultimeterDataFFF1", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|Data");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|DataFFF1");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrMultimeter_Data.Data = vr.GetNextByteArray();
+            CurrMultimeter_Data.DataFFF1 = vr.GetNextByteArray();
             CurrMultimeter_Data.TimestampMostRecent = DateTimeOffset.Now;
-            OnPropertyChanged(MultimeterDataPropertyChangedName); // "MultimeterData"
+            OnPropertyChanged(MultimeterDataFFF1PropertyChangedName); // "MultimeterDataFFF1"
             return CurrMultimeter_Data;
         }
         /// <summary>
-        /// Writes data to MultimeterData 
+        /// Reads data from MultimeterDataFFF4 and triggers an OnPropertyChanged
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteMultimeterData(byte[] data)
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Multimeter_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Multimeter_Data> ReadMultimeterDataFFF4(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Multimeter_MultimeterData_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Multimeter_index, "Multimeter", index, "MultimeterData");
+            var index = CharacteristicIndex.Multimeter_MultimeterDataFFF4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Multimeter_index, "Multimeter", index, "MultimeterDataFFF4");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "MultimeterDataFFF4", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|DataFFF4");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrMultimeter_Data.DataFFF4 = vr.GetNextByteArray();
+            CurrMultimeter_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(MultimeterDataFFF4PropertyChangedName); // "MultimeterDataFFF4"
+            return CurrMultimeter_Data;
+        }
+        /// <summary>
+        /// Writes data to MultimeterDataFFF1 
+        /// </summary>
+        public async Task<GattCommunicationStatus?> WriteMultimeterDataFFF1(byte[] data)
+        {
+            var index = CharacteristicIndex.Multimeter_MultimeterDataFFF1_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Multimeter_index, "Multimeter", index, "MultimeterDataFFF1");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
             var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteMultimeterData", result);
+            Status.ReportStatus("WriteMultimeterDataFFF1", result);
+            return result;
+        }
+        /// <summary>
+        /// Writes data to MultimeterDataFFF4 
+        /// </summary>
+        public async Task<GattCommunicationStatus?> WriteMultimeterDataFFF4(byte[] data)
+        {
+            var index = CharacteristicIndex.Multimeter_MultimeterDataFFF4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Multimeter_index, "Multimeter", index, "MultimeterDataFFF4");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+            var result = await ch.WriteValueAsync(data.AsBuffer());
+            Status.ReportStatus("WriteMultimeterDataFFF4", result);
             return result;
         }
 

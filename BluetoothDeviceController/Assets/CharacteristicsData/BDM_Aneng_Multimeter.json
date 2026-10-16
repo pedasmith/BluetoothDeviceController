@@ -2,13 +2,17 @@
   "AllDevices": [
     {
       "Name": "Bluetooth DMM",
+      "Aliases": [
+        "MS-BO47Q1767"
+      ],
       "ClassName": "BDM_Aneng_Multimeter",
       "Links": [
         "https://github.com/libreble/multimeter/blob/main/docs/protocols/bdm.md",
         "https://github.com/libreble/multimeter/blob/main/packages/protocol/src/drivers/bdm.ts",
         "https://github.com/ludwich66/Bluetooth-DMM/wiki/Protocol-all-Variants",
         "https://github.com/ludwich66/Bluetooth-DMM/wiki/Bluetooth-DMM-11-Byte-Data-Protocol",
-        "https://github.com/ludwich66/Bluetooth-DMM/wiki"
+        "https://github.com/ludwich66/Bluetooth-DMM/wiki",
+        "https://www.ic-fortune.com/upload/Download/FS9952_LP2-DS-12_EN.pdf"
       ],
       "CompletionStatus": 0,
       "Services": [
@@ -50,9 +54,23 @@
           "Name": "Multimeter",
           "Characteristics": [
             {
+              "UUID": "0000fff1-0000-1000-8000-00805f9b34fb",
+              "Name": "MultimeterDataFFF1",
+              "Type": "BYTES|HEX|DataFFF1",
+              "REM10": "Is for the MS-BDTP1A with device name MS-BO47Q1767 using Fortune FS9952 chip",
+              "DataGroupName": "Multimeter_Data",
+              "IsRead": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Read:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:",
+              "ExampleData": [
+                "18 27 3D 4E 5B 66 72 86 92 A2 B1 CA DD EE FF"
+              ]
+            },
+            {
               "UUID": "0000fff4-0000-1000-8000-00805f9b34fb",
-              "Name": "MultimeterData",
-              "Type": "BYTES|HEX|Data",
+              "Name": "MultimeterDataFFF4",
+              "Type": "BYTES|HEX|DataFFF4",
               "DataGroupName": "Multimeter_Data",
               "IsRead": true,
               "IsWriteWithoutResponse": true,

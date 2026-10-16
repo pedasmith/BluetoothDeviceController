@@ -10,6 +10,7 @@ Supported devices include
 
 * Bike sensors: Bluetooth standard bike cadence and speed sensors
 * Environment Sensors
+
   o [Nordic Thingy:52](./Device_Nordic_Thingy.md)  
   o Govee H5074 H5075 H5103 H5106 H5171 H5179  
   o Ruuvi Air and other sensors  
@@ -18,11 +19,14 @@ Supported devices include
   o TI SensorTag 2541 1350 1352
 * Heart Rate bands: Bluetooth standard heart rate bands
 * Pulse Oximeters
+
   o Viatom compatible PC-60F  
   o Vibeat S5W S6W  
   o Wellvue KS-60FW
 * Test Equipement
-  o Aneng AN9002 Digital Multimeter
+
+  o Aneng AN9002 Digital multimeter
+  o MEET MS-BDTP1A Digital multimeter (BT name MS-BO47Q1767)
 
 
 

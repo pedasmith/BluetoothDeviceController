@@ -45,10 +45,32 @@ using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.Bd
 public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControlBasic, IDeviceControlDevice // Modify: rename to match your device
 {
     // Modify these settings to match your device
+    IMultimeterProtocolParser Parser = null; //  new BdmMultimeterProtocol();
+
+    enum MultimeterType {  Bdm, FortuneFS9952 };
+    MultimeterType CurrMultimeterType = MultimeterType.Bdm;
+    private bool SetParser(byte[] data)
+    {
+        if (Parser != null) return true;
+        if (FortuneFS9952MultimeterProtocol.Matches(data))
+        {
+            CurrMultimeterType = MultimeterType.FortuneFS9952;
+            Parser = new FortuneFS9952MultimeterProtocol();
+            return true;
+        }
+        if (BdmMultimeterProtocol.Matches(data))
+        {
+            CurrMultimeterType = MultimeterType.Bdm;
+            Parser = new BdmMultimeterProtocol();
+            return true;
+        }
+        return false;
+    }
+
     /// <summary>
     /// Used for logging only
     /// </summary>
-    private readonly string InternalDeviceType = "BTBdm_Aneng_Multimeter"; // Modify: edit the string to match your device. The exact name does not matter.
+    private readonly string InternalDeviceType = "Multimeter"; // Modify: edit the string to match your device. The exact name does not matter.
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
@@ -208,7 +230,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            ( DeviceSpecificType.MultimeterDataPropertyChangedName, uiValueChange),
+            ( DeviceSpecificType.MultimeterDataFFF1PropertyChangedName, uiValueChange),
+            ( DeviceSpecificType.MultimeterDataFFF4PropertyChangedName, uiValueChange),
         };
 
         // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
@@ -394,7 +417,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // Modify so the device starts sending notifications for changed properties (data)
 
         // Modify: tell the device to start sending sensor and battery data back.
-        await Device.NotifyMultimeterDataAsync();
+        // Only one of these will actually work
+        await Device.NotifyMultimeterDataFFF1Async(); // Bdm style
+        await Device.NotifyMultimeterDataFFF4Async(); // Fortune FS9952 style
 
 
 #if YOUR_CODE_MIGHT_NEED_TO_QUERY_DEVICE
@@ -409,7 +434,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
 
         // TODO: no battery at all?
-            uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
+        // The MEET MS-BDTP1A with device name MS-BO47Q1767 says it has a battery
+        // but it just pops out a protocol error???
+        uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
 
         // Some UX needs additional information
         connectAllOk = connectAllOk && (await Device.ReadDevice_Name(DefaultCacheMode)) != null;
@@ -657,7 +684,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     bool OldHold = false;
 
-
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. Most often called from Device_PropertyChanged
@@ -671,7 +697,12 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         CurrSensor_Data = Device.CurrMultimeter_Data; // Modify: select the right data
         // CurrSensorSecondary_Data = Device.CurrHumidity_Data; // Modify: pick secondary data as appropriate
         // CurrBattery_Data = Device.CurrBattery_Data; // Modify: if your device doesn't have a battery, remove battery stuff!
-        if (CurrSensor_Data.Data == null) return; // not real data
+        var data = CurrSensor_Data.DataFFF1;
+        if (data == null) data = CurrSensor_Data.DataFFF4;
+        if (data == null ) return; // not real data
+
+        SetParser(data);
+        if (Parser == null) return; // Could not get a match
 
         SparklesHelper.UpdateSparkles(ControlsWithSparkles, name); // name is from e.PropertyName when the Device does a PropertyChanged.
 
@@ -679,7 +710,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // Modify: the CopyToWithConvertAndCreate as made by the autogen system will handle only a
         // single data type. If you make a Facade class to combine multiple sensors into one, you will
         // need to create a version of CopyToWithConvertAndCreate that takes in both types.
-        CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, Parser, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         // CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         // CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
@@ -687,7 +718,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         switch (name)
         {
             // In your code, hook up the right sensors to the right XAML
-            case DeviceSpecificType.MultimeterDataPropertyChangedName: // Modify: update the UX as appropriate
+            case DeviceSpecificType.MultimeterDataFFF1PropertyChangedName: // Modify: update the UX as appropriate
+            case DeviceSpecificType.MultimeterDataFFF4PropertyChangedName: // Modify: update the UX as appropriate
                 // UX is more complex than just matching the parsed state
                 var other = CurrSensor_DataUnits.DisplayOther;
                 var hasAuto = other.Contains(BdmMultimeterDisplayFacade.AutoStr); // "AUTO "
