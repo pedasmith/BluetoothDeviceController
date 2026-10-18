@@ -391,8 +391,6 @@ namespace BluetoothWinUI3
                 BluetoothCacheMode cacheMode = BluetoothCacheMode.Cached;
                 var addr = SelectedWatcherData.Addr;
 
-                AccessoryGuidelinesReport = await BTAccessoryGuidelinesReport.CreateFromAdvertisement(SelectedWatcherData);
-
                 /* 2026-09-04 all this was a failed attempt to connect to the BT-90EPD multimeter.
                 var aresult = await le.RequestAccessAsync();
                 var pto = BluetoothLEPreferredConnectionParameters.ThroughputOptimized; // timeout=0xC8
@@ -409,6 +407,9 @@ namespace BluetoothWinUI3
                     return;
                 }
                 uiDeviceDetailsTextBlock.Text = $"Services for {SelectedWatcherData.AddressAsString} {SelectedWatcherData.BestName}\n\n";
+
+                // Do this a little later
+                AccessoryGuidelinesReport = await BTAccessoryGuidelinesReport.CreateFromAdvertisement(SelectedWatcherData);
 
                 var nameDeviceList = new NameAllBleDevices();
                 var nameDevice = new NameDevice();
@@ -679,9 +680,10 @@ namespace BluetoothWinUI3
                     NameCharacteristic name = null;
                     CharacteristicNameMap.TryGetValue(ch, out name);
                     string decodestr = name?.Type ?? "BYTES|HEX|data|";
+                    decodestr = "BYTES|HEX|data|";
                     var parseResult = IotNumberFormats.ValueParser.Parse(readResult.Value.ToArray(), decodestr);
                     var str = parseResult.AsString;
-                    Log($"Read: {name} {str}");
+                    Log($"Read: {name}: {str}");
                 }
             }
             catch (Exception ex)
@@ -721,23 +723,21 @@ namespace BluetoothWinUI3
             }
             var hexstr = content.Text;
             var compiled = ParserFieldList.ParseLine(nc.Type);
-            var bytes = ReverseCalculations.StringToBytes(compiled, hexstr);
-            //var bytesx = HexUtilities.HexStringToByteArray(hexstr);
-            // 
 
             try
-            { 
+            {
+                var bytes = ReverseCalculations.StringToBytes(compiled, hexstr);
                 var isWriteWithoutResponse = ch.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse);
                 var writeType = isWriteWithoutResponse ? GattWriteOption.WriteWithoutResponse : GattWriteOption.WriteWithResponse;
                 var writeResult = await ch.WriteValueAsync(bytes.ToArray().AsBuffer(), writeType);
-            if (writeResult != GattCommunicationStatus.Success)
-            {
-                Log($"Write: error: status={writeResult}");
-            }
-            else
-            {
-                Log($"Write: success");
-            }
+                if (writeResult != GattCommunicationStatus.Success)
+                {
+                    Log($"Write: error: status={writeResult}");
+                }
+                else
+                {
+                    Log($"Write: success");
+                }
             }
             catch (Exception ex)
             {

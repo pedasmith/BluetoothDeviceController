@@ -15,32 +15,60 @@ namespace BluetoothWinUI3.Reports;
 
 class UserSuppliedAccessoryInformation
 {
-    public enum AccessoryType {  Unknown, Mouse, InputAccessory, AudioAccessory, Other }
+    public enum AccessoryType { Unknown, Mouse, InputAccessory, AudioAccessory, Other }
     public AccessoryType CurrAccessoryType { get; set; } = UserSuppliedAccessoryInformation.AccessoryType.AudioAccessory;
     public bool HasBattery { get; set; } = true;
     public bool IsAccessoryNotJustLEBroadcaster { get; set; } = true; // Section 7.2, DIS "... does not apply to accessories that are just LE Broadcasters"
 }
 
+#if STANDALONE
+/// <summary>
+/// Empty WatcherData class 
+/// </summary>
+class WatcherData
+{
+    public ulong BluetoothAddress = 0;
+}
+#endif
 class BTAccessoryGuidelinesReport
 {
+    BluetoothCommunicationStatus MostRecentStatus;
+#if STANDALONE
+    public static async Task<string> CreateFromAddress(ulong address)
+    {
+        WatcherData advertisement = new() { BluetoothAddress = address }; // Empty class
+        var Report = new BTAccessoryGuidelinesReport();
+        return await Report.CreateFromAddressMethod(address);
+    }
+#endif
     public static async Task<string> CreateFromAdvertisement(WatcherData advertisement)
     {
         var Report = new BTAccessoryGuidelinesReport();
+        return await Report.CreateFromAdvertisementMethod(advertisement);
+    }
+    private async Task<string> CreateFromAdvertisementMethod(WatcherData advertisement)
+    {
         BTCommon_Info Device = new()
         {
             ble = await BluetoothLEDevice.FromBluetoothAddressAsync(advertisement.Addr),
         };
+        Device.Status.OnBluetoothStatus += (source, status) => { MostRecentStatus = status; };
         BluetoothCacheMode DefaultCacheMode = BluetoothCacheMode.Cached;
         if (Device.ble == null)
         {
             return $"Error: unable to make report for {BluetoothAddress.AsString(advertisement.Addr)}";
         }
+        var nameOk = await Device.ReadDevice_Name(DefaultCacheMode);
+        if (nameOk == null)
+        {
+            return $"Error: unable to connect to {BluetoothAddress.AsString(advertisement.Addr)} (failed to get device name)\nBluetooth status: {MostRecentStatus.AsStatusString}";
+        }
 
-        Report.StatusDIS = await Device.ble.GetGattServicesForUuidAsync(BTCommon_Info.ServiceGuid_Device_Info);
+        StatusDIS = await Device.ble.GetGattServicesForUuidAsync(BTCommon_Info.ServiceGuid_Device_Info);
 
-        await Device.ReadDevice_Name(DefaultCacheMode);
+        // await Device.ReadDevice_Name(DefaultCacheMode);
         await Device.ReadAppearance(DefaultCacheMode);
-        Report.ReadConnection_ParametersOK = (await Device.ReadConnection_Parameter(DefaultCacheMode)) != null;
+        ReadConnection_ParametersOK = (await Device.ReadConnection_Parameter(DefaultCacheMode)) != null;
         await Device.ReadBatteryLevel(DefaultCacheMode);
         await Device.ReadManufacturer_Name(DefaultCacheMode);
         await Device.ReadModel_Number(DefaultCacheMode);
@@ -48,13 +76,13 @@ class BTAccessoryGuidelinesReport
         await Device.ReadSoftware_Revision(DefaultCacheMode);
         await Device.ReadPnP_ID(DefaultCacheMode);
 
-        Report.Common_Configuration_Data = Device.CurrCommon_Configuration_Data;
-        Report.Advertisement = advertisement;
-        Report.Battery_Data = Device.CurrBattery_Data;
-        Report.Device_Info_Data = Device.CurrDevice_Info_Data;
+        Common_Configuration_Data = Device.CurrCommon_Configuration_Data;
+        Advertisement = advertisement;
+        Battery_Data = Device.CurrBattery_Data;
+        Device_Info_Data = Device.CurrDevice_Info_Data;
 
-        List<SingleTestResult> tests = Report.RunTests();
-        var retval = ReportGenerator.MakeMarkdown(tests, Report.Common_Configuration_Data, Report.Advertisement);
+        List<SingleTestResult> tests = RunTests();
+        var retval = ReportGenerator.MakeMarkdown(tests, Common_Configuration_Data, Advertisement);
         return retval;
     }
 
@@ -105,7 +133,7 @@ class BTAccessoryGuidelinesReport
         switch (info.Appearance)
         {
             case 0:
-                return retval.Update (SingleTestResult.TestResult.FailUnofficial, "Appearance value is 0, which is not a useful value to set.");
+                return retval.Update(SingleTestResult.TestResult.FailUnofficial, "Appearance value is 0, which is not a useful value to set.");
             case 65535:
                 return retval.Update(SingleTestResult.TestResult.FailShould, "Appearance value was not set.");
             default:
@@ -289,7 +317,8 @@ class BTAccessoryGuidelinesReport
             retval.Update(SingleTestResult.TestResult.FailShall, $"... shall implement the Device Information Service. Service count was {StatusDIS.Services.Count}");
             return retval;
         }
-        var hasGuidInAdvert = Advertisement.ServiceUuids.Contains(BTCommon_Info.ServiceGuid_Device_Info);
+        // TODO: must mark this test as a "could not do"
+        var hasGuidInAdvert = false; //  Advertisement.ServiceUuids.Contains(BTCommon_Info.ServiceGuid_Device_Info);
 
         if (userInfo.IsAccessoryNotJustLEBroadcaster && hasGuidInAdvert)
         {

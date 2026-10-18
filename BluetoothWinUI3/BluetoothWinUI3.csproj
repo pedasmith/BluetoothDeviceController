@@ -49,7 +49,9 @@
     <None Remove="ZoomableDeviceControl.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\BDM_Aneng_Multimeter.json" Link="Assets\CharacteristicsData\BDM_Aneng_Multimeter.json" />
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\BDM_Aneng_Multimeter.json" Link="Assets\CharacteristicsData\BDM_Aneng_Multimeter.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\BTCommon_Info.json" Link="Assets\CharacteristicsData\BTCommon_Info.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -93,6 +95,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\Nordic_Thingy.json" Link="Assets\CharacteristicsData\Nordic_Thingy.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\SensorPush_HTPxw.json" Link="Assets\CharacteristicsData\SensorPush_HTPxw.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\TI_SensorTag_1350.json" Link="Assets\CharacteristicsData\TI_SensorTag_1350.json">
@@ -270,9 +275,9 @@
     <Folder Include="Assets\SerialData\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\BluetoothDeviceController\Assets\CharacteristicsData\_Recognizing_BT_Protocols.md" Link="Assets\CharacteristicsData\_Recognizing_BT_Protocols.md">
+    <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\_Recognizing_BT_Protocols.md" Link="Assets\CharacteristicsData\_Recognizing_BT_Protocols.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Page Update="BTBdm_Aneng_Multimeter.xaml">

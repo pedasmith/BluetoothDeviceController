@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using static BluetoothProtocols.BTStandard_HeartRate;
 
 #if NET8_0_OR_GREATER
 #nullable disable

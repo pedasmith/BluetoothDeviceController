@@ -256,7 +256,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
             var ignoreForPrinting = isOldAdvertisement 
                 || watcherData.ManufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10
                 || watcherData.CompanyId == 0x4C // Apple is 76 (dec) = 0x4C
-                || name.StartsWith("LEDBlue") // TODO: it spits out a lot of advertisements!
+                || name.StartsWith("name=LEDBlue") // TODO: it spits out a lot of advertisements!
                 ;
             if (!ignoreForPrinting)
             {

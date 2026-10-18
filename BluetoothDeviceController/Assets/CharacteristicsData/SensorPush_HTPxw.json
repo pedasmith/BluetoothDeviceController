@@ -1,0 +1,290 @@
+{
+  "AllDevices": [
+    {
+      "Name": "SensorPush HTP.xw",
+      "ClassName": "SensorPush_HTPxw",
+      "CompletionStatus": 0,
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "DataGroupName": "Common Configuration_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "SensorPush HTP.xw 4DA Hex:SensorPush HTP.xw 4DA"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "DataGroupName": "Common Configuration_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "Unknown Hex:00 00"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms|-1 U16^1.25_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "DataGroupName": "Common Configuration_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "100 200 0 10000 Hex:50 00 A0 00 00 00 E8 03"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "00001801-0000-1000-8000-00805f9b34fb",
+          "Name": "Generic Service",
+          "Suppress": true,
+          "Characteristics": [
+            {
+              "UUID": "00002a05-0000-1000-8000-00805f9b34fb",
+              "Name": "Service Changes",
+              "Type": "U16|DEC|StartRange U16|DEC|EndRange",
+              "DataGroupName": "Generic Service_Data",
+              "IsIndicate": true,
+              "Verbs": ":Indicate:RdInNo:InNo:"
+            }
+          ]
+        },
+        {
+          "UUID": "ef090000-11d6-42ba-93b8-9dd7ec090ab0",
+          "Name": "SensorData",
+          "Priority":  10,
+          "Characteristics": [
+            {
+              "UUID": "ef090001-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "DeviceID",
+              "Type": "U32|HEX|DeviceId",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "Verbs": ":Read:Write:RdInNo:",
+              "ExampleData": [
+                "A2 28 04 01 Hex:A2 28 04 01"
+              ]
+            },
+            {
+              "UUID": "ef090002-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "DeviceVersion",
+              "Type": "U8|HEX|Version BYTES|HEX|VersionDetails",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "00 01 04 1E 03 00 06 Hex:00 01 04 1E 03 00 06"
+              ]
+            },
+            {
+              "UUID": "ef090003-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "TxPower",
+              "Type": "U8|DEC|TxPower",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "05 Hex:05",
+                "Valid values: -21, -18, -15, -12, -9, -6, -3, 0, 1, 2, 3, 4, 5",
+                "Recommendation: keep at 5. Battery should last 2 years"
+              ]
+            },
+            {
+              "UUID": "ef090004-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "Reserved04",
+              "Type": "BYTES|HEX|Reserved04Data",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "3C 00 Hex:3C 00"
+              ]
+            },
+            {
+              "UUID": "ef090005-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "AdvertisingInterval",
+              "Type": "U16|DEC|AdvertisingInterval|microsecondsX625",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "08 08 Hex:08 08"
+              ]
+            },
+            {
+              "UUID": "ef090007-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "BatteryStatus",
+              "Type": "U16^1000_/|FIXED|Voltage|volts U16|DEC|Temperature|C",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "29 0C 13 00 Hex:29 0C 13 00"
+              ]
+            },
+            {
+              "UUID": "ef090008-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "Reserved08",
+              "Type": "BYTES|HEX|REserved08Data",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "00 00 00 00 Hex:00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "ef090009-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "Reserved09",
+              "Type": "BYTES|HEX|Reserved09Data",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 Hex:00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+              ]
+            },
+            {
+              "UUID": "ef09000a-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "Reserved0A",
+              "Type": "BYTES|HEX|Reserved0AData",
+              "DataGroupName": "Sensor_Data",
+              "IsNotify": true,
+              "Verbs": ":Notify:RdInNo:InNo:"
+            },
+            {
+              "UUID": "ef09000b-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "Reserved0B",
+              "Type": "BYTES|HEX|Reserved0BData",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "37 00 00 00 05 00 01 00 Hex:37 00 00 00 05 00 01 00"
+              ]
+            },
+            {
+              "UUID": "ef09000c-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "LedControl",
+              "Type": "U8|DEC|LedCommand",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "00 Hex:00",
+                "0=off 1..254=blink n times 255=blink forever"
+              ]
+            },
+            {
+              "UUID": "ef09000d-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "MacAddress",
+              "Type": "BYTES|HEX|MacAddress",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "DA A4 9C 44 50 94 Hex:DA A4 9C 44 50 94"
+              ]
+            },
+            {
+              "UUID": "ef090080-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "Temperature",
+              "Type": "U32^100_/|FIXED|Temperature|C",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "00 00 00 00 Hex:00 00 00 00",
+                "Write any value first, wait .1 seconds, then read. Sets Humidity, too"
+              ]
+            },
+            {
+              "UUID": "ef090081-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "Humidity",
+              "Type": "U32^100_/|FIXED|Humidity|%",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "00 00 00 00 Hex:00 00 00 00",
+                "Write any value first, wait .1 seconds, then read. Sets Temperature, too"
+              ]
+            },
+            {
+              "UUID": "ef090082-11d6-42ba-93b8-9dd7ec090aa9",
+              "Name": "Pressure",
+              "Type": "U32^10000_/|FIXED|Pressure|hPa",
+              "DataGroupName": "Sensor_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "00 00 00 00 Hex:00 00 00 00",
+                "Write any value first, wait .1 seconds, then read."
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "f000ffc0-0451-4000-b000-000000000000",
+          "Name": "ReservedC0",
+          "Suppress":  true,
+          "Characteristics": [
+            {
+              "UUID": "f000ffc1-0451-4000-b000-000000000000",
+              "Name": "ReservedC1",
+              "Type": "BYTES|HEX|ReservedC1",
+              "DataGroupName": "ReservedC0_Data",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Write:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:"
+            },
+            {
+              "UUID": "f000ffc2-0451-4000-b000-000000000000",
+              "Name": "ReservedC2",
+              "Type": "BYTES|HEX|ReservedC2",
+              "DataGroupName": "ReservedC0_Data",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":Write:WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:"
+            },
+            {
+              "UUID": "f000ffc5-0451-4000-b000-000000000000",
+              "Name": "ReservedC5",
+              "Type": "BYTES|HEX|Reserved52",
+              "DataGroupName": "Reserved03_Data",
+              "IsWriteWithoutResponse": true,
+              "IsNotify": true,
+              "Verbs": ":WriteWithoutResponse:Notify:RdInNo:InNo:WrWw:"
+            }
+          ]
+        }
+      ],
+      "Details": "Device details:"
+    }
+  ]
+}

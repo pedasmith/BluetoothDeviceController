@@ -2,6 +2,7 @@ using BluetoothProtocols;
 using BluetoothWatcher.AdvertismentWatcher;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -205,6 +206,9 @@ namespace BluetoothWinUI3
                         Log($"Unable to connect to {CurrWatcherData.AddressAsString}");
                         return;
                     }
+                    // Debugging only: var services = await CurrLEDevice.GetGattServicesAsync(BluetoothCacheMode.Cached);
+
+
                     CurrState = ConnectionState.Connected; // It's not really connected at this point ... 
 
                     break;

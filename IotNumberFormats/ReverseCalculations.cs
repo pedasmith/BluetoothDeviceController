@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -89,10 +90,34 @@ namespace IotNumberFormats
                                     break;
                             }
                             break;
+                        case "U32":
+                            switch (field.DisplayFormatPrimary)
+                            {
+                                case "FIXED": // happens when the device has a calculation (which we can't reverse)
+                                case "HEX":
+                                    var u32 = Convert.ToUInt32(nextValue, 16);
+                                    AddFromU32(retval, u32);
+                                    break;
+                                case "DEC":
+                                    retval.Add(Convert.ToByte(nextValue));
+                                    break;
+                            }
+                            break;
+                        default:
+                            Log($"ERROR: Writing: Unable to handle writing a {field.ByteFormatPrimary}");
+                            break;
                     }
                 }
             }
             return retval;
+        }
+
+        private static void AddFromU32(List<byte> list, UInt32 value)
+        {
+            list.Add((byte)(value & 0xFF));
+            list.Add((byte)((value >> 8) & 0xFF));
+            list.Add((byte)((value >> 16) & 0xFF));
+            list.Add((byte)((value >> 24) & 0xFF));
         }
 
         static void Log(string str)
