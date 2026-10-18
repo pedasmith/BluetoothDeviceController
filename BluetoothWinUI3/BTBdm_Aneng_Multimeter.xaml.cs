@@ -47,20 +47,20 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     // Modify these settings to match your device
     IMultimeterProtocolParser Parser = null; //  new BdmMultimeterProtocol();
 
-    enum MultimeterType {  Bdm, FortuneFS9952 };
-    MultimeterType CurrMultimeterType = MultimeterType.Bdm;
+//    enum MultimeterType {  Bdm, FortuneFS9952 };
+//    MultimeterType CurrMultimeterType = MultimeterType.Bdm;
     private bool SetParser(byte[] data)
     {
         if (Parser != null) return true;
         if (FortuneFS9952MultimeterProtocol.Matches(data))
         {
-            CurrMultimeterType = MultimeterType.FortuneFS9952;
+//            CurrMultimeterType = MultimeterType.FortuneFS9952;
             Parser = new FortuneFS9952MultimeterProtocol();
             return true;
         }
         if (BdmMultimeterProtocol.Matches(data))
         {
-            CurrMultimeterType = MultimeterType.Bdm;
+//            CurrMultimeterType = MultimeterType.Bdm;
             Parser = new BdmMultimeterProtocol();
             return true;
         }

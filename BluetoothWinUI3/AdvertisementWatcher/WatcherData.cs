@@ -30,6 +30,23 @@ namespace BluetoothWatcher.AdvertismentWatcher
     public class WatcherData
     {
         /// <summary>
+        /// Compatibility shim for standalone code like BTSH. That code must be carefully constructed to work
+        /// with the a mocked-up WatcherData.
+        /// </summary>
+        public WatcherData(ulong address)
+        {
+            DefaultAddr = address;
+        }
+
+        /// <summary>
+        /// The normal constructor. Only code designed for standalone use should ever use the constructor that takes an address.
+        /// </summary>
+        public WatcherData()
+        {
+
+        }
+
+        /// <summary>
         /// Advertisement CompleteLocalName (BT 0x09) or ShortenedLocalName (BT 0x08) or ""
         /// OR RuuviTag ___ for Eddystone based RuuviTags
         /// </summary>
@@ -64,8 +81,9 @@ namespace BluetoothWatcher.AdvertismentWatcher
         /// <summary>
         /// ULONG version of the address. See AddressAsString for the nicely formatted version.
         /// </summary>
-        public ulong Addr {  get { return OriginalAdvertisement?.BluetoothAddress ?? 0; } }
+        public ulong Addr {  get { return OriginalAdvertisement?.BluetoothAddress ?? DefaultAddr; } }
         public string AddressAsString { get { return BluetoothAddress.AsString(Addr); } }
+        private ulong DefaultAddr = 0;
 
         /// <summary>
         /// List of service UUIDs in the advertisement. Include the 16-bit ones and the 32-bit

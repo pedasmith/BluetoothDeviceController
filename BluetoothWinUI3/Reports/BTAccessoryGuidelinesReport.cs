@@ -21,26 +21,11 @@ class UserSuppliedAccessoryInformation
     public bool IsAccessoryNotJustLEBroadcaster { get; set; } = true; // Section 7.2, DIS "... does not apply to accessories that are just LE Broadcasters"
 }
 
-#if STANDALONE
-/// <summary>
-/// Empty WatcherData class 
-/// </summary>
-class WatcherData
-{
-    public ulong BluetoothAddress = 0;
-}
-#endif
+
 class BTAccessoryGuidelinesReport
 {
     BluetoothCommunicationStatus MostRecentStatus;
-#if STANDALONE
-    public static async Task<string> CreateFromAddress(ulong address)
-    {
-        WatcherData advertisement = new() { BluetoothAddress = address }; // Empty class
-        var Report = new BTAccessoryGuidelinesReport();
-        return await Report.CreateFromAddressMethod(address);
-    }
-#endif
+
     public static async Task<string> CreateFromAdvertisement(WatcherData advertisement)
     {
         var Report = new BTAccessoryGuidelinesReport();
