@@ -70,6 +70,20 @@
                 <Border Grid.Column="2" VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10">
                     <StackPanel Orientation="Horizontal">
                         <ToggleButton Content="Pause" x:Name="uiPauseButton" Click="OnPause" />
+                        <!-- Used by the PokitPro since it doesn't auto-range -->
+                        <Button Content="Range" x:Name="uiRangeMenuButton" >
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="0" Tag="0" Click="OnRangeMenuItemClick" />
+                                    <MenuFlyoutItem Text="1" Tag="1" Click="OnRangeMenuItemClick" />
+                                    <MenuFlyoutItem Text="2" Tag="2" Click="OnRangeMenuItemClick" />
+                                    <MenuFlyoutItem Text="3" Tag="3" Click="OnRangeMenuItemClick" />
+                                    <MenuFlyoutItem Text="4" Tag="4" Click="OnRangeMenuItemClick" />
+                                    <MenuFlyoutItem Text="5" Tag="5" Click="OnRangeMenuItemClick" />
+                                    <MenuFlyoutItem Text="6" Tag="6" Click="OnRangeMenuItemClick" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
                     </StackPanel>
                 </Border>
 

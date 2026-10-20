@@ -163,6 +163,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             // Multimeters and test equipment
             new SupportedDevice("Bluetooth DMM", typeof(BTBdm_Aneng_Multimeter)), // Aneng Bluetooth DMM 2026
             new SupportedDevice("MS-BO47Q1767", typeof(BTBdm_Aneng_Multimeter)), // MS-BDTP1A using FS9952 chip 2026
+            new SupportedDevice("POkitPro", typeof(BTBdm_Aneng_Multimeter)), // PokitPro has a sensible protocol!
 
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)

@@ -1,4 +1,5 @@
 #region Usings stay the same
+using BluetoothConversions;
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
 using BluetoothProtocolsDevicesCoreExtensions;
@@ -26,8 +27,16 @@ namespace BluetoothWinUI3;
 
 #endregion
 using static BluetoothProtocols.BDM_Aneng_Multimeter;
-using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
 using DeviceSpecificSensorData = BDM_Aneng_Multimeter.Multimeter_Data; // Modify: 
+using DeviceSpecificSensorDataPokitPro = PokitProMeter.Multimeter_Data;
+
+using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.BdmMultimeterDisplayFacade; // Modify: Often the same as the DeviceSpecificSensorData
+
+using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
+using DeviceSpecificTypePokitPro = BluetoothProtocols.PokitProMeter;
+//using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Modify: pick secondary sensor if needed
+
+
 // using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery
 // The DeviceSpecificDataUnits should be set either to the DeviceSpecificSensorData or to a data facade.
 // Use the DeviceSpecificSensorData if it has the data you want to the user to see
@@ -36,8 +45,7 @@ using DeviceSpecificSensorData = BDM_Aneng_Multimeter.Multimeter_Data; // Modify
 // About half of all devices require a facade
 // Not using a facade? Then the line below is what you want (but modify it!)
 //using DeviceSpecificSensorDataUnits = TI_SensorTag_1352.Temperature_Data; // Modify: Often the same as the DeviceSpecificSensorData
-using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.BdmMultimeterDisplayFacade; // Modify: Often the same as the DeviceSpecificSensorData
-//using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Modify: pick secondary sensor if needed
+
 // Modify these to match your device
 
 
@@ -47,20 +55,20 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     // Modify these settings to match your device
     IMultimeterProtocolParser Parser = null; //  new BdmMultimeterProtocol();
 
-//    enum MultimeterType {  Bdm, FortuneFS9952 };
-//    MultimeterType CurrMultimeterType = MultimeterType.Bdm;
+    enum MultimeterType {  Bdm, FortuneFS9952, PokitPro };
+    MultimeterType CurrMultimeterType = MultimeterType.Bdm;
     private bool SetParser(byte[] data)
     {
         if (Parser != null) return true;
         if (FortuneFS9952MultimeterProtocol.Matches(data))
         {
-//            CurrMultimeterType = MultimeterType.FortuneFS9952;
+            CurrMultimeterType = MultimeterType.FortuneFS9952;
             Parser = new FortuneFS9952MultimeterProtocol();
             return true;
         }
         if (BdmMultimeterProtocol.Matches(data))
         {
-//            CurrMultimeterType = MultimeterType.Bdm;
+            CurrMultimeterType = MultimeterType.Bdm;
             Parser = new BdmMultimeterProtocol();
             return true;
         }
@@ -115,7 +123,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         this.DataContextChanged += Control_DataContextChanged;
     }
 
-    DeviceSpecificType Device;
+    DeviceSpecificType DeviceBdmFamily;
+    DeviceSpecificTypePokitPro DevicePokitPro;
+        
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
     ulong OriginalBTAddr = 0xFFFFFFFF_FFFFFFFF;
@@ -153,6 +163,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// Current sensor data from the Device. For the demo, it's battery level.
     /// </summary>
     DeviceSpecificSensorData CurrSensor_Data = null;
+    DeviceSpecificSensorDataPokitPro CurrSensor_DataPokitPro = null;
     /// <summary>
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalDataUnits collection.
@@ -383,21 +394,42 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // Has already been saved, so will exist.
 
-        Device = new DeviceSpecificType()
+        if (DataContextAsKnownDevice.Advertisement.BestName.Contains("PokitPro"))
         {
-            ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
-        };
-        if (Device.ble == null)
+            CurrMultimeterType = MultimeterType.PokitPro;
+            DevicePokitPro = new DeviceSpecificTypePokitPro()
+            {
+                ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
+            };
+            if (DevicePokitPro.ble == null)
+            {
+                // ConnectError:NoBLE
+                Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
+                CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
+                return;
+            }
+            // It's critical to set these!
+            DataContextAsKnownDevice.Id = DevicePokitPro.ble.DeviceId ?? ""; // never null :-)
+            DataContextAsKnownDevice.BTLEDevice = DevicePokitPro.ble;
+        }
+        else
         {
-            // ConnectError:NoBLE
-            Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
-            CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
-            return;
+            DeviceBdmFamily = new DeviceSpecificType()
+            {
+                ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
+            };
+            if (DeviceBdmFamily.ble == null)
+            {
+                // ConnectError:NoBLE
+                Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
+                CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, BluetoothConnectionStatus.Disconnected);
+                return;
+            }
+            // It's critical to set these!
+            DataContextAsKnownDevice.Id = DeviceBdmFamily.ble.DeviceId ?? ""; // never null :-)
+            DataContextAsKnownDevice.BTLEDevice = DeviceBdmFamily.ble;
         }
 
-        // It's critical to set these!
-        DataContextAsKnownDevice.Id = Device.ble.DeviceId ?? ""; // never null :-)
-        DataContextAsKnownDevice.BTLEDevice = Device.ble;
         CurrSaveData = AllSaveData.SwitchToDeviceIdCurrSaveData(CurrSaveData, DataContextAsKnownDevice);
 
         // Initialize the line colors from the default colors in the OxyPlotModel.
@@ -407,9 +439,21 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         KnownDeviceName = DataContextAsKnownDevice.Advertisement?.BestName ?? KnownDeviceName;
         uiKnownDeviceName.Text = KnownDeviceName;
 
-        Device.PropertyChanged += Device_PropertyChanged;
-        Device.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
-        Device.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+        switch (CurrMultimeterType)
+        {
+            case MultimeterType.Bdm:
+            case MultimeterType.FortuneFS9952:
+                DeviceBdmFamily.PropertyChanged += Device_PropertyChanged;
+                DeviceBdmFamily.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
+                DeviceBdmFamily.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+                break;
+            case MultimeterType.PokitPro:
+                DevicePokitPro.PropertyChanged += Device_PropertyChanged;
+                DevicePokitPro.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
+                DevicePokitPro.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+                break;
+        }
+
         bool connectAllOk = true;
         uiBTConnectionControl.CurrState = BTConnectionControl.ConnectionState.Connecting;
         #endregion
@@ -418,8 +462,20 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
         // Modify: tell the device to start sending sensor and battery data back.
         // Only one of these will actually work
-        await Device.NotifyMultimeterDataFFF1Async(); // Bdm style
-        await Device.NotifyMultimeterDataFFF4Async(); // Fortune FS9952 style
+        switch (CurrMultimeterType)
+        {
+            case MultimeterType.Bdm:
+            case MultimeterType.FortuneFS9952:
+                await DeviceBdmFamily.NotifyMultimeterDataFFF1Async(); // Bdm style
+                await DeviceBdmFamily.NotifyMultimeterDataFFF4Async(); // Fortune FS9952 style
+                break;
+            case MultimeterType.PokitPro:
+                await DevicePokitPro.NotifyMM_DataAsync();
+                var mmsetting = await DevicePokitPro.WriteMM_Settings([5, 6, 200, 0, 0, 0]); // 5=ohms 0=rabge 200 0 0 0=200 mseconds
+                // range 2=up to 500
+                // range 6=decent range :-)
+                break;
+        }
 
 
 #if YOUR_CODE_MIGHT_NEED_TO_QUERY_DEVICE
@@ -439,7 +495,17 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
 
         // Some UX needs additional information
-        connectAllOk = connectAllOk && (await Device.ReadDevice_Name(DefaultCacheMode)) != null;
+        if (DeviceBdmFamily != null)
+        {
+            connectAllOk = connectAllOk && (await DeviceBdmFamily.ReadDevice_Name(DefaultCacheMode)) != null;
+            CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, DeviceBdmFamily.ble.ConnectionStatus);
+        }
+        if (DevicePokitPro != null)
+        {
+            connectAllOk = connectAllOk && (await DevicePokitPro.ReadDevice_Name(DefaultCacheMode)) != null;
+            CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, DevicePokitPro.ble.ConnectionStatus);
+        }
+
         // How this works: when you call the Read call, in addition to returning data it will
         // also call the Device.PropertyChanged (INPC) callback. In my code, it's handy to just
         // have all the UX update code for handling changes in the same place, so I just
@@ -448,7 +514,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // The system tracks device changes
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
-        CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
+        // Now above: CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
     }
 
 
@@ -690,19 +756,32 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// </summary>
     private void UpdateDeviceDataUX(string name)
     {
-        if (Device == null) return;
+        bool haveDevice = DeviceBdmFamily != null || DevicePokitPro != null;
+        if (!haveDevice) return;
 
 
-        // Modify: Always update these even though in practice they are only set once.
-        CurrSensor_Data = Device.CurrMultimeter_Data; // Modify: select the right data
-        // CurrSensorSecondary_Data = Device.CurrHumidity_Data; // Modify: pick secondary data as appropriate
-        // CurrBattery_Data = Device.CurrBattery_Data; // Modify: if your device doesn't have a battery, remove battery stuff!
-        var data = CurrSensor_Data.DataFFF1;
-        if (data == null) data = CurrSensor_Data.DataFFF4;
-        if (data == null ) return; // not real data
+        switch (CurrMultimeterType)
+        {
+            case MultimeterType.Bdm:
+            case MultimeterType.FortuneFS9952:
+                // Modify: Always update these even though in practice they are only set once.
+                CurrSensor_Data = DeviceBdmFamily.CurrMultimeter_Data; // Modify: select the right data
+                                                                       // CurrSensorSecondary_Data = Device.CurrHumidity_Data; // Modify: pick secondary data as appropriate
+                                                                       // CurrBattery_Data = Device.CurrBattery_Data; // Modify: if your device doesn't have a battery, remove battery stuff!
+                var data = CurrSensor_Data.DataFFF1;
+                if (data == null) data = CurrSensor_Data.DataFFF4;
+                if (data == null) return; // not real data
 
-        SetParser(data);
-        if (Parser == null) return; // Could not get a match
+                SetParser(data); // Parser is passed into CopyToWithConvertAndCreate
+                if (Parser == null) return; // Could not get a match
+                break;
+
+            case MultimeterType.PokitPro:
+                CurrSensor_DataPokitPro = DevicePokitPro.CurrMultimeter_Data;
+                // TODO: do what?
+                break;
+        }
+
 
         SparklesHelper.UpdateSparkles(ControlsWithSparkles, name); // name is from e.PropertyName when the Device does a PropertyChanged.
 
@@ -710,63 +789,75 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // Modify: the CopyToWithConvertAndCreate as made by the autogen system will handle only a
         // single data type. If you make a Facade class to combine multiple sensors into one, you will
         // need to create a version of CopyToWithConvertAndCreate that takes in both types.
-        CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, Parser, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         // CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
         // CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
 
         // Modify: Edit all this code to match your device and UX.
+        bool updateDisplay = false;
+        string other ="";
+        bool hasHold = false;
         switch (name)
         {
             // In your code, hook up the right sensors to the right XAML
-            case DeviceSpecificType.MultimeterDataFFF1PropertyChangedName: // Modify: update the UX as appropriate
-            case DeviceSpecificType.MultimeterDataFFF4PropertyChangedName: // Modify: update the UX as appropriate
-                // UX is more complex than just matching the parsed state
-                var other = CurrSensor_DataUnits.DisplayOther;
+            case DeviceSpecificType.MultimeterDataFFF1PropertyChangedName:
+            case DeviceSpecificType.MultimeterDataFFF4PropertyChangedName: // UX is more complex than just matching the parsed state
+                CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, Parser, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+                other = CurrSensor_DataUnits.DisplayOther;
                 var hasAuto = other.Contains(BdmMultimeterDisplayFacade.AutoStr); // "AUTO "
-                var hasHold = other.Contains(BdmMultimeterDisplayFacade.HoldStr); // "Hold "
+                hasHold = other.Contains(BdmMultimeterDisplayFacade.HoldStr); // "Hold "
                 other = other.Replace(BdmMultimeterDisplayFacade.AutoStr, ""); // "AUTO ", ""); // Auto isn't useful
-                if (IsPaused && !hasHold)
-                {
-                    // Set up the other to show the pause
-                    other = other + "Pause ";
-                }
-
-                if (!IsPaused)
-                {
-                    uiValue.Text = CurrSensor_DataUnits.DisplayText; // which to use? Answer: what the DMM says! .DisplayNumber.ToString("F3");
-                    uiUnits.Text = CurrSensor_DataUnits.DisplayUnits;
-                    uiOther.Text = other;
-                    uiMeasurementType.Text = CurrSensor_DataUnits.ModeStr;
-                    OxyPlotModel.Axes[1].Title = $"{CurrSensor_DataUnits.ModeStr}";
-                }
-                SetPauseToMatchHold(hasHold);
-
-
-                // Only the sensor data gets plotted as historical data. In the demo,
-                // other values are also read (e.g., the Interval_Min), but they aren't
-                // part of the sensor data that's plotted.
-                // The historical data is updated from the CurrSensor_DataUnits
-                if (!hasHold && !IsPaused)
-                {
-                    // On hold, freeze the display
-                    UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
-                }
+                updateDisplay = true;
                 break;
 
-            // Secondary sensor is shown in the UX but isn't in the history data.
+            case DeviceSpecificTypePokitPro.MM_DataPropertyChangedName:
+                CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_DataPokitPro, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+                other = CurrSensor_DataUnits.DisplayOther;
+                updateDisplay = true;
+                break;
+
+
+                // Secondary sensor is shown in the UX but isn't in the history data.
+        }
+        if (updateDisplay)
+        {
+            if (!IsPaused)
+            {
+                uiValue.Text = CurrSensor_DataUnits.DisplayText; // which to use? Answer: what the DMM says! .DisplayNumber.ToString("F3");
+                uiUnits.Text = CurrSensor_DataUnits.DisplayUnits;
+                uiOther.Text = other;
+                uiMeasurementType.Text = CurrSensor_DataUnits.ModeStr;
+                OxyPlotModel.Axes[1].Title = $"{CurrSensor_DataUnits.ModeStr}";
+            }
+
+            if (IsPaused && !hasHold)
+            {
+                // Set up the other to show the pause
+                other = other + "Pause ";
+            }
+            SetPauseToMatchHold(hasHold);
+
+            // Only the sensor data gets plotted as historical data. In the demo,
+            // other values are also read (e.g., the Interval_Min), but they aren't
+            // part of the sensor data that's plotted.
+            // The historical data is updated from the CurrSensor_DataUnits
+            if (!hasHold && !IsPaused)
+            {
+                // On hold, freeze the display
+                UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
+            }
         }
 
         //
         // Many devices include a battery level. If so, chances are it's called "BatteryLevel" or "Battery_Data"
         // 
         //
-//TODO:         if (CurrBattery_DataUnits != null)
-//        {
-//            if (name == DeviceSpecificType.Battery_DataPropertyChangedName || name == "")
-//            {
-//                uiBTConnectionControl.SetBatteryLevel(CurrBattery_DataUnits.BatteryLevel);
-//            }
-//        }
+        //TODO:         if (CurrBattery_DataUnits != null)
+        //        {
+        //            if (name == DeviceSpecificType.Battery_DataPropertyChangedName || name == "")
+        //            {
+        //                uiBTConnectionControl.SetBatteryLevel(CurrBattery_DataUnits.BatteryLevel);
+        //            }
+        //        }
     }
     // End of UX changes
 
@@ -840,4 +931,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
     #endregion
 
+    private async void OnRangeMenuItemClick(object sender, RoutedEventArgs e)
+    {
+        if (DevicePokitPro == null) return;
+        var rangestr = (sender as FrameworkElement)?.Tag as string;
+        if (string.IsNullOrEmpty(rangestr)) return; // will never happen
+        byte range = 0;
+        var byteparse = Byte.TryParse(rangestr, out range);
+        if (!byteparse) return;
+        byte[] mmsetting = [5, (byte)range, 200, 0, 0, 0]; // 5=ohms 0=range 200 0 0 0=200 mseconds
+        var result = await DevicePokitPro.WriteMM_Settings(mmsetting);
+        ;
+    }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

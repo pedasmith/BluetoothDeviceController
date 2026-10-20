@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IExportData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Nordic_Thingy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BTStandard_CyclingSpeedCadence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PokitProMeter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TI_SensorTag_1350.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TI_SensorTag_1352.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TI_SensorTag_2541.cs" />

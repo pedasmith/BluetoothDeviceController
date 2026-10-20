@@ -27,8 +27,9 @@ goto :EOF
 
 REM Or generate just the one, which is a little easier to handle when debugging.
 :Debug
-%BIN% -inputJsonFile "%JSONDIR%"\BDM_Aneng_Multimeter.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
 goto :EOF
+%BIN% -inputJsonFile "%JSONDIR%"\BDM_Aneng_Multimeter.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\BTCommon_Info.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\Govee_H6005.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\Bluetooth_CurrentTimeService.json -inputTemplates Templates -output output

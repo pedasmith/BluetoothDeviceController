@@ -96,7 +96,7 @@
             {
               "UUID": "00002a29-0000-1000-8000-00805f9b34fb",
               "Name": "Manufacturer Name",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|Manufacturer_Name",
               "IsRead": true,
               "ExampleData": [
                 "Value:  49 6E 67 65 6E 75 69 74 79 20 44 65 73 69 67 6E",
@@ -106,7 +106,7 @@
             {
               "UUID": "00002a24-0000-1000-8000-00805f9b34fb",
               "Name": "Model Number",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|Model_Number",
               "IsRead": true,
               "ExampleData": [
                 "Value:  31 30 2E 30",
@@ -116,7 +116,7 @@
             {
               "UUID": "00002a26-0000-1000-8000-00805f9b34fb",
               "Name": "Firmware Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|Firmware_Revision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  31 2E 32 2E 30",
@@ -126,7 +126,7 @@
             {
               "UUID": "00002a28-0000-1000-8000-00805f9b34fb",
               "Name": "Software Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|Software_Revision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  31 2E 30 30",
@@ -136,7 +136,7 @@
             {
               "UUID": "00002a27-0000-1000-8000-00805f9b34fb",
               "Name": "Hardware Revision",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|Hardware_Revision",
               "IsRead": true,
               "ExampleData": [
                 "Value:  31 2E 30",
@@ -146,7 +146,7 @@
             {
               "UUID": "00002a25-0000-1000-8000-00805f9b34fb",
               "Name": "Serial Number",
-              "Type": "STRING|ASCII",
+              "Type": "STRING|ASCII|Serial_Number",
               "IsRead": true,
               "ExampleData": [
                 "Value:  33 36 34 39 00 00 00 00 00",
@@ -171,7 +171,7 @@
             {
               "UUID": "3dba36e1-6120-4706-8dfd-ed9c16e569b6",
               "Name": "Status_Status",
-              "Type": "U8|HEX|DeviceStatus F32|FIXED|BatteryLevel",
+              "Type": "U8|DEC|DeviceStatus F32|FIXED|BatteryLevel",
               "REM10 DeviceStatus": "0=Idle 1=MM Vdc 2=MM Vac 3=MM AmpDC 4=MM AmpAC 5=MM ohm 6=MM Diode 7=MM Cont 8=MM Temp 9=DSO 10=Logger",
               "IsRead": true,
               "IsNotify": true,
@@ -231,7 +231,7 @@
             {
               "UUID": "53dc9a7a-bc19-4280-b76b-002d0e23b078",
               "Name": "MM_Settings",
-              "Type": "U8|HEX|Mode U8|HEX|Range U32|HEX|Interval|ms",
+              "Type": "U8|DEC|ModeSetting U8|DEC|RangeSetting U32|DEC|IntervalSetting|ms",
               "IsWrite": true,
               "REM05": "mode 0=idle, 1=voltDC, 2=voltAC 3=ampDC,4=ampAC 5=ohm 6=diode 7=continuity 8=temp",
               "REM10": "05 FF 00 04 00 00 ",
@@ -241,7 +241,7 @@
             {
               "UUID": "047d3559-8bee-423a-b229-4417fa603b90",
               "Name": "MM_Data",
-              "Type": "U8|HEX|Status F32|FIXED|Data U8|HEX|OperationMode U8|HEX|Range",
+              "Type": "U8|DEC|Status F32|FIXED|Data U8|DEC|OperationMode U8|HEX|Range",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
@@ -289,7 +289,7 @@
             {
               "UUID": "5f97c62b-a83b-46c6-b9cd-cac59e130a78",
               "Name": "DataLogger_Settings",
-              "Type": "U8|HEX|DlogCommand U16|HEX|DlogReserved1 U8|HEX|DlogMode U8|HEX|DlogRange U16|DEC|DlogUpdateInterval|s U32|DEC|DlogTimestamp",
+              "Type": "U8|HEX|DlogCommand U16|HEX|DlogReserved1 U8|HEX|DlogModeSetting U8|HEX|DlogRangeSetting U16|DEC|DlogUpdateInterval|s U32|DEC|DlogTimestamp",
               "IsWrite": true
             },
             {
