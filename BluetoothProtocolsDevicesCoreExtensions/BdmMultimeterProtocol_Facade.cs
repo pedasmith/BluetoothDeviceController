@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 
 // This file is also used in a test framework. When it is, STANDALONE is defined so the file
 // can be used without the rest of the system
 #if !STANDALONE
 using BluetoothProtocols;
-using Windows.ApplicationModel.ConversationalAgent;
-using Windows.Perception.Spatial.Preview;
+using Windows.Storage.Streams;
 #endif
 
 #if NET8_0_OR_GREATER
@@ -29,6 +29,32 @@ public static class DoubleExtension
         double scale = Math.Pow(10, Math.Floor(Math.Log10(Math.Abs(value))) + 1);
         var retval = scale * Math.Round(value / scale, digits);
         return retval;
+    }
+
+    public static string FixupSignificant(this string sig)
+    {
+        var sigindex = sig.IndexOf('.');
+        if (sigindex >= 0)
+        {
+            // converted to e.g. 16.000000000000001
+            var ndigit = sig.Length - sigindex - 1;
+            if (ndigit > 3)
+            {
+                // nuke the '1' at the end then remove all the 0s
+                // there will be a '.' as the sentinal
+                sig = sig.Substring(0, sig.Length - 1);
+                char lookfor = sig[sig.Length - 1]; // either 0 or 9!
+                while (sig[sig.Length - 1] == lookfor)
+                {
+                    sig = sig.Substring(0, sig.Length - 1);
+                }
+                if (sig[sig.Length - 1] == '.')
+                {
+                    sig = sig.Substring(0, sig.Length - 1);
+                }
+            }
+        }
+        return sig;
     }
 }
 /// <summary>
@@ -144,31 +170,13 @@ public class BdmMultimeterDisplayFacade
         dest.DisplayNumber = source.Data;
         dest.DisplayUnits = "";
         AdjustDisplayNumberAndUnitsAndMultiplier(source.Data, dest);
-        dest.DisplayUnits += UnitsFromPokitProMode(source.OperationMode);
+        if (source.Data != 0)
+        {
+            dest.DisplayUnits += UnitsFromPokitProMode(source.OperationMode);
+        }
         dest.DisplayOther = OtherFromPokitProMode(source.OperationMode); // e.g., "DC" and "diode"
         var sig = dest.DisplayNumber.Significant(3).ToString();
-        // sometime the displaynumber is super weird
-        var sigindex = sig.IndexOf('.');
-        if (sigindex >= 0)
-        {
-            // converted to e.g. 16.000000000000001
-            var ndigit = sig.Length - sigindex - 1;
-            if (ndigit > 3)
-            {
-                // nuke the '1' at the end then remove all the 0s
-                // there will be a '.' as the sentinal
-                sig = sig.Substring(0, sig.Length - 1);
-                char lookfor = sig[sig.Length - 1]; // either 0 or 9!
-                while (sig[sig.Length-1] == lookfor)
-                {
-                    sig = sig.Substring(0, sig.Length - 1);
-                }
-                if (sig[sig.Length - 1] == '.')
-                {
-                    sig = sig.Substring(0, sig.Length - 1);
-                }
-            }
-        }
+        sig = sig.FixupSignificant();
         dest.DisplayText = sig;
 
         // From the original class
@@ -228,7 +236,7 @@ public class BdmMultimeterDisplayFacade
             4 => "AC", // AC
             5 => "",
             6 => "Diode ",
-            7 => "continuity",
+            7 => "",
             8 => "",
             _ => "other",
         };
@@ -238,43 +246,44 @@ public class BdmMultimeterDisplayFacade
 
     private static void AdjustDisplayNumberAndUnitsAndMultiplier(double sourceData, BdmMultimeterDisplayFacade dest)
     {
-        if (sourceData == 0)
+        var sourceDataAbs = Math.Abs(sourceData);
+        if (sourceDataAbs == 0)
         {
             dest.Multiplier = 1.0;
-            dest.DisplayNumber = sourceData;
-            dest.DisplayUnits = "";
+            dest.DisplayNumber = sourceDataAbs;
+            //dest.DisplayUnits = ""; Don't change this -- e.g., reistance drops from 2 KOhm to 0 should show 0 KOhm
         }
-        else if (sourceData < 0.000_000_001)
+        else if (sourceDataAbs < 0.000_000_001)
         {
             dest.Multiplier = 0.0000_000_000_0001;
             dest.DisplayNumber = sourceData * 1000.0 * 1000 * 1000 * 1000;
             dest.DisplayUnits = "p"; // pico
         }
-        else if (sourceData < 0.000_000_001)
+        else if (sourceDataAbs < 0.000_000_001)
         {
             dest.Multiplier = 0.000_000_001;
             dest.DisplayNumber = sourceData * 1000.0 * 1000 * 1000;
             dest.DisplayUnits = "n"; // nano
         }
-        else if (sourceData < 0.001)
+        else if (sourceDataAbs < 0.001)
         {
             dest.Multiplier = 0.000_001;
             dest.DisplayNumber = sourceData * 1000.0 * 1000;
             dest.DisplayUnits = "µ"; // micro
         }
-        else if (sourceData < 1.0)
+        else if (sourceDataAbs < 1.0)
         {
             dest.Multiplier = 0.001;
             dest.DisplayNumber = sourceData * 1000.0;
             dest.DisplayUnits = "m"; // milli
         }
-        else if (sourceData > 1000_000)
+        else if (sourceDataAbs > 1000_000)
         {
             dest.Multiplier = 1000_000.0;
             dest.DisplayNumber = sourceData / (1000.0 * 1000);
             dest.DisplayUnits = "M";
         }
-        else if (sourceData > 1000)
+        else if (sourceDataAbs > 1000)
         {
             dest.Multiplier = 1000.0;
             dest.DisplayNumber = sourceData / 1000.0;
@@ -301,8 +310,8 @@ public class BdmMultimeterDisplayFacade
         exporter.CellSet(MultimeterValue);
         exporter.CellSet(DisplayText);
         exporter.CellSet(DisplayUnits);
-        exporter.CellSet(Overload.ToString());
         exporter.CellSet(ModeStr);
+        exporter.CellSet(Overload ? "Overload" : "");
         exporter.CellSet(DisplayOther);
     }
 #endif
@@ -885,5 +894,22 @@ public class FortuneFS9952MultimeterProtocol : IMultimeterProtocolParser
         nerror += protocol.TestOne("18 27 3D 4E 5B 66 72 86 92 A2 B1 CA DD EE FF", "10.04 kΩ AUTO ");
         nerror += protocol.TestOne("10 27 3D 4E 5A 60 70 80 90 A0 B3 C2 DD EE FF", " 0.L  MΩ AUTO ");
         return nerror;
+    }
+}
+
+
+public static class PokitPro_Meter_Multimeter_Extensions
+{
+    public enum MM_ModeType {  Idle=0, VoltDC=1, VoltAC=2, AmpDC=3, AmpAC=4, Resistance=5, Diode=6, Continuity=7, Temperature=8 }
+    public static byte[] GetMM_Setting_Bytes(this PokitProMeter.Multimeter_Data data)
+    {
+        var dw = new DataWriter();
+        dw.ByteOrder = ByteOrder.LittleEndian; // Bluetooth is little endian by default
+        dw.WriteByte((byte)data.ModeSetting);
+        dw.WriteByte((byte)data.RangeSetting);
+        dw.WriteUInt32((UInt32)data.IntervalSetting);
+        //await dw.StoreAsync(); will throw, which is silly
+        var buffer = dw.DetachBuffer();
+        return buffer.ToArray();
     }
 }

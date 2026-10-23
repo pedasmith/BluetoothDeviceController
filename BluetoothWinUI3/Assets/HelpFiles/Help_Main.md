@@ -27,6 +27,7 @@ Supported devices include
 
   o Aneng AN9002 Digital multimeter
   o MEET MS-BDTP1A Digital multimeter (BT name MS-BO47Q1767)
+  o Pokit Pro oscilloscope and multimeter (in Multimeter mode)
 
 
 

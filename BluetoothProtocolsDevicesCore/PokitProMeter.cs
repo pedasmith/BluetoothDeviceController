@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display..
-    /// This class was automatically generated 2026-10-20::11:38
+    /// This class was automatically generated 2026-10-22::11:42
     /// </summary>
 
     public partial class PokitProMeter : INotifyPropertyChanged
@@ -2056,8 +2056,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteMM_Settings", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteMM_Settings", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteMM_Settings: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
 
@@ -2258,8 +2268,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteDSO_Settings", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteDSO_Settings", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteDSO_Settings: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
 
@@ -2460,8 +2480,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteDataLogger_Settings", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteDataLogger_Settings", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteDataLogger_Settings: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
 
@@ -2700,8 +2730,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteServer_Supported_Features", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteServer_Supported_Features", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteServer_Supported_Features: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
         /// <summary>
@@ -2716,8 +2756,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteClient_Supported_Features", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteClient_Supported_Features", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteClient_Supported_Features: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
 
@@ -2844,8 +2894,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteDevice_Name", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteDevice_Name", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteDevice_Name: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
 
@@ -3524,8 +3584,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteStatus_Device_Name", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteStatus_Device_Name", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteStatus_Device_Name: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
         /// <summary>
@@ -3540,8 +3610,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteStatus_Flash_LED", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteStatus_Flash_LED", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteStatus_Flash_LED: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
         /// <summary>
@@ -3556,8 +3636,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteStatus_Light_LED", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteStatus_Light_LED", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteStatus_Light_LED: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
         /// <summary>
@@ -3572,8 +3662,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteUnknownStatusValues", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteUnknownStatusValues", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteUnknownStatusValues: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
 
@@ -3752,8 +3852,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteCalbrateTemperature", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteCalbrateTemperature", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteCalbrateTemperature: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
         /// <summary>
@@ -3768,8 +3878,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteCalibrateUnknown1", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteCalibrateUnknown1", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteCalibrateUnknown1: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
         /// <summary>
@@ -3784,8 +3904,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteCalibrrateUnknown2", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteCalibrrateUnknown2", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteCalibrrateUnknown2: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
 
@@ -3912,8 +4042,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteOTA_Control", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteOTA_Control", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteOTA_Control: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
         /// <summary>
@@ -3928,8 +4068,18 @@ namespace BluetoothProtocols
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("WriteOTA_Data", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteOTA_Data", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"WriteOTA_Data: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
 

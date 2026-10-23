@@ -1,9 +1,9 @@
 #region Usings stay the same
-using BluetoothConversions;
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
 using BluetoothProtocolsDevicesCoreExtensions;
 using BluetoothWatcher.AdvertismentWatcher;
+using BluetoothWinUI3.Beeps;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
@@ -390,6 +390,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             return;
         }
 
+        Beeper.Beep();
+
         OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // Has already been saved, so will exist.
@@ -471,7 +473,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 break;
             case MultimeterType.PokitPro:
                 await DevicePokitPro.NotifyMM_DataAsync();
-                var mmsetting = await DevicePokitPro.WriteMM_Settings([5, 6, 200, 0, 0, 0]); // 5=ohms 0=rabge 200 0 0 0=200 mseconds
+                DevicePokitPro.CurrMultimeter_Data.ModeSetting = (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Resistance;
+                DevicePokitPro.CurrMultimeter_Data.RangeSetting = 6;
+                DevicePokitPro.CurrMultimeter_Data.IntervalSetting = 200;
+                var mmsetting = await DevicePokitPro.WriteMM_Settings(DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes()); // 5=ohms 0=rabge 200 0 0 0=200 mseconds
                 // range 2=up to 500
                 // range 6=decent range :-)
                 break;
@@ -749,7 +754,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
 
     bool OldHold = false;
-
+    bool IsIdle = false;
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. Most often called from Device_PropertyChanged
@@ -778,7 +783,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
             case MultimeterType.PokitPro:
                 CurrSensor_DataPokitPro = DevicePokitPro.CurrMultimeter_Data;
-                // TODO: do what?
+                // Special case: the PokitPro will return a micro-ohm value when it should report zero
+                if (CurrSensor_DataPokitPro.OperationMode == (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Resistance
+                    && CurrSensor_DataPokitPro.Data < 0.1)
+                {
+                    // TODO: double check actual documentation
+                    // It can't actually read value this low
+                    CurrSensor_DataPokitPro.Data = 0;
+                }
                 break;
         }
 
@@ -813,6 +825,18 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_DataPokitPro, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
                 other = CurrSensor_DataUnits.DisplayOther;
                 updateDisplay = true;
+
+                // If we had one of the 'waiting' messages shown, take them down
+                if (IsIdle)
+                {
+                    return;
+                }
+                else
+                {
+                    // Note that we never actually get an 'idle' message
+                    uidIdle.Visibility = Visibility.Collapsed;
+                    uidSwitch.Visibility = Visibility.Collapsed;
+                }
                 break;
 
 
@@ -844,6 +868,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             {
                 // On hold, freeze the display
                 UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
+            }
+
+            // Beep as appropriate
+
+            if (CurrSensor_DataUnits.Mode == DeviceSpecificSensorDataUnits.DmmMode.Continuity)
+            {
+                if (CurrSensor_DataUnits.MultimeterValue <= 1.0)
+                {
+                    Beeper.BeepIfNotBeeping("continuity");
+                }
             }
         }
 
@@ -942,5 +976,56 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         byte[] mmsetting = [5, (byte)range, 200, 0, 0, 0]; // 5=ohms 0=range 200 0 0 0=200 mseconds
         var result = await DevicePokitPro.WriteMM_Settings(mmsetting);
         ;
+    }
+
+    private async void OnSetupPokitPro(object sender, RoutedEventArgs e)
+    {
+        if (DevicePokitPro == null) return;
+
+        // Set the mode
+        var mode = DevicePokitPro.CurrMultimeter_Data.ModeSetting;
+        var modestr = mode.ToString();
+        foreach (var item in uidMMSetupPokitPro_Mode.Items)
+        {
+            var rb = item as RadioButton;
+            if (rb == null) continue;
+            var tag = rb.Tag as string;
+            if (string.IsNullOrEmpty (tag)) continue;
+
+            var match = tag == modestr;
+            rb.IsChecked = match ? true : false;
+        }
+
+        var result = await uidMMSetupPokitPro.ShowAsync();
+
+        // Update the mode!
+        foreach (var item in uidMMSetupPokitPro_Mode.Items)
+        {
+            var rb = item as RadioButton;
+            if (rb == null) continue;
+
+            if (rb.IsChecked.Value) modestr = rb.Tag as string;
+        }
+
+        byte newPokitProMode=0;
+        var parseOk = byte.TryParse(modestr, out newPokitProMode);
+        if (!parseOk) return;
+
+        DevicePokitPro.CurrMultimeter_Data.ModeSetting = newPokitProMode;
+        var setOk = DevicePokitPro.WriteMM_Settings(DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes());
+
+        if (newPokitProMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
+        {
+            uidIdle.Visibility = Visibility.Visible;
+            uidSwitch.Visibility = Visibility.Collapsed;
+            IsIdle = true;
+        }
+        else
+        {
+            IsIdle = false;
+            uidIdle.Visibility = Visibility.Collapsed;
+            uidSwitch.Visibility = Visibility.Visible;
+            IsIdle = false;
+        }
     }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

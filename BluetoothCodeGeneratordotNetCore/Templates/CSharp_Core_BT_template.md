@@ -657,8 +657,18 @@ TODO: set up If= for the rest of the calls :-)
             {
                 return null;
             }
-            var result = await ch.WriteValueAsync(data.AsBuffer());
-            Status.ReportStatus("Write[[CharacteristicName.dotNet]]", result);
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("Write[[CharacteristicName.dotNet]]", result);
+            }
+            catch (Exception ex)
+            {
+                result = GattCommunicationStatus.Unreachable;
+                Status.ReportStatus($"Write[[CharacteristicName.dotNet]]: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+            }
             return result;
         }
 ```

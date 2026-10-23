@@ -56,6 +56,16 @@
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
                     <tv:TableView x:Name="uiTableView" IsReadOnly="True" />
                 </Grid>
+                <Border Grid.Row="2" x:Name="uidIdle" BorderThickness="0.1" BorderBrush="DarkGray" Padding="5" Margin="5" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource sDevicePrimaryData}">Idle mode</TextBlock>
+                </Border>
+                <Border Grid.Row="2" x:Name="uidSwitch" BorderThickness="0.1" BorderBrush="DarkGray" Padding="5" Margin="5" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource sDevicePrimaryData}">
+                        <Run>Changing to new mode</Run><LineBreak/>
+                        <Run>Set the device switch</Run><LineBreak/>
+                        <Run>before changing the mode</Run>
+                    </TextBlock>
+                </Border>
             </Grid>
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -67,10 +77,11 @@
                     <TextBlock Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
                     <local:BTConnectionControl x:Name="uiBTConnectionControl" />
                 </StackPanel>
-                <Border Grid.Column="2" VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10">
+                <Border Grid.Column="2" VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,0">
                     <StackPanel Orientation="Horizontal">
                         <ToggleButton Content="Pause" x:Name="uiPauseButton" Click="OnPause" />
                         <!-- Used by the PokitPro since it doesn't auto-range -->
+                        <!--
                         <Button Content="Range" x:Name="uiRangeMenuButton" >
                             <Button.Flyout>
                                 <MenuFlyout>
@@ -84,9 +95,33 @@
                                 </MenuFlyout>
                             </Button.Flyout>
                         </Button>
+                        -->
+                        <Button Content="Control" x:Name="uiSetupPokitPro" Click="OnSetupPokitPro" />
+                        <ContentDialog x:Name="uidMMSetupPokitPro" Title="Multimeter Setup" PrimaryButtonText="Ok">
+                            <ContentDialog.Content>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <RadioButtons x:Name="uidMMSetupPokitPro_Mode">
+                                            <RadioButton Content="Idle" Tag="0"/>
+                                            <RadioButton Content="Volt DC" Tag="1"/>
+                                            <RadioButton Content="Volt AC" Tag="2"/>
+                                            <RadioButton Content="Resistance" Tag="5"/>
+                                            <RadioButton Content="Diode" Tag="6"/>
+                                            <RadioButton Content="Continuity" Tag="7"/>
+                                            <RadioButton Content="Temperature" Tag="8"/>
+                                            <RadioButton Content="Amp DC" Tag="3"/>
+                                            <RadioButton Content="Amp AC" Tag="4"/>
+                                        </RadioButtons>
+                                    </StackPanel>
+                                </Grid>
+                            </ContentDialog.Content>
+                        </ContentDialog>
                     </StackPanel>
                 </Border>
-
             </Grid>
         </Grid>
     </Border>

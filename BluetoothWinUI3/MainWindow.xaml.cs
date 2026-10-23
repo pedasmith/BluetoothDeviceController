@@ -1,6 +1,7 @@
 using BluetoothProtocolsNames;
 using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWatcher.Units;
+using BluetoothWinUI3.Beeps;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using Exporters;
 using Microsoft.UI;
@@ -17,6 +18,7 @@ using Utilities;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Devices.Midi;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System.Display;
@@ -95,7 +97,9 @@ namespace BluetoothWinUI3
 
             // Arguably I don't need to do this here -- the data is only used by the BTServicesCharacteristicsDisplay
             await SingletonBleNames.InitAsync();
+            await Beeper.InitializeAsync();
         }
+
 
         // Code is From https://learn.microsoft.com/en-us/windows/windows-app-sdk/api/winrt/microsoft.ui.windowing.appwindow.seticon?view=windows-app-sdk-1.8#Microsoft_UI_Windowing_AppWindow_SetIcon_System_String_
         private async Task SetIconAsync()
