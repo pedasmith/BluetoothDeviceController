@@ -133,6 +133,7 @@
                         <TextBlock>  | </TextBlock>
                         <TextBlock x:Name="uiAdvertRaw" IsTextSelectionEnabled="True" />
                     </StackPanel>
+                    <MediaPlayerElement x:Name="uiMediaPlayerElement" Grid.Column="1" />
                 </Grid>
 
             </StackPanel>

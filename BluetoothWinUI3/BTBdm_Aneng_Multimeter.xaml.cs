@@ -115,6 +115,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         Initialize(); // Initialization that will stay the same
     }
 
+
     #region Instance value for a device stay the same
     private void Initialize()
     {
@@ -851,6 +852,19 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 uiOther.Text = other;
                 uiMeasurementType.Text = CurrSensor_DataUnits.ModeStr;
                 OxyPlotModel.Axes[1].Title = $"{CurrSensor_DataUnits.ModeStr}";
+
+                // Beep or speak as appropriate
+                if (CurrSensor_DataUnits.Mode == DeviceSpecificSensorDataUnits.DmmMode.Continuity)
+                {
+                    if (CurrSensor_DataUnits.MultimeterValue <= 1.0)
+                    {
+                        Beeper.BeepIfNotBeeping("continuity");
+                    }
+                }
+                else
+                {
+                    GlobalSpeaker.Speak(CurrSensor_DataUnits.DisplayText.ToString());
+                }
             }
 
             if (IsPaused && !hasHold)
@@ -870,15 +884,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
             }
 
-            // Beep as appropriate
 
-            if (CurrSensor_DataUnits.Mode == DeviceSpecificSensorDataUnits.DmmMode.Continuity)
-            {
-                if (CurrSensor_DataUnits.MultimeterValue <= 1.0)
-                {
-                    Beeper.BeepIfNotBeeping("continuity");
-                }
-            }
         }
 
         //
@@ -893,6 +899,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         //            }
         //        }
     }
+
     // End of UX changes
 
     #region Historical Data and export code stays the same

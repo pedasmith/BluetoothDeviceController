@@ -3,11 +3,12 @@ using BluetoothProtocols;
 using BluetoothWinUI3.Units;
 using IotNumberFormats;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Runtime.InteropServices;
 using Utilities;
 using UtilitiesWinUI3;
-using Windows.Devices.Midi;
+
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,6 +29,7 @@ namespace BluetoothWinUI3
         }
 
         public static AppSwitches CurrAppSwitches = new AppSwitches();
+        public static MediaPlayerElement? CurrMediaPlayerElement = null;
 
         private Window? _window;
 

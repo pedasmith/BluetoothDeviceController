@@ -98,6 +98,8 @@ namespace BluetoothWinUI3
             // Arguably I don't need to do this here -- the data is only used by the BTServicesCharacteristicsDisplay
             await SingletonBleNames.InitAsync();
             await Beeper.InitializeAsync();
+            App.CurrMediaPlayerElement = uiMediaPlayerElement;
+            uiMediaPlayerElement.SetMediaPlayer(new Windows.Media.Playback.MediaPlayer());
         }
 
 
