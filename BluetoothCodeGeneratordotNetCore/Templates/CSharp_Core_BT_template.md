@@ -648,7 +648,7 @@ TODO: set up If= for the rest of the calls :-)
         /// <summary>
         /// Writes data to [[CharacteristicName]] 
         /// </summary>
-        public async Task<GattCommunicationStatus?> Write[[CharacteristicName.dotNet]](byte[] data)
+        public async Task<GattCommunicationStatus?> Write[[CharacteristicName.dotNet]](byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.[[ServiceName.dotNet]]_[[CharacteristicName.dotNet]]_index;
             await Ensure_Characteristic_Async(ServiceIndex.[[ServiceName.dotNet]]_index, "[[ServiceName]]", index, "[[CharacteristicName]]");
@@ -666,8 +666,8 @@ TODO: set up If= for the rest of the calls :-)
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"Write[[CharacteristicName.dotNet]]: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"Write[[CharacteristicName.dotNet]]: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }

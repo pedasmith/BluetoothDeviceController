@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="AppDictionary.xaml" />
+    <None Remove="AppModeTileStyleResourceDictionary.xaml" />
     <None Remove="Assets\DevicePictures\Nordic_Thingy.png" />
     <None Remove="Assets\HelpFiles\Device_Nordic_Thingy.md" />
     <None Remove="Assets\HelpFiles\Help_Main.md" />
@@ -279,6 +280,11 @@
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\_Recognizing_BT_Protocols.md" Link="Assets\CharacteristicsData\_Recognizing_BT_Protocols.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="AppModeTileStyleResourceDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="BTBdm_Aneng_Multimeter.xaml">

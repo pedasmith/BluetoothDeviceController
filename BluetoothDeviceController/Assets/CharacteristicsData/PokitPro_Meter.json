@@ -236,7 +236,11 @@
               "REM05": "mode 0=idle, 1=voltDC, 2=voltAC 3=ampDC,4=ampAC 5=ohm 6=diode 7=continuity 8=temp",
               "REM10": "05 FF 00 04 00 00 ",
               "REM20": "09 00 01 00 00 00 00",
-              "REM30": "range v 0=...300mv 1=300mv..2V 2=2..6V 3=6v..12v 4=12 to 30"
+              "REM30": "range v 0=...300mv 1=300mv..2V 2=2..6V 3=6v..12v 4=12 to 30",
+              "Range_Volts": "0=0..300mv 1=300mv..2V 2=2V..6V 3=6V..12V 4=12V..30V 5=30V..60V 255=Autorange",
+              "Range_Amps" : "0=0..10mA 1=10mA..30mA 2=30mA..150mA 3=150mA..300mA 4=300mA..3A 255=Autorange",
+              "Range_Ohms": "0=0..160 1=160..330 2=330..890 3=890..1.5K 4=1.5K..10K 5=10K..100K 6=100K..470K 7=470K..1M 255=Autorange",
+              "Critical note!":  "Setting the Mode to a value that doesn't match the physical switch will throw an exceptin!"
             },
             {
               "UUID": "047d3559-8bee-423a-b229-4417fa603b90",
@@ -246,7 +250,8 @@
               "IsNotify": true,
               "ExampleData": [
                 "Value:  00 00 00 00 00 00 00",
-                "REM10: Status "
+                "REM10: Status ",
+                "Status: V/A/Ohm: 0=auto range off 1=autorange one 255=error. Continuity: 0=no cont 1=cont"
               ]
             }
           ] 

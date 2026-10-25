@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display..
-    /// This class was automatically generated 2026-10-22::11:42
+    /// This class was automatically generated 2026-10-25::12:36
     /// </summary>
 
     public partial class PokitProMeter : INotifyPropertyChanged
@@ -2047,7 +2047,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to MM_Settings 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteMM_Settings(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteMM_Settings(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Multimeter_MM_Settings_index;
             await Ensure_Characteristic_Async(ServiceIndex.Multimeter_index, "Multimeter", index, "MM_Settings");
@@ -2065,8 +2065,8 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteMM_Settings: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteMM_Settings: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
@@ -2259,7 +2259,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to DSO_Settings 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteDSO_Settings(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteDSO_Settings(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.DSO_Oscilloscope_DSO_Settings_index;
             await Ensure_Characteristic_Async(ServiceIndex.DSO_Oscilloscope_index, "DSO_Oscilloscope", index, "DSO_Settings");
@@ -2277,8 +2277,8 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteDSO_Settings: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteDSO_Settings: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
@@ -2471,7 +2471,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to DataLogger_Settings 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteDataLogger_Settings(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteDataLogger_Settings(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.DataLogger_Dlog_DataLogger_Settings_index;
             await Ensure_Characteristic_Async(ServiceIndex.DataLogger_Dlog_index, "DataLogger_Dlog", index, "DataLogger_Settings");
@@ -2489,8 +2489,8 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteDataLogger_Settings: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteDataLogger_Settings: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
@@ -2721,7 +2721,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to Server_Supported_Features 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteServer_Supported_Features(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteServer_Supported_Features(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Generic_Service_Server_Supported_Features_index;
             await Ensure_Characteristic_Async(ServiceIndex.Generic_Service_index, "Generic Service", index, "Server_Supported_Features");
@@ -2739,15 +2739,15 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteServer_Supported_Features: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteServer_Supported_Features: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
         /// Writes data to Client_Supported_Features 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteClient_Supported_Features(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteClient_Supported_Features(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Generic_Service_Client_Supported_Features_index;
             await Ensure_Characteristic_Async(ServiceIndex.Generic_Service_index, "Generic Service", index, "Client_Supported_Features");
@@ -2765,8 +2765,8 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteClient_Supported_Features: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteClient_Supported_Features: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
@@ -2885,7 +2885,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to Device Name 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteDevice_Name(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteDevice_Name(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Common_Configuration_Device_Name_index;
             await Ensure_Characteristic_Async(ServiceIndex.Common_Configuration_index, "Common Configuration", index, "Device Name");
@@ -2903,8 +2903,8 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteDevice_Name: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteDevice_Name: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
@@ -3575,7 +3575,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to Status_Device_Name 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteStatus_Device_Name(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteStatus_Device_Name(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Service_Status_Status_Device_Name_index;
             await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Device_Name");
@@ -3593,15 +3593,15 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteStatus_Device_Name: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteStatus_Device_Name: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
         /// Writes data to Status_Flash_LED 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteStatus_Flash_LED(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteStatus_Flash_LED(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Service_Status_Status_Flash_LED_index;
             await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Flash_LED");
@@ -3619,15 +3619,15 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteStatus_Flash_LED: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteStatus_Flash_LED: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
         /// Writes data to Status_Light_LED 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteStatus_Light_LED(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteStatus_Light_LED(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Service_Status_Status_Light_LED_index;
             await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Light_LED");
@@ -3645,15 +3645,15 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteStatus_Light_LED: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteStatus_Light_LED: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
         /// Writes data to UnknownStatusValues 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteUnknownStatusValues(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteUnknownStatusValues(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Service_Status_UnknownStatusValues_index;
             await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "UnknownStatusValues");
@@ -3671,8 +3671,8 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteUnknownStatusValues: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteUnknownStatusValues: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
@@ -3843,7 +3843,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to CalbrateTemperature 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteCalbrateTemperature(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteCalbrateTemperature(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.CalibrationService_CalbrateTemperature_index;
             await Ensure_Characteristic_Async(ServiceIndex.CalibrationService_index, "CalibrationService", index, "CalbrateTemperature");
@@ -3861,15 +3861,15 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteCalbrateTemperature: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteCalbrateTemperature: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
         /// Writes data to CalibrateUnknown1 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteCalibrateUnknown1(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteCalibrateUnknown1(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.CalibrationService_CalibrateUnknown1_index;
             await Ensure_Characteristic_Async(ServiceIndex.CalibrationService_index, "CalibrationService", index, "CalibrateUnknown1");
@@ -3887,15 +3887,15 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteCalibrateUnknown1: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteCalibrateUnknown1: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
         /// Writes data to CalibrrateUnknown2 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteCalibrrateUnknown2(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteCalibrrateUnknown2(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.CalibrationService_CalibrrateUnknown2_index;
             await Ensure_Characteristic_Async(ServiceIndex.CalibrationService_index, "CalibrationService", index, "CalibrrateUnknown2");
@@ -3913,8 +3913,8 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteCalibrrateUnknown2: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteCalibrrateUnknown2: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
@@ -4033,7 +4033,7 @@ namespace BluetoothProtocols
         /// <summary>
         /// Writes data to OTA_Control 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteOTA_Control(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteOTA_Control(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Silabs_Service_OTA_OTA_Control_index;
             await Ensure_Characteristic_Async(ServiceIndex.Silabs_Service_OTA_index, "Silabs_Service_OTA", index, "OTA_Control");
@@ -4051,15 +4051,15 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteOTA_Control: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteOTA_Control: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
         /// Writes data to OTA_Data 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteOTA_Data(byte[] data)
+        public async Task<GattCommunicationStatus?> WriteOTA_Data(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
             var index = CharacteristicIndex.Silabs_Service_OTA_OTA_Data_index;
             await Ensure_Characteristic_Async(ServiceIndex.Silabs_Service_OTA_index, "Silabs_Service_OTA", index, "OTA_Data");
@@ -4077,8 +4077,8 @@ namespace BluetoothProtocols
             }
             catch (Exception ex)
             {
-                result = GattCommunicationStatus.Unreachable;
-                Status.ReportStatus($"WriteOTA_Data: Exception {ex.Message}", GattCommunicationStatus.Unreachable);
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteOTA_Data: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }

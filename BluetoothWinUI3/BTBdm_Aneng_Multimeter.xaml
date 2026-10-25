@@ -66,6 +66,12 @@
                         <Run>before changing the mode</Run>
                     </TextBlock>
                 </Border>
+                <Border Grid.Row="2" x:Name="uidSwitchError" BorderThickness="0.1" BorderBrush="DarkGray" Padding="5" Margin="5" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource sDevicePrimaryData}">
+                        <Run>Error: you must set the switch</Run><LineBreak/>
+                        <Run>before changing the mode</Run>
+                    </TextBlock>
+                </Border>
             </Grid>
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -97,26 +103,40 @@
                         </Button>
                         -->
                         <Button Content="Control" x:Name="uiSetupPokitPro" Click="OnSetupPokitPro" />
-                        <ContentDialog x:Name="uidMMSetupPokitPro" Title="Multimeter Setup" PrimaryButtonText="Ok">
+                        <ContentDialog x:Name="uidMMSetupPokitPro" Title="Multimeter Setup" PrimaryButtonText="Ok" Width="500">
                             <ContentDialog.Content>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <RadioButtons x:Name="uidMMSetupPokitPro_Mode">
-                                            <RadioButton Content="Idle" Tag="0"/>
-                                            <RadioButton Content="Volt DC" Tag="1"/>
-                                            <RadioButton Content="Volt AC" Tag="2"/>
-                                            <RadioButton Content="Resistance" Tag="5"/>
-                                            <RadioButton Content="Diode" Tag="6"/>
-                                            <RadioButton Content="Continuity" Tag="7"/>
-                                            <RadioButton Content="Temperature" Tag="8"/>
-                                            <RadioButton Content="Amp DC" Tag="3"/>
-                                            <RadioButton Content="Amp AC" Tag="4"/>
-                                        </RadioButtons>
-                                    </StackPanel>
+
+                                    <Grid x:Name="uidMMSetupPokitPro_Mode">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <RadioButton Grid.Row="0" Grid.Column="0" Content="Idle" Tag="0" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="1" Grid.Column="0" Content="Volt DC" Tag="1" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="1" Grid.Column="1" Content="Volt AC" Tag="2" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="2" Grid.Column="0" Content="Resistance" Tag="5" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="2" Grid.Column="1" Content="Diode" Tag="6" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="2" Grid.Column="2" Content="Continuity" Tag="7" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="2" Grid.Column="3" Content="Temperature" Tag="8" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="5" Grid.Column="0" Content="Amp DC" Tag="3" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="5" Grid.Column="1" Content="Amp AC" Tag="4" Style="{StaticResource ModeTileRadioStyle}"/>
+                                    </Grid>
                                 </Grid>
                             </ContentDialog.Content>
                         </ContentDialog>

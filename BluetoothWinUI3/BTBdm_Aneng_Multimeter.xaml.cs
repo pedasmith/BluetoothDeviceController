@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -474,7 +475,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 break;
             case MultimeterType.PokitPro:
                 await DevicePokitPro.NotifyMM_DataAsync();
-                DevicePokitPro.CurrMultimeter_Data.ModeSetting = (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Resistance;
+                DevicePokitPro.CurrMultimeter_Data.ModeSetting = (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Idle; // always start with Idle
                 DevicePokitPro.CurrMultimeter_Data.RangeSetting = 6;
                 DevicePokitPro.CurrMultimeter_Data.IntervalSetting = 200;
                 var mmsetting = await DevicePokitPro.WriteMM_Settings(DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes()); // 5=ohms 0=rabge 200 0 0 0=200 mseconds
@@ -992,7 +993,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // Set the mode
         var mode = DevicePokitPro.CurrMultimeter_Data.ModeSetting;
         var modestr = mode.ToString();
-        foreach (var item in uidMMSetupPokitPro_Mode.Items)
+        foreach (var item in uidMMSetupPokitPro_Mode.Children)
         {
             var rb = item as RadioButton;
             if (rb == null) continue;
@@ -1006,7 +1007,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         var result = await uidMMSetupPokitPro.ShowAsync();
 
         // Update the mode!
-        foreach (var item in uidMMSetupPokitPro_Mode.Items)
+        foreach (var item in uidMMSetupPokitPro_Mode.Children)
         {
             var rb = item as RadioButton;
             if (rb == null) continue;
@@ -1018,21 +1019,37 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         var parseOk = byte.TryParse(modestr, out newPokitProMode);
         if (!parseOk) return;
 
-        DevicePokitPro.CurrMultimeter_Data.ModeSetting = newPokitProMode;
-        var setOk = DevicePokitPro.WriteMM_Settings(DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes());
+        var oldMode = DevicePokitPro.CurrMultimeter_Data.ModeSetting;
+        var oldRange = DevicePokitPro.CurrMultimeter_Data.RangeSetting;
 
-        if (newPokitProMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
+        DevicePokitPro.CurrMultimeter_Data.ModeSetting = newPokitProMode;
+        var settingsBytes = DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes();
+        var setOk = await DevicePokitPro.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
+        if (setOk == (GattCommunicationStatus)999)
         {
-            uidIdle.Visibility = Visibility.Visible;
-            uidSwitch.Visibility = Visibility.Collapsed;
+            // Threw an exception. Technically this could be for a lot of reasons. But the #1 reason
+            // by a mile is that the switch isn't set correctly. If so, reset to the old mode.
+            uidSwitchError.Visibility = Visibility.Visible;
+            DevicePokitPro.CurrMultimeter_Data.ModeSetting = oldMode;
+            DevicePokitPro.CurrMultimeter_Data.RangeSetting = oldRange;
+            SetVisible(uidSwitchError);
+        }
+        else if (newPokitProMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
+        {
+            SetVisible(uidIdle);
             IsIdle = true;
         }
         else
         {
-            IsIdle = false;
-            uidIdle.Visibility = Visibility.Collapsed;
-            uidSwitch.Visibility = Visibility.Visible;
+            SetVisible(uidSwitch);
             IsIdle = false;
         }
+    }
+
+    private void SetVisible(FrameworkElement item)
+    {
+        uidIdle.Visibility = (item == uidIdle) ? Visibility.Visible : Visibility.Collapsed;
+        uidSwitch.Visibility = (item == uidSwitch) ? Visibility.Visible : Visibility.Collapsed;
+        uidSwitchError.Visibility = (item == uidSwitchError) ? Visibility.Visible : Visibility.Collapsed;
     }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name
