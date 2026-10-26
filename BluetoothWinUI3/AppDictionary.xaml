@@ -187,6 +187,10 @@
         <Setter Property="IsTextSelectionEnabled" Value="True" />
     </Style>
 
+    <Style x:Key="sAllFontsNS" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="IsTextSelectionEnabled" Value="False" />
+    </Style>
+
 
     <Style x:Key="sDeviceBorder" TargetType="Border">
         <Setter Property="BorderThickness" Value="0" />
@@ -302,7 +306,14 @@
         <Setter Property="VerticalAlignment" Value="Bottom" />
     </Style>
 
+    <Style x:Key="sDeviceListDataCompressedNS" TargetType="TextBlock" BasedOn="{StaticResource sDeviceListDataCompressed}">
+        <Setter Property="IsTextSelectionEnabled" Value="False" />
+    </Style>
+    <Style x:Key="sDeviceListDataCompressedPrimaryNS" TargetType="TextBlock" BasedOn="{StaticResource sDeviceListDataCompressedPrimary}">
+        <Setter Property="IsTextSelectionEnabled" Value="False" />
+    </Style>
 
+    
     <Style x:Key="sGraphLineKey" TargetType="Line">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="X1" Value="0" />

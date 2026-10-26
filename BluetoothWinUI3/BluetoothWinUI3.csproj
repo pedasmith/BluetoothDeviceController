@@ -44,6 +44,7 @@
     <None Remove="BTServicesCharacteristicsDisplay.xaml" />
     <None Remove="HeartRate_Pleth_Control.xaml" />
     <None Remove="HeartRate_RRInterval_Control.xaml" />
+    <None Remove="IconLabelControl.xaml" />
     <None Remove="MarkdownHelpSystem.xaml" />
     <None Remove="TestUserControl.xaml" />
     <None Remove="TextBlockWithHistory.xaml" />
@@ -280,6 +281,11 @@
     <Content Include="..\BluetoothDeviceController\Assets\CharacteristicsData\_Recognizing_BT_Protocols.md" Link="Assets\CharacteristicsData\_Recognizing_BT_Protocols.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="IconLabelControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="AppModeTileStyleResourceDictionary.xaml">
