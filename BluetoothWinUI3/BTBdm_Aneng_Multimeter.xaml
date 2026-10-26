@@ -86,7 +86,7 @@
                 <Border Grid.Column="2" VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,0">
                     <StackPanel Orientation="Horizontal">
                         <ToggleButton Content="Pause" x:Name="uiPauseButton" Click="OnPause" />
-                        <!-- Used by the PokitPro since it doesn't auto-range -->
+                        <!-- Used by the PokitPro since it doesn't auto-range Later: yes it does when the range is set to 255! -->
                         <!--
                         <Button Content="Range" x:Name="uiRangeMenuButton" >
                             <Button.Flyout>
@@ -103,20 +103,23 @@
                         </Button>
                         -->
                         <Button Content="Control" x:Name="uiSetupPokitPro" Click="OnSetupPokitPro" />
-                        <ContentDialog x:Name="uidMMSetupPokitPro" Title="Multimeter Setup" PrimaryButtonText="Ok" Width="500">
+                        <ContentDialog x:Name="uidMMSetupPokitPro" Title="Multimeter Setup" 
+                                       PrimaryButtonText="Apply" CloseButtonText="Cancel" 
+                                       DefaultButton="Primary" Width="500">
                             <ContentDialog.Content>
-                                <Grid>
+                                <Grid >
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
                                     <Grid x:Name="uidMMSetupPokitPro_Mode">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="auto" MinWidth="60" />
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="auto" />
@@ -125,17 +128,33 @@
                                             <RowDefinition Height="auto" />
                                             <RowDefinition Height="auto" />
                                             <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
                                         </Grid.RowDefinitions>
 
-                                        <RadioButton Grid.Row="0" Grid.Column="0" Content="Idle" Tag="0" Style="{StaticResource ModeTileRadioStyle}"/>
-                                        <RadioButton Grid.Row="1" Grid.Column="0" Content="Volt DC" Tag="1" Style="{StaticResource ModeTileRadioStyle}"/>
-                                        <RadioButton Grid.Row="1" Grid.Column="1" Content="Volt AC" Tag="2" Style="{StaticResource ModeTileRadioStyle}"/>
-                                        <RadioButton Grid.Row="2" Grid.Column="0" Content="Resistance" Tag="5" Style="{StaticResource ModeTileRadioStyle}"/>
-                                        <RadioButton Grid.Row="2" Grid.Column="1" Content="Diode" Tag="6" Style="{StaticResource ModeTileRadioStyle}"/>
-                                        <RadioButton Grid.Row="2" Grid.Column="2" Content="Continuity" Tag="7" Style="{StaticResource ModeTileRadioStyle}"/>
-                                        <RadioButton Grid.Row="2" Grid.Column="3" Content="Temperature" Tag="8" Style="{StaticResource ModeTileRadioStyle}"/>
-                                        <RadioButton Grid.Row="5" Grid.Column="0" Content="Amp DC" Tag="3" Style="{StaticResource ModeTileRadioStyle}"/>
-                                        <RadioButton Grid.Row="5" Grid.Column="1" Content="Amp AC" Tag="4" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Sleep</TextBlock>
+                                        <RadioButton Grid.Row="0" Grid.Column="1" Content="💤Idle" Tag="0" Style="{StaticResource ModeTileRadioStyleEmphasize}"/>
+                                        <Rectangle   Grid.Row="1" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Volts</TextBlock>
+                                        <RadioButton Grid.Row="2" Grid.Column="1" Content="⎓ Volts DC" Tag="1" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="2" Grid.Column="2" Content="⏦ Volts AC" Tag="2" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <Rectangle   Grid.Row="3" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
+
+                                        <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Measure</TextBlock>
+                                        <RadioButton Grid.Row="4" Grid.Column="1" Content="Ω  Ohms" Tag="5" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="4" Grid.Column="2" Content="▶│ Diode" Tag="6" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="5" Grid.Column="1" Content="🔊Continuity" Tag="7" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="5" Grid.Column="2" Content="🌡Temperature" Tag="8" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <Rectangle   Grid.Row="6" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
+
+                                        <TextBlock Grid.Row="7" Grid.Column="0" VerticalAlignment="Center">Current</TextBlock>
+                                        <RadioButton Grid.Row="7" Grid.Column="1" Content="⎓ Amps DC" Tag="3" Style="{StaticResource ModeTileRadioStyle}"/>
+                                        <RadioButton Grid.Row="7" Grid.Column="2" Content="⏦ Amps AC" Tag="4" Style="{StaticResource ModeTileRadioStyle}"/>
                                     </Grid>
                                 </Grid>
                             </ContentDialog.Content>

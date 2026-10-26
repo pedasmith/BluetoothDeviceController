@@ -476,11 +476,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             case MultimeterType.PokitPro:
                 await DevicePokitPro.NotifyMM_DataAsync();
                 DevicePokitPro.CurrMultimeter_Data.ModeSetting = (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Idle; // always start with Idle
-                DevicePokitPro.CurrMultimeter_Data.RangeSetting = 6;
+                DevicePokitPro.CurrMultimeter_Data.RangeSetting = 255;
                 DevicePokitPro.CurrMultimeter_Data.IntervalSetting = 200;
                 var mmsetting = await DevicePokitPro.WriteMM_Settings(DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes()); // 5=ohms 0=rabge 200 0 0 0=200 mseconds
+                SetVisible(uidIdle);
+                IsIdle = true;
                 // range 2=up to 500
                 // range 6=decent range :-)
+                // range 255=autorange!
                 break;
         }
 
