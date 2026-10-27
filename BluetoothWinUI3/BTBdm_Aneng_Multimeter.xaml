@@ -57,7 +57,12 @@
                     <tv:TableView x:Name="uiTableView" IsReadOnly="True" />
                 </Grid>
                 <Border Grid.Row="2" x:Name="uidIdle" BorderThickness="0.1" BorderBrush="DarkGray" Padding="5" Margin="5" Visibility="Collapsed">
-                    <TextBlock Style="{StaticResource sDevicePrimaryData}">Idle mode</TextBlock>
+                    <TextBlock Style="{StaticResource sDevicePrimaryData}">
+                        <Run>Idle mode</Run><LineBreak />
+                        <LineBreak />
+                        <Run>Set up the device, then set</Run><LineBreak/>
+                        <Run>the Control value </Run>
+                    </TextBlock>
                 </Border>
                 <Border Grid.Row="2" x:Name="uidSwitch" BorderThickness="0.1" BorderBrush="DarkGray" Padding="5" Margin="5" Visibility="Collapsed">
                     <TextBlock Style="{StaticResource sDevicePrimaryData}">
@@ -86,22 +91,6 @@
                 <Border Grid.Column="2" VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,0">
                     <StackPanel Orientation="Horizontal">
                         <ToggleButton Content="Pause" x:Name="uiPauseButton" Click="OnPause" />
-                        <!-- Used by the PokitPro since it doesn't auto-range Later: yes it does when the range is set to 255! -->
-                        <!--
-                        <Button Content="Range" x:Name="uiRangeMenuButton" >
-                            <Button.Flyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem Text="0" Tag="0" Click="OnRangeMenuItemClick" />
-                                    <MenuFlyoutItem Text="1" Tag="1" Click="OnRangeMenuItemClick" />
-                                    <MenuFlyoutItem Text="2" Tag="2" Click="OnRangeMenuItemClick" />
-                                    <MenuFlyoutItem Text="3" Tag="3" Click="OnRangeMenuItemClick" />
-                                    <MenuFlyoutItem Text="4" Tag="4" Click="OnRangeMenuItemClick" />
-                                    <MenuFlyoutItem Text="5" Tag="5" Click="OnRangeMenuItemClick" />
-                                    <MenuFlyoutItem Text="6" Tag="6" Click="OnRangeMenuItemClick" />
-                                </MenuFlyout>
-                            </Button.Flyout>
-                        </Button>
-                        -->
                         <Button Content="Control" x:Name="uiSetupPokitPro" Click="OnSetupPokitPro" />
                         <ContentDialog x:Name="uidMMSetupPokitPro" Title="Multimeter Setup" 
                                        PrimaryButtonText="Apply" CloseButtonText="Cancel" 
@@ -174,6 +163,11 @@
                                         <RadioButton Grid.Row="7" Grid.Column="2" Tag="4" Style="{StaticResource ModeTileRadioStyle}">
                                             <local:IconLabelControl Icon="⏦" Label="Amps AC"/>
                                         </RadioButton>
+                                        <Rectangle Grid.Row="8" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
+                                        
+                                        <!-- No need to expose these, ever. The Pokit Pro app always does auto-range (according to Copilot)
+                                        <ComboBox Grid.Row="9" Grid.ColumnSpan="5" Header="Range" x:Name="uidMMSetupPokitRange" IsEnabled="False"/>
+                                        -->
                                     </Grid>
                                 </Grid>
                             </ContentDialog.Content>

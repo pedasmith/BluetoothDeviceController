@@ -23,18 +23,19 @@ namespace BluetoothWinUI3.Beeps
             MS = await MidiSynthesizer.CreateAsync();
             NotePlayer = new (CTS.Token);
         }
-
+        public const string Connect = "connect";
+        public const string Continuity = "continuity";
         static Dictionary<string, string> BeepType = new()
         {
-            { "connect", "O2 T120 E8" },
-            { "continuity", "T120 L4 O0 C c#" },
+            { Connect, "O2 T120 E8 E8" },
+            { Continuity, "T120 L4 O0 C c#" },
         };
 
         /// <summary>
         /// Allowed beep types: connect continuity (or an MML string)
         /// </summary>
         /// <param name="mmlString"></param>
-        public static void Beep(string mmlString = "O2 T120 E8 E8 F8 G8 G8 F8")
+        public static void Beep(string mmlString = "O2 T120 E8 E8 F8")
         {
             if (NotePlayer == null) return;
             if (BeepType.ContainsKey(mmlString))
@@ -44,7 +45,7 @@ namespace BluetoothWinUI3.Beeps
             NotePlayer.AddMmlString(mmlString);
         }
 
-        public static void BeepIfNotBeeping(string mmlString = "O2 T120 E8 E8 F8 G8 G8 F8")
+        public static void BeepIfNotBeeping(string mmlString = "O2 T120 E8 E8 F8")
         {
             if (NotePlayer.IsPlaying()) return;
 

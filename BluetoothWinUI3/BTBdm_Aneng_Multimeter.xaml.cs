@@ -35,7 +35,7 @@ using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.Bd
 
 using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
 using DeviceSpecificTypePokitPro = BluetoothProtocols.PokitProMeter;
-//using DeviceSpecificSensorSecondaryData = TI_SensorTag_1352.Humidity_Data; // Modify: pick secondary sensor if needed
+using DeviceSpecificSensorSecondaryDataPokit = PokitProMeter.Service_Status_Data; // Modify: pick secondary sensor if needed
 
 
 // using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery
@@ -187,7 +187,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// Data directly from the device. It's always in the original units from the device
     /// and isn't converted into the user's preferred units.
     /// </summary>
-    // DeviceSpecificSensorSecondaryData CurrSensorSecondary_Data = null;
+    DeviceSpecificSensorSecondaryDataPokit CurrSensorSecondary_DataPokit = null;
 
     /// <summary>
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
@@ -245,6 +245,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         {
             ( DeviceSpecificType.MultimeterDataFFF1PropertyChangedName, uiValueChange),
             ( DeviceSpecificType.MultimeterDataFFF4PropertyChangedName, uiValueChange),
+            ( DeviceSpecificTypePokitPro.MM_DataPropertyChangedName, uiValueChange),
         };
 
         // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
@@ -392,7 +393,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             return;
         }
 
-        Beeper.Beep();
+        Beeper.Beep(Beeper.Connect);
 
         OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
@@ -475,15 +476,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 break;
             case MultimeterType.PokitPro:
                 await DevicePokitPro.NotifyMM_DataAsync();
+                await DevicePokitPro.NotifyStatus_StatusAsync();
+                var ppsdata = await DevicePokitPro.ReadStatus_Status();
+                Log($"Pokit: Starting: mode={ppsdata.DeviceStatus} voltage={ppsdata.BatteryVoltage:F2}");
                 DevicePokitPro.CurrMultimeter_Data.ModeSetting = (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Idle; // always start with Idle
-                DevicePokitPro.CurrMultimeter_Data.RangeSetting = 255;
+                DevicePokitPro.CurrMultimeter_Data.RangeSetting = 255; // always auto-range!
                 DevicePokitPro.CurrMultimeter_Data.IntervalSetting = 200;
-                var mmsetting = await DevicePokitPro.WriteMM_Settings(DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes()); // 5=ohms 0=rabge 200 0 0 0=200 mseconds
-                SetVisible(uidIdle);
+                var ppbytes = DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes();
+                var mmsetting = await DevicePokitPro.WriteMM_Settings(ppbytes); // 5=ohms 0=rabge 200 0 0 0=200 mseconds
+                SetVisible(uidIdle, true); // allow override because we really want to be in idle mode
                 IsIdle = true;
-                // range 2=up to 500
-                // range 6=decent range :-)
-                // range 255=autorange!
                 break;
         }
 
@@ -788,6 +790,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
             case MultimeterType.PokitPro:
                 CurrSensor_DataPokitPro = DevicePokitPro.CurrMultimeter_Data;
+                CurrSensorSecondary_DataPokit = DevicePokitPro.CurrService_Status_Data;
+
                 // Special case: the PokitPro will return a micro-ohm value when it should report zero
                 if (CurrSensor_DataPokitPro.OperationMode == (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Resistance
                     && CurrSensor_DataPokitPro.Data < 0.1)
@@ -844,6 +848,20 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 }
                 break;
 
+            case DeviceSpecificTypePokitPro.Status_StatusPropertyChangedName: // mode and battery voltage
+                Log($"Pokit:Status_Status:time,{DateTime.Now.ToString("HH:mm")},mode,{CurrSensorSecondary_DataPokit.DeviceStatus},voltage,{CurrSensorSecondary_DataPokit.BatteryVoltage:F2}");
+                if (CurrSensorSecondary_DataPokit.DeviceStatus == (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Idle)
+                {
+                    // The device has decided to switch to idle mode. That's OK, but update the screen accordingly
+                    // Do not override the Error
+                    SetVisible(uidIdle, false);
+                }
+                break;
+
+            default:
+                Log($"MM: Other change {name}");
+                break;
+
 
                 // Secondary sensor is shown in the UX but isn't in the history data.
         }
@@ -862,7 +880,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 {
                     if (CurrSensor_DataUnits.MultimeterValue <= 1.0)
                     {
-                        Beeper.BeepIfNotBeeping("continuity");
+                        Beeper.BeepIfNotBeeping(Beeper.Continuity);
                     }
                 }
                 else
@@ -1007,6 +1025,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             rb.IsChecked = match ? true : false;
         }
 
+        //
+        // Show the dialog box
+        //
         var result = await uidMMSetupPokitPro.ShowAsync();
 
         // Update the mode!
@@ -1032,14 +1053,18 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         {
             // Threw an exception. Technically this could be for a lot of reasons. But the #1 reason
             // by a mile is that the switch isn't set correctly. If so, reset to the old mode.
+            Log("Pokit: Invalid request to change mode; set to Idle instead.");
             uidSwitchError.Visibility = Visibility.Visible;
-            DevicePokitPro.CurrMultimeter_Data.ModeSetting = oldMode;
+            DevicePokitPro.CurrMultimeter_Data.ModeSetting = (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Idle; // and not oldMode
             DevicePokitPro.CurrMultimeter_Data.RangeSetting = oldRange;
             SetVisible(uidSwitchError);
+
+            settingsBytes = DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes();
+            var resetOk = await DevicePokitPro.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
         }
         else if (newPokitProMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
         {
-            SetVisible(uidIdle);
+            SetVisible(uidIdle, true); // user explicitly requested the idle mode, so show it
             IsIdle = true;
         }
         else
@@ -1047,12 +1072,70 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             SetVisible(uidSwitch);
             IsIdle = false;
         }
+
+        var ppsdata = await DevicePokitPro.ReadStatus_Status();
+        Log($"Pokit: Set Mode result: mode={ppsdata.DeviceStatus} voltage={ppsdata.BatteryVoltage:F2}");
+
     }
 
-    private void SetVisible(FrameworkElement item)
+#if NEVER_EVER_DEFINED
+/// It turns out that the Pokit Pro doesn't expose the range settings in the app. It's always on auto-range!
+    private void OnMMPokitSetupClick(object sender, RoutedEventArgs e)
     {
+        var tag = (sender as RadioButton)?.Tag as string;
+        if (tag == null) return; // can never happen
+        int mode;
+        if (!int.TryParse(tag, out mode)) return; // can never happen
+        var combo = uidMMSetupPokitRange;
+        combo.Items.Clear();
+        int currRange = (int)CurrSensor_DataPokitPro.OperationMode;
+        switch (mode)
+        {
+            case 1:
+            case 2: // volts
+                combo.IsEnabled = true;
+                combo.Items.Add(new ComboBoxItem() { Content = "Autorange", Tag = "255", IsSelected=(currRange==255) });
+                break;
+
+            case 3:
+            case 4: // amps
+                combo.IsEnabled = true;
+                combo.Items.Add(new ComboBoxItem() { Content = "Autorange", Tag = "255", IsSelected = (currRange == 255) });
+                break;
+
+            case 5: // ohms
+                combo.IsEnabled = true;
+                combo.Items.Add(new ComboBoxItem() { Content = "Autorange", Tag = "255", IsSelected = (currRange == 255) });
+                combo.Items.Add(new ComboBoxItem() { Content = "  0..160 Ω", Tag = "0", IsSelected = (currRange == 0) });
+                combo.Items.Add(new ComboBoxItem() { Content = "160..330 Ω", Tag = "1", IsSelected = (currRange == 1) });
+                combo.Items.Add(new ComboBoxItem() { Content = "330..890 Ω", Tag = "2", IsSelected = (currRange == 2) });
+                combo.Items.Add(new ComboBoxItem() { Content = "890..1.5 ㏀", Tag = "3", IsSelected = (currRange == 3) });
+                combo.Items.Add(new ComboBoxItem() { Content = "1.5..10 ㏀", Tag = "4", IsSelected = (currRange == 4) });
+                combo.Items.Add(new ComboBoxItem() { Content = " 10..100 ㏀", Tag = "5", IsSelected = (currRange == 5) });
+                combo.Items.Add(new ComboBoxItem() { Content = "100..470 ㏀", Tag = "6", IsSelected = (currRange == 6) });
+                combo.Items.Add(new ComboBoxItem() { Content = "470..1000 ㏀", Tag = "7", IsSelected = (currRange == 7) });
+                break;
+
+
+            default:
+                combo.IsEnabled = false;
+                break;
+        }
+
+    }
+#endif
+
+    private void SetVisible(FrameworkElement item, bool letIdleOverrideSwitchError = false)
+    {
+        if (letIdleOverrideSwitchError == false && uidSwitchError.Visibility == Visibility.Visible && item == uidIdle)
+        {
+            // The user is already looking at the switch error and we have detected Idle mode.
+            // Don't switch from the error to the idle screen.
+            return;
+        }
         uidIdle.Visibility = (item == uidIdle) ? Visibility.Visible : Visibility.Collapsed;
         uidSwitch.Visibility = (item == uidSwitch) ? Visibility.Visible : Visibility.Collapsed;
         uidSwitchError.Visibility = (item == uidSwitchError) ? Visibility.Visible : Visibility.Collapsed;
     }
+
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

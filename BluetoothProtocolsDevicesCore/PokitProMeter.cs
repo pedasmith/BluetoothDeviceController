@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display..
-    /// This class was automatically generated 2026-10-25::12:36
+    /// This class was automatically generated 2026-10-26::18:47
     /// </summary>
 
     public partial class PokitProMeter : INotifyPropertyChanged
@@ -90,7 +90,7 @@ namespace BluetoothProtocols
         Service_Status service Guid=57d3a771-267c-4394-8872-78223e92aec5
             Service_Status_Data (DataGroup record)
                 Status_Device characteristic has FirmwareMajor (Byte-->double) FirmwareMinor (Byte-->double) MaxInputVoltage (UInt16-->double) MaxInputCurrent (UInt16-->double) MaxInputResistance (UInt16-->double) MaxSamplingRate (UInt16-->double) DeviceBufferSize (UInt16-->double) Reserved01 (UInt16-->double) MacAddress (Bytes-->string)  Guid=6974f5e5-0e54-45c3-97dd-29e4b5fb0849
-                Status_Status characteristic has DeviceStatus (Byte-->double) BatteryLevel (Single-->double)  Guid=3dba36e1-6120-4706-8dfd-ed9c16e569b6
+                Status_Status characteristic has DeviceStatus (Byte-->double) BatteryVoltage (Single-->double)  Guid=3dba36e1-6120-4706-8dfd-ed9c16e569b6
                 Status_Device_Name characteristic has Device_Name (String-->string)  Guid=7f0375de-077e-4555-8f78-800494509cc3
                 Status_Flash_LED characteristic has Red (Byte-->double) Green (Byte-->double) Blue (Byte-->double) Beep (Byte-->double)  Guid=ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e
                 Status_Light_LED characteristic has Light (Byte-->double)  Guid=aaf3f6d5-43d4-4a83-9510-dff3d858d4cc
@@ -1261,14 +1261,14 @@ namespace BluetoothProtocols
                 get { return _DeviceStatus; }
                 set { if (value == _DeviceStatus) return; _DeviceStatus = value; OnPropertyChanged();}
             }
-            private double _BatteryLevel = 0.0;
+            private double _BatteryVoltage = 0.0;
             /// <summary>
-            /// BatteryLevel (F32 ) from Service=Service_Status and Characteristic=Status_Status
+            /// BatteryVoltage (F32 ) from Service=Service_Status and Characteristic=Status_Status
             ///</summary>
-            public double BatteryLevel 
+            public double BatteryVoltage 
             { 
-                get { return _BatteryLevel; }
-                set { if (value == _BatteryLevel) return; _BatteryLevel = value; OnPropertyChanged();}
+                get { return _BatteryVoltage; }
+                set { if (value == _BatteryVoltage) return; _BatteryVoltage = value; OnPropertyChanged();}
             }
 
             private string _Device_Name = "";
@@ -1365,7 +1365,7 @@ namespace BluetoothProtocols
                 dest.Reserved01 = source.Reserved01;
                 dest.MacAddress = source.MacAddress;
                 dest.DeviceStatus = source.DeviceStatus;
-                dest.BatteryLevel = source.BatteryLevel;
+                dest.BatteryVoltage = source.BatteryVoltage;
                 dest.Device_Name = source.Device_Name;
                 dest.Red = source.Red;
                 dest.Green = source.Green;
@@ -1399,7 +1399,7 @@ namespace BluetoothProtocols
                 dest.Reserved01 = convert(source.Reserved01, "");
                 dest.MacAddress = source.MacAddress;
                 dest.DeviceStatus = convert(source.DeviceStatus, "");
-                dest.BatteryLevel = convert(source.BatteryLevel, "");
+                dest.BatteryVoltage = convert(source.BatteryVoltage, "");
                 dest.Device_Name = source.Device_Name;
                 dest.Red = convert(source.Red, "");
                 dest.Green = convert(source.Green, "");
@@ -1412,7 +1412,7 @@ namespace BluetoothProtocols
 
             public override string[] ExportGetHeaders(IExportData _)
             {
-                return ["FirmwareMajor", "FirmwareMinor", "MaxInputVoltage", "MaxInputCurrent", "MaxInputResistance", "MaxSamplingRate", "DeviceBufferSize", "Reserved01", "MacAddress", "DeviceStatus", "BatteryLevel", "Device_Name", "Red", "Green", "Blue", "Beep", "Light", "StatusUnknown5"];
+                return ["FirmwareMajor", "FirmwareMinor", "MaxInputVoltage", "MaxInputCurrent", "MaxInputResistance", "MaxSamplingRate", "DeviceBufferSize", "Reserved01", "MacAddress", "DeviceStatus", "BatteryVoltage", "Device_Name", "Red", "Green", "Blue", "Beep", "Light", "StatusUnknown5"];
             }
 
             public override void ExportRow(IExportData exporter)
@@ -1429,7 +1429,7 @@ namespace BluetoothProtocols
                 exporter.CellSet(Reserved01);
                 exporter.CellSet(MacAddress);
                 exporter.CellSet(DeviceStatus);
-                exporter.CellSet(BatteryLevel);
+                exporter.CellSet(BatteryVoltage);
                 exporter.CellSet(Device_Name);
                 exporter.CellSet(Red);
                 exporter.CellSet(Green);
@@ -1441,7 +1441,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {FirmwareMajor} {FirmwareMinor} {MaxInputVoltage} {MaxInputCurrent} {MaxInputResistance} {MaxSamplingRate} {DeviceBufferSize} {Reserved01} {MacAddress} {DeviceStatus} {BatteryLevel} {Device_Name} {Red} {Green} {Blue} {Beep} {Light} {StatusUnknown5}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {FirmwareMajor} {FirmwareMinor} {MaxInputVoltage} {MaxInputCurrent} {MaxInputResistance} {MaxSamplingRate} {DeviceBufferSize} {Reserved01} {MacAddress} {DeviceStatus} {BatteryVoltage} {Device_Name} {Red} {Green} {Blue} {Beep} {Light} {StatusUnknown5}");
             }
         }
 //
@@ -3286,13 +3286,13 @@ namespace BluetoothProtocols
         private void NotifyStatus_StatusCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Service_Status_Status_Status_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|DeviceStatus F32|FIXED|BatteryLevel");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|DeviceStatus F32|FIXED|BatteryVoltage");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrService_Status_Data.TimestampMostRecent = args.Timestamp;
             CurrService_Status_Data.DeviceStatus = vr.GetNextDouble();
-            CurrService_Status_Data.BatteryLevel = vr.GetNextDouble();
+            CurrService_Status_Data.BatteryVoltage = vr.GetNextDouble();
             OnPropertyChanged(Status_StatusPropertyChangedName); // "Status_Status"
         }
         // Per-characteristics methods for Service_Status Status_Device_Name
@@ -3451,12 +3451,12 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "Status_Status", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|DeviceStatus F32|FIXED|BatteryLevel");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|DeviceStatus F32|FIXED|BatteryVoltage");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
             CurrService_Status_Data.DeviceStatus = vr.GetNextDouble();
-            CurrService_Status_Data.BatteryLevel = vr.GetNextDouble();
+            CurrService_Status_Data.BatteryVoltage = vr.GetNextDouble();
             CurrService_Status_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(Status_StatusPropertyChangedName); // "Status_Status"
             return CurrService_Status_Data;
