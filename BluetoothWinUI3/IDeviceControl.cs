@@ -55,6 +55,7 @@ namespace BluetoothWinUI3
         /// </summary>
         void UpdateUX(SaveData saveData);
 
+        void SetInitialUserPreferences(UserPreferences newPrefs, UserPreferences oldPrefs);
         void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs);
 
         void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize);
@@ -72,6 +73,10 @@ namespace BluetoothWinUI3
             CanRename = 0x04,
             CanShowTable = 0x08,
             CanGetDetails = 0x10,
+            /// <summary>
+            /// The control will beep & voice data. controls is uimBTVoice and uimBTBeep are enabled.
+            /// </summary>
+            CanBeepAndVoice = 0x20,
         }
         UXCapabilities GetUXCapabilities();
 

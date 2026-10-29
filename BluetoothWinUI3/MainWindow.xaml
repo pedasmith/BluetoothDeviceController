@@ -48,6 +48,16 @@
                     <MenuFlyoutItem Text="Background Color" Click="OnBTColorBackground" AccessKey="T" x:Name="uimBTColorBackground"  />
                     <MenuFlyoutItem Text="Text Color" Click="OnBTColorText"  AccessKey="T" x:Name="uimBTColorText" />
                     <MenuFlyoutSubItem Text="Graph Colors" x:Name="uimBTGraphColorsMenu" />
+                    <MenuFlyoutSubItem Text="Voice" x:Name="uimBTVoice" >
+                        <RadioMenuFlyoutItem Text="On" Click="OnBTVoice" Tag="on" x:Name="uimBTVoiceOn" GroupName="groupVoice" />
+                        <RadioMenuFlyoutItem Text="Quiet" Click="OnBTVoice" Tag="quiet" x:Name="uimBTVoiceQuiet" GroupName="groupVoice" />
+                        <RadioMenuFlyoutItem Text="Off" Click="OnBTVoice" Tag="off" x:Name="uimBTVoiceOff" GroupName="groupVoice" />
+                    </MenuFlyoutSubItem>
+                    <MenuFlyoutSubItem Text="Beeps" x:Name="uimBTBeep">
+                        <RadioMenuFlyoutItem Text="On" Click="OnBTBeep" Tag="on" x:Name="uimBTBeepOn" GroupName="groupBeep" />
+                        <RadioMenuFlyoutItem Text="Quiet" Click="OnBTBeep" Tag="quiet" x:Name="uimBTBeepQuiet" GroupName="groupBeep" />
+                        <RadioMenuFlyoutItem Text="Off" Click="OnBTBeep" Tag="off" x:Name="uimBTBeepOff" GroupName="groupBeep" />
+                    </MenuFlyoutSubItem>
                 </MenuBarItem>
                 <MenuBarItem Title="Preferences" AccessKey="P">
                     <MenuFlyoutSubItem Text="Temperature Units" x:Name="uiTemperaturePreferences">
@@ -70,6 +80,17 @@
                         <RadioMenuFlyoutItem Text="Kilometers" Click="OnPreferencesDistance" Tag="km" x:Name="uiPreferencesKilometers" GroupName="groupDistance" />
                         <RadioMenuFlyoutItem Text="Miles" Click="OnPreferencesDistance" Tag="miles" x:Name="uiPreferencesMiles" GroupName="groupDistance" />
                     </MenuFlyoutSubItem>
+                    <MenuFlyoutSubItem Text="Voice" >
+                        <RadioMenuFlyoutItem Text="On" Click="OnPreferencesVoice" Tag="on" x:Name="uiPreferencesVoiceOn" GroupName="groupVoice" />
+                        <RadioMenuFlyoutItem Text="Quiet" Click="OnPreferencesVoice" Tag="quiet" x:Name="uiPreferencesVoiceQuiet" GroupName="groupVoice" />
+                        <RadioMenuFlyoutItem Text="Off" Click="OnPreferencesVoice" Tag="off" x:Name="uiPreferencesVoiceOff" GroupName="groupVoice" />
+                    </MenuFlyoutSubItem>
+                    <MenuFlyoutSubItem Text="Beeps">
+                        <RadioMenuFlyoutItem Text="On" Click="OnPreferencesBeep" Tag="on" x:Name="uiPreferencesBeepOn" GroupName="groupBeep" />
+                        <RadioMenuFlyoutItem Text="Quiet" Click="OnPreferencesBeep" Tag="quiet" x:Name="uiPreferencesBeepQuiet" GroupName="groupBeep" />
+                        <RadioMenuFlyoutItem Text="Off" Click="OnPreferencesBeep" Tag="off" x:Name="uiPreferencesBeepOff" GroupName="groupBeep" />
+                    </MenuFlyoutSubItem>
+                    <ToggleMenuFlyoutItem Text="Mute All" IsChecked="False" Click="OnPreferencesMuteAll" x:Name="uiPreferencesMuteAll" />
                 </MenuBarItem>
                 
                 <MenuBarItem Title="Debug" x:Name="uiMenuDebug" AccessKey="D">

@@ -12,7 +12,7 @@ namespace BluetoothWinUI3.Beeps
         private static bool Initialize()
         {
             if (CurrSpeak != null && CurrSpeak.MPE != null) return true; // already initialized
-            CurrSpeak = new Speak("David");
+            CurrSpeak = new Speak();
             CurrSpeak.MPE = App.CurrMediaPlayerElement;
 
             if (CurrSpeak != null && CurrSpeak.MPE != null) return true; // already initialized
@@ -20,10 +20,14 @@ namespace BluetoothWinUI3.Beeps
         }
         static Task? SpeakTask;
 
-        public static void Speak(string speak)
+        public static void Speak(UserPreferences.SoundLevelType voiceLevel, string speak)
         {
             if (!Initialize()) return;
-            SpeakTask = CurrSpeak?.RunAsync(speak);
+            if (MainWindow.IsMuteAll) return;
+            double volume = 1.0; // default for 'On' (and also 'NotSet', but that should never be passed in)
+            if (voiceLevel == UserPreferences.SoundLevelType.Off) return;
+            if (voiceLevel == UserPreferences.SoundLevelType.Quiet) volume = 0.5;
+            SpeakTask = CurrSpeak?.RunAsync(volume, speak);
         }
     }
 }

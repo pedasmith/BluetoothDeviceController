@@ -554,6 +554,15 @@ public sealed partial class BTSimple_DemoControl : UserControl, IDeviceControlBa
     #endregion
 
     /// <summary>
+    /// Set the initial user preferences. This can be called before the UX is set up (and is needed when
+    /// we start to connect to set the right beep level)
+    /// </summary>
+    public void SetInitialUserPreferences(UserPreferences newPrefs, UserPreferences oldPrefs)
+    {
+        CurrUserPrefs = newPrefs;
+    }
+
+    /// <summary>
     /// UserPreferences are for the app as a whole, not for this particular device. For example: the preferred temperature unit.
     /// </summary>
     public void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs)

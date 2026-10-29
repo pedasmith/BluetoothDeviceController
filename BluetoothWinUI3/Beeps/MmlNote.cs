@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -37,6 +37,8 @@ namespace MusicMacroLanguage
         public int Instrument = -1; // default instrument is "not set"
         public int DurationInMilliseconds;
         public byte Velocity = 75;
+        public static readonly byte VelocityDefault = 75;
+        public static readonly byte VelocityQuiet = 25;
         public double SilencePercent = 7.0 / 8.0; // MN=music normal.  ML=1.0 (no spaces) MS=.75 (longer space)
         private static byte PitchToMidiNote(char pitch, int NoteModifier, int octave)
         {
@@ -60,7 +62,7 @@ namespace MusicMacroLanguage
         public byte MidiNote { get { return PitchToMidiNote(Pitch, NoteModifier, Octave); } }
 
         public enum MMLType { Classical, Modern }
-        static public IEnumerable<MmlNote> Parse(string MML, MMLType type)
+        static public IEnumerable<MmlNote> Parse(string MML, MMLType type, byte? velocity = null)
         {
             List<MmlNote> Retval = new List<MmlNote>();
             // Nice defaults
@@ -196,6 +198,7 @@ namespace MusicMacroLanguage
                     }
 
                     var n = new MmlNote(noteImage, note[0], noteModifier, noteOctave, noteDurationInMilliseconds, silencePercent, instrument);
+                    if (velocity.HasValue) n.Velocity = velocity.Value;
                     Retval.Add(n);
                 }
             }

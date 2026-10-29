@@ -361,27 +361,27 @@
     <AppxBundlePlatforms>arm64</AppxBundlePlatforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <DebugType>embedded</DebugType>
+    <DebugType>full</DebugType>
     <Deterministic>False</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DebugType>embedded</DebugType>
+    <DebugType>full</DebugType>
     <Deterministic>False</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <DebugType>embedded</DebugType>
+    <DebugType>full</DebugType>
     <Deterministic>False</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <DebugType>embedded</DebugType>
+    <DebugType>full</DebugType>
     <Deterministic>False</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DebugType>embedded</DebugType>
+    <DebugType>full</DebugType>
     <Deterministic>False</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <DebugType>embedded</DebugType>
+    <DebugType>full</DebugType>
     <Deterministic>False</Deterministic>
   </PropertyGroup>
   <Import Project="..\BluetoothConversions\BluetoothConversions.projitems" Label="Shared" />

@@ -30,9 +30,9 @@ namespace AdvancedCalculator.BCBasic.RunTimeLibrary
         bool PlayTaskRunning = false;
         MidiSynthesizer MS = null;
 
-        public void AddMmlString(string mmlString)
+        public void AddMmlString(string mmlString, byte? velocity = null)
         {
-            var notes = MusicMacroLanguage.MmlNote.Parse(mmlString, MusicMacroLanguage.MmlNote.MMLType.Modern);
+            var notes = MusicMacroLanguage.MmlNote.Parse(mmlString, MusicMacroLanguage.MmlNote.MMLType.Modern, velocity);
             AddNotes(notes);
         }
 

@@ -231,6 +231,14 @@ namespace BluetoothWinUI3
             DeviceColorBrushes.SetUxColors(this.rootPanel, brushes);
         }
 
+        /// <summary>
+        /// Set the initial user preferences. This can be called before the UX is set up (and is needed when
+        /// we start to connect to set the right beep level)
+        /// </summary>
+        public void SetInitialUserPreferences(UserPreferences newPrefs, UserPreferences oldPrefs)
+        {
+        }
+
         public void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs)
         {
             Log($"{InternalDeviceType}: UpdateUX with UserPreferences");

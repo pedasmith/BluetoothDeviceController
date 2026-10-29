@@ -82,7 +82,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="180"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
@@ -91,7 +91,9 @@
                 <Border Grid.Column="2" VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,0">
                     <StackPanel Orientation="Horizontal">
                         <ToggleButton Content="Pause" x:Name="uiPauseButton" Click="OnPause" />
+                        <Button Content="Beep" Click="OnBeep" />
                         <Button Content="Control" x:Name="uiSetupPokitPro" Click="OnSetupPokitPro" />
+
                         <ContentDialog x:Name="uidMMSetupPokitPro" Title="Multimeter Setup" 
                                        PrimaryButtonText="Apply" CloseButtonText="Cancel" 
                                        DefaultButton="Primary" Width="500">

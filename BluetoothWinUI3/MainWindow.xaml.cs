@@ -18,9 +18,7 @@ using Utilities;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
-using Windows.Devices.Midi;
 using Windows.Storage;
-using Windows.Storage.Streams;
 using Windows.System.Display;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -73,7 +71,7 @@ namespace BluetoothWinUI3
 
         private void MainWindow_Closed(object sender, WindowEventArgs args)
         {
-            CurrUserPrefs.Save();
+            CurrUserPrefs.Save(); // MainWindow_Closed
         }
 
         BleNames SingletonBleNames = new BleNames();
@@ -87,7 +85,8 @@ namespace BluetoothWinUI3
             }
             await SetIconAsync();
 
-            SetUxFromUserPreferences();
+            SetUxFromUserPreferences(); // MainWindow_Loaded
+
             if (CurrUserPrefs.AutostartAdvertisementWatcher)
             {
                 AdvertisementWatcher.Start();
@@ -97,6 +96,8 @@ namespace BluetoothWinUI3
 
             // Arguably I don't need to do this here -- the data is only used by the BTServicesCharacteristicsDisplay
             await SingletonBleNames.InitAsync();
+
+            // All the beep and speaking bits
             await Beeper.InitializeAsync();
             App.CurrMediaPlayerElement = uiMediaPlayerElement;
             uiMediaPlayerElement.SetMediaPlayer(new Windows.Media.Playback.MediaPlayer());
@@ -153,6 +154,20 @@ namespace BluetoothWinUI3
                 case Temperature.TemperatureUnit.Kelvin: uiPreferencesKelvin.IsChecked = true; break;
                 case Temperature.TemperatureUnit.Rankine: uiPreferencesRankine.IsChecked = true; break;
                 case Temperature.TemperatureUnit.Réaumur: uiPreferencesRéaumur.IsChecked = true; break;
+            }
+
+            uiPreferencesMuteAll.IsChecked = IsMuteAll; // Not actually a preference
+            switch (CurrUserPrefs.BeepLevel)
+            {
+                case UserPreferences.SoundLevelType.Off: uiPreferencesBeepOff.IsChecked = true; break;
+                case UserPreferences.SoundLevelType.Quiet: uiPreferencesBeepQuiet.IsChecked = true; break;
+                case UserPreferences.SoundLevelType.On: uiPreferencesBeepOn.IsChecked = true; break;
+            }
+            switch (CurrUserPrefs.VoiceLevel)
+            {
+                case UserPreferences.SoundLevelType.Off: uiPreferencesVoiceOff.IsChecked = true; break;
+                case UserPreferences.SoundLevelType.Quiet: uiPreferencesVoiceQuiet.IsChecked = true; break;
+                case UserPreferences.SoundLevelType.On: uiPreferencesVoiceOn.IsChecked = true; break;
             }
         }
 
@@ -264,7 +279,13 @@ namespace BluetoothWinUI3
             var known = KnownDevices.Add(e, control, zoomControl, supportedDevice);
             userControl?.SetNotifyDeviceControlChanges(this);
             AllSaveData.GetOrCreateSaveData(known);
+            userControl?.SetInitialUserPreferences(CurrUserPrefs, null);
+
+            //
+            // Set the DataContext; this will drive most of the setup
+            //
             control.DataContext = known;
+
             userControl?.UpdateUX(CurrUserPrefs, null);
 
             if (uiKnownDevices.Items.Count == 1)
@@ -471,7 +492,7 @@ namespace BluetoothWinUI3
             // Save it and update colors!
             colorsSave.Set(colorType, newcolor);
             AllSaveData.Save(" update color");
-            selected.UpdateUX(saveData);
+            selected.UpdateUX(saveData); // MainWindow:DoBTColor (OnBTColorBackground and OnBTColorText)
         }
 
         private async void OnBTRename(object sender, RoutedEventArgs e)
@@ -493,7 +514,7 @@ namespace BluetoothWinUI3
             saveData.SetUserName(newname);
             AllSaveData.Save(" rename {newname}");
             ;
-            selected.UpdateUX(saveData);
+            selected.UpdateUX(saveData); // MainWindow: OnBTRename
         }
 
         // Keep screen on so that we constantly monitor devices
@@ -677,6 +698,7 @@ namespace BluetoothWinUI3
                 device.UpdateUX(currPrefs, oldPrefs);
             }
         }
+
         private void OnPreferencesDistance(object sender, RoutedEventArgs e)
         {
             var tag = (sender as FrameworkElement)?.Tag as string;
@@ -807,12 +829,28 @@ namespace BluetoothWinUI3
             foreach (var linename in linenames)
             {
                 AddMenuHelper(uimBTGraphColorsMenu, linename, linename, OnChangeGraphColor);
-                AddMenuHelper(uimViewHighlightMenu, linename, linename, OnHighlightGraphLine); // here!here highlight
+                AddMenuHelper(uimViewHighlightMenu, linename, linename, OnHighlightGraphLine);
             }
 
             var hasLineNames = linenames.Count > 0;
             uimBTGraphColorsMenu.IsEnabled = hasLineNames;
             uimViewHighlightMenu.IsEnabled = hasLineNames;
+
+            // Set the beep and voice get selected BTBeep uiPreferencesBeepOn
+            var knownDevice = selectedDevice.DataContextAsKnownDevice;
+            if (knownDevice == null) return;
+            var saveData = AllSaveData.FindWithId(knownDevice.Id); // a little backward?
+
+            // No save data? then unset all of the radio buttons!
+            var beepLevel = saveData?.Preferences?.BeepLevel ?? UserPreferences.SoundLevelType.NotSet;
+            uimBTBeepOff.IsChecked = beepLevel == UserPreferences.SoundLevelType.Off;
+            uimBTBeepQuiet.IsChecked = beepLevel == UserPreferences.SoundLevelType.Quiet;
+            uimBTBeepOn.IsChecked = beepLevel == UserPreferences.SoundLevelType.On;
+
+            var voiceLevel = saveData?.Preferences?.VoiceLevel ?? UserPreferences.SoundLevelType.NotSet;
+            uimBTVoiceOff.IsChecked = voiceLevel == UserPreferences.SoundLevelType.Off;
+            uimBTVoiceQuiet.IsChecked = voiceLevel == UserPreferences.SoundLevelType.Quiet;
+            uimBTVoiceOn.IsChecked = voiceLevel == UserPreferences.SoundLevelType.On;
         }
         private void AddMenuHelper(MenuFlyoutSubItem parent, string userName, string tag, RoutedEventHandler fnc)
         {
@@ -841,6 +879,9 @@ namespace BluetoothWinUI3
 
             uimViewShowTable.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanShowTable);
             uimBTCanRename.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanRename);
+
+            uimBTVoice.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanBeepAndVoice);
+            uimBTBeep.IsEnabled = capabilities.HasFlag(IDeviceControlBasic.UXCapabilities.CanBeepAndVoice);
         }
 
         private async void OnKnownDeviceSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1061,5 +1102,93 @@ namespace BluetoothWinUI3
         }
 
 
+        /// <summary>
+        /// Tags are on, quiet, off. Preferences are app-wide.
+        /// </summary>
+        private void OnPreferencesBeep(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            if (tag == null) return; // can never happen
+            switch (tag)
+            {
+                case "on": CurrUserPrefs.BeepLevel = UserPreferences.SoundLevelType.On; break;
+                case "quiet": CurrUserPrefs.BeepLevel = UserPreferences.SoundLevelType.Quiet; break;
+                case "off": CurrUserPrefs.BeepLevel = UserPreferences.SoundLevelType.Off; break;
+            }
+            CurrUserPrefs.Save();
+        }
+
+        /// <summary>
+        /// Tags are on, quiet, off. Preferences are app-wide
+        /// </summary>
+        private void OnPreferencesVoice(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            if (tag == null) return; // can never happen
+            switch (tag)
+            {
+                case "on": CurrUserPrefs.VoiceLevel = UserPreferences.SoundLevelType.On; break;
+                case "quiet": CurrUserPrefs.VoiceLevel = UserPreferences.SoundLevelType.Quiet; break;
+                case "off": CurrUserPrefs.VoiceLevel = UserPreferences.SoundLevelType.Off; break;
+            }
+            CurrUserPrefs.Save();
+        }
+
+        /// <summary>
+        /// When on, mutes all output. Is not saved (to save a value, set the Beep and Voices to off)
+        /// </summary>
+        private void OnPreferencesMuteAll(object sender, RoutedEventArgs e)
+        {
+            IsMuteAll = (sender as ToggleMenuFlyoutItem)?.IsChecked ?? false;
+        }
+        public static bool IsMuteAll { get; set; } = false;
+
+        /// <summary>
+        /// Tags are on, quiet, off. Setting is per-device
+        /// </summary>
+        private async void OnBTBeep(object sender, RoutedEventArgs e)
+        {
+            string verb = "setbeep";
+            var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
+            if (selected == null) return;
+            var knownDevice = await GetKnownDevice(selected, verb);
+            if (knownDevice == null) return;
+            var saveData = AllSaveData.FindWithId(knownDevice.Id); // a little backward?
+            if (saveData == null) return; // should never happen?
+
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            if (tag == null) return; // can never happen
+            switch (tag)
+            {
+                case "on": saveData.Preferences.BeepLevel = UserPreferences.SoundLevelType.On; break;
+                case "quiet": saveData.Preferences.BeepLevel = UserPreferences.SoundLevelType.Quiet; break;
+                case "off": saveData.Preferences.BeepLevel = UserPreferences.SoundLevelType.Off; break;
+            }
+            AllSaveData.Save(" update beep");
+        }
+
+        /// <summary>
+        /// Tags are on, quiet, off. Setting is per-device
+        /// </summary>
+        private async void OnBTVoice(object sender, RoutedEventArgs e)
+        {
+            string verb = "setvoice";
+            var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
+            if (selected == null) return;
+            var knownDevice = await GetKnownDevice(selected, verb);
+            if (knownDevice == null) return;
+            var saveData = AllSaveData.FindWithId(knownDevice.Id); // a little backward?
+            if (saveData == null) return; // should never happen?
+
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            if (tag == null) return; // can never happen
+            switch (tag)
+            {
+                case "on": saveData.Preferences.VoiceLevel = UserPreferences.SoundLevelType.On; break;
+                case "quiet": saveData.Preferences.VoiceLevel = UserPreferences.SoundLevelType.Quiet; break;
+                case "off": saveData.Preferences.VoiceLevel = UserPreferences.SoundLevelType.Off; break;
+            }
+            AllSaveData.Save(" update voice");
+        }
     }
 }

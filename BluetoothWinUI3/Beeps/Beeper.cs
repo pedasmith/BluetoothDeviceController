@@ -27,33 +27,53 @@ namespace BluetoothWinUI3.Beeps
         public const string Continuity = "continuity";
         static Dictionary<string, string> BeepType = new()
         {
-            { Connect, "O2 T120 E8 E8" },
-            { Continuity, "T120 L4 O0 C c#" },
+            // FYI: I13 is the Marimba
+            { Connect, "I13 T180 O3 L8 C E G" }, // was "O2 T120 E8 E8"
+            { "zzConnect", "O2 T120 E8 E8" },
+            { Continuity, "I13 T180 O4 L4 C" }, // was "T120 L4 O0 C c#"
         };
 
         /// <summary>
         /// Allowed beep types: connect continuity (or an MML string)
         /// </summary>
         /// <param name="mmlString"></param>
-        public static void Beep(string mmlString = "O2 T120 E8 E8 F8")
+        public static void Beep(UserPreferences.SoundLevelType beepLevel, string mmlString = "O2 T120 E8 E8 F8")
         {
+            if (MainWindow.IsMuteAll) return;
             if (NotePlayer == null) return;
             if (BeepType.ContainsKey(mmlString))
             {
                 mmlString = BeepType[mmlString];
             }
-            NotePlayer.AddMmlString(mmlString);
+            var velocity = GetVelocity(beepLevel);
+            if (velocity == 0) return;
+            NotePlayer.AddMmlString(mmlString, velocity);
         }
 
-        public static void BeepIfNotBeeping(string mmlString = "O2 T120 E8 E8 F8")
+        public static void BeepIfNotBeeping(UserPreferences.SoundLevelType beepLevel, string mmlString = "O2 T120 E8 E8 F8")
         {
+            if (MainWindow.IsMuteAll) return;
+            if (NotePlayer == null) return;
             if (NotePlayer.IsPlaying()) return;
 
             if (BeepType.ContainsKey(mmlString))
             {
                 mmlString = BeepType[mmlString];
             }
-            NotePlayer.AddMmlString(mmlString);
+            var velocity = GetVelocity(beepLevel);
+            if (velocity == 0) return;
+            NotePlayer.AddMmlString(mmlString, velocity);
+        }
+
+        private static byte GetVelocity(UserPreferences.SoundLevelType beepLevel)
+        {
+            switch (beepLevel)
+            {
+                case UserPreferences.SoundLevelType.Off: return 0;
+                case UserPreferences.SoundLevelType.On: return 75;
+                case UserPreferences.SoundLevelType.Quiet: return 25;
+            }
+            return 75;
         }
     }
 }

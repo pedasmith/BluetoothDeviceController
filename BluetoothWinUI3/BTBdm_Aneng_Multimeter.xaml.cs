@@ -393,8 +393,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             return;
         }
 
-        Beeper.Beep(Beeper.Connect);
-
         OriginalBTAddr = DataContextAsKnownDevice.Advertisement.Addr;
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // Has already been saved, so will exist.
@@ -517,6 +515,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             connectAllOk = connectAllOk && (await DevicePokitPro.ReadDevice_Name(DefaultCacheMode)) != null;
             CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, DevicePokitPro.ble.ConnectionStatus);
         }
+
+        var beepLevel = UserPreferences.SoundLevelAdjusted(CurrUserPrefs.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        Beeper.Beep(beepLevel, Beeper.Connect);
+
 
         // How this works: when you call the Read call, in addition to returning data it will
         // also call the Device.PropertyChanged (INPC) callback. In my code, it's handy to just
@@ -654,6 +656,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
     #endregion
 
+
+    /// <summary>
+    /// Set the initial user preferences. This can be called before the UX is set up (and is needed when
+    /// we start to connect to set the right beep level)
+    /// </summary>
+    public void SetInitialUserPreferences(UserPreferences newPrefs, UserPreferences oldPrefs)
+    {
+        CurrUserPrefs = newPrefs;
+    }
+
     /// <summary>
     /// UserPreferences are for the app as a whole, not for this particular device. For example: the preferred temperature unit.
     /// </summary>
@@ -713,11 +725,21 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        UIThreadHelper.CallOnUIThread(() =>
+        UIThreadHelper.CallOnUIThread(async () =>
         {
             if (!IsLoaded) return;
             CurrSaveData?.History.UpdateDataHistory(DateTimeOffset.Now);
             UpdateDeviceDataUX(e.PropertyName);
+
+
+            // If it's more than 10 minutes since the last mode check, do a mode reading
+            // Only applies to the Pokit Pro device
+            var now = DateTimeOffset.Now;
+            if (DevicePokitPro != null && now.Subtract(TimeOfLastModeCheck).TotalMinutes >= 10.0)
+            {
+                TimeOfLastModeCheck = now;
+                await DevicePokitPro.ReadStatus_Status();
+            }
         });
     }
     #endregion
@@ -762,6 +784,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     bool OldHold = false;
     bool IsIdle = false;
+    DateTimeOffset TimeOfLastModeCheck = DateTimeOffset.MinValue;
+    DateTimeOffset TimeOfLastContinuityBeep = DateTimeOffset.MinValue;
+    const double CONTINUITY_BEEP_WAIT_IN_SECONDS = 1.0;
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. Most often called from Device_PropertyChanged
@@ -793,12 +818,26 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 CurrSensorSecondary_DataPokit = DevicePokitPro.CurrService_Status_Data;
 
                 // Special case: the PokitPro will return a micro-ohm value when it should report zero
-                if (CurrSensor_DataPokitPro.OperationMode == (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Resistance
-                    && CurrSensor_DataPokitPro.Data < 0.1)
+                switch ((PokitPro_Meter_Multimeter_Extensions.MM_ModeType)CurrSensor_DataPokitPro.OperationMode)
                 {
-                    // TODO: double check actual documentation
-                    // It can't actually read value this low
-                    CurrSensor_DataPokitPro.Data = 0;
+                    case PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Continuity:
+                        if (CurrSensor_DataPokitPro.Status == 0)
+                        {
+                            CurrSensor_DataPokitPro.Data = 0; // No Continuity
+                        }
+                        else
+                        {
+                            CurrSensor_DataPokitPro.Data = 1.0; //  Continuity
+                        }
+                        break;
+                    case PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Resistance:
+                        if (CurrSensor_DataPokitPro.Data < 0.1)
+                        {
+                            // TODO: double check actual documentation
+                            // It can't actually read value this low
+                            CurrSensor_DataPokitPro.Data = 0;
+                        }
+                        break;
                 }
                 break;
         }
@@ -878,14 +917,25 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 // Beep or speak as appropriate
                 if (CurrSensor_DataUnits.Mode == DeviceSpecificSensorDataUnits.DmmMode.Continuity)
                 {
-                    if (CurrSensor_DataUnits.MultimeterValue <= 1.0)
+                    if (CurrSensor_DataUnits.MultimeterValue == 1.0) // 0=no continuity 1=continuity
                     {
-                        Beeper.BeepIfNotBeeping(Beeper.Continuity);
+                        var now = DateTimeOffset.Now;
+                        if (now.Subtract(TimeOfLastContinuityBeep).TotalSeconds >= CONTINUITY_BEEP_WAIT_IN_SECONDS)
+                        {
+                            TimeOfLastContinuityBeep = now;
+                            var beepLevel = UserPreferences.SoundLevelAdjusted(CurrUserPrefs.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+                            Beeper.BeepIfNotBeeping(beepLevel, Beeper.Continuity);
+                        }
+                    }
+                    else
+                    {
+                        TimeOfLastContinuityBeep = DateTimeOffset.MinValue; // after losing continuity, the next get should beep
                     }
                 }
                 else
                 {
-                    GlobalSpeaker.Speak(CurrSensor_DataUnits.DisplayText.ToString());
+                    var voiceLevel = UserPreferences.SoundLevelAdjusted(CurrUserPrefs.VoiceLevel, CurrSaveData.Preferences.VoiceLevel);
+                    GlobalSpeaker.Speak(voiceLevel, CurrSensor_DataUnits.DisplayText.ToString());
                 }
             }
 
@@ -973,6 +1023,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             | IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
             | IDeviceControlBasic.UXCapabilities.CanGetData
             | IDeviceControlBasic.UXCapabilities.CanShowTable
+            | IDeviceControlBasic.UXCapabilities.CanBeepAndVoice
             ;
         }
         return retval;
@@ -1138,4 +1189,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         uidSwitchError.Visibility = (item == uidSwitchError) ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    private void OnBeep(object sender, RoutedEventArgs e)
+    {
+        var beepLevel = UserPreferences.SoundLevelAdjusted(CurrUserPrefs.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        Beeper.Beep(beepLevel, Beeper.Connect);
+    }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

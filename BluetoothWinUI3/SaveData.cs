@@ -13,6 +13,7 @@ using System.Text.Json.Serialization;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Sensors;
 using Windows.UI;
+using static BluetoothWinUI3.UserPreferences;
 
 
 #if NET8_0_OR_GREATER
@@ -38,7 +39,7 @@ namespace BluetoothWinUI3
                 Directory.CreateDirectory(folderPath);
                 string filePath = Path.Combine(folderPath, "AllDeviceData.devices");
 
-                var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
+                var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), JsonOptions); //  SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
                 File.WriteAllText(filePath, json);
 
                 Log($"Saved configuration to {filePath}{suffix}");
@@ -49,7 +50,13 @@ namespace BluetoothWinUI3
                 ; // Might fail if the user has the AllDeviceData.devices file open
             }
         }
-
+        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+            Converters = { new JsonStringEnumConverter() },
+            
+        };
         private static void Log(string str)
         {
             System.Diagnostics.Debug.WriteLine(str);
@@ -70,7 +77,7 @@ namespace BluetoothWinUI3
                 var json = File.ReadAllText(filePath);
                 try
                 {
-                    var list = (List<SaveData>)System.Text.Json.JsonSerializer.Deserialize(json, typeof(List<SaveData>), SaveDataContext.Default);
+                    var list = (List<SaveData>)System.Text.Json.JsonSerializer.Deserialize(json, typeof(List<SaveData>), JsonOptions);
                     if (list != null)
                     {
                         int nremoved = 0;
@@ -562,10 +569,15 @@ namespace BluetoothWinUI3
         /// Index for the color. This is used to keep the indexes stable over time. It's not technically a user preference.
         /// </summary>
         public int ColorIndex { get; set; } = -1;
+
         /// <summary>
         /// Copy of the tags (like #environment) from the control. It's not saved in the JSON and isn't a user preference.
         /// </summary>
         public string Tags = "";
+
+        public SoundLevelType BeepLevel { get; set; } = SoundLevelType.NotSet;
+        public SoundLevelType VoiceLevel { get; set; } = SoundLevelType.NotSet;
+
     }
 
     /// <summary>
