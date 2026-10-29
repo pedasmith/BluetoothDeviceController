@@ -516,7 +516,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, DevicePokitPro.ble.ConnectionStatus);
         }
 
-        var beepLevel = UserPreferences.SoundLevelAdjusted(CurrUserPrefs.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
         Beeper.Beep(beepLevel, Beeper.Connect);
 
 
@@ -658,40 +658,29 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
 
     /// <summary>
-    /// Set the initial user preferences. This can be called before the UX is set up (and is needed when
-    /// we start to connect to set the right beep level)
-    /// </summary>
-    public void SetInitialUserPreferences(UserPreferences newPrefs, UserPreferences oldPrefs)
-    {
-        CurrUserPrefs = newPrefs;
-    }
-
-    /// <summary>
     /// UserPreferences are for the app as a whole, not for this particular device. For example: the preferred temperature unit.
     /// </summary>
-    public void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs)
+    public void UserPreferencesUpdated(UserPreferences oldPrefs)
     {
-        CurrUserPrefs = newPrefs;
-
         // Update the saved data in the HistoricalDataUnits to match the new user preferences.
         foreach (var data in HistoricalDataUnits.Data)
         {
             // Modify to update the data based on user preferred units (e.g, C versus F)
             // For the BTSimple_Demo, there is just the temperature
-            if (oldPrefs != null && newPrefs.Distance != oldPrefs.Distance)
+            if (oldPrefs != null && UserPreferences.Global.Distance != oldPrefs.Distance)
             {
                 // Modify: based on your knowledge of the sensor data, edit the distance readings.
-                // data.Distance = BluetoothWatcher.Units.Distance.Convert(data.Distance, oldPrefs.Distance, CurrUserPrefs.Distance);
+                // data.Distance = BluetoothWatcher.Units.Distance.Convert(data.Distance, oldPrefs.Distance, UserPreferences.Global.Distance);
             }
-            if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
+            if (oldPrefs != null && UserPreferences.Global.Temperature != oldPrefs.Temperature)
             {
                 // Modify: based on your knowledge of the sensor data, edit the temperature readings.
-                // data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, CurrUserPrefs.Temperature);
+                // data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, UserPreferences.Global.Temperature);
             }
-            if (oldPrefs != null && newPrefs.Pressure != oldPrefs.Pressure)
+            if (oldPrefs != null && UserPreferences.Global.Pressure != oldPrefs.Pressure)
             {
                 // Modify: based on your knowledge of the sensor data, edit the pressure readings.
-                // data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, CurrUserPrefs.Pressure);
+                // data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, UserPreferences.Global.Pressure);
             }
         }
 
@@ -707,12 +696,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         CurrWindowSize = windowSize;
         UtilitiesWinUI3.UtilitiesWinUI3.UpdateUXWindowSize(windowSize, largeActualSize, rootPanel, OxyPlotModel, uiOxyPlot);
     }
-
-
-    /// <summary>
-    /// User preferences as set by the UpdateUX call
-    /// </summary>
-    UserPreferences CurrUserPrefs { get; set; } = null;
 
 
     private void Log(string str)
@@ -849,8 +832,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // Modify: the CopyToWithConvertAndCreate as made by the autogen system will handle only a
         // single data type. If you make a Facade class to combine multiple sensors into one, you will
         // need to create a version of CopyToWithConvertAndCreate that takes in both types.
-        // CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        // CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        // CurrSensorSecondary_DataUnits = DeviceSpecificSensorSecondaryData.CopyToWithConvertAndCreate(CurrSensorSecondary_Data, CurrSensorSecondary_DataUnits, KnownDeviceName, UserPreferences.Global.Convert);
+        // CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, UserPreferences.Global.Convert);
 
         // Modify: Edit all this code to match your device and UX.
         bool updateDisplay = false;
@@ -861,7 +844,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             // In your code, hook up the right sensors to the right XAML
             case DeviceSpecificType.MultimeterDataFFF1PropertyChangedName:
             case DeviceSpecificType.MultimeterDataFFF4PropertyChangedName: // UX is more complex than just matching the parsed state
-                CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, Parser, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+                CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, Parser, CurrSensor_DataUnits, KnownDeviceName, UserPreferences.Global.Convert);
                 other = CurrSensor_DataUnits.DisplayOther;
                 var hasAuto = other.Contains(BdmMultimeterDisplayFacade.AutoStr); // "AUTO "
                 hasHold = other.Contains(BdmMultimeterDisplayFacade.HoldStr); // "Hold "
@@ -870,7 +853,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 break;
 
             case DeviceSpecificTypePokitPro.MM_DataPropertyChangedName:
-                CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_DataPokitPro, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+                CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_DataPokitPro, CurrSensor_DataUnits, KnownDeviceName, UserPreferences.Global.Convert);
                 other = CurrSensor_DataUnits.DisplayOther;
                 updateDisplay = true;
 
@@ -923,7 +906,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                         if (now.Subtract(TimeOfLastContinuityBeep).TotalSeconds >= CONTINUITY_BEEP_WAIT_IN_SECONDS)
                         {
                             TimeOfLastContinuityBeep = now;
-                            var beepLevel = UserPreferences.SoundLevelAdjusted(CurrUserPrefs.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+                            var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
                             Beeper.BeepIfNotBeeping(beepLevel, Beeper.Continuity);
                         }
                     }
@@ -934,7 +917,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 }
                 else
                 {
-                    var voiceLevel = UserPreferences.SoundLevelAdjusted(CurrUserPrefs.VoiceLevel, CurrSaveData.Preferences.VoiceLevel);
+                    var voiceLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.VoiceLevel, CurrSaveData.Preferences.VoiceLevel);
                     GlobalSpeaker.Speak(voiceLevel, CurrSensor_DataUnits.DisplayText.ToString());
                 }
             }
@@ -1191,7 +1174,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     private void OnBeep(object sender, RoutedEventArgs e)
     {
-        var beepLevel = UserPreferences.SoundLevelAdjusted(CurrUserPrefs.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
         Beeper.Beep(beepLevel, Beeper.Connect);
     }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

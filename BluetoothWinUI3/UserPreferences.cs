@@ -14,6 +14,7 @@ namespace BluetoothWinUI3
 {
     public class UserPreferences
     {
+        public static UserPreferences Global = null;
         public Distance.DistanceUnit Distance { get; set; } = BluetoothWatcher.Units.Distance.DistanceUnit.Kilometers;
         public Pressure.PressureUnit Pressure { get; set; } = BluetoothWatcher.Units.Pressure.PressureUnit.hectoPascal_milliBar;
         public Temperature.TemperatureUnit Temperature { get; set; } = BluetoothWatcher.Units.Temperature.TemperatureUnit.Celcius;
@@ -34,6 +35,10 @@ namespace BluetoothWinUI3
 
         public bool AutostartAdvertisementWatcher { get; set; } = true;
 
+        /// <summary>
+        /// Reads in UserPreferences.preferences, a JSON file, into a new UserPreferences object.
+        /// The file is in the Documents directory in folder "BluetoothDevices"
+        /// </summary>
         public static UserPreferences Restore()
         {
             string folderPath = GetSaveDirectoryAsString();

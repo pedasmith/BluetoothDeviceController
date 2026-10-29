@@ -541,41 +541,31 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
     }
     #endregion
 
-    /// <summary>
-    /// Set the initial user preferences. This can be called before the UX is set up (and is needed when
-    /// we start to connect to set the right beep level)
-    /// </summary>
-    public void SetInitialUserPreferences(UserPreferences newPrefs, UserPreferences oldPrefs)
-    {
-        CurrUserPrefs = newPrefs;
-    }
 
     /// <summary>
     /// UserPreferences are for the app as a whole, not for this particular device. For example: the preferred temperature unit.
     /// </summary>
-    public void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs)
+    public void UserPreferencesUpdated(UserPreferences oldPrefs)
     {
-        CurrUserPrefs = newPrefs;
-
         // Update the saved data in the HistoricalDataUnits to match the new user preferences.
         foreach (var data in HistoricalDataUnits.Data)
         {
             // Modify to update the data based on user preferred units (e.g, C versus F)
             // For the BTSimple_Demo, there is just the temperature
-            if (oldPrefs != null && newPrefs.Distance != oldPrefs.Distance)
+            if (oldPrefs != null && UserPreferences.Global.Distance != oldPrefs.Distance)
             {
                 // Modify: based on your knowledge of the sensor data, edit the distance readings.
-                // data.Distance = BluetoothWatcher.Units.Distance.Convert(data.Distance, oldPrefs.Distance, CurrUserPrefs.Distance);
+                // data.Distance = BluetoothWatcher.Units.Distance.Convert(data.Distance, oldPrefs.Distance, UserPreferences.Global.Distance);
             }
-            if (oldPrefs != null && newPrefs.Temperature != oldPrefs.Temperature)
+            if (oldPrefs != null && UserPreferences.Global.Temperature != oldPrefs.Temperature)
             {
                 // Modify: based on your knowledge of the sensor data, edit the temperature readings.
-                data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, CurrUserPrefs.Temperature);
+                data.Temperature = BluetoothWatcher.Units.Temperature.Convert(data.Temperature, oldPrefs.Temperature, UserPreferences.Global.Temperature);
             }
-            if (oldPrefs != null && newPrefs.Pressure != oldPrefs.Pressure)
+            if (oldPrefs != null && UserPreferences.Global.Pressure != oldPrefs.Pressure)
             {
                 // Modify: based on your knowledge of the sensor data, edit the pressure readings.
-                // data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, CurrUserPrefs.Pressure);
+                // data.Pressure = BluetoothWatcher.Units.Pressure.Convert(data.Pressure, oldPrefs.Pressure, UserPreferences.Global.Pressure);
             }
         }
 
@@ -592,11 +582,6 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
         UtilitiesWinUI3.UtilitiesWinUI3.UpdateUXWindowSize(windowSize, largeActualSize, rootPanel, OxyPlotModel, uiOxyPlot);
     }
 
-
-    /// <summary>
-    /// User preferences as set by the UpdateUX call
-    /// </summary>
-    UserPreferences CurrUserPrefs { get; set; } = null;
 
 
     private void Log(string str)
@@ -638,8 +623,8 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
         // Modify: the CopyToWithConvertAndCreate as made by the autogen system will handle only a
         // single data type. If you make a Facade class to combine multiple sensors into one, you will
         // need to create a version of CopyToWithConvertAndCreate that takes in both types.
-        CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
-        CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, CurrUserPrefs.Convert);
+        CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, CurrSensor_DataUnits, KnownDeviceName, UserPreferences.Global.Convert);
+        CurrBattery_DataUnits = DeviceSpecificBatteryData.CopyToWithConvertAndCreate(CurrBattery_Data, CurrBattery_DataUnits, KnownDeviceName, UserPreferences.Global.Convert);
 
         // Modify: Edit all this code to match your device and UX.
         switch (name)

@@ -55,8 +55,12 @@ namespace BluetoothWinUI3
         /// </summary>
         void UpdateUX(SaveData saveData);
 
-        void SetInitialUserPreferences(UserPreferences newPrefs, UserPreferences oldPrefs);
-        void UpdateUX(UserPreferences newPrefs, UserPreferences oldPrefs);
+        /// <summary>
+        /// Sent to controls when the user preferences are updated. Beeps and sound changes aren't 
+        /// considered to be changes :-)
+        /// </summary>
+        /// <param name="oldPrefs"></param>
+        void UserPreferencesUpdated(UserPreferences oldPrefs);
 
         void UpdateUX(MainWindow.WindowSize windowSize, Windows.Foundation.Size largeActualSize);
 

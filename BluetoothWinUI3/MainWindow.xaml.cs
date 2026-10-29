@@ -50,7 +50,6 @@ namespace BluetoothWinUI3
 
         AdvertisementWatcher AdvertisementWatcher = new AdvertisementWatcher(); // Wraps the BluetoothLEAdvertisementWatcher
         int NAdvertisements = 0;
-        UserPreferences CurrUserPrefs = new UserPreferences();
 
         SmartExportManager SmartExportManager = new SmartExportManager();
         SaveDataRunner SaveDataRunner = new SaveDataRunner();
@@ -58,7 +57,9 @@ namespace BluetoothWinUI3
         public enum WindowSize { Normal, Large } // Normal is 400x400 large is 600x800 (HxW)
         public MainWindow()
         {
-            CurrUserPrefs = UserPreferences.Restore();
+            var userprefs = UserPreferences.Restore();
+            UserPreferences.Global = userprefs; // two step dance just in case I need more flexibility later on
+
             UIThreadHelper.DQueue = this.DispatcherQueue;
             AdvertisementWatcher.WatcherEvent += AdvertisementWatcher_WatcherEvent;
             InitializeComponent();
@@ -71,7 +72,7 @@ namespace BluetoothWinUI3
 
         private void MainWindow_Closed(object sender, WindowEventArgs args)
         {
-            CurrUserPrefs.Save(); // MainWindow_Closed
+            UserPreferences.Global.Save(); // MainWindow_Closed
         }
 
         BleNames SingletonBleNames = new BleNames();
@@ -87,7 +88,7 @@ namespace BluetoothWinUI3
 
             SetUxFromUserPreferences(); // MainWindow_Loaded
 
-            if (CurrUserPrefs.AutostartAdvertisementWatcher)
+            if (UserPreferences.Global.AutostartAdvertisementWatcher)
             {
                 AdvertisementWatcher.Start();
             }
@@ -132,12 +133,12 @@ namespace BluetoothWinUI3
 
         private void SetUxFromUserPreferences()
         {
-            switch (CurrUserPrefs.Distance)
+            switch (UserPreferences.Global.Distance)
             {
                 case Distance.DistanceUnit.Kilometers: uiPreferencesKilometers.IsChecked = true; break;
                 case Distance.DistanceUnit.Miles: uiPreferencesMiles.IsChecked = true; break;
             }
-            switch (CurrUserPrefs.Pressure)
+            switch (UserPreferences.Global.Pressure)
             {
                 case Pressure.PressureUnit.mmHg_Torr: uiPreferencesmmHg.IsChecked = true; break;
                 case Pressure.PressureUnit.inHg: uiPreferencesinHg.IsChecked = true; break;
@@ -147,7 +148,7 @@ namespace BluetoothWinUI3
                 case Pressure.PressureUnit.PSI: uiPreferencesPSI.IsChecked = true; break;
                 case Pressure.PressureUnit.Atmosphere: uiPreferencesAtmosphere.IsChecked = true; break;
             }
-            switch (CurrUserPrefs.Temperature)
+            switch (UserPreferences.Global.Temperature)
             {
                 case Temperature.TemperatureUnit.Celcius: uiPreferencesCelcius.IsChecked = true; break;
                 case Temperature.TemperatureUnit.Fahrenheit: uiPreferencesFahrenheit.IsChecked = true; break;
@@ -157,13 +158,13 @@ namespace BluetoothWinUI3
             }
 
             uiPreferencesMuteAll.IsChecked = IsMuteAll; // Not actually a preference
-            switch (CurrUserPrefs.BeepLevel)
+            switch (UserPreferences.Global.BeepLevel)
             {
                 case UserPreferences.SoundLevelType.Off: uiPreferencesBeepOff.IsChecked = true; break;
                 case UserPreferences.SoundLevelType.Quiet: uiPreferencesBeepQuiet.IsChecked = true; break;
                 case UserPreferences.SoundLevelType.On: uiPreferencesBeepOn.IsChecked = true; break;
             }
-            switch (CurrUserPrefs.VoiceLevel)
+            switch (UserPreferences.Global.VoiceLevel)
             {
                 case UserPreferences.SoundLevelType.Off: uiPreferencesVoiceOff.IsChecked = true; break;
                 case UserPreferences.SoundLevelType.Quiet: uiPreferencesVoiceQuiet.IsChecked = true; break;
@@ -279,14 +280,13 @@ namespace BluetoothWinUI3
             var known = KnownDevices.Add(e, control, zoomControl, supportedDevice);
             userControl?.SetNotifyDeviceControlChanges(this);
             AllSaveData.GetOrCreateSaveData(known);
-            userControl?.SetInitialUserPreferences(CurrUserPrefs, null);
 
             //
             // Set the DataContext; this will drive most of the setup
             //
             control.DataContext = known;
 
-            userControl?.UpdateUX(CurrUserPrefs, null);
+            userControl?.UserPreferencesUpdated(null);
 
             if (uiKnownDevices.Items.Count == 1)
             {
@@ -688,14 +688,14 @@ namespace BluetoothWinUI3
 
         }
 
-        private void UpdateAllDeviceUserPreferences(UserPreferences currPrefs, UserPreferences oldPrefs)
+        private void UpdateAllDeviceUserPreferences(UserPreferences oldPrefs)
         {
             foreach (var item in uiKnownDevices.Items)
             {
                 var deviceContainer =item as ZoomableDeviceControl;
                 var device = deviceContainer?.GetDeviceControl() as IDeviceControlBasic;
                 if (device == null) continue;
-                device.UpdateUX(currPrefs, oldPrefs);
+                device.UserPreferencesUpdated(oldPrefs);
             }
         }
 
@@ -703,48 +703,48 @@ namespace BluetoothWinUI3
         {
             var tag = (sender as FrameworkElement)?.Tag as string;
             if (tag == null) return;
-            var oldPrefs = CurrUserPrefs.Clone();
+            var oldPrefs = UserPreferences.Global.Clone();
             switch (tag)
             {
-                case "km": CurrUserPrefs.Distance = Distance.DistanceUnit.Kilometers; break;
-                case "miles": CurrUserPrefs.Distance = Distance.DistanceUnit.Miles; break;
-                default: CurrUserPrefs.Distance = Distance.DistanceUnit.Kilometers; break;
+                case "km": UserPreferences.Global.Distance = Distance.DistanceUnit.Kilometers; break;
+                case "miles": UserPreferences.Global.Distance = Distance.DistanceUnit.Miles; break;
+                default: UserPreferences.Global.Distance = Distance.DistanceUnit.Kilometers; break;
             }
-            UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
+            UpdateAllDeviceUserPreferences(oldPrefs);
         }
 
         private void OnPreferencesPressure(object sender, RoutedEventArgs e)
         {
             var tag = (sender as FrameworkElement)?.Tag as string;
             if (tag == null) return;
-            var oldPrefs = CurrUserPrefs.Clone();
+            var oldPrefs = UserPreferences.Global.Clone();
             switch (tag)
             {
-                case "mmHg": CurrUserPrefs.Pressure = Pressure.PressureUnit.mmHg_Torr; break;
-                case "inHg": CurrUserPrefs.Pressure = Pressure.PressureUnit.inHg; break;
-                case "mbar_hpa": CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar; break;
-                case "kiloPascal": CurrUserPrefs.Pressure = Pressure.PressureUnit.kiloPascal; break;
-                case "Pascal": CurrUserPrefs.Pressure = Pressure.PressureUnit.Pascal; break;
-                case "PSI": CurrUserPrefs.Pressure = Pressure.PressureUnit.PSI; break;
-                case "Atmosphere": CurrUserPrefs.Pressure = Pressure.PressureUnit.Atmosphere; break;
-                default: CurrUserPrefs.Pressure = Pressure.PressureUnit.hectoPascal_milliBar; break;
+                case "mmHg": UserPreferences.Global.Pressure = Pressure.PressureUnit.mmHg_Torr; break;
+                case "inHg": UserPreferences.Global.Pressure = Pressure.PressureUnit.inHg; break;
+                case "mbar_hpa": UserPreferences.Global.Pressure = Pressure.PressureUnit.hectoPascal_milliBar; break;
+                case "kiloPascal": UserPreferences.Global.Pressure = Pressure.PressureUnit.kiloPascal; break;
+                case "Pascal": UserPreferences.Global.Pressure = Pressure.PressureUnit.Pascal; break;
+                case "PSI": UserPreferences.Global.Pressure = Pressure.PressureUnit.PSI; break;
+                case "Atmosphere": UserPreferences.Global.Pressure = Pressure.PressureUnit.Atmosphere; break;
+                default: UserPreferences.Global.Pressure = Pressure.PressureUnit.hectoPascal_milliBar; break;
             }
-            UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
+            UpdateAllDeviceUserPreferences(oldPrefs);
         }
         private void OnPreferencesTemperature(object sender, RoutedEventArgs e)
         {
             var tag = (sender as FrameworkElement)?.Tag as string;
             if (tag == null) return;
-            var oldPrefs = CurrUserPrefs.Clone();
+            var oldPrefs = UserPreferences.Global.Clone();
             switch (tag)
             {
-                case "Celcius": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Celcius; break;
-                case "Fahrenheit": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Fahrenheit; break;
-                case "Kelvin": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Kelvin; break;
-                case "Rankine": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Rankine; break;
-                case "Réaumur": CurrUserPrefs.Temperature = Temperature.TemperatureUnit.Réaumur; break;
+                case "Celcius": UserPreferences.Global.Temperature = Temperature.TemperatureUnit.Celcius; break;
+                case "Fahrenheit": UserPreferences.Global.Temperature = Temperature.TemperatureUnit.Fahrenheit; break;
+                case "Kelvin": UserPreferences.Global.Temperature = Temperature.TemperatureUnit.Kelvin; break;
+                case "Rankine": UserPreferences.Global.Temperature = Temperature.TemperatureUnit.Rankine; break;
+                case "Réaumur": UserPreferences.Global.Temperature = Temperature.TemperatureUnit.Réaumur; break;
             }
-            UpdateAllDeviceUserPreferences(CurrUserPrefs, oldPrefs);
+            UpdateAllDeviceUserPreferences(oldPrefs);
         }
 
         private async void OnViewToggleTable(object sender, RoutedEventArgs e)
@@ -1111,11 +1111,11 @@ namespace BluetoothWinUI3
             if (tag == null) return; // can never happen
             switch (tag)
             {
-                case "on": CurrUserPrefs.BeepLevel = UserPreferences.SoundLevelType.On; break;
-                case "quiet": CurrUserPrefs.BeepLevel = UserPreferences.SoundLevelType.Quiet; break;
-                case "off": CurrUserPrefs.BeepLevel = UserPreferences.SoundLevelType.Off; break;
+                case "on": UserPreferences.Global.BeepLevel = UserPreferences.SoundLevelType.On; break;
+                case "quiet": UserPreferences.Global.BeepLevel = UserPreferences.SoundLevelType.Quiet; break;
+                case "off": UserPreferences.Global.BeepLevel = UserPreferences.SoundLevelType.Off; break;
             }
-            CurrUserPrefs.Save();
+            UserPreferences.Global.Save();
         }
 
         /// <summary>
@@ -1127,11 +1127,11 @@ namespace BluetoothWinUI3
             if (tag == null) return; // can never happen
             switch (tag)
             {
-                case "on": CurrUserPrefs.VoiceLevel = UserPreferences.SoundLevelType.On; break;
-                case "quiet": CurrUserPrefs.VoiceLevel = UserPreferences.SoundLevelType.Quiet; break;
-                case "off": CurrUserPrefs.VoiceLevel = UserPreferences.SoundLevelType.Off; break;
+                case "on": UserPreferences.Global.VoiceLevel = UserPreferences.SoundLevelType.On; break;
+                case "quiet": UserPreferences.Global.VoiceLevel = UserPreferences.SoundLevelType.Quiet; break;
+                case "off": UserPreferences.Global.VoiceLevel = UserPreferences.SoundLevelType.Off; break;
             }
-            CurrUserPrefs.Save();
+            UserPreferences.Global.Save();
         }
 
         /// <summary>
