@@ -13,6 +13,7 @@ using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
+using System.Reflection;
 using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
@@ -30,12 +31,10 @@ namespace BluetoothWinUI3;
 using static BluetoothProtocols.BDM_Aneng_Multimeter;
 using DeviceSpecificSensorData = BDM_Aneng_Multimeter.Multimeter_Data; // Modify: 
 using DeviceSpecificSensorDataPokitPro = PokitProMeter.Multimeter_Data;
-
 using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.BdmMultimeterDisplayFacade; // Modify: Often the same as the DeviceSpecificSensorData
-
+using DeviceSpecificSensorSecondaryDataPokit = PokitProMeter.Service_Status_Data; // Modify: pick secondary sensor if needed
 using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
 using DeviceSpecificTypePokitPro = BluetoothProtocols.PokitProMeter;
-using DeviceSpecificSensorSecondaryDataPokit = PokitProMeter.Service_Status_Data; // Modify: pick secondary sensor if needed
 
 
 // using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery
@@ -83,7 +82,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
-    /// Common tags: environment exersise health cooking agriculture light testequipment report utility other
+    /// Common tags: environment exercise health cooking agriculture light testequipment report utility other
     /// Other tags: cycling heartrate pulseoximeter security entertainment productivity multimeter oscilloscope
     /// Full list in tagToResourceKeyMap AppDictionaryFromTag.cs
     /// </summary>
@@ -516,10 +515,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, DevicePokitPro.ble.ConnectionStatus);
         }
 
-        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
-        Beeper.Beep(beepLevel, Beeper.Connect);
-
-
         // How this works: when you call the Read call, in addition to returning data it will
         // also call the Device.PropertyChanged (INPC) callback. In my code, it's handy to just
         // have all the UX update code for handling changes in the same place, so I just
@@ -560,7 +555,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     private void Ble_ConnectionStatusChanged(BluetoothLEDevice sender, object args)
     {
         // Choices for ConnectionStatus is just Disconnected and Connected 
-        uiBTConnectionControl.SetState(sender.ConnectionStatus);
+        // beeplevel
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        uiBTConnectionControl.SetState(sender.ConnectionStatus, beepLevel, Tags);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
     }
 
@@ -570,7 +567,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// </summary>
     private void Status_OnBluetoothStatus(object source, BluetoothCommunicationStatus status)
     {
-        uiBTConnectionControl.SetState(status);
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        uiBTConnectionControl.SetState(status, beepLevel, Tags);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {status.AsStatusString}"); });
         ;
     }

@@ -1,5 +1,6 @@
 using BluetoothProtocols;
 using BluetoothWatcher.AdvertismentWatcher;
+using BluetoothWinUI3.Beeps;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -12,6 +13,7 @@ using Windows.ApplicationModel.Background;
 using Windows.Devices.Bluetooth;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using static BluetoothWinUI3.UserPreferences;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -96,12 +98,22 @@ namespace BluetoothWinUI3
             } 
         }
 
-        public void SetState(BluetoothConnectionStatus value)
+        public void SetState(BluetoothConnectionStatus value, SoundLevelType beepLevel, string tags)
         {
+            bool isNewState = false;
             switch (value)
             {
                 case BluetoothConnectionStatus.Connected:
+                    isNewState = CurrState != ConnectionState.Connected;
+                    if (isNewState)
+                    {
+                        ; //
+                    }
                     CurrState = ConnectionState.Connected;
+                    if (isNewState)
+                    {
+                        Beeper.Beep(beepLevel, "connect " + tags);
+                    }
                     break;
                 case BluetoothConnectionStatus.Disconnected:
                     CurrState = ConnectionState.Disconnected;
@@ -109,12 +121,22 @@ namespace BluetoothWinUI3
             }
         }
 
-        public void SetState(BluetoothCommunicationStatus value)
+        public void SetState(BluetoothCommunicationStatus value, SoundLevelType beepLevel, string tags)
         {
+            bool isNewState = false;
             switch (value.Status)
             {
                 case Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success:
+                    isNewState = CurrState != ConnectionState.Connected;
+                    if (isNewState)
+                    {
+                        ; //
+                    }
                     CurrState = ConnectionState.Connected;
+                    if (isNewState)
+                    {
+                        Beeper.Beep(beepLevel, "connect " + tags);
+                    }
                     break;
                 default: // everything else is bad: Unreachable ProtocolError AccessDenied
                     CurrState = ConnectionState.Disconnected;

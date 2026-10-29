@@ -42,7 +42,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
-    /// Common tags: environment exersise health cooking agriculture light testequipment report utility other
+    /// Common tags: environment exercise health cooking agriculture light testequipment report utility other
     /// Other tags: cycling heartrate pulseoximeter security entertainment productivity multimeter oscilloscope
     /// Full list in tagToResourceKeyMap AppDictionaryFromTag.cs
     /// </summary>

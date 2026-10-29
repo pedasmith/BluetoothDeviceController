@@ -102,6 +102,22 @@ namespace BluetoothWinUI3
             await Beeper.InitializeAsync();
             App.CurrMediaPlayerElement = uiMediaPlayerElement;
             uiMediaPlayerElement.SetMediaPlayer(new Windows.Media.Playback.MediaPlayer());
+
+            // Fill out the Beep menu
+            uimDebugBeeps.Items.Clear();
+            foreach (var kvp in Beeper.BeepType)
+            {
+                var mfi = new MenuFlyoutItem() { Text = kvp.Key, Tag = kvp.Value };
+                mfi.Click += (sender, args) => { 
+                    Beeper.Beep(UserPreferences.Global.BeepLevel, (sender as FrameworkElement)?.Tag as string ?? ""); 
+                };
+                uimDebugBeeps.Items.Add(mfi);
+            }
+        }
+
+        private void Mfi_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
 

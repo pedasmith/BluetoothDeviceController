@@ -16,12 +16,13 @@ internal static class AppDictionaryFromTags
 {
     /// <summary>
     /// Given a tag like #cycling or #testequipment gets the resources 
-    /// Common tags: environment exersise health cooking agriculture light testequipment report utility other
+    /// Common tags: environment exercise health cooking agriculture light testequipment report utility other
     /// Other tags: cycling heartrate pulseoximeter security entertainment productivity multimeter oscilloscope
     /// Full list in tagToResourceKeyMap AppDictionaryFromTag.cs
     /// </summary>
     static OrderedDictionary<string, string> tagToResourceKeyMap = new OrderedDictionary<string, string>
     {
+        // Future: blood pressure?
         { "#cycling", "sDeviceBorder_Background_Cycling" },
         { "#heartrate", "sDeviceBorder_Background_Health" },
         { "#pulseoximeter", "sDeviceBorder_Background_PulseOximeter" },
@@ -41,7 +42,7 @@ internal static class AppDictionaryFromTags
 
 
         // Synonyms
-        { "#exersise", "sDeviceBorder_Background_Health"  },
+        { "#exercise", "sDeviceBorder_Background_Health"  },
         { "#cooking", "sDeviceBorder_Background_Productivity"  },
         { "#agriculture", "sDeviceBorder_Background_Productivity"  },
         { "#light", "sDeviceBorder_Background_Utility"  },

@@ -11,6 +11,7 @@ using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
+using System.Reflection;
 using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
@@ -51,7 +52,7 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
-    /// Common tags: environment exersise health cooking agriculture light testequipment report utility other
+    /// Common tags: environment exercise health cooking agriculture light testequipment report utility other
     /// Other tags: cycling heartrate pulseoximeter security entertainment productivity multimeter oscilloscope
     /// Full list in tagToResourceKeyMap AppDictionaryFromTag.cs
     /// </summary>
@@ -449,7 +450,8 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
     private void Ble_ConnectionStatusChanged(BluetoothLEDevice sender, object args)
     {
         // Choices for ConnectionStatus is just Disconnected and Connected 
-        uiBTConnectionControl.SetState(sender.ConnectionStatus);
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        uiBTConnectionControl.SetState(sender.ConnectionStatus, beepLevel, Tags);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
     }
 
@@ -459,7 +461,8 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
     /// </summary>
     private void Status_OnBluetoothStatus(object source, BluetoothCommunicationStatus status)
     {
-        uiBTConnectionControl.SetState(status);
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        uiBTConnectionControl.SetState(status, beepLevel, Tags);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {status.AsStatusString}"); });
         ;
     }

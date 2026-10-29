@@ -51,7 +51,7 @@ public sealed partial class BTTI_SensorTagControl : UserControl, IDeviceControlB
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
-    /// Common tags: environment exersise health cooking agriculture light
+    /// Common tags: environment exercise health cooking agriculture light
     /// </summary>
     public string Tags { get { return "#environment"; } }
 
@@ -579,7 +579,8 @@ public sealed partial class BTTI_SensorTagControl : UserControl, IDeviceControlB
     private void Ble_ConnectionStatusChanged(BluetoothLEDevice sender, object args)
     {
         // Choices for ConnectionStatus is just Disconnected and Connected 
-        uiBTConnectionControl.SetState(sender.ConnectionStatus);
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        uiBTConnectionControl.SetState(sender.ConnectionStatus, beepLevel, Tags);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
     }
 
@@ -589,7 +590,8 @@ public sealed partial class BTTI_SensorTagControl : UserControl, IDeviceControlB
     /// </summary>
     private void Status_OnBluetoothStatus(object source, BluetoothCommunicationStatus status)
     {
-        uiBTConnectionControl.SetState(status);
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        uiBTConnectionControl.SetState(status, beepLevel, Tags);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {status.AsStatusString}"); });
         ;
     }

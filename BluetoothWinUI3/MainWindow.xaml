@@ -103,6 +103,7 @@
                         <MenuFlyoutItem Text="Load Devices" Click="OnDebugLoadDevices" AccessKey="L" />
                         <MenuFlyoutItem Text="Save Devices" Click="OnDebugSaveDevices" AccessKey="S" />
                     </MenuFlyoutSubItem>
+                    <MenuFlyoutSubItem Text="Beeps" x:Name="uimDebugBeeps" />
                     <MenuFlyoutSubItem Text="Filters">
                         <ToggleMenuFlyoutItem Text="Filter far-away advertisements" Click="OnDebugSetFilterRssiDb"  />
                         <ToggleMenuFlyoutItem Text="Filter Extended advertisements" Click="OnDebugSetFilterExtendedAdvertisements" />

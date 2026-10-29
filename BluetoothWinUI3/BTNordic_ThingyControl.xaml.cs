@@ -40,7 +40,7 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
 
     /// <summary>
     /// Tags for the device. This is used to categorize the different devices.
-    /// Common tags: environment exersise health cooking agriculture light testequipment report utility other
+    /// Common tags: environment exercise health cooking agriculture light testequipment report utility other
     /// Other tags: cycling heartrate pulseoximeter security entertainment productivity multimeter oscilloscope
     /// Full list in tagToResourceKeyMap AppDictionaryFromTag.cs
     /// </summary>
@@ -405,7 +405,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         {
             Log($"{KnownDeviceName}: connect is inconsistent: connectAllOk={connectAllOk} but ble={Device.ble.ConnectionStatus}");
         }
-        uiBTConnectionControl.SetState(Device.ble.ConnectionStatus);
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        uiBTConnectionControl.SetState(Device.ble.ConnectionStatus, beepLevel, Tags);
         CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
     }
 
@@ -423,7 +424,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
         // Choices for ConnectionStatus is just Disconnected and Connected 
         if (sender.ConnectionStatus != BluetoothConnectionStatus.Connected)
         {
-            uiBTConnectionControl.SetState(sender.ConnectionStatus);
+            var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+            uiBTConnectionControl.SetState(sender.ConnectionStatus, beepLevel, Tags);
         }
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {sender.ConnectionStatus}"); });
         ;
@@ -435,7 +437,8 @@ public sealed partial class BTNordic_ThingyControl : UserControl, IDeviceControl
     /// </summary>
     private void Status_OnBluetoothStatus(object source, BluetoothCommunicationStatus status)
     {
-        uiBTConnectionControl.SetState(status);
+        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
+        uiBTConnectionControl.SetState(status, beepLevel, Tags);
         UIThreadHelper.CallOnUIThread(() => { Log($"{InternalDeviceType}: Status update: {status.AsStatusString}"); });
         ;
     }
