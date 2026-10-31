@@ -30,11 +30,12 @@ namespace BluetoothWinUI3;
 #endregion
 using static BluetoothProtocols.BDM_Aneng_Multimeter;
 using DeviceSpecificSensorData = BDM_Aneng_Multimeter.Multimeter_Data; // Modify: 
-using DeviceSpecificSensorDataPokitPro = PokitProMeter.Multimeter_Data;
+using DeviceSpecificSensorDataPokit = PokitOscilloscopeMeter.Multimeter_Data;
 using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.BdmMultimeterDisplayFacade; // Modify: Often the same as the DeviceSpecificSensorData
-using DeviceSpecificSensorSecondaryDataPokit = PokitProMeter.Service_Status_Data; // Modify: pick secondary sensor if needed
+using DeviceSpecificSensorSecondaryC5DataPokit = PokitOscilloscopeMeter.Service_StatusC5_Data; // Modify: pick secondary sensor if needed
+using DeviceSpecificSensorSecondaryC4DataPokit = PokitOscilloscopeMeter.Service_StatusC4_Data; // Modify: pick secondary sensor if needed
 using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
-using DeviceSpecificTypePokitPro = BluetoothProtocols.PokitProMeter;
+using DeviceSpecificTypePokit = BluetoothProtocols.PokitOscilloscopeMeter;
 
 
 // using DeviceSpecificBatteryData = TI_SensorTag_1352.Battery_Data; // Modify: many device support battery
@@ -55,7 +56,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     // Modify these settings to match your device
     IMultimeterProtocolParser Parser = null; //  new BdmMultimeterProtocol();
 
-    enum MultimeterType {  Bdm, FortuneFS9952, PokitPro };
+    enum MultimeterType {  Bdm, FortuneFS9952, PokitProC5, PokitMeterC4 };
     MultimeterType CurrMultimeterType = MultimeterType.Bdm;
     private bool SetParser(byte[] data)
     {
@@ -125,7 +126,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
 
     DeviceSpecificType DeviceBdmFamily;
-    DeviceSpecificTypePokitPro DevicePokitPro;
+    DeviceSpecificTypePokit DevicePokit;
         
     string KnownDeviceName = "device";
     SaveData CurrSaveData = null;
@@ -164,7 +165,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// Current sensor data from the Device. For the demo, it's battery level.
     /// </summary>
     DeviceSpecificSensorData CurrSensor_Data = null;
-    DeviceSpecificSensorDataPokitPro CurrSensor_DataPokitPro = null;
+    DeviceSpecificSensorDataPokit CurrSensor_DataPokit = null;
     /// <summary>
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
     /// This is what gets added to the HistoricalDataUnits collection.
@@ -186,7 +187,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// Data directly from the device. It's always in the original units from the device
     /// and isn't converted into the user's preferred units.
     /// </summary>
-    DeviceSpecificSensorSecondaryDataPokit CurrSensorSecondary_DataPokit = null;
+    DeviceSpecificSensorSecondaryC5DataPokit CurrSensorSecondaryC5_DataPokit = null;
+    DeviceSpecificSensorSecondaryC4DataPokit CurrSensorSecondaryC4_DataPokit = null;
 
     /// <summary>
     /// Similar to Curr...Data , but the values are converted to the user's preferred units. 
@@ -244,7 +246,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         {
             ( DeviceSpecificType.MultimeterDataFFF1PropertyChangedName, uiValueChange),
             ( DeviceSpecificType.MultimeterDataFFF4PropertyChangedName, uiValueChange),
-            ( DeviceSpecificTypePokitPro.MM_DataPropertyChangedName, uiValueChange),
+            ( DeviceSpecificTypePokit.MM_DataPropertyChangedName, uiValueChange),
         };
 
         // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
@@ -396,14 +398,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         uiAddress.Text = DataContextAsKnownDevice.Advertisement.AddressAsString;
         CurrSaveData = AllSaveData.FindWithAdvertisementAddress(DataContextAsKnownDevice.Advertisement.Addr); // Has already been saved, so will exist.
 
-        if (DataContextAsKnownDevice.Advertisement.BestName.Contains("PokitPro"))
+        var bestName = DataContextAsKnownDevice.Advertisement.BestName;
+        if (bestName.Contains("Pokit")) // Pokit and PikitPro
         {
-            CurrMultimeterType = MultimeterType.PokitPro;
-            DevicePokitPro = new DeviceSpecificTypePokitPro()
+            CurrMultimeterType = bestName.Contains("PokitPro") ? MultimeterType.PokitProC5 : MultimeterType.PokitMeterC4;
+
+            DevicePokit = new DeviceSpecificTypePokit()
             {
                 ble = await BluetoothLEDevice.FromBluetoothAddressAsync(DataContextAsKnownDevice.Advertisement.Addr),
             };
-            if (DevicePokitPro.ble == null)
+            if (DevicePokit.ble == null)
             {
                 // ConnectError:NoBLE
                 Log($"Error: {InternalDeviceType}: Unable to get BLE from {BluetoothAddress.AsString(DataContextAsKnownDevice.Advertisement.Addr)}");
@@ -411,8 +415,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 return;
             }
             // It's critical to set these!
-            DataContextAsKnownDevice.Id = DevicePokitPro.ble.DeviceId ?? ""; // never null :-)
-            DataContextAsKnownDevice.BTLEDevice = DevicePokitPro.ble;
+            DataContextAsKnownDevice.Id = DevicePokit.ble.DeviceId ?? ""; // never null :-)
+            DataContextAsKnownDevice.BTLEDevice = DevicePokit.ble;
         }
         else
         {
@@ -449,10 +453,11 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 DeviceBdmFamily.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
                 DeviceBdmFamily.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
                 break;
-            case MultimeterType.PokitPro:
-                DevicePokitPro.PropertyChanged += Device_PropertyChanged;
-                DevicePokitPro.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
-                DevicePokitPro.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+            case MultimeterType.PokitMeterC4:
+            case MultimeterType.PokitProC5:
+                DevicePokit.PropertyChanged += Device_PropertyChanged;
+                DevicePokit.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
+                DevicePokit.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
                 break;
         }
 
@@ -471,16 +476,47 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 await DeviceBdmFamily.NotifyMultimeterDataFFF1Async(); // Bdm style
                 await DeviceBdmFamily.NotifyMultimeterDataFFF4Async(); // Fortune FS9952 style
                 break;
-            case MultimeterType.PokitPro:
-                await DevicePokitPro.NotifyMM_DataAsync();
-                await DevicePokitPro.NotifyStatus_StatusAsync();
-                var ppsdata = await DevicePokitPro.ReadStatus_Status();
-                Log($"Pokit: Starting: mode={ppsdata.DeviceStatus} voltage={ppsdata.BatteryVoltage:F2}");
-                DevicePokitPro.CurrMultimeter_Data.ModeSetting = (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Idle; // always start with Idle
-                DevicePokitPro.CurrMultimeter_Data.RangeSetting = 255; // always auto-range!
-                DevicePokitPro.CurrMultimeter_Data.IntervalSetting = 200;
-                var ppbytes = DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes();
-                var mmsetting = await DevicePokitPro.WriteMM_Settings(ppbytes); // 5=ohms 0=rabge 200 0 0 0=200 mseconds
+            case MultimeterType.PokitMeterC4:
+            case MultimeterType.PokitProC5:
+                await DevicePokit.NotifyMM_DataAsync();
+                switch (CurrMultimeterType)
+                {
+                    case MultimeterType.PokitMeterC4:
+                        {
+                            await DevicePokit.NotifyStatus_StatusC4Async();
+                            var ppsdata = await DevicePokit.ReadStatus_StatusC4();
+                            if (ppsdata != null)
+                            {
+                                Log($"PokitMeter: Starting: mode={ppsdata.DeviceStatus} voltage={ppsdata.BatteryVoltage:F2}");
+                            }
+                            var ddata = await DevicePokit.ReadStatus_DeviceC4();
+                            if (ddata != null)
+                            {
+                                Log($"Firmware {ddata.FirmwareMajor}.{ddata.FirmwareMinor} Max Values:{ddata.MaxInputVoltage}V {ddata.MaxInputCurrent}A {ddata.MaxInputResistance}Ohm Sampling={ddata.MaxSamplingRate} ");
+                            }
+                        }
+                        break;
+                    case MultimeterType.PokitProC5:
+                        {
+                            await DevicePokit.NotifyStatus_StatusC5Async();
+                            var ppsdata = await DevicePokit.ReadStatus_StatusC5();
+                            if (ppsdata != null)
+                            {
+                                Log($"PokitPro: Starting: mode={ppsdata.DeviceStatus} voltage={ppsdata.BatteryVoltage:F2}");
+                            }
+                            var ddata = await DevicePokit.ReadStatus_DeviceC5();
+                            if (ddata != null)
+                            {
+                                Log($"Firmware {ddata.FirmwareMajor}.{ddata.FirmwareMinor} Max Values:{ddata.MaxInputVoltage}V {ddata.MaxInputCurrent}A {ddata.MaxInputResistance}Ohm Sampling={ddata.MaxSamplingRate} ");
+                            }
+                        }
+                        break;
+                }
+                DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // always start with Idle
+                DevicePokit.CurrMultimeter_Data.RangeSetting = 255; // always auto-range!
+                DevicePokit.CurrMultimeter_Data.IntervalSetting = 200;
+                var ppbytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
+                var mmsetting = await DevicePokit.WriteMM_Settings(ppbytes); // 5=ohms 0=range 200 0 0 0=200 milli-seconds
                 SetVisible(uidIdle, true); // allow override because we really want to be in idle mode
                 IsIdle = true;
                 break;
@@ -509,10 +545,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             connectAllOk = connectAllOk && (await DeviceBdmFamily.ReadDevice_Name(DefaultCacheMode)) != null;
             CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, DeviceBdmFamily.ble.ConnectionStatus);
         }
-        if (DevicePokitPro != null)
+        if (DevicePokit != null)
         {
-            connectAllOk = connectAllOk && (await DevicePokitPro.ReadDevice_Name(DefaultCacheMode)) != null;
-            CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, DevicePokitPro.ble.ConnectionStatus);
+            connectAllOk = connectAllOk && (await DevicePokit.ReadDevice_Name(DefaultCacheMode)) != null;
+            CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, DevicePokit.ble.ConnectionStatus);
         }
 
         // How this works: when you call the Read call, in addition to returning data it will
@@ -716,10 +752,18 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             // If it's more than 10 minutes since the last mode check, do a mode reading
             // Only applies to the Pokit Pro device
             var now = DateTimeOffset.Now;
-            if (DevicePokitPro != null && now.Subtract(TimeOfLastModeCheck).TotalMinutes >= 10.0)
+            if (DevicePokit != null && now.Subtract(TimeOfLastModeCheck).TotalMinutes >= 10.0)
             {
                 TimeOfLastModeCheck = now;
-                await DevicePokitPro.ReadStatus_Status();
+                switch (CurrMultimeterType)
+                {
+                    case MultimeterType.PokitMeterC4:
+                        await DevicePokit.ReadStatus_StatusC4();
+                        break;
+                    case MultimeterType.PokitProC5:
+                        await DevicePokit.ReadStatus_StatusC5();
+                        break;
+                }
             }
         });
     }
@@ -774,7 +818,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// </summary>
     private void UpdateDeviceDataUX(string name)
     {
-        bool haveDevice = DeviceBdmFamily != null || DevicePokitPro != null;
+        bool haveDevice = DeviceBdmFamily != null || DevicePokit != null;
         if (!haveDevice) return;
 
 
@@ -794,29 +838,31 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 if (Parser == null) return; // Could not get a match
                 break;
 
-            case MultimeterType.PokitPro:
-                CurrSensor_DataPokitPro = DevicePokitPro.CurrMultimeter_Data;
-                CurrSensorSecondary_DataPokit = DevicePokitPro.CurrService_Status_Data;
+            case MultimeterType.PokitMeterC4:
+            case MultimeterType.PokitProC5:
+                CurrSensor_DataPokit = DevicePokit.CurrMultimeter_Data;
+                CurrSensorSecondaryC5_DataPokit = DevicePokit.CurrService_StatusC5_Data;
+                CurrSensorSecondaryC4_DataPokit = DevicePokit.CurrService_StatusC4_Data;
 
-                // Special case: the PokitPro will return a micro-ohm value when it should report zero
-                switch ((PokitPro_Meter_Multimeter_Extensions.MM_ModeType)CurrSensor_DataPokitPro.OperationMode)
+                // Special case: the Pokit will return a micro-ohm value when it should report zero
+                switch ((Pokit_Meter_Multimeter_Extensions.MM_ModeType)CurrSensor_DataPokit.OperationMode)
                 {
-                    case PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Continuity:
-                        if (CurrSensor_DataPokitPro.Status == 0)
+                    case Pokit_Meter_Multimeter_Extensions.MM_ModeType.Continuity:
+                        if (CurrSensor_DataPokit.Status == 0)
                         {
-                            CurrSensor_DataPokitPro.Data = 0; // No Continuity
+                            CurrSensor_DataPokit.Data = 0; // No Continuity
                         }
                         else
                         {
-                            CurrSensor_DataPokitPro.Data = 1.0; //  Continuity
+                            CurrSensor_DataPokit.Data = 1.0; //  Continuity
                         }
                         break;
-                    case PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Resistance:
-                        if (CurrSensor_DataPokitPro.Data < 0.1)
+                    case Pokit_Meter_Multimeter_Extensions.MM_ModeType.Resistance:
+                        if (CurrSensor_DataPokit.Data < 0.1)
                         {
                             // TODO: double check actual documentation
                             // It can't actually read value this low
-                            CurrSensor_DataPokitPro.Data = 0;
+                            CurrSensor_DataPokit.Data = 0;
                         }
                         break;
                 }
@@ -850,8 +896,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 updateDisplay = true;
                 break;
 
-            case DeviceSpecificTypePokitPro.MM_DataPropertyChangedName:
-                CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_DataPokitPro, CurrSensor_DataUnits, KnownDeviceName, UserPreferences.Global.Convert);
+            case DeviceSpecificTypePokit.MM_DataPropertyChangedName:
+                CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_DataPokit, CurrSensor_DataUnits, KnownDeviceName, UserPreferences.Global.Convert);
                 other = CurrSensor_DataUnits.DisplayOther;
                 updateDisplay = true;
 
@@ -868,14 +914,26 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 }
                 break;
 
-            case DeviceSpecificTypePokitPro.Status_StatusPropertyChangedName: // mode and battery voltage
-                Log($"Pokit:Status_Status:time,{DateTime.Now.ToString("HH:mm")},mode,{CurrSensorSecondary_DataPokit.DeviceStatus},voltage,{CurrSensorSecondary_DataPokit.BatteryVoltage:F2}");
-                if (CurrSensorSecondary_DataPokit.DeviceStatus == (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Idle)
+            case DeviceSpecificTypePokit.Status_StatusC5PropertyChangedName: // mode and battery voltage
+                // For the batter Log($"Pokit:Status_Status:time,{DateTime.Now.ToString("HH:mm")},mode,{CurrSensorSecondary_DataPokit.DeviceStatus},voltage,{CurrSensorSecondary_DataPokit.BatteryVoltage:F2}");
+                if (CurrSensorSecondaryC5_DataPokit.DeviceStatus == (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle)
                 {
                     // The device has decided to switch to idle mode. That's OK, but update the screen accordingly
                     // Do not override the Error
                     SetVisible(uidIdle, false);
                 }
+                break;
+
+            case DeviceSpecificTypePokit.Status_StatusC4PropertyChangedName: // mode and battery voltage
+                if (CurrSensorSecondaryC4_DataPokit.DeviceStatus == (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle)
+                {
+                    // The device has decided to switch to idle mode. That's OK, but update the screen accordingly
+                    // Do not override the Error
+                    SetVisible(uidIdle, false);
+                }
+                break;
+            case DeviceSpecificTypePokit.Device_NamePropertyChangedName:
+                Log($"Device name: Pokit: {DevicePokit.CurrCommon_Configuration_Data.Device_Name}");
                 break;
 
             default:
@@ -1028,25 +1086,25 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     private async void OnRangeMenuItemClick(object sender, RoutedEventArgs e)
     {
-        if (DevicePokitPro == null) return;
+        if (DevicePokit == null) return;
         var rangestr = (sender as FrameworkElement)?.Tag as string;
         if (string.IsNullOrEmpty(rangestr)) return; // will never happen
         byte range = 0;
         var byteparse = Byte.TryParse(rangestr, out range);
         if (!byteparse) return;
         byte[] mmsetting = [5, (byte)range, 200, 0, 0, 0]; // 5=ohms 0=range 200 0 0 0=200 mseconds
-        var result = await DevicePokitPro.WriteMM_Settings(mmsetting);
+        var result = await DevicePokit.WriteMM_Settings(mmsetting);
         ;
     }
 
-    private async void OnSetupPokitPro(object sender, RoutedEventArgs e)
+    private async void OnSetupPokit(object sender, RoutedEventArgs e)
     {
-        if (DevicePokitPro == null) return;
+        if (DevicePokit == null) return;
 
         // Set the mode
-        var mode = DevicePokitPro.CurrMultimeter_Data.ModeSetting;
+        var mode = DevicePokit.CurrMultimeter_Data.ModeSetting;
         var modestr = mode.ToString();
-        foreach (var item in uidMMSetupPokitPro_Mode.Children)
+        foreach (var item in uidMMSetupPokit_Mode.Children)
         {
             var rb = item as RadioButton;
             if (rb == null) continue;
@@ -1060,10 +1118,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         //
         // Show the dialog box
         //
-        var result = await uidMMSetupPokitPro.ShowAsync();
+        var result = await uidMMSetupPokit.ShowAsync();
 
         // Update the mode!
-        foreach (var item in uidMMSetupPokitPro_Mode.Children)
+        foreach (var item in uidMMSetupPokit_Mode.Children)
         {
             var rb = item as RadioButton;
             if (rb == null) continue;
@@ -1071,30 +1129,30 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             if (rb.IsChecked.Value) modestr = rb.Tag as string;
         }
 
-        byte newPokitProMode=0;
-        var parseOk = byte.TryParse(modestr, out newPokitProMode);
+        byte newPokitMode=0;
+        var parseOk = byte.TryParse(modestr, out newPokitMode);
         if (!parseOk) return;
 
-        var oldMode = DevicePokitPro.CurrMultimeter_Data.ModeSetting;
-        var oldRange = DevicePokitPro.CurrMultimeter_Data.RangeSetting;
+        var oldMode = DevicePokit.CurrMultimeter_Data.ModeSetting;
+        var oldRange = DevicePokit.CurrMultimeter_Data.RangeSetting;
 
-        DevicePokitPro.CurrMultimeter_Data.ModeSetting = newPokitProMode;
-        var settingsBytes = DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes();
-        var setOk = await DevicePokitPro.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
+        DevicePokit.CurrMultimeter_Data.ModeSetting = newPokitMode;
+        var settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
+        var setOk = await DevicePokit.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
         if (setOk == (GattCommunicationStatus)999)
         {
             // Threw an exception. Technically this could be for a lot of reasons. But the #1 reason
             // by a mile is that the switch isn't set correctly. If so, reset to the old mode.
             Log("Pokit: Invalid request to change mode; set to Idle instead.");
             uidSwitchError.Visibility = Visibility.Visible;
-            DevicePokitPro.CurrMultimeter_Data.ModeSetting = (double)PokitPro_Meter_Multimeter_Extensions.MM_ModeType.Idle; // and not oldMode
-            DevicePokitPro.CurrMultimeter_Data.RangeSetting = oldRange;
+            DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // and not oldMode
+            DevicePokit.CurrMultimeter_Data.RangeSetting = oldRange;
             SetVisible(uidSwitchError);
 
-            settingsBytes = DevicePokitPro.CurrMultimeter_Data.GetMM_Setting_Bytes();
-            var resetOk = await DevicePokitPro.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
+            settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
+            var resetOk = await DevicePokit.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
         }
-        else if (newPokitProMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
+        else if (newPokitMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
         {
             SetVisible(uidIdle, true); // user explicitly requested the idle mode, so show it
             IsIdle = true;
@@ -1105,8 +1163,27 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             IsIdle = false;
         }
 
-        var ppsdata = await DevicePokitPro.ReadStatus_Status();
-        Log($"Pokit: Set Mode result: mode={ppsdata.DeviceStatus} voltage={ppsdata.BatteryVoltage:F2}");
+        switch (CurrMultimeterType)
+        {
+            case MultimeterType.PokitMeterC4:
+                {
+                    var ppsdata = await DevicePokit.ReadStatus_StatusC4();
+                    if (ppsdata != null)
+                    {
+                        Log($"Pokit: Set Mode result: mode={ppsdata.DeviceStatus} voltage={ppsdata.BatteryVoltage:F2}");
+                    }
+                }
+                break;
+            case MultimeterType.PokitProC5:
+                {
+                    var ppsdata = await DevicePokit.ReadStatus_StatusC5();
+                    if (ppsdata != null)
+                    {
+                        Log($"Pokit: Set Mode result: mode={ppsdata.DeviceStatus} voltage={ppsdata.BatteryVoltage:F2}");
+                    }
+                }
+                break;
+        }
 
     }
 
@@ -1120,7 +1197,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         if (!int.TryParse(tag, out mode)) return; // can never happen
         var combo = uidMMSetupPokitRange;
         combo.Items.Clear();
-        int currRange = (int)CurrSensor_DataPokitPro.OperationMode;
+        int currRange = (int)CurrSensor_DataPokit.OperationMode;
         switch (mode)
         {
             case 1:

@@ -14,7 +14,7 @@
         <Setter Property="Fill" Value="{ThemeResource SystemControlForegroundBaseLowBrush}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
-    
+
     <Style x:Key="ModeTileRadioStyleEmphasize" TargetType="RadioButton" BasedOn="{StaticResource ModeTileRadioStyle}">
         <Setter Property="FontSize" Value="18" />
     </Style>

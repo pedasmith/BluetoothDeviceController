@@ -92,9 +92,9 @@
                     <StackPanel Orientation="Horizontal">
                         <ToggleButton Content="Pause" x:Name="uiPauseButton" Click="OnPause" />
                         <Button Content="Beep" Click="OnBeep" />
-                        <Button Content="Control" x:Name="uiSetupPokitPro" Click="OnSetupPokitPro" />
+                        <Button Content="Control" x:Name="uiSetupPokitPro" Click="OnSetupPokit" />
 
-                        <ContentDialog x:Name="uidMMSetupPokitPro" Title="Multimeter Setup" 
+                        <ContentDialog x:Name="uidMMSetupPokit" Title="Multimeter Setup" 
                                        PrimaryButtonText="Apply" CloseButtonText="Cancel" 
                                        DefaultButton="Primary" Width="500">
                             <ContentDialog.Content>
@@ -104,7 +104,7 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <Grid x:Name="uidMMSetupPokitPro_Mode">
+                                    <Grid x:Name="uidMMSetupPokit_Mode">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="auto" MinWidth="60" />
                                             <ColumnDefinition Width="auto" />

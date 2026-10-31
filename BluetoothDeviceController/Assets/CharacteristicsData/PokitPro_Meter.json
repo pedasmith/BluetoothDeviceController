@@ -1,8 +1,8 @@
 ﻿{
   "AllDevices": [
     {
-      "Name": "PokitPro",
-      "ClassName": "PokitProMeter",
+      "Name": "Pokit",
+      "ClassName": "PokitOscilloscopeMeter",
       "ClassModifiers": "partial",
       "Description": "Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display.",
       "SuppressFile": ":ZZZDOXAMLFORNOWSuppressXAML:",
@@ -156,13 +156,14 @@
           ]
         },
         {
-          "UUID": "57d3a771-267c-4394-8872-78223e92aec5",
-          "Name": "Service_Status",
+          "UUID": "57d3a771-267c-4394-8872-78223e92aec4",
+          "Name": "Service_StatusC4",
+          "REM": "Pokit Meter Only! This is almost identical to 57d3a771-267c-4394-8872-78223e92aec5 from the PokitPro",
           "Characteristics": [
             {
               "UUID": "6974f5e5-0e54-45c3-97dd-29e4b5fb0849",
-              "Name": "Status_Device",
-              "Type": "U8|HEX|FirmwareMajor U8|HEX|FirmwareMinor U16|HEX|MaxInputVoltage U16|HEX|MaxInputCurrent U16|HEX|MaxInputResistance U16|HEX|MaxSamplingRate U16|HEX|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress",
+              "Name": "Status_DeviceC4",
+              "Type": "U8|DEC|FirmwareMajor U8|DEC|FirmwareMinor U16|DEC|MaxInputVoltage U16|DEC|MaxInputCurrent U16|DEC|MaxInputResistance U16|DEC|MaxSamplingRate U16|DEC|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress",
               "IsRead": true,
               "ExampleData": [
                 "Value:  01 02 52 03 0A 00 B8 0B E8 03 00 40 00 00 5C 02 72 09 AC 8B"
@@ -170,7 +171,7 @@
             },
             {
               "UUID": "3dba36e1-6120-4706-8dfd-ed9c16e569b6",
-              "Name": "Status_Status",
+              "Name": "Status_StatusC4",
               "Type": "U8|DEC|DeviceStatus F32|FIXED|BatteryVoltage",
               "REM10 DeviceStatus": "0=Idle 1=MM Vdc 2=MM Vac 3=MM AmpDC 4=MM AmpAC 5=MM ohm 6=MM Diode 7=MM Cont 8=MM Temp 9=DSO 10=Logger",
               "IsRead": true,
@@ -180,8 +181,17 @@
               ]
             },
             {
+              "UUID": "ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e",
+              "Name": "Status_Flash_LEDC4",
+              "Type": "U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|Beep",
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  FF 00 00 00"
+              ]
+            },
+            {
               "UUID": "7f0375de-077e-4555-8f78-800494509cc3",
-              "Name": "Status_Device_Name",
+              "Name": "Status_Device_NameC4",
               "Type": "STRING|ASCII|Device_Name",
               "IsRead": true,
               "IsWrite": true,
@@ -190,18 +200,8 @@
               ]
             },
             {
-              "UUID": "ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e",
-              "Name": "Status_Flash_LED",
-              "Type": "U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|Beep",
-              "IsRead": true,
-              "IsWrite": true,
-              "ExampleData": [
-                "Value:  FF 00 00 00"
-              ]
-            },
-            {
               "UUID": "aaf3f6d5-43d4-4a83-9510-dff3d858d4cc",
-              "Name": "Status_Light_LED",
+              "Name": "Status_Light_LEDC4",
               "Type": "U8|HEX|Light",
               "IsRead": true,
               "IsWrite": true,
@@ -212,7 +212,75 @@
             },
             {
               "UUID": "8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89",
-              "Name": "UnknownStatusValues",
+              "Name": "UnknownStatusValuesC4",
+              "Type": "BYTES|HEX|StatusUnknown5",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  02 00"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "57d3a771-267c-4394-8872-78223e92aec5",
+          "Name": "Service_StatusC5",
+          "Characteristics": [
+            {
+              "UUID": "6974f5e5-0e54-45c3-97dd-29e4b5fb0849",
+              "Name": "Status_DeviceC5",
+              "Type": "U8|DEC|FirmwareMajor U8|DEC|FirmwareMinor U16|DEC|MaxInputVoltage U16|DEC|MaxInputCurrent U16|DEC|MaxInputResistance U16|DEC|MaxSamplingRate U16|DEC|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress",
+              "IsRead": true,
+              "ExampleData": [
+                "Value:  01 02 52 03 0A 00 B8 0B E8 03 00 40 00 00 5C 02 72 09 AC 8B"
+              ]
+            },
+            {
+              "UUID": "3dba36e1-6120-4706-8dfd-ed9c16e569b6",
+              "Name": "Status_StatusC5",
+              "Type": "U8|DEC|DeviceStatus F32|FIXED|BatteryVoltage",
+              "REM10 DeviceStatus": "0=Idle 1=MM Vdc 2=MM Vac 3=MM AmpDC 4=MM AmpAC 5=MM ohm 6=MM Diode 7=MM Cont 8=MM Temp 9=DSO 10=Logger",
+              "IsRead": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00 6D E7 73 40 01 00 00"
+              ]
+            },
+            {
+              "UUID": "7f0375de-077e-4555-8f78-800494509cc3",
+              "Name": "Status_Device_NameC5",
+              "Type": "STRING|ASCII|Device_Name",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  50 6F 6B 69 74 50 72 6F = PokitPro"
+              ]
+            },
+            {
+              "UUID": "ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e",
+              "Name": "Status_Flash_LEDC5",
+              "Type": "U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|Beep",
+              "IsRead": true,
+              "IsWrite": true,
+              "ExampleData": [
+                "Value:  FF 00 00 00"
+              ]
+            },
+            {
+              "UUID": "aaf3f6d5-43d4-4a83-9510-dff3d858d4cc",
+              "Name": "Status_Light_LEDC5",
+              "Type": "U8|HEX|Light",
+              "IsRead": true,
+              "IsWrite": true,
+              "IsNotify": true,
+              "ExampleData": [
+                "Value:  00"
+              ]
+            },
+            {
+              "UUID": "8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89",
+              "Name": "UnknownStatusValuesC5",
               "Type": "BYTES|HEX|StatusUnknown5",
               "IsRead": true,
               "IsWrite": true,
@@ -238,9 +306,9 @@
               "REM20": "09 00 01 00 00 00 00",
               "REM30": "range v 0=...300mv 1=300mv..2V 2=2..6V 3=6v..12v 4=12 to 30",
               "Range_Volts": "0=0..300mv 1=300mv..2V 2=2V..6V 3=6V..12V 4=12V..30V 5=30V..60V 255=Autorange",
-              "Range_Amps" : "0=0..10mA 1=10mA..30mA 2=30mA..150mA 3=150mA..300mA 4=300mA..3A 255=Autorange",
+              "Range_Amps": "0=0..10mA 1=10mA..30mA 2=30mA..150mA 3=150mA..300mA 4=300mA..3A 255=Autorange",
               "Range_Ohms": "0=0..160 1=160..330 2=330..890 3=890..1.5K 4=1.5K..10K 5=10K..100K 6=100K..470K 7=470K..1M 255=Autorange",
-              "Critical note!":  "Setting the Mode to a value that doesn't match the physical switch will throw an exception!"
+              "Critical note!": "Setting the Mode to a value that doesn't match the physical switch will throw an exception!"
             },
             {
               "UUID": "047d3559-8bee-423a-b229-4417fa603b90",
@@ -254,7 +322,7 @@
                 "Status: V/A/Ohm: 0=auto range off 1=autorange one 255=error. Continuity: 0=no cont 1=cont"
               ]
             }
-          ] 
+          ]
         },
         {
           "UUID": "1569801e-1425-4a7a-b617-a4f4ed719de6",

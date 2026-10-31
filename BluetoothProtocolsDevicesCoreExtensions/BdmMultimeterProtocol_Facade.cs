@@ -73,7 +73,7 @@ public class BdmMultimeterDisplayFacade
     public static string HoldStr = "Hold ";
     public static string AutoStr = "AUTO ";
     public enum DmmMode { Other, Volts, DutyCycle, Hertz, Temperature, Resistance, Diode, Continuity, Capacitance, Amps,
-        Idle, // PokitPro
+        Idle, // PokitOscilloscopeMeter like PokitPro and PokitMeter
     }
     // DmmMode {  Other, XXVolts, XXDutyCycle, XXHertz, XXTemperature, XXResistance, XXDiode, Continuity, XXCapacitance, XXAmps }
     // Missing: continuity? Which is resistance with beeps!
@@ -156,7 +156,7 @@ public class BdmMultimeterDisplayFacade
         return dest;
     }
 
-    public static BdmMultimeterDisplayFacade CopyToWithConvertAndCreate(PokitProMeter.Multimeter_Data source, BdmMultimeterDisplayFacade dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+    public static BdmMultimeterDisplayFacade CopyToWithConvertAndCreate(PokitOscilloscopeMeter.Multimeter_Data source, BdmMultimeterDisplayFacade dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
     {
         if (dest == null)
         {
@@ -165,16 +165,16 @@ public class BdmMultimeterDisplayFacade
 
 
         // All of the facade-specific values.
-        dest.Mode = DmmModeFromPokitProMode(source.OperationMode);
-        dest.Multiplier = 1.0; // all the PokitPro data is in normal units
+        dest.Mode = DmmModeFromPokitMode(source.OperationMode);
+        dest.Multiplier = 1.0; // all the Pokit data is in normal units
         dest.DisplayNumber = source.Data;
         dest.DisplayUnits = "";
         AdjustDisplayNumberAndUnitsAndMultiplier(source.Data, dest);
         if (source.Data != 0)
         {
-            dest.DisplayUnits += UnitsFromPokitProMode(source.OperationMode);
+            dest.DisplayUnits += UnitsFromPokitMode(source.OperationMode);
         }
-        dest.DisplayOther = OtherFromPokitProMode(source.OperationMode); // e.g., "DC" and "diode"
+        dest.DisplayOther = OtherFromPokitMode(source.OperationMode); // e.g., "DC" and "diode"
         var sig = dest.DisplayNumber.Significant(3).ToString();
         sig = sig.FixupSignificant();
         dest.DisplayText = sig;
@@ -189,7 +189,7 @@ public class BdmMultimeterDisplayFacade
     /// <summary>
     /// mode 0=idle, 1=voltDC, 2=voltAC 3=ampDC,4=ampAC 5=ohm 6=diode 7=continuity 8=temp
     /// </summary>
-    private static DmmMode DmmModeFromPokitProMode(double value)
+    private static DmmMode DmmModeFromPokitMode(double value)
     {
         DmmMode retval = ((int)value) switch
         {
@@ -207,7 +207,7 @@ public class BdmMultimeterDisplayFacade
         return retval;
     }
 
-    private static string UnitsFromPokitProMode(double value)
+    private static string UnitsFromPokitMode(double value)
     {
         String retval = ((int)value) switch
         {
@@ -225,7 +225,7 @@ public class BdmMultimeterDisplayFacade
         return retval;
 
     }
-    private static string OtherFromPokitProMode(double value)
+    private static string OtherFromPokitMode(double value)
     {
         String retval = ((int)value) switch
         {
@@ -898,10 +898,10 @@ public class FortuneFS9952MultimeterProtocol : IMultimeterProtocolParser
 }
 
 
-public static class PokitPro_Meter_Multimeter_Extensions
+public static class Pokit_Meter_Multimeter_Extensions
 {
     public enum MM_ModeType {  Idle=0, VoltDC=1, VoltAC=2, AmpDC=3, AmpAC=4, Resistance=5, Diode=6, Continuity=7, Temperature=8 }
-    public static byte[] GetMM_Setting_Bytes(this PokitProMeter.Multimeter_Data data)
+    public static byte[] GetMM_Setting_Bytes(this PokitOscilloscopeMeter.Multimeter_Data data)
     {
         var dw = new DataWriter();
         dw.ByteOrder = ByteOrder.LittleEndian; // Bluetooth is little endian by default

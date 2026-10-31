@@ -17,10 +17,10 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display..
-    /// This class was automatically generated 2026-10-26::18:47
+    /// This class was automatically generated 2026-10-31::15:54
     /// </summary>
 
-    public partial class PokitProMeter : INotifyPropertyChanged
+    public partial class PokitOscilloscopeMeter : INotifyPropertyChanged
     {
         // Useful links for the device and protocol documentation
         // Link: https://help.pokitmeter.com/hc/en-us/community/posts/360023523213-Bluetooth-API-Documentation
@@ -38,10 +38,10 @@ namespace BluetoothProtocols
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public string Name { get; } = "PokitPro";
+        public string Name { get; } = "Pokit";
         public string Description { get; } = "Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display.";
 
-        /* Service and Characteristics summary for the device PokitPro
+        /* Service and Characteristics summary for the device Pokit
 
         Multimeter service Guid=e7481d2f-5781-442e-bb9a-fd4e3441dadc
             Multimeter_Data (DataGroup record)
@@ -87,14 +87,24 @@ namespace BluetoothProtocols
                 Serial Number characteristic has Serial_Number (String-->string)  Guid=2a25
 
 
-        Service_Status service Guid=57d3a771-267c-4394-8872-78223e92aec5
-            Service_Status_Data (DataGroup record)
-                Status_Device characteristic has FirmwareMajor (Byte-->double) FirmwareMinor (Byte-->double) MaxInputVoltage (UInt16-->double) MaxInputCurrent (UInt16-->double) MaxInputResistance (UInt16-->double) MaxSamplingRate (UInt16-->double) DeviceBufferSize (UInt16-->double) Reserved01 (UInt16-->double) MacAddress (Bytes-->string)  Guid=6974f5e5-0e54-45c3-97dd-29e4b5fb0849
-                Status_Status characteristic has DeviceStatus (Byte-->double) BatteryVoltage (Single-->double)  Guid=3dba36e1-6120-4706-8dfd-ed9c16e569b6
-                Status_Device_Name characteristic has Device_Name (String-->string)  Guid=7f0375de-077e-4555-8f78-800494509cc3
-                Status_Flash_LED characteristic has Red (Byte-->double) Green (Byte-->double) Blue (Byte-->double) Beep (Byte-->double)  Guid=ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e
-                Status_Light_LED characteristic has Light (Byte-->double)  Guid=aaf3f6d5-43d4-4a83-9510-dff3d858d4cc
-                UnknownStatusValues characteristic has StatusUnknown5 (Bytes-->string)  Guid=8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89
+        Service_StatusC4 service Guid=57d3a771-267c-4394-8872-78223e92aec4
+            Service_StatusC4_Data (DataGroup record)
+                Status_DeviceC4 characteristic has FirmwareMajor (Byte-->double) FirmwareMinor (Byte-->double) MaxInputVoltage (UInt16-->double) MaxInputCurrent (UInt16-->double) MaxInputResistance (UInt16-->double) MaxSamplingRate (UInt16-->double) DeviceBufferSize (UInt16-->double) Reserved01 (UInt16-->double) MacAddress (Bytes-->string)  Guid=6974f5e5-0e54-45c3-97dd-29e4b5fb0849
+                Status_StatusC4 characteristic has DeviceStatus (Byte-->double) BatteryVoltage (Single-->double)  Guid=3dba36e1-6120-4706-8dfd-ed9c16e569b6
+                Status_Flash_LEDC4 characteristic has Red (Byte-->double) Green (Byte-->double) Blue (Byte-->double) Beep (Byte-->double)  Guid=ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e
+                Status_Device_NameC4 characteristic has Device_Name (String-->string)  Guid=7f0375de-077e-4555-8f78-800494509cc3
+                Status_Light_LEDC4 characteristic has Light (Byte-->double)  Guid=aaf3f6d5-43d4-4a83-9510-dff3d858d4cc
+                UnknownStatusValuesC4 characteristic has StatusUnknown5 (Bytes-->string)  Guid=8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89
+
+
+        Service_StatusC5 service Guid=57d3a771-267c-4394-8872-78223e92aec5
+            Service_StatusC5_Data (DataGroup record)
+                Status_DeviceC5 characteristic has FirmwareMajor (Byte-->double) FirmwareMinor (Byte-->double) MaxInputVoltage (UInt16-->double) MaxInputCurrent (UInt16-->double) MaxInputResistance (UInt16-->double) MaxSamplingRate (UInt16-->double) DeviceBufferSize (UInt16-->double) Reserved01 (UInt16-->double) MacAddress (Bytes-->string)  Guid=6974f5e5-0e54-45c3-97dd-29e4b5fb0849
+                Status_StatusC5 characteristic has DeviceStatus (Byte-->double) BatteryVoltage (Single-->double)  Guid=3dba36e1-6120-4706-8dfd-ed9c16e569b6
+                Status_Device_NameC5 characteristic has Device_Name (String-->string)  Guid=7f0375de-077e-4555-8f78-800494509cc3
+                Status_Flash_LEDC5 characteristic has Red (Byte-->double) Green (Byte-->double) Blue (Byte-->double) Beep (Byte-->double)  Guid=ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e
+                Status_Light_LEDC5 characteristic has Light (Byte-->double)  Guid=aaf3f6d5-43d4-4a83-9510-dff3d858d4cc
+                UnknownStatusValuesC5 characteristic has StatusUnknown5 (Bytes-->string)  Guid=8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89
 
 
         CalibrationService service Guid=6f53be2f-780b-49b8-a7c3-e8a052b3ae2c
@@ -130,12 +140,18 @@ namespace BluetoothProtocols
         public const string Software_RevisionPropertyChangedName = "Software_Revision";
         public const string Hardware_RevisionPropertyChangedName = "Hardware_Revision";
         public const string Serial_NumberPropertyChangedName = "Serial_Number";
-        public const string Status_DevicePropertyChangedName = "Status_Device";
-        public const string Status_StatusPropertyChangedName = "Status_Status";
-        public const string Status_Device_NamePropertyChangedName = "Status_Device_Name";
-        public const string Status_Flash_LEDPropertyChangedName = "Status_Flash_LED";
-        public const string Status_Light_LEDPropertyChangedName = "Status_Light_LED";
-        public const string UnknownStatusValuesPropertyChangedName = "UnknownStatusValues";
+        public const string Status_DeviceC4PropertyChangedName = "Status_DeviceC4";
+        public const string Status_StatusC4PropertyChangedName = "Status_StatusC4";
+        public const string Status_Flash_LEDC4PropertyChangedName = "Status_Flash_LEDC4";
+        public const string Status_Device_NameC4PropertyChangedName = "Status_Device_NameC4";
+        public const string Status_Light_LEDC4PropertyChangedName = "Status_Light_LEDC4";
+        public const string UnknownStatusValuesC4PropertyChangedName = "UnknownStatusValuesC4";
+        public const string Status_DeviceC5PropertyChangedName = "Status_DeviceC5";
+        public const string Status_StatusC5PropertyChangedName = "Status_StatusC5";
+        public const string Status_Device_NameC5PropertyChangedName = "Status_Device_NameC5";
+        public const string Status_Flash_LEDC5PropertyChangedName = "Status_Flash_LEDC5";
+        public const string Status_Light_LEDC5PropertyChangedName = "Status_Light_LEDC5";
+        public const string UnknownStatusValuesC5PropertyChangedName = "UnknownStatusValuesC5";
         public const string CalbrateTemperaturePropertyChangedName = "CalbrateTemperature";
         public const string CalibrateUnknown1PropertyChangedName = "CalibrateUnknown1";
         public const string CalibrrateUnknown2PropertyChangedName = "CalibrrateUnknown2";
@@ -1162,17 +1178,17 @@ namespace BluetoothProtocols
         }
 //
         /// <summary>
-        /// Data from all of the characteristics in the Service_Status Service. Dervices from
+        /// Data from all of the characteristics in the Service_StatusC4 Service. Dervices from
         /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
         /// and implements INotifyPropertyChanged.
         /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class Service_Status_Data :BTCommonMetaData<Service_Status_Data> //, IExportDataSource
+        public class Service_StatusC4_Data :BTCommonMetaData<Service_StatusC4_Data> //, IExportDataSource
         {
             private double _FirmwareMajor = 0;
             /// <summary>
-            /// FirmwareMajor (U8 ) from Service=Service_Status and Characteristic=Status_Device
+            /// FirmwareMajor (U8 ) from Service=Service_StatusC4 and Characteristic=Status_DeviceC4
             ///</summary>
             public double FirmwareMajor 
             { 
@@ -1181,7 +1197,7 @@ namespace BluetoothProtocols
             }
             private double _FirmwareMinor = 0;
             /// <summary>
-            /// FirmwareMinor (U8 ) from Service=Service_Status and Characteristic=Status_Device
+            /// FirmwareMinor (U8 ) from Service=Service_StatusC4 and Characteristic=Status_DeviceC4
             ///</summary>
             public double FirmwareMinor 
             { 
@@ -1190,7 +1206,7 @@ namespace BluetoothProtocols
             }
             private double _MaxInputVoltage = 0;
             /// <summary>
-            /// MaxInputVoltage (U16 ) from Service=Service_Status and Characteristic=Status_Device
+            /// MaxInputVoltage (U16 ) from Service=Service_StatusC4 and Characteristic=Status_DeviceC4
             ///</summary>
             public double MaxInputVoltage 
             { 
@@ -1199,7 +1215,7 @@ namespace BluetoothProtocols
             }
             private double _MaxInputCurrent = 0;
             /// <summary>
-            /// MaxInputCurrent (U16 ) from Service=Service_Status and Characteristic=Status_Device
+            /// MaxInputCurrent (U16 ) from Service=Service_StatusC4 and Characteristic=Status_DeviceC4
             ///</summary>
             public double MaxInputCurrent 
             { 
@@ -1208,7 +1224,7 @@ namespace BluetoothProtocols
             }
             private double _MaxInputResistance = 0;
             /// <summary>
-            /// MaxInputResistance (U16 ) from Service=Service_Status and Characteristic=Status_Device
+            /// MaxInputResistance (U16 ) from Service=Service_StatusC4 and Characteristic=Status_DeviceC4
             ///</summary>
             public double MaxInputResistance 
             { 
@@ -1217,7 +1233,7 @@ namespace BluetoothProtocols
             }
             private double _MaxSamplingRate = 0;
             /// <summary>
-            /// MaxSamplingRate (U16 ) from Service=Service_Status and Characteristic=Status_Device
+            /// MaxSamplingRate (U16 ) from Service=Service_StatusC4 and Characteristic=Status_DeviceC4
             ///</summary>
             public double MaxSamplingRate 
             { 
@@ -1226,7 +1242,7 @@ namespace BluetoothProtocols
             }
             private double _DeviceBufferSize = 0;
             /// <summary>
-            /// DeviceBufferSize (U16 ) from Service=Service_Status and Characteristic=Status_Device
+            /// DeviceBufferSize (U16 ) from Service=Service_StatusC4 and Characteristic=Status_DeviceC4
             ///</summary>
             public double DeviceBufferSize 
             { 
@@ -1235,7 +1251,7 @@ namespace BluetoothProtocols
             }
             private double _Reserved01 = 0;
             /// <summary>
-            /// Reserved01 (U16 ) from Service=Service_Status and Characteristic=Status_Device
+            /// Reserved01 (U16 ) from Service=Service_StatusC4 and Characteristic=Status_DeviceC4
             ///</summary>
             public double Reserved01 
             { 
@@ -1244,7 +1260,7 @@ namespace BluetoothProtocols
             }
             private byte[] _MacAddress = null;
             /// <summary>
-            /// MacAddress (BYTES ) from Service=Service_Status and Characteristic=Status_Device
+            /// MacAddress (BYTES ) from Service=Service_StatusC4 and Characteristic=Status_DeviceC4
             ///</summary>
             public byte[] MacAddress 
             { 
@@ -1254,7 +1270,7 @@ namespace BluetoothProtocols
 
             private double _DeviceStatus = 0;
             /// <summary>
-            /// DeviceStatus (U8 ) from Service=Service_Status and Characteristic=Status_Status
+            /// DeviceStatus (U8 ) from Service=Service_StatusC4 and Characteristic=Status_StatusC4
             ///</summary>
             public double DeviceStatus 
             { 
@@ -1263,7 +1279,7 @@ namespace BluetoothProtocols
             }
             private double _BatteryVoltage = 0.0;
             /// <summary>
-            /// BatteryVoltage (F32 ) from Service=Service_Status and Characteristic=Status_Status
+            /// BatteryVoltage (F32 ) from Service=Service_StatusC4 and Characteristic=Status_StatusC4
             ///</summary>
             public double BatteryVoltage 
             { 
@@ -1271,19 +1287,9 @@ namespace BluetoothProtocols
                 set { if (value == _BatteryVoltage) return; _BatteryVoltage = value; OnPropertyChanged();}
             }
 
-            private string _Device_Name = "";
-            /// <summary>
-            /// Device_Name (STRING ) from Service=Service_Status and Characteristic=Status_Device_Name
-            ///</summary>
-            public string Device_Name 
-            { 
-                get { return _Device_Name; }
-                set { if (value == _Device_Name) return; _Device_Name = value; OnPropertyChanged();}
-            }
-
             private double _Red = 0;
             /// <summary>
-            /// Red (U8 ) from Service=Service_Status and Characteristic=Status_Flash_LED
+            /// Red (U8 ) from Service=Service_StatusC4 and Characteristic=Status_Flash_LEDC4
             ///</summary>
             public double Red 
             { 
@@ -1292,7 +1298,7 @@ namespace BluetoothProtocols
             }
             private double _Green = 0;
             /// <summary>
-            /// Green (U8 ) from Service=Service_Status and Characteristic=Status_Flash_LED
+            /// Green (U8 ) from Service=Service_StatusC4 and Characteristic=Status_Flash_LEDC4
             ///</summary>
             public double Green 
             { 
@@ -1301,7 +1307,7 @@ namespace BluetoothProtocols
             }
             private double _Blue = 0;
             /// <summary>
-            /// Blue (U8 ) from Service=Service_Status and Characteristic=Status_Flash_LED
+            /// Blue (U8 ) from Service=Service_StatusC4 and Characteristic=Status_Flash_LEDC4
             ///</summary>
             public double Blue 
             { 
@@ -1310,7 +1316,7 @@ namespace BluetoothProtocols
             }
             private double _Beep = 0;
             /// <summary>
-            /// Beep (U8 ) from Service=Service_Status and Characteristic=Status_Flash_LED
+            /// Beep (U8 ) from Service=Service_StatusC4 and Characteristic=Status_Flash_LEDC4
             ///</summary>
             public double Beep 
             { 
@@ -1318,9 +1324,19 @@ namespace BluetoothProtocols
                 set { if (value == _Beep) return; _Beep = value; OnPropertyChanged();}
             }
 
+            private string _Device_Name = "";
+            /// <summary>
+            /// Device_Name (STRING ) from Service=Service_StatusC4 and Characteristic=Status_Device_NameC4
+            ///</summary>
+            public string Device_Name 
+            { 
+                get { return _Device_Name; }
+                set { if (value == _Device_Name) return; _Device_Name = value; OnPropertyChanged();}
+            }
+
             private double _Light = 0;
             /// <summary>
-            /// Light (U8 ) from Service=Service_Status and Characteristic=Status_Light_LED
+            /// Light (U8 ) from Service=Service_StatusC4 and Characteristic=Status_Light_LEDC4
             ///</summary>
             public double Light 
             { 
@@ -1330,16 +1346,16 @@ namespace BluetoothProtocols
 
             private byte[] _StatusUnknown5 = null;
             /// <summary>
-            /// StatusUnknown5 (BYTES ) from Service=Service_Status and Characteristic=UnknownStatusValues
+            /// StatusUnknown5 (BYTES ) from Service=Service_StatusC4 and Characteristic=UnknownStatusValuesC4
             ///</summary>
             public byte[] StatusUnknown5 
             { 
                 get { return _StatusUnknown5; }
                 set { if (value == _StatusUnknown5) return; _StatusUnknown5 = value; OnPropertyChanged();}
             }
-            public override Service_Status_Data Clone(string name = null)
+            public override Service_StatusC4_Data Clone(string name = null)
             {
-                var retval = this.MemberwiseClone() as Service_Status_Data;
+                var retval = this.MemberwiseClone() as Service_StatusC4_Data;
                 if (name != null)
                 {
                     retval.Name = name;
@@ -1350,7 +1366,291 @@ namespace BluetoothProtocols
             /// <summary>
             /// Copies all of the source fields to the 'this' destination
             /// </summary>
-            public override void CopyFrom(Service_Status_Data source)
+            public override void CopyFrom(Service_StatusC4_Data source)
+            {
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.FirmwareMajor = source.FirmwareMajor;
+                dest.FirmwareMinor = source.FirmwareMinor;
+                dest.MaxInputVoltage = source.MaxInputVoltage;
+                dest.MaxInputCurrent = source.MaxInputCurrent;
+                dest.MaxInputResistance = source.MaxInputResistance;
+                dest.MaxSamplingRate = source.MaxSamplingRate;
+                dest.DeviceBufferSize = source.DeviceBufferSize;
+                dest.Reserved01 = source.Reserved01;
+                dest.MacAddress = source.MacAddress;
+                dest.DeviceStatus = source.DeviceStatus;
+                dest.BatteryVoltage = source.BatteryVoltage;
+                dest.Red = source.Red;
+                dest.Green = source.Green;
+                dest.Blue = source.Blue;
+                dest.Beep = source.Beep;
+                dest.Device_Name = source.Device_Name;
+                dest.Light = source.Light;
+                dest.StatusUnknown5 = source.StatusUnknown5;
+            }
+
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static Service_StatusC4_Data CopyToWithConvertAndCreate(Service_StatusC4_Data source, Service_StatusC4_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
+                dest.FirmwareMajor = convert(source.FirmwareMajor, "");
+                dest.FirmwareMinor = convert(source.FirmwareMinor, "");
+                dest.MaxInputVoltage = convert(source.MaxInputVoltage, "");
+                dest.MaxInputCurrent = convert(source.MaxInputCurrent, "");
+                dest.MaxInputResistance = convert(source.MaxInputResistance, "");
+                dest.MaxSamplingRate = convert(source.MaxSamplingRate, "");
+                dest.DeviceBufferSize = convert(source.DeviceBufferSize, "");
+                dest.Reserved01 = convert(source.Reserved01, "");
+                dest.MacAddress = source.MacAddress;
+                dest.DeviceStatus = convert(source.DeviceStatus, "");
+                dest.BatteryVoltage = convert(source.BatteryVoltage, "");
+                dest.Red = convert(source.Red, "");
+                dest.Green = convert(source.Green, "");
+                dest.Blue = convert(source.Blue, "");
+                dest.Beep = convert(source.Beep, "");
+                dest.Device_Name = source.Device_Name;
+                dest.Light = convert(source.Light, "");
+                dest.StatusUnknown5 = source.StatusUnknown5;
+                return dest;
+            }
+
+            public override string[] ExportGetHeaders(IExportData _)
+            {
+                return ["FirmwareMajor", "FirmwareMinor", "MaxInputVoltage", "MaxInputCurrent", "MaxInputResistance", "MaxSamplingRate", "DeviceBufferSize", "Reserved01", "MacAddress", "DeviceStatus", "BatteryVoltage", "Red", "Green", "Blue", "Beep", "Device_Name", "Light", "StatusUnknown5"];
+            }
+
+            public override void ExportRow(IExportData exporter)
+            {
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
+                exporter.CellSet(FirmwareMajor);
+                exporter.CellSet(FirmwareMinor);
+                exporter.CellSet(MaxInputVoltage);
+                exporter.CellSet(MaxInputCurrent);
+                exporter.CellSet(MaxInputResistance);
+                exporter.CellSet(MaxSamplingRate);
+                exporter.CellSet(DeviceBufferSize);
+                exporter.CellSet(Reserved01);
+                exporter.CellSet(MacAddress);
+                exporter.CellSet(DeviceStatus);
+                exporter.CellSet(BatteryVoltage);
+                exporter.CellSet(Red);
+                exporter.CellSet(Green);
+                exporter.CellSet(Blue);
+                exporter.CellSet(Beep);
+                exporter.CellSet(Device_Name);
+                exporter.CellSet(Light);
+                exporter.CellSet(StatusUnknown5);                
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {FirmwareMajor} {FirmwareMinor} {MaxInputVoltage} {MaxInputCurrent} {MaxInputResistance} {MaxSamplingRate} {DeviceBufferSize} {Reserved01} {MacAddress} {DeviceStatus} {BatteryVoltage} {Red} {Green} {Blue} {Beep} {Device_Name} {Light} {StatusUnknown5}");
+            }
+        }
+//
+        /// <summary>
+        /// Data from all of the characteristics in the Service_StatusC5 Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
+        /// </summary>
+        public class Service_StatusC5_Data :BTCommonMetaData<Service_StatusC5_Data> //, IExportDataSource
+        {
+            private double _FirmwareMajor = 0;
+            /// <summary>
+            /// FirmwareMajor (U8 ) from Service=Service_StatusC5 and Characteristic=Status_DeviceC5
+            ///</summary>
+            public double FirmwareMajor 
+            { 
+                get { return _FirmwareMajor; }
+                set { if (value == _FirmwareMajor) return; _FirmwareMajor = value; OnPropertyChanged();}
+            }
+            private double _FirmwareMinor = 0;
+            /// <summary>
+            /// FirmwareMinor (U8 ) from Service=Service_StatusC5 and Characteristic=Status_DeviceC5
+            ///</summary>
+            public double FirmwareMinor 
+            { 
+                get { return _FirmwareMinor; }
+                set { if (value == _FirmwareMinor) return; _FirmwareMinor = value; OnPropertyChanged();}
+            }
+            private double _MaxInputVoltage = 0;
+            /// <summary>
+            /// MaxInputVoltage (U16 ) from Service=Service_StatusC5 and Characteristic=Status_DeviceC5
+            ///</summary>
+            public double MaxInputVoltage 
+            { 
+                get { return _MaxInputVoltage; }
+                set { if (value == _MaxInputVoltage) return; _MaxInputVoltage = value; OnPropertyChanged();}
+            }
+            private double _MaxInputCurrent = 0;
+            /// <summary>
+            /// MaxInputCurrent (U16 ) from Service=Service_StatusC5 and Characteristic=Status_DeviceC5
+            ///</summary>
+            public double MaxInputCurrent 
+            { 
+                get { return _MaxInputCurrent; }
+                set { if (value == _MaxInputCurrent) return; _MaxInputCurrent = value; OnPropertyChanged();}
+            }
+            private double _MaxInputResistance = 0;
+            /// <summary>
+            /// MaxInputResistance (U16 ) from Service=Service_StatusC5 and Characteristic=Status_DeviceC5
+            ///</summary>
+            public double MaxInputResistance 
+            { 
+                get { return _MaxInputResistance; }
+                set { if (value == _MaxInputResistance) return; _MaxInputResistance = value; OnPropertyChanged();}
+            }
+            private double _MaxSamplingRate = 0;
+            /// <summary>
+            /// MaxSamplingRate (U16 ) from Service=Service_StatusC5 and Characteristic=Status_DeviceC5
+            ///</summary>
+            public double MaxSamplingRate 
+            { 
+                get { return _MaxSamplingRate; }
+                set { if (value == _MaxSamplingRate) return; _MaxSamplingRate = value; OnPropertyChanged();}
+            }
+            private double _DeviceBufferSize = 0;
+            /// <summary>
+            /// DeviceBufferSize (U16 ) from Service=Service_StatusC5 and Characteristic=Status_DeviceC5
+            ///</summary>
+            public double DeviceBufferSize 
+            { 
+                get { return _DeviceBufferSize; }
+                set { if (value == _DeviceBufferSize) return; _DeviceBufferSize = value; OnPropertyChanged();}
+            }
+            private double _Reserved01 = 0;
+            /// <summary>
+            /// Reserved01 (U16 ) from Service=Service_StatusC5 and Characteristic=Status_DeviceC5
+            ///</summary>
+            public double Reserved01 
+            { 
+                get { return _Reserved01; }
+                set { if (value == _Reserved01) return; _Reserved01 = value; OnPropertyChanged();}
+            }
+            private byte[] _MacAddress = null;
+            /// <summary>
+            /// MacAddress (BYTES ) from Service=Service_StatusC5 and Characteristic=Status_DeviceC5
+            ///</summary>
+            public byte[] MacAddress 
+            { 
+                get { return _MacAddress; }
+                set { if (value == _MacAddress) return; _MacAddress = value; OnPropertyChanged();}
+            }
+
+            private double _DeviceStatus = 0;
+            /// <summary>
+            /// DeviceStatus (U8 ) from Service=Service_StatusC5 and Characteristic=Status_StatusC5
+            ///</summary>
+            public double DeviceStatus 
+            { 
+                get { return _DeviceStatus; }
+                set { if (value == _DeviceStatus) return; _DeviceStatus = value; OnPropertyChanged();}
+            }
+            private double _BatteryVoltage = 0.0;
+            /// <summary>
+            /// BatteryVoltage (F32 ) from Service=Service_StatusC5 and Characteristic=Status_StatusC5
+            ///</summary>
+            public double BatteryVoltage 
+            { 
+                get { return _BatteryVoltage; }
+                set { if (value == _BatteryVoltage) return; _BatteryVoltage = value; OnPropertyChanged();}
+            }
+
+            private string _Device_Name = "";
+            /// <summary>
+            /// Device_Name (STRING ) from Service=Service_StatusC5 and Characteristic=Status_Device_NameC5
+            ///</summary>
+            public string Device_Name 
+            { 
+                get { return _Device_Name; }
+                set { if (value == _Device_Name) return; _Device_Name = value; OnPropertyChanged();}
+            }
+
+            private double _Red = 0;
+            /// <summary>
+            /// Red (U8 ) from Service=Service_StatusC5 and Characteristic=Status_Flash_LEDC5
+            ///</summary>
+            public double Red 
+            { 
+                get { return _Red; }
+                set { if (value == _Red) return; _Red = value; OnPropertyChanged();}
+            }
+            private double _Green = 0;
+            /// <summary>
+            /// Green (U8 ) from Service=Service_StatusC5 and Characteristic=Status_Flash_LEDC5
+            ///</summary>
+            public double Green 
+            { 
+                get { return _Green; }
+                set { if (value == _Green) return; _Green = value; OnPropertyChanged();}
+            }
+            private double _Blue = 0;
+            /// <summary>
+            /// Blue (U8 ) from Service=Service_StatusC5 and Characteristic=Status_Flash_LEDC5
+            ///</summary>
+            public double Blue 
+            { 
+                get { return _Blue; }
+                set { if (value == _Blue) return; _Blue = value; OnPropertyChanged();}
+            }
+            private double _Beep = 0;
+            /// <summary>
+            /// Beep (U8 ) from Service=Service_StatusC5 and Characteristic=Status_Flash_LEDC5
+            ///</summary>
+            public double Beep 
+            { 
+                get { return _Beep; }
+                set { if (value == _Beep) return; _Beep = value; OnPropertyChanged();}
+            }
+
+            private double _Light = 0;
+            /// <summary>
+            /// Light (U8 ) from Service=Service_StatusC5 and Characteristic=Status_Light_LEDC5
+            ///</summary>
+            public double Light 
+            { 
+                get { return _Light; }
+                set { if (value == _Light) return; _Light = value; OnPropertyChanged();}
+            }
+
+            private byte[] _StatusUnknown5 = null;
+            /// <summary>
+            /// StatusUnknown5 (BYTES ) from Service=Service_StatusC5 and Characteristic=UnknownStatusValuesC5
+            ///</summary>
+            public byte[] StatusUnknown5 
+            { 
+                get { return _StatusUnknown5; }
+                set { if (value == _StatusUnknown5) return; _StatusUnknown5 = value; OnPropertyChanged();}
+            }
+            public override Service_StatusC5_Data Clone(string name = null)
+            {
+                var retval = this.MemberwiseClone() as Service_StatusC5_Data;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
+            }
+
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom(Service_StatusC5_Data source)
             {
                 var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
                 dest.TimestampMostRecent = source.TimestampMostRecent;
@@ -1381,7 +1681,7 @@ namespace BluetoothProtocols
             /// and will set the name to the given name if it's not null or empty.
             /// </summary>
 
-            public static Service_Status_Data CopyToWithConvertAndCreate(Service_Status_Data source, Service_Status_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            public static Service_StatusC5_Data CopyToWithConvertAndCreate(Service_StatusC5_Data source, Service_StatusC5_Data dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
             {
                 if (dest == null)
                 {
@@ -1650,9 +1950,10 @@ namespace BluetoothProtocols
             Generic_Service_index = 3,
             Common_Configuration_index = 4,
             Device_Info_index = 5,
-            Service_Status_index = 6,
-            CalibrationService_index = 7,
-            Silabs_Service_OTA_index = 8,
+            Service_StatusC4_index = 6,
+            Service_StatusC5_index = 7,
+            CalibrationService_index = 8,
+            Silabs_Service_OTA_index = 9,
         }
 
         /// <summary>
@@ -1680,17 +1981,23 @@ namespace BluetoothProtocols
             Device_Info_Software_Revision_index = 17,     // GUID 00002a28-0000-1000-8000-00805f9b34fb
             Device_Info_Hardware_Revision_index = 18,     // GUID 00002a27-0000-1000-8000-00805f9b34fb
             Device_Info_Serial_Number_index = 19,     // GUID 00002a25-0000-1000-8000-00805f9b34fb
-            Service_Status_Status_Device_index = 20,     // GUID 6974f5e5-0e54-45c3-97dd-29e4b5fb0849
-            Service_Status_Status_Status_index = 21,     // GUID 3dba36e1-6120-4706-8dfd-ed9c16e569b6
-            Service_Status_Status_Device_Name_index = 22,     // GUID 7f0375de-077e-4555-8f78-800494509cc3
-            Service_Status_Status_Flash_LED_index = 23,     // GUID ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e
-            Service_Status_Status_Light_LED_index = 24,     // GUID aaf3f6d5-43d4-4a83-9510-dff3d858d4cc
-            Service_Status_UnknownStatusValues_index = 25,     // GUID 8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89
-            CalibrationService_CalbrateTemperature_index = 26,     // GUID 0cd0f713-f5aa-4572-9e23-f8049f6bcaaa
-            CalibrationService_CalibrateUnknown1_index = 27,     // GUID b6728f91-409c-4d6c-864e-272a6a7a0204
-            CalibrationService_CalibrrateUnknown2_index = 28,     // GUID 5588e47b-cb81-4f7b-acc4-6029a3f39f72
-            Silabs_Service_OTA_OTA_Control_index = 29,     // GUID f7bf3564-fb6d-4e53-88a4-5e37e0326063
-            Silabs_Service_OTA_OTA_Data_index = 30,     // GUID 984227f3-34fc-4045-a5d0-2c581f81a153
+            Service_StatusC4_Status_DeviceC4_index = 20,     // GUID 6974f5e5-0e54-45c3-97dd-29e4b5fb0849
+            Service_StatusC4_Status_StatusC4_index = 21,     // GUID 3dba36e1-6120-4706-8dfd-ed9c16e569b6
+            Service_StatusC4_Status_Flash_LEDC4_index = 22,     // GUID ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e
+            Service_StatusC4_Status_Device_NameC4_index = 23,     // GUID 7f0375de-077e-4555-8f78-800494509cc3
+            Service_StatusC4_Status_Light_LEDC4_index = 24,     // GUID aaf3f6d5-43d4-4a83-9510-dff3d858d4cc
+            Service_StatusC4_UnknownStatusValuesC4_index = 25,     // GUID 8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89
+            Service_StatusC5_Status_DeviceC5_index = 26,     // GUID 6974f5e5-0e54-45c3-97dd-29e4b5fb0849
+            Service_StatusC5_Status_StatusC5_index = 27,     // GUID 3dba36e1-6120-4706-8dfd-ed9c16e569b6
+            Service_StatusC5_Status_Device_NameC5_index = 28,     // GUID 7f0375de-077e-4555-8f78-800494509cc3
+            Service_StatusC5_Status_Flash_LEDC5_index = 29,     // GUID ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e
+            Service_StatusC5_Status_Light_LEDC5_index = 30,     // GUID aaf3f6d5-43d4-4a83-9510-dff3d858d4cc
+            Service_StatusC5_UnknownStatusValuesC5_index = 31,     // GUID 8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89
+            CalibrationService_CalbrateTemperature_index = 32,     // GUID 0cd0f713-f5aa-4572-9e23-f8049f6bcaaa
+            CalibrationService_CalibrateUnknown1_index = 33,     // GUID b6728f91-409c-4d6c-864e-272a6a7a0204
+            CalibrationService_CalibrrateUnknown2_index = 34,     // GUID 5588e47b-cb81-4f7b-acc4-6029a3f39f72
+            Silabs_Service_OTA_OTA_Control_index = 35,     // GUID f7bf3564-fb6d-4e53-88a4-5e37e0326063
+            Silabs_Service_OTA_OTA_Data_index = 36,     // GUID 984227f3-34fc-4045-a5d0-2c581f81a153
         }
 
         // All of the services that this device supports
@@ -1719,17 +2026,21 @@ namespace BluetoothProtocols
         /// </summary>
         public static readonly Guid ServiceGuid_Device_Info = Guid.Parse("0000180a-0000-1000-8000-00805f9b34fb"); // #5 is Device Info
         /// <summary>
-        /// Convenience GUID for Service_Status service. 
+        /// Convenience GUID for Service_StatusC4 service. 
         /// </summary>
-        public static readonly Guid ServiceGuid_Service_Status = Guid.Parse("57d3a771-267c-4394-8872-78223e92aec5"); // #6 is Service_Status
+        public static readonly Guid ServiceGuid_Service_StatusC4 = Guid.Parse("57d3a771-267c-4394-8872-78223e92aec4"); // #6 is Service_StatusC4
+        /// <summary>
+        /// Convenience GUID for Service_StatusC5 service. 
+        /// </summary>
+        public static readonly Guid ServiceGuid_Service_StatusC5 = Guid.Parse("57d3a771-267c-4394-8872-78223e92aec5"); // #7 is Service_StatusC5
         /// <summary>
         /// Convenience GUID for CalibrationService service. 
         /// </summary>
-        public static readonly Guid ServiceGuid_CalibrationService = Guid.Parse("6f53be2f-780b-49b8-a7c3-e8a052b3ae2c"); // #7 is CalibrationService
+        public static readonly Guid ServiceGuid_CalibrationService = Guid.Parse("6f53be2f-780b-49b8-a7c3-e8a052b3ae2c"); // #8 is CalibrationService
         /// <summary>
         /// Convenience GUID for Silabs_Service_OTA service. 
         /// </summary>
-        public static readonly Guid ServiceGuid_Silabs_Service_OTA = Guid.Parse("1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0"); // #8 is Silabs_Service_OTA        
+        public static readonly Guid ServiceGuid_Silabs_Service_OTA = Guid.Parse("1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0"); // #9 is Silabs_Service_OTA        
 
         /// <summary>
         /// List of the guids supported by the device. 
@@ -1742,15 +2053,16 @@ namespace BluetoothProtocols
             Guid.Parse("00001801-0000-1000-8000-00805f9b34fb"), // #3 is Generic Service
             Guid.Parse("00001800-0000-1000-8000-00805f9b34fb"), // #4 is Common Configuration
             Guid.Parse("0000180a-0000-1000-8000-00805f9b34fb"), // #5 is Device Info
-            Guid.Parse("57d3a771-267c-4394-8872-78223e92aec5"), // #6 is Service_Status
-            Guid.Parse("6f53be2f-780b-49b8-a7c3-e8a052b3ae2c"), // #7 is CalibrationService
-            Guid.Parse("1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0"), // #8 is Silabs_Service_OTA
+            Guid.Parse("57d3a771-267c-4394-8872-78223e92aec4"), // #6 is Service_StatusC4
+            Guid.Parse("57d3a771-267c-4394-8872-78223e92aec5"), // #7 is Service_StatusC5
+            Guid.Parse("6f53be2f-780b-49b8-a7c3-e8a052b3ae2c"), // #8 is CalibrationService
+            Guid.Parse("1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0"), // #9 is Silabs_Service_OTA
         };
 
         /// <summary>
         /// Active list of services. Will be filled in as the services are connected. Starts off as null.
         /// </summary>
-        List<GattDeviceService> Services = new List<GattDeviceService>() { null, null, null, null, null, null, null, null, null, };
+        List<GattDeviceService> Services = new List<GattDeviceService>() { null, null, null, null, null, null, null, null, null, null, };
 
         /// <summary>
         /// List of the Characteristic GUIDS for all of the characteristics for all of the services.
@@ -1778,22 +2090,28 @@ namespace BluetoothProtocols
             Guid.Parse("00002a28-0000-1000-8000-00805f9b34fb"), // #17 is Device Info Software Revision
             Guid.Parse("00002a27-0000-1000-8000-00805f9b34fb"), // #18 is Device Info Hardware Revision
             Guid.Parse("00002a25-0000-1000-8000-00805f9b34fb"), // #19 is Device Info Serial Number
-            Guid.Parse("6974f5e5-0e54-45c3-97dd-29e4b5fb0849"), // #20 is Service_Status Status_Device
-            Guid.Parse("3dba36e1-6120-4706-8dfd-ed9c16e569b6"), // #21 is Service_Status Status_Status
-            Guid.Parse("7f0375de-077e-4555-8f78-800494509cc3"), // #22 is Service_Status Status_Device_Name
-            Guid.Parse("ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e"), // #23 is Service_Status Status_Flash_LED
-            Guid.Parse("aaf3f6d5-43d4-4a83-9510-dff3d858d4cc"), // #24 is Service_Status Status_Light_LED
-            Guid.Parse("8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89"), // #25 is Service_Status UnknownStatusValues
-            Guid.Parse("0cd0f713-f5aa-4572-9e23-f8049f6bcaaa"), // #26 is CalibrationService CalbrateTemperature
-            Guid.Parse("b6728f91-409c-4d6c-864e-272a6a7a0204"), // #27 is CalibrationService CalibrateUnknown1
-            Guid.Parse("5588e47b-cb81-4f7b-acc4-6029a3f39f72"), // #28 is CalibrationService CalibrrateUnknown2
-            Guid.Parse("f7bf3564-fb6d-4e53-88a4-5e37e0326063"), // #29 is Silabs_Service_OTA OTA_Control
-            Guid.Parse("984227f3-34fc-4045-a5d0-2c581f81a153"), // #30 is Silabs_Service_OTA OTA_Data
+            Guid.Parse("6974f5e5-0e54-45c3-97dd-29e4b5fb0849"), // #20 is Service_StatusC4 Status_DeviceC4
+            Guid.Parse("3dba36e1-6120-4706-8dfd-ed9c16e569b6"), // #21 is Service_StatusC4 Status_StatusC4
+            Guid.Parse("ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e"), // #22 is Service_StatusC4 Status_Flash_LEDC4
+            Guid.Parse("7f0375de-077e-4555-8f78-800494509cc3"), // #23 is Service_StatusC4 Status_Device_NameC4
+            Guid.Parse("aaf3f6d5-43d4-4a83-9510-dff3d858d4cc"), // #24 is Service_StatusC4 Status_Light_LEDC4
+            Guid.Parse("8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89"), // #25 is Service_StatusC4 UnknownStatusValuesC4
+            Guid.Parse("6974f5e5-0e54-45c3-97dd-29e4b5fb0849"), // #26 is Service_StatusC5 Status_DeviceC5
+            Guid.Parse("3dba36e1-6120-4706-8dfd-ed9c16e569b6"), // #27 is Service_StatusC5 Status_StatusC5
+            Guid.Parse("7f0375de-077e-4555-8f78-800494509cc3"), // #28 is Service_StatusC5 Status_Device_NameC5
+            Guid.Parse("ec9bb1f3-05a9-4277-8dd0-60a7896f0d6e"), // #29 is Service_StatusC5 Status_Flash_LEDC5
+            Guid.Parse("aaf3f6d5-43d4-4a83-9510-dff3d858d4cc"), // #30 is Service_StatusC5 Status_Light_LEDC5
+            Guid.Parse("8fe5b5a9-b5b4-4a7b-8ff2-87224b970f89"), // #31 is Service_StatusC5 UnknownStatusValuesC5
+            Guid.Parse("0cd0f713-f5aa-4572-9e23-f8049f6bcaaa"), // #32 is CalibrationService CalbrateTemperature
+            Guid.Parse("b6728f91-409c-4d6c-864e-272a6a7a0204"), // #33 is CalibrationService CalibrateUnknown1
+            Guid.Parse("5588e47b-cb81-4f7b-acc4-6029a3f39f72"), // #34 is CalibrationService CalibrrateUnknown2
+            Guid.Parse("f7bf3564-fb6d-4e53-88a4-5e37e0326063"), // #35 is Silabs_Service_OTA OTA_Control
+            Guid.Parse("984227f3-34fc-4045-a5d0-2c581f81a153"), // #36 is Silabs_Service_OTA OTA_Data
         };
 
-        private List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
-        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,  };
-        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
+        private List<GattCharacteristic> Characteristics = new List<GattCharacteristic>() { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
+        private List<bool> NotifyCharacteristic_ValueChanged_set = new List<bool> { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,  };
+        private List<IotNumberFormats.ValueParser> ValueParsers = new List<IotNumberFormats.ValueParser>() {  null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,  };
 
 
         /// <summary>
@@ -3231,12 +3549,12 @@ namespace BluetoothProtocols
 
         #endregion
 //
-        #region Service_Service_Status
-        // Service Service_Status 
+        #region Service_Service_StatusC4
+        // Service Service_StatusC4 
 
-        public Service_Status_Data CurrService_Status_Data { get; set; } = new Service_Status_Data();
+        public Service_StatusC4_Data CurrService_StatusC4_Data { get; set; } = new Service_StatusC4_Data();
 
-        // Per-characteristics methods for Service_Status Status_Device
+        // Per-characteristics methods for Service_StatusC4 Status_DeviceC4
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -3244,32 +3562,32 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyStatus_DeviceAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyStatus_DeviceC4Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("Status_Device", ServiceIndex.Service_Status_index, "Service_Status", CharacteristicIndex.Service_Status_Status_Device_index, NotifyStatus_DeviceCallback, notifyType);
+            var retval = await SetupNotifyAsync("Status_DeviceC4", ServiceIndex.Service_StatusC4_index, "Service_StatusC4", CharacteristicIndex.Service_StatusC4_Status_DeviceC4_index, NotifyStatus_DeviceC4Callback, notifyType);
             return retval;
         }
 
-        private void NotifyStatus_DeviceCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyStatus_DeviceC4Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Service_Status_Status_Device_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|FirmwareMajor U8|HEX|FirmwareMinor U16|HEX|MaxInputVoltage U16|HEX|MaxInputCurrent U16|HEX|MaxInputResistance U16|HEX|MaxSamplingRate U16|HEX|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress");
+            var index = (int)CharacteristicIndex.Service_StatusC4_Status_DeviceC4_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|FirmwareMajor U8|DEC|FirmwareMinor U16|DEC|MaxInputVoltage U16|DEC|MaxInputCurrent U16|DEC|MaxInputResistance U16|DEC|MaxSamplingRate U16|DEC|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_Status_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_Status_Data.FirmwareMajor = vr.GetNextDouble();
-            CurrService_Status_Data.FirmwareMinor = vr.GetNextDouble();
-            CurrService_Status_Data.MaxInputVoltage = vr.GetNextDouble();
-            CurrService_Status_Data.MaxInputCurrent = vr.GetNextDouble();
-            CurrService_Status_Data.MaxInputResistance = vr.GetNextDouble();
-            CurrService_Status_Data.MaxSamplingRate = vr.GetNextDouble();
-            CurrService_Status_Data.DeviceBufferSize = vr.GetNextDouble();
-            CurrService_Status_Data.Reserved01 = vr.GetNextDouble();
-            CurrService_Status_Data.MacAddress = vr.GetNextByteArray();
-            OnPropertyChanged(Status_DevicePropertyChangedName); // "Status_Device"
+            CurrService_StatusC4_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC4_Data.FirmwareMajor = vr.GetNextDouble();
+            CurrService_StatusC4_Data.FirmwareMinor = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MaxInputVoltage = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MaxInputCurrent = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MaxInputResistance = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MaxSamplingRate = vr.GetNextDouble();
+            CurrService_StatusC4_Data.DeviceBufferSize = vr.GetNextDouble();
+            CurrService_StatusC4_Data.Reserved01 = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MacAddress = vr.GetNextByteArray();
+            OnPropertyChanged(Status_DeviceC4PropertyChangedName); // "Status_DeviceC4"
         }
-        // Per-characteristics methods for Service_Status Status_Status
+        // Per-characteristics methods for Service_StatusC4 Status_StatusC4
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -3277,25 +3595,25 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyStatus_StatusAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyStatus_StatusC4Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("Status_Status", ServiceIndex.Service_Status_index, "Service_Status", CharacteristicIndex.Service_Status_Status_Status_index, NotifyStatus_StatusCallback, notifyType);
+            var retval = await SetupNotifyAsync("Status_StatusC4", ServiceIndex.Service_StatusC4_index, "Service_StatusC4", CharacteristicIndex.Service_StatusC4_Status_StatusC4_index, NotifyStatus_StatusC4Callback, notifyType);
             return retval;
         }
 
-        private void NotifyStatus_StatusCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyStatus_StatusC4Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Service_Status_Status_Status_index;
+            var index = (int)CharacteristicIndex.Service_StatusC4_Status_StatusC4_index;
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|DeviceStatus F32|FIXED|BatteryVoltage");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_Status_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_Status_Data.DeviceStatus = vr.GetNextDouble();
-            CurrService_Status_Data.BatteryVoltage = vr.GetNextDouble();
-            OnPropertyChanged(Status_StatusPropertyChangedName); // "Status_Status"
+            CurrService_StatusC4_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC4_Data.DeviceStatus = vr.GetNextDouble();
+            CurrService_StatusC4_Data.BatteryVoltage = vr.GetNextDouble();
+            OnPropertyChanged(Status_StatusC4PropertyChangedName); // "Status_StatusC4"
         }
-        // Per-characteristics methods for Service_Status Status_Device_Name
+        // Per-characteristics methods for Service_StatusC4 Status_Flash_LEDC4
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -3303,52 +3621,27 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyStatus_Device_NameAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyStatus_Flash_LEDC4Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("Status_Device_Name", ServiceIndex.Service_Status_index, "Service_Status", CharacteristicIndex.Service_Status_Status_Device_Name_index, NotifyStatus_Device_NameCallback, notifyType);
+            var retval = await SetupNotifyAsync("Status_Flash_LEDC4", ServiceIndex.Service_StatusC4_index, "Service_StatusC4", CharacteristicIndex.Service_StatusC4_Status_Flash_LEDC4_index, NotifyStatus_Flash_LEDC4Callback, notifyType);
             return retval;
         }
 
-        private void NotifyStatus_Device_NameCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyStatus_Flash_LEDC4Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Service_Status_Status_Device_Name_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("STRING|ASCII|Device_Name");
-            var vr = ValueParsers[index];
-
-            vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_Status_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_Status_Data.Device_Name = vr.GetNextString();
-            OnPropertyChanged(Status_Device_NamePropertyChangedName); // "Status_Device_Name"
-        }
-        // Per-characteristics methods for Service_Status Status_Flash_LED
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-        /// 
-        public async Task<bool> NotifyStatus_Flash_LEDAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            var retval = await SetupNotifyAsync("Status_Flash_LED", ServiceIndex.Service_Status_index, "Service_Status", CharacteristicIndex.Service_Status_Status_Flash_LED_index, NotifyStatus_Flash_LEDCallback, notifyType);
-            return retval;
-        }
-
-        private void NotifyStatus_Flash_LEDCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
-        {
-            var index = (int)CharacteristicIndex.Service_Status_Status_Flash_LED_index;
+            var index = (int)CharacteristicIndex.Service_StatusC4_Status_Flash_LEDC4_index;
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|Beep");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_Status_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_Status_Data.Red = vr.GetNextDouble();
-            CurrService_Status_Data.Green = vr.GetNextDouble();
-            CurrService_Status_Data.Blue = vr.GetNextDouble();
-            CurrService_Status_Data.Beep = vr.GetNextDouble();
-            OnPropertyChanged(Status_Flash_LEDPropertyChangedName); // "Status_Flash_LED"
+            CurrService_StatusC4_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC4_Data.Red = vr.GetNextDouble();
+            CurrService_StatusC4_Data.Green = vr.GetNextDouble();
+            CurrService_StatusC4_Data.Blue = vr.GetNextDouble();
+            CurrService_StatusC4_Data.Beep = vr.GetNextDouble();
+            OnPropertyChanged(Status_Flash_LEDC4PropertyChangedName); // "Status_Flash_LEDC4"
         }
-        // Per-characteristics methods for Service_Status Status_Light_LED
+        // Per-characteristics methods for Service_StatusC4 Status_Device_NameC4
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -3356,24 +3649,49 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyStatus_Light_LEDAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyStatus_Device_NameC4Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("Status_Light_LED", ServiceIndex.Service_Status_index, "Service_Status", CharacteristicIndex.Service_Status_Status_Light_LED_index, NotifyStatus_Light_LEDCallback, notifyType);
+            var retval = await SetupNotifyAsync("Status_Device_NameC4", ServiceIndex.Service_StatusC4_index, "Service_StatusC4", CharacteristicIndex.Service_StatusC4_Status_Device_NameC4_index, NotifyStatus_Device_NameC4Callback, notifyType);
             return retval;
         }
 
-        private void NotifyStatus_Light_LEDCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyStatus_Device_NameC4Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Service_Status_Status_Light_LED_index;
+            var index = (int)CharacteristicIndex.Service_StatusC4_Status_Device_NameC4_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("STRING|ASCII|Device_Name");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrService_StatusC4_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC4_Data.Device_Name = vr.GetNextString();
+            OnPropertyChanged(Status_Device_NameC4PropertyChangedName); // "Status_Device_NameC4"
+        }
+        // Per-characteristics methods for Service_StatusC4 Status_Light_LEDC4
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyStatus_Light_LEDC4Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Status_Light_LEDC4", ServiceIndex.Service_StatusC4_index, "Service_StatusC4", CharacteristicIndex.Service_StatusC4_Status_Light_LEDC4_index, NotifyStatus_Light_LEDC4Callback, notifyType);
+            return retval;
+        }
+
+        private void NotifyStatus_Light_LEDC4Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Service_StatusC4_Status_Light_LEDC4_index;
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Light");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_Status_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_Status_Data.Light = vr.GetNextDouble();
-            OnPropertyChanged(Status_Light_LEDPropertyChangedName); // "Status_Light_LED"
+            CurrService_StatusC4_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC4_Data.Light = vr.GetNextDouble();
+            OnPropertyChanged(Status_Light_LEDC4PropertyChangedName); // "Status_Light_LEDC4"
         }
-        // Per-characteristics methods for Service_Status UnknownStatusValues
+        // Per-characteristics methods for Service_StatusC4 UnknownStatusValuesC4
         /// <summary>
         /// Sets up the notifications; 
         /// Will call Status
@@ -3381,204 +3699,204 @@ namespace BluetoothProtocols
         /// <param name="notifyType"></param>
         /// <returns>true if the notify was set up. </returns>
         /// 
-        public async Task<bool> NotifyUnknownStatusValuesAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        public async Task<bool> NotifyUnknownStatusValuesC4Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
         {
-            var retval = await SetupNotifyAsync("UnknownStatusValues", ServiceIndex.Service_Status_index, "Service_Status", CharacteristicIndex.Service_Status_UnknownStatusValues_index, NotifyUnknownStatusValuesCallback, notifyType);
+            var retval = await SetupNotifyAsync("UnknownStatusValuesC4", ServiceIndex.Service_StatusC4_index, "Service_StatusC4", CharacteristicIndex.Service_StatusC4_UnknownStatusValuesC4_index, NotifyUnknownStatusValuesC4Callback, notifyType);
             return retval;
         }
 
-        private void NotifyUnknownStatusValuesCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void NotifyUnknownStatusValuesC4Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var index = (int)CharacteristicIndex.Service_Status_UnknownStatusValues_index;
+            var index = (int)CharacteristicIndex.Service_StatusC4_UnknownStatusValuesC4_index;
             if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|StatusUnknown5");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrService_Status_Data.TimestampMostRecent = args.Timestamp;
-            CurrService_Status_Data.StatusUnknown5 = vr.GetNextByteArray();
-            OnPropertyChanged(UnknownStatusValuesPropertyChangedName); // "UnknownStatusValues"
+            CurrService_StatusC4_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC4_Data.StatusUnknown5 = vr.GetNextByteArray();
+            OnPropertyChanged(UnknownStatusValuesC4PropertyChangedName); // "UnknownStatusValuesC4"
         }
         /// <summary>
-        /// Reads data from Status_Device and triggers an OnPropertyChanged
+        /// Reads data from Status_DeviceC4 and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_Status_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_Status_Data> ReadStatus_Device(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Service_StatusC4_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC4_Data> ReadStatus_DeviceC4(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Service_Status_Status_Device_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Device");
+            var index = CharacteristicIndex.Service_StatusC4_Status_DeviceC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "Status_DeviceC4");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "Status_Device", cacheMode);
+            IBuffer result = await ReadAsync(ch, "Status_DeviceC4", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|FirmwareMajor U8|HEX|FirmwareMinor U16|HEX|MaxInputVoltage U16|HEX|MaxInputCurrent U16|HEX|MaxInputResistance U16|HEX|MaxSamplingRate U16|HEX|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|FirmwareMajor U8|DEC|FirmwareMinor U16|DEC|MaxInputVoltage U16|DEC|MaxInputCurrent U16|DEC|MaxInputResistance U16|DEC|MaxSamplingRate U16|DEC|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrService_Status_Data.FirmwareMajor = vr.GetNextDouble();
-            CurrService_Status_Data.FirmwareMinor = vr.GetNextDouble();
-            CurrService_Status_Data.MaxInputVoltage = vr.GetNextDouble();
-            CurrService_Status_Data.MaxInputCurrent = vr.GetNextDouble();
-            CurrService_Status_Data.MaxInputResistance = vr.GetNextDouble();
-            CurrService_Status_Data.MaxSamplingRate = vr.GetNextDouble();
-            CurrService_Status_Data.DeviceBufferSize = vr.GetNextDouble();
-            CurrService_Status_Data.Reserved01 = vr.GetNextDouble();
-            CurrService_Status_Data.MacAddress = vr.GetNextByteArray();
-            CurrService_Status_Data.TimestampMostRecent = DateTimeOffset.Now;
-            OnPropertyChanged(Status_DevicePropertyChangedName); // "Status_Device"
-            return CurrService_Status_Data;
+            CurrService_StatusC4_Data.FirmwareMajor = vr.GetNextDouble();
+            CurrService_StatusC4_Data.FirmwareMinor = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MaxInputVoltage = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MaxInputCurrent = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MaxInputResistance = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MaxSamplingRate = vr.GetNextDouble();
+            CurrService_StatusC4_Data.DeviceBufferSize = vr.GetNextDouble();
+            CurrService_StatusC4_Data.Reserved01 = vr.GetNextDouble();
+            CurrService_StatusC4_Data.MacAddress = vr.GetNextByteArray();
+            CurrService_StatusC4_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_DeviceC4PropertyChangedName); // "Status_DeviceC4"
+            return CurrService_StatusC4_Data;
         }
         /// <summary>
-        /// Reads data from Status_Status and triggers an OnPropertyChanged
+        /// Reads data from Status_StatusC4 and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_Status_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_Status_Data> ReadStatus_Status(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Service_StatusC4_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC4_Data> ReadStatus_StatusC4(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Service_Status_Status_Status_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Status");
+            var index = CharacteristicIndex.Service_StatusC4_Status_StatusC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "Status_StatusC4");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "Status_Status", cacheMode);
+            IBuffer result = await ReadAsync(ch, "Status_StatusC4", cacheMode);
             if (result == null) return null;
 
             if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|DeviceStatus F32|FIXED|BatteryVoltage");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrService_Status_Data.DeviceStatus = vr.GetNextDouble();
-            CurrService_Status_Data.BatteryVoltage = vr.GetNextDouble();
-            CurrService_Status_Data.TimestampMostRecent = DateTimeOffset.Now;
-            OnPropertyChanged(Status_StatusPropertyChangedName); // "Status_Status"
-            return CurrService_Status_Data;
+            CurrService_StatusC4_Data.DeviceStatus = vr.GetNextDouble();
+            CurrService_StatusC4_Data.BatteryVoltage = vr.GetNextDouble();
+            CurrService_StatusC4_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_StatusC4PropertyChangedName); // "Status_StatusC4"
+            return CurrService_StatusC4_Data;
         }
         /// <summary>
-        /// Reads data from Status_Device_Name and triggers an OnPropertyChanged
+        /// Reads data from Status_Flash_LEDC4 and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_Status_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_Status_Data> ReadStatus_Device_Name(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Service_StatusC4_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC4_Data> ReadStatus_Flash_LEDC4(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Service_Status_Status_Device_Name_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Device_Name");
+            var index = CharacteristicIndex.Service_StatusC4_Status_Flash_LEDC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "Status_Flash_LEDC4");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "Status_Device_Name", cacheMode);
-            if (result == null) return null;
-
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("STRING|ASCII|Device_Name");
-            var vr = ValueParsers[(int)index];
-
-            vr.Initialize(result.ToArray());
-            CurrService_Status_Data.Device_Name = vr.GetNextString();
-            CurrService_Status_Data.TimestampMostRecent = DateTimeOffset.Now;
-            OnPropertyChanged(Status_Device_NamePropertyChangedName); // "Status_Device_Name"
-            return CurrService_Status_Data;
-        }
-        /// <summary>
-        /// Reads data from Status_Flash_LED and triggers an OnPropertyChanged
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_Status_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_Status_Data> ReadStatus_Flash_LED(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            var index = CharacteristicIndex.Service_Status_Status_Flash_LED_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Flash_LED");
-            var ch = Characteristics[(int)index];
-            if (ch == null)
-            {
-                return null;
-            }
-
-            IBuffer result = await ReadAsync(ch, "Status_Flash_LED", cacheMode);
+            IBuffer result = await ReadAsync(ch, "Status_Flash_LEDC4", cacheMode);
             if (result == null) return null;
 
             if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|Beep");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrService_Status_Data.Red = vr.GetNextDouble();
-            CurrService_Status_Data.Green = vr.GetNextDouble();
-            CurrService_Status_Data.Blue = vr.GetNextDouble();
-            CurrService_Status_Data.Beep = vr.GetNextDouble();
-            CurrService_Status_Data.TimestampMostRecent = DateTimeOffset.Now;
-            OnPropertyChanged(Status_Flash_LEDPropertyChangedName); // "Status_Flash_LED"
-            return CurrService_Status_Data;
+            CurrService_StatusC4_Data.Red = vr.GetNextDouble();
+            CurrService_StatusC4_Data.Green = vr.GetNextDouble();
+            CurrService_StatusC4_Data.Blue = vr.GetNextDouble();
+            CurrService_StatusC4_Data.Beep = vr.GetNextDouble();
+            CurrService_StatusC4_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_Flash_LEDC4PropertyChangedName); // "Status_Flash_LEDC4"
+            return CurrService_StatusC4_Data;
         }
         /// <summary>
-        /// Reads data from Status_Light_LED and triggers an OnPropertyChanged
+        /// Reads data from Status_Device_NameC4 and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_Status_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_Status_Data> ReadStatus_Light_LED(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Service_StatusC4_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC4_Data> ReadStatus_Device_NameC4(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Service_Status_Status_Light_LED_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Light_LED");
+            var index = CharacteristicIndex.Service_StatusC4_Status_Device_NameC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "Status_Device_NameC4");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "Status_Light_LED", cacheMode);
+            IBuffer result = await ReadAsync(ch, "Status_Device_NameC4", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("STRING|ASCII|Device_Name");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrService_StatusC4_Data.Device_Name = vr.GetNextString();
+            CurrService_StatusC4_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_Device_NameC4PropertyChangedName); // "Status_Device_NameC4"
+            return CurrService_StatusC4_Data;
+        }
+        /// <summary>
+        /// Reads data from Status_Light_LEDC4 and triggers an OnPropertyChanged
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Service_StatusC4_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC4_Data> ReadStatus_Light_LEDC4(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Service_StatusC4_Status_Light_LEDC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "Status_Light_LEDC4");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Status_Light_LEDC4", cacheMode);
             if (result == null) return null;
 
             if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Light");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrService_Status_Data.Light = vr.GetNextDouble();
-            CurrService_Status_Data.TimestampMostRecent = DateTimeOffset.Now;
-            OnPropertyChanged(Status_Light_LEDPropertyChangedName); // "Status_Light_LED"
-            return CurrService_Status_Data;
+            CurrService_StatusC4_Data.Light = vr.GetNextDouble();
+            CurrService_StatusC4_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_Light_LEDC4PropertyChangedName); // "Status_Light_LEDC4"
+            return CurrService_StatusC4_Data;
         }
         /// <summary>
-        /// Reads data from UnknownStatusValues and triggers an OnPropertyChanged
+        /// Reads data from UnknownStatusValuesC4 and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Service_Status_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Service_Status_Data> ReadUnknownStatusValues(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Service_StatusC4_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC4_Data> ReadUnknownStatusValuesC4(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
-            var index = CharacteristicIndex.Service_Status_UnknownStatusValues_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "UnknownStatusValues");
+            var index = CharacteristicIndex.Service_StatusC4_UnknownStatusValuesC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "UnknownStatusValuesC4");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
                 return null;
             }
 
-            IBuffer result = await ReadAsync(ch, "UnknownStatusValues", cacheMode);
+            IBuffer result = await ReadAsync(ch, "UnknownStatusValuesC4", cacheMode);
             if (result == null) return null;
 
             if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|StatusUnknown5");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrService_Status_Data.StatusUnknown5 = vr.GetNextByteArray();
-            CurrService_Status_Data.TimestampMostRecent = DateTimeOffset.Now;
-            OnPropertyChanged(UnknownStatusValuesPropertyChangedName); // "UnknownStatusValues"
-            return CurrService_Status_Data;
+            CurrService_StatusC4_Data.StatusUnknown5 = vr.GetNextByteArray();
+            CurrService_StatusC4_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(UnknownStatusValuesC4PropertyChangedName); // "UnknownStatusValuesC4"
+            return CurrService_StatusC4_Data;
         }
         /// <summary>
-        /// Writes data to Status_Device_Name 
+        /// Writes data to Status_Flash_LEDC4 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteStatus_Device_Name(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
+        public async Task<GattCommunicationStatus?> WriteStatus_Flash_LEDC4(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
-            var index = CharacteristicIndex.Service_Status_Status_Device_Name_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Device_Name");
+            var index = CharacteristicIndex.Service_StatusC4_Status_Flash_LEDC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "Status_Flash_LEDC4");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
@@ -3589,22 +3907,22 @@ namespace BluetoothProtocols
             try
             {
                 result = await ch.WriteValueAsync(buffer);
-                Status.ReportStatus("WriteStatus_Device_Name", result);
+                Status.ReportStatus("WriteStatus_Flash_LEDC4", result);
             }
             catch (Exception ex)
             {
                 result = exceptionStatus;
-                Status.ReportStatus($"WriteStatus_Device_Name: Exception {ex.Message}", exceptionStatus);
+                Status.ReportStatus($"WriteStatus_Flash_LEDC4: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
-        /// Writes data to Status_Flash_LED 
+        /// Writes data to Status_Device_NameC4 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteStatus_Flash_LED(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
+        public async Task<GattCommunicationStatus?> WriteStatus_Device_NameC4(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
-            var index = CharacteristicIndex.Service_Status_Status_Flash_LED_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Flash_LED");
+            var index = CharacteristicIndex.Service_StatusC4_Status_Device_NameC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "Status_Device_NameC4");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
@@ -3615,22 +3933,22 @@ namespace BluetoothProtocols
             try
             {
                 result = await ch.WriteValueAsync(buffer);
-                Status.ReportStatus("WriteStatus_Flash_LED", result);
+                Status.ReportStatus("WriteStatus_Device_NameC4", result);
             }
             catch (Exception ex)
             {
                 result = exceptionStatus;
-                Status.ReportStatus($"WriteStatus_Flash_LED: Exception {ex.Message}", exceptionStatus);
+                Status.ReportStatus($"WriteStatus_Device_NameC4: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
-        /// Writes data to Status_Light_LED 
+        /// Writes data to Status_Light_LEDC4 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteStatus_Light_LED(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
+        public async Task<GattCommunicationStatus?> WriteStatus_Light_LEDC4(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
-            var index = CharacteristicIndex.Service_Status_Status_Light_LED_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "Status_Light_LED");
+            var index = CharacteristicIndex.Service_StatusC4_Status_Light_LEDC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "Status_Light_LEDC4");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
@@ -3641,22 +3959,22 @@ namespace BluetoothProtocols
             try
             {
                 result = await ch.WriteValueAsync(buffer);
-                Status.ReportStatus("WriteStatus_Light_LED", result);
+                Status.ReportStatus("WriteStatus_Light_LEDC4", result);
             }
             catch (Exception ex)
             {
                 result = exceptionStatus;
-                Status.ReportStatus($"WriteStatus_Light_LED: Exception {ex.Message}", exceptionStatus);
+                Status.ReportStatus($"WriteStatus_Light_LEDC4: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
         /// <summary>
-        /// Writes data to UnknownStatusValues 
+        /// Writes data to UnknownStatusValuesC4 
         /// </summary>
-        public async Task<GattCommunicationStatus?> WriteUnknownStatusValues(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
+        public async Task<GattCommunicationStatus?> WriteUnknownStatusValuesC4(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
         {
-            var index = CharacteristicIndex.Service_Status_UnknownStatusValues_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Service_Status_index, "Service_Status", index, "UnknownStatusValues");
+            var index = CharacteristicIndex.Service_StatusC4_UnknownStatusValuesC4_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC4_index, "Service_StatusC4", index, "UnknownStatusValuesC4");
             var ch = Characteristics[(int)index];
             if (ch == null)
             {
@@ -3667,12 +3985,460 @@ namespace BluetoothProtocols
             try
             {
                 result = await ch.WriteValueAsync(buffer);
-                Status.ReportStatus("WriteUnknownStatusValues", result);
+                Status.ReportStatus("WriteUnknownStatusValuesC4", result);
             }
             catch (Exception ex)
             {
                 result = exceptionStatus;
-                Status.ReportStatus($"WriteUnknownStatusValues: Exception {ex.Message}", exceptionStatus);
+                Status.ReportStatus($"WriteUnknownStatusValuesC4: Exception {ex.Message}", exceptionStatus);
+            }
+            return result;
+        }
+
+        #endregion
+//
+        #region Service_Service_StatusC5
+        // Service Service_StatusC5 
+
+        public Service_StatusC5_Data CurrService_StatusC5_Data { get; set; } = new Service_StatusC5_Data();
+
+        // Per-characteristics methods for Service_StatusC5 Status_DeviceC5
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyStatus_DeviceC5Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Status_DeviceC5", ServiceIndex.Service_StatusC5_index, "Service_StatusC5", CharacteristicIndex.Service_StatusC5_Status_DeviceC5_index, NotifyStatus_DeviceC5Callback, notifyType);
+            return retval;
+        }
+
+        private void NotifyStatus_DeviceC5Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Service_StatusC5_Status_DeviceC5_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|FirmwareMajor U8|DEC|FirmwareMinor U16|DEC|MaxInputVoltage U16|DEC|MaxInputCurrent U16|DEC|MaxInputResistance U16|DEC|MaxSamplingRate U16|DEC|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrService_StatusC5_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC5_Data.FirmwareMajor = vr.GetNextDouble();
+            CurrService_StatusC5_Data.FirmwareMinor = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MaxInputVoltage = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MaxInputCurrent = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MaxInputResistance = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MaxSamplingRate = vr.GetNextDouble();
+            CurrService_StatusC5_Data.DeviceBufferSize = vr.GetNextDouble();
+            CurrService_StatusC5_Data.Reserved01 = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MacAddress = vr.GetNextByteArray();
+            OnPropertyChanged(Status_DeviceC5PropertyChangedName); // "Status_DeviceC5"
+        }
+        // Per-characteristics methods for Service_StatusC5 Status_StatusC5
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyStatus_StatusC5Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Status_StatusC5", ServiceIndex.Service_StatusC5_index, "Service_StatusC5", CharacteristicIndex.Service_StatusC5_Status_StatusC5_index, NotifyStatus_StatusC5Callback, notifyType);
+            return retval;
+        }
+
+        private void NotifyStatus_StatusC5Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Service_StatusC5_Status_StatusC5_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|DeviceStatus F32|FIXED|BatteryVoltage");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrService_StatusC5_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC5_Data.DeviceStatus = vr.GetNextDouble();
+            CurrService_StatusC5_Data.BatteryVoltage = vr.GetNextDouble();
+            OnPropertyChanged(Status_StatusC5PropertyChangedName); // "Status_StatusC5"
+        }
+        // Per-characteristics methods for Service_StatusC5 Status_Device_NameC5
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyStatus_Device_NameC5Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Status_Device_NameC5", ServiceIndex.Service_StatusC5_index, "Service_StatusC5", CharacteristicIndex.Service_StatusC5_Status_Device_NameC5_index, NotifyStatus_Device_NameC5Callback, notifyType);
+            return retval;
+        }
+
+        private void NotifyStatus_Device_NameC5Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Service_StatusC5_Status_Device_NameC5_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("STRING|ASCII|Device_Name");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrService_StatusC5_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC5_Data.Device_Name = vr.GetNextString();
+            OnPropertyChanged(Status_Device_NameC5PropertyChangedName); // "Status_Device_NameC5"
+        }
+        // Per-characteristics methods for Service_StatusC5 Status_Flash_LEDC5
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyStatus_Flash_LEDC5Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Status_Flash_LEDC5", ServiceIndex.Service_StatusC5_index, "Service_StatusC5", CharacteristicIndex.Service_StatusC5_Status_Flash_LEDC5_index, NotifyStatus_Flash_LEDC5Callback, notifyType);
+            return retval;
+        }
+
+        private void NotifyStatus_Flash_LEDC5Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Service_StatusC5_Status_Flash_LEDC5_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|Beep");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrService_StatusC5_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC5_Data.Red = vr.GetNextDouble();
+            CurrService_StatusC5_Data.Green = vr.GetNextDouble();
+            CurrService_StatusC5_Data.Blue = vr.GetNextDouble();
+            CurrService_StatusC5_Data.Beep = vr.GetNextDouble();
+            OnPropertyChanged(Status_Flash_LEDC5PropertyChangedName); // "Status_Flash_LEDC5"
+        }
+        // Per-characteristics methods for Service_StatusC5 Status_Light_LEDC5
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyStatus_Light_LEDC5Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("Status_Light_LEDC5", ServiceIndex.Service_StatusC5_index, "Service_StatusC5", CharacteristicIndex.Service_StatusC5_Status_Light_LEDC5_index, NotifyStatus_Light_LEDC5Callback, notifyType);
+            return retval;
+        }
+
+        private void NotifyStatus_Light_LEDC5Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Service_StatusC5_Status_Light_LEDC5_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Light");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrService_StatusC5_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC5_Data.Light = vr.GetNextDouble();
+            OnPropertyChanged(Status_Light_LEDC5PropertyChangedName); // "Status_Light_LEDC5"
+        }
+        // Per-characteristics methods for Service_StatusC5 UnknownStatusValuesC5
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyUnknownStatusValuesC5Async(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("UnknownStatusValuesC5", ServiceIndex.Service_StatusC5_index, "Service_StatusC5", CharacteristicIndex.Service_StatusC5_UnknownStatusValuesC5_index, NotifyUnknownStatusValuesC5Callback, notifyType);
+            return retval;
+        }
+
+        private void NotifyUnknownStatusValuesC5Callback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Service_StatusC5_UnknownStatusValuesC5_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("BYTES|HEX|StatusUnknown5");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrService_StatusC5_Data.TimestampMostRecent = args.Timestamp;
+            CurrService_StatusC5_Data.StatusUnknown5 = vr.GetNextByteArray();
+            OnPropertyChanged(UnknownStatusValuesC5PropertyChangedName); // "UnknownStatusValuesC5"
+        }
+        /// <summary>
+        /// Reads data from Status_DeviceC5 and triggers an OnPropertyChanged
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Service_StatusC5_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC5_Data> ReadStatus_DeviceC5(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_Status_DeviceC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "Status_DeviceC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Status_DeviceC5", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|FirmwareMajor U8|DEC|FirmwareMinor U16|DEC|MaxInputVoltage U16|DEC|MaxInputCurrent U16|DEC|MaxInputResistance U16|DEC|MaxSamplingRate U16|DEC|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrService_StatusC5_Data.FirmwareMajor = vr.GetNextDouble();
+            CurrService_StatusC5_Data.FirmwareMinor = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MaxInputVoltage = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MaxInputCurrent = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MaxInputResistance = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MaxSamplingRate = vr.GetNextDouble();
+            CurrService_StatusC5_Data.DeviceBufferSize = vr.GetNextDouble();
+            CurrService_StatusC5_Data.Reserved01 = vr.GetNextDouble();
+            CurrService_StatusC5_Data.MacAddress = vr.GetNextByteArray();
+            CurrService_StatusC5_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_DeviceC5PropertyChangedName); // "Status_DeviceC5"
+            return CurrService_StatusC5_Data;
+        }
+        /// <summary>
+        /// Reads data from Status_StatusC5 and triggers an OnPropertyChanged
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Service_StatusC5_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC5_Data> ReadStatus_StatusC5(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_Status_StatusC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "Status_StatusC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Status_StatusC5", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|DeviceStatus F32|FIXED|BatteryVoltage");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrService_StatusC5_Data.DeviceStatus = vr.GetNextDouble();
+            CurrService_StatusC5_Data.BatteryVoltage = vr.GetNextDouble();
+            CurrService_StatusC5_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_StatusC5PropertyChangedName); // "Status_StatusC5"
+            return CurrService_StatusC5_Data;
+        }
+        /// <summary>
+        /// Reads data from Status_Device_NameC5 and triggers an OnPropertyChanged
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Service_StatusC5_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC5_Data> ReadStatus_Device_NameC5(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_Status_Device_NameC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "Status_Device_NameC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Status_Device_NameC5", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("STRING|ASCII|Device_Name");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrService_StatusC5_Data.Device_Name = vr.GetNextString();
+            CurrService_StatusC5_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_Device_NameC5PropertyChangedName); // "Status_Device_NameC5"
+            return CurrService_StatusC5_Data;
+        }
+        /// <summary>
+        /// Reads data from Status_Flash_LEDC5 and triggers an OnPropertyChanged
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Service_StatusC5_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC5_Data> ReadStatus_Flash_LEDC5(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_Status_Flash_LEDC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "Status_Flash_LEDC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Status_Flash_LEDC5", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Red U8|HEX|Green U8|HEX|Blue U8|HEX|Beep");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrService_StatusC5_Data.Red = vr.GetNextDouble();
+            CurrService_StatusC5_Data.Green = vr.GetNextDouble();
+            CurrService_StatusC5_Data.Blue = vr.GetNextDouble();
+            CurrService_StatusC5_Data.Beep = vr.GetNextDouble();
+            CurrService_StatusC5_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_Flash_LEDC5PropertyChangedName); // "Status_Flash_LEDC5"
+            return CurrService_StatusC5_Data;
+        }
+        /// <summary>
+        /// Reads data from Status_Light_LEDC5 and triggers an OnPropertyChanged
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Service_StatusC5_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC5_Data> ReadStatus_Light_LEDC5(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_Status_Light_LEDC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "Status_Light_LEDC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "Status_Light_LEDC5", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Light");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrService_StatusC5_Data.Light = vr.GetNextDouble();
+            CurrService_StatusC5_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(Status_Light_LEDC5PropertyChangedName); // "Status_Light_LEDC5"
+            return CurrService_StatusC5_Data;
+        }
+        /// <summary>
+        /// Reads data from UnknownStatusValuesC5 and triggers an OnPropertyChanged
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Service_StatusC5_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Service_StatusC5_Data> ReadUnknownStatusValuesC5(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_UnknownStatusValuesC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "UnknownStatusValuesC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "UnknownStatusValuesC5", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("BYTES|HEX|StatusUnknown5");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrService_StatusC5_Data.StatusUnknown5 = vr.GetNextByteArray();
+            CurrService_StatusC5_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(UnknownStatusValuesC5PropertyChangedName); // "UnknownStatusValuesC5"
+            return CurrService_StatusC5_Data;
+        }
+        /// <summary>
+        /// Writes data to Status_Device_NameC5 
+        /// </summary>
+        public async Task<GattCommunicationStatus?> WriteStatus_Device_NameC5(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_Status_Device_NameC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "Status_Device_NameC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteStatus_Device_NameC5", result);
+            }
+            catch (Exception ex)
+            {
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteStatus_Device_NameC5: Exception {ex.Message}", exceptionStatus);
+            }
+            return result;
+        }
+        /// <summary>
+        /// Writes data to Status_Flash_LEDC5 
+        /// </summary>
+        public async Task<GattCommunicationStatus?> WriteStatus_Flash_LEDC5(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_Status_Flash_LEDC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "Status_Flash_LEDC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteStatus_Flash_LEDC5", result);
+            }
+            catch (Exception ex)
+            {
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteStatus_Flash_LEDC5: Exception {ex.Message}", exceptionStatus);
+            }
+            return result;
+        }
+        /// <summary>
+        /// Writes data to Status_Light_LEDC5 
+        /// </summary>
+        public async Task<GattCommunicationStatus?> WriteStatus_Light_LEDC5(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_Status_Light_LEDC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "Status_Light_LEDC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteStatus_Light_LEDC5", result);
+            }
+            catch (Exception ex)
+            {
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteStatus_Light_LEDC5: Exception {ex.Message}", exceptionStatus);
+            }
+            return result;
+        }
+        /// <summary>
+        /// Writes data to UnknownStatusValuesC5 
+        /// </summary>
+        public async Task<GattCommunicationStatus?> WriteUnknownStatusValuesC5(byte[] data, GattCommunicationStatus exceptionStatus = GattCommunicationStatus.Unreachable)
+        {
+            var index = CharacteristicIndex.Service_StatusC5_UnknownStatusValuesC5_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Service_StatusC5_index, "Service_StatusC5", index, "UnknownStatusValuesC5");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+            var buffer = data.AsBuffer();
+            GattCommunicationStatus result = GattCommunicationStatus.Unreachable;
+            try
+            {
+                result = await ch.WriteValueAsync(buffer);
+                Status.ReportStatus("WriteUnknownStatusValuesC5", result);
+            }
+            catch (Exception ex)
+            {
+                result = exceptionStatus;
+                Status.ReportStatus($"WriteUnknownStatusValuesC5: Exception {ex.Message}", exceptionStatus);
             }
             return result;
         }
