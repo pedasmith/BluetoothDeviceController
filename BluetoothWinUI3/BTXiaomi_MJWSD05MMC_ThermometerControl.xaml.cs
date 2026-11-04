@@ -779,7 +779,14 @@ public sealed partial class BTXiaomi_MJWSD05MMC_ThermometerControl : UserControl
                         PrimaryButtonText = "Set",
                         XamlRoot = this.XamlRoot,
                     };
-                    await dialog.ShowAsync();
+
+                    var result = await dialog.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+                    if (result == UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP)
+                    {
+                        // Another dialog is already up -- can happen if e.g., the user has two Pokit meters 
+                        return;
+                    }
+
                     var now = DateTimeOffset.Now;
                     var time = new DateTimeOffset(
                         int.Parse(tbYear.Text),

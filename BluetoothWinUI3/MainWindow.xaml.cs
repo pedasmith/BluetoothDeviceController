@@ -15,6 +15,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Utilities;
+using UtilitiesWinUI3;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth.Advertisement;
@@ -205,7 +206,19 @@ namespace BluetoothWinUI3
                 Content = notice,
                 CloseButtonText = "OK",
             };
-            await dialog.ShowAsync();
+
+            ContentDialogResult result;
+            do
+            {
+
+                result = await dialog.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+                if (result == UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP)
+                {
+                    await Task.Delay(1000); // wait a little bit and try again
+                }
+            }
+            while (result ==UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+
         }
 
         StringBuilder AllAdvertisements = new StringBuilder();
@@ -366,7 +379,11 @@ namespace BluetoothWinUI3
         {
             var version = Package.Current.Id.Version;
             uiVersion.Text = $"{version.Major}.{version.Minor}";
-            await uiDialogAbout.ShowAsync();
+            var result = await uiDialogAbout.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+            if (result == UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP)
+            {
+                return; // do nothing
+            }
         }
 
         private async void OnDebugDeleteDevice(object sender, RoutedEventArgs e)
@@ -500,7 +517,12 @@ namespace BluetoothWinUI3
                 Content = colorPicker,
                 XamlRoot = this.Content.XamlRoot // Required in WinUI 3
             };
-            var result = await dialog.ShowAsync();
+
+            var result = await dialog.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+            if (result == UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP)
+            {
+                return; // do nothing
+            }
             if (result != ContentDialogResult.Primary) return;
 
             var newcolor = UtilitiesWinUI3.UtilitiesWinUI3.ConvertBackIgnoreA(colorPicker.Color);
@@ -522,9 +544,13 @@ namespace BluetoothWinUI3
             var saveData = AllSaveData.GetOrCreateSaveData(knownDevice);
 
 
-            var dlg = uiDialogRenameDevice;
+            var dialog = uiDialogRenameDevice;
             uiDialogRenameDeviceName.Text = saveData.GetUserName();
-            var result = await dlg.ShowAsync();
+            var result = await dialog.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+            if (result == UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP)
+            {
+                return; // do nothing
+            }
 
             string newname = uiDialogRenameDeviceName.Text;
             saveData.SetUserName(newname);
@@ -973,7 +999,11 @@ namespace BluetoothWinUI3
                 Content = colorPicker,
                 XamlRoot = this.Content.XamlRoot // Required in WinUI 3
             };
-            var result = await dialog.ShowAsync();
+            var result = await dialog.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+            if (result == UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP)
+            {
+                return; // do nothing
+            }
             if (result != ContentDialogResult.Primary) return;
 
             var newcolor = UtilitiesWinUI3.UtilitiesWinUI3.ConvertBackIgnoreA(colorPicker.Color);
@@ -1038,7 +1068,11 @@ namespace BluetoothWinUI3
             // No amount of setting the width will help. 
             //https://github.com/microsoft/microsoft-ui-xaml/issues/424
             // uiDialogDirectories.Resources["ContentDialogMinWidth"] = 1080;
-            await uiDialogDirectories.ShowAsync();
+            var result = await uiDialogDirectories.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+            if (result == UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP)
+            {
+                return; // do nothing
+            }
         }
 
         private async void OnZoomPanelSizeChanged(object sender, SizeChangedEventArgs e)

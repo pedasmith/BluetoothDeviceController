@@ -17,6 +17,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 using Utilities;
+using UtilitiesWinUI3;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -716,7 +717,13 @@ namespace BluetoothWinUI3
                 SecondaryButtonText = "Cancel",
                 XamlRoot = this.XamlRoot,
             };
-            var result = await dlg.ShowAsync();
+            var result = await dlg.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+            if (result == UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP)
+            {
+                // Another dialog is already up -- can happen if e.g., the user has two Pokit meters 
+                return;
+            }
+
             if (result != ContentDialogResult.Primary)
             {
                 Log($"Write: cancelled");

@@ -483,7 +483,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 {
                     case MultimeterType.PokitMeterC4:
                         {
-                            await DevicePokit.NotifyStatus_StatusC4Async();
+                            // Despite the documentation Pokit Meter doesn't do notifications
+                            // await DevicePokit.NotifyStatus_StatusC4Async();
                             var ppsdata = await DevicePokit.ReadStatus_StatusC4();
                             if (ppsdata != null)
                             {
@@ -514,11 +515,12 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 }
                 DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // always start with Idle
                 DevicePokit.CurrMultimeter_Data.RangeSetting = 255; // always auto-range!
-                DevicePokit.CurrMultimeter_Data.IntervalSetting = 200;
+                DevicePokit.CurrMultimeter_Data.IntervalSetting = (CurrMultimeterType == MultimeterType.PokitProC5) ? 200 : 1000;
                 var ppbytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
                 var mmsetting = await DevicePokit.WriteMM_Settings(ppbytes); // 5=ohms 0=range 200 0 0 0=200 milli-seconds
                 SetVisible(uidIdle, true); // allow override because we really want to be in idle mode
                 IsIdle = true;
+                await DoSetupPokit();
                 break;
         }
 
@@ -750,7 +752,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
 
             // If it's more than 10 minutes since the last mode check, do a mode reading
-            // Only applies to the Pokit Pro device
+            // Only applies to the Pokit devices
             var now = DateTimeOffset.Now;
             if (DevicePokit != null && now.Subtract(TimeOfLastModeCheck).TotalMinutes >= 10.0)
             {
@@ -1100,7 +1102,11 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     private async void OnSetupPokit(object sender, RoutedEventArgs e)
     {
         if (DevicePokit == null) return;
+        await DoSetupPokit();
+    }
 
+    private async Task DoSetupPokit()
+    { 
         // Set the mode
         var mode = DevicePokit.CurrMultimeter_Data.ModeSetting;
         var modestr = mode.ToString();
@@ -1118,7 +1124,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         //
         // Show the dialog box
         //
-        var result = await uidMMSetupPokit.ShowAsync();
+        //var result = await uidMMSetupPokit.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+        var popupfacade = new PopupAsDialogFacade(uipMMSetupPokit, iupMMSetupPokitOk, iupMMSetupPokitCancel);
+        var result = await popupfacade.ShowAsync();
 
         // Update the mode!
         foreach (var item in uidMMSetupPokit_Mode.Children)
@@ -1131,7 +1139,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
         byte newPokitMode=0;
         var parseOk = byte.TryParse(modestr, out newPokitMode);
-        if (!parseOk) return;
+        if (!parseOk) return; // Can never happen 
 
         var oldMode = DevicePokit.CurrMultimeter_Data.ModeSetting;
         var oldRange = DevicePokit.CurrMultimeter_Data.RangeSetting;
@@ -1144,11 +1152,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             // Threw an exception. Technically this could be for a lot of reasons. But the #1 reason
             // by a mile is that the switch isn't set correctly. If so, reset to the old mode.
             Log("Pokit: Invalid request to change mode; set to Idle instead.");
-            uidSwitchError.Visibility = Visibility.Visible;
-            DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // and not oldMode
-            DevicePokit.CurrMultimeter_Data.RangeSetting = oldRange;
             SetVisible(uidSwitchError);
 
+            DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // and not oldMode
+            DevicePokit.CurrMultimeter_Data.RangeSetting = oldRange;
             settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
             var resetOk = await DevicePokit.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
         }
@@ -1209,7 +1216,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             case 3:
             case 4: // amps
                 combo.IsEnabled = true;
-                combo.Items.Add(new ComboBoxItem() { Content = "Autorange", Tag = "255", IsSelected = (currRange == 255) });
+                combo.Items.Add(new ComboBoxItem() { Content = "Autorange", Tag = "255", Is`ed = (currRange == 255) });
                 break;
 
             case 5: // ohms
@@ -1234,6 +1241,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
 #endif
 
+    /// <summary>
+    /// Was a simple method but is smarter
+    /// </summary>
     private void SetVisible(FrameworkElement item, bool letIdleOverrideSwitchError = false)
     {
         if (letIdleOverrideSwitchError == false && uidSwitchError.Visibility == Visibility.Visible && item == uidIdle)

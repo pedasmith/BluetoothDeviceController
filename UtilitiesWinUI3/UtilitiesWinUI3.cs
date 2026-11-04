@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Streams;
@@ -281,6 +282,39 @@ internal static class UtilitiesWinUI3
         // Write it back.
         stream.Position = 0;
         stream.Write(pixels, 0, realLength);
+    }
+
+    private static Lock ContentDialogOpenLock = new();
+    private static bool IsContentDialogOpen { get; set; } = false;
+    public static readonly ContentDialogResult ANOTHER_DIALOG_ALREADY_UP = (ContentDialogResult)(-999);
+
+    public static async Task<ContentDialogResult> ContentDialogShowSingleAsync(this ContentDialog dlg, ContentDialogResult returnOnAreadyOpen)
+    {
+        lock (ContentDialogOpenLock)
+        {
+            if (IsContentDialogOpen)
+            {
+                System.Diagnostics.Debug.WriteLine("App.ShowContentDialog: ContentDialog already open; ignoring request");
+                return returnOnAreadyOpen;
+            }
+            IsContentDialogOpen = true;
+        }
+        try
+        {
+            var retval = await dlg.ShowAsync();
+            return retval;
+        }
+        catch (Exception)
+        {
+            return returnOnAreadyOpen; // close enough to already open :-)
+        }
+        finally
+        {
+            lock (ContentDialogOpenLock)
+            {
+                IsContentDialogOpen = false;
+            }
+        }
     }
 
 
