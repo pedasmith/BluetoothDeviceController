@@ -31,7 +31,7 @@ namespace BluetoothWinUI3
         /// folder in a file called AllDeviceData.devices. It's restored with a call to Restore() which is done automatically
         /// in App.xaml.cs
         /// </summary>
-        public static void Save(string suffix = "")
+        public static void Save(string suffixForLogging = "")
         {
             try
             {
@@ -42,7 +42,7 @@ namespace BluetoothWinUI3
                 var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), JsonOptions); //  SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
                 File.WriteAllText(filePath, json);
 
-                Log($"Saved configuration to {filePath}{suffix}");
+                Log($"Saved configuration to {filePath}{suffixForLogging}");
             }
             catch (Exception e)
             {
@@ -577,6 +577,13 @@ namespace BluetoothWinUI3
 
         public SoundLevelType BeepLevel { get; set; } = SoundLevelType.NotSet;
         public SoundLevelType VoiceLevel { get; set; } = SoundLevelType.NotSet;
+
+        /// <summary>
+        /// Used by e.g., Pokit meters to store the last mode (like "Resistance").
+        /// It's called LastModeA so that future devices, if they need more data, have a clean place
+        /// to save it (likely LastModeB!)
+        /// </summary>
+        public string LastModeA { get; set; } = ""; // Used by e.g., Pokit meters to store the multimeter mode (like, "VDC").
 
     }
 

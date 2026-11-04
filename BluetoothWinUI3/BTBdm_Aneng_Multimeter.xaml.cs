@@ -513,6 +513,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                         }
                         break;
                 }
+
                 DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // always start with Idle
                 DevicePokit.CurrMultimeter_Data.RangeSetting = 255; // always auto-range!
                 DevicePokit.CurrMultimeter_Data.IntervalSetting = (CurrMultimeterType == MultimeterType.PokitProC5) ? 200 : 1000;
@@ -520,6 +521,19 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 var mmsetting = await DevicePokit.WriteMM_Settings(ppbytes); // 5=ohms 0=range 200 0 0 0=200 milli-seconds
                 SetVisible(uidIdle, true); // allow override because we really want to be in idle mode
                 IsIdle = true;
+
+                var startMode = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle;
+                var haveLastStartMode = double.TryParse(CurrSaveData?.Preferences?.LastModeA ?? "", out startMode);
+                if (!haveLastStartMode)
+                {
+                    Log($"Pokit: No last mode found, starting in Idle");
+                }
+                else
+                {
+                    DevicePokit.CurrMultimeter_Data.ModeSetting = startMode;
+                    Log($"Pokit: Last mode found, starting in {startMode}");
+                }
+
                 await DoSetupPokit();
                 break;
         }
@@ -1163,11 +1177,15 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         {
             SetVisible(uidIdle, true); // user explicitly requested the idle mode, so show it
             IsIdle = true;
+            CurrSaveData.Preferences.LastModeA = modestr;
+            AllSaveData.Save(" Meter mode update (idle)");
         }
         else
         {
             SetVisible(uidSwitch);
             IsIdle = false;
+            CurrSaveData.Preferences.LastModeA = modestr;
+            AllSaveData.Save(" Meter mode update");
         }
 
         switch (CurrMultimeterType)
