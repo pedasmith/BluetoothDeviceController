@@ -13,7 +13,6 @@ using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
-using System.Reflection;
 using System.Threading.Tasks;
 using Utilities;
 using UtilitiesWinUI3;
@@ -494,6 +493,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                             if (ddata != null)
                             {
                                 Log($"Firmware {ddata.FirmwareMajor}.{ddata.FirmwareMinor} Max Values:{ddata.MaxInputVoltage}V {ddata.MaxInputCurrent}A {ddata.MaxInputResistance}Ohm Sampling={ddata.MaxSamplingRate} ");
+                                uidFirmware.Text = $"{ddata.FirmwareMajor}.{ddata.FirmwareMinor}";
+                                uidMaxAmps.Text = ddata.MaxInputCurrent.ToString();
+                                uidMaxVoltage.Text = ddata.MaxInputVoltage.ToString();
+                                uidMaxResistance.Text = ddata.MaxInputResistance.ToString();
                             }
                         }
                         break;
@@ -509,6 +512,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                             if (ddata != null)
                             {
                                 Log($"Firmware {ddata.FirmwareMajor}.{ddata.FirmwareMinor} Max Values:{ddata.MaxInputVoltage}V {ddata.MaxInputCurrent}A {ddata.MaxInputResistance}Ohm Sampling={ddata.MaxSamplingRate} ");
+                                uidFirmware.Text = $"{ddata.FirmwareMajor}.{ddata.FirmwareMinor}";
+                                uidMaxAmps.Text = ddata.MaxInputCurrent.ToString();
+                                uidMaxVoltage.Text = ddata.MaxInputVoltage.ToString();
+                                uidMaxResistance.Text = ddata.MaxInputResistance.ToString();
                             }
                         }
                         break;
@@ -1275,9 +1282,4 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         uidSwitchError.Visibility = (item == uidSwitchError) ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private void OnBeep(object sender, RoutedEventArgs e)
-    {
-        var beepLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.BeepLevel, CurrSaveData.Preferences.BeepLevel);
-        Beeper.Beep(beepLevel, Beeper.Connect);
-    }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

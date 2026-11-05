@@ -91,8 +91,19 @@
                 <Border Grid.Column="2" VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,0">
                     <StackPanel Orientation="Horizontal">
                         <ToggleButton Content="Pause" x:Name="uiPauseButton" Click="OnPause" />
-                        <Button Content="Beep" Click="OnBeep" />
-                        <Button Content="Control" x:Name="uiSetupPokitPro" Click="OnSetupPokit" />
+                        <Button Content="About" x:Name="uiAboutPokit" >
+                            <Button.Flyout>
+                                <Flyout>
+                                    <TextBlock>
+                                        <Run>Firmware: </Run><Run x:Name="uidFirmware" /><LineBreak />
+                                        <Run>Maximum Voltage: </Run><Run x:Name="uidMaxVoltage" /><LineBreak />
+                                        <Run>Maximum Amps: </Run><Run x:Name="uidMaxAmps" /><LineBreak />
+                                        <Run>Maximum Resistance: </Run><Run x:Name="uidMaxResistance" /><LineBreak />
+                                     </TextBlock>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                        <Button Content="Control" x:Name="uiSetupPokit" Click="OnSetupPokit" />
                     </StackPanel>
                 </Border>
             </Grid>

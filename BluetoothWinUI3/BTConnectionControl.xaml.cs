@@ -267,6 +267,8 @@ namespace BluetoothWinUI3
         {
             UIThreadHelper.CallOnUIThread(() =>
             {
+                if (!IsLoaded) return; // we might be shutting down.
+
                 switch (CurrState)
                 {
                     case ConnectionState.FoundViaAdvertisement:
