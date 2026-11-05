@@ -95,10 +95,10 @@
                             <Button.Flyout>
                                 <Flyout>
                                     <TextBlock>
-                                        <Run>Firmware: </Run><Run x:Name="uidFirmware" /><LineBreak />
-                                        <Run>Maximum Voltage: </Run><Run x:Name="uidMaxVoltage" /><LineBreak />
-                                        <Run>Maximum Amps: </Run><Run x:Name="uidMaxAmps" /><LineBreak />
-                                        <Run>Maximum Resistance: </Run><Run x:Name="uidMaxResistance" /><LineBreak />
+                                        <Run>Firmware:&#160;&#160;&#160;</Run><Run x:Name="uidFirmware" /><LineBreak />
+                                        <Run>Maximum Amps:&#160;&#160;&#160; </Run><Run x:Name="uidMaxAmps" /><LineBreak />
+                                        <Run>Maximum Volts:&#160;&#160;&#160; </Run><Run x:Name="uidMaxVoltage" /><LineBreak />
+                                        <Run>Maximum Resistance:&#160;&#160;&#160;</Run><Run x:Name="uidMaxResistance" /><LineBreak />
                                      </TextBlock>
                                 </Flyout>
                             </Button.Flyout>
