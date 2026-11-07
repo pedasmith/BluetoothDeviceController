@@ -231,6 +231,7 @@
               "UUID": "6974f5e5-0e54-45c3-97dd-29e4b5fb0849",
               "Name": "Status_DeviceC5",
               "Type": "U8|DEC|FirmwareMajor U8|DEC|FirmwareMinor U16|DEC|MaxInputVoltage U16|DEC|MaxInputCurrent U16|DEC|MaxInputResistance U16|DEC|MaxSamplingRate U16|DEC|DeviceBufferSize U16|HEX|Reserved01 BYTES|HEX|MacAddress",
+              "REM 10":  "MaxSamplingRate is in kHz. 1000 means the max sampling rate is 1 MHz.",
               "IsRead": true,
               "ExampleData": [
                 "Value:  01 02 52 03 0A 00 B8 0B E8 03 00 40 00 00 5C 02 72 09 AC 8B"
@@ -332,7 +333,9 @@
             {
               "UUID": "a81af1b6-b8b3-4244-8859-3da368d2be39",
               "Name": "DSO_Settings",
-              "Type": "U8|HEX|DsoTriggerType F32|FIXED|DsoTriggerLevel U8|HEX|DsoMode U8|HEX|DsoRange U32|DEC|DsoSamplingWindow|ms U16|DEC|DsoNSamples",
+              "Type": "U8|DEC|DsoTriggerTypeSetting F32|FIXED|DsoTriggerLevelSetting U8|DEC|DsoModeSetting U8|DEC|DsoRangeSetting U32|DEC|DsoSamplingWindowSetting|ms U16|DEC|DsoNSamplesSetting",
+              "REM MODE": "0=idle 1=VDC 2=VAC 3=Amp DC 4=Amp AC",
+              "REM Range": "0=300mV 1=2V 2=6V 3=12V 4=30V 5=60V",
               "IsWrite": true
             },
             {
@@ -345,11 +348,12 @@
             {
               "UUID": "970f00ba-f46f-4825-96a8-153a5cd0cda9",
               "Name": "DSO_Metadata",
-              "Type": "U8|HEX|DsoStatus F32|FIXED|DsoDataScale U8|HEX|DsoDataMode U8|HEX|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz",
+              "Type": "U8|DEC|DsoStatus F32|FIXED|DsoDataScale U8|DEC|DsoDataMode U8|DEC|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [
-                "Value:  00 00 00 00 00 00 00 10 27 00 00 00 00 40 42 0F 00 00 00 00 00"
+                "Value:  00 00 00 00 00 00 00 10 27 00 00 00 00 40 42 0F 00 00 00 00 00",
+                "REM MODE: 0=idle 1=VDC 2=VAC 3=Amp DC 4=Amp AC"
               ]
             }
           ]

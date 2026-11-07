@@ -190,6 +190,11 @@
                             </RadioButton>
                             <Rectangle Grid.Row="8" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
 
+                            <TextBlock Grid.Row="9" Grid.Column="0" VerticalAlignment="Center">Testing</TextBlock>
+                            <RadioButton Grid.Row="9" Grid.Column="1" Tag="9" Style="{StaticResource ModeTileRadioStyle}">
+                                <local:IconLabelControl Icon="⎓" Label="Oscilloscope"/>
+                            </RadioButton>
+
                             <!-- No need to expose these, ever. The Pokit Pro app always does auto-range (according to Copilot)
                                         <ComboBox Grid.Row="9" Grid.ColumnSpan="5" Header="Range" x:Name="uidMMSetupPokitRange" IsEnabled="False"/>
                                         -->

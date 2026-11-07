@@ -912,4 +912,24 @@ public static class Pokit_Meter_Multimeter_Extensions
         var buffer = dw.DetachBuffer();
         return buffer.ToArray();
     }
+
+    public static byte[] GetDso_Setting_Bytes(this PokitOscilloscopeMeter.DSO_Oscilloscope_Data data)
+    {
+        var dw = new DataWriter();
+        dw.ByteOrder = ByteOrder.LittleEndian; // Bluetooth is little endian by default
+        // "Type": "U8|DEC|DsoTriggerTypeSetting F32|FIXED|DsoTriggerLevelSetting U8|DEC|DsoModeSetting U8|DEC|DsoRangeSetting U32|DEC|DsoSamplingWindowSetting|ms U16|DEC|DsoNSamplesSetting",
+
+        dw.WriteByte((byte)data.DsoTriggerTypeSetting);
+        dw.WriteSingle((float)data.DsoTriggerLevelSetting);
+        dw.WriteByte((byte)data.DsoModeSetting);
+        dw.WriteByte((byte)data.DsoRangeSetting);
+        dw.WriteUInt32((UInt32)data.DsoSamplingWindowSetting);
+        dw.WriteUInt16((UInt16)data.DsoNSamplesSetting);
+        //await dw.StoreAsync(); will throw, which is silly
+        var buffer = dw.DetachBuffer();
+        return buffer.ToArray();
+    }
+
+
+
 }

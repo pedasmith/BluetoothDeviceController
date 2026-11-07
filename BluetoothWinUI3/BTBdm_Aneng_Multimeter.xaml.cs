@@ -28,11 +28,12 @@ namespace BluetoothWinUI3;
 
 #endregion
 using static BluetoothProtocols.BDM_Aneng_Multimeter;
+//using static BluetoothProtocolsDevicesCore.DataCollection<SensorData>;
 using DeviceSpecificSensorData = BDM_Aneng_Multimeter.Multimeter_Data; // Modify: 
 using DeviceSpecificSensorDataPokit = PokitOscilloscopeMeter.Multimeter_Data;
 using DeviceSpecificSensorDataUnits = BluetoothProtocolsDevicesCoreExtensions.BdmMultimeterDisplayFacade; // Modify: Often the same as the DeviceSpecificSensorData
-using DeviceSpecificSensorSecondaryC5DataPokit = PokitOscilloscopeMeter.Service_StatusC5_Data; // Modify: pick secondary sensor if needed
 using DeviceSpecificSensorSecondaryC4DataPokit = PokitOscilloscopeMeter.Service_StatusC4_Data; // Modify: pick secondary sensor if needed
+using DeviceSpecificSensorSecondaryC5DataPokit = PokitOscilloscopeMeter.Service_StatusC5_Data; // Modify: pick secondary sensor if needed
 using DeviceSpecificType = BDM_Aneng_Multimeter; // Modify: pick your device, not BTSimple_Demo
 using DeviceSpecificTypePokit = BluetoothProtocols.PokitOscilloscopeMeter;
 
@@ -517,6 +518,11 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                                 uidMaxVoltage.Text = ddata.MaxInputVoltage.ToString();
                                 uidMaxResistance.Text = ddata.MaxInputResistance.ToString();
                             }
+
+                            // TODO: Oscilloscope setup
+                            await DevicePokit.NotifyDSO_MetadataAsync();
+                            //await DevicePokit.NotifyDSO_SettingsAsync();
+                            await DevicePokit.NotifyDSO_ReadingAsync();
                         }
                         break;
                 }
@@ -765,6 +771,36 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        // TODO: oscilloscope
+
+        // The raw oscilloscope data comes in fast and must be processed right away. 
+        // Don't wait until we can run something on the UI thread
+        switch (e.PropertyName)
+        {
+            case PokitOscilloscopeMeter.DSO_MetadataPropertyChangedName:
+                DSO_Log += $"DSO:Scale: {DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataScale} At {DevicePokit.CurrDSO_Oscilloscope_Data.TimestampMostRecent.ToString("ss.ffffff")}\n"; // microseconds
+                DsoScale = DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataScale;
+                break;
+            case PokitOscilloscopeMeter.DSO_ReadingPropertyChangedName:
+                if ((DSO_NReadingsSoFar + DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count) > DSO_RawData.Length)
+                {
+                    Log($"Error: DSO_ReadingPropertyChangedName: DSO_NReadingsSoFar={DSO_NReadingsSoFar} + DsoDataRaw.Count={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count} > DSO_NReadingsExpected={DSO_NReadingsExpected}");
+                    return;
+                }
+                if (DSO_NReadingsSoFar == 0)
+                {
+                    DSO_FirstDataTimestamp = DevicePokit.CurrDSO_Oscilloscope_Data.TimestampMostRecent;
+                }
+                DSO_Log += $"DSO:Data: At {DevicePokit.CurrDSO_Oscilloscope_Data.TimestampMostRecent.ToString("ss.ffffff")}\n"; // microseconds
+                for (int i=0;i<DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count;i++)
+                {
+                    DSO_RawData[i+ DSO_NReadingsSoFar] = DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw[i]; // Will multiply by DsoScale later
+                }
+                DSO_NReadingsSoFar += DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count;
+                if (DSO_NReadingsLeft == 0) DSO_ReadyToDisplay = true;
+                break;
+        }
+
         UIThreadHelper.CallOnUIThread(async () =>
         {
             if (!IsLoaded) return;
@@ -835,6 +871,32 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     DateTimeOffset TimeOfLastModeCheck = DateTimeOffset.MinValue;
     DateTimeOffset TimeOfLastContinuityBeep = DateTimeOffset.MinValue;
     const double CONTINUITY_BEEP_WAIT_IN_SECONDS = 1.0;
+
+    // TODO: Oscilloscope data
+
+    /// <summary>
+    /// Number of Read values are left before we're done. We know ahead of time how many
+    /// values to expect (e.g., we ask for exactly 500 samples, so that's what we get)
+    /// </summary>
+    /// 
+    int DSO_NReadingsExpected = 0;
+    int DSO_NReadingsSoFar = 0;
+    int DSO_NReadingsLeft { get { return DSO_NReadingsExpected - DSO_NReadingsSoFar; } }
+    double[] DSO_RawData = null;
+    DateTimeOffset DSO_FirstDataTimestamp = DateTimeOffset.MinValue;
+    bool DSO_ReadyToDisplay = false;
+    string DSO_Log = "";
+
+    //int Curr_DSO_NMetadataEvents = -10;
+    //DateTime ReadingStartTime = DateTime.MinValue;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    long ReadingDeltaInTicks = 100; // Good default; matches the "10 microseconds per sample" set in 2024-06-08
+    List<double> RawReadings = new List<double>();
+    double DsoScale = 1.0;
+
     /// <summary>
     /// Called either when we have a single new data value (e.g., "Temperature") or when all the data
     /// needs to be updated. Most often called from Device_PropertyChanged
@@ -883,7 +945,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                     case Pokit_Meter_Multimeter_Extensions.MM_ModeType.Resistance:
                         if (CurrSensor_DataPokit.Data < 0.1)
                         {
-                            // TODO: double check actual documentation
                             // It can't actually read value this low
                             CurrSensor_DataPokit.Data = 0;
                         }
@@ -957,6 +1018,43 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 break;
             case DeviceSpecificTypePokit.Device_NamePropertyChangedName:
                 Log($"Device name: Pokit: {DevicePokit.CurrCommon_Configuration_Data.Device_Name}");
+                break;
+
+
+            // TODO: Oscilloscope data. The UX is not yet implemented, but the data is coming in.
+            case DeviceSpecificTypePokit.DSO_MetadataPropertyChangedName:
+                SetVisible(null, false);
+                Log($"DSO Metadata changed:  Status={DevicePokit.CurrDSO_Oscilloscope_Data.DsoStatus} Scale={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataScale} NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataNsamples} Hz={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingRate}");
+                break;
+
+            case DeviceSpecificTypePokit.DSO_ReadingPropertyChangedName:
+                // TODO: make the oscilloscope correctly instead of lashing it together
+                Log($"DSO Reading: !! N={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count} NLeft={DSO_NReadingsLeft}");
+                if (DSO_ReadyToDisplay)
+                {
+                    DSO_ReadyToDisplay = false;
+                    SetVisible(null, true);
+                    // Make the display!
+                    HistoricalDataUnits.Data.Clear();
+                    var start = DSO_FirstDataTimestamp;
+                    for (int i = 0; i < DSO_RawData.Length; i++)
+                    {
+                        var timestamp = start.AddTicks(i * ReadingDeltaInTicks);
+                        var dataUnits = new DeviceSpecificSensorDataUnits()
+                        {
+                            Name = KnownDeviceName,
+                            TimestampMostRecent = timestamp,
+                            DisplayNumber = DSO_RawData[i] * DsoScale,
+                            Multiplier = 1.0,
+                            DisplayUnits = "V",
+                            Mode = DeviceSpecificSensorDataUnits.DmmMode.Volts,
+                        };
+                        HistoricalDataUnits.Data.Add(dataUnits);
+
+                    }
+                    ShowGraphFromBatchData();
+                    Log(DSO_Log);
+                }
                 break;
 
             default:
@@ -1071,6 +1169,21 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
     }
 
+    private void ShowGraphFromBatchData()
+    {
+        if (HistoricalDataUnits.Count >= 2)
+        {
+            // DOC: Can't have the axes start off invisible because then they can't be switched back on
+            if (CurrWindowSize == MainWindow.WindowSize.Normal)
+            {
+                // Just in case the user quick set to large.
+                OxyPlotModel.SetAxesVisibility(uiOxyPlot, false);
+            }
+        }
+
+        uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
+    }
+
 
     /// <summary>
     /// Called from MainWindow when the user asks for, e.g., exported data or graphs. Most sensors will 
@@ -1107,25 +1220,20 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
     #endregion
 
-    private async void OnRangeMenuItemClick(object sender, RoutedEventArgs e)
-    {
-        if (DevicePokit == null) return;
-        var rangestr = (sender as FrameworkElement)?.Tag as string;
-        if (string.IsNullOrEmpty(rangestr)) return; // will never happen
-        byte range = 0;
-        var byteparse = Byte.TryParse(rangestr, out range);
-        if (!byteparse) return;
-        byte[] mmsetting = [5, (byte)range, 200, 0, 0, 0]; // 5=ohms 0=range 200 0 0 0=200 mseconds
-        var result = await DevicePokit.WriteMM_Settings(mmsetting);
-        ;
-    }
-
+    /// <summary>
+    /// Button callback for Setup; just calls into DoSetupPokit();
+    /// </summary>
     private async void OnSetupPokit(object sender, RoutedEventArgs e)
     {
         if (DevicePokit == null) return;
         await DoSetupPokit();
     }
 
+    /// <summary>
+    /// Pop up a the Mode Setting popup so the user can pick the MM type they want
+    /// Types are things like "Volts DC" or "Diode" 
+    /// Is called either from the user clicking a button or from the startup code.
+    /// </summary>
     private async Task DoSetupPokit()
     { 
         // Set the mode
@@ -1143,7 +1251,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         }
 
         //
-        // Show the dialog box
+        // Show the dialog box (really a popup)
         //
         //var result = await uidMMSetupPokit.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
         var popupfacade = new PopupAsDialogFacade(uipMMSetupPokit, iupMMSetupPokitOk, iupMMSetupPokitCancel);
@@ -1165,34 +1273,81 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         var oldMode = DevicePokit.CurrMultimeter_Data.ModeSetting;
         var oldRange = DevicePokit.CurrMultimeter_Data.RangeSetting;
 
-        DevicePokit.CurrMultimeter_Data.ModeSetting = newPokitMode;
-        var settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
-        var setOk = await DevicePokit.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
-        if (setOk == (GattCommunicationStatus)999)
+        // TODO: Setting up the oscilloscope mode!
+        if (newPokitMode == 9) // DSO
         {
-            // Threw an exception. Technically this could be for a lot of reasons. But the #1 reason
-            // by a mile is that the switch isn't set correctly. If so, reset to the old mode.
-            Log("Pokit: Invalid request to change mode; set to Idle instead.");
-            SetVisible(uidSwitchError);
 
-            DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // and not oldMode
-            DevicePokit.CurrMultimeter_Data.RangeSetting = oldRange;
-            settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
-            var resetOk = await DevicePokit.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
-        }
-        else if (newPokitMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
-        {
-            SetVisible(uidIdle, true); // user explicitly requested the idle mode, so show it
-            IsIdle = true;
-            CurrSaveData.Preferences.LastModeA = modestr;
-            AllSaveData.Save(" Meter mode update (idle)");
+            DSO_Log = "Starting:\n";
+            DSO_ReadyToDisplay = false;
+
+            int READING_SPARCITY = 8; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
+            ushort nSamples;
+
+            // TODO: use either C4 (meter) or C5 (Pro)
+            var maxSamplesPerSecond = DevicePokit.CurrService_StatusC5_Data.MaxSamplingRate * 1000 / READING_SPARCITY; // value is in KHz. 1000 == 1 MHz sample rate
+            var minMicrosecondsPerSample = (1.0 / maxSamplesPerSecond) * 1_000_000.0;
+            UInt32 timePerSampleInMicroseconds = (UInt32)minMicrosecondsPerSample;
+
+
+            nSamples = (UInt16)(DevicePokit.CurrService_StatusC5_Data.DeviceBufferSize / READING_SPARCITY); // Max number of samples
+            nSamples = Math.Min(nSamples, (ushort)(DevicePokit.CurrService_StatusC5_Data.DeviceBufferSize - 1000)); // TODO: must reduce the amount, otherwise it doesn't work.
+            UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
+
+            DSO_RawData = new double[nSamples];
+
+            DSO_NReadingsSoFar = 0;
+            DSO_NReadingsExpected = nSamples; // will be updated by the metadata
+            ReadingDeltaInTicks = timePerSampleInMicroseconds * 10;
+
+
+            DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = 0; // Free running
+            DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = 0; // N/A for free running
+            DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting = 1; // 1=VDC 2=VAC
+            DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting = 1; // 3; //  4; // 5=up to 60 V
+            DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting = samplingWindowInMicroseconds; // value in microseconds
+            DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting = nSamples; 
+
+            Log($"DSO Settings: SamplingWindow={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting} microSeconds NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting}");
+            var bytes = DevicePokit.CurrDSO_Oscilloscope_Data.GetDso_Setting_Bytes();
+            var resok = await DevicePokit.WriteDSO_Settings(bytes, (GattCommunicationStatus)999);
+            ;
+
+            // Audio calculations:
+            // Common audio is 1_000 HZ.
+            // One complete wave is 0.001 seconds = 1000 microseconds
+            // To collect 10 complete wave, we need 10_0000 microseconds of data
         }
         else
         {
-            SetVisible(uidSwitch);
-            IsIdle = false;
-            CurrSaveData.Preferences.LastModeA = modestr;
-            AllSaveData.Save(" Meter mode update");
+            DevicePokit.CurrMultimeter_Data.ModeSetting = newPokitMode;
+            var settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
+            var setOk = await DevicePokit.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
+            if (setOk == (GattCommunicationStatus)999)
+            {
+                // Threw an exception. Technically this could be for a lot of reasons. But the #1 reason
+                // by a mile is that the switch isn't set correctly. If so, reset to the old mode.
+                Log("Pokit: Invalid request to change mode; set to Idle instead.");
+                SetVisible(uidSwitchError);
+
+                DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // and not oldMode
+                DevicePokit.CurrMultimeter_Data.RangeSetting = oldRange;
+                settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
+                var resetOk = await DevicePokit.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
+            }
+            else if (newPokitMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
+            {
+                SetVisible(uidIdle, true); // user explicitly requested the idle mode, so show it
+                IsIdle = true;
+                CurrSaveData.Preferences.LastModeA = modestr;
+                AllSaveData.Save(" Meter mode update (idle)");
+            }
+            else
+            {
+                SetVisible(uidSwitch);
+                IsIdle = false;
+                CurrSaveData.Preferences.LastModeA = modestr;
+                AllSaveData.Save(" Meter mode update");
+            }
         }
 
         switch (CurrMultimeterType)
@@ -1267,7 +1422,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 #endif
 
     /// <summary>
-    /// Was a simple method but is smarter
+    /// Was a simple method but is smarter now. Is used to switch between Idle, Switch and SwitchError (or remove them all)
     /// </summary>
     private void SetVisible(FrameworkElement item, bool letIdleOverrideSwitchError = false)
     {

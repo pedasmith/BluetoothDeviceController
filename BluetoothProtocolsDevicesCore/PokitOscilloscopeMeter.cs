@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display..
-    /// This class was automatically generated 2026-10-31::15:54
+    /// This class was automatically generated 2026-11-05::10:16
     /// </summary>
 
     public partial class PokitOscilloscopeMeter : INotifyPropertyChanged
@@ -51,7 +51,7 @@ namespace BluetoothProtocols
 
         DSO_Oscilloscope service Guid=1569801e-1425-4a7a-b617-a4f4ed719de6
             DSO_Oscilloscope_Data (DataGroup record)
-                DSO_Settings characteristic has DsoTriggerType (Byte-->double) DsoTriggerLevel (Single-->double) DsoMode (Byte-->double) DsoRange (Byte-->double) DsoSamplingWindow (UInt32-->double) DsoNSamples (UInt16-->double)  Guid=a81af1b6-b8b3-4244-8859-3da368d2be39
+                DSO_Settings characteristic has DsoTriggerTypeSetting (Byte-->double) DsoTriggerLevelSetting (Single-->double) DsoModeSetting (Byte-->double) DsoRangeSetting (Byte-->double) DsoSamplingWindowSetting (UInt32-->double) DsoNSamplesSetting (UInt16-->double)  Guid=a81af1b6-b8b3-4244-8859-3da368d2be39
                 DSO_Reading characteristic has DsoDataRaw (Int16-->double[])  Guid=98e14f8e-536e-4f24-b4f4-1debfed0a99e
                 DSO_Metadata characteristic has DsoStatus (Byte-->double) DsoDataScale (Single-->double) DsoDataMode (Byte-->double) DsoDataRange (Byte-->double) DsoDataSamplingWindow (UInt32-->double) DsoDataNsamples (UInt16-->double) DsoSamplingRate (UInt32-->double)  Guid=970f00ba-f46f-4825-96a8-153a5cd0cda9
 
@@ -322,59 +322,59 @@ namespace BluetoothProtocols
         /// </summary>
         public class DSO_Oscilloscope_Data :BTCommonMetaData<DSO_Oscilloscope_Data> //, IExportDataSource
         {
-            private double _DsoTriggerType = 0;
+            private double _DsoTriggerTypeSetting = 0;
             /// <summary>
-            /// DsoTriggerType (U8 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
+            /// DsoTriggerTypeSetting (U8 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
             ///</summary>
-            public double DsoTriggerType 
+            public double DsoTriggerTypeSetting 
             { 
-                get { return _DsoTriggerType; }
-                set { if (value == _DsoTriggerType) return; _DsoTriggerType = value; OnPropertyChanged();}
+                get { return _DsoTriggerTypeSetting; }
+                set { if (value == _DsoTriggerTypeSetting) return; _DsoTriggerTypeSetting = value; OnPropertyChanged();}
             }
-            private double _DsoTriggerLevel = 0.0;
+            private double _DsoTriggerLevelSetting = 0.0;
             /// <summary>
-            /// DsoTriggerLevel (F32 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
+            /// DsoTriggerLevelSetting (F32 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
             ///</summary>
-            public double DsoTriggerLevel 
+            public double DsoTriggerLevelSetting 
             { 
-                get { return _DsoTriggerLevel; }
-                set { if (value == _DsoTriggerLevel) return; _DsoTriggerLevel = value; OnPropertyChanged();}
+                get { return _DsoTriggerLevelSetting; }
+                set { if (value == _DsoTriggerLevelSetting) return; _DsoTriggerLevelSetting = value; OnPropertyChanged();}
             }
-            private double _DsoMode = 0;
+            private double _DsoModeSetting = 0;
             /// <summary>
-            /// DsoMode (U8 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
+            /// DsoModeSetting (U8 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
             ///</summary>
-            public double DsoMode 
+            public double DsoModeSetting 
             { 
-                get { return _DsoMode; }
-                set { if (value == _DsoMode) return; _DsoMode = value; OnPropertyChanged();}
+                get { return _DsoModeSetting; }
+                set { if (value == _DsoModeSetting) return; _DsoModeSetting = value; OnPropertyChanged();}
             }
-            private double _DsoRange = 0;
+            private double _DsoRangeSetting = 0;
             /// <summary>
-            /// DsoRange (U8 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
+            /// DsoRangeSetting (U8 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
             ///</summary>
-            public double DsoRange 
+            public double DsoRangeSetting 
             { 
-                get { return _DsoRange; }
-                set { if (value == _DsoRange) return; _DsoRange = value; OnPropertyChanged();}
+                get { return _DsoRangeSetting; }
+                set { if (value == _DsoRangeSetting) return; _DsoRangeSetting = value; OnPropertyChanged();}
             }
-            private double _DsoSamplingWindow = 0;
+            private double _DsoSamplingWindowSetting = 0;
             /// <summary>
-            /// DsoSamplingWindow (U32 ms) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
+            /// DsoSamplingWindowSetting (U32 ms) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
             ///</summary>
-            public double DsoSamplingWindow 
+            public double DsoSamplingWindowSetting 
             { 
-                get { return _DsoSamplingWindow; }
-                set { if (value == _DsoSamplingWindow) return; _DsoSamplingWindow = value; OnPropertyChanged();}
+                get { return _DsoSamplingWindowSetting; }
+                set { if (value == _DsoSamplingWindowSetting) return; _DsoSamplingWindowSetting = value; OnPropertyChanged();}
             }
-            private double _DsoNSamples = 0;
+            private double _DsoNSamplesSetting = 0;
             /// <summary>
-            /// DsoNSamples (U16 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
+            /// DsoNSamplesSetting (U16 ) from Service=DSO_Oscilloscope and Characteristic=DSO_Settings
             ///</summary>
-            public double DsoNSamples 
+            public double DsoNSamplesSetting 
             { 
-                get { return _DsoNSamples; }
-                set { if (value == _DsoNSamples) return; _DsoNSamples = value; OnPropertyChanged();}
+                get { return _DsoNSamplesSetting; }
+                set { if (value == _DsoNSamplesSetting) return; _DsoNSamplesSetting = value; OnPropertyChanged();}
             }
 
             private List<double> _DsoDataRaw = new();
@@ -468,12 +468,12 @@ namespace BluetoothProtocols
                 var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = source.Name;
-                dest.DsoTriggerType = source.DsoTriggerType;
-                dest.DsoTriggerLevel = source.DsoTriggerLevel;
-                dest.DsoMode = source.DsoMode;
-                dest.DsoRange = source.DsoRange;
-                dest.DsoSamplingWindow = source.DsoSamplingWindow;
-                dest.DsoNSamples = source.DsoNSamples;
+                dest.DsoTriggerTypeSetting = source.DsoTriggerTypeSetting;
+                dest.DsoTriggerLevelSetting = source.DsoTriggerLevelSetting;
+                dest.DsoModeSetting = source.DsoModeSetting;
+                dest.DsoRangeSetting = source.DsoRangeSetting;
+                dest.DsoSamplingWindowSetting = source.DsoSamplingWindowSetting;
+                dest.DsoNSamplesSetting = source.DsoNSamplesSetting;
                 dest.DsoDataRaw = new List<double>(source.DsoDataRaw);
                 dest.DsoStatus = source.DsoStatus;
                 dest.DsoDataScale = source.DsoDataScale;
@@ -498,12 +498,12 @@ namespace BluetoothProtocols
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
-                dest.DsoTriggerType = convert(source.DsoTriggerType, "");
-                dest.DsoTriggerLevel = convert(source.DsoTriggerLevel, "");
-                dest.DsoMode = convert(source.DsoMode, "");
-                dest.DsoRange = convert(source.DsoRange, "");
-                dest.DsoSamplingWindow = convert(source.DsoSamplingWindow, "ms");
-                dest.DsoNSamples = convert(source.DsoNSamples, "");
+                dest.DsoTriggerTypeSetting = convert(source.DsoTriggerTypeSetting, "");
+                dest.DsoTriggerLevelSetting = convert(source.DsoTriggerLevelSetting, "");
+                dest.DsoModeSetting = convert(source.DsoModeSetting, "");
+                dest.DsoRangeSetting = convert(source.DsoRangeSetting, "");
+                dest.DsoSamplingWindowSetting = convert(source.DsoSamplingWindowSetting, "ms");
+                dest.DsoNSamplesSetting = convert(source.DsoNSamplesSetting, "");
                 if (source.DsoDataRaw != null)
                 {
                     dest.DsoDataRaw = new List<double>();
@@ -525,19 +525,19 @@ namespace BluetoothProtocols
 
             public override string[] ExportGetHeaders(IExportData _)
             {
-                return ["DsoTriggerType", "DsoTriggerLevel", "DsoMode", "DsoRange", "DsoSamplingWindow", "DsoNSamples", "DsoDataRaw", "DsoStatus", "DsoDataScale", "DsoDataMode", "DsoDataRange", "DsoDataSamplingWindow", "DsoDataNsamples", "DsoSamplingRate"];
+                return ["DsoTriggerTypeSetting", "DsoTriggerLevelSetting", "DsoModeSetting", "DsoRangeSetting", "DsoSamplingWindowSetting", "DsoNSamplesSetting", "DsoDataRaw", "DsoStatus", "DsoDataScale", "DsoDataMode", "DsoDataRange", "DsoDataSamplingWindow", "DsoDataNsamples", "DsoSamplingRate"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
                 // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
                 // RowEnd and add in the timestamps
-                exporter.CellSet(DsoTriggerType);
-                exporter.CellSet(DsoTriggerLevel);
-                exporter.CellSet(DsoMode);
-                exporter.CellSet(DsoRange);
-                exporter.CellSet(DsoSamplingWindow);
-                exporter.CellSet(DsoNSamples);
+                exporter.CellSet(DsoTriggerTypeSetting);
+                exporter.CellSet(DsoTriggerLevelSetting);
+                exporter.CellSet(DsoModeSetting);
+                exporter.CellSet(DsoRangeSetting);
+                exporter.CellSet(DsoSamplingWindowSetting);
+                exporter.CellSet(DsoNSamplesSetting);
                 exporter.CellSet(DsoDataRaw);
                 exporter.CellSet(DsoStatus);
                 exporter.CellSet(DsoDataScale);
@@ -550,7 +550,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {DsoTriggerType} {DsoTriggerLevel} {DsoMode} {DsoRange} {DsoSamplingWindow} {DsoNSamples} {DsoDataRaw} {DsoStatus} {DsoDataScale} {DsoDataMode} {DsoDataRange} {DsoDataSamplingWindow} {DsoDataNsamples} {DsoSamplingRate}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {DsoTriggerTypeSetting} {DsoTriggerLevelSetting} {DsoModeSetting} {DsoRangeSetting} {DsoSamplingWindowSetting} {DsoNSamplesSetting} {DsoDataRaw} {DsoStatus} {DsoDataScale} {DsoDataMode} {DsoDataRange} {DsoDataSamplingWindow} {DsoDataNsamples} {DsoSamplingRate}");
             }
         }
 //
@@ -2413,17 +2413,17 @@ namespace BluetoothProtocols
         private void NotifyDSO_SettingsCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.DSO_Oscilloscope_DSO_Settings_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|DsoTriggerType F32|FIXED|DsoTriggerLevel U8|HEX|DsoMode U8|HEX|DsoRange U32|DEC|DsoSamplingWindow|ms U16|DEC|DsoNSamples");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|DsoTriggerTypeSetting F32|FIXED|DsoTriggerLevelSetting U8|DEC|DsoModeSetting U8|DEC|DsoRangeSetting U32|DEC|DsoSamplingWindowSetting|ms U16|DEC|DsoNSamplesSetting");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrDSO_Oscilloscope_Data.TimestampMostRecent = args.Timestamp;
-            CurrDSO_Oscilloscope_Data.DsoTriggerType = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoTriggerLevel = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoMode = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoRange = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoSamplingWindow = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoNSamples = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoModeSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoRangeSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoNSamplesSetting = vr.GetNextDouble();
             OnPropertyChanged(DSO_SettingsPropertyChangedName); // "DSO_Settings"
         }
         // Per-characteristics methods for DSO_Oscilloscope DSO_Reading
@@ -2468,7 +2468,7 @@ namespace BluetoothProtocols
         private void NotifyDSO_MetadataCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.DSO_Oscilloscope_DSO_Metadata_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|DsoStatus F32|FIXED|DsoDataScale U8|HEX|DsoDataMode U8|HEX|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|DsoStatus F32|FIXED|DsoDataScale U8|DEC|DsoDataMode U8|DEC|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
@@ -2500,16 +2500,16 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "DSO_Settings", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|DsoTriggerType F32|FIXED|DsoTriggerLevel U8|HEX|DsoMode U8|HEX|DsoRange U32|DEC|DsoSamplingWindow|ms U16|DEC|DsoNSamples");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|DsoTriggerTypeSetting F32|FIXED|DsoTriggerLevelSetting U8|DEC|DsoModeSetting U8|DEC|DsoRangeSetting U32|DEC|DsoSamplingWindowSetting|ms U16|DEC|DsoNSamplesSetting");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrDSO_Oscilloscope_Data.DsoTriggerType = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoTriggerLevel = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoMode = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoRange = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoSamplingWindow = vr.GetNextDouble();
-            CurrDSO_Oscilloscope_Data.DsoNSamples = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoModeSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoRangeSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting = vr.GetNextDouble();
+            CurrDSO_Oscilloscope_Data.DsoNSamplesSetting = vr.GetNextDouble();
             CurrDSO_Oscilloscope_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(DSO_SettingsPropertyChangedName); // "DSO_Settings"
             return CurrDSO_Oscilloscope_Data;
@@ -2559,7 +2559,7 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "DSO_Metadata", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|DsoStatus F32|FIXED|DsoDataScale U8|HEX|DsoDataMode U8|HEX|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|DsoStatus F32|FIXED|DsoDataScale U8|DEC|DsoDataMode U8|DEC|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
