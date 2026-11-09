@@ -300,7 +300,7 @@
             {
               "UUID": "53dc9a7a-bc19-4280-b76b-002d0e23b078",
               "Name": "MM_Settings",
-              "Type": "U8|DEC|ModeSetting U8|DEC|RangeSetting U32|DEC|IntervalSetting|ms",
+              "Type": "U8|DEC|ModeSetting U8|DEC|MMRangeSetting U32|DEC|IntervalSetting|ms",
               "IsWrite": true,
               "REM05": "mode 0=idle, 1=voltDC, 2=voltAC 3=ampDC,4=ampAC 5=ohm 6=diode 7=continuity 8=temp",
               "REM10": "05 FF 00 04 00 00 ",
@@ -334,6 +334,7 @@
               "UUID": "a81af1b6-b8b3-4244-8859-3da368d2be39",
               "Name": "DSO_Settings",
               "Type": "U8|DEC|DsoTriggerTypeSetting F32|FIXED|DsoTriggerLevelSetting U8|DEC|DsoModeSetting U8|DEC|DsoRangeSetting U32|DEC|DsoSamplingWindowSetting|ms U16|DEC|DsoNSamplesSetting",
+              "REM TriggerTypeSetting": "0=free 1=rising 2=falling (3=resend)",
               "REM MODE": "0=idle 1=VDC 2=VAC 3=Amp DC 4=Amp AC",
               "REM Range": "0=300mV 1=2V 2=6V 3=12V 4=30V 5=60V",
               "IsWrite": true

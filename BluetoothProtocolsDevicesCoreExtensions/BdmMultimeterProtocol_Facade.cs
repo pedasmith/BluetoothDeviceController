@@ -906,7 +906,7 @@ public static class Pokit_Meter_Multimeter_Extensions
         var dw = new DataWriter();
         dw.ByteOrder = ByteOrder.LittleEndian; // Bluetooth is little endian by default
         dw.WriteByte((byte)data.ModeSetting);
-        dw.WriteByte((byte)data.RangeSetting);
+        dw.WriteByte((byte)data.MMRangeSetting);
         dw.WriteUInt32((UInt32)data.IntervalSetting);
         //await dw.StoreAsync(); will throw, which is silly
         var buffer = dw.DetachBuffer();

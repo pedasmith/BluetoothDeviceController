@@ -388,7 +388,7 @@ namespace BluetoothWinUI3
 
         private async void OnDebugDeleteDevice(object sender, RoutedEventArgs e)
         {
-            // here!here
+            // TODO: complete?
             string verb = "remove";
             var selected = await GetBTSelectedAsync(verb) as IDeviceControlDevice;
             if (selected == null) return;

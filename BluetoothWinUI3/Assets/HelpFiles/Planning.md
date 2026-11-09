@@ -6,6 +6,13 @@
 - Add the ability to not automatically connect??
 - Classify advertisements and allow user to filter (e.g., no Apple adverts!)
 
+## Testing
+
+I can make an MSIX package that installs!
+
+1. Change the Package.appxmanifest to have a publisher of "CN=DevTest, OID.2.25.311729368913984317654407730594956997722=1"
+1. Install via PowerShell (admin mode) with `Add-AppxPackageBluetoothWinUI3_1.0.4.0_x64_Debug.msix -AllowUnsigned` 
+
 ## Pulse Oximeter
 
 Individual pulse oximeters work.

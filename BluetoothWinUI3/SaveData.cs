@@ -1,17 +1,14 @@
 ﻿using BluetoothProtocols;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
-using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Windows.Devices.Bluetooth;
-using Windows.Devices.Sensors;
 using Windows.UI;
 using static BluetoothWinUI3.UserPreferences;
 
@@ -40,6 +37,12 @@ namespace BluetoothWinUI3
                 string filePath = Path.Combine(folderPath, "AllDeviceData.devices");
 
                 var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), JsonOptions); //  SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
+                json = json.Replace(",\r\n      \"LastModeA\": \"\"", "");
+                json = json.Replace(",\r\n      \"LastModeB\": \"\"", "");
+                json = json.Replace(",\r\n      \"LastModeC\": \"\"", "");
+                json = json.Replace(",\r\n      \"LastModeD\": \"\"", "");
+                json = json.Replace(",\r\n      \"LastModeE\": \"\"", "");
+                json = json.Replace(",\r\n      \"LastModeF\": \"\"", "");
                 File.WriteAllText(filePath, json);
 
                 Log($"Saved configuration to {filePath}{suffixForLogging}");
@@ -579,11 +582,29 @@ namespace BluetoothWinUI3
         public SoundLevelType VoiceLevel { get; set; } = SoundLevelType.NotSet;
 
         /// <summary>
-        /// Used by e.g., Pokit meters to store the last mode (like "Resistance").
-        /// It's called LastModeA so that future devices, if they need more data, have a clean place
-        /// to save it (likely LastModeB!)
+        /// Used by e.g., Pokit meters to store the last type; is either "dso" or "mm".
         /// </summary>
-        public string LastModeA { get; set; } = ""; // Used by e.g., Pokit meters to store the multimeter mode (like, "VDC").
+        public string DeviceSettingA { get; set; } = ""; // Used by e.g., Pokit meters for "mm" 
+
+        /// <summary>
+        /// Used by e.g., Pokit meters to store the last MM mode. Will be number like VAC is "2"
+        /// </summary>
+        public string DeviceSettingB { get; set; } = "";
+
+        /// <summary>
+        /// Used by, e.g., Pokit meters for the last dsoMode (Volts DC, for example)
+        /// </summary>
+        public string DeviceSettingC { get; set; } = "";
+
+        /// <summary>
+        /// Used by, e.g., Pokit meters for the last dsoTrigger (single/rising/falling)
+        /// </summary>
+        public string DeviceSettingD { get; set; } = "";
+
+        /// <summary>
+        /// Used by, e.g., Pokit meters for the last dsoTriggerLevel 
+        /// </summary>
+        public string DeviceSettingE { get; set; } = "";
 
     }
 

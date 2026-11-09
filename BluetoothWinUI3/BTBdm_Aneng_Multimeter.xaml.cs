@@ -7,6 +7,7 @@ using BluetoothWinUI3.Beeps;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using OxyPlot;
@@ -18,6 +19,7 @@ using Utilities;
 using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Security.Cryptography.Core;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -528,24 +530,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 }
 
                 DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // always start with Idle
-                DevicePokit.CurrMultimeter_Data.RangeSetting = 255; // always auto-range!
+                DevicePokit.CurrMultimeter_Data.MMRangeSetting = 255; // always auto-range!
                 DevicePokit.CurrMultimeter_Data.IntervalSetting = (CurrMultimeterType == MultimeterType.PokitProC5) ? 200 : 1000;
                 var ppbytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
                 var mmsetting = await DevicePokit.WriteMM_Settings(ppbytes); // 5=ohms 0=range 200 0 0 0=200 milli-seconds
                 SetVisible(uidIdle, true); // allow override because we really want to be in idle mode
                 IsIdle = true;
 
-                var startMode = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle;
-                var haveLastStartMode = double.TryParse(CurrSaveData?.Preferences?.LastModeA ?? "", out startMode);
-                if (!haveLastStartMode)
-                {
-                    Log($"Pokit: No last mode found, starting in Idle");
-                }
-                else
-                {
-                    DevicePokit.CurrMultimeter_Data.ModeSetting = startMode;
-                    Log($"Pokit: Last mode found, starting in {startMode}");
-                }
+                SetupPokitDataFromCurrSave();
 
                 await DoSetupPokit();
                 break;
@@ -589,6 +581,29 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // Can't do this earlier; merely calling FromBluetoothAddressAsync doesn't actually 
         // connect. Once we do the notify and reads the device will be connected or not.
         // Now above: CurrSaveData?.History.UpdateConnectionHistory(DateTimeOffset.Now, Device.ble.ConnectionStatus);
+    }
+
+    /// <summary>
+    /// Moves CurrSaveData.Preferences into the DevicePokit as appropriate.
+    /// </summary>
+    private void SetupPokitDataFromCurrSave()
+    {
+        if (CurrSaveData == null) return;
+        if (CurrSaveData.Preferences == null) return;
+
+        DevicePokit.CurrMultimeter_Data.ModeSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingB ?? "", (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle);
+
+        DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingC ?? "", 0); // 0=idle
+        DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingD ?? "", 0); // 0=free
+        DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingE ?? "", 0); // in volts/amps
+    }
+
+    private double ParseDouble(string rawSetting, double defaultValue)
+    {
+        double retval = defaultValue;
+        var ok = double.TryParse(rawSetting, out retval);
+        if (!ok) retval = defaultValue;
+        return retval;
     }
 
 
@@ -811,9 +826,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             // If it's more than 10 minutes since the last mode check, do a mode reading
             // Only applies to the Pokit devices
             var now = DateTimeOffset.Now;
-            if (DevicePokit != null && now.Subtract(TimeOfLastModeCheck).TotalMinutes >= 10.0)
+            if (DevicePokit != null && now.Subtract(TimeOfMostRecentModeCheck).TotalMinutes >= 10.0)
             {
-                TimeOfLastModeCheck = now;
+                TimeOfMostRecentModeCheck = now;
                 switch (CurrMultimeterType)
                 {
                     case MultimeterType.PokitMeterC4:
@@ -868,7 +883,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     bool OldHold = false;
     bool IsIdle = false;
-    DateTimeOffset TimeOfLastModeCheck = DateTimeOffset.MinValue;
+    DateTimeOffset TimeOfMostRecentModeCheck = DateTimeOffset.MinValue;
     DateTimeOffset TimeOfLastContinuityBeep = DateTimeOffset.MinValue;
     const double CONTINUITY_BEEP_WAIT_IN_SECONDS = 1.0;
 
@@ -1230,25 +1245,109 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
 
     /// <summary>
-    /// Pop up a the Mode Setting popup so the user can pick the MM type they want
-    /// Types are things like "Volts DC" or "Diode" 
-    /// Is called either from the user clicking a button or from the startup code.
+    /// Copies data from the DevicePokit.CurrMultimeter_data and DevicePokit.CurrDso_Data to the switches in uipMMSetupPokit
+    /// Also uses the CurrSave.Preferences for ModeA to switch dso/mm switch.
     /// </summary>
-    private async Task DoSetupPokit()
-    { 
-        // Set the mode
-        var mode = DevicePokit.CurrMultimeter_Data.ModeSetting;
-        var modestr = mode.ToString();
+    private void PokitModeSettingsToSwitches()
+    {
+        var mmVsDso = CurrSaveData?.Preferences?.DeviceSettingA ?? "mm"; // mm or dso.
+        var isDso = mmVsDso == "dso"; // dso is "all others" 
+        uiInstrumentType.IsOn = isDso;
+
+        var mmModeStr = DevicePokit.CurrMultimeter_Data.ModeSetting.ToString(); // numerical
         foreach (var item in uidMMSetupPokit_Mode.Children)
         {
             var rb = item as RadioButton;
             if (rb == null) continue;
             var tag = rb.Tag as string;
-            if (string.IsNullOrEmpty (tag)) continue;
+            if (string.IsNullOrEmpty(tag)) continue;
 
-            var match = tag == modestr;
+            var match = tag == mmModeStr;
             rb.IsChecked = match ? true : false;
         }
+
+        var triggerStr = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting.ToString();
+        var modeStr = DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting.ToString();
+        foreach (var item in uidDsoSetupPokit_Mode.Children)
+        {
+            var rb = item as RadioButton;
+            if (rb == null) continue;
+            var tag = rb.Tag as string;
+            if (string.IsNullOrEmpty(tag)) continue;
+            switch (rb.GroupName)
+            {
+                case "dsoMode":
+                    rb.IsChecked = (tag == modeStr) ? true : false;
+                    break;
+                case "dsoTrigger":
+                    rb.IsChecked = (tag == triggerStr) ? true : false;
+                    break;
+            }
+        }
+        uidDsoTriggerLevel.Value = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting;
+
+    }
+
+    /// <summary>
+    /// Walks through the values in the uipMMSetupPokit and copies them into the DevicePokit.CurrMultimeter_Data and DevicePokit.CurrDso_Data
+    /// </summary>
+    private void SwitchesToModeSettings()
+    {
+        foreach (var item in uidMMSetupPokit_Mode.Children)
+        {
+            var rb = item as RadioButton;
+            if (rb == null) continue;
+            if (rb.IsChecked.Value)
+            {
+                var tag = rb.Tag as string;
+                if (string.IsNullOrEmpty(tag)) continue; // Can never happen.
+                DevicePokit.CurrMultimeter_Data.ModeSetting = byte.Parse(tag); // Tags must be numbers :-)
+            }
+        }
+
+        foreach (var item in uidDsoSetupPokit_Mode.Children)
+        {
+            var rb = item as RadioButton;
+            if (rb == null) continue;
+            if (rb.IsChecked.Value)
+            {
+                var tag = rb.Tag as string;
+                if (string.IsNullOrEmpty(tag)) continue; // Can never happen.
+                var tagb = byte.Parse(tag);
+                switch (rb.GroupName)
+                {
+                    case "dsoMode":
+                        // 0=Idle 1=VDC 2=VAC 3=Amp DC 4=Amp AC
+                        DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting = tagb;
+                        break;
+
+                    case "dsoTrigger":
+                        // 0=free 1=rising 2=falling (3=resend) 
+                        DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = tagb;
+                        break;
+                }
+            }
+        }
+        var triggerstr = uidDsoTriggerLevel.Text;
+        if (!String.IsNullOrEmpty(triggerstr) && double.TryParse(triggerstr, out double triggerlevel))
+        {
+            DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = triggerlevel;
+        }
+        else
+        {
+            // TODO: handle invalid value?
+        }
+    }
+
+    /// <summary>
+    /// Pop up a the Mode Setting popup so the user can pick the MM type they want
+    /// Types are things like "Volts DC" or "Diode" 
+    /// Is called either from the user clicking a button or from the startup code.
+    /// </summary>
+    private async Task DoSetupPokit()
+    {
+        // Set the mode
+         PokitModeSettingsToSwitches();
 
         //
         // Show the dialog box (really a popup)
@@ -1256,25 +1355,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         //var result = await uidMMSetupPokit.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
         var popupfacade = new PopupAsDialogFacade(uipMMSetupPokit, iupMMSetupPokitOk, iupMMSetupPokitCancel);
         var result = await popupfacade.ShowAsync();
+        if (result != ContentDialogResult.Primary) return; // user cancelled.
 
-        // Update the mode!
-        foreach (var item in uidMMSetupPokit_Mode.Children)
-        {
-            var rb = item as RadioButton;
-            if (rb == null) continue;
 
-            if (rb.IsChecked.Value) modestr = rb.Tag as string;
-        }
-
-        byte newPokitMode=0;
-        var parseOk = byte.TryParse(modestr, out newPokitMode);
-        if (!parseOk) return; // Can never happen 
-
-        var oldMode = DevicePokit.CurrMultimeter_Data.ModeSetting;
-        var oldRange = DevicePokit.CurrMultimeter_Data.RangeSetting;
+        SwitchesToModeSettings(); // Push data into the CurrMultimeter_Data and Dso!
+        var userSetMMMode = DevicePokit.CurrMultimeter_Data.ModeSetting;
 
         // TODO: Setting up the oscilloscope mode!
-        if (newPokitMode == 9) // DSO
+        if (uiInstrumentType.IsOn) // DSO
         {
 
             DSO_Log = "Starting:\n";
@@ -1283,14 +1371,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             int READING_SPARCITY = 8; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
             ushort nSamples;
 
-            // TODO: use either C4 (meter) or C5 (Pro)
-            var maxSamplesPerSecond = DevicePokit.CurrService_StatusC5_Data.MaxSamplingRate * 1000 / READING_SPARCITY; // value is in KHz. 1000 == 1 MHz sample rate
+            var maxRate = DevicePokit.CurrService_StatusC5_Data?.MaxSamplingRate ?? DevicePokit.CurrService_StatusC4_Data?.MaxSamplingRate ?? 1000; ;
+            var maxSamplesPerSecond = maxRate * 1000 / READING_SPARCITY; // value is in KHz. 1000 == 1 MHz sample rate
             var minMicrosecondsPerSample = (1.0 / maxSamplesPerSecond) * 1_000_000.0;
             UInt32 timePerSampleInMicroseconds = (UInt32)minMicrosecondsPerSample;
 
-
-            nSamples = (UInt16)(DevicePokit.CurrService_StatusC5_Data.DeviceBufferSize / READING_SPARCITY); // Max number of samples
-            nSamples = Math.Min(nSamples, (ushort)(DevicePokit.CurrService_StatusC5_Data.DeviceBufferSize - 1000)); // TODO: must reduce the amount, otherwise it doesn't work.
+            var bufferSize = DevicePokit.CurrService_StatusC5_Data?.DeviceBufferSize ?? DevicePokit.CurrService_StatusC4_Data?.DeviceBufferSize ?? 2000;
+            nSamples = (UInt16)(bufferSize / READING_SPARCITY); // Max number of samples
+            nSamples = Math.Min(nSamples, (ushort)(bufferSize - 1000)); // TODO: must reduce the amount, otherwise it doesn't work.
             UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
 
             DSO_RawData = new double[nSamples];
@@ -1300,9 +1388,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             ReadingDeltaInTicks = timePerSampleInMicroseconds * 10;
 
 
-            DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = 0; // Free running
-            DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = 0; // N/A for free running
-            DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting = 1; // 1=VDC 2=VAC
+            //DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = 0; // Free running
+            //DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = 0; // N/A for free running
+            //DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting = 1; // 1=VDC 2=VAC
             DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting = 1; // 3; //  4; // 5=up to 60 V
             DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting = samplingWindowInMicroseconds; // value in microseconds
             DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting = nSamples; 
@@ -1312,6 +1400,12 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             var resok = await DevicePokit.WriteDSO_Settings(bytes, (GattCommunicationStatus)999);
             ;
 
+            CurrSaveData.Preferences.DeviceSettingA = "dso";
+            CurrSaveData.Preferences.DeviceSettingC = DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting.ToString();
+            CurrSaveData.Preferences.DeviceSettingD = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting.ToString();
+            CurrSaveData.Preferences.DeviceSettingE = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting.ToString();
+
+
             // Audio calculations:
             // Common audio is 1_000 HZ.
             // One complete wave is 0.001 seconds = 1000 microseconds
@@ -1319,7 +1413,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         }
         else
         {
-            DevicePokit.CurrMultimeter_Data.ModeSetting = newPokitMode;
+            CurrSaveData.Preferences.DeviceSettingA = "mm";
+            var newPokitMMMode = DevicePokit.CurrMultimeter_Data.ModeSetting; // Was set in the SwitchesToModeSettings() call above.
+
             var settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
             var setOk = await DevicePokit.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
             if (setOk == (GattCommunicationStatus)999)
@@ -1330,23 +1426,22 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 SetVisible(uidSwitchError);
 
                 DevicePokit.CurrMultimeter_Data.ModeSetting = (double)Pokit_Meter_Multimeter_Extensions.MM_ModeType.Idle; // and not oldMode
-                DevicePokit.CurrMultimeter_Data.RangeSetting = oldRange;
                 settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();
                 var resetOk = await DevicePokit.WriteMM_Settings(settingsBytes, (GattCommunicationStatus)999);
+
+                DevicePokit.CurrMultimeter_Data.ModeSetting = userSetMMMode; // So the switches show up correctly!
             }
-            else if (newPokitMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
+            else if (newPokitMMMode == 0) // and not (byte)BdmMultimeterDisplayFacade.DmmMode.Idle)
             {
                 SetVisible(uidIdle, true); // user explicitly requested the idle mode, so show it
                 IsIdle = true;
-                CurrSaveData.Preferences.LastModeA = modestr;
-                AllSaveData.Save(" Meter mode update (idle)");
+                CurrSaveData.Preferences.DeviceSettingB = DevicePokit.CurrMultimeter_Data.ModeSetting.ToString(); // numerical;
             }
             else
             {
                 SetVisible(uidSwitch);
                 IsIdle = false;
-                CurrSaveData.Preferences.LastModeA = modestr;
-                AllSaveData.Save(" Meter mode update");
+                CurrSaveData.Preferences.DeviceSettingB = DevicePokit.CurrMultimeter_Data.ModeSetting.ToString(); // numerical;
             }
         }
 
@@ -1371,6 +1466,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 }
                 break;
         }
+        AllSaveData.Save(" Meter control setup");
 
     }
 
@@ -1426,6 +1522,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// </summary>
     private void SetVisible(FrameworkElement item, bool letIdleOverrideSwitchError = false)
     {
+        if (!IsLoaded) return;
+
         if (letIdleOverrideSwitchError == false && uidSwitchError.Visibility == Visibility.Visible && item == uidIdle)
         {
             // The user is already looking at the switch error and we have detected Idle mode.
@@ -1437,4 +1535,22 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         uidSwitchError.Visibility = (item == uidSwitchError) ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    private void OnInstrumentTypeToggled(object sender, RoutedEventArgs e)
+    {
+        var isOscilloscope = (sender as ToggleSwitch)?.IsOn ?? false;
+        uidMMSetupPokit_Mode.Visibility = isOscilloscope ? Visibility.Collapsed : Visibility.Visible;
+        uidDsoSetupPokit_Mode.Visibility = isOscilloscope ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void OnDsoPickedVolts(object sender, RoutedEventArgs e)
+    {
+        uidDsoRangeVolts.Visibility = Visibility.Visible;
+        uidDsoRangeAmps.Visibility = Visibility.Collapsed;
+    }
+
+    private void OnDsoPickedAmps(object sender, RoutedEventArgs e)
+    {
+        uidDsoRangeVolts.Visibility = Visibility.Collapsed;
+        uidDsoRangeAmps.Visibility = Visibility.Visible;
+    }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

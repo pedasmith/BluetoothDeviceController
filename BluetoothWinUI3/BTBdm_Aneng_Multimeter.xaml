@@ -109,10 +109,10 @@
             </Grid>
 
             <Popup x:Name="uipMMSetupPokit" 
-                   HorizontalOffset="10" VerticalOffset="50" Margin="5" 
+                   HorizontalOffset="10" VerticalOffset="0" Margin="5" 
                    Grid.Row="1" Grid.RowSpan="3" Width="480">
                 <Border 
-                    Margin="5" Padding="5"
+                    Margin="5" Padding="15"
                     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
                     BorderBrush="Black" BorderThickness="1">
                     <Grid >
@@ -125,7 +125,12 @@
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource sDevicePrimaryTitle}">Multimeter Control</TextBlock>
+                        <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource sDevicePrimaryTitle}" VerticalAlignment="Center" Margin="0,0,20,2">Control</TextBlock>
+                            <ToggleSwitch x:Name="uiInstrumentType" OnContent="Oscilloscope" OffContent="Multimeter"
+                                          Toggled="OnInstrumentTypeToggled"
+                                          />
+                        </StackPanel>
 
                         <Grid Grid.Row="1" x:Name="uidMMSetupPokit_Mode">
                             <Grid.ColumnDefinitions>
@@ -190,15 +195,95 @@
                             </RadioButton>
                             <Rectangle Grid.Row="8" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
 
-                            <TextBlock Grid.Row="9" Grid.Column="0" VerticalAlignment="Center">Testing</TextBlock>
-                            <RadioButton Grid.Row="9" Grid.Column="1" Tag="9" Style="{StaticResource ModeTileRadioStyle}">
-                                <local:IconLabelControl Icon="⎓" Label="Oscilloscope"/>
+                            <!-- No need to expose these, ever. The Pokit Pro app always does auto-range (according to Copilot)
+                                        <ComboBox Grid.Row="9" Grid.ColumnSpan="5" Header="Range" x:Name="uidMMSetupPokitRange" IsEnabled="False"/>
+                                        -->
+                        </Grid>
+
+                        <Grid Grid.Row="1" x:Name="uidDsoSetupPokit_Mode" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" MinWidth="60" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Sleep</TextBlock>
+                            <RadioButton Grid.Row="0" Grid.Column="1" Tag="0" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoMode">
+                                <local:IconLabelControl Icon="💤" Label="Idle"/>
                             </RadioButton>
+                            <Rectangle Grid.Row="1" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Measure</TextBlock>
+                            <RadioButton Grid.Row="2" Grid.Column="1" Tag="1" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoMode" Checked="OnDsoPickedVolts" >
+                                <local:IconLabelControl Icon="⎓" Label="Volts DC"/>
+                            </RadioButton>
+                            <RadioButton Grid.Row="2" Grid.Column="2" Tag="2" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoMode" Checked="OnDsoPickedVolts">
+                                <local:IconLabelControl Icon="⏦" Label="Volts AC"/>
+                            </RadioButton>
+
+                            <RadioButton Grid.Row="3" Grid.Column="1" Tag="3" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoMode" Checked="OnDsoPickedAmps">
+                                <local:IconLabelControl Icon="⎓" Label="Amps DC"/>
+                            </RadioButton>
+                            <RadioButton Grid.Row="3" Grid.Column="2" Tag="4" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoMode" Checked="OnDsoPickedAmps">
+                                <local:IconLabelControl Icon="⏦" Label="Amps AC"/>
+                            </RadioButton>
+                            <Rectangle Grid.Row="4" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
+
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" VerticalAlignment="Center">Trigger</TextBlock>
+                            <RadioButton Grid.Row="5" Grid.Column="1" Tag="0" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoTrigger">
+                                <local:IconLabelControl Icon="" Label="Single"/>
+                            </RadioButton>
+                            <RadioButton Grid.Row="6" Grid.Column="1" Tag="1" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoTrigger">
+                                <local:IconLabelControl Icon="🭊" Label="Rise"/>
+                            </RadioButton>
+                            <RadioButton Grid.Row="6" Grid.Column="2" Tag="2" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoTrigger">
+                                <local:IconLabelControl Icon="🬿" Label="Fall"/>
+                            </RadioButton>
+                            <StackPanel Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
+                                <NumberBox Text="3.0" x:Name="uidDsoTriggerLevel" />
+                            </StackPanel>
+                            <Rectangle Grid.Row="8" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
+
+                            <TextBlock Grid.Row="9" Grid.Column="0" VerticalAlignment="Center">Range</TextBlock>
+                            <ComboBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2" x:Name="uidDsoRangeVolts" MinWidth="120">
+                                <ComboBoxItem Content="300 mV" Tag="0" />
+                                <ComboBoxItem Content=" 2 V" Tag="1" />
+                                <ComboBoxItem Content=" 6 V" Tag="2" />
+                                <ComboBoxItem Content="12 V" Tag="3" />
+                                <ComboBoxItem Content="30 V" Tag="4" />
+                                <ComboBoxItem Content="60 V" Tag="5" />
+                            </ComboBox>
+                            <ComboBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2" x:Name="uidDsoRangeAmps" Visibility="Collapsed" MinWidth="120">
+                                <ComboBoxItem Content=" 10 mA" Tag="0" />
+                                <ComboBoxItem Content=" 30 mA" Tag="1" />
+                                <ComboBoxItem Content="150 mA" Tag="2" />
+                                <ComboBoxItem Content="300 mA" Tag="3" />
+                                <ComboBoxItem Content="  3 A" Tag="4" />
+                            </ComboBox>
+
 
                             <!-- No need to expose these, ever. The Pokit Pro app always does auto-range (according to Copilot)
                                         <ComboBox Grid.Row="9" Grid.ColumnSpan="5" Header="Range" x:Name="uidMMSetupPokitRange" IsEnabled="False"/>
                                         -->
                         </Grid>
+
                         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
                             <Button Content="OK" x:Name="iupMMSetupPokitOk" />
                             <Button Content="Cancel" x:Name="iupMMSetupPokitCancel" />

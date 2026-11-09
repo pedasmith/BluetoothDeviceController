@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display..
-    /// This class was automatically generated 2026-11-05::10:16
+    /// This class was automatically generated 2026-11-07::20:05
     /// </summary>
 
     public partial class PokitOscilloscopeMeter : INotifyPropertyChanged
@@ -45,7 +45,7 @@ namespace BluetoothProtocols
 
         Multimeter service Guid=e7481d2f-5781-442e-bb9a-fd4e3441dadc
             Multimeter_Data (DataGroup record)
-                MM_Settings characteristic has ModeSetting (Byte-->double) RangeSetting (Byte-->double) IntervalSetting (UInt32-->double)  Guid=53dc9a7a-bc19-4280-b76b-002d0e23b078
+                MM_Settings characteristic has ModeSetting (Byte-->double) MMRangeSetting (Byte-->double) IntervalSetting (UInt32-->double)  Guid=53dc9a7a-bc19-4280-b76b-002d0e23b078
                 MM_Data characteristic has Status (Byte-->double) Data (Single-->double) OperationMode (Byte-->double) Range (Byte-->double)  Guid=047d3559-8bee-423a-b229-4417fa603b90
 
 
@@ -183,14 +183,14 @@ namespace BluetoothProtocols
                 get { return _ModeSetting; }
                 set { if (value == _ModeSetting) return; _ModeSetting = value; OnPropertyChanged();}
             }
-            private double _RangeSetting = 0;
+            private double _MMRangeSetting = 0;
             /// <summary>
-            /// RangeSetting (U8 ) from Service=Multimeter and Characteristic=MM_Settings
+            /// MMRangeSetting (U8 ) from Service=Multimeter and Characteristic=MM_Settings
             ///</summary>
-            public double RangeSetting 
+            public double MMRangeSetting 
             { 
-                get { return _RangeSetting; }
-                set { if (value == _RangeSetting) return; _RangeSetting = value; OnPropertyChanged();}
+                get { return _MMRangeSetting; }
+                set { if (value == _MMRangeSetting) return; _MMRangeSetting = value; OnPropertyChanged();}
             }
             private double _IntervalSetting = 0;
             /// <summary>
@@ -257,7 +257,7 @@ namespace BluetoothProtocols
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = source.Name;
                 dest.ModeSetting = source.ModeSetting;
-                dest.RangeSetting = source.RangeSetting;
+                dest.MMRangeSetting = source.MMRangeSetting;
                 dest.IntervalSetting = source.IntervalSetting;
                 dest.Status = source.Status;
                 dest.Data = source.Data;
@@ -280,7 +280,7 @@ namespace BluetoothProtocols
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.ModeSetting = convert(source.ModeSetting, "");
-                dest.RangeSetting = convert(source.RangeSetting, "");
+                dest.MMRangeSetting = convert(source.MMRangeSetting, "");
                 dest.IntervalSetting = convert(source.IntervalSetting, "ms");
                 dest.Status = convert(source.Status, "");
                 dest.Data = convert(source.Data, "");
@@ -291,7 +291,7 @@ namespace BluetoothProtocols
 
             public override string[] ExportGetHeaders(IExportData _)
             {
-                return ["ModeSetting", "RangeSetting", "IntervalSetting", "Status", "Data", "OperationMode", "Range"];
+                return ["ModeSetting", "MMRangeSetting", "IntervalSetting", "Status", "Data", "OperationMode", "Range"];
             }
 
             public override void ExportRow(IExportData exporter)
@@ -299,7 +299,7 @@ namespace BluetoothProtocols
                 // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
                 // RowEnd and add in the timestamps
                 exporter.CellSet(ModeSetting);
-                exporter.CellSet(RangeSetting);
+                exporter.CellSet(MMRangeSetting);
                 exporter.CellSet(IntervalSetting);
                 exporter.CellSet(Status);
                 exporter.CellSet(Data);
@@ -309,7 +309,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {ModeSetting} {RangeSetting} {IntervalSetting} {Status} {Data} {OperationMode} {Range}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {ModeSetting} {MMRangeSetting} {IntervalSetting} {Status} {Data} {OperationMode} {Range}");
             }
         }
 //
@@ -2265,13 +2265,13 @@ namespace BluetoothProtocols
         private void NotifyMM_SettingsCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Multimeter_MM_Settings_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|ModeSetting U8|DEC|RangeSetting U32|DEC|IntervalSetting|ms");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|DEC|ModeSetting U8|DEC|MMRangeSetting U32|DEC|IntervalSetting|ms");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrMultimeter_Data.TimestampMostRecent = args.Timestamp;
             CurrMultimeter_Data.ModeSetting = vr.GetNextDouble();
-            CurrMultimeter_Data.RangeSetting = vr.GetNextDouble();
+            CurrMultimeter_Data.MMRangeSetting = vr.GetNextDouble();
             CurrMultimeter_Data.IntervalSetting = vr.GetNextDouble();
             OnPropertyChanged(MM_SettingsPropertyChangedName); // "MM_Settings"
         }
@@ -2321,12 +2321,12 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "MM_Settings", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|ModeSetting U8|DEC|RangeSetting U32|DEC|IntervalSetting|ms");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|DEC|ModeSetting U8|DEC|MMRangeSetting U32|DEC|IntervalSetting|ms");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
             CurrMultimeter_Data.ModeSetting = vr.GetNextDouble();
-            CurrMultimeter_Data.RangeSetting = vr.GetNextDouble();
+            CurrMultimeter_Data.MMRangeSetting = vr.GetNextDouble();
             CurrMultimeter_Data.IntervalSetting = vr.GetNextDouble();
             CurrMultimeter_Data.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(MM_SettingsPropertyChangedName); // "MM_Settings"

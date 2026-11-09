@@ -14,12 +14,18 @@
         <Setter Property="Fill" Value="{ThemeResource SystemControlForegroundBaseLowBrush}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
+    
+    <Style x:Key="ModeTileSeparatorThick" TargetType="Rectangle">
+        <Setter Property="Height" Value="2" />
+        <Setter Property="Fill" Value="{ThemeResource SystemControlForegroundBaseLowBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
 
     <Style x:Key="ModeTileRadioStyleEmphasize" TargetType="RadioButton" BasedOn="{StaticResource ModeTileRadioStyle}">
         <Setter Property="FontSize" Value="18" />
     </Style>
 
-    <Style x:Key="ModeTileRadioStyle" TargetType="RadioButton">
+    <Style x:Key="ModeTileRadioStyle" TargetType="RadioButton" >
         <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1" />
@@ -28,8 +34,6 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontSize" Value="14" />
-
-
 
         <Setter Property="Template">
             <Setter.Value>

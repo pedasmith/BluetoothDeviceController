@@ -182,7 +182,8 @@
 
 
     <Style x:Key="sAllFonts" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Candara,Segoe Fluent Icons,Segoe MDL2 Assets" />
+        <!-- Note: Cascadia Code is needed for LOWER LEFT BLOCK DIAGONAL UPPER MIDDLE LEFT TO LOWER RIGHT in Symbols for Legacy Computing -->
+        <Setter Property="FontFamily" Value="Candara,Segoe Fluent Icons,Segoe MDL2 Assets,Segoe UI Symbol,Global User Interface,Cascadia Code" />
         <Setter Property="Foreground" Value="{ThemeResource sAllFonts_Foreground}" />
         <Setter Property="IsTextSelectionEnabled" Value="True" />
     </Style>
