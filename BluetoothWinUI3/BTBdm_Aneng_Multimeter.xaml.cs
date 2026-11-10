@@ -7,7 +7,6 @@ using BluetoothWinUI3.Beeps;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using OxyPlot;
@@ -495,12 +494,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                             var ddata = await DevicePokit.ReadStatus_DeviceC4();
                             if (ddata != null)
                             {
-                                Log($"Firmware {ddata.FirmwareMajor}.{ddata.FirmwareMinor} Max Values:{ddata.MaxInputVoltage}V {ddata.MaxInputCurrent}A {ddata.MaxInputResistance}Ohm Sampling={ddata.MaxSamplingRate} ");
+                                var type = "C4";
+                                Log($"Firmware {type}: {ddata.FirmwareMajor}.{ddata.FirmwareMinor} Max Values:{ddata.MaxInputVoltage}V {ddata.MaxInputCurrent}A {ddata.MaxInputResistance}Ohm Sampling={ddata.MaxSamplingRate} Buffer={ddata.DeviceBufferSize} ");
                                 uidFirmware.Text = $"{ddata.FirmwareMajor}.{ddata.FirmwareMinor}";
                                 uidMaxAmps.Text = ddata.MaxInputCurrent.ToString();
                                 uidMaxVoltage.Text = ddata.MaxInputVoltage.ToString();
                                 uidMaxResistance.Text = ddata.MaxInputResistance.ToString();
                             }
+
+                            await DevicePokit.NotifyDSO_MetadataAsync();
+                            await DevicePokit.NotifyDSO_ReadingAsync();
                         }
                         break;
                     case MultimeterType.PokitProC5:
@@ -514,16 +517,15 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                             var ddata = await DevicePokit.ReadStatus_DeviceC5();
                             if (ddata != null)
                             {
-                                Log($"Firmware {ddata.FirmwareMajor}.{ddata.FirmwareMinor} Max Values:{ddata.MaxInputVoltage}V {ddata.MaxInputCurrent}A {ddata.MaxInputResistance}Ohm Sampling={ddata.MaxSamplingRate} ");
+                                var type = "C5";
+                                Log($"Firmware {type}: {ddata.FirmwareMajor}.{ddata.FirmwareMinor} Max Values:{ddata.MaxInputVoltage}V {ddata.MaxInputCurrent}A {ddata.MaxInputResistance}Ohm Sampling={ddata.MaxSamplingRate} Buffer={ddata.DeviceBufferSize} ");
                                 uidFirmware.Text = $"{ddata.FirmwareMajor}.{ddata.FirmwareMinor}";
                                 uidMaxAmps.Text = ddata.MaxInputCurrent.ToString();
                                 uidMaxVoltage.Text = ddata.MaxInputVoltage.ToString();
                                 uidMaxResistance.Text = ddata.MaxInputResistance.ToString();
                             }
 
-                            // TODO: Oscilloscope setup
                             await DevicePokit.NotifyDSO_MetadataAsync();
-                            //await DevicePokit.NotifyDSO_SettingsAsync();
                             await DevicePokit.NotifyDSO_ReadingAsync();
                         }
                         break;
@@ -557,7 +559,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
         // TODO: no battery at all?
         // The MEET MS-BDTP1A with device name MS-BO47Q1767 says it has a battery
-        // but it just pops out a protocol error???
+        // but it just pops out a protocol error??
         uiBTConnectionControl.SetBatteryVisibility(Visibility.Collapsed);
 
         // Some UX needs additional information
@@ -596,6 +598,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingC ?? "", 0); // 0=idle
         DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingD ?? "", 0); // 0=free
         DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingE ?? "", 0); // in volts/amps
+        DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingF ?? "", 4); // largest range usable by both volts and amps
     }
 
     private double ParseDouble(string rawSetting, double defaultValue)
@@ -786,6 +789,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     private void Device_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        bool handleOnUxThread = true;
         // TODO: oscilloscope
 
         // The raw oscilloscope data comes in fast and must be processed right away. 
@@ -795,6 +799,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             case PokitOscilloscopeMeter.DSO_MetadataPropertyChangedName:
                 DSO_Log += $"DSO:Scale: {DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataScale} At {DevicePokit.CurrDSO_Oscilloscope_Data.TimestampMostRecent.ToString("ss.ffffff")}\n"; // microseconds
                 DsoScale = DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataScale;
+                handleOnUxThread = false;
                 break;
             case PokitOscilloscopeMeter.DSO_ReadingPropertyChangedName:
                 if ((DSO_NReadingsSoFar + DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count) > DSO_RawData.Length)
@@ -813,33 +818,37 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 }
                 DSO_NReadingsSoFar += DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count;
                 if (DSO_NReadingsLeft == 0) DSO_ReadyToDisplay = true;
+                handleOnUxThread = DSO_ReadyToDisplay;
                 break;
         }
 
-        UIThreadHelper.CallOnUIThread(async () =>
+        if (handleOnUxThread) // handle quickly!
         {
-            if (!IsLoaded) return;
-            CurrSaveData?.History.UpdateDataHistory(DateTimeOffset.Now);
-            UpdateDeviceDataUX(e.PropertyName);
-
-
-            // If it's more than 10 minutes since the last mode check, do a mode reading
-            // Only applies to the Pokit devices
-            var now = DateTimeOffset.Now;
-            if (DevicePokit != null && now.Subtract(TimeOfMostRecentModeCheck).TotalMinutes >= 10.0)
+            UIThreadHelper.CallOnUIThread(async () =>
             {
-                TimeOfMostRecentModeCheck = now;
-                switch (CurrMultimeterType)
+                if (!IsLoaded) return;
+                CurrSaveData?.History.UpdateDataHistory(DateTimeOffset.Now);
+                UpdateDeviceDataUX(e.PropertyName);
+
+
+                // If it's more than 10 minutes since the last mode check, do a mode reading
+                // Only applies to the Pokit devices
+                var now = DateTimeOffset.Now;
+                if (DevicePokit != null && now.Subtract(TimeOfMostRecentModeCheck).TotalMinutes >= 10.0)
                 {
-                    case MultimeterType.PokitMeterC4:
-                        await DevicePokit.ReadStatus_StatusC4();
-                        break;
-                    case MultimeterType.PokitProC5:
-                        await DevicePokit.ReadStatus_StatusC5();
-                        break;
+                    TimeOfMostRecentModeCheck = now;
+                    switch (CurrMultimeterType)
+                    {
+                        case MultimeterType.PokitMeterC4:
+                            await DevicePokit.ReadStatus_StatusC4();
+                            break;
+                        case MultimeterType.PokitProC5:
+                            await DevicePokit.ReadStatus_StatusC5();
+                            break;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
     #endregion
 
@@ -1268,6 +1277,11 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
         var triggerStr = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting.ToString();
         var modeStr = DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting.ToString();
+        var rangeStr = DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting.ToString();
+        var isVolt = modeStr == "1" || modeStr == "2";
+        var isAmp = modeStr == "3" || modeStr == "4";
+        // Idle is neither volts nor amps
+
         foreach (var item in uidDsoSetupPokit_Mode.Children)
         {
             var rb = item as RadioButton;
@@ -1284,6 +1298,24 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                     break;
             }
         }
+
+        //if (isVolt)
+        {
+            foreach (var item in uidDsoRangeVolts.Items)
+            {
+                var tag = (item as ComboBoxItem)?.Tag as string;
+                if (tag == rangeStr) uidDsoRangeVolts.SelectedItem = item;
+            }
+        }
+        //if (isAmp)
+        {
+            foreach (var item in uidDsoRangeAmps.Items)
+            {
+                var tag = (item as ComboBoxItem)?.Tag as string;
+                if (tag == rangeStr) uidDsoRangeAmps.SelectedItem = item;
+            }
+        }
+
         uidDsoTriggerLevel.Value = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting;
 
     }
@@ -1328,6 +1360,24 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 }
             }
         }
+
+        // Setting the range depends in part on IsAmps or IsVolts
+        var isVolts = uidDsoRangeVolts.Visibility == Visibility.Visible;
+        var isAmps = uidDsoRangeAmps.Visibility == Visibility.Visible;
+        // Idle is neither volts nor amps
+        var selected = (isVolts ? uidDsoRangeVolts.SelectedItem : uidDsoRangeAmps.SelectedItem) as FrameworkElement;
+        if (selected != null && (isVolts || isAmps))
+        {
+            double value = 0;
+            var ok = double.TryParse(selected.Tag as string ?? "", out value);
+            if (ok)
+            {
+                DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting = value;
+            }
+        }
+
+
+
         var triggerstr = uidDsoTriggerLevel.Text;
         if (!String.IsNullOrEmpty(triggerstr) && double.TryParse(triggerstr, out double triggerlevel))
         {
@@ -1371,12 +1421,23 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             int READING_SPARCITY = 8; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
             ushort nSamples;
 
-            var maxRate = DevicePokit.CurrService_StatusC5_Data?.MaxSamplingRate ?? DevicePokit.CurrService_StatusC4_Data?.MaxSamplingRate ?? 1000; ;
+            double maxRate = 1000;
+            var bufferSize = 1000.0; // default value
+            switch (CurrMultimeterType)
+            {
+                case MultimeterType.PokitMeterC4:
+                    bufferSize = DevicePokit.CurrService_StatusC4_Data.DeviceBufferSize;
+                    maxRate = DevicePokit.CurrService_StatusC4_Data.MaxSamplingRate;
+                    break;
+                case MultimeterType.PokitProC5:
+                    bufferSize = DevicePokit.CurrService_StatusC5_Data.DeviceBufferSize;
+                    maxRate = DevicePokit.CurrService_StatusC5_Data.MaxSamplingRate;
+                    break;
+            }
             var maxSamplesPerSecond = maxRate * 1000 / READING_SPARCITY; // value is in KHz. 1000 == 1 MHz sample rate
             var minMicrosecondsPerSample = (1.0 / maxSamplesPerSecond) * 1_000_000.0;
             UInt32 timePerSampleInMicroseconds = (UInt32)minMicrosecondsPerSample;
 
-            var bufferSize = DevicePokit.CurrService_StatusC5_Data?.DeviceBufferSize ?? DevicePokit.CurrService_StatusC4_Data?.DeviceBufferSize ?? 2000;
             nSamples = (UInt16)(bufferSize / READING_SPARCITY); // Max number of samples
             nSamples = Math.Min(nSamples, (ushort)(bufferSize - 1000)); // TODO: must reduce the amount, otherwise it doesn't work.
             UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
@@ -1391,7 +1452,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             //DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = 0; // Free running
             //DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = 0; // N/A for free running
             //DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting = 1; // 1=VDC 2=VAC
-            DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting = 1; // 3; //  4; // 5=up to 60 V
+            //DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting = 1; // 3; //  4; // 5=up to 60 V
             DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting = samplingWindowInMicroseconds; // value in microseconds
             DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting = nSamples; 
 
@@ -1404,6 +1465,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             CurrSaveData.Preferences.DeviceSettingC = DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting.ToString();
             CurrSaveData.Preferences.DeviceSettingD = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting.ToString();
             CurrSaveData.Preferences.DeviceSettingE = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting.ToString();
+            CurrSaveData.Preferences.DeviceSettingF = DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting.ToString();
 
 
             // Audio calculations:
@@ -1444,7 +1506,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 CurrSaveData.Preferences.DeviceSettingB = DevicePokit.CurrMultimeter_Data.ModeSetting.ToString(); // numerical;
             }
         }
-
+#if NEVER_EVER_DEFINED
+// TOOD: why did I have the code do this? On the Pokit Meter, it makes the oscilloscope window vanish
         switch (CurrMultimeterType)
         {
             case MultimeterType.PokitMeterC4:
@@ -1466,6 +1529,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 }
                 break;
         }
+#endif
         AllSaveData.Save(" Meter control setup");
 
     }
@@ -1552,5 +1616,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     {
         uidDsoRangeVolts.Visibility = Visibility.Collapsed;
         uidDsoRangeAmps.Visibility = Visibility.Visible;
+    }
+    private void OnDsoPickedNeither(object sender, RoutedEventArgs e)
+    {
+        uidDsoRangeVolts.Visibility = Visibility.Collapsed;
+        uidDsoRangeAmps.Visibility = Visibility.Collapsed;
     }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

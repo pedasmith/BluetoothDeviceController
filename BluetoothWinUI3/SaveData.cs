@@ -606,6 +606,11 @@ namespace BluetoothWinUI3
         /// </summary>
         public string DeviceSettingE { get; set; } = "";
 
+        /// <summary>
+        /// Used by, e.g., Pokit meters for the last dsoRange. 
+        /// </summary>
+        public string DeviceSettingF { get; set; } = "";
+
     }
 
     /// <summary>

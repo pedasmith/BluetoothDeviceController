@@ -224,7 +224,7 @@
                             </Grid.RowDefinitions>
                             
                             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Sleep</TextBlock>
-                            <RadioButton Grid.Row="0" Grid.Column="1" Tag="0" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoMode">
+                            <RadioButton Grid.Row="0" Grid.Column="1" Tag="0" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoMode" Checked="OnDsoPickedNeither">
                                 <local:IconLabelControl Icon="💤" Label="Idle"/>
                             </RadioButton>
                             <Rectangle Grid.Row="1" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />

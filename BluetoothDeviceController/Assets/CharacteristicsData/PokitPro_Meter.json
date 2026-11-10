@@ -336,7 +336,8 @@
               "Type": "U8|DEC|DsoTriggerTypeSetting F32|FIXED|DsoTriggerLevelSetting U8|DEC|DsoModeSetting U8|DEC|DsoRangeSetting U32|DEC|DsoSamplingWindowSetting|ms U16|DEC|DsoNSamplesSetting",
               "REM TriggerTypeSetting": "0=free 1=rising 2=falling (3=resend)",
               "REM MODE": "0=idle 1=VDC 2=VAC 3=Amp DC 4=Amp AC",
-              "REM Range": "0=300mV 1=2V 2=6V 3=12V 4=30V 5=60V",
+              "REM Range (volts)": "0=300mV 1=2V 2=6V 3=12V 4=30V 5=60V",
+              "REM Range (amps)":  "0=10mA 1=30mA 2=150mA 3=300mA 4=3Amp",
               "IsWrite": true
             },
             {
