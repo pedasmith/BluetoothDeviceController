@@ -31,7 +31,7 @@
                 </Grid.RowDefinitions>
                 <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" ItemContainerStyle="{StaticResource sDeviceDataListItem}" x:Name="uiDeviceDataList">
                     <StackPanel Style="{StaticResource sDeviceDataPanelWidex3}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="uiMMInfoDisplay">
                             <TextBlock Style="{StaticResource sDevicePrimaryDataXLarge}" MinWidth="120" ><Run x:Name="uiValue" /></TextBlock>
                             <Border VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10">
                                 <Grid>
@@ -46,6 +46,18 @@
                                 </Grid>
                             </Border>
                         </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="uiDsoInfoDisplay" Visibility="Collapsed">
+                            <Border VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="uiDsoValues" Style="{StaticResource sDeviceData}">
+                                        <Run>Min:&#160;</Run><Run x:Name="uiDsoMin" />
+                                        <Run>Max:&#160;</Run><Run x:Name="uiDsoMax" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
                         <!-- Don't need a line color when there's just the one!
                         <Line Tag="ValueColor" Style="{StaticResource sGraphLineKey}" />
                         -->
@@ -80,7 +92,7 @@
             </Grid>
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="140"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
@@ -277,6 +289,7 @@
                                 <ComboBoxItem Content="300 mA" Tag="3" />
                                 <ComboBoxItem Content="  3 A" Tag="4" />
                             </ComboBox>
+                            <Slider x:Name="uiSparsity" Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2" Minimum="1" Maximum="5" TickFrequency="1" Value="2" />
 
 
                             <!-- No need to expose these, ever. The Pokit Pro app always does auto-range (according to Copilot)

@@ -253,7 +253,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
         // The line data must exist in the HistoricalData
         OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Multimeter Data")
-            .AddLineNoDefault("Value", "MultimeterValue")
+            .AddLineNoDefault("Value", "MeasuredValue")
             ;
         OxyPlotModel.Title = null;
         HistoricalDataUnits.MaxDataCount = 100; // turns the display into classic scrolling display
@@ -811,7 +811,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 {
                     DSO_FirstDataTimestamp = DevicePokit.CurrDSO_Oscilloscope_Data.TimestampMostRecent;
                 }
-                DSO_Log += $"DSO:Data: At {DevicePokit.CurrDSO_Oscilloscope_Data.TimestampMostRecent.ToString("ss.ffffff")}\n"; // microseconds
+                DSO_Log += $"DSO:Data: index={DSO_NReadingsSoFar} len={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count} expecting={DSO_NReadingsExpected} At {DevicePokit.CurrDSO_Oscilloscope_Data.TimestampMostRecent.ToString("ss.ffffff")}\n"; // microseconds
                 for (int i=0;i<DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count;i++)
                 {
                     DSO_RawData[i+ DSO_NReadingsSoFar] = DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw[i]; // Will multiply by DsoScale later
@@ -904,7 +904,13 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// </summary>
     /// 
     int DSO_NReadingsExpected = 0;
+    /// <summary>
+    /// Number of readings seen so far; updated when we get ___ 
+    /// </summary>
     int DSO_NReadingsSoFar = 0;
+    /// <summary>
+    /// Number of readings left is DSO_NReadingsExpected - DSO_NReadingsSoFa
+    /// </summary>
     int DSO_NReadingsLeft { get { return DSO_NReadingsExpected - DSO_NReadingsSoFar; } }
     double[] DSO_RawData = null;
     DateTimeOffset DSO_FirstDataTimestamp = DateTimeOffset.MinValue;
@@ -1053,14 +1059,17 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
             case DeviceSpecificTypePokit.DSO_ReadingPropertyChangedName:
                 // TODO: make the oscilloscope correctly instead of lashing it together
-                Log($"DSO Reading: !! N={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataRaw.Count} NLeft={DSO_NReadingsLeft}");
-                if (DSO_ReadyToDisplay)
+                Log($"DSO Reading: Ready to display={DSO_ReadyToDisplay}");
+                if (DSO_ReadyToDisplay)  // Always true: DSO_ReadingPropertyChangedName is only passed in after we have all data
                 {
                     DSO_ReadyToDisplay = false;
                     SetVisible(null, true);
+                    bool isVolt = DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataMode == 1 || DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataMode == 2;
                     // Make the display!
                     HistoricalDataUnits.Data.Clear();
                     var start = DSO_FirstDataTimestamp;
+                    double minValue = double.MaxValue;
+                    double maxValue = double.MinValue;
                     for (int i = 0; i < DSO_RawData.Length; i++)
                     {
                         var timestamp = start.AddTicks(i * ReadingDeltaInTicks);
@@ -1070,13 +1079,18 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                             TimestampMostRecent = timestamp,
                             DisplayNumber = DSO_RawData[i] * DsoScale,
                             Multiplier = 1.0,
-                            DisplayUnits = "V",
-                            Mode = DeviceSpecificSensorDataUnits.DmmMode.Volts,
+                            DisplayUnits = "V", // TODO: correct units
+                            Mode = DeviceSpecificSensorDataUnits.DmmMode.Volts, // TODO: correct units
                         };
                         HistoricalDataUnits.Data.Add(dataUnits);
-
+                        maxValue = Math.Max(maxValue, dataUnits.MeasuredValue);
+                        minValue = Math.Min(minValue, dataUnits.MeasuredValue);
                     }
+                    Log($"DSO: About to show graph");
                     ShowGraphFromBatchData();
+
+                    uiDsoMin.Text = ValueToString(minValue, DevicePokit.CurrDSO_Oscilloscope_Data);
+                    uiDsoMax.Text = ValueToString(maxValue, DevicePokit.CurrDSO_Oscilloscope_Data);
                     Log(DSO_Log);
                 }
                 break;
@@ -1101,7 +1115,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 // Beep or speak as appropriate
                 if (CurrSensor_DataUnits.Mode == DeviceSpecificSensorDataUnits.DmmMode.Continuity)
                 {
-                    if (CurrSensor_DataUnits.MultimeterValue == 1.0) // 0=no continuity 1=continuity
+                    if (CurrSensor_DataUnits.MeasuredValue == 1.0) // 0=no continuity 1=continuity
                     {
                         var now = DateTimeOffset.Now;
                         if (now.Subtract(TimeOfLastContinuityBeep).TotalSeconds >= CONTINUITY_BEEP_WAIT_IN_SECONDS)
@@ -1154,6 +1168,18 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         //                uiBTConnectionControl.SetBatteryLevel(CurrBattery_DataUnits.BatteryLevel);
         //            }
         //        }
+    }
+
+    private string ValueToString(double value, PokitOscilloscopeMeter.DSO_Oscilloscope_Data data)
+    {
+        var suffix = data.IsVolts() ? "V" : "A";
+        if (value < 1)
+        {
+            suffix = "m" + suffix;
+            value = value * 1000;
+        }
+        var retval = value.ToString("F3") + suffix;
+        return retval;
     }
 
     // End of UX changes
@@ -1278,8 +1304,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         var triggerStr = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting.ToString();
         var modeStr = DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting.ToString();
         var rangeStr = DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting.ToString();
-        var isVolt = modeStr == "1" || modeStr == "2";
-        var isAmp = modeStr == "3" || modeStr == "4";
+        var isVolt = DevicePokit.CurrDSO_Oscilloscope_Data.IsVolts();
+        var isAmp = DevicePokit.CurrDSO_Oscilloscope_Data.IsAmps();
         // Idle is neither volts nor amps
 
         foreach (var item in uidDsoSetupPokit_Mode.Children)
@@ -1414,11 +1440,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // TODO: Setting up the oscilloscope mode!
         if (uiInstrumentType.IsOn) // DSO
         {
-
             DSO_Log = "Starting:\n";
             DSO_ReadyToDisplay = false;
 
-            int READING_SPARCITY = 8; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
+            uiDsoInfoDisplay.Visibility = Visibility.Visible;
+            uiMMInfoDisplay.Visibility = Visibility.Collapsed;
+
+            int READING_SPARSITY = 2; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
+            READING_SPARSITY = 1 << ((int)uiSparsity.Value - 1); // uiSparsity is 1..5. 1<<0..4 is 1, 2, 4, 8, 16
+            Log($"DBG: Sparsity UX={uiSparsity.Value} value={READING_SPARSITY}");
+
             ushort nSamples;
 
             double maxRate = 1000;
@@ -1434,11 +1465,11 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                     maxRate = DevicePokit.CurrService_StatusC5_Data.MaxSamplingRate;
                     break;
             }
-            var maxSamplesPerSecond = maxRate * 1000 / READING_SPARCITY; // value is in KHz. 1000 == 1 MHz sample rate
+            var maxSamplesPerSecond = maxRate * 1000 / READING_SPARSITY; // value is in KHz. 1000 == 1 MHz sample rate
             var minMicrosecondsPerSample = (1.0 / maxSamplesPerSecond) * 1_000_000.0;
             UInt32 timePerSampleInMicroseconds = (UInt32)minMicrosecondsPerSample;
 
-            nSamples = (UInt16)(bufferSize / READING_SPARCITY); // Max number of samples
+            nSamples = (UInt16)(bufferSize / READING_SPARSITY); // Max number of samples
             nSamples = Math.Min(nSamples, (ushort)(bufferSize - 1000)); // TODO: must reduce the amount, otherwise it doesn't work.
             UInt32 samplingWindowInMicroseconds = nSamples * timePerSampleInMicroseconds; // total time
 
@@ -1476,6 +1507,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         else
         {
             CurrSaveData.Preferences.DeviceSettingA = "mm";
+
+            uiDsoInfoDisplay.Visibility = Visibility.Collapsed;
+            uiMMInfoDisplay.Visibility = Visibility.Visible;
+
             var newPokitMMMode = DevicePokit.CurrMultimeter_Data.ModeSetting; // Was set in the SwitchesToModeSettings() call above.
 
             var settingsBytes = DevicePokit.CurrMultimeter_Data.GetMM_Setting_Bytes();

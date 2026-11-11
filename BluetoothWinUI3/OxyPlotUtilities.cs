@@ -143,6 +143,7 @@ internal static class OxyPlotUtilities
         { "RespirationRate", new LineColorStyle(OxyColors.Green, LineStyle.Dash, WIDTH_SECONDARY)},
 
         // Multimeter
+        { "MeasuredValue", new LineColorStyle(OxyColor.FromRgb(0x00, 0x66, 0xCC)) }, // Copilot selected this shade of Engineering Blue
         { "MultimeterValue", new LineColorStyle(OxyColor.FromRgb(0x00, 0x66, 0xCC)) }, // Copilot selected this shade of Engineering Blue
         { "Value", new LineColorStyle(OxyColors.Gray)},
     };

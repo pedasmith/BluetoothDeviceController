@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using System;
 using System.Threading.Tasks;
 
 namespace BluetoothWinUI3
@@ -48,6 +49,8 @@ namespace BluetoothWinUI3
         {
             if (Popup.IsOpen) return ContentDialogResult.None; // can't show twice!
 
+            Popup.Opened += OnPopupOpen;
+
             PopupClosedCompletion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             Result = ContentDialogResult.None;
             Popup.Closed += Popup_Closed;
@@ -56,12 +59,21 @@ namespace BluetoothWinUI3
 
             Popup.IsOpen = true;
 
-            PrimaryButton.Focus(Microsoft.UI.Xaml.FocusState.Programmatic);
 
             await PopupClosedCompletion.Task;
-
+            Popup.Opened -= OnPopupOpen;
             return Result;
         }
+
+        private void OnPopupOpen(object? sender, object e)
+        {
+            // Why Keyboard and not the obviously more correct Programmatic? because WinUI3
+            // has another bug, this one around focus changes. 
+            // https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.controls.control.focus?view=winrt-28000
+            var focusResult = PrimaryButton.Focus(Microsoft.UI.Xaml.FocusState.Keyboard);
+            ;
+        }
+
         public void Close()
         {
             Popup.IsOpen = false;

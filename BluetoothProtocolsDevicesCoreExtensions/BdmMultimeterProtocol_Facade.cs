@@ -100,7 +100,12 @@ public class BdmMultimeterDisplayFacade
         }
     }
     public double Multiplier = 1.0;
-    public double MultimeterValue { get { return DisplayNumber * Multiplier; } }
+    /// <summary>
+    /// Final value (DisplayNumber * Multiplier)
+    /// Remember that DisplayNumber might be "1.2" when the real value is 1200 when multiplier is 1000. This is common, not uncommon.
+    /// The oscilloscope and the Pokit values always have a multiplier of 1.0
+    /// </summary>
+    public double MeasuredValue { get { return DisplayNumber * Multiplier; } }
 
 #if !STANDALONE
     public override BdmMultimeterDisplayFacade Clone(string name = null)
@@ -307,7 +312,7 @@ public class BdmMultimeterDisplayFacade
     {
         // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
         // RowEnd and add in the timestamps
-        exporter.CellSet(MultimeterValue);
+        exporter.CellSet(MeasuredValue);
         exporter.CellSet(DisplayText);
         exporter.CellSet(DisplayUnits);
         exporter.CellSet(ModeStr);
@@ -317,7 +322,7 @@ public class BdmMultimeterDisplayFacade
 #endif
     public override string ToString()
     {
-        return $"{DisplayText}{DisplayUnits} measure={ModeStr} overload={Overload} value={MultimeterValue} other={DisplayOther}";
+        return $"{DisplayText}{DisplayUnits} measure={ModeStr} overload={Overload} value={MeasuredValue} other={DisplayOther}";
     }
 }
 
@@ -928,6 +933,26 @@ public static class Pokit_Meter_Multimeter_Extensions
         //await dw.StoreAsync(); will throw, which is silly
         var buffer = dw.DetachBuffer();
         return buffer.ToArray();
+    }
+
+    public enum DsoMode {  Idle=0, VDC=1, VAC=2, AmpsDC=4, AmpsAC=5 };
+
+    /// <summary>
+    /// Returns true iff the mode is VDC or VAC
+    /// </summary>
+    public static bool IsVolts(this PokitOscilloscopeMeter.DSO_Oscilloscope_Data data)
+    {
+        var retval = data.DsoDataMode == (double)DsoMode.VDC || data.DsoDataMode == (double)DsoMode.VAC;
+        return retval;
+    }
+
+    /// <summary>
+    /// Returns true iff the mode is AmpsDC or AmpsVAC
+    /// </summary>
+    public static bool IsAmps(this PokitOscilloscopeMeter.DSO_Oscilloscope_Data data)
+    {
+        var retval = data.DsoDataMode == (double)DsoMode.AmpsDC || data.DsoDataMode == (double)DsoMode.AmpsAC;
+        return retval;
     }
 
 
