@@ -1,8 +1,10 @@
-﻿using OxyPlot;
+﻿using BluetoothProtocols;
+using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
+using Windows.Gaming.Input.ForceFeedback;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -13,6 +15,31 @@ namespace BluetoothWinUI3;
 
 internal static class OxyPlotUtilities
 {
+    /// <summary>
+    /// Every PlotModel used has, for the Axes[0], the default X DateTime axis. This is what
+    /// almost all device need. But the Pokit meter / oscilloscope also needs an axis that's 
+    /// marked in milliseconds. The AlternateAxis is where the alternate axes can be stashed.
+    /// 
+    /// There is always an alternate axes. It is initialized to be the same as the original axes.
+    /// </summary>
+    private static readonly Dictionary<PlotModel, Axis> AlternateAxes = new();
+    private static readonly Dictionary<PlotModel, Axis> OriginalAxes = new();
+
+    public static void SetAlternativeAxis(this PlotModel oxyPlotModel, Axis axis)
+    {
+        AlternateAxes[oxyPlotModel] = axis;
+    }
+
+    public static void UseAlternateAxis(this PlotModel oxyPlotModel)
+    {
+        oxyPlotModel.Axes[0] = AlternateAxes[oxyPlotModel];
+    }
+
+    public static void UseOriginalAxis(this PlotModel oxyPlotModel)
+    {
+        oxyPlotModel.Axes[0] = OriginalAxes[oxyPlotModel];
+    }
+
     public static PlotModel MakeOxyPlotModel(string title)
     {
         PlotModel retval = new PlotModel
@@ -31,70 +58,20 @@ internal static class OxyPlotUtilities
                         Color = OxyColor.FromAColor(0x80, OxyColors.Yellow),
                         StrokeThickness = 10,
                         MarkerType = MarkerType.None,
-                        DataFieldX = "TimestampMostRecentDT", // All sensor data has a TimestampMostRecentDT
+                        DataFieldX = nameof(BTCommonMetaData<>.TimestampMostRecentDT), // All sensor data has a TimestampMostRecentDT
                     } 
             }
         };
+        OriginalAxes[retval] = retval.Axes[0];
+        AlternateAxes[retval] = retval.Axes[0];
         return retval;
     }
 
-#if OLD_CODE_TO_BE_DELETED
-    private static LineSeries MakeHighlightSeries()
-    {
-        var retval = new LineSeries
-        {
-            Color = OxyColor.FromAColor(0x80, OxyColors.Yellow),
-            StrokeThickness = 10,
-            MarkerType = MarkerType.None,
-            DataFieldX = "TimestampMostRecentDT", // All sensor data has a TimestampMostRecentDT
-        };
-        return retval;
-    }
-#endif
 
     public static PlotModel MakeOxyPlotModelSimple(string title, int step, int range, string axisTitle, string propertyName)
     {
         PlotModel retval = MakeOxyPlotModel(title)
             .AddLine(step, range, axisTitle, propertyName);
-#if ORIGINAL_OLD_CODE_TO_BE_DELETED
-        PlotModel retval = new PlotModel
-        {
-            Title = title,
-            PlotAreaBorderColor = OxyColors.Transparent,
-            TextColor = OxyColors.Black,
-            Axes =
-            {
-                new DateTimeAxis { Position = AxisPosition.Bottom },
-                new LinearAxis
-                {
-                    Position = AxisPosition.Left,
-                    PositionTier = 0, // PositionTier=0 is the innermost tier. //DOC:
-                    MajorGridlineColor = OxyColors.Black,
-                    MajorGridlineStyle = LineStyle.Solid,
-                    MajorGridlineThickness = 1,
-                    MajorStep = step, // Battery percentage run 0..100
-                    MinimumRange= range, // Set this match your graphing needs
-                    Title=axisTitle, // Set to something the user will recognize
-                    Key=propertyName // Key has to match the YAxisKey in the Series
-                },
-            },
-            Series =
-            {
-                MakeHighlightSeries(),
-                new LineSeries
-                {
-                    Title = axisTitle,
-                    Color = PreferredPlotColors[0], // OxyColors.DarkBlue
-                    StrokeThickness = 0.75,
-                    MarkerType = MarkerType.None,
-                    DataFieldX = "TimestampMostRecentDT", // All sensor data has a TimestampMostRecentDT
-                    DataFieldY = propertyName, // Must match the data in the sensor data class
-                    YAxisKey= propertyName, // This key has to match the one in the Axis field.
-                    // Suggestion is to set the YAxisKey to be the same as the DataFieldY
-                },
-            }
-        };
-#endif
         return retval;
     }
 
@@ -181,7 +158,7 @@ internal static class OxyPlotUtilities
 
         LinearAxis axis = null;
         bool hasAxis = false;
-        foreach (var item in retval.Axes)
+        foreach (var item in retval.Axes) // Will pick from the y axes. The X axis has no key.
         {
             if (item.Key == axisKey)
             {
@@ -235,7 +212,7 @@ internal static class OxyPlotUtilities
             LineStyle = style.LineStyle,
 
             MarkerType = MarkerType.None,
-            DataFieldX = "TimestampMostRecentDT",
+            DataFieldX = nameof(BTCommonMetaData<>.TimestampMostRecentDT), 
             DataFieldY = propertyName,
             YAxisKey = axisKey,
         };
@@ -254,19 +231,6 @@ internal static class OxyPlotUtilities
         foreach (var item in value.Axes)
         {
             if (item.Position == position)
-            {
-                retval++;
-            }
-        }
-        return retval;
-    }
-
-    private static int NLeft(this PlotModel value)
-    {
-        int retval = 0;
-        foreach (var item in value.Axes)
-        {
-            if (item.Position == AxisPosition.Left)
             {
                 retval++;
             }
@@ -368,6 +332,10 @@ internal static class OxyPlotUtilities
         {
             axis.IsAxisVisible = isVisible;
         }
+        // Either axis might be visible. 
+        OriginalAxes[oxyPlotModel].IsAxisVisible = isVisible;
+        AlternateAxes[oxyPlotModel].IsAxisVisible = isVisible;
+
         uiOxyPlot.InvalidatePlot(false); // false means just update for the axis
     }
 

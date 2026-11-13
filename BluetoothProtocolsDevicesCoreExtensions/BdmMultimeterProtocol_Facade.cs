@@ -65,6 +65,11 @@ public class BdmMultimeterDisplayFacade
     : BTCommonMetaData<BdmMultimeterDisplayFacade>
 #endif
 {
+    /// <summary>
+    /// Used in oscilloscope mode, when we need the graph to be measured in milliseconds sinces the
+    /// start of the data collection
+    /// </summary>
+    public double TimeSinceStartInMilliseconds { get; set; } = 0;
     public string DisplayText = "";
     public double DisplayNumber = double.NaN;
     public bool Overload = false;
@@ -76,7 +81,6 @@ public class BdmMultimeterDisplayFacade
         Idle, // PokitOscilloscopeMeter like PokitPro and PokitMeter
     }
     // DmmMode {  Other, XXVolts, XXDutyCycle, XXHertz, XXTemperature, XXResistance, XXDiode, Continuity, XXCapacitance, XXAmps }
-    // Missing: continuity? Which is resistance with beeps!
 
     public DmmMode Mode { get; set; } = DmmMode.Other;
     public string ModeStr

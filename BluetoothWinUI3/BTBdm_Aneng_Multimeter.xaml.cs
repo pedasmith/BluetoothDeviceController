@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using OxyPlot;
+using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
@@ -18,7 +19,6 @@ using Utilities;
 using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Security.Cryptography.Core;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -253,8 +253,15 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
         // The line data must exist in the HistoricalData
         OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Multimeter Data")
-            .AddLineNoDefault("Value", "MeasuredValue")
+            .AddLineNoDefault("Value", nameof(BdmMultimeterDisplayFacade.MeasuredValue))
             ;
+        var millisecondAxis = new LinearAxis()
+        {
+            Position = AxisPosition.Bottom,
+            Title = "Milliseconds",
+            Minimum = 0,
+        };
+        OxyPlotModel.SetAlternativeAxis(millisecondAxis);
         OxyPlotModel.Title = null;
         HistoricalDataUnits.MaxDataCount = 100; // turns the display into classic scrolling display
 
@@ -377,6 +384,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
     #endregion
 
+    private DateTimeOffset ReconnectTime = DateTimeOffset.Now;
     /// <summary>
     /// Called by e.g., the ConnectionControl when the user wants to reconnect to the device (sensor).
     /// The initial connect is handled by the controls in Control_DataContextChanged() when the
@@ -470,6 +478,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
         // Modify: tell the device to start sending sensor and battery data back.
         // Only one of these will actually work
+        ReconnectTime = DateTimeOffset.Now;
         switch (CurrMultimeterType)
         {
             case MultimeterType.Bdm:
@@ -921,9 +930,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     //DateTime ReadingStartTime = DateTime.MinValue;
 
     /// <summary>
-    /// 
+    /// A tick is 100 nanoseconds. There are 10 of them in a microsecond. 100 of them is 10 microseconds.
+    /// The default is 100 which matches "10 microseconds per sample" set in 2024-06-08.
     /// </summary>
-    long ReadingDeltaInTicks = 100; // Good default; matches the "10 microseconds per sample" set in 2024-06-08
+    long ReadingDeltaInTicks = 100; 
     List<double> RawReadings = new List<double>();
     double DsoScale = 1.0;
 
@@ -943,8 +953,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             case MultimeterType.FortuneFS9952:
                 // Modify: Always update these even though in practice they are only set once.
                 CurrSensor_Data = DeviceBdmFamily.CurrMultimeter_Data; // Modify: select the right data
-                                                                       // CurrSensorSecondary_Data = Device.CurrHumidity_Data; // Modify: pick secondary data as appropriate
-                                                                       // CurrBattery_Data = Device.CurrBattery_Data; // Modify: if your device doesn't have a battery, remove battery stuff!
+                // CurrSensorSecondary_Data = Device.CurrHumidity_Data; // Modify: pick secondary data as appropriate
+                // CurrBattery_Data = Device.CurrBattery_Data; // Modify: if your device doesn't have a battery, remove battery stuff!
+
                 var data = CurrSensor_Data.DataFFF1;
                 if (data == null) data = CurrSensor_Data.DataFFF4;
                 if (data == null) return; // not real data
@@ -1003,6 +1014,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             case DeviceSpecificType.MultimeterDataFFF1PropertyChangedName:
             case DeviceSpecificType.MultimeterDataFFF4PropertyChangedName: // UX is more complex than just matching the parsed state
                 CurrSensor_DataUnits = DeviceSpecificSensorDataUnits.CopyToWithConvertAndCreate(CurrSensor_Data, Parser, CurrSensor_DataUnits, KnownDeviceName, UserPreferences.Global.Convert);
+                CurrSensor_DataUnits.TimeSinceStartInMilliseconds = DateTimeOffset.Now.Subtract(ReconnectTime).TotalMilliseconds;
                 other = CurrSensor_DataUnits.DisplayOther;
                 var hasAuto = other.Contains(BdmMultimeterDisplayFacade.AutoStr); // "AUTO "
                 hasHold = other.Contains(BdmMultimeterDisplayFacade.HoldStr); // "Hold "
@@ -1058,7 +1070,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 break;
 
             case DeviceSpecificTypePokit.DSO_ReadingPropertyChangedName:
-                // TODO: make the oscilloscope correctly instead of lashing it together
                 Log($"DSO Reading: Ready to display={DSO_ReadyToDisplay}");
                 if (DSO_ReadyToDisplay)  // Always true: DSO_ReadingPropertyChangedName is only passed in after we have all data
                 {
@@ -1077,6 +1088,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                         {
                             Name = KnownDeviceName,
                             TimestampMostRecent = timestamp,
+                            TimeSinceStartInMilliseconds = ((double)(i*ReadingDeltaInTicks)) / (10000.0), 
                             DisplayNumber = DSO_RawData[i] * DsoScale,
                             Multiplier = 1.0,
                             DisplayUnits = "V", // TODO: correct units
@@ -1437,7 +1449,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         SwitchesToModeSettings(); // Push data into the CurrMultimeter_Data and Dso!
         var userSetMMMode = DevicePokit.CurrMultimeter_Data.ModeSetting;
 
-        // TODO: Setting up the oscilloscope mode!
         if (uiInstrumentType.IsOn) // DSO
         {
             DSO_Log = "Starting:\n";
@@ -1445,6 +1456,10 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
             uiDsoInfoDisplay.Visibility = Visibility.Visible;
             uiMMInfoDisplay.Visibility = Visibility.Collapsed;
+            OxyPlotModel.UseAlternateAxis(); // Alternate axis is milliseconds
+            // TODO: make a helper function for this. series[0] is the highlight line
+            (OxyPlotModel.Series[0] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimeSinceStartInMilliseconds);
+            (OxyPlotModel.Series[1] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimeSinceStartInMilliseconds);
 
             int READING_SPARSITY = 2; // can be 1 2 4 8 16. 1 means as much resolution as possible, 16 as sparse as possible.
             READING_SPARSITY = 1 << ((int)uiSparsity.Value - 1); // uiSparsity is 1..5. 1<<0..4 is 1, 2, 4, 8, 16
@@ -1510,6 +1525,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
             uiDsoInfoDisplay.Visibility = Visibility.Collapsed;
             uiMMInfoDisplay.Visibility = Visibility.Visible;
+            OxyPlotModel.UseOriginalAxis(); // Original axes is DateTimeAxis
+            (OxyPlotModel.Series[0] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimestampMostRecentDT);
+            (OxyPlotModel.Series[1] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimestampMostRecentDT);
 
             var newPokitMMMode = DevicePokit.CurrMultimeter_Data.ModeSetting; // Was set in the SwitchesToModeSettings() call above.
 
