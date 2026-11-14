@@ -90,35 +90,36 @@
                     </TextBlock>
                 </Border>
             </Grid>
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="140"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0">
-                    <TextBlock Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
-                    <local:BTConnectionControl x:Name="uiBTConnectionControl" />
-                </StackPanel>
-                <Border Grid.Column="2" VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,0">
-                    <StackPanel Orientation="Horizontal">
-                        <ToggleButton Content="Pause" x:Name="uiPauseButton" Click="OnPause" />
-                        <Button Content="About" x:Name="uiAboutPokit" >
-                            <Button.Flyout>
-                                <Flyout>
-                                    <TextBlock>
-                                        <Run>Firmware:&#160;&#160;&#160;</Run><Run x:Name="uidFirmware" /><LineBreak />
-                                        <Run>Maximum Amps:&#160;&#160;&#160; </Run><Run x:Name="uidMaxAmps" /><LineBreak />
-                                        <Run>Maximum Volts:&#160;&#160;&#160; </Run><Run x:Name="uidMaxVoltage" /><LineBreak />
-                                        <Run>Maximum Resistance:&#160;&#160;&#160;</Run><Run x:Name="uidMaxResistance" /><LineBreak />
-                                     </TextBlock>
-                                </Flyout>
-                            </Button.Flyout>
-                        </Button>
-                        <Button Content="Control" x:Name="uiSetupPokit" Click="OnSetupPokit" />
+            <CommandBar Grid.Row="2" VerticalAlignment="Bottom" DefaultLabelPosition="Bottom">
+                <CommandBar.Content>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Style="{StaticResource sDeviceMinorText}"><Run>Bluetooth Address: </Run><Run x:Name="uiAddress"/></TextBlock>
+                        <local:BTConnectionControl x:Name="uiBTConnectionControl" />
                     </StackPanel>
-                </Border>
-            </Grid>
+                </CommandBar.Content>
+                <CommandBar.PrimaryCommands>
+                    <AppBarToggleButton Icon="Pause" Label="Pause" x:Name="uiPauseButton" Click="OnPause" />
+                    <AppBarButton Icon="OpenPane" Label="Control" x:Name="uiSetupPokit" Click="OnSetupPokit" Visibility="Collapsed"/>
+                    <AppBarButton Icon="RepeatOne" Label="Again" x:Name="uiPokitAgain" Click="OnPokitRepeatCommand" Visibility="Collapsed"/>
+                    <AppBarButton Icon="ZoomIn" Label="Zoom In" x:Name="uiPokitZoomIn" Click="OnPokitZoomIn" Visibility="Collapsed" />
+                    <AppBarButton Icon="ZoomOut" Label="Zoom Out" x:Name="uiPokitZoomOut" Click="OnPokitZoomOut" Visibility="Collapsed" />
+                    <AppBarButton Icon="Back" Label="Pan Left" x:Name="uiPokitPanLeft" Click="OnPokitPanLeft" Visibility="Collapsed" />
+                    <AppBarButton Icon="Forward" Label="Pan Right" x:Name="uiPokitPanRight" Click="OnPokitPanRight" Visibility="Collapsed" />
+                    <AppBarButton Icon="BackToWindow" Label="Reset" x:Name="uiPokitZoomPanReset" Click="OnPokitZoomPanReset" Visibility="Collapsed" />
+                    <AppBarButton Icon="Help" Label="About" x:Name="uiAboutPokit" >
+                        <AppBarButton.Flyout>
+                            <Flyout>
+                                <TextBlock>
+                                    <Run>Firmware:&#160;&#160;&#160;</Run><Run x:Name="uidFirmware" /><LineBreak />
+                                    <Run>Maximum Amps:&#160;&#160;&#160; </Run><Run x:Name="uidMaxAmps" /><LineBreak />
+                                    <Run>Maximum Volts:&#160;&#160;&#160; </Run><Run x:Name="uidMaxVoltage" /><LineBreak />
+                                    <Run>Maximum Resistance:&#160;&#160;&#160;</Run><Run x:Name="uidMaxResistance" /><LineBreak />
+                                </TextBlock>
+                            </Flyout>
+                        </AppBarButton.Flyout>
+                    </AppBarButton>
+                </CommandBar.PrimaryCommands>
+            </CommandBar>
 
             <Popup x:Name="uipMMSetupPokit" 
                    HorizontalOffset="10" VerticalOffset="0" Margin="5" 
@@ -289,7 +290,8 @@
                                 <ComboBoxItem Content="300 mA" Tag="3" />
                                 <ComboBoxItem Content="  3 A" Tag="4" />
                             </ComboBox>
-                            <Slider x:Name="uiSparsity" Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2" Minimum="1" Maximum="5" TickFrequency="1" Value="2" />
+                            <!-- Sparcity of 4 is the sweet spot: it doesn't drop data like smaller values and it's pretty fast.  -->
+                            <Slider x:Name="uiSparsity" Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2" Minimum="1" Maximum="5" TickFrequency="1" Value="4" Visibility="Collapsed" />
 
 
                             <!-- No need to expose these, ever. The Pokit Pro app always does auto-range (according to Copilot)

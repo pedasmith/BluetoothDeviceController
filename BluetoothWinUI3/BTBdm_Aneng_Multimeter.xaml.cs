@@ -467,6 +467,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 DevicePokit.PropertyChanged += Device_PropertyChanged;
                 DevicePokit.Status.OnBluetoothStatus += Status_OnBluetoothStatus;
                 DevicePokit.ble.ConnectionStatusChanged += Ble_ConnectionStatusChanged;
+                uiSetupPokit.Visibility = Visibility.Visible;
                 break;
         }
 
@@ -1449,13 +1450,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         SwitchesToModeSettings(); // Push data into the CurrMultimeter_Data and Dso!
         var userSetMMMode = DevicePokit.CurrMultimeter_Data.ModeSetting;
 
-        if (uiInstrumentType.IsOn) // DSO
+        if (uiInstrumentType.IsOn) // DSO aka "dso" mode
         {
             DSO_Log = "Starting:\n";
             DSO_ReadyToDisplay = false;
 
             uiDsoInfoDisplay.Visibility = Visibility.Visible;
             uiMMInfoDisplay.Visibility = Visibility.Collapsed;
+            uiPauseButton.Visibility = Visibility.Collapsed;
             OxyPlotModel.UseAlternateAxis(); // Alternate axis is milliseconds
             // TODO: make a helper function for this. series[0] is the highlight line
             (OxyPlotModel.Series[0] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimeSinceStartInMilliseconds);
@@ -1490,7 +1492,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
             DSO_RawData = new double[nSamples];
 
-            DSO_NReadingsSoFar = 0;
             DSO_NReadingsExpected = nSamples; // will be updated by the metadata
             ReadingDeltaInTicks = timePerSampleInMicroseconds * 10;
 
@@ -1503,6 +1504,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting = nSamples; 
 
             Log($"DSO Settings: SamplingWindow={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting} microSeconds NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting}");
+            DSO_NReadingsSoFar = 0;
             var bytes = DevicePokit.CurrDSO_Oscilloscope_Data.GetDso_Setting_Bytes();
             var resok = await DevicePokit.WriteDSO_Settings(bytes, (GattCommunicationStatus)999);
             ;
@@ -1513,6 +1515,13 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             CurrSaveData.Preferences.DeviceSettingE = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting.ToString();
             CurrSaveData.Preferences.DeviceSettingF = DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting.ToString();
 
+            // Repeat is only valid in in oscilloscope mode "dso" and not multimeter mode "mm"
+            uiPokitAgain.Visibility = Visibility.Visible;
+            uiPokitZoomIn.Visibility = Visibility.Visible;
+            uiPokitZoomOut.Visibility = Visibility.Visible;
+            uiPokitPanLeft.Visibility = Visibility.Visible;
+            uiPokitPanRight.Visibility = Visibility.Visible;
+            uiPokitZoomPanReset.Visibility = Visibility.Visible;
 
             // Audio calculations:
             // Common audio is 1_000 HZ.
@@ -1525,6 +1534,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
             uiDsoInfoDisplay.Visibility = Visibility.Collapsed;
             uiMMInfoDisplay.Visibility = Visibility.Visible;
+            uiPauseButton.Visibility = Visibility.Visible;
             OxyPlotModel.UseOriginalAxis(); // Original axes is DateTimeAxis
             (OxyPlotModel.Series[0] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimestampMostRecentDT);
             (OxyPlotModel.Series[1] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimestampMostRecentDT);
@@ -1558,6 +1568,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 IsIdle = false;
                 CurrSaveData.Preferences.DeviceSettingB = DevicePokit.CurrMultimeter_Data.ModeSetting.ToString(); // numerical;
             }
+
+            // Repeat is only valid in in oscilloscope mode "dso" and not multimeter mode "mm"
+            uiPokitAgain.Visibility = Visibility.Collapsed;
+            uiPokitZoomIn.Visibility = Visibility.Collapsed;
+            uiPokitZoomOut.Visibility = Visibility.Collapsed;
+            uiPokitPanLeft.Visibility = Visibility.Collapsed;
+            uiPokitPanRight.Visibility = Visibility.Collapsed;
+            uiPokitZoomPanReset.Visibility = Visibility.Collapsed;
         }
 #if NEVER_EVER_DEFINED
 // TOOD: why did I have the code do this? On the Pokit Meter, it makes the oscilloscope window vanish
@@ -1674,5 +1692,66 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     {
         uidDsoRangeVolts.Visibility = Visibility.Collapsed;
         uidDsoRangeAmps.Visibility = Visibility.Collapsed;
+    }
+
+    private async void OnPokitRepeatCommand(object sender, RoutedEventArgs e)
+    {
+        Log($"DSO Settings: SamplingWindow={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting} microSeconds NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting}");
+        DSO_NReadingsSoFar = 0;
+        var bytes = DevicePokit.CurrDSO_Oscilloscope_Data.GetDso_Setting_Bytes();
+        var resok = await DevicePokit.WriteDSO_Settings(bytes, (GattCommunicationStatus)999);
+    }
+    private static void ZoomAxis(Axis axis, double factor)
+    {
+        double center = (axis.ActualMinimum + axis.ActualMaximum) / 2.0;
+        double range = axis.ActualMaximum - axis.ActualMinimum;
+
+        double newRange = range / factor;
+
+        axis.Zoom(
+            center - newRange / 2.0,
+            center + newRange / 2.0);
+    }
+    private void OnPokitZoomIn(object sender, RoutedEventArgs e)
+    {
+        ZoomAxis(OxyPlotModel.Axes[0], 2);
+        OxyPlotModel.InvalidatePlot(false);
+    }
+
+    private void OnPokitZoomOut(object sender, RoutedEventArgs e)
+    {
+        ZoomAxis(OxyPlotModel.Axes[0], 0.5);
+        OxyPlotModel.InvalidatePlot(false);
+    }
+
+    double SCROLL_AMOUNT = 0.10; // 1/10th
+    private void OnPokitPanLeft(object sender, RoutedEventArgs e)
+    {
+        var axis = OxyPlotModel.Axes[0];
+        double range = axis.ActualMaximum - axis.ActualMinimum;
+        double delta = range * SCROLL_AMOUNT;
+
+        //axis.Pan(range * SCROLL_AMOUNT);      // scroll right/up
+        axis.Zoom(axis.ActualMinimum - delta, axis.ActualMaximum - delta);
+        OxyPlotModel.InvalidatePlot(false);
+    }
+
+    private void OnPokitPanRight(object sender, RoutedEventArgs e)
+    {
+        var axis = OxyPlotModel.Axes[0];
+        double range = axis.ActualMaximum - axis.ActualMinimum;
+        double delta = range * SCROLL_AMOUNT;
+
+        //axis.Pan(range * SCROLL_AMOUNT);      // scroll right/up
+        axis.Zoom(axis.ActualMinimum + delta, axis.ActualMaximum + delta);
+        OxyPlotModel.InvalidatePlot(false);
+    }
+
+    private void OnPokitZoomPanReset(object sender, RoutedEventArgs e)
+    {
+        var axis = OxyPlotModel.Axes[0];
+        axis.Reset();
+        OxyPlotModel.InvalidatePlot(false);
+
     }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name
