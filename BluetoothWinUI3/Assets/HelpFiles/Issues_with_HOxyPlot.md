@@ -21,3 +21,11 @@ Instead, I have to start with the axes being visible, and then when I have two d
 
 The OxyPlot code has its own set of color definitions. AFAICT, this is required by C#, and all of the different systems (Silverlight, WPF, etc) that it supports. But it would be super helpful to have a seperate set of code that handles the conversions. In my own app, I created a tiny "UtilitiesOxyColor.cs" class with trivial conversions.
 
+## Mouse control of cursors is awkward
+
+I'm making an oscilloscope graph. Modern oscilloscope have little measuring cursors: the user can position the cursors and some measurements (like the distance between the cursors) is displayed automatically. But there's no obvious way to let the user move the annotations around.
+
+## Events are all obsolete?
+
+The events (like the axis translations changing) are all marked as obsolete. I rely on these events to make the cursor controls work.
+

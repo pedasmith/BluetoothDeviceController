@@ -110,7 +110,7 @@
                 <CommandBar.PrimaryCommands>
                     <AppBarToggleButton Icon="Pause" Label="Pause" x:Name="uiPauseButton" Click="OnPause" />
                     <AppBarButton Icon="OpenPane" Label="Control" x:Name="uiSetupPokit" Click="OnSetupPokit" Visibility="Collapsed"/>
-                    <AppBarButton Icon="RepeatOne" Label="Again" x:Name="uiPokitAgain" Click="OnPokitRepeatCommand" Visibility="Collapsed"/>
+                    <AppBarButton Icon="RepeatOne" Label="Again" ToolTipService.ToolTip="Repeat" x:Name="uiPokitAgain" Click="OnPokitRepeatCommand" Visibility="Collapsed"/>
                     <AppBarButton Icon="ZoomIn" Label="Zoom In" x:Name="uiPokitZoomIn" Click="OnPokitZoomIn" Visibility="Collapsed" />
                     <AppBarButton Icon="ZoomOut" Label="Zoom Out" x:Name="uiPokitZoomOut" Click="OnPokitZoomOut" Visibility="Collapsed" />
                     <AppBarButton Icon="Back" Label="Pan Left" x:Name="uiPokitPanLeft" Click="OnPokitPanLeft" Visibility="Collapsed" />

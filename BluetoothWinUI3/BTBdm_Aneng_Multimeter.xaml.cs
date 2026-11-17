@@ -21,6 +21,7 @@ using Utilities;
 using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Security.Cryptography.Core;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -263,16 +264,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             Title = "Milliseconds",
             Minimum = 0,
         };
+#pragma warning disable CS0618 // Type or member is obsolete. Nothing I can do about OxyPlot marking this obsolete without a replacement.
         millisecondAxis.AxisChanged += MillisecondAxis_AxisChanged;
         millisecondAxis.TransformChanged += MillisecondAxis_TransformChanged;
         OxyPlotModel.SetAlternativeAxis(millisecondAxis);
         OxyPlotModel.Title = null;
 
-#pragma warning disable CS0618 // Type or member is obsolete. Nothing I can do about OxyPlot marking this obsolete without a replacement.
         OxyPlotModel.Updated += OxyPlotModel_Updated; // called when InvalidatePlot() is called
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        InitializeCursors(); // they start off invisible
+        CursorsInitializeOxyplotAnnotations(); // they start off invisible
         HistoricalDataUnits.MaxDataCount = 100; // turns the display into classic scrolling display
 
         // "Sensor Data" is for the main graph title  and is human-readable
@@ -294,13 +295,13 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     private void MillisecondAxis_TransformChanged(object sender, EventArgs e)
     {
         Log($"DBG: AxisChanged: calling PositionThumbsAtCursors");
-        PositionThumbsAtCursors();
+        CursorsPositionThumbsAtAnnotations();
     }
 
     private void MillisecondAxis_AxisChanged(object sender, AxisChangedEventArgs e)
     {
         Log($"DBG: AxisChanged: calling PositionThumbsAtCursors");
-        PositionThumbsAtCursors();
+        CursorsPositionThumbsAtAnnotations();
     }
 
     /// <summary>
@@ -962,6 +963,11 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     double[] DSO_RawData = null;
     DateTimeOffset DSO_FirstDataTimestamp = DateTimeOffset.MinValue;
     bool DSO_ReadyToDisplay = false;
+
+    /// <summary>
+    /// When true, we initialize the cursors to the default position. Subsequent displays do not.
+    /// </summary>
+    bool DSO_FirstDisplay = true;
     string DSO_Log = "";
 
     //int Curr_DSO_NMetadataEvents = -10;
@@ -1046,7 +1052,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         bool updateDisplay = false;
         string other ="";
         bool hasHold = false;
-        MakeCursorsInvisible(); // In UpdateDeviceDataUX for all updates. Will call MakeCursorsVisible() for the case of dso oscilloscope data
+        CursorsSetVisibility(Visibility.Collapsed); // In UpdateDeviceDataUX for all updates. Will call CursorsSetVisibility() for the case of dso oscilloscope data
 
         switch (name)
         {
@@ -1128,7 +1134,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                         {
                             Name = KnownDeviceName,
                             TimestampMostRecent = timestamp,
-                            TimeSinceStartInMilliseconds = ((double)(i*ReadingDeltaInTicks)) / (10000.0), 
+                            TimeSinceStartInMilliseconds = ((double)(i * ReadingDeltaInTicks)) / (10000.0),
                             DisplayNumber = DSO_RawData[i] * DsoScale,
                             Multiplier = 1.0,
                             DisplayUnits = "V", // TODO: correct units
@@ -1138,17 +1144,17 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                         maxValue = Math.Max(maxValue, dataUnits.MeasuredValue);
                         minValue = Math.Min(minValue, dataUnits.MeasuredValue);
                     }
-                    int thickIndex = (int)(((double)HistoricalDataUnits.Count) * 0.10);
-                    int thinIndex = (int)(((double)HistoricalDataUnits.Count) * 0.90);
-                    Cursors[THICK_INDEX].OxyAnnotation.X = HistoricalDataUnits.Data[thickIndex].TimeSinceStartInMilliseconds;
-                    Cursors[THIN_INDEX].OxyAnnotation.X = HistoricalDataUnits.Data[thinIndex].TimeSinceStartInMilliseconds;
-                    // MakeCursorsVisible();
+                    if (DSO_FirstDisplay)
+                    {
+                        CursorsInitializeFromHistoricalData();
+                    }
 
                     uiDsoMin.Text = ValueToString(minValue, DevicePokit.CurrDSO_Oscilloscope_Data);
                     uiDsoMax.Text = ValueToString(maxValue, DevicePokit.CurrDSO_Oscilloscope_Data);
                     Log($"DSO: About to show graph");
-                    MakeCursorsVisible();
+                    CursorsSetVisibility(Visibility.Visible);
                     ShowGraphFromBatchData();
+                    DSO_FirstDisplay = false;
                     Log("Delayed DSO LOG\n" + DSO_Log);
                 }
                 break;
@@ -1289,7 +1295,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             }
         }
 
-        // InvalidatePlot will trigger an update and call OxyPlotModel_Updated which calls PositionThumbsAtCursors
+        // InvalidatePlot will trigger an update and call OxyPlotModel_Updated which calls CursorsPositionThumbsAtAnnotations
         Log($"DBG: ShowGraphFromBatchData: about to InvalidatePlot");
         uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
     }
@@ -1499,14 +1505,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
         if (uiInstrumentType.IsOn) // DSO aka "dso" mode
         {
-            DSO_Log = "Starting:\n";
+            DSO_Log = "";
             DSO_ReadyToDisplay = false;
 
             uiDsoInfoDisplay.Visibility = Visibility.Visible;
             uiMMInfoDisplay.Visibility = Visibility.Collapsed;
             uiPauseButton.Visibility = Visibility.Collapsed;
             OxyPlotModel.UseAlternateAxis(); // Alternate axis is milliseconds
-            MakeCursorsInvisible(); // will be visible again after we get data
+            CursorsSetVisibility(Visibility.Collapsed); // will be visible again after we get data
             // TODO: make a helper function for this. series[0] is the highlight line
             (OxyPlotModel.Series[0] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimeSinceStartInMilliseconds);
             (OxyPlotModel.Series[1] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimeSinceStartInMilliseconds);
@@ -1813,10 +1819,96 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         OxyPlotModel.InvalidatePlot(true);
     }
 
+    #region Cursors
+
+
     /// <summary>
-    /// Positions the cursor thumbs at the horizontal positions corresponding to the thick and thin cursors.
+    /// List of cursors (thumbs / lineAnnotations) for the oscilloscope.
     /// </summary>
-    private void PositionThumbsAtCursors()
+    private readonly List<CursorData> Cursors = new();
+    const int THICK_INDEX = 0;
+    const int THIN_INDEX = 1;
+    double THUMB_RADIUS = 10; // half of the size which is 20 in the XAML
+    readonly double CURSOR_TOLERANCE = 0.05;
+
+    /// <summary>
+    /// Mini class that combines the XamlThumb, the OxyPlot OxyAnnotation, and the current state.
+    /// </summary>
+    private class CursorData(FrameworkElement xamlThumb, LineAnnotation oxyAnnotation)
+    {
+        //public enum PinStateType { Unpinned, Pinned, Invisible };
+        //public PinStateType PinState = PinStateType.Invisible;
+        public FrameworkElement XamlThumb = xamlThumb;
+        public LineAnnotation OxyAnnotation = oxyAnnotation;
+        public bool IsDragging = false;
+    }
+
+
+    /// <summary>
+    /// Called when the user clicks on a thumb.
+    /// </summary>
+    private void OnMousePlotDown(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (CursorVisibility == Visibility.Collapsed) return;
+        if (OxyPlotModel.Annotations.Count == 0) return; // can never happen because when cursors are visible the annoations are set.
+        var xAxis = OxyPlotModel.Axes[0];
+
+        var p = e.GetCurrentPoint(uiOxyPlot).Position;
+        double dataX = xAxis.InverseTransform(p.X);
+        var tolerance = (xAxis.ActualMaximum - xAxis.ActualMinimum) * CURSOR_TOLERANCE;
+
+        foreach (var cursor in Cursors)
+        {
+            if (Math.Abs(dataX - cursor.OxyAnnotation.X) < tolerance)
+            {
+                cursor.IsDragging = true;
+                cursor.XamlThumb.CapturePointer(e.Pointer);
+            }
+            else
+            {
+                cursor.IsDragging = false; // Always reset just to be certain
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Called when the user is dragging a cursor. Will move the cursors that's marked as being dragged.
+    /// </summary>
+    private void OnMousePlotMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        var xAxis = OxyPlotModel.Axes[0];
+        var p = e.GetCurrentPoint(uiOxyPlot).Position;
+
+        foreach (var cursor in Cursors)
+        {
+            if (cursor.IsDragging)
+            {
+                cursor.OxyAnnotation.X = xAxis.InverseTransform(p.X);
+                OxyPlotModel.InvalidatePlot(false); // To move the annotation cursor lines
+                CursorsPositionThumbsAtAnnotations();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Called when the user releases the mouse.
+    /// </summary>
+    private void OnMousePlotReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        Log($"DBG: Thumb: Released");
+        foreach (var cursor in Cursors)
+        {
+            cursor.IsDragging = false;
+            cursor.XamlThumb.ReleasePointerCaptures();
+        }
+    }
+    
+
+    /// <summary>
+    /// Positions the XAML cursor thumbs at the horizontal positions corresponding to the OxyAnnotation cursors.
+    /// </summary>
+    private void CursorsPositionThumbsAtAnnotations()
     {
         var xAxis = OxyPlotModel.Axes[0] as LinearAxis;
         if (xAxis == null) return; // can never happen; it's always linear
@@ -1831,63 +1923,21 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
 
     /// <summary>
-    /// Squirrels away the cursor positions in display coordinates. Used when, e.g., panning the screen: the user can 
+    /// Sets the cursor position from the historical data. Is often just done
+    /// once when the first DSO Oscilloscope trace is set up.
     /// </summary>
-    private void SaveThubsPositions()
+    void CursorsInitializeFromHistoricalData()
     {
-
-    }
-    private void OnMousePlotDown(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        OnMouseClickCursorMaybe(e);
-    }
-
-
-
-    private void OnMousePlotMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        var xAxis = OxyPlotModel.Axes[0];
-        var p = e.GetCurrentPoint(uiOxyPlot).Position;
-
-        foreach (var cursor in Cursors)
-        {
-            if (cursor.IsDragging)
-            {
-                cursor.OxyAnnotation.X = xAxis.InverseTransform(p.X);
-                OxyPlotModel.InvalidatePlot(false); // To move the annotation cursor lines
-                PositionThumbsAtCursors();
-            }
-        }
-    }
-
-    private void OnMousePlotReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        Log($"DBG: Thumb: Released");
-        foreach (var cursor in Cursors)
-        {
-            cursor.IsDragging = false;
-            cursor.XamlThumb.ReleasePointerCaptures();
-        }
+        int thickIndex = (int)(((double)HistoricalDataUnits.Count) * 0.10);
+        int thinIndex = (int)(((double)HistoricalDataUnits.Count) * 0.90);
+        Cursors[THICK_INDEX].OxyAnnotation.X = HistoricalDataUnits.Data[thickIndex].TimeSinceStartInMilliseconds;
+        Cursors[THIN_INDEX].OxyAnnotation.X = HistoricalDataUnits.Data[thinIndex].TimeSinceStartInMilliseconds;
     }
 
     /// <summary>
-    /// List of cursors (thumbs / lineAnnotations) for the oscilloscope.
+    /// Creates the OxyPlot OxyAnnotations (LineAnnotation) for the two cursors.
     /// </summary>
-    private readonly List<CursorData> Cursors = new();
-    const int THICK_INDEX = 0;
-    const int THIN_INDEX = 1;
-    double THUMB_RADIUS = 10; // half of the size which is 20 in the XAML
-    readonly double CURSOR_TOLERANCE = 0.05;
-    private class CursorData(FrameworkElement xamlThumb, LineAnnotation oxyAnnotation)
-    {
-        public enum PinStateType { Unpinned, Pinned, Invisible };
-        public PinStateType PinState = PinStateType.Invisible;
-        public FrameworkElement XamlThumb = xamlThumb;
-        public LineAnnotation OxyAnnotation = oxyAnnotation;
-        public bool IsDragging = false;
-    }
-
-    private void InitializeCursors()
+    private void CursorsInitializeOxyplotAnnotations()
     {
         LineAnnotation cursorThick = new LineAnnotation
         {
@@ -1912,58 +1962,35 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         Cursors.Add(new CursorData(uiCursorThinThumb, cursorThin));
     }
 
+    /// <summary>
+    /// Says if the cursors are visible or collapsed. SEt by the MakeVisible and MakeInvisible methods.
+    /// </summary>
     Visibility CursorVisibility = Visibility.Collapsed;
-    private void MakeCursorsVisible()
+    private void CursorsSetVisibility(Visibility visibility)
     {
-        if (CursorVisibility == Visibility.Visible) return;
-
-        OxyPlotModel.Annotations.Clear();
-        CursorVisibility = Visibility.Visible;
-        foreach (var cursor in Cursors)
+        if (CursorVisibility == visibility) return;
+        CursorVisibility = visibility;
+        switch (visibility)
         {
-            cursor.XamlThumb.Visibility = Visibility.Visible;
-            OxyPlotModel.Annotations.Add(cursor.OxyAnnotation);
-        }
-    }
-
-    private void MakeCursorsInvisible()
-    {
-        if (CursorVisibility == Visibility.Collapsed) return;
-
-        OxyPlotModel.Annotations.Clear();
-        CursorVisibility = Visibility.Collapsed;
-        foreach(var cursor in Cursors)
-        {
-            cursor.XamlThumb.Visibility = Visibility.Collapsed;
-        }
-    }
-
-    private void OnMouseClickCursorMaybe(Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        if (CursorVisibility == Visibility.Collapsed) return;
-        if (OxyPlotModel.Annotations.Count == 0) return; // can never happen
-        var xAxis = OxyPlotModel.Axes[0];
-
-        var p = e.GetCurrentPoint(uiOxyPlot).Position;
-        double dataX = xAxis.InverseTransform(p.X);
-        var tolerance = (xAxis.ActualMaximum - xAxis.ActualMinimum) * CURSOR_TOLERANCE;
-
-        foreach (var cursor in Cursors)
-        {
-            if (Math.Abs(dataX - cursor.OxyAnnotation.X) < tolerance)
-            {
-                cursor.IsDragging = true;
-                cursor.XamlThumb.CapturePointer(e.Pointer);
-            }
-            else
-            {
-                cursor.IsDragging = false;
-            }
+            case Visibility.Visible:
+                OxyPlotModel.Annotations.Clear();
+                foreach (var cursor in Cursors)
+                {
+                    cursor.XamlThumb.Visibility = Visibility.Visible;
+                    OxyPlotModel.Annotations.Add(cursor.OxyAnnotation);
+                }
+                break;
+            case Visibility.Collapsed:
+                OxyPlotModel.Annotations.Clear();
+                foreach (var cursor in Cursors)
+                {
+                    cursor.XamlThumb.Visibility = Visibility.Collapsed;
+                }
+                break;
         }
     }
 
 
-
-
+    #endregion
 
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name
