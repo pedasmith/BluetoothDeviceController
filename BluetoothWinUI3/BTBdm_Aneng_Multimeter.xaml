@@ -65,6 +65,16 @@
                 </GridView>
 
                 <oxyplot:PlotView Grid.Row="2" x:Name="uiOxyPlot" Background="Transparent" Visibility="Visible"  />
+                <Ellipse Grid.Row="2" x:Name="uiCursorThickThumb" Visibility="Collapsed"
+                         Fill="DarkBlue" 
+                         Width="20" Height="20" 
+                         VerticalAlignment="Top" HorizontalAlignment="Left" Margin="40,0,0,0" 
+                         PointerPressed="OnMousePlotDown" PointerMoved="OnMousePlotMoved" PointerReleased="OnMousePlotReleased" />
+                <Ellipse Grid.Row="2" x:Name="uiCursorThinThumb" Visibility="Collapsed"
+                         Fill="DarkSlateBlue" 
+                         Width="20" Height="20" 
+                         VerticalAlignment="Top" HorizontalAlignment="Left" Margin="40,0,0,0" 
+                         PointerPressed="OnMousePlotDown" PointerMoved="OnMousePlotMoved" PointerReleased="OnMousePlotReleased" />
                 <Grid Grid.Row="2" x:Name="uiDataGridPanel" Visibility="Collapsed" >
                     <tv:TableView x:Name="uiTableView" IsReadOnly="True" />
                 </Grid>
@@ -106,6 +116,7 @@
                     <AppBarButton Icon="Back" Label="Pan Left" x:Name="uiPokitPanLeft" Click="OnPokitPanLeft" Visibility="Collapsed" />
                     <AppBarButton Icon="Forward" Label="Pan Right" x:Name="uiPokitPanRight" Click="OnPokitPanRight" Visibility="Collapsed" />
                     <AppBarButton Icon="BackToWindow" Label="Reset" x:Name="uiPokitZoomPanReset" Click="OnPokitZoomPanReset" Visibility="Collapsed" />
+                    <AppBarButton Icon="BackToWindow" Label="Redraw" x:Name="uiPokitRedraw" Click="OnPokitRedraw" Visibility="Collapsed" />
                     <AppBarButton Icon="Help" Label="About" x:Name="uiAboutPokit" >
                         <AppBarButton.Flyout>
                             <Flyout>
@@ -291,7 +302,9 @@
                                 <ComboBoxItem Content="  3 A" Tag="4" />
                             </ComboBox>
                             <!-- Sparcity of 4 is the sweet spot: it doesn't drop data like smaller values and it's pretty fast.  -->
+                            <!--
                             <Slider x:Name="uiSparsity" Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2" Minimum="1" Maximum="5" TickFrequency="1" Value="4" Visibility="Collapsed" />
+                            -->
 
 
                             <!-- No need to expose these, ever. The Pokit Pro app always does auto-range (according to Copilot)
