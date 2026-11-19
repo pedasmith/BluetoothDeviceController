@@ -846,7 +846,13 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         {
             case PokitOscilloscopeMeter.DSO_MetadataPropertyChangedName:
                 DSO_Log += $"DSO:Scale: {DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataScale} At {DevicePokit.CurrDSO_Oscilloscope_Data.TimestampMostRecent.ToString("ss.ffffff")}\n"; // microseconds
+                DSO_Log += $"DSO:Scale:additional: SamplingWindow={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataSamplingWindow} NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataNSamples} RateHz={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingRate}";
                 DsoScale = DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataScale;
+                // DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingRate is in Hz
+                var timePerSampleInSeconds = 1.0 / (double)DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingRate;
+                var timePerSampleInMicroseconds = timePerSampleInSeconds * 1_000_000.0;
+                DsoReadingDeltaInTicks = timePerSampleInMicroseconds * 10;  // This is the requested amount; we'll get the actual amount from the Metadata
+
                 handleOnUxThread = false;
                 break;
             case PokitOscilloscopeMeter.DSO_ReadingPropertyChangedName:
@@ -944,8 +950,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     DateTimeOffset TimeOfLastContinuityBeep = DateTimeOffset.MinValue;
     const double CONTINUITY_BEEP_WAIT_IN_SECONDS = 1.0;
 
-    // TODO: Oscilloscope data
-
     /// <summary>
     /// Number of Read values are left before we're done. We know ahead of time how many
     /// values to expect (e.g., we ask for exactly 500 samples, so that's what we get)
@@ -977,7 +981,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// A tick is 100 nanoseconds. There are 10 of them in a microsecond. 100 of them is 10 microseconds.
     /// The default is 100 which matches "10 microseconds per sample" set in 2024-06-08.
     /// </summary>
-    long ReadingDeltaInTicks = 100; 
+    double DsoReadingDeltaInTicks = 100; 
     List<double> RawReadings = new List<double>();
     double DsoScale = 1.0;
 
@@ -1109,10 +1113,9 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 break;
 
 
-            // TODO: Oscilloscope data. The UX is not yet implemented, but the data is coming in.
             case DeviceSpecificTypePokit.DSO_MetadataPropertyChangedName:
                 SetVisible(null, false);
-                Log($"DSO Metadata changed:  Status={DevicePokit.CurrDSO_Oscilloscope_Data.DsoStatus} Scale={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataScale} NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataNsamples} Hz={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingRate}");
+                Log($"DSO Metadata changed:  Status={DevicePokit.CurrDSO_Oscilloscope_Data.DsoStatus} Scale={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataScale} NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataNSamples} Hz={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingRate}");
                 break;
 
             case DeviceSpecificTypePokit.DSO_ReadingPropertyChangedName:
@@ -1129,16 +1132,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                     double maxValue = double.MinValue;
                     for (int i = 0; i < DSO_RawData.Length; i++)
                     {
-                        var timestamp = start.AddTicks(i * ReadingDeltaInTicks);
+                        var timestamp = start.AddTicks((long)(i * DsoReadingDeltaInTicks));
                         var dataUnits = new DeviceSpecificSensorDataUnits()
                         {
                             Name = KnownDeviceName,
                             TimestampMostRecent = timestamp,
-                            TimeSinceStartInMilliseconds = ((double)(i * ReadingDeltaInTicks)) / (10000.0),
+                            TimeSinceStartInMilliseconds = ((double)(i * DsoReadingDeltaInTicks)) / (10000.0),
                             DisplayNumber = DSO_RawData[i] * DsoScale,
                             Multiplier = 1.0,
-                            DisplayUnits = "V", // TODO: correct units
-                            Mode = DeviceSpecificSensorDataUnits.DmmMode.Volts, // TODO: correct units
+                            DisplayUnits = BdmMultimeterDisplayFacade.UnitsFromPokitMode(DevicePokit.CurrDSO_Oscilloscope_Data.DsoDataMode),
+                            Mode = DevicePokit.CurrDSO_Oscilloscope_Data.IsVolts() ? DeviceSpecificSensorDataUnits.DmmMode.Volts : DeviceSpecificSensorDataUnits.DmmMode.Amps,
                         };
                         HistoricalDataUnits.Data.Add(dataUnits);
                         maxValue = Math.Max(maxValue, dataUnits.MeasuredValue);
@@ -1234,15 +1237,16 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         //        }
     }
 
+
     private string ValueToString(double value, PokitOscilloscopeMeter.DSO_Oscilloscope_Data data)
     {
         var suffix = data.IsVolts() ? "V" : "A";
-        if (value < 1)
+        if (Math.Abs(value) < 1)
         {
             suffix = "m" + suffix;
             value = value * 1000;
         }
-        var retval = value.ToString("F3") + suffix;
+        var retval = value.ToString("F2") + suffix;
         return retval;
     }
 
@@ -1477,7 +1481,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         }
         else
         {
-            // TODO: handle invalid value?
+            // Can never happen because the XAML is always correctly tagged
+            DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = 0;
         }
     }
 
@@ -1513,7 +1518,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             uiPauseButton.Visibility = Visibility.Collapsed;
             OxyPlotModel.UseAlternateAxis(); // Alternate axis is milliseconds
             CursorsSetVisibility(Visibility.Collapsed); // will be visible again after we get data
-            // TODO: make a helper function for this. series[0] is the highlight line
+            // NOTE: Maybe make a helper function for this? series[0] is the highlight line
             (OxyPlotModel.Series[0] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimeSinceStartInMilliseconds);
             (OxyPlotModel.Series[1] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimeSinceStartInMilliseconds);
 
@@ -1524,7 +1529,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             ushort nSamples;
 
             double maxRate = 1000;
-            var bufferSize = 1000.0; // default value
+            double bufferSize = 2048.0; // default value
             switch (CurrMultimeterType)
             {
                 case MultimeterType.PokitMeterC4:
@@ -1543,24 +1548,19 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             //UInt32 timePerSampleInMicroseconds = (UInt32)minMicrosecondsPerSample;
 
             nSamples = (ushort)bufferSize; // (UInt16)(bufferSize / READING_SPARSITY); // Max number of samples
-            //nSamples = Math.Min(nSamples, (ushort)(bufferSize - 1000)); // TODO: must reduce the amount, otherwise it doesn't work.
+            //nSamples = Math.Min(nSamples, (ushort)(bufferSize - 1000)); // NOTE: must reduce the amount, otherwise it doesn't work.
             UInt32 samplingWindowInMicroseconds = 16000; //  nSamples * timePerSampleInMicroseconds; // total time
             UInt32 timePerSampleInMicroseconds = samplingWindowInMicroseconds / nSamples;
 
             DSO_RawData = new double[nSamples];
 
             DSO_NReadingsExpected = nSamples; // will be updated by the metadata
-            ReadingDeltaInTicks = timePerSampleInMicroseconds * 10;
+            DsoReadingDeltaInTicks = timePerSampleInMicroseconds * 10;  // This is the requested amount; we'll get the actual amount from the Metadata
 
-
-            //DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = 0; // Free running
-            //DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = 0; // N/A for free running
-            //DevicePokit.CurrDSO_Oscilloscope_Data.DsoModeSetting = 1; // 1=VDC 2=VAC
-            //DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting = 1; // 3; //  4; // 5=up to 60 V
             DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting = samplingWindowInMicroseconds; // value in microseconds
             DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting = nSamples; 
 
-            Log($"DSO Settings: SamplingWindow={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting} microSeconds NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting}");
+            Log($"DSO Settings: Setting samplingWindow={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting} microSeconds NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting}");
             DSO_NReadingsSoFar = 0;
             var bytes = DevicePokit.CurrDSO_Oscilloscope_Data.GetDso_Setting_Bytes();
             var resok = await DevicePokit.WriteDSO_Settings(bytes, (GattCommunicationStatus)999);
@@ -1579,7 +1579,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             uiPokitPanLeft.Visibility = Visibility.Visible;
             uiPokitPanRight.Visibility = Visibility.Visible;
             uiPokitZoomPanReset.Visibility = Visibility.Visible;
-            uiPokitRedraw.Visibility = Visibility.Visible;
+            uiPokitCursorMenu.Visibility = Visibility.Visible;
 
             // Audio calculations:
             // Common audio is 1_000 HZ.
@@ -1634,7 +1634,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             uiPokitPanLeft.Visibility = Visibility.Collapsed;
             uiPokitPanRight.Visibility = Visibility.Collapsed;
             uiPokitZoomPanReset.Visibility = Visibility.Collapsed;
-            uiPokitRedraw.Visibility = Visibility.Collapsed;
+            uiPokitCursorMenu.Visibility = Visibility.Collapsed;
         }
 #if NEVER_EVER_DEFINED
 // TOOD: why did I have the code do this? On the Pokit Meter, it makes the oscilloscope window vanish
@@ -1664,52 +1664,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
     }
 
-#if NEVER_EVER_DEFINED
-/// It turns out that the Pokit Pro doesn't expose the range settings in the app. It's always on auto-range!
-    private void OnMMPokitSetupClick(object sender, RoutedEventArgs e)
-    {
-        var tag = (sender as RadioButton)?.Tag as string;
-        if (tag == null) return; // can never happen
-        int mode;
-        if (!int.TryParse(tag, out mode)) return; // can never happen
-        var combo = uidMMSetupPokitRange;
-        combo.Items.Clear();
-        int currRange = (int)CurrSensor_DataPokit.OperationMode;
-        switch (mode)
-        {
-            case 1:
-            case 2: // volts
-                combo.IsEnabled = true;
-                combo.Items.Add(new ComboBoxItem() { Content = "Autorange", Tag = "255", IsSelected=(currRange==255) });
-                break;
 
-            case 3:
-            case 4: // amps
-                combo.IsEnabled = true;
-                combo.Items.Add(new ComboBoxItem() { Content = "Autorange", Tag = "255", Is`ed = (currRange == 255) });
-                break;
-
-            case 5: // ohms
-                combo.IsEnabled = true;
-                combo.Items.Add(new ComboBoxItem() { Content = "Autorange", Tag = "255", IsSelected = (currRange == 255) });
-                combo.Items.Add(new ComboBoxItem() { Content = "  0..160 Ω", Tag = "0", IsSelected = (currRange == 0) });
-                combo.Items.Add(new ComboBoxItem() { Content = "160..330 Ω", Tag = "1", IsSelected = (currRange == 1) });
-                combo.Items.Add(new ComboBoxItem() { Content = "330..890 Ω", Tag = "2", IsSelected = (currRange == 2) });
-                combo.Items.Add(new ComboBoxItem() { Content = "890..1.5 ㏀", Tag = "3", IsSelected = (currRange == 3) });
-                combo.Items.Add(new ComboBoxItem() { Content = "1.5..10 ㏀", Tag = "4", IsSelected = (currRange == 4) });
-                combo.Items.Add(new ComboBoxItem() { Content = " 10..100 ㏀", Tag = "5", IsSelected = (currRange == 5) });
-                combo.Items.Add(new ComboBoxItem() { Content = "100..470 ㏀", Tag = "6", IsSelected = (currRange == 6) });
-                combo.Items.Add(new ComboBoxItem() { Content = "470..1000 ㏀", Tag = "7", IsSelected = (currRange == 7) });
-                break;
-
-
-            default:
-                combo.IsEnabled = false;
-                break;
-        }
-
-    }
-#endif
 
     /// <summary>
     /// Was a simple method but is smarter now. Is used to switch between Idle, Switch and SwitchError (or remove them all)
@@ -1814,10 +1769,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         OxyPlotModel.InvalidatePlot(false);
     }
 
-    private void OnPokitRedraw(object sender, RoutedEventArgs e)
-    {
-        OxyPlotModel.InvalidatePlot(true);
-    }
 
     #region Cursors
 
@@ -1856,13 +1807,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         var p = e.GetCurrentPoint(uiOxyPlot).Position;
         double dataX = xAxis.InverseTransform(p.X);
         var tolerance = (xAxis.ActualMaximum - xAxis.ActualMinimum) * CURSOR_TOLERANCE;
-
+        bool gotDrag = false; // only drag one cursor. I accidently tried it the other way, and it was awful!
         foreach (var cursor in Cursors)
         {
-            if (Math.Abs(dataX - cursor.OxyAnnotation.X) < tolerance)
+            if (Math.Abs(dataX - cursor.OxyAnnotation.X) < tolerance && !gotDrag)
             {
                 cursor.IsDragging = true;
                 cursor.XamlThumb.CapturePointer(e.Pointer);
+                gotDrag = true;
             }
             else
             {
@@ -1889,6 +1841,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                 CursorsPositionThumbsAtAnnotations();
             }
         }
+        DisplayCursorData();
     }
 
     /// <summary>
@@ -1902,6 +1855,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             cursor.IsDragging = false;
             cursor.XamlThumb.ReleasePointerCaptures();
         }
+        DisplayCursorData();
     }
     
 
@@ -1932,6 +1886,8 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         int thinIndex = (int)(((double)HistoricalDataUnits.Count) * 0.90);
         Cursors[THICK_INDEX].OxyAnnotation.X = HistoricalDataUnits.Data[thickIndex].TimeSinceStartInMilliseconds;
         Cursors[THIN_INDEX].OxyAnnotation.X = HistoricalDataUnits.Data[thinIndex].TimeSinceStartInMilliseconds;
+
+        DisplayCursorData();
     }
 
     /// <summary>
@@ -1963,7 +1919,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
 
     /// <summary>
-    /// Says if the cursors are visible or collapsed. SEt by the MakeVisible and MakeInvisible methods.
+    /// Says if the cursors are visible or collapsed. Set by CursorsSetVisibility.
     /// </summary>
     Visibility CursorVisibility = Visibility.Collapsed;
     private void CursorsSetVisibility(Visibility visibility)
@@ -1979,6 +1935,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
                     cursor.XamlThumb.Visibility = Visibility.Visible;
                     OxyPlotModel.Annotations.Add(cursor.OxyAnnotation);
                 }
+                DisplayCursorData();
                 break;
             case Visibility.Collapsed:
                 OxyPlotModel.Annotations.Clear();
@@ -1991,6 +1948,83 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
 
 
-    #endregion
+    private void OnPokitShowHideCursors(object sender, RoutedEventArgs e)
+    {
+        var showCursors = (sender as ToggleMenuFlyoutItem).IsChecked;
+        CursorsSetVisibility(showCursors ? Visibility.Visible : Visibility.Collapsed);
+        OxyPlotModel.InvalidatePlot(false);
+    }
+
+    private void OnPokitResetThick(object sender, RoutedEventArgs e)
+    {
+        var cursor = Cursors[THICK_INDEX];
+        double PERCENT = 0.1;
+
+        // OnPokitResetThick and OnPokitResetThin are identical from here down
+        var xAxis = OxyPlotModel.Axes[0] as LinearAxis; // x axis
+        var start = xAxis.InverseTransform(xAxis.ScreenMin.X);
+        var end = xAxis.InverseTransform(xAxis.ScreenMax.X);
+        var value = ((end - start) * PERCENT) + start; // 0.1 over from the left
+        var pos = xAxis.Transform(value);
+        cursor.OxyAnnotation.X = value;
+        OxyPlotModel.InvalidatePlot(false);
+
+        DisplayCursorData();
+    }
+
+    private void OnPokitResetThin(object sender, RoutedEventArgs e)
+    {
+        var cursor = Cursors[THIN_INDEX];
+        double PERCENT = 0.9;
+
+        // OnPokitResetThick and OnPokitResetThin are identical from here down
+        var xAxis = OxyPlotModel.Axes[0] as LinearAxis; // x axis
+        var start = xAxis.InverseTransform(xAxis.ScreenMin.X);
+        var end = xAxis.InverseTransform(xAxis.ScreenMax.X);
+        var value = ((end - start) * PERCENT) + start; // 0.1 over from the left
+        var pos = xAxis.Transform(value);
+        cursor.OxyAnnotation.X = value;
+        OxyPlotModel.InvalidatePlot(false);
+
+        DisplayCursorData();
+    }
+
+    /// <summary>
+    /// Current version: gets the reported value at the time at or after the given time.
+    /// Future version: do a little interpolation!
+    /// </summary>
+    private double GetValueAt(double dsoTimeSinceStartInMilliseconds)
+    {
+        double retval = HistoricalDataUnits.Data[0].MeasuredValue;
+        foreach (var data in HistoricalDataUnits.Data)
+        {
+            retval = data.MeasuredValue; // keep updating it :-)
+            if (data.TimeSinceStartInMilliseconds >= dsoTimeSinceStartInMilliseconds)
+            {
+                return retval; // early return
+            }
+        }
+        return retval;
+    }
+
+    /// <summary>
+    /// Fills in the XAML uiDsoThickValue uiDsoThinValue uiDsoThickThinFreq uiDsoThickThinTimeDelta
+    /// Does not need to fill in dsoMin and dsoMax since those are already set.
+    /// </summary>
+    private void DisplayCursorData()
+    {
+        var thickValue = GetValueAt(Cursors[THICK_INDEX].OxyAnnotation.X);
+        var thinValue = GetValueAt(Cursors[THIN_INDEX].OxyAnnotation.X);
+        var deltaValue = Math.Abs(thickValue - thinValue);
+        var timeDeltaInMilliseconds = Math.Abs(Cursors[THICK_INDEX].OxyAnnotation.X - Cursors[THIN_INDEX].OxyAnnotation.X);
+        var freq = timeDeltaInMilliseconds > 0.000001 ? 1.0 / ((timeDeltaInMilliseconds / 1000.0)) : 0;
+
+        uiDsoThickValue.Text = ValueToString(thickValue, DevicePokit.CurrDSO_Oscilloscope_Data);
+        uiDsoThinValue.Text = ValueToString(thinValue, DevicePokit.CurrDSO_Oscilloscope_Data);
+        uiDsoThickThinValueDelta.Text = ValueToString(deltaValue, DevicePokit.CurrDSO_Oscilloscope_Data);
+        uiDsoThickThinTimeDelta.Text = timeDeltaInMilliseconds.ToString("F2");
+        uiDsoThickThinFreq.Text = freq.ToString("F0");
+    }
+    #endregion Cursors
 
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

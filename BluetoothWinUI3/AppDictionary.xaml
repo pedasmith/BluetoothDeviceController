@@ -223,8 +223,9 @@
     <Style x:Key="sDeviceDataPanelWidex2" TargetType="StackPanel" BasedOn="{StaticResource sDeviceDataPanel}">
         <Setter Property="Width" Value="240" />
     </Style>
-    <Style x:Key="sDeviceDataPanelWidex3" TargetType="StackPanel" BasedOn="{StaticResource sDeviceDataPanel}">
-        <Setter Property="Width" Value="360" />
+    <Style x:Key="sDeviceDataPanelWideStretch" TargetType="StackPanel" >
+        <Setter Property="MinWidth" Value="360" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
 
     <Style x:Key="sZoomableDeviceBorder" TargetType="Border" BasedOn="{StaticResource sDeviceBorder}">
@@ -323,6 +324,10 @@
         <Setter Property="Y2" Value="0" />
         <Setter Property="Stroke" Value="Transparent" />
         <Setter Property="StrokeThickness" Value="4" />
+    </Style>
+
+    <Style TargetType="FontIcon">
+        <Setter Property="FontFamily" Value="Candara,Segoe Fluent Icons,Segoe MDL2 Assets,Segoe UI Symbol,Global User Interface,Cascadia Code" />
     </Style>
 
 

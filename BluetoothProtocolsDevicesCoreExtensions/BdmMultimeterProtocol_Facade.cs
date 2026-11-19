@@ -73,6 +73,9 @@ public class BdmMultimeterDisplayFacade
     public string DisplayText = "";
     public double DisplayNumber = double.NaN;
     public bool Overload = false;
+    /// <summary>
+    /// Units is generally one of 
+    /// </summary>
     public string DisplayUnits = "";
     public string DisplayOther = "";
     public static string HoldStr = "Hold ";
@@ -216,7 +219,11 @@ public class BdmMultimeterDisplayFacade
         return retval;
     }
 
-    private static string UnitsFromPokitMode(double value)
+    /// <summary>
+    /// Converts the Pokit mode to a symbol. Technically this distinguish Dso and multimeter modes, but
+    /// the pokit very nicely keeps those the same.
+    /// </summary>
+    public static string UnitsFromPokitMode(double value)
     {
         String retval = ((int)value) switch
         {

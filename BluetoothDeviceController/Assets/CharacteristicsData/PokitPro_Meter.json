@@ -350,7 +350,7 @@
             {
               "UUID": "970f00ba-f46f-4825-96a8-153a5cd0cda9",
               "Name": "DSO_Metadata",
-              "Type": "U8|DEC|DsoStatus F32|FIXED|DsoDataScale U8|DEC|DsoDataMode U8|DEC|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNsamples U32|DEC|DsoSamplingRate|hz",
+              "Type": "U8|DEC|DsoStatus F32|FIXED|DsoDataScale U8|DEC|DsoDataMode U8|DEC|DsoDataRange U32|DEC|DsoDataSamplingWindow U16|DEC|DsoDataNSamples U32|DEC|DsoSamplingRate|hz",
               "IsRead": true,
               "IsNotify": true,
               "ExampleData": [

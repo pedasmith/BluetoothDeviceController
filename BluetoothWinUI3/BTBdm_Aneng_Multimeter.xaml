@@ -29,8 +29,8 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" ItemContainerStyle="{StaticResource sDeviceDataListItem}" x:Name="uiDeviceDataList">
-                    <StackPanel Style="{StaticResource sDeviceDataPanelWidex3}">
+                <GridView Grid.Row="0" Style="{StaticResource sDeviceDataList}" ItemContainerStyle="{StaticResource sDeviceDataListItem}" x:Name="uiDeviceDataList" HorizontalAlignment="Stretch">
+                    <StackPanel Style="{StaticResource sDeviceDataPanelWideStretch}" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="uiMMInfoDisplay">
                             <TextBlock Style="{StaticResource sDevicePrimaryDataXLarge}" MinWidth="120" ><Run x:Name="uiValue" /></TextBlock>
                             <Border VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10">
@@ -47,16 +47,13 @@
                             </Border>
                         </StackPanel>
                         
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="uiDsoInfoDisplay" Visibility="Collapsed">
-                            <Border VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock x:Name="uiDsoValues" Style="{StaticResource sDeviceData}">
-                                        <Run>Min:&#160;</Run><Run x:Name="uiDsoMin" />
-                                        <Run>Max:&#160;</Run><Run x:Name="uiDsoMax" />
-                                    </TextBlock>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
+                        <Border x:Name="uiDsoInfoDisplay"  VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10" HorizontalAlignment="Stretch">
+                            <TextBlock x:Name="uiDsoValues" Style="{StaticResource sDeviceData}" TextWrapping="Wrap" HorizontalAlignment="Stretch" >
+                                    <Run>Range:&#160;</Run><Run x:Name="uiDsoMin" /><Run>&#160;To&#160;</Run><Run x:Name="uiDsoMax" />
+                                    <Run>Thick:&#160;</Run><Run x:Name="uiDsoThickValue" /><Run>&#160;Thin&#160;</Run><Run x:Name="uiDsoThinValue" /><Run>&#160;𝚫&#160;</Run><Run x:Name="uiDsoThickThinValueDelta" />
+                                    <Run>Freq:&#160;</Run><Run x:Name="uiDsoThickThinFreq" /><Run>Hz &#160;Delta:&#160;</Run><Run x:Name="uiDsoThickThinTimeDelta" /><Run>ms</Run>
+                            </TextBlock>
+                        </Border>
 
                         <!-- Don't need a line color when there's just the one!
                         <Line Tag="ValueColor" Style="{StaticResource sGraphLineKey}" />
@@ -108,6 +105,7 @@
                     </StackPanel>
                 </CommandBar.Content>
                 <CommandBar.PrimaryCommands>
+                    <!-- What icons? This list: https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.controls.symbol?view=winrt-28000 -->
                     <AppBarToggleButton Icon="Pause" Label="Pause" x:Name="uiPauseButton" Click="OnPause" />
                     <AppBarButton Icon="OpenPane" Label="Control" x:Name="uiSetupPokit" Click="OnSetupPokit" Visibility="Collapsed"/>
                     <AppBarButton Icon="RepeatOne" Label="Again" ToolTipService.ToolTip="Repeat" x:Name="uiPokitAgain" Click="OnPokitRepeatCommand" Visibility="Collapsed"/>
@@ -115,8 +113,28 @@
                     <AppBarButton Icon="ZoomOut" Label="Zoom Out" x:Name="uiPokitZoomOut" Click="OnPokitZoomOut" Visibility="Collapsed" />
                     <AppBarButton Icon="Back" Label="Pan Left" x:Name="uiPokitPanLeft" Click="OnPokitPanLeft" Visibility="Collapsed" />
                     <AppBarButton Icon="Forward" Label="Pan Right" x:Name="uiPokitPanRight" Click="OnPokitPanRight" Visibility="Collapsed" />
-                    <AppBarButton Icon="BackToWindow" Label="Reset" x:Name="uiPokitZoomPanReset" Click="OnPokitZoomPanReset" Visibility="Collapsed" />
-                    <AppBarButton Icon="BackToWindow" Label="Redraw" x:Name="uiPokitRedraw" Click="OnPokitRedraw" Visibility="Collapsed" />
+                    <AppBarButton Icon="BackToWindow" Label="Reset Zoom" x:Name="uiPokitZoomPanReset" Click="OnPokitZoomPanReset" Visibility="Collapsed" />
+                    <AppBarButton Label="Cursors" x:Name="uiPokitCursorMenu" Visibility="Collapsed">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="⫯" FontWeight="Black" FontSize="18"/>
+                        </AppBarButton.Icon>
+                        <AppBarButton.Flyout>
+                            <MenuFlyout>
+                                <ToggleMenuFlyoutItem Icon="Find" Text="Show Cursors" Click="OnPokitShowHideCursors" IsChecked="True" />
+                                <MenuFlyoutItem Text="Reset Thick" Click="OnPokitResetThick">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="𝗜" />
+                                        <!-- Alt Glyph: ‖⫯ -->
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Reset Thin" Click="OnPokitResetThin">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="|" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </AppBarButton.Flyout>
+                    </AppBarButton>
                     <AppBarButton Icon="Help" Label="About" x:Name="uiAboutPokit" >
                         <AppBarButton.Flyout>
                             <Flyout>
