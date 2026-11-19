@@ -1,0 +1,95 @@
+{
+  "AllDevices": [
+    {
+      "Name": "WT901BLE67",
+      "ClassName": "Wit_CompassBle5",
+      "Descriptions": "WIT makes a series of small compass modules capable of reading acceleration, motion, and angle",
+      "Links":[
+        "https://github.com/WITMOTION",
+        "https://github.com/WITMOTION/WitBluetooth_BWT901BLE5_0",
+        "https://wit-motion.gitbook.io/witmotion-sdk/ble-5.0-protocol/bluetooth-5.0-communication-protocol",
+        "https://wit-motion.gitbook.io/witmotion-sdk/ble-5.0-protocol/sdk",
+        "https://drive.google.com/drive/folders/1I6sBC-8Q3_vtY-GrFDZbWJZJFk7UnNfO"
+      ],
+      "CompletionStatus": 0,
+      "Services": [
+        {
+          "UUID": "00001800-0000-1000-8000-00805f9b34fb",
+          "Name": "Common Configuration",
+          "Characteristics": [
+            {
+              "UUID": "00002a00-0000-1000-8000-00805f9b34fb",
+              "Name": "Device Name",
+              "Type": "STRING|ASCII|Device_Name",
+              "DataGroupName": "Common Configuration_Data",
+              "IsRead": true,
+              "IsWrite": true,
+              "Verbs": ":Read:Write:RdInNo:WrWw:",
+              "ExampleData": [
+                "WT901BLE67 Hex:WT901BLE67"
+              ]
+            },
+            {
+              "UUID": "00002a01-0000-1000-8000-00805f9b34fb",
+              "Name": "Appearance",
+              "Type": "U16|Speciality^Appearance|Appearance",
+              "DataGroupName": "Common Configuration_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "Unknown Hex:00 00"
+              ]
+            },
+            {
+              "UUID": "00002a04-0000-1000-8000-00805f9b34fb",
+              "Name": "Connection Parameter",
+              "Type": "U16^1.25_*|DEC|Interval_Min|ms|-1 U16^1.25_*|DEC|Interval_Max|ms U16|DEC|Latency|ms U16^10_*|DEC|Timeout|ms",
+              "DataGroupName": "Common Configuration_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "15 30 10 4000 Hex:0C 00 18 00 0A 00 90 01"
+              ]
+            },
+            {
+              "UUID": "00002aa6-0000-1000-8000-00805f9b34fb",
+              "Name": "Central Address Resolution",
+              "Type": "U8|DEC|AddressResolutionSupported",
+              "DataGroupName": "Common Configuration_Data",
+              "IsRead": true,
+              "Verbs": ":Read:RdInNo:",
+              "ExampleData": [
+                "1 Hex:01"
+              ]
+            }
+          ]
+        },
+        {
+          "UUID": "0000ffe5-0000-1000-8000-00805f9a34fb",
+          "Name": "Compass",
+          "Priority": 10,
+          "Characteristics": [
+            {
+              "UUID": "0000ffe9-0000-1000-8000-00805f9a34fb",
+              "Name": "CompassCommand",
+              "Type": "BYTES|HEX|Command",
+              "DataGroupName": "Compass",
+              "IsWrite": true,
+              "IsWriteWithoutResponse": true,
+              "Verbs": ":Write:WriteWithoutResponse:WrWw:"
+            },
+            {
+              "UUID": "0000ffe4-0000-1000-8000-00805f9a34fb",
+              "Name": "CompassData",
+              "Type": "U8|HEX|Start||0x55 U8|HEX|Flags I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw",
+              "DataGroupName": "Compass",
+              "IsNotify": true,
+              "Verbs": ":Notify:RdInNo:InNo:"
+            }
+          ]
+        }
+      ],
+      "Details": "Device details:"
+    }
+  ]
+}

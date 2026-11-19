@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// Hand-held multimeter and oscilloscope that uses a phone (or PC) as the display..
-    /// This class was automatically generated 2026-11-18::17:52
+    /// This class was automatically generated 2026-11-18::22:01
     /// </summary>
 
     public partial class PokitOscilloscopeMeter : INotifyPropertyChanged

@@ -27,6 +27,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TI_SensorTag_2541.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UnitConverterDelegate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Viatom_PC_60F.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Wit_CompassBle5.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xiaomi_MJWSD05MMC_Thermometer.cs" />
   </ItemGroup>
 </Project>
