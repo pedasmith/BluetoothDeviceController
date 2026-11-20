@@ -1154,6 +1154,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
 
                     uiDsoMin.Text = ValueToString(minValue, DevicePokit.CurrDSO_Oscilloscope_Data);
                     uiDsoMax.Text = ValueToString(maxValue, DevicePokit.CurrDSO_Oscilloscope_Data);
+                    uiDsoInfoDisplay.Visibility = Visibility.Visible; // We have data, so show the data box
                     Log($"DSO: About to show graph");
                     CursorsSetVisibility(Visibility.Visible);
                     ShowGraphFromBatchData();
@@ -1493,13 +1494,14 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// </summary>
     private async Task DoSetupPokit()
     {
-        // Set the mode
-         PokitModeSettingsToSwitches();
+        // We won't know what to show for a little while. 
+        uiDsoInfoDisplay.Visibility = Visibility.Collapsed; // Don't show until we have data to show!
+        uiMMInfoDisplay.Visibility = Visibility.Collapsed;
 
         //
         // Show the dialog box (really a popup)
         //
-        //var result = await uidMMSetupPokit.ContentDialogShowSingleAsync(UtilitiesWinUI3.UtilitiesWinUI3.ANOTHER_DIALOG_ALREADY_UP);
+        PokitModeSettingsToSwitches();
         var popupfacade = new PopupAsDialogFacade(uipMMSetupPokit, iupMMSetupPokitOk, iupMMSetupPokitCancel);
         var result = await popupfacade.ShowAsync();
         if (result != ContentDialogResult.Primary) return; // user cancelled.
@@ -1513,8 +1515,6 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             DSO_Log = "";
             DSO_ReadyToDisplay = false;
 
-            uiDsoInfoDisplay.Visibility = Visibility.Visible;
-            uiMMInfoDisplay.Visibility = Visibility.Collapsed;
             uiPauseButton.Visibility = Visibility.Collapsed;
             OxyPlotModel.UseAlternateAxis(); // Alternate axis is milliseconds
             CursorsSetVisibility(Visibility.Collapsed); // will be visible again after we get data
@@ -1591,7 +1591,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
             CurrSaveData.Preferences.DeviceSettingA = "mm";
 
             uiDsoInfoDisplay.Visibility = Visibility.Collapsed;
-            uiMMInfoDisplay.Visibility = Visibility.Visible;
+            uiMMInfoDisplay.Visibility = Visibility.Visible; // Can show right away because we will get data very quickly
             uiPauseButton.Visibility = Visibility.Visible;
             OxyPlotModel.UseOriginalAxis(); // Original axes is DateTimeAxis
             (OxyPlotModel.Series[0] as OxyPlot.Series.LineSeries).DataFieldX = nameof(BdmMultimeterDisplayFacade.TimestampMostRecentDT);
@@ -2027,4 +2027,11 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     }
     #endregion Cursors
 
+    private async void OnPokitAbout(object sender, RoutedEventArgs e)
+    {
+        var popupfacade = new PopupAsDialogFacade(uipDeviceDetailsPokit, iupDeviceDetailsPokitOk, null);
+        var result = await popupfacade.ShowAsync();
+        if (result != ContentDialogResult.Primary) return; // user cancelled.
+
+    }
 } // end of class BTSimple_DemoControl // Modify: update the comment to match the class name

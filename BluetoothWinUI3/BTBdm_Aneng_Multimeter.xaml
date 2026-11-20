@@ -47,7 +47,7 @@
                             </Border>
                         </StackPanel>
                         
-                        <Border x:Name="uiDsoInfoDisplay"  VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10" HorizontalAlignment="Stretch">
+                        <Border x:Name="uiDsoInfoDisplay"  VerticalAlignment="Bottom" BorderThickness=".5" BorderBrush="LightBlue" Margin="8,0,0,10" HorizontalAlignment="Stretch" Visibility="Collapsed">
                             <TextBlock x:Name="uiDsoValues" Style="{StaticResource sDeviceData}" TextWrapping="Wrap" HorizontalAlignment="Stretch" >
                                     <Run>Range:&#160;</Run><Run x:Name="uiDsoMin" /><Run>&#160;To&#160;</Run><Run x:Name="uiDsoMax" />
                                     <Run>Thick:&#160;</Run><Run x:Name="uiDsoThickValue" /><Run>&#160;Thin&#160;</Run><Run x:Name="uiDsoThinValue" /><Run>&#160;𝚫&#160;</Run><Run x:Name="uiDsoThickThinValueDelta" />
@@ -106,15 +106,15 @@
                 </CommandBar.Content>
                 <CommandBar.PrimaryCommands>
                     <!-- What icons? This list: https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.controls.symbol?view=winrt-28000 -->
-                    <AppBarToggleButton Icon="Pause" Label="Pause" x:Name="uiPauseButton" Click="OnPause" />
-                    <AppBarButton Icon="OpenPane" Label="Control" x:Name="uiSetupPokit" Click="OnSetupPokit" Visibility="Collapsed"/>
+                    <AppBarToggleButton Icon="Pause" Label="Pause" ToolTipService.ToolTip="Pause" x:Name="uiPauseButton" Click="OnPause" />
+                    <AppBarButton Icon="OpenPane" Label="Control" ToolTipService.ToolTip="Control" x:Name="uiSetupPokit" Click="OnSetupPokit" Visibility="Collapsed"/>
                     <AppBarButton Icon="RepeatOne" Label="Again" ToolTipService.ToolTip="Repeat" x:Name="uiPokitAgain" Click="OnPokitRepeatCommand" Visibility="Collapsed"/>
-                    <AppBarButton Icon="ZoomIn" Label="Zoom In" x:Name="uiPokitZoomIn" Click="OnPokitZoomIn" Visibility="Collapsed" />
-                    <AppBarButton Icon="ZoomOut" Label="Zoom Out" x:Name="uiPokitZoomOut" Click="OnPokitZoomOut" Visibility="Collapsed" />
-                    <AppBarButton Icon="Back" Label="Pan Left" x:Name="uiPokitPanLeft" Click="OnPokitPanLeft" Visibility="Collapsed" />
-                    <AppBarButton Icon="Forward" Label="Pan Right" x:Name="uiPokitPanRight" Click="OnPokitPanRight" Visibility="Collapsed" />
-                    <AppBarButton Icon="BackToWindow" Label="Reset Zoom" x:Name="uiPokitZoomPanReset" Click="OnPokitZoomPanReset" Visibility="Collapsed" />
-                    <AppBarButton Label="Cursors" x:Name="uiPokitCursorMenu" Visibility="Collapsed">
+                    <AppBarButton Icon="ZoomIn" Label="Zoom In" ToolTipService.ToolTip="Zoom In" x:Name="uiPokitZoomIn" Click="OnPokitZoomIn" Visibility="Collapsed" />
+                    <AppBarButton Icon="ZoomOut" Label="Zoom Out" ToolTipService.ToolTip="Zoom Out" x:Name="uiPokitZoomOut" Click="OnPokitZoomOut" Visibility="Collapsed" />
+                    <AppBarButton Icon="Back" Label="Pan Left" ToolTipService.ToolTip="Pan Left" x:Name="uiPokitPanLeft" Click="OnPokitPanLeft" Visibility="Collapsed" />
+                    <AppBarButton Icon="Forward" Label="Pan Right" ToolTipService.ToolTip="Pan Right" x:Name="uiPokitPanRight" Click="OnPokitPanRight" Visibility="Collapsed" />
+                    <AppBarButton Icon="BackToWindow" Label="Reset Zoom" ToolTipService.ToolTip="Reset graph" x:Name="uiPokitZoomPanReset" Click="OnPokitZoomPanReset" Visibility="Collapsed" />
+                    <AppBarButton Label="Cursors" x:Name="uiPokitCursorMenu"  ToolTipService.ToolTip="Cursors" Visibility="Collapsed">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="⫯" FontWeight="Black" FontSize="18"/>
                         </AppBarButton.Icon>
@@ -135,20 +135,32 @@
                             </MenuFlyout>
                         </AppBarButton.Flyout>
                     </AppBarButton>
-                    <AppBarButton Icon="Help" Label="About" x:Name="uiAboutPokit" >
-                        <AppBarButton.Flyout>
-                            <Flyout>
-                                <TextBlock>
+                    <AppBarButton Icon="Help" Label="About" ToolTipService.ToolTip="About" x:Name="uiAboutPokit" Click="OnPokitAbout" />
+                </CommandBar.PrimaryCommands>
+            </CommandBar>
+
+            <Popup x:Name="uipDeviceDetailsPokit">
+                <Border
+                    Margin="5" Padding="15"
+                    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
+                    BorderBrush="Black" BorderThickness="1">
+                    <Grid >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock IsTextSelectionEnabled="True">
                                     <Run>Firmware:&#160;&#160;&#160;</Run><Run x:Name="uidFirmware" /><LineBreak />
                                     <Run>Maximum Amps:&#160;&#160;&#160; </Run><Run x:Name="uidMaxAmps" /><LineBreak />
                                     <Run>Maximum Volts:&#160;&#160;&#160; </Run><Run x:Name="uidMaxVoltage" /><LineBreak />
                                     <Run>Maximum Resistance:&#160;&#160;&#160;</Run><Run x:Name="uidMaxResistance" /><LineBreak />
-                                </TextBlock>
-                            </Flyout>
-                        </AppBarButton.Flyout>
-                    </AppBarButton>
-                </CommandBar.PrimaryCommands>
-            </CommandBar>
+                        </TextBlock>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <Button Content="OK" x:Name="iupDeviceDetailsPokitOk" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Popup>
 
             <Popup x:Name="uipMMSetupPokit" 
                    HorizontalOffset="10" VerticalOffset="0" Margin="5" 

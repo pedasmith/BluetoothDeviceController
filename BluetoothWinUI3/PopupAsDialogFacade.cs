@@ -33,7 +33,7 @@ namespace BluetoothWinUI3
         {
             Popup.Closed -= Popup_Closed;
             PrimaryButton.Click -= PrimaryButton_Click;
-            SecondaryButton.Click -= SecondaryButton_Click;
+            if (SecondaryButton != null) SecondaryButton.Click -= SecondaryButton_Click;
             PopupClosedCompletion.TrySetResult(true);
         }
         private ContentDialogResult Result = ContentDialogResult.None;
@@ -55,7 +55,7 @@ namespace BluetoothWinUI3
             Result = ContentDialogResult.None;
             Popup.Closed += Popup_Closed;
             PrimaryButton.Click += PrimaryButton_Click;
-            SecondaryButton.Click += SecondaryButton_Click;
+            if (SecondaryButton != null) SecondaryButton.Click += SecondaryButton_Click;
 
             Popup.IsOpen = true;
 
