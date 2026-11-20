@@ -55,7 +55,7 @@ using DeviceSpecificTypePokit = BluetoothProtocols.PokitOscilloscopeMeter;
 
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControlBasic, IDeviceControlDevice // Modify: rename to match your device
+public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDeviceControlBasic, IDeviceControlDevice // Modify: rename to match your device
 {
     // Modify these settings to match your device
     IMultimeterProtocolParser Parser = null; //  new BdmMultimeterProtocol();
@@ -115,7 +115,7 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
     /// </summary>
     const double HistoricalDataUpdateRateInSeconds = 0.2; // Update really quickly for the multimeter
 
-    public BTBdm_Aneng_Multimeter() // Modify: edit the name to match the class name
+    public BTBdm_Aneng_MultimeterControl() // Modify: edit the name to match the class name
     {
         Initialize(); // Initialization that will stay the same
     }
@@ -2034,4 +2034,4 @@ public sealed partial class BTBdm_Aneng_Multimeter : UserControl, IDeviceControl
         if (result != ContentDialogResult.Primary) return; // user cancelled.
 
     }
-} // end of class BTSimple_DemoControl // Modify: update the comment to match the class name
+} // end of class BTBdm_Aneng_MultimeterControl // Modify: update the comment to match the class name

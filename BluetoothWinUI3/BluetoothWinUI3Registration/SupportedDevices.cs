@@ -161,11 +161,12 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             SupportedDevice.MakeFromManufacturerId(1177, typeof(BTCommon_EnvironmentalControl)), // 1177=0x499 Ruuvi Innovations Ltd.
 
             // Multimeters and test equipment
-            new SupportedDevice("Bluetooth DMM", typeof(BTBdm_Aneng_Multimeter)), // Aneng Bluetooth DMM 2026
-            new SupportedDevice("MS-BO47Q1767", typeof(BTBdm_Aneng_Multimeter)), // MS-BDTP1A using FS9952 chip 2026
-            new SupportedDevice("PokitPro", typeof(BTBdm_Aneng_Multimeter)), // PokitPro has a sensible protocol!
-            new SupportedDevice("Pokit", typeof(BTBdm_Aneng_Multimeter)), // Pokit has a sensible protocol like the PokitPro
+            new SupportedDevice("Bluetooth DMM", typeof(BTBdm_Aneng_MultimeterControl)), // Aneng Bluetooth DMM 2026
+            new SupportedDevice("MS-BO47Q1767", typeof(BTBdm_Aneng_MultimeterControl)), // MS-BDTP1A using FS9952 chip 2026
+            new SupportedDevice("PokitPro", typeof(BTBdm_Aneng_MultimeterControl)), // PokitPro has a sensible protocol!
+            new SupportedDevice("Pokit", typeof(BTBdm_Aneng_MultimeterControl)), // Pokit has a sensible protocol like the PokitPro
 
+            new SupportedDevice("WT901", typeof(BTWit_CompassBle5Control)), // Aneng Bluetooth DMM 2026
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {

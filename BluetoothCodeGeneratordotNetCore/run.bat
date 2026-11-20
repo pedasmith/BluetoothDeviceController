@@ -27,7 +27,6 @@ goto :EOF
 
 REM Or generate just the one, which is a little easier to handle when debugging.
 :Debug
-%BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\WIT_Compass.json -inputTemplates Templates -output output
 goto :EOF
 %BIN% -inputJsonFile "%JSONDIR%"\BDM_Aneng_Multimeter.json -inputTemplates Templates -output output
@@ -46,6 +45,7 @@ goto :EOF
 %BIN% -inputJsonFile "%JSONDIR%"\TI_SensorTag_1350.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\TI_SensorTag_1352.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\Viatom_PC60FW_PulseOximeter.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\WIT_Compass.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\Xiaomi_MJWSD05MMC.json -inputTemplates Templates -output output
 goto :EOF
 

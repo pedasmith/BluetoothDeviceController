@@ -23,11 +23,12 @@ Supported devices include
   o Viatom compatible PC-60F  
   o Vibeat S5W S6W  
   o Wellvue KS-60FW
-* Test Equipement
+* Test Equipment
 
   o Aneng AN9002 Digital multimeter
   o MEET MS-BDTP1A Digital multimeter (BT name MS-BO47Q1767)
   o Pokit Pro and Pokit Meter oscilloscope and multimeter
+  o WIT WT9011DCL digital compass
 
 
 

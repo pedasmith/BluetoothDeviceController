@@ -36,12 +36,12 @@
     <None Remove="Assets\Icons\BTIcon.ico" />
     <None Remove="Assets\Icons\Icon.png" />
     <None Remove="Assets\Icons\StoreLogo.png" />
-    <None Remove="BTBdm_Aneng_Multimeter.xaml" />
     <None Remove="BTBlank_BlankControl.xaml" />
     <None Remove="BTCommon_HealthControl.xaml" />
     <None Remove="BTCommon_UnsupportedControl.xaml" />
     <None Remove="BTNordic_ThingyControl.xaml" />
     <None Remove="BTServicesCharacteristicsDisplay.xaml" />
+    <None Remove="BTWit_CompassBle5Control.xaml" />
     <None Remove="HeartRate_Pleth_Control.xaml" />
     <None Remove="HeartRate_RRInterval_Control.xaml" />
     <None Remove="IconLabelControl.xaml" />
@@ -286,6 +286,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="BTWit_CompassBle5Control.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="IconLabelControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -296,7 +301,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="BTBdm_Aneng_Multimeter.xaml">
+    <Page Update="BTBdm_Aneng_MultimeterControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
