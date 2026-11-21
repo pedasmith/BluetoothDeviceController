@@ -1325,7 +1325,7 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
             | IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
             | IDeviceControlBasic.UXCapabilities.CanGetData
             | IDeviceControlBasic.UXCapabilities.CanShowTable
-            | IDeviceControlBasic.UXCapabilities.CanBeepAndVoice
+            | IDeviceControlBasic.UXCapabilities.CanBeepAndVoice // Sound and talk
             ;
         }
         return retval;

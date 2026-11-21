@@ -2,6 +2,7 @@
 using BluetoothProtocols;
 using BluetoothProtocolsDevicesCore;
 using BluetoothWatcher.AdvertismentWatcher;
+using BluetoothWinUI3.Beeps;
 using BluetoothWinUI3.BluetoothWinUI3Registration;
 using BluetoothWinUI3.BTDeviceUnitConverters;
 using Microsoft.UI.Xaml;
@@ -24,7 +25,6 @@ namespace BluetoothWinUI3;
 
 #endregion
 using static BluetoothProtocols.Wit_CompassBle5;
-using DeviceSpecificType = Wit_CompassBle5; // Modify: pick your device, not BTSimple_Demo
 using DeviceSpecificSensorData = Wit_CompassBle5.Compass_Data; // Modify: 
 // The DeviceSpecificDataUnits should be set either to the DeviceSpecificSensorData or to a data facade.
 // Use the DeviceSpecificSensorData if it has the data you want to the user to see
@@ -34,6 +34,7 @@ using DeviceSpecificSensorData = Wit_CompassBle5.Compass_Data; // Modify:
 // Not using a facade? Then the line below is what you want (but modify it!)
 //using DeviceSpecificSensorDataUnits = TI_SensorTag_1352.Temperature_Data; // Modify: Often the same as the DeviceSpecificSensorData
 using DeviceSpecificSensorDataUnits = Wit_CompassBle5.Compass_Data; // Modify: Often the same as the DeviceSpecificSensorData
+using DeviceSpecificType = Wit_CompassBle5; // Modify: pick your device, not BTSimple_Demo
 // TODO: battery data? using DeviceSpecificBatteryData = Wit_CompassBle5.Battery_Data; // Modify: many device support battery                                                                // Modify these to match your device
 
 
@@ -647,6 +648,20 @@ I haven't figured out the battery data yet!
                 // part of the sensor data that's plotted.
                 // The historical data is updated from the CurrSensor_DataUnits
                 UpdateHistoricalDataAndGraph(CurrSensor_DataUnits);
+
+                var textToSpeak = "";
+                var angle = Math.Abs(CurrSensor_DataUnits.AngleRoll);
+                if (angle < 0.1)
+                {
+                    textToSpeak = "Level";
+                }
+                else
+                {
+                    var direction = (CurrSensor_DataUnits.AngleRoll > 0) ? "Left " : "Right ";
+                    textToSpeak = direction + angle.ToString("F1");
+                }
+                var voiceLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.VoiceLevel, CurrSaveData.Preferences.VoiceLevel);
+                GlobalSpeaker.Speak(voiceLevel, textToSpeak);
                 break;
 
             // Secondary sensor is shown in the UX but isn't in the history data.
@@ -716,6 +731,7 @@ I haven't figured out the battery data yet!
             | IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
             | IDeviceControlBasic.UXCapabilities.CanGetData
             | IDeviceControlBasic.UXCapabilities.CanShowTable
+            | IDeviceControlBasic.UXCapabilities.CanBeepAndVoice // Sound and talk
             ;
         }
         return retval;

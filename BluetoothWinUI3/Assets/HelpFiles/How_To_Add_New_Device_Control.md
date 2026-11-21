@@ -72,6 +72,25 @@ Adding voice output is easy! Each device is responcible for their own voice outp
 
 The GlobalSpeaker is smart. You can give it a fast stream of text and it will only output an appropriate amount. It will also handle when the entire app is muted and the volume level. It also used to handle the different voice, but apparently Microsoft has decided that apps shouldn't let the user pick different voices.
 
+You must also update the ```GetUXCapabilities()``` method to return ```CanBeepAndVoice```. An example of a typical GetUxCapabilities is:
+
+```c#
+    public IDeviceControlBasic.UXCapabilities GetUXCapabilities()
+    {
+        var retval = IDeviceControlBasic.UXCapabilities.CanRename;
+        if (HasSensorData)
+        {
+            retval = retval
+            | IDeviceControlBasic.UXCapabilities.CanGetGraphAsPng
+            | IDeviceControlBasic.UXCapabilities.CanGetData
+            | IDeviceControlBasic.UXCapabilities.CanShowTable
+            | IDeviceControlBasic.UXCapabilities.CanBeepAndVoice // Sound and talk
+            ;
+        }
+        return retval;
+    }
+```
+
 # Critical quality items
 
 ## Outermost panel is alway a Border named rootPanel
