@@ -4,7 +4,6 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
-using Windows.Gaming.Input.ForceFeedback;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -123,6 +122,12 @@ internal static class OxyPlotUtilities
         { "MeasuredValue", new LineColorStyle(OxyColor.FromRgb(0x00, 0x66, 0xCC)) }, // Copilot selected this shade of Engineering Blue
         { "MultimeterValue", new LineColorStyle(OxyColor.FromRgb(0x00, 0x66, 0xCC)) }, // Copilot selected this shade of Engineering Blue
         { "Value", new LineColorStyle(OxyColors.Gray)},
+
+
+        // Compass (colors selected by Copilot)
+        { "AngleRoll", new LineColorStyle(OxyColor.FromRgb(0x10, 0x7C, 0x10)) }, 
+        { "AnglePitch", new LineColorStyle(OxyColor.FromRgb(0x00, 0x78, 0xD4)) },
+        { "AngleYaw", new LineColorStyle(OxyColor.FromRgb(0xC2, 0x39, 0xB3))},
     };
 
     private static List<LineColorStyle> BackupColorStyle = new ()

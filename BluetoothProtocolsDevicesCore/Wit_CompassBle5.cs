@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-11-20::12:11
+    /// This class was automatically generated 2026-11-20::16:50
     /// </summary>
 
     public  class Wit_CompassBle5 : INotifyPropertyChanged
@@ -47,7 +47,7 @@ namespace BluetoothProtocols
         Compass service Guid=0000ffe5-0000-1000-8000-00805f9a34fb
             Compass_Data (DataGroup record)
                 CompassCommand characteristic has Command (Bytes-->string)  Guid=0000ffe9-0000-1000-8000-00805f9a34fb
-                CompassData characteristic has Start (Byte-->double) Flags (Byte-->double) AccelX (Int16-->double) AccelY (Int16-->double) AccelZ (Int16-->double) AngularVelocityX (Int16-->double) AngularVelocityY (Int16-->double) AngularVelocityZ (Int16-->double) AngleRoll (Int16-->double) AnglePitch (Int16-->double) AngleYaw (Int16-->double)  Guid=0000ffe4-0000-1000-8000-00805f9a34fb
+                CompassData characteristic has Start (Byte-->double) DataPacketType (Byte-->double) AccelX (Int16-->double) AccelY (Int16-->double) AccelZ (Int16-->double) AngularVelocityX (Int16-->double) AngularVelocityY (Int16-->double) AngularVelocityZ (Int16-->double) AngleRoll (Int16-->double) AnglePitch (Int16-->double) AngleYaw (Int16-->double)  Guid=0000ffe4-0000-1000-8000-00805f9a34fb
 
 
         Common Configuration service Guid=1800
@@ -100,14 +100,14 @@ namespace BluetoothProtocols
                 get { return _Start; }
                 set { if (value == _Start) return; _Start = value; OnPropertyChanged();}
             }
-            private double _Flags = 0;
+            private double _DataPacketType = 0;
             /// <summary>
-            /// Flags (U8 ) from Service=Compass and Characteristic=CompassData
+            /// DataPacketType (U8 ) from Service=Compass and Characteristic=CompassData
             ///</summary>
-            public double Flags 
+            public double DataPacketType 
             { 
-                get { return _Flags; }
-                set { if (value == _Flags) return; _Flags = value; OnPropertyChanged();}
+                get { return _DataPacketType; }
+                set { if (value == _DataPacketType) return; _DataPacketType = value; OnPropertyChanged();}
             }
             private double _AccelX = 0;
             /// <summary>
@@ -210,7 +210,7 @@ namespace BluetoothProtocols
                 dest.Name = source.Name;
                 dest.Command = source.Command;
                 dest.Start = source.Start;
-                dest.Flags = source.Flags;
+                dest.DataPacketType = source.DataPacketType;
                 dest.AccelX = source.AccelX;
                 dest.AccelY = source.AccelY;
                 dest.AccelZ = source.AccelZ;
@@ -238,7 +238,7 @@ namespace BluetoothProtocols
                 dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
                 dest.Command = source.Command;
                 dest.Start = convert(source.Start, "");
-                dest.Flags = convert(source.Flags, "");
+                dest.DataPacketType = convert(source.DataPacketType, "");
                 dest.AccelX = convert(source.AccelX, "");
                 dest.AccelY = convert(source.AccelY, "");
                 dest.AccelZ = convert(source.AccelZ, "");
@@ -253,7 +253,7 @@ namespace BluetoothProtocols
 
             public override string[] ExportGetHeaders(IExportData _)
             {
-                return ["Command", "Start", "Flags", "AccelX", "AccelY", "AccelZ", "AngularVelocityX", "AngularVelocityY", "AngularVelocityZ", "AngleRoll", "AnglePitch", "AngleYaw"];
+                return ["Command", "Start", "DataPacketType", "AccelX", "AccelY", "AccelZ", "AngularVelocityX", "AngularVelocityY", "AngularVelocityZ", "AngleRoll", "AnglePitch", "AngleYaw"];
             }
 
             public override void ExportRow(IExportData exporter)
@@ -262,7 +262,7 @@ namespace BluetoothProtocols
                 // RowEnd and add in the timestamps
                 exporter.CellSet(Command);
                 exporter.CellSet(Start);
-                exporter.CellSet(Flags);
+                exporter.CellSet(DataPacketType);
                 exporter.CellSet(AccelX);
                 exporter.CellSet(AccelY);
                 exporter.CellSet(AccelZ);
@@ -276,7 +276,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Command} {Start} {Flags} {AccelX} {AccelY} {AccelZ} {AngularVelocityX} {AngularVelocityY} {AngularVelocityZ} {AngleRoll} {AnglePitch} {AngleYaw}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Command} {Start} {DataPacketType} {AccelX} {AccelY} {AccelZ} {AngularVelocityX} {AngularVelocityY} {AngularVelocityZ} {AngleRoll} {AnglePitch} {AngleYaw}");
             }
         }
 //
@@ -676,13 +676,13 @@ namespace BluetoothProtocols
         private void NotifyCompassDataCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var index = (int)CharacteristicIndex.Compass_CompassData_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX|Start||0x55 U8|HEX|Flags I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw");
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX^^HIDDEN|Start||0x55 U8|HEX|DataPacketType I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw");
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
             CurrCompass_Data.TimestampMostRecent = args.Timestamp;
             CurrCompass_Data.Start = vr.GetNextDouble();
-            CurrCompass_Data.Flags = vr.GetNextDouble();
+            CurrCompass_Data.DataPacketType = vr.GetNextDouble();
             CurrCompass_Data.AccelX = vr.GetNextDouble();
             CurrCompass_Data.AccelY = vr.GetNextDouble();
             CurrCompass_Data.AccelZ = vr.GetNextDouble();
@@ -739,12 +739,12 @@ namespace BluetoothProtocols
             IBuffer result = await ReadAsync(ch, "CompassData", cacheMode);
             if (result == null) return null;
 
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX|Start||0x55 U8|HEX|Flags I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw");
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX^^HIDDEN|Start||0x55 U8|HEX|DataPacketType I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw");
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
             CurrCompass_Data.Start = vr.GetNextDouble();
-            CurrCompass_Data.Flags = vr.GetNextDouble();
+            CurrCompass_Data.DataPacketType = vr.GetNextDouble();
             CurrCompass_Data.AccelX = vr.GetNextDouble();
             CurrCompass_Data.AccelY = vr.GetNextDouble();
             CurrCompass_Data.AccelZ = vr.GetNextDouble();

@@ -52,7 +52,7 @@ public sealed partial class BTWit_CompassBle5Control : UserControl, IDeviceContr
     /// Other tags: cycling heartrate pulseoximeter security entertainment productivity multimeter oscilloscope
     /// Full list in tagToResourceKeyMap AppDictionaryFromTag.cs
     /// </summary>
-    public string Tags { get { return "#other"; } }
+    public string Tags { get { return "#compass #utility"; } }
 
     // Modify these advanced settings only when needed (most devices won't update these)
     /// <summary>
@@ -210,9 +210,9 @@ public sealed partial class BTWit_CompassBle5Control : UserControl, IDeviceContr
         // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
         // The line data must exist in the HistoricalData
         OxyPlotModel = OxyPlotUtilities.MakeOxyPlotModel("Inclinometer Data")
-            .AddLine(0, 360, "Pitch", "AnglePitch")
-            .AddLine(0, 360, "Roll", "AngleRoll")
-            .AddLine(0, 360, "Yaw", "AngleYaw")
+            .AddLine(45, 10, "Pitch", nameof(DeviceSpecificSensorData.AnglePitch))
+            .AddLine(45, 10, "Roll", nameof(DeviceSpecificSensorData.AngleRoll))
+            .AddLine(45, 10, "Yaw", nameof(DeviceSpecificSensorData.AngleYaw))
             ;
 
         // "Sensor Data" is for the main graph title  and is human-readable
@@ -223,8 +223,9 @@ public sealed partial class BTWit_CompassBle5Control : UserControl, IDeviceContr
         // Note that this table is the visible table; the exported data is set differently.
         // Examples:
         // In this demo, the Facade only includes columns to show
-        CurrTableCustomization.TableColumnsToExclude.Add("HasPressure");
-        CurrTableCustomization.TableColumnsToExclude.Add("Pressure");
+        CurrTableCustomization.TableColumnsToExclude.Add("Command");
+        CurrTableCustomization.TableColumnsToExclude.Add("Start");
+        CurrTableCustomization.TableColumnsToExclude.Add("Flags");
 
         // end modifications
 

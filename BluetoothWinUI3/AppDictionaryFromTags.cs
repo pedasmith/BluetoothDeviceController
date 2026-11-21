@@ -32,6 +32,8 @@ internal static class AppDictionaryFromTags
         { "#multimeter", "sDeviceBorder_Background_Multimeter"  },
         { "#oscilloscope", "sDeviceBorder_Background_Multimeter"  },
 
+        { "#compass", "sDeviceBorder_Background_Compass" },
+
         { "#environment", "sDeviceBorder_Background_Environment" },
         { "#security", "sDeviceBorder_Background_Security" },
         { "#entertainment", "sDeviceBorder_Background_Entertainment" },

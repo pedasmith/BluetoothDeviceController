@@ -30,17 +30,17 @@ REM Or generate just the one, which is a little easier to handle when debugging.
 %BIN% -inputJsonFile "%JSONDIR%"\WIT_Compass.json -inputTemplates Templates -output output
 goto :EOF
 %BIN% -inputJsonFile "%JSONDIR%"\BDM_Aneng_Multimeter.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\BTCommon_Info.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\Govee_H6005.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\Bluetooth_CurrentTimeService.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\BtUnicodeKeyboard.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\SensyOne-S1ProMultiSense.json -inputTemplates Templates -output output
-%BIN% -inputJsonFile "%JSONDIR%"\ChoiceMMed_PulseOximeter.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\BTCommon_Info.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Cycling_Speed_Cadence.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Demo.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\BTStandard_Heart_Rate.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\BtUnicodeKeyboard.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\ChoiceMMed_PulseOximeter.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\Govee_H6005.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\Nordic_Thingy.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\PokitPro_Meter.json -inputTemplates Templates -output output
+%BIN% -inputJsonFile "%JSONDIR%"\SensyOne-S1ProMultiSense.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\TI_SensorTag_2541.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\TI_SensorTag_1350.json -inputTemplates Templates -output output
 %BIN% -inputJsonFile "%JSONDIR%"\TI_SensorTag_1352.json -inputTemplates Templates -output output

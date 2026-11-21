@@ -15,7 +15,7 @@ Supported devices include
   o Govee H5074 H5075 H5103 H5106 H5171 H5179  
   o Ruuvi Air and other sensors  
   o SensorPro T201  
-  o ThermPro TP351 TP357 PT359  
+  o ThermPro TP351 TP357 TP359  
   o TI SensorTag 2541 1350 1352
 * Heart Rate bands: Bluetooth standard heart rate bands
 * Pulse Oximeters

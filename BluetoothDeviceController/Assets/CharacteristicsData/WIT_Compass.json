@@ -81,7 +81,7 @@
             {
               "UUID": "0000ffe4-0000-1000-8000-00805f9a34fb",
               "Name": "CompassData",
-              "Type": "U8|HEX|Start||0x55 U8|HEX|Flags I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw",
+              "Type": "U8|HEX^^HIDDEN|Start||0x55 U8|HEX|DataPacketType I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw",
               "DataGroupName": "Compass_Data",
               "IsNotify": true,
               "Verbs": ":Notify:RdInNo:InNo:"
