@@ -1069,6 +1069,7 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
                 var hasAuto = other.Contains(BdmMultimeterDisplayFacade.AutoStr); // "AUTO "
                 hasHold = other.Contains(BdmMultimeterDisplayFacade.HoldStr); // "Hold "
                 other = other.Replace(BdmMultimeterDisplayFacade.AutoStr, ""); // "AUTO ", ""); // Auto isn't useful
+                other = other.Replace("blank1 ", "").Replace("blank2 ", "").Replace("blank3 ", "").Replace("blank4 ", ""); // none of the blank data is useful for the user
                 updateDisplay = true;
                 break;
 
@@ -1108,8 +1109,11 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
                     SetVisible(uidIdle, false);
                 }
                 break;
-            case DeviceSpecificTypePokit.Device_NamePropertyChangedName:
-                Log($"Device name: Pokit: {DevicePokit.CurrCommon_Configuration_Data.Device_Name}");
+            case DeviceSpecificTypePokit.Device_NamePropertyChangedName: // Other devices also have a device name
+                if (DevicePokit != null)
+                {
+                    Log($"Device name: Pokit: {DevicePokit.CurrCommon_Configuration_Data.Device_Name}");
+                }
                 break;
 
 
@@ -1202,8 +1206,10 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
                 }
                 else
                 {
+                    // if (updateDisplay) { .. }
+                    var textToSpeak = CurrSensor_DataUnits.DisplayText.ToString();
                     var voiceLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.VoiceLevel, CurrSaveData.Preferences.VoiceLevel);
-                    GlobalSpeaker.Speak(voiceLevel, CurrSensor_DataUnits.DisplayText.ToString());
+                    GlobalSpeaker.Speak(voiceLevel, textToSpeak);
                 }
             }
 
@@ -1285,7 +1291,7 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
             }
         }
 
-        uiOxyPlot.InvalidatePlot(false); //DOC: Must be true to redraw the lines
+        uiOxyPlot.InvalidatePlot(true); //DOC: Must be true to redraw the lines
     }
 
     private void ShowGraphFromBatchData()

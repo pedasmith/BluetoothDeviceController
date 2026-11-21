@@ -59,6 +59,19 @@ In the Name, type Manufacturer_DeviceControl.xaml. Replace "Manufacturer" and "D
 
 Bluetooth devices which are supported are listed in the *BluetoothWinUI3Registration\SupportedDevices.cs* file. You will need to add your device to that file.
 
+# Additional Features: Voice
+
+Adding voice output is easy! Each device is responcible for their own voice output. The simplest way is to add this code to your ```UpdateDeviceDataUX``` method (that's the method that's called when you have new data)
+
+```c#
+                    // if (updateDisplay) { .. }
+                    var textToSpeak = CurrSensor_DataUnits.DisplayText.ToString();
+                    var voiceLevel = UserPreferences.SoundLevelAdjusted(UserPreferences.Global.VoiceLevel, CurrSaveData.Preferences.VoiceLevel);
+                    GlobalSpeaker.Speak(voiceLevel, textToSpeak);
+```
+
+The GlobalSpeaker is smart. You can give it a fast stream of text and it will only output an appropriate amount. It will also handle when the entire app is muted and the volume level. It also used to handle the different voice, but apparently Microsoft has decided that apps shouldn't let the user pick different voices.
+
 # Critical quality items
 
 ## Outermost panel is alway a Border named rootPanel

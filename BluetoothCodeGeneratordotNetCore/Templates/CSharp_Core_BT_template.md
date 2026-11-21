@@ -522,7 +522,9 @@ This is the primary section of the code.
 ```
 
 
-## CharacteristicPropertyDataFieldsHeaders Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" CodeListSeparator=", "
+## CharacteristicPropertyDataFieldsHeaders Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics/NotHiddenProperties CodeListSubZero="" CodeListSeparator=", "
+
+Hidden fields stay in the actual protocol files, but are not part of the exported data for obvious reasons.
 
 ```
 "[[DataName]]"
@@ -534,7 +536,9 @@ This is the primary section of the code.
 ```
 
 
-## CharacteristicPropertyDataFieldsRow Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" 
+## CharacteristicPropertyDataFieldsRow Type=list ListOutput=parent Trim=endCR Source=Services/DataGroups/Characteristics/NotHiddenProperties CodeListSubZero="" 
+
+Since the HEX^^HIDDEN fields are in the exported headers, they shouldn't be in the export data either!
 
 ```
                 exporter.CellSet([[DataName.dotNet]]);
@@ -544,7 +548,7 @@ This is the primary section of the code.
 
 Makes the list of data fields for the nice ToString()
 
-## CharacteristicDataGroupFieldForToString Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics/Properties CodeListSubZero="" Code=" {[[DataName.dotNet]]}"
+## CharacteristicDataGroupFieldForToString Type=list ListOutput=parent Trim=true Source=Services/DataGroups/Characteristics/NotHiddenProperties CodeListSubZero="" Code=" {[[DataName.dotNet]]}"
 
 Individual data fields for the nice ToString()
 

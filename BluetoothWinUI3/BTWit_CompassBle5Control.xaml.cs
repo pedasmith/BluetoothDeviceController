@@ -204,7 +204,7 @@ public sealed partial class BTWit_CompassBle5Control : UserControl, IDeviceContr
         // The string is the INPC name from the device, and the Run is the corresponding Sparkle text.
         ControlsWithSparkles = new List<(string, Microsoft.UI.Xaml.Documents.Run)>()
         {
-            ( DeviceSpecificType.CompassDataPropertyChangedName, uiAnglePitchChange),
+            ( DeviceSpecificType.CompassDataPropertyChangedName, uiCompassChange),
         };
 
         // Modify: set up the graph by making an OxyPlotModel and adding lines to it.
@@ -223,9 +223,8 @@ public sealed partial class BTWit_CompassBle5Control : UserControl, IDeviceContr
         // Note that this table is the visible table; the exported data is set differently.
         // Examples:
         // In this demo, the Facade only includes columns to show
-        CurrTableCustomization.TableColumnsToExclude.Add("Command");
         CurrTableCustomization.TableColumnsToExclude.Add("Start");
-        CurrTableCustomization.TableColumnsToExclude.Add("Flags");
+        CurrTableCustomization.TableColumnsToExclude.Add("DataPacketType");
 
         // end modifications
 

@@ -694,7 +694,10 @@ public class FortuneFS9952MultimeterProtocol : IMultimeterProtocolParser
         D2, G2, F2, A2, P1, C2, B2, beep,
         D1, E1, F1, ph, milli, C1, G1, A1,
         micro, celcius, B1, mh, volts, fahrenheit, kilo, delta,
-        amp, blank1, mega, hFE, blank2, blank3, ohm, battery,
+        amp, blank1, mega, blank2, blank3, blank4, ohm, battery,
+        // Note: I think the data sheet I saw is not the right one. The data sheet says that the
+        // blank2 is an "hFE" which is a transistor thing. But my MEET MS-BDTP1A doesn't
+        // have that. I think it's been repurposed to be the Bluetooth signal?
     };
 
 
@@ -815,9 +818,10 @@ public class FortuneFS9952MultimeterProtocol : IMultimeterProtocolParser
         if (on(bits, BitLocations.mh)) retval.DisplayOther += "mh "; // Manual hold
         if (on(bits, BitLocations.delta)) retval.DisplayOther += "delta ";
         if (on(bits, BitLocations.blank1)) retval.DisplayOther += "blank1 ";
-        if (on(bits, BitLocations.hFE)) retval.DisplayOther += "hFE "; // Transistor gain
+        // if (on(bits, BitLocations.hFE)) retval.DisplayOther += "hFE "; // Transistor gain
         if (on(bits, BitLocations.blank2)) retval.DisplayOther += "blank2 ";
         if (on(bits, BitLocations.blank3)) retval.DisplayOther += "blank3 ";
+        if (on(bits, BitLocations.blank4)) retval.DisplayOther += "blank4 ";
         if (on(bits, BitLocations.battery)) retval.DisplayOther += "battery ";
 
 

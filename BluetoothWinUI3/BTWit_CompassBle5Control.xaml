@@ -19,7 +19,9 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="uiKnownDeviceName" Grid.Row="0" Text="Demonstration Display" Style="{StaticResource sDeviceTitle}"/>
+            <TextBlock Grid.Row="0" Style="{StaticResource sDeviceTitle}">
+                <Run x:Name="uiKnownDeviceName" Text="Demonstration Display" /><Run Text="&#160;"/><Run x:Name="uiCompassChange" Text="┄"/>
+            </TextBlock>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
@@ -32,7 +34,7 @@
 
                     <StackPanel Style="{StaticResource sDeviceDataPanel}">
                         <TextBlock Style="{StaticResource sDevicePrimaryTitle}">
-                        <Run>Pitch</Run><Run Text="&#160;"/><Run x:Name="uiAnglePitchChange" Text="┄"/>
+                        <Run>Pitch</Run>
                         </TextBlock>
                         <TextBlock Style="{StaticResource sDevicePrimaryData}"><Run x:Name="uiAnglePitch"/></TextBlock>
                         <Line Tag="AnglePitchColor" Style="{StaticResource sGraphLineKey}" />

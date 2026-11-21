@@ -17,7 +17,7 @@ namespace BluetoothProtocols
 {
     /// <summary>
     /// .
-    /// This class was automatically generated 2026-11-20::16:50
+    /// This class was automatically generated 2026-11-20::17:03
     /// </summary>
 
     public  class Wit_CompassBle5 : INotifyPropertyChanged
@@ -45,8 +45,10 @@ namespace BluetoothProtocols
         /* Service and Characteristics summary for the device WT901BLE67
 
         Compass service Guid=0000ffe5-0000-1000-8000-00805f9a34fb
-            Compass_Data (DataGroup record)
+            Compass_Command (DataGroup record)
                 CompassCommand characteristic has Command (Bytes-->string)  Guid=0000ffe9-0000-1000-8000-00805f9a34fb
+
+            Compass_Data (DataGroup record)
                 CompassData characteristic has Start (Byte-->double) DataPacketType (Byte-->double) AccelX (Int16-->double) AccelY (Int16-->double) AccelZ (Int16-->double) AngularVelocityX (Int16-->double) AngularVelocityY (Int16-->double) AngularVelocityZ (Int16-->double) AngleRoll (Int16-->double) AnglePitch (Int16-->double) AngleYaw (Int16-->double)  Guid=0000ffe4-0000-1000-8000-00805f9a34fb
 
 
@@ -79,7 +81,7 @@ namespace BluetoothProtocols
         /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
         /// Note the use of the Curiously Recurring Template Pattern (CRTP)
         /// </summary>
-        public class Compass_Data :BTCommonMetaData<Compass_Data> //, IExportDataSource
+        public class Compass_Command :BTCommonMetaData<Compass_Command> //, IExportDataSource
         {
             private byte[] _Command = null;
             /// <summary>
@@ -90,7 +92,71 @@ namespace BluetoothProtocols
                 get { return _Command; }
                 set { if (value == _Command) return; _Command = value; OnPropertyChanged();}
             }
+            public override Compass_Command Clone(string name = null)
+            {
+                var retval = this.MemberwiseClone() as Compass_Command;
+                if (name != null)
+                {
+                    retval.Name = name;
+                }
+                return retval;
+            }
 
+            /// <summary>
+            /// Copies all of the source fields to the 'this' destination
+            /// </summary>
+            public override void CopyFrom(Compass_Command source)
+            {
+                var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = source.Name;
+                dest.Command = source.Command;
+            }
+
+            // Like CopyFrom, but convert the doubles as appropriate + sets name
+            /// <summary>
+            /// Similar to CopyFrom, but will create the destination if needed (using Clone), will convert the units,
+            /// and will set the name to the given name if it's not null or empty.
+            /// </summary>
+
+            public static Compass_Command CopyToWithConvertAndCreate(Compass_Command source, Compass_Command dest, string name, BluetoothProtocols.UnitConverterDelegate.ConvertMethod convert)
+            {
+                if (dest == null)
+                {
+                    dest = source.Clone(name);
+                }
+                dest.TimestampMostRecent = source.TimestampMostRecent;
+                dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
+                dest.Command = source.Command;
+                return dest;
+            }
+
+            public override string[] ExportGetHeaders(IExportData _)
+            {
+                return ["Command"];
+            }
+
+            public override void ExportRow(IExportData exporter)
+            {
+                // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
+                // RowEnd and add in the timestamps
+                exporter.CellSet(Command);                
+            }
+
+            public override string ToString()
+            {
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Command}");
+            }
+        }
+        /// <summary>
+        /// Data from all of the characteristics in the Compass Service. Dervices from
+        /// BTCommonMetaData which includes DateTimeOffset, DateTimeOffsetDT, Name
+        /// and implements INotifyPropertyChanged.
+        /// Code generation template is the ServiceDataGroups template in CSharp_Core_BT_template.md
+        /// Note the use of the Curiously Recurring Template Pattern (CRTP)
+        /// </summary>
+        public class Compass_Data :BTCommonMetaData<Compass_Data> //, IExportDataSource
+        {
             private double _Start = 0x55;
             /// <summary>
             /// Start (U8 ) from Service=Compass and Characteristic=CompassData
@@ -208,7 +274,6 @@ namespace BluetoothProtocols
                 var dest = this; // so that the code here and in CopyToWithConvertAndCreate are more similar
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = source.Name;
-                dest.Command = source.Command;
                 dest.Start = source.Start;
                 dest.DataPacketType = source.DataPacketType;
                 dest.AccelX = source.AccelX;
@@ -236,7 +301,6 @@ namespace BluetoothProtocols
                 }
                 dest.TimestampMostRecent = source.TimestampMostRecent;
                 dest.Name = String.IsNullOrEmpty(name) ? source.Name : name;
-                dest.Command = source.Command;
                 dest.Start = convert(source.Start, "");
                 dest.DataPacketType = convert(source.DataPacketType, "");
                 dest.AccelX = convert(source.AccelX, "");
@@ -253,16 +317,13 @@ namespace BluetoothProtocols
 
             public override string[] ExportGetHeaders(IExportData _)
             {
-                return ["Command", "Start", "DataPacketType", "AccelX", "AccelY", "AccelZ", "AngularVelocityX", "AngularVelocityY", "AngularVelocityZ", "AngleRoll", "AnglePitch", "AngleYaw"];
+                return ["AccelX", "AccelY", "AccelZ", "AngularVelocityX", "AngularVelocityY", "AngularVelocityZ", "AngleRoll", "AnglePitch", "AngleYaw"];
             }
 
             public override void ExportRow(IExportData exporter)
             {
                 // Note: the code in ExportDeviceData.cs in ExportData will do the RowStart
                 // RowEnd and add in the timestamps
-                exporter.CellSet(Command);
-                exporter.CellSet(Start);
-                exporter.CellSet(DataPacketType);
                 exporter.CellSet(AccelX);
                 exporter.CellSet(AccelY);
                 exporter.CellSet(AccelZ);
@@ -276,7 +337,7 @@ namespace BluetoothProtocols
 
             public override string ToString()
             {
-                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {Command} {Start} {DataPacketType} {AccelX} {AccelY} {AccelZ} {AngularVelocityX} {AngularVelocityY} {AngularVelocityZ} {AngleRoll} {AnglePitch} {AngleYaw}");
+                return String.Format($"{TimestampMostRecentDT.ToString("HH:mm.ss")} {AccelX} {AccelY} {AccelZ} {AngularVelocityX} {AngularVelocityY} {AngularVelocityZ} {AngleRoll} {AnglePitch} {AngleYaw}");
             }
         }
 //
@@ -632,7 +693,7 @@ namespace BluetoothProtocols
         #region Service_Compass
         // Service Compass 
 
-        public Compass_Data CurrCompass_Data { get; set; } = new Compass_Data();
+        public Compass_Command CurrCompass_Command { get; set; } = new Compass_Command();
 
         // Per-characteristics methods for Compass CompassCommand
         /// <summary>
@@ -655,51 +716,16 @@ namespace BluetoothProtocols
             var vr = ValueParsers[index];
 
             vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrCompass_Data.TimestampMostRecent = args.Timestamp;
-            CurrCompass_Data.Command = vr.GetNextByteArray();
+            CurrCompass_Command.TimestampMostRecent = args.Timestamp;
+            CurrCompass_Command.Command = vr.GetNextByteArray();
             OnPropertyChanged(CompassCommandPropertyChangedName); // "CompassCommand"
-        }
-        // Per-characteristics methods for Compass CompassData
-        /// <summary>
-        /// Sets up the notifications; 
-        /// Will call Status
-        /// </summary>
-        /// <param name="notifyType"></param>
-        /// <returns>true if the notify was set up. </returns>
-        /// 
-        public async Task<bool> NotifyCompassDataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
-        {
-            var retval = await SetupNotifyAsync("CompassData", ServiceIndex.Compass_index, "Compass", CharacteristicIndex.Compass_CompassData_index, NotifyCompassDataCallback, notifyType);
-            return retval;
-        }
-
-        private void NotifyCompassDataCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
-        {
-            var index = (int)CharacteristicIndex.Compass_CompassData_index;
-            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX^^HIDDEN|Start||0x55 U8|HEX|DataPacketType I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw");
-            var vr = ValueParsers[index];
-
-            vr.Initialize(args.CharacteristicValue.ToArray());
-            CurrCompass_Data.TimestampMostRecent = args.Timestamp;
-            CurrCompass_Data.Start = vr.GetNextDouble();
-            CurrCompass_Data.DataPacketType = vr.GetNextDouble();
-            CurrCompass_Data.AccelX = vr.GetNextDouble();
-            CurrCompass_Data.AccelY = vr.GetNextDouble();
-            CurrCompass_Data.AccelZ = vr.GetNextDouble();
-            CurrCompass_Data.AngularVelocityX = vr.GetNextDouble();
-            CurrCompass_Data.AngularVelocityY = vr.GetNextDouble();
-            CurrCompass_Data.AngularVelocityZ = vr.GetNextDouble();
-            CurrCompass_Data.AngleRoll = vr.GetNextDouble();
-            CurrCompass_Data.AnglePitch = vr.GetNextDouble();
-            CurrCompass_Data.AngleYaw = vr.GetNextDouble();
-            OnPropertyChanged(CompassDataPropertyChangedName); // "CompassData"
         }
         /// <summary>
         /// Reads data from CompassCommand and triggers an OnPropertyChanged
         /// </summary>
         /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Compass_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Compass_Data> ReadCompassCommand(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        /// <returns>Compass_Command of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Compass_Command> ReadCompassCommand(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
         {
             var index = CharacteristicIndex.Compass_CompassCommand_index;
             await Ensure_Characteristic_Async(ServiceIndex.Compass_index, "Compass", index, "CompassCommand");
@@ -716,47 +742,10 @@ namespace BluetoothProtocols
             var vr = ValueParsers[(int)index];
 
             vr.Initialize(result.ToArray());
-            CurrCompass_Data.Command = vr.GetNextByteArray();
-            CurrCompass_Data.TimestampMostRecent = DateTimeOffset.Now;
+            CurrCompass_Command.Command = vr.GetNextByteArray();
+            CurrCompass_Command.TimestampMostRecent = DateTimeOffset.Now;
             OnPropertyChanged(CompassCommandPropertyChangedName); // "CompassCommand"
-            return CurrCompass_Data;
-        }
-        /// <summary>
-        /// Reads data from CompassData and triggers an OnPropertyChanged
-        /// </summary>
-        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
-        /// <returns>Compass_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
-        public async Task<Compass_Data> ReadCompassData(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
-        {
-            var index = CharacteristicIndex.Compass_CompassData_index;
-            await Ensure_Characteristic_Async(ServiceIndex.Compass_index, "Compass", index, "CompassData");
-            var ch = Characteristics[(int)index];
-            if (ch == null)
-            {
-                return null;
-            }
-
-            IBuffer result = await ReadAsync(ch, "CompassData", cacheMode);
-            if (result == null) return null;
-
-            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX^^HIDDEN|Start||0x55 U8|HEX|DataPacketType I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw");
-            var vr = ValueParsers[(int)index];
-
-            vr.Initialize(result.ToArray());
-            CurrCompass_Data.Start = vr.GetNextDouble();
-            CurrCompass_Data.DataPacketType = vr.GetNextDouble();
-            CurrCompass_Data.AccelX = vr.GetNextDouble();
-            CurrCompass_Data.AccelY = vr.GetNextDouble();
-            CurrCompass_Data.AccelZ = vr.GetNextDouble();
-            CurrCompass_Data.AngularVelocityX = vr.GetNextDouble();
-            CurrCompass_Data.AngularVelocityY = vr.GetNextDouble();
-            CurrCompass_Data.AngularVelocityZ = vr.GetNextDouble();
-            CurrCompass_Data.AngleRoll = vr.GetNextDouble();
-            CurrCompass_Data.AnglePitch = vr.GetNextDouble();
-            CurrCompass_Data.AngleYaw = vr.GetNextDouble();
-            CurrCompass_Data.TimestampMostRecent = DateTimeOffset.Now;
-            OnPropertyChanged(CompassDataPropertyChangedName); // "CompassData"
-            return CurrCompass_Data;
+            return CurrCompass_Command;
         }
         /// <summary>
         /// Writes data to CompassCommand 
@@ -783,6 +772,82 @@ namespace BluetoothProtocols
                 Status.ReportStatus($"WriteCompassCommand: Exception {ex.Message}", exceptionStatus);
             }
             return result;
+        }
+        // Service Compass 
+
+        public Compass_Data CurrCompass_Data { get; set; } = new Compass_Data();
+
+        // Per-characteristics methods for Compass CompassData
+        /// <summary>
+        /// Sets up the notifications; 
+        /// Will call Status
+        /// </summary>
+        /// <param name="notifyType"></param>
+        /// <returns>true if the notify was set up. </returns>
+        /// 
+        public async Task<bool> NotifyCompassDataAsync(GattClientCharacteristicConfigurationDescriptorValue notifyType = GattClientCharacteristicConfigurationDescriptorValue.Notify)
+        {
+            var retval = await SetupNotifyAsync("CompassData", ServiceIndex.Compass_index, "Compass", CharacteristicIndex.Compass_CompassData_index, NotifyCompassDataCallback, notifyType);
+            return retval;
+        }
+
+        private void NotifyCompassDataCallback(GattCharacteristic sender, GattValueChangedEventArgs args)
+        {
+            var index = (int)CharacteristicIndex.Compass_CompassData_index;
+            if (ValueParsers[index] == null) ValueParsers[index] = new IotNumberFormats.ValueParser("U8|HEX^^HIDDEN|Start||0x55 U8|HEX^^HIDDEN|DataPacketType I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw");
+            var vr = ValueParsers[index];
+
+            vr.Initialize(args.CharacteristicValue.ToArray());
+            CurrCompass_Data.TimestampMostRecent = args.Timestamp;
+            CurrCompass_Data.Start = vr.GetNextDouble();
+            CurrCompass_Data.DataPacketType = vr.GetNextDouble();
+            CurrCompass_Data.AccelX = vr.GetNextDouble();
+            CurrCompass_Data.AccelY = vr.GetNextDouble();
+            CurrCompass_Data.AccelZ = vr.GetNextDouble();
+            CurrCompass_Data.AngularVelocityX = vr.GetNextDouble();
+            CurrCompass_Data.AngularVelocityY = vr.GetNextDouble();
+            CurrCompass_Data.AngularVelocityZ = vr.GetNextDouble();
+            CurrCompass_Data.AngleRoll = vr.GetNextDouble();
+            CurrCompass_Data.AnglePitch = vr.GetNextDouble();
+            CurrCompass_Data.AngleYaw = vr.GetNextDouble();
+            OnPropertyChanged(CompassDataPropertyChangedName); // "CompassData"
+        }
+        /// <summary>
+        /// Reads data from CompassData and triggers an OnPropertyChanged
+        /// </summary>
+        /// <param name="cacheMode">Caching mode. Often for data we want uncached data.</param>
+        /// <returns>Compass_Data of results; each result is named based on the name in the characteristic string. E.G. U8|Hex|Red will be named Red</returns>
+        public async Task<Compass_Data> ReadCompassData(BluetoothCacheMode cacheMode = BluetoothCacheMode.Uncached)
+        {
+            var index = CharacteristicIndex.Compass_CompassData_index;
+            await Ensure_Characteristic_Async(ServiceIndex.Compass_index, "Compass", index, "CompassData");
+            var ch = Characteristics[(int)index];
+            if (ch == null)
+            {
+                return null;
+            }
+
+            IBuffer result = await ReadAsync(ch, "CompassData", cacheMode);
+            if (result == null) return null;
+
+            if (ValueParsers[(int)index] == null) ValueParsers[(int)index] = new IotNumberFormats.ValueParser("U8|HEX^^HIDDEN|Start||0x55 U8|HEX^^HIDDEN|DataPacketType I16^32768_/_16_*|FIXED|AccelX I16^32768_/_16_*|FIXED|AccelY I16^32768_/_16_*|FIXED|AccelZ I16^32768_/_2000_*|FIXED|AngularVelocityX I16^32768_/_2000_*|FIXED|AngularVelocityY I16^32768_/_2000_*|FIXED|AngularVelocityZ I16^32768_/_180_*|FIXED|AngleRoll I16^32768_/_180_*|FIXED|AnglePitch I16^32768_/_180_*|FIXED|AngleYaw");
+            var vr = ValueParsers[(int)index];
+
+            vr.Initialize(result.ToArray());
+            CurrCompass_Data.Start = vr.GetNextDouble();
+            CurrCompass_Data.DataPacketType = vr.GetNextDouble();
+            CurrCompass_Data.AccelX = vr.GetNextDouble();
+            CurrCompass_Data.AccelY = vr.GetNextDouble();
+            CurrCompass_Data.AccelZ = vr.GetNextDouble();
+            CurrCompass_Data.AngularVelocityX = vr.GetNextDouble();
+            CurrCompass_Data.AngularVelocityY = vr.GetNextDouble();
+            CurrCompass_Data.AngularVelocityZ = vr.GetNextDouble();
+            CurrCompass_Data.AngleRoll = vr.GetNextDouble();
+            CurrCompass_Data.AnglePitch = vr.GetNextDouble();
+            CurrCompass_Data.AngleYaw = vr.GetNextDouble();
+            CurrCompass_Data.TimestampMostRecent = DateTimeOffset.Now;
+            OnPropertyChanged(CompassDataPropertyChangedName); // "CompassData"
+            return CurrCompass_Data;
         }
 
         #endregion
