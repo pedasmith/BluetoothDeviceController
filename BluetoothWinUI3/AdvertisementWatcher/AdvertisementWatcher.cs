@@ -52,6 +52,10 @@ namespace BluetoothWatcher.AdvertismentWatcher
 
         private void BleAdvertisementWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
+            if (args.Advertisement.LocalName?.StartsWith("MJW") ?? false)
+            {
+                ; // Handy place for a debugger
+            }
             bool ignoreRssiDbFilter = false;
             WatcherData watcherData = null;
             bool havePreviousAdvert = false;
@@ -63,7 +67,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 NExtendedAdvertisementsFiltered++;
                 return;
             }
-
+            bool isWeak = args.RawSignalStrengthInDBm < FilterRssiDb;
             if (args.IsScanResponse)
             {
                 watcherData = previousAdvert;
@@ -74,7 +78,11 @@ namespace BluetoothWatcher.AdvertismentWatcher
                         int nExtended = 0;
                         nExtended += (args.AdvertisementType == BluetoothLEAdvertisementType.Extended) ? 1 : 0;
                         nExtended += (watcherData.ResponseAdvertisement.AdvertisementType == BluetoothLEAdvertisementType.Extended) ? 1: 0;
-                        Log($"NOTE: got a second response advertisement! Name={watcherData.BestName} NExtended={nExtended} NResponse={watcherData.NResponseAdvertisement}");
+                        if (!isWeak)
+                        {
+                            // Since we won't have seen the original signal!
+                            Log($"NOTE: got a second response advertisement! Name={watcherData.BestName} NExtended={nExtended} NResponse={watcherData.NResponseAdvertisement}");
+                        }
                         // After some analysis: I still don't know why this happens. Maybe we missed an advert?
                     }
                     watcherData.ResponseAdvertisement = args;
@@ -247,6 +255,10 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 var n = args.Advertisement.LocalName;
                 ignoreRssiDbFilter = true;
             }
+            if (watcherData.BestName.StartsWith("zzzMJW"))
+            {
+                ignoreRssiDbFilter = true; // where is the blasted thing? :-)
+            }
             if (args.RawSignalStrengthInDBm < FilterRssiDb && !ignoreRssiDbFilter)
             {
                 return;
@@ -269,7 +281,7 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 }
                 var tx = $"tx={watcherData.TransmitPower}  txarg={args.TransmitPowerLevelInDBm} ";
                 if (!args.TransmitPowerLevelInDBm.HasValue && watcherData.TransmitPower == null) tx = "";
-                System.Diagnostics.Debug.WriteLine($"Bluetooth Event: addr={BluetoothAddress.AsString(args.BluetoothAddress)} rx={args.RawSignalStrengthInDBm} {tx}{name}{company}");
+                System.Diagnostics.Debug.WriteLine($"Bluetooth Event: {DateTimeOffset.Now.ToString("HH:mm:ss")}: addr={BluetoothAddress.AsString(args.BluetoothAddress)} rx={args.RawSignalStrengthInDBm} {tx}{name}{company}");
             }
 
             WatcherEvent?.Invoke(sender, watcherData); // Often the MainPage.BleWatcher_WatcherEvent

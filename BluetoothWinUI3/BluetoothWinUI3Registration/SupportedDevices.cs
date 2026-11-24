@@ -1,13 +1,10 @@
 ﻿using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3.Utilities;
-using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
+using Windows.Storage.Streams;
+using static BluetoothProtocols.AdvertisementDataSectionParser;
 
 #if NET8_0_OR_GREATER
 #nullable disable
@@ -15,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace BluetoothWinUI3.BluetoothWinUI3Registration
 {
+
     public interface IBTControl
     {
         public void Initialize(WatcherData advertisement);
@@ -58,37 +56,75 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             return retval;
         }
 
+        public static SupportedDevice MakeFromManufacturerIdAndServiceData16bit(int manufacturerId, uint serviceData, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type factory)
+        {
+            var retval = new SupportedDevice(factory);
+            retval.MatchingManufacturerId = manufacturerId;
+            retval.MatchingServiceData16Bit = serviceData;
+            return retval;
+        }
+
         private SupportedDevice([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type factory)
         {
             FactoryInterface = factory;
         }
-        public string MatchingName { get; set; } = "Thingy*"; // For example 
+        /// <summary>
+        /// Name in advertisement to match. Uses a star match. Example: "Thingy*:
+        /// </summary>
+        public string MatchingName { get; set; } = ""; 
         public Guid MatchingServiceGuid { get; set; } = Guid.Empty;
         public string MatchingEddystoneUrl { get; set; } = String.Empty;
         public int MatchingManufacturerId { get; set; } = 0;
+        public uint MatchingServiceData16Bit { get; set; } = 0;
 
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
         public Type FactoryInterface { get; set; } = null;
+        /// <summary>
+        /// Implements a ladder to check each requirement. A test might involve multiple checks (e.g., a SwitchBot must have
+        /// the right manufacturer and also a MatchingServiceData16Bit
+        /// </summary>
         public bool Matches(WatcherData advertisement)
         {
-            var retval = false;
-            if (MatchingServiceGuid != Guid.Empty)
+            var retval = true;
+            if (retval && MatchingServiceGuid != Guid.Empty)
             {
                 retval = advertisement.ServiceUuids.Contains(MatchingServiceGuid);
-                if (retval)
-                {
-                    ; // handy place for a debugger
-                }
             }
-            else if (MatchingEddystoneUrl != String.Empty)
+            if (retval && MatchingEddystoneUrl != String.Empty)
             {
                 retval = advertisement.EddystoneUrl.StarMatch(MatchingEddystoneUrl);
             }
-            else if (MatchingManufacturerId != 0)
+            if (retval && MatchingManufacturerId != 0)
             {
                 retval = advertisement.CompanyId == MatchingManufacturerId;
             }
-            else
+            if (retval && MatchingServiceData16Bit != 0)
+            {
+                var isCorrectServiceData = false;
+                foreach (var advert in advertisement.Advertisements)
+                {
+                    foreach (var section in advert.Advertisement.DataSections)
+                    {
+                        DataTypeValue dtv = ConvertDataTypeValue(section.DataType); // get the enum value
+                        switch (dtv)
+                        {
+                            case DataTypeValue.ServiceData:
+                                {
+                                    var dr = DataReader.FromBuffer(section.Data);
+                                    dr.ByteOrder = ByteOrder.LittleEndian;
+                                    if (dr.UnconsumedBufferLength >= 2)
+                                    {
+                                        var addr = dr.ReadUInt16();
+                                        if (addr == MatchingServiceData16Bit) isCorrectServiceData = true;
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                    retval = isCorrectServiceData;
+                }
+            }
+            if (retval && !string.IsNullOrEmpty(MatchingName))
             {
                 var name = advertisement.BestName;
                 retval = name.StarMatch(MatchingName);
@@ -114,6 +150,9 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
 
         private static List<SupportedDevice> Devices { get; set; } = new List<SupportedDevice>()
         {
+            // Aranet sensors
+            new SupportedDevice("Aranet4 *", typeof(BTCommon_EnvironmentalControl)), // Temperture/Humidity/CO2
+
             // Govee Environmental Thermometer devices
             new SupportedDevice("Govee_H5074_*", typeof(BTCommon_EnvironmentalControl)),
             new SupportedDevice("GVH5075_*", typeof(BTCommon_EnvironmentalControl)),
@@ -152,13 +191,14 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             //new SupportedDevice("iP900BP", typeof(BTCommon_HealthControl)), // Innovo iP900BP-P pulse oximeter (ChoiceMMed)
             //new SupportedDevice("500E-B", typeof(BTCommon_HealthControl)), // ZacVRate pulse oximeter (ChoiceMMed)
 
-            // Bike Cycle Cadence and Speed
+            // BT Standard devices like Bike Cycle Cadence and Speed + HeartRate
             //new SupportedDevice("BK6*", typeof(BTTAOPE_CyclingSpeedCadenceControl)),
             SupportedDevice.MakeFromGuid("00001816-0000-1000-8000-00805F9B34FB", typeof(BTStandard_CyclingSpeedCadenceControl)),
             SupportedDevice.MakeFromGuid("0000180d-0000-1000-8000-00805F9B34FB", typeof(BTStandard_HeartRateControl)),
 
             SupportedDevice.MakeFromEddystone("https://ruu.vi/*", typeof(BTCommon_EnvironmentalControl)),
             SupportedDevice.MakeFromManufacturerId(1177, typeof(BTCommon_EnvironmentalControl)), // 1177=0x499 Ruuvi Innovations Ltd.
+            SupportedDevice.MakeFromManufacturerIdAndServiceData16bit((int)0x0969, 0xFD3D, typeof(BTCommon_EnvironmentalControl)), // SwitchBot has no name!
 
             // Multimeters and test equipment
             new SupportedDevice("Bluetooth DMM", typeof(BTBdm_Aneng_MultimeterControl)), // Aneng Bluetooth DMM 2026
@@ -166,7 +206,7 @@ namespace BluetoothWinUI3.BluetoothWinUI3Registration
             new SupportedDevice("PokitPro", typeof(BTBdm_Aneng_MultimeterControl)), // PokitPro has a sensible protocol!
             new SupportedDevice("Pokit", typeof(BTBdm_Aneng_MultimeterControl)), // Pokit has a sensible protocol like the PokitPro
 
-            new SupportedDevice("WT901", typeof(BTWit_CompassBle5Control)), // Aneng Bluetooth DMM 2026
+            new SupportedDevice("WT901", typeof(BTWit_CompassBle5Control)), // WIT compass / inclinometer
         };
         public static SupportedDevice GetSupported(BluetoothWatcher.AdvertismentWatcher.WatcherData advertisement)
         {

@@ -40,8 +40,6 @@ namespace BluetoothProtocols
         /// <summary>
         /// ParseScanResponseServiceData the URL that RuuviTags produce
         /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
         public static Ruuvi_Communication ParseRuuviTag(string url)
         {
             bool success = false;

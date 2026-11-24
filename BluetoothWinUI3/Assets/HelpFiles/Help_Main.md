@@ -11,10 +11,12 @@ Supported devices include
 * Bike sensors: Bluetooth standard bike cadence and speed sensors
 * Environment Sensors
 
-  o [Nordic Thingy:52](./Device_Nordic_Thingy.md)  
+  o Aranet Aranet4
   o Govee H5074 H5075 H5103 H5106 H5171 H5179  
+  o [Nordic Thingy:52](./Device_Nordic_Thingy.md)  
   o Ruuvi Air and other sensors  
-  o SensorPro T201  
+  o SensorPro T201 
+  O
   o ThermPro TP351 TP357 TP359  
   o TI SensorTag 2541 1350 1352
 * Heart Rate bands: Bluetooth standard heart rate bands

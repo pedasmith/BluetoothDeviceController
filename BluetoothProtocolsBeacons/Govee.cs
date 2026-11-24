@@ -1,8 +1,6 @@
 ﻿using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3;
 using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel.Design;
 using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
@@ -22,8 +20,8 @@ namespace BluetoothProtocols
         /// from the Bluetooth SIG. See the BluetoothCompanyIdentifier for details.
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
-        public UInt16 CompanyId { get; set; } // will by 0xEC88=60552 for the Govee H5074 H5075
-        public enum SensorType { Other, H5074, H5075, H5103, H5106, H5171, H5179, NotThisSensorFamily };
+        public UInt16 CompanyId { get; set; } // will be 0xEC88=60552 for the Govee H5074 H5075
+        public enum SensorType { NotThisSensorFamily, Other, H5074, H5075, H5103, H5106, H5171, H5179};
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -71,8 +69,6 @@ namespace BluetoothProtocols
         /// Returns true if the local name OR the original name matches Govee_H5074_ or GVH5075_
         /// All of these parsers happen to have an AdvertIsSensorFamily :-)
         /// </summary>
-        /// <param name="wrapper"></param>
-        /// <returns></returns>
         public static SensorType AdvertIsSensorFamily(WatcherData wrapper)
         {
             var retval = NameToSensorType(wrapper.BestName);
@@ -180,9 +176,6 @@ namespace BluetoothProtocols
         /// Will parse a Govee sensor. Must be given the sensor type which is from AdvertIsGovee (parsing depends on 
         /// the type)
         /// </summary>
-        /// <param name="sensorType"></param>
-        /// <param name="section"></param>
-        /// <returns></returns>
         public static Govee Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section, Govee source)
         {
             var retval = source ?? new Govee();

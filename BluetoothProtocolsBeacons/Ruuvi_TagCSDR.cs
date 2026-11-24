@@ -1,8 +1,6 @@
 ﻿using BluetoothWatcher.AdvertismentWatcher;
 using BluetoothWinUI3;
 using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel.Design;
 using Utilities;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
@@ -25,9 +23,9 @@ namespace BluetoothProtocols
         /// from the Bluetooth SIG. See the BluetoothCompanyIdentifier for details.
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
-        public UInt16 CompanyId { get; set; } // will by 0x0499==1177 for standard Ruuvi tags
+        public UInt16 CompanyId { get; set; } // will be 0x0499==1177 for standard Ruuvi tags
         // RuuviTag2021 is the sensor marked "RuuviTag" but which uses the Type 5 data
-        public enum SensorType { Other, OriginalEddystone, RuuviTag2021, Air, NotThisSensorFamily };
+        public enum SensorType { NotThisSensorFamily, Other, OriginalEddystone, RuuviTag2021, Air };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 

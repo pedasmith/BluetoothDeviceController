@@ -23,8 +23,8 @@ namespace BluetoothProtocols
         /// from the Bluetooth SIG. See the BluetoothCompanyIdentifier for details.
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
-        public UInt16 CompanyId { get; set; } // will by 0xEC88=60552 for the Govee H5074 H5075
-        public enum SensorType { Other, T201, NotThisSensorFamily };
+        public UInt16 CompanyId { get; set; } // will be 0xEC88=60552 for the Govee H5074 H5075
+        public enum SensorType { NotThisSensorFamily, Other, T201 };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -73,8 +73,6 @@ namespace BluetoothProtocols
         /// Returns true if the local name OR the original name matches Govee_H5074_ or GVH5075_
         /// All of these parsers happen to have an AdvertIsSensorFamily :-)
         /// </summary>
-        /// <param name="wrapper"></param>
-        /// <returns></returns>
         public static SensorType AdvertIsSensorFamily(WatcherData wrapper)
         {
             var retval = NameToSensorType(wrapper.BestName);
@@ -130,9 +128,6 @@ namespace BluetoothProtocols
         /// Will parse a SensorPro sensor. Must be given the sensor type which is from AdvertIsThermPro (parsing depends on 
         /// the type)
         /// </summary>
-        /// <param name="sensorType"></param>
-        /// <param name="section"></param>
-        /// <returns></returns>
         public static SensorPro Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section, SensorPro source)
         {
             var retval = source ?? new SensorPro();

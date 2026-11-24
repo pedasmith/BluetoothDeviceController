@@ -11,8 +11,6 @@ namespace BluetoothProtocols
         /// <summary>
         /// Converts a bluetooth address provided as a long into a useful string
         /// </summary>
-        /// <param name="address"></param>
-        /// <returns></returns>
         public static string AsString(ulong address)
         {
             var b5 = (byte)((address >> 40) & 0xFF);

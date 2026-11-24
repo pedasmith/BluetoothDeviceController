@@ -21,7 +21,7 @@ namespace BluetoothProtocols
     public class Ruuvi_Tag
     {
         public bool IsValid { get; set; } = true;
-        public UInt16 CompanyId { get; set; } // will by 0x0499==1177 for standard Ruuvi tags
+        public UInt16 CompanyId { get; set; } // will be 0x0499==1177 for standard Ruuvi tags
         public byte TagType { get; set; } // 5==standard data tag
         public double TemperatureInDegreesC { get; set; }
         public int PressureInPascals { get; set; }

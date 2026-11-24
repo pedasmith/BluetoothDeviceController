@@ -7,7 +7,6 @@ using BluetoothWinUI3.Units;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Shapes;
 using OxyPlot;
 using OxyPlot.Axes;
 using System;
@@ -108,7 +107,7 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// Current sensor data from the Device. For the demo, it's battery level.
     /// </summary>
     DeviceSpecificSensorData CurrSensor_Data = null;
-    enum SensorFamily { Unknown, Govee, Ruuvi_TagCSDR, SensorPro, ThermPro };
+    enum SensorFamily { Unknown, Aranet, Govee, Ruuvi_TagCSDR, SensorPro, SwitchBot, ThermPro };
     SensorFamily CurrSensorFamily = SensorFamily.Unknown;
 
     /// <summary>
@@ -121,9 +120,11 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
     /// <summary>
     /// There are multiple sensors that this one control can handle. They are all initialized to 'NotThisSensorFamily'
     /// </summary>
+    Aranet.SensorType AranetSensorType = Aranet.SensorType.NotThisSensorFamily;
     Govee.SensorType GoveeSensorType = Govee.SensorType.NotThisSensorFamily;
     Ruuvi_TagCSDR.SensorType Ruuvi_TagCSDRSensorType = Ruuvi_TagCSDR.SensorType.NotThisSensorFamily;
     SensorPro.SensorType SensorProSensorType = SensorPro.SensorType.NotThisSensorFamily;
+    SwitchBot.SensorType SwitchBotSensorType = SwitchBot.SensorType.NotThisSensorFamily;
     ThermPro.SensorType ThermProSensorType = ThermPro.SensorType.NotThisSensorFamily;
     #endregion
 
@@ -397,6 +398,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
 
         // Initialize data values. Somewhat ugly code :-(
+        AranetSensorType = Aranet.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
+        if (AranetSensorType != Aranet.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.Aranet;
+
         GoveeSensorType = Govee.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
         if (GoveeSensorType != Govee.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.Govee;
 
@@ -405,6 +409,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         SensorProSensorType = SensorPro.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
         if (SensorProSensorType != SensorPro.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.SensorPro;
+
+        SwitchBotSensorType = SwitchBot.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
+        if (SwitchBotSensorType != SwitchBot.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.SwitchBot;
 
         ThermProSensorType = ThermPro.AdvertIsSensorFamily(DataContextAsKnownDevice.Advertisement);
         if (ThermProSensorType != ThermPro.SensorType.NotThisSensorFamily) CurrSensorFamily = SensorFamily.ThermPro;
@@ -698,6 +705,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
 
         switch (CurrSensorFamily)
         {
+            case SensorFamily.Aranet:
+                CurrSensor_Data = Aranet.Parse(AranetSensorType, data, CurrSensor_Data as Aranet);
+                break;
             case SensorFamily.Govee:
                 CurrSensor_Data = Govee.Parse(GoveeSensorType, data, CurrSensor_Data as Govee);
                 break;
@@ -706,6 +716,9 @@ public sealed partial class BTCommon_EnvironmentalControl : UserControl, IDevice
                 break;
             case SensorFamily.SensorPro:
                 CurrSensor_Data = SensorPro.Parse(SensorProSensorType, data, CurrSensor_Data as SensorPro);
+                break;
+            case SensorFamily.SwitchBot:
+                CurrSensor_Data = SwitchBot.Parse(SwitchBotSensorType, data, CurrSensor_Data as SwitchBot);
                 break;
             case SensorFamily.ThermPro:
                 CurrSensor_Data = ThermPro.Parse(ThermProSensorType, data, CurrSensor_Data as ThermPro);

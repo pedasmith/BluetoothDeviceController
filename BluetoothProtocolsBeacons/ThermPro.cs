@@ -24,7 +24,7 @@ namespace BluetoothProtocols
         /// https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml
         /// </summary>
         public UInt16 CompanyId { get; set; } 
-        public enum SensorType { Other, TP351, TP357, TP359, NotThisSensorFamily };
+        public enum SensorType { NotThisSensorFamily, Other, TP351, TP357, TP359 };
         public SensorType TagType { get; set; } = SensorType.Other;
         public double TemperatureInDegreesF { get { return (Temperature * 9.0 / 5.0) + 32.0; } }
 
@@ -130,9 +130,6 @@ namespace BluetoothProtocols
         /// Will parse a ThermPro sensor. Must be given the sensor type which is from AdvertIsThermPro (parsing depends on 
         /// the type)
         /// </summary>
-        /// <param name="sensorType"></param>
-        /// <param name="section"></param>
-        /// <returns></returns>
         public static ThermPro Parse(SensorType sensorType, BluetoothLEAdvertisementDataSection section, ThermPro source)
         {
             var retval = source ?? new ThermPro();

@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Apple_IBeacon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Aranet.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothAddress.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BufferList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Eddystone.cs" />
@@ -23,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SensorDataRecord.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SensorDataRecordCopyable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SensorPro.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Switchbot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ThermPro.cs" />
   </ItemGroup>
 </Project>
