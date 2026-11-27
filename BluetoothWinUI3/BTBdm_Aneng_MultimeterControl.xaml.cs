@@ -1419,6 +1419,9 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
                 if (tag == rangeStr) uidDsoRangeAmps.SelectedItem = item;
             }
         }
+        // Might be neither, in which case do neither.
+        if (isVolt) uidDsoTriggerLevelLabel.Text = "Volts";
+        if (isAmp) uidDsoTriggerLevelLabel.Text = "Amps";
 
         uidDsoTriggerLevel.Value = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting;
 
@@ -1725,17 +1728,21 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
     {
         uidDsoRangeVolts.Visibility = Visibility.Visible;
         uidDsoRangeAmps.Visibility = Visibility.Collapsed;
+        uidDsoTriggerLevelLabel.Text = "Volts";
     }
 
     private void OnDsoPickedAmps(object sender, RoutedEventArgs e)
     {
         uidDsoRangeVolts.Visibility = Visibility.Collapsed;
         uidDsoRangeAmps.Visibility = Visibility.Visible;
+        uidDsoTriggerLevelLabel.Text = "Amps";
     }
     private void OnDsoPickedNeither(object sender, RoutedEventArgs e)
     {
         uidDsoRangeVolts.Visibility = Visibility.Collapsed;
         uidDsoRangeAmps.Visibility = Visibility.Collapsed;
+        // no change to uidDsoTriggerLevelLabel.Text = "Amps";
+
     }
 
     private async void OnPokitRepeatCommand(object sender, RoutedEventArgs e)

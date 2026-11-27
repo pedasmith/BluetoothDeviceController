@@ -319,8 +319,14 @@
     <Style x:Key="sDeviceListDataCompressedPrimaryNS" TargetType="TextBlock" BasedOn="{StaticResource sDeviceListDataCompressedPrimary}">
         <Setter Property="IsTextSelectionEnabled" Value="False" />
     </Style>
+    <Style x:Key="sSettingsPopupLabel" TargetType="TextBlock" BasedOn="{StaticResource sAllFonts}">
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
 
-    
+
     <Style x:Key="sGraphLineKey" TargetType="Line">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="X1" Value="0" />

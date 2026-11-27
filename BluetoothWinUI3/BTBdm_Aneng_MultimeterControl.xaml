@@ -168,7 +168,20 @@
                 <Border 
                     Margin="5" Padding="15"
                     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
-                    BorderBrush="Black" BorderThickness="1">
+                    BorderBrush="Black" BorderThickness="1"
+                    >
+                    <Border.Resources>
+                        <!-- i want all the text include button labels etc to be the same color. -->
+                        <Style TargetType="Button">
+                            <Setter Property="Foreground" Value="{ThemeResource sAllFonts_Foreground}" />
+                        </Style>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="Foreground" Value="{ThemeResource sAllFonts_Foreground}" />
+                        </Style>
+                        <Style TargetType="ToggleSwitch">
+                            <Setter Property="Foreground" Value="{ThemeResource sAllFonts_Foreground}" />
+                        </Style>
+                    </Border.Resources>
                     <Grid >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" />
@@ -276,14 +289,14 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
-                            
-                            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Sleep</TextBlock>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource sSettingsPopupLabel}">Sleep</TextBlock>
                             <RadioButton Grid.Row="0" Grid.Column="1" Tag="0" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoMode" Checked="OnDsoPickedNeither">
                                 <local:IconLabelControl Icon="💤" Label="Idle"/>
                             </RadioButton>
                             <Rectangle Grid.Row="1" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Measure</TextBlock>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource sSettingsPopupLabel}" >Measure</TextBlock>
                             <RadioButton Grid.Row="2" Grid.Column="1" Tag="1" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoMode" Checked="OnDsoPickedVolts" >
                                 <local:IconLabelControl Icon="⎓" Label="Volts DC"/>
                             </RadioButton>
@@ -300,7 +313,7 @@
                             <Rectangle Grid.Row="4" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
 
 
-                            <TextBlock Grid.Row="5" Grid.Column="0" VerticalAlignment="Center">Trigger</TextBlock>
+                            <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource sSettingsPopupLabel}">Trigger</TextBlock>
                             <RadioButton Grid.Row="5" Grid.Column="1" Tag="0" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoTrigger">
                                 <local:IconLabelControl Icon="" Label="Single"/>
                             </RadioButton>
@@ -310,12 +323,13 @@
                             <RadioButton Grid.Row="6" Grid.Column="2" Tag="2" Style="{StaticResource ModeTileRadioStyle}" GroupName="dsoTrigger">
                                 <local:IconLabelControl Icon="🬿" Label="Fall"/>
                             </RadioButton>
-                            <StackPanel Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" >
+                            <StackPanel Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="1" HorizontalAlignment="Stretch" >
                                 <NumberBox Text="3.0" x:Name="uidDsoTriggerLevel" />
                             </StackPanel>
+                            <TextBlock Grid.Row="7" Grid.Column="2" Text="Volts" x:Name="uidDsoTriggerLevelLabel" Style="{StaticResource sSettingsPopupLabel}" Margin="5,0,0,0" />
                             <Rectangle Grid.Row="8" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
 
-                            <TextBlock Grid.Row="9" Grid.Column="0" VerticalAlignment="Center">Range</TextBlock>
+                            <TextBlock Grid.Row="9" Grid.Column="0" Style="{StaticResource sSettingsPopupLabel}">Range</TextBlock>
                             <ComboBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1" x:Name="uidDsoRangeVolts" MinWidth="120">
                                 <ComboBoxItem Content="300 mV" Tag="0" />
                                 <ComboBoxItem Content=" 2 V" Tag="1" />
