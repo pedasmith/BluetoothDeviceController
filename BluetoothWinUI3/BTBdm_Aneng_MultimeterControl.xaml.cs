@@ -16,12 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis; // Required for the DynamicallyAccessedMembers attribute needed for trimming to not fail.
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Utilities;
 using UtilitiesWinUI3;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Security.Cryptography.Core;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -649,6 +647,9 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
         DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingD ?? "", 0); // 0=free
         DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingE ?? "", 0); // in volts/amps
         DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingF ?? "", 4); // largest range usable by both volts and amps
+
+        var time = ParseDouble(CurrSaveData?.Preferences?.DeviceSettingG ?? "", 10_000); // DsoSamplingWindowSetting which is time in microseconds
+        DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting = time;
     }
 
     private double ParseDouble(string rawSetting, double defaultValue)
@@ -1421,6 +1422,24 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
 
         uidDsoTriggerLevel.Value = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting;
 
+        // Set the uidDsoRangeTimeinMilliseconds ComboBox from DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting via DeviceSettingG
+        var timeInMilliseconds = DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting / 1000.0; // DsoSamplingWindowSetting is in microseconds
+        foreach (var child in uidDsoRangeTimeinMilliseconds.Items)
+        {
+            var fe = child as FrameworkElement;
+            if (fe == null) continue; // can never happen.
+            double tag;
+            var tagOk = double.TryParse(fe.Tag as string ?? "99_999_999", out tag);
+            if (!tagOk) continue; // can never happen
+            if (tag >= timeInMilliseconds)
+            {
+                // Found the closest match. This will always be an exact equals unless previously
+                // usable values are removed from the combobox.
+                uidDsoRangeTimeinMilliseconds.SelectedItem = child;
+                break;
+            }
+        }
+
     }
 
     /// <summary>
@@ -1555,15 +1574,19 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
 
             nSamples = (ushort)bufferSize; // (UInt16)(bufferSize / READING_SPARSITY); // Max number of samples
             //nSamples = Math.Min(nSamples, (ushort)(bufferSize - 1000)); // NOTE: must reduce the amount, otherwise it doesn't work.
-            UInt32 samplingWindowInMicroseconds = 16000; //  nSamples * timePerSampleInMicroseconds; // total time
-            UInt32 timePerSampleInMicroseconds = samplingWindowInMicroseconds / nSamples;
+            UInt32 samplingWindowDouble = 16000; //  nSamples * timePerSampleInMicroseconds; // total time
+            string samplingWindowInMilliseconds = (uidDsoRangeTimeinMilliseconds.SelectedItem as FrameworkElement)?.Tag as string ?? "10";
+            var samplingOk = UInt32.TryParse(samplingWindowInMilliseconds, out samplingWindowDouble);
+            samplingWindowDouble = samplingOk ? samplingWindowDouble * 1000 : 16000; // The samplingOk is will always be true
+
+            UInt32 timePerSampleInMicroseconds = samplingWindowDouble / nSamples;
 
             DSO_RawData = new double[nSamples];
 
             DSO_NReadingsExpected = nSamples; // will be updated by the metadata
             DsoReadingDeltaInTicks = timePerSampleInMicroseconds * 10;  // This is the requested amount; we'll get the actual amount from the Metadata
 
-            DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting = samplingWindowInMicroseconds; // value in microseconds
+            DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting = samplingWindowDouble; // value in microseconds
             DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting = nSamples; 
 
             Log($"DSO Settings: Setting samplingWindow={DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting} microSeconds NSamples={DevicePokit.CurrDSO_Oscilloscope_Data.DsoNSamplesSetting}");
@@ -1577,6 +1600,7 @@ public sealed partial class BTBdm_Aneng_MultimeterControl : UserControl, IDevice
             CurrSaveData.Preferences.DeviceSettingD = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerTypeSetting.ToString();
             CurrSaveData.Preferences.DeviceSettingE = DevicePokit.CurrDSO_Oscilloscope_Data.DsoTriggerLevelSetting.ToString();
             CurrSaveData.Preferences.DeviceSettingF = DevicePokit.CurrDSO_Oscilloscope_Data.DsoRangeSetting.ToString();
+            CurrSaveData.Preferences.DeviceSettingG = DevicePokit.CurrDSO_Oscilloscope_Data.DsoSamplingWindowSetting.ToString();
 
             // Repeat is only valid in in oscilloscope mode "dso" and not multimeter mode "mm"
             uiPokitAgain.Visibility = Visibility.Visible;

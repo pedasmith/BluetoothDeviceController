@@ -316,7 +316,7 @@
                             <Rectangle Grid.Row="8" Grid.ColumnSpan="5" Style="{StaticResource ModeTileSeparator}" />
 
                             <TextBlock Grid.Row="9" Grid.Column="0" VerticalAlignment="Center">Range</TextBlock>
-                            <ComboBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2" x:Name="uidDsoRangeVolts" MinWidth="120">
+                            <ComboBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1" x:Name="uidDsoRangeVolts" MinWidth="120">
                                 <ComboBoxItem Content="300 mV" Tag="0" />
                                 <ComboBoxItem Content=" 2 V" Tag="1" />
                                 <ComboBoxItem Content=" 6 V" Tag="2" />
@@ -324,12 +324,21 @@
                                 <ComboBoxItem Content="30 V" Tag="4" />
                                 <ComboBoxItem Content="60 V" Tag="5" />
                             </ComboBox>
-                            <ComboBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2" x:Name="uidDsoRangeAmps" Visibility="Collapsed" MinWidth="120">
+                            <ComboBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1" x:Name="uidDsoRangeAmps" Visibility="Collapsed" MinWidth="120">
                                 <ComboBoxItem Content=" 10 mA" Tag="0" />
                                 <ComboBoxItem Content=" 30 mA" Tag="1" />
                                 <ComboBoxItem Content="150 mA" Tag="2" />
                                 <ComboBoxItem Content="300 mA" Tag="3" />
                                 <ComboBoxItem Content="  3 A" Tag="4" />
+                            </ComboBox>
+                            <ComboBox Grid.Row="9" Grid.Column="2" x:Name="uidDsoRangeTimeinMilliseconds" SelectedIndex="0" Visibility="Visible">
+                                <!-- 5 is the smallest a Pokit Pro can do -->
+                                <ComboBoxItem Content="  5 ms" Tag="5" />
+                                <ComboBoxItem Content=" 10 ms" Tag="10" />
+                                <ComboBoxItem Content="100 ms" Tag="100" />
+                                <ComboBoxItem Content="200 ms" Tag="200" />
+                                <ComboBoxItem Content="500 ms" Tag="500" />
+                                <ComboBoxItem Content="1 s" Tag="1000" />
                             </ComboBox>
                             <!-- Sparcity of 4 is the sweet spot: it doesn't drop data like smaller values and it's pretty fast.  -->
                             <!--

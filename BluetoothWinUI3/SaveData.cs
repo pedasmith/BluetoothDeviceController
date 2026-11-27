@@ -37,12 +37,13 @@ namespace BluetoothWinUI3
                 string filePath = Path.Combine(folderPath, "AllDeviceData.devices");
 
                 var json = System.Text.Json.JsonSerializer.Serialize(AllDevices, typeof(List<SaveData>), JsonOptions); //  SaveDataContext.Default);  //<List<SaveData>>((AllDevices, options);
-                json = json.Replace(",\r\n      \"LastModeA\": \"\"", "");
-                json = json.Replace(",\r\n      \"LastModeB\": \"\"", "");
-                json = json.Replace(",\r\n      \"LastModeC\": \"\"", "");
-                json = json.Replace(",\r\n      \"LastModeD\": \"\"", "");
-                json = json.Replace(",\r\n      \"LastModeE\": \"\"", "");
-                json = json.Replace(",\r\n      \"LastModeF\": \"\"", "");
+                json = json.Replace(",\r\n      \"DeviceSettingA\": \"\"", "");
+                json = json.Replace(",\r\n      \"DeviceSettingB\": \"\"", "");
+                json = json.Replace(",\r\n      \"DeviceSettingC\": \"\"", "");
+                json = json.Replace(",\r\n      \"DeviceSettingD\": \"\"", "");
+                json = json.Replace(",\r\n      \"DeviceSettingE\": \"\"", "");
+                json = json.Replace(",\r\n      \"DeviceSettingF\": \"\"", "");
+                json = json.Replace(",\r\n      \"DeviceSettingG\": \"\"", "");
                 File.WriteAllText(filePath, json);
 
                 Log($"Saved configuration to {filePath}{suffixForLogging}");
@@ -610,6 +611,11 @@ namespace BluetoothWinUI3
         /// Used by, e.g., Pokit meters for the last dsoRange. 
         /// </summary>
         public string DeviceSettingF { get; set; } = "";
+
+        /// <summary>
+        /// Used by, e.g., Pokit meters for the last dsoRangeTimeInMilliseconds
+        /// </summary>
+        public string DeviceSettingG { get; set; } = "";
 
     }
 

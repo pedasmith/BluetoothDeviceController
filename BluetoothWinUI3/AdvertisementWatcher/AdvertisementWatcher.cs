@@ -269,6 +269,8 @@ namespace BluetoothWatcher.AdvertismentWatcher
                 || watcherData.ManufacturerType == BluetoothCompanyIdentifier.CommonManufacturerType.Apple10
                 || watcherData.CompanyId == 0x4C // Apple is 76 (dec) = 0x4C
                 || name.StartsWith("name=LEDBlue") // TODO: it spits out a lot of advertisements!
+                || watcherData.CompanyId == 1447 // Sonos is 1447
+                || watcherData.CompanyId == 6 // Microsoft is 6
                 ;
             if (!ignoreForPrinting)
             {
